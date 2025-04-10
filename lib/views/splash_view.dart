@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
@@ -20,7 +21,6 @@ import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:medito/exceptions/app_error.dart';
 
 const _carouselHeight = 200.0;
 const _dotSize = 8.0;
@@ -74,11 +74,7 @@ class SplashViewState extends ConsumerState<SplashView>
             '[SPLASH] Current user before resume check: ${auth.currentUser}',
             level: 1000);
 
-        var prefs = await SharedPreferences.getInstance();
-        var isLoggedIn =
-            prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
-
-        if (isLoggedIn) {
+        if (await auth.isLoggedIn()) {
           dev.log('[SPLASH] Checking auth status on resume');
           // getToken will only refresh if the current token is expired
           try {
@@ -91,6 +87,7 @@ class SplashViewState extends ConsumerState<SplashView>
           } catch (e) {
             dev.log('[SPLASH] Token refresh failed on resume',
                 error: e, level: 1000);
+            // Auth repository handles whether to force logout or not for different error types
           }
         }
       } else {
@@ -138,9 +135,7 @@ class SplashViewState extends ConsumerState<SplashView>
           level: 1000);
 
       final currentUser = auth.currentUser;
-      final isLoggedIn = await SharedPreferences.getInstance().then((prefs) =>
-          prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false);
-
+      final isLoggedIn = await auth.isLoggedIn();
       dev.log(
           '[SPLASH] Auth state: ${isLoggedIn ? 'logged in' : 'not logged in'}, has email: ${currentUser?.email != null}',
           level: 1000);

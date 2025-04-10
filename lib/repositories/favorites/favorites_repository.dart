@@ -6,7 +6,6 @@ import 'package:medito/providers/shared_preference/shared_preference_provider.da
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

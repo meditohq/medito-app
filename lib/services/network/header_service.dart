@@ -1,6 +1,5 @@
 import '../../utils/logger.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/services/network/http_api_service.dart';
 

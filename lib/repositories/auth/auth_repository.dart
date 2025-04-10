@@ -44,6 +44,7 @@ abstract class AuthRepository {
   Future<void> signInAnonymously();
   void resetAuthState();
   Future<void> migrateEmailToStorage();
+  Future<bool> isLoggedIn();
 }
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -198,14 +199,75 @@ class AuthRepositoryImpl extends AuthRepository {
         var storedEmail = await _secureStorage.getUserEmail();
         dev.log('[AUTH_REPO] Retrieved stored email: $storedEmail', level: 800);
 
-        _tokens = await _authService.refreshToken(refreshToken);
+        // Attempt to refresh token with exponential backoff
+        int retryCount = 0;
+        const maxRetries = 3;
+        bool refreshSuccess = false;
+
+        while (!refreshSuccess && retryCount < maxRetries) {
+          try {
+            dev.log(
+                '[AUTH_REPO] Token refresh attempt ${retryCount + 1}/$maxRetries',
+                level: 800);
+
+            // Add a delay between retries (except for the first attempt)
+            if (retryCount > 0) {
+              var delay = Duration(
+                  milliseconds: 500 * (1 << retryCount)); // Exponential backoff
+              dev.log(
+                  '[AUTH_REPO] Waiting ${delay.inMilliseconds}ms before retry',
+                  level: 800);
+              await Future.delayed(delay);
+            }
+
+            _tokens = await _authService.refreshToken(refreshToken);
+            refreshSuccess = true;
+
+            dev.log(
+                '[AUTH_REPO] Token refresh successful on attempt ${retryCount + 1}',
+                level: 800);
+          } on NoInternetError catch (e) {
+            dev.log(
+                '[AUTH_REPO] No internet during token refresh attempt ${retryCount + 1}',
+                error: e,
+                level: 800);
+            retryCount++;
+            if (retryCount >= maxRetries) rethrow;
+          } on TimeoutError catch (e) {
+            dev.log(
+                '[AUTH_REPO] Timeout during token refresh attempt ${retryCount + 1}',
+                error: e,
+                level: 800);
+            retryCount++;
+            if (retryCount >= maxRetries) rethrow;
+          } on ServerError catch (e) {
+            dev.log(
+                '[AUTH_REPO] Server error during token refresh attempt ${retryCount + 1}',
+                error: e,
+                level: 800);
+            retryCount++;
+            if (retryCount >= maxRetries) rethrow;
+          } on RefreshTokenError catch (e) {
+            dev.log('[AUTH_REPO] Refresh token invalid/expired',
+                error: e, level: 800);
+            // Don't retry for invalid refresh token
+            rethrow;
+          } catch (e) {
+            dev.log(
+                '[AUTH_REPO] Unexpected error during token refresh attempt ${retryCount + 1}',
+                error: e,
+                level: 800);
+            retryCount++;
+            if (retryCount >= maxRetries) rethrow;
+          }
+        }
 
         dev.log(
             '[AUTH_REPO] After refresh - Email: ${_tokens?.email}, ClientId: ${_tokens?.clientId}',
             level: 800);
 
         // If for some reason email is lost in the new tokens, try to preserve it
-        if (_tokens?.email == null) {
+        if (_tokens?.email == null || _tokens!.email!.isEmpty) {
           // Try using old email first
           if (oldEmail != null && oldEmail.isNotEmpty) {
             dev.log(
@@ -254,6 +316,29 @@ class AuthRepositoryImpl extends AuthRepository {
 
         _httpApiService.setAuthHeader(_tokens!.accessToken);
         return _tokens!.accessToken;
+      } on NoInternetError catch (e) {
+        dev.log('[AUTH_REPO] Network error refreshing token',
+            error: e, level: 800);
+        // For network errors, just propagate the error without clearing auth state
+        // This allows retry when connectivity is restored
+        rethrow;
+      } on TimeoutError catch (e) {
+        dev.log('[AUTH_REPO] Timeout refreshing token', error: e, level: 800);
+        // For timeouts, just propagate the error without clearing auth state
+        // This allows retry when connectivity is better
+        rethrow;
+      } on ServerError catch (e) {
+        dev.log('[AUTH_REPO] Server error refreshing token',
+            error: e, level: 800);
+        // For server errors, just propagate the error without clearing auth state
+        // This allows retry when server is back up
+        rethrow;
+      } on RefreshTokenError catch (e) {
+        dev.log('[AUTH_REPO] Refresh token error, clearing auth state',
+            error: e, level: 800);
+        // For permanent refresh token errors, clear auth state
+        await _resetAuth();
+        rethrow;
       } catch (e) {
         dev.log('[AUTH_REPO] Error refreshing token', error: e, level: 800);
         // Let higher level code handle this error
@@ -583,6 +668,11 @@ class AuthRepositoryImpl extends AuthRepository {
       dev.log('[AUTH_REPO] No email found to migrate, user may be anonymous',
           level: 500);
     }
+  }
+
+  @override
+  Future<bool> isLoggedIn() async {
+    return _preferences.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
   }
 }
 

@@ -25,7 +25,6 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/services/network/http_api_service.dart';
 // ignore: depend_on_referenced_packages
 import 'package:device_preview/device_preview.dart';
@@ -303,11 +302,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       final authRepository = ref.read(authRepositorySyncProvider);
       // The repository's getToken method will only refresh if token is expired
       if (authRepository.currentUser != null) {
-        final prefs = await SharedPreferences.getInstance();
-        final isLoggedIn =
-            prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
-
-        if (isLoggedIn) {
+        if (await authRepository.isLoggedIn()) {
           AppLogger.d('AUTH', 'Checking auth token after app foregrounded');
           await authRepository.getToken();
         }

@@ -1,5 +1,4 @@
 import '../../utils/logger.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/services/network/http_api_service.dart';

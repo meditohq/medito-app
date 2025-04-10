@@ -631,6 +631,6 @@ class StringConstants {
   static const emailExistsDialogTitle = 'Existing Account Found';
   static const emailExistsDialogMessage =
       'Looks like you have signed in with an email address before. Would you like to sign in with your email address again?';
-  static const emailExistsContinueNewAccount = 'Continue with New Account';
+  static const emailExistsContinueNewAccount = 'Continue';
   static const emailExistsSignInWithEmail = 'Sign in with Email';
 }

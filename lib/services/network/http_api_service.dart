@@ -29,6 +29,10 @@ class HttpApiService {
   static var _instanceCount = 0;
   final _instanceId = ++_instanceCount;
 
+  // Add a lock to prevent concurrent token refresh attempts
+  bool _isRefreshingToken = false;
+  Completer<void> _refreshTokenCompleter = Completer<void>();
+
   // List of callbacks to notify on auth events
   final List<AuthStateCallback> _authCallbacks = [];
 
@@ -42,6 +46,7 @@ class HttpApiService {
     dev.log('[HTTP] Creating new HttpApiService instance #$_instanceId');
     _client.connectionTimeout = kTimeoutDuration;
     _initializeHeaders();
+    _refreshTokenCompleter.complete(); // Initialize as completed
   }
 
   // Register for auth events
@@ -157,11 +162,6 @@ class HttpApiService {
     dynamic body,
   }) async {
     try {
-      dev.log('[HTTP] Starting request on instance #$_instanceId', error: {
-        'has_auth': _headers.containsKey(kAuthorizationHeader),
-        'auth_header': _headers[kAuthorizationHeader]?.substring(0, 20),
-        'all_headers': _headers.toString(),
-      });
 
       final request = await requestBuilder();
       _headers.forEach(request.headers.set);
@@ -243,7 +243,6 @@ class HttpApiService {
       dev.log('Max retries reached - forcing logout');
       await _addHttpDebugLog(
           'Max retries ($maxBackgroundRetries) reached - forcing logout');
-      await _forceLogout('Max token refresh retries reached');
       throw const UnauthorizedError();
     }
 
@@ -303,6 +302,11 @@ class HttpApiService {
       _retryCount = 0;
       await _addHttpDebugLog('Request successful after token refresh');
       return content.isEmpty ? {} : _parseResponseContent(content);
+    } on NoInternetError {
+      // Don't log out on connection issues - let the user retry when connection is available
+      dev.log('[HTTP] No internet connection during token refresh');
+      await _addHttpDebugLog('No internet connection during token refresh');
+      rethrow;
     } catch (e) {
       dev.log('Token refresh failed', error: e);
 
@@ -323,7 +327,7 @@ class HttpApiService {
       } else if (e is UnauthorizedError &&
           _retryCount >= maxBackgroundRetries) {
         dev.log('[HTTP] Too many failed attempts - forcing logout');
-        await _addHttpDebugLog('Too many failed attempts (${_retryCount})');
+        await _addHttpDebugLog('Too many failed attempts ($_retryCount)');
         await _forceLogout('Too many token refresh failures');
       } else {
         dev.log(
@@ -449,71 +453,102 @@ class HttpApiService {
 
   // Helper method to refresh token through auth service
   Future<void> _refreshTokenThroughAuthService() async {
-    // We cannot directly access the repository from here without making major changes
-    // so we'll use the AuthService's refreshToken method directly
-    dev.log(
-        '[HTTP] Starting token refresh through auth service, instance #$_instanceId');
-    await _addHttpDebugLog('Beginning token refresh through auth service');
-
-    // Run diagnostic to track what's happening
-    try {
-      await diagnoseSecurity();
-    } catch (e) {
-      dev.log('[HTTP] Failed to run diagnostics', error: e);
+    // Wait if a refresh is already in progress
+    if (_isRefreshingToken) {
+      dev.log(
+          '[HTTP] Token refresh already in progress, waiting for completion');
+      await _addHttpDebugLog(
+          'Token refresh already in progress, waiting for results');
+      try {
+        await _refreshTokenCompleter.future;
+        dev.log('[HTTP] Using result of already in-progress token refresh');
+        return;
+      } catch (e) {
+        dev.log(
+            '[HTTP] Previous token refresh failed, will attempt new refresh',
+            error: e);
+        // Previous refresh failed, we'll try again
+      }
     }
 
-    // First check if user is already logged out
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final isLoggedIn =
-          prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+    // Set up a new refresh operation
+    _isRefreshingToken = true;
+    _refreshTokenCompleter = Completer<void>();
 
-      if (!isLoggedIn) {
-        dev.log('[HTTP] User is not logged in, no need to refresh token');
-        await _addHttpDebugLog('User not logged in, skipping token refresh');
+    try {
+      dev.log(
+          '[HTTP] Starting token refresh through auth service, instance #$_instanceId');
+      await _addHttpDebugLog('Beginning token refresh through auth service');
+
+      // Run diagnostic to track what's happening
+      try {
+        await diagnoseSecurity();
+      } catch (e) {
+        dev.log('[HTTP] Failed to run diagnostics', error: e);
+      }
+
+      // First check if user is already logged out
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final isLoggedIn =
+            prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+
+        if (!isLoggedIn) {
+          dev.log('[HTTP] User is not logged in, no need to refresh token');
+          await _addHttpDebugLog('User not logged in, skipping token refresh');
+          throw const RefreshTokenError();
+        }
+      } catch (e) {
+        dev.log('[HTTP] Error checking login state: $e');
+        // Continue anyway, as we'll check the refresh token next
+      }
+
+      final refreshToken = await _authService.getStoredRefreshToken();
+      if (refreshToken == null) {
+        dev.log('[HTTP] No refresh token available - forcing logout');
+        await _addHttpDebugLog('No refresh token available - forcing logout');
+        await _forceLogout('No refresh token found');
         throw const RefreshTokenError();
       }
-    } catch (e) {
-      dev.log('[HTTP] Error checking login state: $e');
-      // Continue anyway, as we'll check the refresh token next
-    }
 
-    final refreshToken = await _authService.getStoredRefreshToken();
-    if (refreshToken == null) {
-      dev.log('[HTTP] No refresh token available - forcing logout');
-      await _addHttpDebugLog('No refresh token available - forcing logout');
-      await _forceLogout('No refresh token found');
-      throw const RefreshTokenError();
-    }
-
-    dev.log('[HTTP] Got refresh token, attempting to refresh', error: {
-      'token_length': refreshToken.length,
-      'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
-    });
-    await _addHttpDebugLog(
-        'Using refresh token of length ${refreshToken.length}');
-
-    try {
-      final tokens = await _authService.refreshToken(refreshToken);
-      dev.log('[HTTP] Token refresh successful, updating auth header', error: {
-        'access_token_length': tokens.accessToken.length,
-        'access_token_prefix':
-            tokens.accessToken.substring(0, min(10, tokens.accessToken.length)),
-        'instance': _instanceId,
-        'refresh_token_length': tokens.refreshToken.length,
-        'refresh_token_prefix': tokens.refreshToken
-            .substring(0, min(10, tokens.refreshToken.length)),
+      dev.log('[HTTP] Got refresh token, attempting to refresh', error: {
+        'token_length': refreshToken.length,
+        'token_prefix': refreshToken.substring(0, min(10, refreshToken.length)),
       });
-      setAuthHeader(tokens.accessToken);
-      await _addHttpDebugLog('Auth header updated successfully with new token');
+      await _addHttpDebugLog(
+          'Using refresh token of length ${refreshToken.length}');
+
+      try {
+        final tokens = await _authService.refreshToken(refreshToken);
+        dev.log('[HTTP] Token refresh successful, updating auth header',
+            error: {
+              'access_token_length': tokens.accessToken.length,
+              'access_token_prefix': tokens.accessToken
+                  .substring(0, min(10, tokens.accessToken.length)),
+              'instance': _instanceId,
+              'refresh_token_length': tokens.refreshToken.length,
+              'refresh_token_prefix': tokens.refreshToken
+                  .substring(0, min(10, tokens.refreshToken.length)),
+            });
+        setAuthHeader(tokens.accessToken);
+        await _addHttpDebugLog(
+            'Auth header updated successfully with new token');
+        _refreshTokenCompleter.complete();
+      } catch (e) {
+        dev.log('[HTTP] Exception during token refresh', error: {
+          'error_type': e.runtimeType.toString(),
+          'error_message': e.toString(),
+          'instance': _instanceId,
+        });
+        await _addHttpDebugLog('Error refreshing token: ${e.runtimeType}');
+        _refreshTokenCompleter.completeError(e);
+        rethrow;
+      }
     } catch (e) {
-      dev.log('[HTTP] Exception during token refresh', error: {
-        'error_type': e.runtimeType.toString(),
-        'error_message': e.toString(),
-        'instance': _instanceId,
-      });
-      await _addHttpDebugLog('Error refreshing token: ${e.runtimeType}');
+      _refreshTokenCompleter.completeError(e);
       rethrow;
+    } finally {
+      _isRefreshingToken = false;
     }
   }
 }
