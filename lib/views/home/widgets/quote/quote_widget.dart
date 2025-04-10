@@ -66,7 +66,6 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              _buildBackgroundIcon(),
               _buildQuoteContent(quoteStyle, authorStyle),
               Positioned(
                 right: -12,
@@ -96,21 +95,6 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
     final shareText =
         '${widget.data?.quote}\n- ${widget.data?.author}\n\n${StringConstants.shareStatsText}';
     Share.share(shareText);
-  }
-
-  Widget _buildBackgroundIcon() {
-    return Positioned(
-      top: -30,
-      right: -20,
-      child: Opacity(
-        opacity: 0.07,
-        child: HugeIcon(
-          icon: Icons.format_quote,
-          color: ColorConstants.white,
-          size: 100,
-        ),
-      ),
-    );
   }
 
   Widget _buildQuoteContent(TextStyle? quoteStyle, TextStyle? authorStyle) {

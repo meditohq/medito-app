@@ -179,24 +179,14 @@ class ProductGroupCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (sortedVariants.length > 1)
-                    Text(
-                      '${StringConstants.fromPrefix}${productGroup.basePrice.toStringAsFixed(2)} ${productGroup.currency}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: ColorConstants.white.withOpacity(0.7),
-                          ),
-                    )
-                  else
-                    Text(
-                      '${productGroup.basePrice.toStringAsFixed(2)} ${productGroup.currency}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: ColorConstants.white.withOpacity(0.7),
-                          ),
-                    ),
+                  Text(
+                    productGroup.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: ColorConstants.white.withOpacity(0.7),
+                        ),
+                  ),
                 ],
               ),
             ),
