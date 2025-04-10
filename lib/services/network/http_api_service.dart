@@ -297,8 +297,8 @@ class HttpApiService {
       return content.isEmpty ? {} : _parseResponseContent(content);
     } on NoInternetError catch (e, stackTrace) {
       // Don't log out on connection issues - let the user retry when connection is available
-      AppLogger.w('HTTP', 'No internet connection during token refresh attempt',
-          e, stackTrace);
+      AppLogger.w(
+          'HTTP', 'No internet connection during token refresh attempt');
       await _addHttpDebugLog('No internet connection during token refresh');
       rethrow;
     } catch (e, stackTrace) {
@@ -331,11 +331,8 @@ class HttpApiService {
         await _addHttpDebugLog('Too many failed attempts ($_retryCount)');
         await _forceLogout('Too many token refresh failures');
       } else {
-        AppLogger.w(
-            'HTTP',
-            'Error during refresh but still have retries - not forcing logout yet',
-            e,
-            stackTrace);
+        AppLogger.w('HTTP',
+            'Error during refresh but still have retries - not forcing logout yet');
         await _addHttpDebugLog(
             'Error during refresh, will retry (attempt ${_retryCount + 1}/$maxBackgroundRetries)');
       }
@@ -474,10 +471,7 @@ class HttpApiService {
         return;
       } catch (e, stackTrace) {
         AppLogger.w(
-            'HTTP',
-            'Previous token refresh failed, will attempt new refresh',
-            e,
-            stackTrace);
+            'HTTP', 'Previous token refresh failed, will attempt new refresh');
         // Previous refresh failed, we'll try again
       }
     }
