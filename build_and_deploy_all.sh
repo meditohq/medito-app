@@ -30,8 +30,22 @@ flutter test
 echo "🚀 Starting Android build and deploy..."
 ./build_apk.sh
 
-echo "✅ All builds completed! Opening APK directory..."
-open build/app/outputs/apk/prod/release/ # Open the specific APK output directory 
+# Create dated APKs directory if it doesn't exist
+DATED_APKS_DIR="dated_apks"
+mkdir -p "$DATED_APKS_DIR"
+
+# Generate dated filename with format xxx-ddMMMYYYY.apk
+DATE_STAMP=$(date +"%d%b%Y")
+SOURCE_APK="build/app/outputs/apk/prod/release/app-prod-release.apk"
+DEST_APK="$DATED_APKS_DIR/medito-$CURRENT_VERSION-$DATE_STAMP.apk"
+
+# Copy the APK with the new name
+cp "$SOURCE_APK" "$DEST_APK"
+echo "✅ APK copied to $DEST_APK"
+
+# Open the dated APKs directory
+echo "✅ All builds completed! Opening dated APKs directory..."
+open "$DATED_APKS_DIR"
 
 echo "🚀 Starting iOS build and upload..."
 ./build_and_upload_ios.sh
