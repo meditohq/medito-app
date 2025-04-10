@@ -14,7 +14,6 @@ import '../maintenance/maintenance_provider.dart';
 final maintenanceNeededProvider =
     FutureProvider<MaintenanceModel?>((ref) async {
   try {
-    AppLogger.d('ROOT', '[MAINTENANCE] Starting maintenance check');
     final maintenanceData = await ref.read(fetchMaintenanceProvider.future);
 
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
@@ -25,19 +24,12 @@ final maintenanceNeededProvider =
     final needsMaintenance = (maintenanceData.isUnderMaintenance) ||
         minRequired > buildNumber;
 
-    debugPrint(
-        '[MAINTENANCE] Current build: $buildNumber, Minimum required: $minRequired, Under maintenance: ${maintenanceData.isUnderMaintenance}');
-    AppLogger.d('ROOT', '[MAINTENANCE] Needs maintenance: $needsMaintenance');
-
     if (needsMaintenance) {
-      AppLogger.d('ROOT', '[MAINTENANCE] Maintenance needed, returning model');
       return maintenanceData;
     }
 
-    AppLogger.d('ROOT', '[MAINTENANCE] No maintenance needed');
     return null;
   } catch (e) {
-    AppLogger.e('ROOT', '[MAINTENANCE_ERROR] Error checking maintenance: $e');
     return null;
   }
 });

@@ -9,10 +9,12 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/me/me_repository.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HelpScreen extends ConsumerStatefulWidget {
@@ -27,11 +29,17 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
   final List<bool> _expandedItems = [];
   bool _isLoading = true;
   bool _isSubscriber = false;
+  bool _isAnalyticsEnabled = true;
+
+  // Use the same key as in FirebaseAnalyticsService
+  static const String _analyticsEnabledKey =
+      FirebaseAnalyticsService.analyticsEnabledKey;
 
   @override
   void initState() {
     super.initState();
     _checkSubscriptionStatus();
+    _checkAnalyticsStatus();
   }
 
   Future<void> _checkSubscriptionStatus() async {
@@ -50,6 +58,21 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
         _initializeHelpItems();
         _expandedItems.addAll(List.generate(_helpItems.length, (_) => false));
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _checkAnalyticsStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // Default to true if not set (analytics is enabled by default)
+      setState(() {
+        _isAnalyticsEnabled = prefs.getBool(_analyticsEnabledKey) ?? true;
+      });
+    } catch (e) {
+      // If there's an error, keep default value
+      setState(() {
+        _isAnalyticsEnabled = true;
       });
     }
   }
@@ -117,6 +140,19 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
         ),
       );
     }
+
+    // Add analytics tracking toggle
+    _helpItems.add(
+      HelpItem(
+        title: StringConstants.analyticsTrackingTitle,
+        content: StringConstants.analyticsTrackingContent,
+        actionText: _isAnalyticsEnabled
+            ? StringConstants.turnOffAnalyticsText
+            : StringConstants.turnOnAnalyticsText,
+        onActionPressed: _toggleAnalyticsTracking,
+        icon: HugeIcons.solidSharpSettings03,
+      ),
+    );
 
     // Add the remaining help items
     _helpItems.addAll([
@@ -438,6 +474,72 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
 
   Future<void> _handleBatteryOptimization() async {
     await _launchUrl(StringConstants.dontKillMyAppUrl);
+  }
+
+  Future<void> _toggleAnalyticsTracking() async {
+    final analyticsService = ref.read(analyticsServiceProvider);
+
+    // For iOS, explain the relationship with ATT permission
+    if (Platform.isIOS && _isAnalyticsEnabled) {
+      final bool shouldProceed = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: ColorConstants.ebony,
+              title: const Text(
+                'Data Collection',
+                style: TextStyle(color: Colors.white),
+              ),
+              content: const Text(
+                'This will disable analytics tracking in the app. Note that you can also control tracking permissions at the system level in your iOS Settings under Privacy & Security > Tracking.',
+                style: TextStyle(color: Colors.white70),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: ColorConstants.lightPurple),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    'Disable Tracking',
+                    style: TextStyle(color: ColorConstants.lightPurple),
+                  ),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+
+      if (!shouldProceed) {
+        return;
+      }
+    }
+
+    setState(() {
+      _isAnalyticsEnabled = !_isAnalyticsEnabled;
+    });
+
+    await analyticsService.setConsent(
+      analyticsStorageConsentGranted: _isAnalyticsEnabled,
+      adStorageConsentGranted: _isAnalyticsEnabled,
+      adUserDataConsentGranted: _isAnalyticsEnabled,
+      adPersonalizationSignalsConsentGranted: _isAnalyticsEnabled,
+    );
+
+    showSnackBar(
+      context,
+      _isAnalyticsEnabled
+          ? StringConstants.analyticsEnabledMessage
+          : StringConstants.analyticsDisabledMessage,
+    );
+
+    // Refresh the help items to update the button text
+    setState(() {
+      _initializeHelpItems();
+    });
   }
 }
 

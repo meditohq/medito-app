@@ -10,6 +10,7 @@ import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
@@ -98,16 +99,13 @@ class SplashViewState extends ConsumerState<SplashView>
 
   Future<void> _initialiseApp() async {
     try {
-      AppLogger.i('SPLASH', 'Initializing Firebase...');
-      if (Firebase.apps.isEmpty) {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        );
-        AppLogger.i('SPLASH', 'Firebase initialized successfully');
-      } else {
-        AppLogger.i('SPLASH', 'Firebase was already initialized');
-      }
+      // First initialize Firebase
+      await _initializeFirebase();
 
+      // Then initialize Firebase Analytics separately
+      await _initializeAnalytics();
+
+      // Continue with app initialization
       await _checkAuthAndInitialize();
     } catch (e, stackTrace) {
       AppLogger.e('SPLASH', 'Error initializing app', e, stackTrace);
@@ -117,6 +115,33 @@ class SplashViewState extends ConsumerState<SplashView>
         _showAccountButtons = true;
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _initializeFirebase() async {
+    AppLogger.i('SPLASH', 'Initializing Firebase...');
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      AppLogger.i('SPLASH', 'Firebase initialized successfully');
+    } else {
+      AppLogger.i('SPLASH', 'Firebase was already initialized');
+    }
+  }
+
+  Future<void> _initializeAnalytics() async {
+    try {
+      // Initialize Firebase Analytics with consent enabled using consent mode v2
+      // Don't request ATT permission yet - we'll do that later for better UX
+      await FirebaseAnalyticsService()
+          .initialize(requestAttPermissionImmediately: false);
+      AppLogger.i(
+          'SPLASH', 'Firebase Analytics initialized with consent mode v2');
+    } catch (e, stackTrace) {
+      // Log the error but don't prevent app startup
+      AppLogger.e(
+          'SPLASH', 'Error initializing Firebase Analytics', e, stackTrace);
     }
   }
 

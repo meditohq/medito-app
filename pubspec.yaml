@@ -25,12 +25,14 @@ dependencies:
     sdk: flutter
   audio_session: ^0.1.21
   audio_service: ^0.18.15
+  app_tracking_transparency: ^2.0.4
   cached_network_image: ^3.4.1
   device_info_plus: ^11.3.3
   email_validator: ^3.0.0
   equatable: ^2.0.5
   firebase_core: ^3.10.1
   firebase_messaging: ^15.2.1
+  firebase_analytics: ^11.0.0
   flutter_local_notifications: ^19.0.0
   flutter_markdown: ^0.7.4+1
   flutter_riverpod: ^2.4.9

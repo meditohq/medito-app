@@ -452,7 +452,7 @@ class StringConstants {
 
   /// Content text for the Contact Us section in the Help screen
   static const String contactUsContent =
-      'If you have any questions not addressed on this page, any feedback, or if you need assistance, please reach out to us. We\'re here to help!';
+      'If you have any questions not addressed on this page, any feedback, or if you need assistance, try updating the app. If that doesn\'t help, please reach out to us. We\'re here to help!';
 
   /// Action button text for the Contact Us section in the Help screen
   static const String contactUsActionText = 'Contact Us';
@@ -633,4 +633,22 @@ class StringConstants {
       'Looks like you have signed in with an email address before. Would you like to sign in with your email address again?';
   static const emailExistsContinueNewAccount = 'Continue';
   static const emailExistsSignInWithEmail = 'Sign in with Email';
+
+  // Used in the help screen for analytics tracking options
+  static const String analyticsTrackingTitle = 'Data Collection';
+  static const String analyticsTrackingContent =
+      'We collect anonymous usage data to help us improve the app. No personal information is collected.';
+  static const String turnOffAnalyticsText = 'Turn Off Analytics';
+  static const String turnOnAnalyticsText = 'Turn On Analytics';
+  static const String analyticsDisabledMessage =
+      'Analytics tracking has been disabled';
+  static const String analyticsEnabledMessage =
+      'Analytics tracking has been enabled';
+
+  // Used in iOS tracking permissions dialog
+  static const String iosTrackingDialogTitle = 'Data Collection';
+  static const String iosTrackingDialogContent =
+      'This will disable analytics tracking in the app. Note that you can also control tracking permissions at the system level in your iOS Settings under Privacy & Security > Tracking.';
+  static const String iosTrackingDialogCancel = 'Cancel';
+  static const String iosTrackingDialogDisable = 'Disable Tracking';
 }
