@@ -22,8 +22,8 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
     return [
       HomeWidgetType.shortcuts,
       HomeWidgetType.carousel,
-      HomeWidgetType.products,
       HomeWidgetType.quote,
+      HomeWidgetType.products,
     ];
   }
 
