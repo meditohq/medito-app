@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -92,5 +92,3 @@ class ReviewService {
     }
   }
 }
-
-import '../utils/logger.dart';

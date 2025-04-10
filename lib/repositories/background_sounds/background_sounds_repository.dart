@@ -1,7 +1,7 @@
+import '../../utils/logger.dart';
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
@@ -187,5 +187,3 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 BackgroundSoundsRepository backgroundSoundsRepository(Ref ref) {
   return BackgroundSoundsRepositoryImpl(client: HttpApiService(), ref: ref);
 }
-
-import '../../utils/logger.dart';

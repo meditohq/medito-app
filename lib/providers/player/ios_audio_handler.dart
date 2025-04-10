@@ -15,6 +15,7 @@ import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/stats_updater.dart';
+import '../../utils/logger.dart';
 
 class IosAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
@@ -209,7 +210,8 @@ class IosAudioHandler extends BaseAudioHandler {
       // Failed to update stats directly, store for later processing
       await _storeForLaterProcessing(payload);
     } catch (e) {
-      AppLogger.e('IOS', 'Error processing track completion in AudioHandler: $e');
+      AppLogger.e(
+          'IOS', 'Error processing track completion in AudioHandler: $e');
     }
   }
 
@@ -238,7 +240,8 @@ class IosAudioHandler extends BaseAudioHandler {
         return true;
       }
     } catch (e) {
-      AppLogger.e('IOS', 'Error updating stats directly from audio handler: $e');
+      AppLogger.e(
+          'IOS', 'Error updating stats directly from audio handler: $e');
     }
     return false;
   }
@@ -332,5 +335,3 @@ class IosStateData {
     this.duration,
   );
 }
-
-import '../../utils/logger.dart';

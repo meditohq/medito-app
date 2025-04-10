@@ -235,7 +235,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
         final featureFlags = ref.watch(featureFlagsProvider);
         if (featureFlags.isStreakFreezeEnabled) {
-          _checkForFreezeUsage(ref);
+          // _checkForFreezeUsage(ref);
         }
 
         return MediaQuery.withClampedTextScaling(

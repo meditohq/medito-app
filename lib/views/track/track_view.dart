@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+import '../../../utils/logger.dart';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';

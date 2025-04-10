@@ -3,6 +3,7 @@ import 'package:medito/models/favorites/favorite_item.dart';
 import 'package:medito/repositories/favorites/favorites_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/utils/favorites_merger.dart';
+import '../../utils/logger.dart';
 
 class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
   late final FavoritesRepository _repository;
@@ -51,7 +52,8 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
       await _repository.saveFavorites(mergedFavorites);
     } catch (e) {
       // If server fetch fails, log it but keep the current (local) state.
-      AppLogger.e('FAVORITES', 'Failed to load or merge favorites from server: $e');
+      AppLogger.e(
+          'FAVORITES', 'Failed to load or merge favorites from server: $e');
       // Do not change state to error here, local data is still valid.
     }
   }
@@ -91,7 +93,8 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
       await syncWithServer();
     } catch (e) {
       // Log save error, but state remains optimistically updated
-      AppLogger.e('FAVORITES', 'Failed to save or sync after adding favorite: $e');
+      AppLogger.e(
+          'FAVORITES', 'Failed to save or sync after adding favorite: $e');
       // Do not revert state here.
     }
   }
@@ -113,7 +116,8 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
       await syncWithServer(); // Sync after saving
     } catch (e) {
       // Log save error, but state remains optimistically updated
-      AppLogger.e('FAVORITES', 'Failed to save or sync after removing favorite: $e');
+      AppLogger.e(
+          'FAVORITES', 'Failed to save or sync after removing favorite: $e');
       // Do not revert state here.
     }
   }
@@ -122,5 +126,3 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
 final favoritesNotifierProvider =
     NotifierProvider<FavoritesNotifier, AsyncValue<List<FavoriteItem>>>(
         FavoritesNotifier.new);
-
-import '../../utils/logger.dart';

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/views/maintenance/maintenance_view.dart';
+import '../../../utils/logger.dart';
 
 /// Widget that watches for maintenance status and shows the maintenance screen when needed
 class MaintenanceChecker extends ConsumerStatefulWidget {
@@ -76,5 +77,3 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
     );
   }
 }
-
-import '../utils/logger.dart';

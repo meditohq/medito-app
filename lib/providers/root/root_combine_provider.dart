@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/maintenance/maintenance_model.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 import '../maintenance/maintenance_provider.dart';
 

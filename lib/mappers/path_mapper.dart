@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
-
 import '../models/path/path_dto.dart';
 import '../models/path/path_result.dart';
+import '../utils/logger.dart';
 
 class PathMapper {
   JourneyResult mapDtoToResult(PathDTO dto) {
@@ -13,7 +12,7 @@ class PathMapper {
       AppLogger.d('PATH', e.toString());
       return PathResultError.journeyResultError(
           'Failed to map path data: ${e.toString()}');
-    } 
+    }
   }
 
   JourneyStep _mapStepDtoToStep(StepDTO dto) {
@@ -57,20 +56,18 @@ class PathMapper {
       case 'track':
         var trackId = data['track_id'] as String? ?? '';
         var duration = data['duration'] as int? ?? 0;
-        
+
         return TrackData(id: trackId, duration: duration);
       case 'journal':
         var entryText = data['entryText'] as String? ?? '';
-        
+
         return JournalData(id: id, entryText: entryText);
       case 'article':
         var content = data['content'] as String? ?? '';
-        
+
         return ArticleData(id: id, content: content);
       default:
         throw ArgumentError('Unknown task type: $type');
     }
   }
 }
-
-import '../utils/logger.dart';

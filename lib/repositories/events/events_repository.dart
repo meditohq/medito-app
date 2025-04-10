@@ -1,3 +1,4 @@
+import '../../utils/logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -86,5 +87,3 @@ class EventsRepositoryImpl extends EventsRepository {
 @riverpod
 EventsRepository eventsRepository(Ref _) =>
     EventsRepositoryImpl(client: HttpApiService());
-
-import '../../utils/logger.dart';

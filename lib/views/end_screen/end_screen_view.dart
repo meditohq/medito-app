@@ -102,7 +102,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
             children: [
               _buildStatsArea(),
               _buildCard(),
-              _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
+             // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
             ],
           ),
         ),

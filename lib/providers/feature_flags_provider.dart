@@ -5,7 +5,7 @@ class FeatureFlags {
   final bool isStreakFreezeEnabled;
 
   const FeatureFlags({
-    this.isStreakFreezeEnabled = true,
+    this.isStreakFreezeEnabled = false,
   });
 }
 

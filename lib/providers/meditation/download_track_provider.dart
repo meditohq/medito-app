@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/repositories/downloader/downloader_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/track/track_model.dart';
 import '../../repositories/track/track_repository.dart';
+import '../../utils/logger.dart';
 import '../../utils/utils.dart';
 import '../player/download/audio_downloader_provider.dart';
 
@@ -19,8 +19,7 @@ Future<List<TrackModel>> downloadedTracks(Ref ref) {
 }
 
 @riverpod
-Future<void> removeDownloadedTrack(Ref ref,
-    {required TrackModel track}) async {
+Future<void> removeDownloadedTrack(Ref ref, {required TrackModel track}) async {
   var firstItem = track.audio.first.files.first;
   var fileName =
       '${track.id}-${firstItem.id}${getAudioFileExtension(firstItem.path)}';
@@ -78,5 +77,3 @@ Future<void> addSingleTrackInPreference(Ref ref,
   );
   unawaited(ref.refresh(downloadedTracksProvider.future));
 }
-
-import '../../utils/logger.dart';

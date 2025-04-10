@@ -1,3 +1,4 @@
+import '../../utils/logger.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/models/models.dart';
@@ -51,5 +52,3 @@ class HeaderService {
         'currency-name': deviceInfo.currencyName,
       };
 }
-
-import '../../utils/logger.dart';

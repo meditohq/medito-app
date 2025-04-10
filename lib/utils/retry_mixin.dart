@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/utils/logger.dart';
 
 mixin RetryMixin {
   Future<T> retryOperation<T>({
@@ -27,5 +27,3 @@ mixin RetryMixin {
     throw const ServerError();
   }
 }
-
-import 'logger.dart';

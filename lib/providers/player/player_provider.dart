@@ -11,6 +11,7 @@ import '../../utils/utils.dart';
 import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
 import 'ios_audio_handler.dart';
+import '../../utils/logger.dart';
 
 final _api = MeditoAudioServiceApi();
 final _androidServiceApi = MeditoAndroidAudioServiceManager();
@@ -29,7 +30,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     required TrackModel trackModel,
     required TrackFilesModel file,
   }) async {
-    AppLogger.d('PLAYER', '🔊 Loading track: \\${trackModel.title}, fileId: \\${file.id}');
+    AppLogger.d('PLAYER',
+        '🔊 Loading track: \\${trackModel.title}, fileId: \\${file.id}');
     var track = trackModel.customCopyWith();
     var audios = [...track.audio];
 
@@ -42,7 +44,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       }
     }
 
-    debugPrint(
+    AppLogger.d('PLAYER',
         '🔊 Selected track: \\${track.title}, audio count: \\${track.audio.length}');
 
     await _playTrack(
@@ -79,7 +81,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     );
 
     if (Platform.isAndroid) {
-      AppLogger.d('PLAYER', '🔊 On Android - starting service and checking readiness');
+      AppLogger.d(
+          'PLAYER', '🔊 On Android - starting service and checking readiness');
       try {
         // Start service and wait for readiness
         await _androidServiceApi.startService();
@@ -92,7 +95,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         final isReady = await _waitForServiceReadiness();
 
         if (isReady) {
-          AppLogger.d('PLAYER', '🔊 Service is ready, proceeding with playback');
+          AppLogger.d(
+              'PLAYER', '🔊 Service is ready, proceeding with playback');
           await _playAudioWithRetry(downloadPath ?? file.path, trackData);
         } else {
           debugPrint(
@@ -113,7 +117,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         await iosAudioHandler.play();
         AppLogger.d('PLAYER', '🔊 iOS play() called');
       } catch (e) {
-        AppLogger.e('PLAYER', '❌ Error playing audio on iOS: \\${e.toString()}');
+        AppLogger.e(
+            'PLAYER', '❌ Error playing audio on iOS: \\${e.toString()}');
       }
     }
   }
@@ -125,7 +130,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
-        AppLogger.d('PLAYER', '🔊 Checking if service is ready (attempt ${attempt + 1})');
+        AppLogger.d('PLAYER',
+            '🔊 Checking if service is ready (attempt ${attempt + 1})');
         final isReady = await _androidServiceApi.isServiceReady();
         debugPrint(
             '🔊 Service readiness check returned: $isReady (attempt ${attempt + 1})');
@@ -170,7 +176,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         AppLogger.d('PLAYER', '🔊 playAudio call succeeded');
         return; // Success
       } catch (e) {
-        AppLogger.e('PLAYER', '❌ Error playing audio (attempt ${attempt + 1}): $e');
+        AppLogger.e(
+            'PLAYER', '❌ Error playing audio (attempt ${attempt + 1}): $e');
 
         if (attempt < maxAttempts - 1) {
           // Calculate backoff delay
@@ -260,5 +267,3 @@ const audioPercentageListened = 0.8;
 const androidNotificationIcon = 'logo';
 const notificationId = 1595122;
 const androidNotificationChannelId = 'medito_reminder_channel';
-
-import '../../utils/logger.dart';

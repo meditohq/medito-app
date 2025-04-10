@@ -1,3 +1,4 @@
+import '../../utils/logger.dart';
 import 'dart:convert';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/models/favorites/favorite_item.dart';
@@ -63,7 +64,6 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
 
   @override
   Future<void> syncWithServer(List<FavoriteItem> favorites) async {
-    
     if (favorites.isEmpty) return;
 
     try {
@@ -96,5 +96,3 @@ FavoritesRepository favoritesRepository(Ref ref) {
     prefs: ref.read(sharedPreferencesProvider),
   );
 }
-
-import '../../utils/logger.dart';

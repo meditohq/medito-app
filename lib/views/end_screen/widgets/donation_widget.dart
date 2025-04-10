@@ -3,6 +3,7 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
+import '../../../utils/logger.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';
 import '../../../providers/donation/donation_page_provider.dart';
@@ -364,5 +365,3 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
     }
   }
 }
-
-import '../../../utils/logger.dart';
