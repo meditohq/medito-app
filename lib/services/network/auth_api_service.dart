@@ -9,6 +9,7 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HttpClientWrapper {
   HttpClient createClient() => HttpClient();
@@ -266,6 +267,11 @@ class AuthApiService {
   void handleErrorResponse(int statusCode, [String? content]) {
     AppLogger.w('AUTH', 'HTTP Error $statusCode');
 
+    if (statusCode == HttpStatus.unprocessableEntity ||
+        statusCode == HttpStatus.notAcceptable) {
+      throw const InactiveEmailError();
+    }
+
     if (content != null && content.isNotEmpty) {
       try {
         final Map<String, dynamic> errorData =
@@ -310,7 +316,8 @@ class AuthApiService {
       } catch (e) {
         if (e is RateLimitError ||
             e is EmailExistsError ||
-            e is RefreshTokenError) {
+            e is RefreshTokenError ||
+            e is InactiveEmailError) {
           rethrow; // Rethrow specific exceptions
         }
         AppLogger.e(

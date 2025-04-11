@@ -564,6 +564,10 @@ class StringConstants {
       'Server error, please try again later';
   static const String errorUnknownMessage =
       'Something went wrong, please try again';
+
+  static const String inactiveEmailError =
+      'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.';
+
   // Used in settings to toggle Do Not Disturb mode during meditation
   static const String enableDndDuringMeditation =
       'Silence phone during meditation';

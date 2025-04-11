@@ -165,6 +165,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         _retryAfterSeconds = e.tryAfterSeconds ?? 60;
       });
       _startRetryTimer();
+    } on InactiveEmailError catch (e) {
+      showSnackBar(context, e.message);
     } catch (e) {
       showSnackBar(context, 'Error: ${e.toString()}');
     } finally {
