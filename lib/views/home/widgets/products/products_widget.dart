@@ -6,6 +6,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:medito/services/products_service.dart';
 
 class ProductsWidget extends StatelessWidget {
   final List<ProductGroupModel>? productGroups;
@@ -25,21 +26,24 @@ class ProductsWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    AppLogger.d(
-        'ProductsWidget', 'Rendering ${productGroups!.length} product groups');
-    if (productGroups!.isNotEmpty) {
-      AppLogger.d('ProductsWidget',
-          'First product group - ${productGroups![0].name}, variants: ${productGroups![0].variants.length}');
-    }
+    // Sort product groups - new products first
+    final sortedGroups = List<ProductGroupModel>.from(productGroups!)
+      ..sort((a, b) {
+        // Check if any variant in the group is new
+        final aHasNew = a.variants.any((v) => v.isNew);
+        final bHasNew = b.variants.any((v) => v.isNew);
+        if (aHasNew != bHasNew) return aHasNew ? -1 : 1;
+        return 0;
+      });
 
     return Padding(
       padding: const EdgeInsets.only(top: 20, bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
               StringConstants.meditationProducts,
               style: TextStyle(
                 color: Colors.white,
@@ -57,9 +61,9 @@ class ProductsWidget extends StatelessWidget {
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.only(left: 16),
-              itemCount: productGroups!.length,
+              itemCount: sortedGroups.length,
               itemBuilder: (context, index) {
-                final productGroup = productGroups![index];
+                final productGroup = sortedGroups[index];
                 AppLogger.d('ProductsWidget',
                     'Building product group card for ${productGroup.name} at index $index');
                 return ProductGroupCard(productGroup: productGroup);
@@ -83,12 +87,15 @@ class ProductGroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Sort variants by price
-    final sortedVariants = List<ProductModel>.from(productGroup.variants)
-      ..sort((a, b) => a.price.compareTo(b.price));
+    final hasNewVariant = productGroup.variants.any((v) => v.isNew);
 
     return GestureDetector(
-      onTap: () => _openProductUrl(productGroup.url),
+      onTap: () {
+        _openProductUrl(productGroup.url);
+        for (final variant in productGroup.variants) {
+          ProductsService().markProductAsSeen(variant.id);
+        }
+      },
       child: Container(
         width: cardWidth,
         margin: const EdgeInsets.only(right: 12),
@@ -101,79 +108,107 @@ class ProductGroupCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (productGroup.allImageUrls.isNotEmpty)
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: ProductImageCarousel(
-                      productGroup: productGroup,
-                      cardWidth: cardWidth,
+            Stack(
+              children: [
+                if (productGroup.allImageUrls.isNotEmpty)
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(12)),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: ProductImageCarousel(
+                          productGroup: productGroup,
+                          cardWidth: cardWidth,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )
-            else if (productGroup.imageUrl != null)
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: CachedNetworkImage(
-                      imageUrl: productGroup.imageUrl!,
-                      fit: BoxFit.cover,
-                      width: cardWidth,
-                      key: ValueKey('product_image_${productGroup.groupId}'),
-                      placeholder: (context, url) => Container(
-                        color: ColorConstants.charcoal,
-                        child: const Center(
-                          child: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                  )
+                else if (productGroup.imageUrl != null)
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(12)),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: CachedNetworkImage(
+                          imageUrl: productGroup.imageUrl!,
+                          fit: BoxFit.cover,
+                          width: cardWidth,
+                          key:
+                              ValueKey('product_image_${productGroup.groupId}'),
+                          placeholder: (context, url) => Container(
+                            color: ColorConstants.charcoal,
+                            child: const Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: ColorConstants.charcoal,
+                            child: Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                color: ColorConstants.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      errorWidget: (context, url, error) => Container(
-                        color: ColorConstants.charcoal,
-                        child: Center(
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            color: ColorConstants.white,
+                    ),
+                  )
+                else
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(12)),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Container(
+                          color: ColorConstants.charcoal,
+                          child: Center(
+                            child: Icon(
+                              Icons.image_not_supported_outlined,
+                              color: ColorConstants.white,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              )
-            else
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
+                if (hasNewVariant)
+                  Positioned(
+                    top: 8,
+                    right: 8,
                     child: Container(
-                      color: ColorConstants.charcoal,
-                      child: Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          color: ColorConstants.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: ColorConstants.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        StringConstants.newProductLabel,
+                        style: TextStyle(
+                          color: ColorConstants.onyx,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Column(

@@ -11,6 +11,11 @@ class ProductModel {
   final String? size;
   final String? color;
   final String? itemGroupId;
+  final DateTime? firstSeenDate;
+
+  bool get isNew =>
+      firstSeenDate != null &&
+      DateTime.now().difference(firstSeenDate!).inDays < 7;
 
   ProductModel({
     required this.id,
@@ -23,7 +28,44 @@ class ProductModel {
     this.size,
     this.color,
     this.itemGroupId,
+    this.firstSeenDate,
   });
+
+  ProductModel copyWith({
+    String? id,
+    String? name,
+    String? description,
+    String? url,
+    double? price,
+    String? currency,
+    String? imageUrl,
+    String? size,
+    String? color,
+    String? itemGroupId,
+    DateTime? firstSeenDate,
+    bool? isNew,
+  }) {
+    DateTime? finalFirstSeenDate;
+    if (firstSeenDate == null && this.firstSeenDate != null && isNew == null) {
+      finalFirstSeenDate = this.firstSeenDate;
+    } else {
+      finalFirstSeenDate = firstSeenDate;
+    }
+
+    return ProductModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      url: url ?? this.url,
+      price: price ?? this.price,
+      currency: currency ?? this.currency,
+      imageUrl: imageUrl ?? this.imageUrl,
+      size: size ?? this.size,
+      color: color ?? this.color,
+      itemGroupId: itemGroupId ?? this.itemGroupId,
+      firstSeenDate: finalFirstSeenDate,
+    );
+  }
 
   factory ProductModel.fromRss(Map<String, dynamic> json) {
     try {
@@ -43,6 +85,7 @@ class ProductModel {
         size: _extractStringValue(json, 'g:size'),
         color: _extractStringValue(json, 'g:color'),
         itemGroupId: _extractStringValue(json, 'g:item_group_id'),
+        firstSeenDate: null,
       );
     } catch (e) {
       dev.log('ProductModel: Error creating from RSS: $e');
@@ -52,6 +95,7 @@ class ProductModel {
         name: json['g:title']?.toString() ?? 'Unknown Product',
         price: 0.0,
         currency: 'USD',
+        firstSeenDate: null,
       );
     }
   }

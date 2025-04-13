@@ -3,11 +3,13 @@ import 'dart:developer' as dev;
 import 'package:http/http.dart' as http;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/home/product/product_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml2json/xml2json.dart';
 
 class ProductsService {
   static const String _productsFeedUrl =
       'https://shop.medito.app/.well-known/merchant-center/rss.xml';
+  static const String _cachedProductDataKey = 'cachedProductData';
 
   Future<ProductsResponse> fetchProducts() async {
     dev.log('ProductsService: Starting to fetch products');
@@ -26,6 +28,10 @@ class ProductsService {
       final productResponse = _parseRssResponse(response.body);
       dev.log(
           'ProductsService: Parsed ${productResponse.products.length} products');
+
+      // Update product cache and set firstSeenDate using copyWith
+      await _updateProductCacheAndSetFirstSeen(productResponse.products);
+
       return productResponse;
     } catch (e) {
       dev.log('ProductsService: Error fetching products: ${e.toString()}',
@@ -125,6 +131,7 @@ class ProductsService {
       List<ProductModel> products = [];
       for (var item in formattedItems) {
         try {
+          // Create model without firstSeenDate initially
           products.add(ProductModel.fromRss(item));
         } catch (e) {
           dev.log('ProductsService: Error creating product model: $e');
@@ -144,6 +151,101 @@ class ProductsService {
           error: e, stackTrace: StackTrace.current);
       throw UnknownError(
           message: 'Error parsing products data: ${e.toString()}');
+    }
+  }
+
+  // Updated method to handle caching and set firstSeenDate
+  Future<void> _updateProductCacheAndSetFirstSeen(
+      List<ProductModel> currentProducts) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedDataJson = prefs.getString(_cachedProductDataKey);
+      Map<String, String> cachedData = {}; // Store ID -> ISO 8601 Date String
+
+      if (cachedDataJson != null) {
+        try {
+          final Map<String, dynamic> decodedData = json.decode(cachedDataJson);
+          // Ensure values are strings before casting
+          cachedData =
+              decodedData.map((key, value) => MapEntry(key, value.toString()));
+          dev.log(
+              'ProductsService: Loaded ${cachedData.length} cached product entries');
+        } catch (e) {
+          dev.log(
+              'ProductsService: Error decoding cached data: $e, resetting cache.');
+          await prefs.remove(_cachedProductDataKey); // Clear corrupted cache
+        }
+      }
+
+      final Map<String, String> newCacheData = {};
+      final now = DateTime.now();
+      final nowString = now.toIso8601String();
+
+      for (int i = 0; i < currentProducts.length; i++) {
+        final product = currentProducts[i];
+        final productId = product.id;
+
+        if (cachedData.containsKey(productId)) {
+          // Product exists in cache, use existing firstSeenDate
+          final cachedDateString = cachedData[productId]!;
+          try {
+            final firstSeenDate = DateTime.parse(cachedDateString);
+            currentProducts[i] = product.copyWith(firstSeenDate: firstSeenDate);
+            newCacheData[productId] =
+                cachedDateString; // Keep existing date in new cache
+            dev.log(
+                'ProductsService: Product $productId already seen on $cachedDateString');
+          } catch (e) {
+            // Handle potential parse error, treat as new
+            dev.log(
+                'ProductsService: Error parsing cached date for $productId: $e. Treating as new.');
+            currentProducts[i] = product.copyWith(firstSeenDate: now);
+            newCacheData[productId] = nowString;
+          }
+        } else {
+          // New product, set firstSeenDate to now
+          currentProducts[i] = product.copyWith(firstSeenDate: now);
+          newCacheData[productId] = nowString; // Add new product to cache
+          dev.log(
+              'ProductsService: New product $productId seen now ($nowString)');
+        }
+      }
+
+      // Update the cache with the potentially modified product data map
+      final newCachedDataJson = json.encode(newCacheData);
+      await prefs.setString(_cachedProductDataKey, newCachedDataJson);
+      dev.log(
+          'ProductsService: Updated cache with ${newCacheData.length} product entries');
+    } catch (e) {
+      dev.log('ProductsService: Error updating product cache: $e',
+          error: e, stackTrace: StackTrace.current);
+      // Log and continue without cache update on error
+    }
+  }
+
+  // --- Functionality to handle tap ---
+  // This function should be called from the UI/ViewModel when a product is tapped.
+  // It removes the firstSeenDate from the cache for that product, effectively marking it as not new.
+  Future<void> markProductAsSeen(String productId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedDataJson = prefs.getString(_cachedProductDataKey);
+      if (cachedDataJson == null) return; // No cache exists
+
+      Map<String, dynamic> cachedData = json.decode(cachedDataJson);
+
+      if (cachedData.containsKey(productId)) {
+        cachedData[productId] = DateTime(1970).toIso8601String();
+        final updatedCacheJson = json.encode(cachedData);
+        await prefs.setString(_cachedProductDataKey, updatedCacheJson);
+        dev.log(
+            'ProductsService: Marked product $productId as seen (set date to epoch).');
+      } else {
+        dev.log(
+            'ProductsService: Product $productId not found in cache to mark as seen.');
+      }
+    } catch (e) {
+      dev.log('ProductsService: Error marking product as seen: $e', error: e);
     }
   }
 }

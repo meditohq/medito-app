@@ -655,4 +655,7 @@ class StringConstants {
       'This will disable analytics tracking in the app. Note that you can also control tracking permissions at the system level in your iOS Settings under Privacy & Security > Tracking.';
   static const String iosTrackingDialogCancel = 'Cancel';
   static const String iosTrackingDialogDisable = 'Disable Tracking';
+
+  // Used in the products widget to label new products
+  static const String newProductLabel = 'NEW';
 }
