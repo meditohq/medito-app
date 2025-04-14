@@ -19,6 +19,7 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
+import 'package:app_links/app_links.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../../providers/pack/pack_provider.dart';
@@ -30,6 +31,7 @@ class SignUpLogInPage extends ConsumerWidget {
   });
 
   final bool fromSettings;
+  static const routeName = '/signup';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -73,17 +75,47 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   var _isRateLimited = false;
   var _retryAfterSeconds = 0;
   Timer? _timer;
+  StreamSubscription? _linkSubscription;
+  final _appLinks = AppLinks();
 
   @override
   void initState() {
     super.initState();
     _emailController.addListener(_validateEmail);
     _otpController.addListener(_validateOtp);
+    _setupDeepLinkHandling();
+  }
+
+  void _setupDeepLinkHandling() {
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      if (!mounted) return;
+
+      if (uri.path.startsWith('/otp/')) {
+        final otp = uri.pathSegments[1];
+        if (otp.length == 6) {
+          if (!mounted) return;
+
+          if (!_hasRequestedOtp) {
+            showSnackBar(
+              context,
+              'Please request an OTP first before using a deep link',
+            );
+            return;
+          }
+
+          setState(() {
+            _otpController.text = otp;
+            _verifyOtp();
+          });
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _linkSubscription?.cancel();
     _emailController.removeListener(_validateEmail);
     _otpController.removeListener(_validateOtp);
     _emailController.dispose();

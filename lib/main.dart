@@ -30,6 +30,7 @@ import 'package:medito/services/network/http_api_service.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
+import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -138,21 +139,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     AppLogger.d('DEEPLINK', 'Host: ${uri.host}');
     AppLogger.d('DEEPLINK', 'Path: ${uri.path}');
 
-    var path = '';
-    var id = '';
-
     try {
-      if (uri.scheme == 'org.meditofoundation') {
-        path = uri.host;
-        id = uri.path.replaceFirst('/', '');
-      } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
-        var pathSegments = uri.path.split('/')
-          ..removeWhere((segment) => segment.isEmpty);
+      var pathSegments = <String>[];
 
-        if (pathSegments.isNotEmpty) {
-          path = pathSegments[0];
-          id = pathSegments.length > 1 ? pathSegments[1] : '';
-        }
+      if (uri.scheme == 'org.meditofoundation') {
+        pathSegments = [uri.host, ...uri.pathSegments];
+      } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
+        pathSegments = uri.pathSegments;
       } else {
         showSnackBar(
           context,
@@ -161,13 +154,22 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         return;
       }
 
-      if (path.isEmpty) {
+      if (pathSegments.isEmpty) {
         showSnackBar(
           context,
           StringConstants.invalidDeepLink,
         );
         return;
       }
+
+      // Handle OTP links
+      if (pathSegments[0] == 'otp' || pathSegments[1] == 'otp' && pathSegments.length > 1) {
+        return;
+      }
+
+      // Handle other navigation links
+      var path = pathSegments[0];
+      var id = pathSegments.length > 1 ? pathSegments[1] : '';
 
       AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
 
@@ -247,7 +249,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
               navigatorKey: navigatorKey,
               theme: appTheme(context),
               title: ParentWidget._title,
-              home: const SplashView(),
+              initialRoute: '/',
+              routes: {
+                '/': (context) => const SplashView(),
+                SignUpLogInPage.routeName: (context) => const SignUpLogInPage(),
+              },
             ),
           ),
         );
