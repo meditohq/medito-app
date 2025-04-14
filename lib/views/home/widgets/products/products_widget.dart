@@ -194,13 +194,13 @@ class ProductGroupCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: ColorConstants.white,
+                        color: ColorConstants.onyx,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         StringConstants.newProductLabel,
                         style: TextStyle(
-                          color: ColorConstants.onyx,
+                          color: ColorConstants.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
