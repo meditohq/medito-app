@@ -1,5 +1,5 @@
 ---
-description: When a snackbar is shown, do this
+description: When a snackbar is to be shown, do this
 globs: 
 alwaysApply: false
 ---

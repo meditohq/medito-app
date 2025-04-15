@@ -1,6 +1,6 @@
 ---
-description: To run the app
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
-use the commands in [launch.json](mdc:.vscode/launch.json) 
+If you need to launch the app, use the commands in [launch.json](mdc:.vscode/launch.json) 

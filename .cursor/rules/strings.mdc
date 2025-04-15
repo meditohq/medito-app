@@ -1,7 +1,7 @@
 ---
-description: when creating and managing String constants for the UI
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 
-When adding a new string, put it in [string_constants.dart](mdc:lib/constants/string_constants.dart) and add a comment describing the context in which this string is used.
+When adding a new UI string, put it in [string_constants.dart](mdc:lib/constants/string_constants.dart) and add a comment describing the context in which this string is used.

@@ -1,6 +1,6 @@
 ---
-description: Know when to add comments
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 Only add comments if the code is doing something weird, it is a temporary fix, or if the code is not very readable.

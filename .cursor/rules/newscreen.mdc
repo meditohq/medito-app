@@ -1,5 +1,5 @@
 ---
-description: Creating new screens with an app bar
+description: Use this rule if we are creating a new screen
 globs: 
 alwaysApply: false
 ---

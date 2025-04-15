@@ -1,7 +1,7 @@
 ---
-description: When using a UI string 
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 
 

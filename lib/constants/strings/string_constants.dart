@@ -8,6 +8,7 @@ class StringConstants {
   static const String home = 'Home';
   static const String none = 'None';
   static const String removed = 'Removed';
+  // Title for the meditation products section on the home screen and in CustomiseHomeLayoutScreen
   static const String meditationProducts = 'Shop to Support';
   static const String fromPrefix = 'From ';
   static const String emptyDownloadsMessage =
@@ -367,8 +368,11 @@ class StringConstants {
 
   static const errorNotFound = 'Resource not found';
 
+  // Title for the shortcuts section on the home screen and in CustomiseHomeLayoutScreen
   static const String shortcutsTitle = 'Shortcuts';
+  // Title for the carousel section on the home screen and in CustomiseHomeLayoutScreen
   static const String carouselTitle = 'Featured';
+  // Title for the daily quote section on the home screen and in CustomiseHomeLayoutScreen
   static const String quoteTitle = 'Daily Quote';
 
   static const customization = 'Customisation';
@@ -663,8 +667,10 @@ class StringConstants {
   static const String tracksSectionHeader = 'Tracks';
   static const String noResultsFound = 'No results found for your search';
 
+  // Used as the analytics event name when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen
   static const String analyticsEventHomeWidgetOrder =
       'home_widget_order_changed';
+  // Description for the analytics event when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen
   static const String analyticsEventHomeWidgetOrderDesc =
       'User changed the order of home screen widgets';
 }
