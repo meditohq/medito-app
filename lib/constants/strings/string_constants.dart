@@ -662,4 +662,9 @@ class StringConstants {
   static const String packsSectionHeader = 'Packs';
   static const String tracksSectionHeader = 'Tracks';
   static const String noResultsFound = 'No results found for your search';
+
+  static const String analyticsEventHomeWidgetOrder =
+      'home_widget_order_changed';
+  static const String analyticsEventHomeWidgetOrderDesc =
+      'User changed the order of home screen widgets';
 }

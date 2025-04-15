@@ -5,62 +5,92 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
+import 'package:medito/providers/providers.dart';
 
-class CustomiseHomeLayoutScreen extends ConsumerWidget {
+class CustomiseHomeLayoutScreen extends ConsumerStatefulWidget {
   const CustomiseHomeLayoutScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final order = ref.watch(homeWidgetOrderProvider);
-    final notifier = ref.read(homeWidgetOrderProvider.notifier);
+  ConsumerState<CustomiseHomeLayoutScreen> createState() =>
+      CustomiseHomeLayoutScreenState();
+}
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: ColorConstants.ebony,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Tap and hold to drag items into your preferred order',
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: ReorderableListView.builder(
-                itemCount: order.length,
-                itemBuilder: (context, index) {
-                  final widgetType = order[index];
-                  return ListTile(
-                    key: ValueKey(widgetType.name),
-                    leading: HugeIcon(
-                      icon: HugeIcons.solidSharpMenu01,
-                      color: ColorConstants.white,
-                    ),
-                    title: Text(_getTitleForType(widgetType)),
-                  );
-                },
-                onReorder: (oldIndex, newIndex) {
-                  if (oldIndex < newIndex) newIndex -= 1;
-                  final newOrder = List.of(order);
-                  final item = newOrder.removeAt(oldIndex);
-                  newOrder.insert(newIndex, item);
-                  notifier.updateOrder(newOrder);
-                },
+class CustomiseHomeLayoutScreenState
+    extends ConsumerState<CustomiseHomeLayoutScreen> {
+  @override
+  Widget build(BuildContext context) {
+    var order = ref.watch(homeWidgetOrderProvider);
+    var notifier = ref.read(homeWidgetOrderProvider.notifier);
+
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, popResult) async {
+        if (!didPop) {
+          _logOrderAndPop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: ColorConstants.ebony,
+          elevation: 0,
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                'Tap and hold to drag items into your preferred order',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
               ),
             ),
-          ),
-          SingleBackButtonActionBar(
-            onBackPressed: () => Navigator.pop(context),
-          ),
-        ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: ReorderableListView.builder(
+                  itemCount: order.length,
+                  itemBuilder: (context, index) {
+                    var widgetType = order[index];
+
+                    return ListTile(
+                      key: ValueKey(widgetType.name),
+                      leading: HugeIcon(
+                        icon: HugeIcons.solidSharpMenu01,
+                        color: ColorConstants.white,
+                      ),
+                      title: Text(_getTitleForType(widgetType)),
+                    );
+                  },
+                  onReorder: (oldIndex, newIndex) {
+                    if (oldIndex < newIndex) newIndex -= 1;
+                    var newOrder = List.of(order);
+                    var item = newOrder.removeAt(oldIndex);
+                    newOrder.insert(newIndex, item);
+                    notifier.updateOrder(newOrder);
+                  },
+                ),
+              ),
+            ),
+            SingleBackButtonActionBar(
+              onBackPressed: _logOrderAndPop,
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _logOrderAndPop() {
+    var order = ref.read(homeWidgetOrderProvider);
+    var analytics = ref.read(analyticsServiceProvider);
+
+    analytics.logEvent(
+      name: StringConstants.analyticsEventHomeWidgetOrder,
+      parameters: {
+        'order': HomeWidgetType.toStringList(order),
+        'desc': StringConstants.analyticsEventHomeWidgetOrderDesc,
+      },
     );
   }
 
