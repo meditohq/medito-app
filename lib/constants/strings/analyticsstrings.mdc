@@ -1,0 +1,7 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# analyticsstrings.mdc
+Put all analytics event string constants in analytics_event_constants.dart. Add a comment for each event describing the context in which it is used

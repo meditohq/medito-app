@@ -666,11 +666,4 @@ class StringConstants {
   static const String packsSectionHeader = 'Packs';
   static const String tracksSectionHeader = 'Tracks';
   static const String noResultsFound = 'No results found for your search';
-
-  // Used as the analytics event name when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen
-  static const String analyticsEventHomeWidgetOrder =
-      'home_widget_order_changed';
-  // Description for the analytics event when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen
-  static const String analyticsEventHomeWidgetOrderDesc =
-      'User changed the order of home screen widgets';
 }

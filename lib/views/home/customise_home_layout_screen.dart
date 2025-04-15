@@ -6,6 +6,7 @@ import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 
 class CustomiseHomeLayoutScreen extends ConsumerStatefulWidget {
   const CustomiseHomeLayoutScreen({super.key});
@@ -86,10 +87,10 @@ class CustomiseHomeLayoutScreenState
     var analytics = ref.read(analyticsServiceProvider);
 
     analytics.logEvent(
-      name: StringConstants.analyticsEventHomeWidgetOrder,
+      name: AnalyticsEventConstants.homeWidgetOrderChanged,
       parameters: {
         'order': HomeWidgetType.toStringList(order),
-        'desc': StringConstants.analyticsEventHomeWidgetOrderDesc,
+        'desc': AnalyticsEventConstants.homeWidgetOrderChangedDesc,
       },
     );
   }

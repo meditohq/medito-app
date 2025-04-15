@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:medito/services/products_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/providers.dart';
 
 class ProductsWidget extends StatelessWidget {
   final List<ProductGroupModel>? productGroups;
@@ -76,7 +79,7 @@ class ProductsWidget extends StatelessWidget {
   }
 }
 
-class ProductGroupCard extends StatelessWidget {
+class ProductGroupCard extends ConsumerWidget {
   final ProductGroupModel productGroup;
   final double cardWidth = 150.0;
 
@@ -86,11 +89,23 @@ class ProductGroupCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final hasNewVariant = productGroup.variants.any((v) => v.isNew);
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        // Log analytics event
+        var analytics = ref.read(analyticsServiceProvider);
+
+        analytics.logEvent(
+          name: AnalyticsEventConstants.productClicked,
+          parameters: {
+            'group_id': productGroup.groupId,
+            'name': productGroup.name,
+            'url': productGroup.url ?? '',
+          },
+        );
+
         _openProductUrl(productGroup.url);
         for (final variant in productGroup.variants) {
           ProductsService().markProductAsSeen(variant.id);
