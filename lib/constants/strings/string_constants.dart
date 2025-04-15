@@ -658,4 +658,8 @@ class StringConstants {
 
   // Used in the products widget to label new products
   static const String newProductLabel = 'NEW';
+
+  static const String packsSectionHeader = 'Packs';
+  static const String tracksSectionHeader = 'Tracks';
+  static const String noResultsFound = 'No results found for your search';
 }

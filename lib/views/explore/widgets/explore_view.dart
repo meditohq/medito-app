@@ -11,6 +11,7 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:medito/providers/explore/search_provider.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;
@@ -42,8 +43,9 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   void _onSearchChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
+      var asciiQuery = value.replaceAll(RegExp(r'[^\x00-\x7F]'), '');
       setState(() {
-        _searchQuery = value;
+        _searchQuery = asciiQuery;
         if (_searchQuery.isEmpty) ref.invalidate(explorePacksProvider);
       });
     });
@@ -157,15 +159,120 @@ class ExploreContentWidget extends ConsumerWidget {
         loading: () => const LoadingWidget(),
       );
     } else {
-      final searchResults = ref.watch(searchTracksProvider(searchQuery));
-      return searchResults.when(
-        data: (tracks) => _buildTrackList(context, ref, tracks),
+      final searchTracksAsync = ref.watch(searchTracksProvider(searchQuery));
+      final explorePacksAsync = ref.watch(explorePacksProvider);
+
+      return searchTracksAsync.when(
+        data: (tracks) {
+          return explorePacksAsync.when(
+            data: (allPacks) {
+              var lowerQuery = searchQuery.toLowerCase();
+              var packs = allPacks
+                  .where((p) =>
+                      p.title.toLowerCase().contains(lowerQuery) ||
+                      p.subtitle.toLowerCase().contains(lowerQuery))
+                  .toList();
+
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Builder(
+                    builder: (context) {
+                      if (packs.isEmpty && tracks.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: padding16, vertical: padding16),
+                          child: Text(
+                            StringConstants.noResultsFound,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: Colors.white70),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (packs.isNotEmpty) ...[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: padding16),
+                              child: Text(
+                                StringConstants.packsSectionHeader,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                            _buildPackList(context, ref, packs),
+                            const SizedBox(height: 8),
+                          ],
+                          if (tracks.isNotEmpty) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: 0,
+                                top: padding8,
+                                left: padding16,
+                                right: padding16,
+                              ),
+                              child: Text(
+                                StringConstants.tracksSectionHeader,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                            _buildTrackList(context, ref, tracks),
+                          ],
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+            error: (err, stack) {
+              var errorMsg = err.toString();
+              return Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Pack filter error:',
+                        style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    Text(errorMsg,
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ],
+                ),
+              );
+            },
+            loading: () => const LoadingWidget(),
+          );
+        },
         error: (err, stack) {
-          final error = err is AppError ? err : const UnknownError();
-          return MeditoErrorWidget(
-            error: error,
-            isScaffold: false,
-            onTap: () => ref.invalidate(searchTracksProvider(searchQuery)),
+          var errorMsg = err.toString();
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Track search error:',
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                Text(errorMsg, style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
           );
         },
         loading: () => const LoadingWidget(),
@@ -236,31 +343,34 @@ class ExploreContentWidget extends ConsumerWidget {
       List<TrackItem> items, BoxConstraints constraints) {
     var itemWidth = (constraints.maxWidth - padding16) / 2;
 
-    return Wrap(
-      spacing: 0,
-      runSpacing: padding16,
-      children: items.map((item) {
-        return SizedBox(
-          width: itemWidth,
-          child: Padding(
-            padding: const EdgeInsets.only(left: padding16),
-            child: TrackCardWidget(
-              title: item.title,
-              subTitle: item.subtitle,
-              coverUrlPath: item.coverUrl,
-              onTap: () {
-                onPackTapped();
-                handleNavigation(
-                  TypeConstants.track,
-                  [item.id, item.path],
-                  context,
-                  ref: ref,
-                );
-              },
+    return Padding(
+      padding: const EdgeInsets.only(top: padding16),
+      child: Wrap(
+        spacing: 0,
+        runSpacing: padding16,
+        children: items.map((item) {
+          return SizedBox(
+            width: itemWidth,
+            child: Padding(
+              padding: const EdgeInsets.only(left: padding16),
+              child: TrackCardWidget(
+                title: item.title,
+                subTitle: item.subtitle,
+                coverUrlPath: item.coverUrl,
+                onTap: () {
+                  onPackTapped();
+                  handleNavigation(
+                    TypeConstants.track,
+                    [item.id, item.path],
+                    context,
+                    ref: ref,
+                  );
+                },
+              ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 
