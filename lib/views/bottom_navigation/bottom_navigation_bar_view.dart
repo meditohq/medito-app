@@ -133,7 +133,7 @@ class _BottomNavigationBarViewState
           }
         },
         child: HugeIcon(
-          icon: HugeIcons.solidRoundedSearch01,
+          icon: HugeIcons.solidRoundedLibraries,
           color: _currentPageIndex == 1
               ? ColorConstants.lightPurple
               : ColorConstants.white,
