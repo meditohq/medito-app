@@ -163,7 +163,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       }
 
       // Handle OTP links
-      if (pathSegments[0] == 'otp' || pathSegments[1] == 'otp' && pathSegments.length > 1) {
+      if (pathSegments[0] == 'otp' ||
+          pathSegments[1] == 'otp' && pathSegments.length > 1) {
         return;
       }
 
