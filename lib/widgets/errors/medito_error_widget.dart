@@ -113,35 +113,58 @@ class MeditoErrorWidget extends ConsumerWidget {
               textAlign: TextAlign.center,
             ),
             height16,
-            if (error is UnauthorizedError)
-              LoadingButtonWidget(
-                btnText: StringConstants.signInAgain,
-                onPressed: () async {
-                  final authRepository = ProviderScope.containerOf(context)
-                      .read(authRepositorySyncProvider);
-                  await authRepository.signOut();
-                  await StatsManager().clearAllStats();
-                  if (context.mounted) {
-                    final ref = ProviderScope.containerOf(context);
-                    ref.read(meRefreshProvider)();
-
-                    // Add a small delay to let the me provider refresh before navigation
-                    await Future.delayed(const Duration(milliseconds: 100));
-
-                    if (context.mounted) {
-                      // Navigate to splash screen from UI
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => const SplashView(),
+            if (error is UnauthorizedError || error is RefreshTokenError)
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 300,
+                    child: OutlinedButton(
+                      onPressed: onTap,
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        (route) => false,
-                      );
-                    }
-                  }
-                },
-                isLoading: isLoading,
-                bgColor: ColorConstants.lightPurple,
-                textColor: ColorConstants.onyx,
+                      ),
+                      child: Text(StringConstants.retry),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: 300,
+                    child: LoadingButtonWidget(
+                      btnText: StringConstants.signInAgain,
+                      onPressed: () async {
+                        final authRepository =
+                            ProviderScope.containerOf(context)
+                                .read(authRepositorySyncProvider);
+                        await authRepository.signOut();
+                        await StatsManager().clearAllStats();
+                        if (context.mounted) {
+                          final ref = ProviderScope.containerOf(context);
+                          ref.read(meRefreshProvider)();
+
+                          // Add a small delay to let the me provider refresh before navigation
+                          await Future.delayed(
+                              const Duration(milliseconds: 100));
+
+                          if (context.mounted) {
+                            // Navigate to splash screen from UI
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (context) => const SplashView(),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                        }
+                      },
+                      isLoading: isLoading,
+                      bgColor: ColorConstants.lightPurple,
+                      textColor: ColorConstants.onyx,
+                    ),
+                  ),
+                ],
               )
             else
               Column(

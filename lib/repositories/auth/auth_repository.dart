@@ -4,6 +4,7 @@ import 'package:medito/constants/constants.dart' hide AuthTokens;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:developer' as dev;
@@ -11,6 +12,8 @@ import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/repositories/me/me_repository.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'dart:io';
 
 class User {
   final String id;
@@ -148,6 +151,27 @@ class AuthRepositoryImpl extends AuthRepository {
         } else {
           dev.log('[AUTH_REPO] No refresh token found despite logged in status',
               level: 800);
+
+          // Log a unique Firebase Analytics event for diagnostics
+          try {
+            FirebaseAnalytics.instance.logEvent(
+              name: 'unexpected_logout_refresh_token_missing',
+              parameters: {
+                'os': Platform.operatingSystem,
+                'os_version': Platform.operatingSystemVersion,
+                'client_id': clientId,
+                'app_version': await PackageInfo.fromPlatform()
+                    .then((info) => info.buildNumber),
+                'timestamp': DateTime.now().toIso8601String(),
+              },
+            );
+          } catch (e, stack) {
+            dev.log(
+                '[AUTH_REPO] Failed to log analytics event for unexpected logout',
+                error: e,
+                stackTrace: stack);
+          }
+
           await _resetAuth();
           // Inconsistent state: logged in flag true, but no token. Reset.
         }

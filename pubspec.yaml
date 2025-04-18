@@ -36,7 +36,7 @@ dependencies:
   flutter_local_notifications: ^19.0.0
   flutter_markdown: ^0.7.4+1
   flutter_riverpod: ^2.4.9
-  flutter_secure_storage: ^10.0.0-beta.4
+  flutter_secure_storage: ^9.0.0
   flutter_svg: ^2.0.9
   freezed_annotation: ^2.4.4
   haptic_feedback: ^0.5.1+1
@@ -67,6 +67,7 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   xml: ^6.5.0
   xml2json: ^6.2.7
+  crypto: ^3.0.6
 
 dev_dependencies:
   flutter_test:

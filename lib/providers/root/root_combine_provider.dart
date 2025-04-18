@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/maintenance/maintenance_model.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 import '../maintenance/maintenance_provider.dart';
 
@@ -21,8 +20,8 @@ final maintenanceNeededProvider =
     final buildNumber = int.tryParse(deviceInfo.buildNumber) ?? 0;
     final minRequired = maintenanceData.minimumBuildNumber ?? 0;
 
-    final needsMaintenance = (maintenanceData.isUnderMaintenance) ||
-        minRequired > buildNumber;
+    final needsMaintenance =
+        (maintenanceData.isUnderMaintenance) || minRequired > buildNumber;
 
     if (needsMaintenance) {
       return maintenanceData;

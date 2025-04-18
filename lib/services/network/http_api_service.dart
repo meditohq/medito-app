@@ -295,7 +295,7 @@ class HttpApiService {
       AppLogger.i('HTTP', 'Request successful after token refresh');
       await _addHttpDebugLog('Request successful after token refresh');
       return content.isEmpty ? {} : _parseResponseContent(content);
-    } on NoInternetError catch (e, stackTrace) {
+    } on NoInternetError catch (e, _) {
       // Don't log out on connection issues - let the user retry when connection is available
       AppLogger.w(
           'HTTP', 'No internet connection during token refresh attempt');
@@ -469,7 +469,7 @@ class HttpApiService {
         AppLogger.i(
             'HTTP', 'Using result of already in-progress token refresh');
         return;
-      } catch (e, stackTrace) {
+      } catch (e, _) {
         AppLogger.w(
             'HTTP', 'Previous token refresh failed, will attempt new refresh');
         // Previous refresh failed, we'll try again
@@ -513,9 +513,10 @@ class HttpApiService {
 
       final refreshToken = await _authService.getStoredRefreshToken();
       if (refreshToken == null) {
-        AppLogger.e('HTTP', 'No refresh token available - forcing logout');
-        await _addHttpDebugLog('No refresh token available - forcing logout');
-        await _forceLogout('No refresh token found');
+        AppLogger.w('HTTP', 'No refresh token available - skipping refresh');
+        await _addHttpDebugLog('No refresh token available - skipping refresh');
+
+        // No force logout - just throw the error to be handled by UI
         throw const RefreshTokenError();
       }
 

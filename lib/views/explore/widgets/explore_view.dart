@@ -11,7 +11,6 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:medito/providers/explore/search_provider.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;

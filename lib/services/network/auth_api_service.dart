@@ -9,7 +9,8 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class HttpClientWrapper {
   HttpClient createClient() => HttpClient();
@@ -119,7 +120,8 @@ class AuthApiService {
       // Create new tokens object with the refreshed access token
       final tokens = AuthTokens(
         accessToken: response['access_token'] as String,
-        refreshToken: refreshToken, // Keep the same refresh token
+        refreshToken: response['refresh_token']
+            as String, // Use refresh token from response
         expiresIn: response['expires_in'] as int,
         clientId: response['client_id'] as String? ??
             _tokens?.clientId ??
@@ -167,8 +169,44 @@ class AuthApiService {
         'setAuthTokens called. PreviousEmail: $previousEmail, NewEmail: ${tokens.email}');
 
     if (tokens.refreshToken.isNotEmpty) {
-      await _secureStorage.storeRefreshToken(tokens.refreshToken);
+      try {
+        // Directly use the secure storage service's storeRefreshToken method
+        // which already has its own comprehensive retry mechanism
+        await _secureStorage.storeRefreshToken(tokens.refreshToken);
+        AppLogger.d('AUTH_API', 'Refresh token saved to secure storage');
+      } catch (e, stack) {
+        // This error is critical - log it extensively
+        AppLogger.e(
+            'AUTH_API',
+            'CRITICAL: Failed to save refresh token to secure storage. User may experience unexpected logout on next app start.',
+            e,
+            stack);
+
+        // Track this critical error in Firebase Analytics
+        try {
+          final packageInfo = await PackageInfo.fromPlatform();
+          await FirebaseAnalytics.instance.logEvent(
+            name: 'auth_token_storage_failed',
+            parameters: {
+              'os': Platform.operatingSystem,
+              'os_version': Platform.operatingSystemVersion,
+              'app_version': packageInfo.version,
+              'build_number': packageInfo.buildNumber,
+              'error_type': e.runtimeType.toString(),
+              'error_message':
+                  e.toString().substring(0, min(100, e.toString().length)),
+              'timestamp': DateTime.now().toIso8601String(),
+            },
+          );
+        } catch (analyticsError) {
+          AppLogger.e(
+              'AUTH_API',
+              'Failed to log token storage failure to analytics',
+              analyticsError);
+        }
+      }
     }
+
     AppLogger.d('AUTH_API',
         'Tokens updated. HasRefreshToken: ${tokens.refreshToken.isNotEmpty}, Email: ${tokens.email}, ExpiresIn: ${tokens.expiresIn}');
   }

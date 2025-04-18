@@ -15,7 +15,6 @@ class MockAuthApiService extends Mock implements AuthApiService {}
 void main() {
   late MockSecureStorageService mockSecureStorage;
   late MockAuthApiService mockAuthService;
-  late HttpApiService httpService;
 
   setUp(() {
     mockSecureStorage = MockSecureStorageService();
@@ -23,14 +22,6 @@ void main() {
 
     // Register fallback values for parameters
     registerFallbackValue('fallback-token');
-
-    // For real tests, we would need a way to inject dependencies into HttpApiService
-    // HttpApiService._instance = null; // This line won't work due to private access
-    httpService = HttpApiService();
-
-    // Replace the authService in httpService with our mock
-    // This requires modifying HttpApiService to allow injection for testing
-    // In this example, we're assuming that's already been done
   });
 
   group('Token Refresh Tests', () {
