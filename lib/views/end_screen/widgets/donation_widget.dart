@@ -11,17 +11,17 @@ import '../../../repositories/me/me_repository.dart';
 import '../../../routes/routes.dart';
 import '../../../utils/utils.dart';
 import '../../../widgets/errors/medito_error_widget.dart';
+import 'feedback_widget.dart';
 
 class DonationWidget extends ConsumerStatefulWidget {
   const DonationWidget({super.key});
 
   @override
-  ConsumerState<DonationWidget> createState() => _DonationWidgetState();
+  ConsumerState<DonationWidget> createState() => DonationWidgetState();
 }
 
-class _DonationWidgetState extends ConsumerState<DonationWidget> {
+class DonationWidgetState extends ConsumerState<DonationWidget> {
   bool _isDonor = false;
-  bool _showThankYouMessage = false;
   bool _isCheckingSubscription = true;
 
   @override
@@ -60,109 +60,12 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
                       child: _buildDonationWidget(context, donationPageModel),
                     ),
               height20,
-               _buildFeedbackCard(context),
+              const FeedbackWidget(),
             ],
           );
         },
       ),
     );
-  }
-
-  Widget _buildFeedbackCard(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: ColorConstants.onyx,
-      ),
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        spacing: 16,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text(
-            StringConstants.howDoYouFeel,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: teachers,
-              fontSize: 22,
-              color: ColorConstants.white,
-            ),
-          ),
-          _showThankYouMessage
-              ? _buildThanksMessage()
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 16,
-                  children: [
-                    Semantics(
-                      button: true,
-                      label: StringConstants.thanksForSharingHappy,
-                      child: _buildEmotionButton(
-                        context,
-                        HugeIcons.solidStandardSmile,
-                        StringConstants.thanksForSharing,
-                        _handlePositiveFeedback,
-                      ),
-                    ),
-                    Semantics(
-                      button: true,
-                      label: StringConstants.thanksForSharingNeutral,
-                      child: _buildEmotionButton(
-                        context,
-                        HugeIcons.solidStandardNeutral,
-                        StringConstants.thanksForSharing,
-                        _handleNeutralFeedback,
-                      ),
-                    ),
-                    Semantics(
-                      button: true,
-                      label: StringConstants.thanksForSharingSad,
-                      child: _buildEmotionButton(
-                        context,
-                        HugeIcons.solidStandardSad01,
-                        StringConstants.thanksForSharing,
-                        _handleNegativeFeedback,
-                      ),
-                    ),
-                  ],
-                ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildThanksMessage() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: const Text(
-        StringConstants.thanksForSharing,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 18,
-          color: ColorConstants.white,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _handlePositiveFeedback() async {
-    setState(() {
-      _showThankYouMessage = true;
-    });
-  }
-
-  Future<void> _handleNeutralFeedback() async {
-    setState(() {
-      _showThankYouMessage = true;
-    });
-  }
-
-  Future<void> _handleNegativeFeedback() async {
-    setState(() {
-      _showThankYouMessage = true;
-    });
   }
 
   Future<void> _checkSubscriptionStatus() async {
@@ -189,31 +92,6 @@ class _DonationWidgetState extends ConsumerState<DonationWidget> {
         });
       }
     }
-  }
-
-  Widget _buildEmotionButton(
-    BuildContext context,
-    IconData icon,
-    String feedbackMessage,
-    VoidCallback onTap,
-  ) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(2),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(8),
-          color: ColorConstants.ebony,
-        ),
-        child: Icon(
-          icon,
-          size: 36,
-          color: ColorConstants.lightPurple,
-        ),
-      ),
-    );
   }
 
   Widget _buildLoadingWidget() {
