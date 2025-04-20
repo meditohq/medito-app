@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 class FeedbackWidget extends StatefulWidget {
-  const FeedbackWidget({super.key});
+
+  const FeedbackWidget({
+    super.key,
+  });
 
   @override
   State<FeedbackWidget> createState() => FeedbackWidgetState();
@@ -97,11 +100,10 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
       _showThankYouMessage = true;
     });
 
-    await FirebaseAnalytics.instance.logEvent(
-      name: 'post_meditation_feedback',
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventPostMeditationFeedback,
       parameters: {
-        'emotion': 'positive',
-        'emoji': '😊',
+        'type': 'thumbs_up',
       },
     );
   }
@@ -111,11 +113,10 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
       _showThankYouMessage = true;
     });
 
-    await FirebaseAnalytics.instance.logEvent(
-      name: 'post_meditation_feedback',
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventPostMeditationFeedback,
       parameters: {
-        'emotion': 'neutral',
-        'emoji': '😐',
+        'type': 'neutral',
       },
     );
   }
@@ -125,11 +126,10 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
       _showThankYouMessage = true;
     });
 
-    await FirebaseAnalytics.instance.logEvent(
-      name: 'post_meditation_feedback',
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventPostMeditationFeedback,
       parameters: {
-        'emotion': 'negative',
-        'emoji': '☹️',
+        'type': 'thumbs_down',
       },
     );
   }

@@ -14,8 +14,32 @@ class FirebaseAnalyticsService {
   late final FirebaseAnalytics _analytics;
   bool _initialized = false;
 
-  // Key for storing analytics preference
+  // Keys and constants
   static const String analyticsEnabledKey = 'analytics_enabled';
+
+  // Analytics event names
+  static const String eventUnexpectedLogoutRefreshTokenMissing =
+      'unexpected_logout_refresh_token_missing';
+  static const String eventSecureStoragePersistentFailure =
+      'secure_storage_persistent_failure';
+  static const String eventTokenBackupStorageAttempt =
+      'token_backup_storage_attempt';
+  static const String eventTokenBackupStorageResult =
+      'token_backup_storage_result';
+  static const String eventTokenRetrievedFromBackup =
+      'token_retrieved_from_backup';
+  static const String eventTokenBackupAfterErrorAttempt =
+      'token_backup_after_error_attempt';
+  static const String eventTokenBackupAfterErrorResult =
+      'token_backup_after_error_result';
+  static const String eventRefreshTokenRetrievalFailed =
+      'refresh_token_retrieval_failed';
+       static const String eventEmailAddressSaveFailed =
+      'email_address_save_failed';
+  static const String eventEmailAddressSaveFailed2 =
+      'email_address_save_failed2';
+  static const String eventAuthTokenStorageFailed = 'auth_token_storage_failed';
+  static const String eventPostMeditationFeedback = 'post_meditation_feedback';
 
   FirebaseAnalyticsService._internal() {
     _analytics = FirebaseAnalytics.instance;

@@ -11,6 +11,7 @@ import 'package:medito/services/secure_storage_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 class HttpClientWrapper {
   HttpClient createClient() => HttpClient();
@@ -185,17 +186,13 @@ class AuthApiService {
         // Track this critical error in Firebase Analytics
         try {
           final packageInfo = await PackageInfo.fromPlatform();
-          await FirebaseAnalytics.instance.logEvent(
-            name: 'auth_token_storage_failed',
+          await FirebaseAnalyticsService().logEvent(
+            name: FirebaseAnalyticsService.eventAuthTokenStorageFailed,
             parameters: {
-              'os': Platform.operatingSystem,
-              'os_version': Platform.operatingSystemVersion,
-              'app_version': packageInfo.version,
+              'error': e.toString(),
+              'stack_trace': stack.toString(),
+              'version': packageInfo.version,
               'build_number': packageInfo.buildNumber,
-              'error_type': e.runtimeType.toString(),
-              'error_message':
-                  e.toString().substring(0, min(100, e.toString().length)),
-              'timestamp': DateTime.now().toIso8601String(),
             },
           );
         } catch (analyticsError) {

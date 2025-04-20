@@ -333,7 +333,7 @@ class SplashViewState extends ConsumerState<SplashView>
             ? Center(
                 child: SvgPicture.asset(
                   AssetConstants.icLogo,
-                  width: 80,
+                  width: 168,
                 ),
               )
             : LayoutBuilder(
