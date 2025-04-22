@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/styles/widget_styles.dart';
-import 'package:medito/models/local_audio_completed.dart';
-import 'package:medito/providers/stats_provider.dart';
-import '../../../../constants/colors/color_constants.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
+import '../../../../constants/colors/color_constants.dart';
+import 'streak_circle_constants.dart';
 
 class StreakCircle extends ConsumerStatefulWidget {
   final VoidCallback onTap;
@@ -15,32 +16,22 @@ class StreakCircle extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<StreakCircle> createState() => _StreakCircleState();
+  ConsumerState<StreakCircle> createState() => StreakCircleState();
 }
 
-class _StreakCircleState extends ConsumerState<StreakCircle>
+class StreakCircleState extends ConsumerState<StreakCircle>
     with TickerProviderStateMixin {
-  late AnimationController _animationController;
-
-  static const _kBorderRadius = 30.0;
-  static const _kIconSize = 20.0;
-  static const _kInnerIconSize = 18.0;
-  static const _kFontSize = 16.0;
-  static const _kLineHeight = 1.4;
-  static const _kPadding = EdgeInsets.fromLTRB(11, 9, 13, 9);
+  late final StreakCircleController _controller;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    );
+    _controller = StreakCircleController(vsync: this);
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -53,53 +44,52 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
         return statsAsync.when(
           loading: () => _buildShimmer(),
           error: (error, stackTrace) {
-            // If there was a previous successful state, display that instead of the error
             if (statsAsync.hasValue) {
               final stats = statsAsync.value!;
               final isStreakDoneToday =
-                  _isStreakDoneToday(stats.audioCompleted);
-              final streakText = '${stats.streakCurrent}';
+                  _controller.isStreakDoneToday(stats.audioCompleted);
+              final displayValue = _controller.getDisplayValue(stats);
+              final progressValue = _controller.getProgressValue(stats);
+              final showConsistencyScore =
+                  _controller.shouldShowConsistencyScore(stats);
 
-              // We might stop the animation here since we are in an error/offline state
-              if (_animationController.isAnimating) {
-                _animationController.stop();
-              }
+              _controller.updateAnimation(isStreakDoneToday);
 
               return AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) =>
-                    _buildStreakCircle(isStreakDoneToday, streakText),
+                animation: _controller.animationController,
+                builder: (context, child) => _buildStreakCircle(
+                    isStreakDoneToday,
+                    displayValue,
+                    progressValue,
+                    showConsistencyScore),
               );
             } else {
-              // If there's no previous data, show the actual error state
               return _buildErrorState(ref);
             }
           },
           data: (stats) {
-            // If 1the stats have a zero 'updated' timestamp, they're either initial empty stats
-            // or they haven't been properly fetched yet
+           
             final isPossiblyStillLoading = stats.updated == 0;
 
             if (isPossiblyStillLoading) {
-              // Only try to refresh if it's the initial load
               Future.microtask(
                   () => ref.read(statsProvider.notifier).refresh());
               return _buildShimmer();
             }
 
-            final isStreakDoneToday = _isStreakDoneToday(stats.audioCompleted);
-            final streakText = '${stats.streakCurrent}';
+            final isStreakDoneToday =
+                _controller.isStreakDoneToday(stats.audioCompleted);
+            final displayValue = _controller.getDisplayValue(stats);
+            final progressValue = _controller.getProgressValue(stats);
+            final showConsistencyScore =
+                _controller.shouldShowConsistencyScore(stats);
 
-            if (isStreakDoneToday && !_animationController.isAnimating) {
-              _animationController.repeat();
-            } else if (!isStreakDoneToday && _animationController.isAnimating) {
-              _animationController.stop();
-            }
+            _controller.updateAnimation(isStreakDoneToday);
 
             return AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) =>
-                  _buildStreakCircle(isStreakDoneToday, streakText),
+              animation: _controller.animationController,
+              builder: (context, child) => _buildStreakCircle(isStreakDoneToday,
+                  displayValue, progressValue, showConsistencyScore),
             );
           },
         );
@@ -107,7 +97,8 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
     );
   }
 
-  Widget _buildStreakCircle(bool isStreakDoneToday, String streakText) {
+  Widget _buildStreakCircle(bool isStreakDoneToday, String displayValue,
+      double progressValue, bool showConsistencyScore) {
     return Container(
       decoration: isStreakDoneToday
           ? BoxDecoration(
@@ -120,10 +111,11 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
                   ColorConstants.lightPurple.withOpacity(0.25),
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
-                transform:
-                    GradientRotation(_animationController.value * 2 * 3.14159),
+                transform: GradientRotation(
+                    _controller.animationController.value * 2 * 3.14159),
               ),
-              borderRadius: BorderRadius.circular(_kBorderRadius + 1.5),
+              borderRadius: BorderRadius.circular(
+                  StreakCircleConstants.borderRadius + 1.5),
             )
           : null,
       child: Padding(
@@ -132,47 +124,67 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
           color: Colors.transparent,
           child: InkWell(
             onTap: widget.onTap,
-            borderRadius: BorderRadius.circular(_kBorderRadius),
+            borderRadius:
+                BorderRadius.circular(StreakCircleConstants.borderRadius),
             child: Ink(
               decoration: BoxDecoration(
                 color: ColorConstants.onyx,
-                borderRadius: BorderRadius.circular(_kBorderRadius),
+                borderRadius:
+                    BorderRadius.circular(StreakCircleConstants.borderRadius),
               ),
               child: Padding(
-                padding: _kPadding,
+                padding: StreakCircleConstants.padding,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        if (isStreakDoneToday)
+                    if (showConsistencyScore)
+                      SizedBox(
+                        width: StreakCircleConstants.iconSize,
+                        height: StreakCircleConstants.iconSize,
+                        child: CircularProgressIndicator(
+                          value: progressValue,
+                          backgroundColor:
+                              ColorConstants.white.withOpacity(0.2),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            isStreakDoneToday
+                                ? ColorConstants.lightPurple
+                                : ColorConstants.white,
+                          ),
+                          strokeWidth: 2,
+                          strokeCap: StrokeCap.round,
+                        ),
+                      )
+                    else
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (isStreakDoneToday)
+                            HugeIcon(
+                              icon: HugeIcons.solidRoundedFire,
+                              size: StreakCircleConstants.iconSize,
+                              color: Colors.white,
+                            ),
                           HugeIcon(
                             icon: HugeIcons.solidRoundedFire,
-                            size: _kIconSize,
-                            color: Colors.white,
+                            color: isStreakDoneToday
+                                ? ColorConstants.lightPurple
+                                : ColorConstants.white,
+                            size: StreakCircleConstants.innerIconSize,
                           ),
-                        HugeIcon(
-                          icon: HugeIcons.solidRoundedFire,
-                          color: isStreakDoneToday
-                              ? ColorConstants.lightPurple
-                              : ColorConstants.white,
-                          size: _kInnerIconSize,
-                        )
-                      ],
-                    ),
+                        ],
+                      ),
                     const SizedBox(width: 8),
                     Text(
-                      streakText,
+                      displayValue,
                       style: TextStyle(
                         color: ColorConstants.white,
-                        fontSize: _kFontSize,
+                        fontSize: StreakCircleConstants.fontSize,
                         fontWeight: isStreakDoneToday
                             ? FontWeight.bold
                             : FontWeight.w400,
                         fontFamily: dmMono,
-                        height: _kLineHeight,
+                        height: StreakCircleConstants.lineHeight,
                       ),
                     ),
                   ],
@@ -185,29 +197,15 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
     );
   }
 
-  bool _isStreakDoneToday(List<LocalAudioCompleted>? audioCompleted) {
-    if (audioCompleted == null || audioCompleted.isEmpty) {
-      return false;
-    }
-
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    return audioCompleted.any((audio) {
-      final audioDate = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-      return audioDate.isAtSameMomentAs(today) || audioDate.isAfter(today);
-    });
-  }
-
   Widget _buildShimmer() {
     return Container(
       decoration: BoxDecoration(
         color: ColorConstants.onyx,
-        borderRadius: BorderRadius.circular(_kBorderRadius),
+        borderRadius: BorderRadius.circular(StreakCircleConstants.borderRadius),
       ),
-      child: const Padding(
-        padding: _kPadding,
-        child: SizedBox(
+      child: Padding(
+        padding: StreakCircleConstants.padding,
+        child: const SizedBox(
           width: 24,
           height: 22,
           child: Center(
@@ -229,10 +227,10 @@ class _StreakCircleState extends ConsumerState<StreakCircle>
     return Container(
       decoration: BoxDecoration(
         color: ColorConstants.onyx,
-        borderRadius: BorderRadius.circular(_kBorderRadius),
+        borderRadius: BorderRadius.circular(StreakCircleConstants.borderRadius),
       ),
       child: Padding(
-        padding: _kPadding,
+        padding: StreakCircleConstants.padding,
         child: GestureDetector(
           onTap: () => ref.refresh(statsProvider),
           child: HugeIcon(
