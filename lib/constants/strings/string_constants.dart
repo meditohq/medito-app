@@ -667,4 +667,8 @@ class StringConstants {
   static const String packsSectionHeader = 'Packs';
   static const String tracksSectionHeader = 'Tracks';
   static const String noResultsFound = 'No results found for your search';
+
+  static const String statsWelcomeTitle = 'Introducing Consistency Score!';
+  static const String statsWelcomeMessage =
+      'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication.\n\nYour home screen will show the higher score to keep you motivated.';
 }

@@ -6,6 +6,7 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -13,12 +14,53 @@ import 'package:share_plus/share_plus.dart';
 
 import '../row_item_widget.dart';
 
-class StatsBottomSheetWidget extends ConsumerWidget {
+class StatsBottomSheetWidget extends ConsumerStatefulWidget {
   const StatsBottomSheetWidget({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StatsBottomSheetWidget> createState() =>
+      _StatsBottomSheetWidgetState();
+}
+
+class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
+    with SingleTickerProviderStateMixin {
+  bool _isCardVisible = true;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _animation =
+        Tween<double>(begin: 1.0, end: 0.0).animate(_animationController);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _fadeAndHideCard() {
+    _animationController.forward();
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          _isCardVisible = false;
+        });
+        ref.read(streakCircleProvider.notifier).markAsSeen();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var statsAsync = ref.watch(statsProvider);
+    var hasSeenStreakCircle = ref.watch(streakCircleProvider);
 
     return SafeArea(
       child: Container(
@@ -31,6 +73,94 @@ class StatsBottomSheetWidget extends ConsumerWidget {
               height16,
               const HandleBarWidget(),
               height16,
+              if (_isCardVisible)
+                hasSeenStreakCircle.when(
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                  data: (seen) {
+                    if (seen) return const SizedBox.shrink();
+                    return AnimatedOpacity(
+                      opacity: _animation.value,
+                      duration: const Duration(milliseconds: 300),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          bottom: 0,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                            top: 16,
+                            left: 16,
+                            right: 16,
+                            bottom: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: ColorConstants.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: ColorConstants.white,
+                              width: 1,
+                              style: BorderStyle.solid,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  HugeIcon(
+                                    icon: HugeIcons.solidRoundedFire,
+                                    size: 20,
+                                    color: ColorConstants.white,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    StringConstants.statsWelcomeTitle,
+                                    style: TextStyle(
+                                      color: ColorConstants.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: dmSans,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                StringConstants.statsWelcomeMessage,
+                                style: TextStyle(
+                                  color: ColorConstants.white,
+                                  fontSize: 14,
+                                  height: 1.4,
+                                  fontFamily: dmSans,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: ElevatedButton(
+                                  onPressed: _fadeAndHideCard,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: ColorConstants.white,
+                                    foregroundColor: ColorConstants.onyx,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 6),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text('Got it',
+                                      style: TextStyle(fontSize: 14)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               statsAsync.when(
                 loading: () => const Center(
                   child: SizedBox(

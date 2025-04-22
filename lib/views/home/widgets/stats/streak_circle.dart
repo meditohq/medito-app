@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/models/local_audio_completed.dart';
+import 'package:medito/models/stats/all_stats_model.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 import '../../../../constants/colors/color_constants.dart';
 import 'streak_circle_constants.dart';
@@ -40,6 +43,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
     return Consumer(
       builder: (context, ref, child) {
         final statsAsync = ref.watch(statsProvider);
+        final hasSeenStreakCircle = ref.watch(streakCircleProvider);
 
         return statsAsync.when(
           loading: () => _buildShimmer(),
@@ -55,20 +59,23 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
               _controller.updateAnimation(isStreakDoneToday);
 
-              return AnimatedBuilder(
-                animation: _controller.animationController,
-                builder: (context, child) => _buildStreakCircle(
-                    isStreakDoneToday,
-                    displayValue,
-                    progressValue,
-                    showConsistencyScore),
+              return _buildWithBadge(
+                hasSeenStreakCircle,
+                AnimatedBuilder(
+                  animation: _controller.animationController,
+                  builder: (context, child) => _buildStreakCircle(
+                      isStreakDoneToday,
+                      displayValue,
+                      progressValue,
+                      showConsistencyScore),
+                ),
               );
             } else {
               return _buildErrorState(ref);
             }
           },
           data: (stats) {
-           
+
             final isPossiblyStillLoading = stats.updated == 0;
 
             if (isPossiblyStillLoading) {
@@ -86,12 +93,41 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
             _controller.updateAnimation(isStreakDoneToday);
 
-            return AnimatedBuilder(
-              animation: _controller.animationController,
-              builder: (context, child) => _buildStreakCircle(isStreakDoneToday,
-                  displayValue, progressValue, showConsistencyScore),
+            return _buildWithBadge(
+              hasSeenStreakCircle,
+              AnimatedBuilder(
+                animation: _controller.animationController,
+                builder: (context, child) => _buildStreakCircle(
+                    isStreakDoneToday,
+                    displayValue,
+                    progressValue,
+                    showConsistencyScore),
+              ),
             );
           },
+        );
+      },
+    );
+  }
+
+  Widget _buildWithBadge(AsyncValue<bool> hasSeenStreakCircle, Widget child) {
+    return hasSeenStreakCircle.when(
+      loading: () => child,
+      error: (_, __) => child,
+      data: (seen) {
+        if (seen) return child;
+
+        return Badge(
+          backgroundColor: ColorConstants.amber,
+          smallSize: 8,
+          alignment: Alignment.topLeft,
+          child: GestureDetector(
+            onTap: () {
+              ref.read(streakCircleProvider.notifier).markAsSeen();
+              widget.onTap();
+            },
+            child: child,
+          ),
         );
       },
     );
@@ -176,7 +212,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                       ),
                     const SizedBox(width: 8),
                     Text(
-                      displayValue,
+                      displayValue + (showConsistencyScore ? '%' : ''),
                       style: TextStyle(
                         color: ColorConstants.white,
                         fontSize: StreakCircleConstants.fontSize,
