@@ -134,6 +134,11 @@ class StatsBottomSheetWidget extends ConsumerWidget {
           color: ColorConstants.onyx,
           child: Column(
             children: [
+              _buildStatRow(
+                context,
+                StringConstants.consistencyScore,
+                '${(stats.consistencyScore! * 100).round()}%',
+              ),
               _buildStatRow(context, StringConstants.currentStreak,
                   '${stats.streakCurrent} ${stats.streakCurrent == 1 ? StringConstants.day : StringConstants.days}'),
               _buildStatRow(context, StringConstants.longestStreak,

@@ -30,6 +30,7 @@ class LocalAllStats {
   final int? streakFreezes;
   final int? maxStreakFreezes;
   final List<int> freezeUsageDates;
+  final double? consistencyScore;
 
   LocalAllStats({
     required this.streakCurrent,
@@ -42,6 +43,7 @@ class LocalAllStats {
     this.streakFreezes = 0,
     this.maxStreakFreezes = 0,
     required this.freezeUsageDates,
+    this.consistencyScore = 0,
   });
 
   factory LocalAllStats.empty() {
@@ -56,6 +58,7 @@ class LocalAllStats {
       streakFreezes: 0,
       maxStreakFreezes: 0,
       freezeUsageDates: [],
+      consistencyScore: 0,
     );
   }
 
@@ -74,6 +77,7 @@ class LocalAllStats {
       streakFreezes: stats.streakFreezes,
       maxStreakFreezes: stats.maxStreakFreezes,
       freezeUsageDates: stats.freezeUsageDates,
+      consistencyScore: 0,
     );
   }
 
@@ -107,6 +111,7 @@ class LocalAllStats {
     int? streakFreezes,
     int? maxStreakFreezes,
     List<int>? freezeUsageDates,
+    double? consistencyScore,
   }) {
     return LocalAllStats(
       streakCurrent: streakCurrent ?? this.streakCurrent,
@@ -119,6 +124,7 @@ class LocalAllStats {
       streakFreezes: streakFreezes ?? this.streakFreezes,
       maxStreakFreezes: maxStreakFreezes ?? this.maxStreakFreezes,
       freezeUsageDates: freezeUsageDates ?? this.freezeUsageDates,
+      consistencyScore: consistencyScore ?? this.consistencyScore,
     );
   }
 }

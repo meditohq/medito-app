@@ -132,6 +132,7 @@ class StringConstants {
 
   static const String currentStreak = 'Current Streak';
   static const String longestStreak = 'Longest Streak';
+  static const String consistencyScore = 'Consistency Score';
   static const String totalTracksCompleted = 'Total Tracks Completed';
   static const String totalTimeListened = 'Total Time Listened';
   static const String days = 'days';

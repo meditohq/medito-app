@@ -108,12 +108,8 @@ class StatsManager {
     // overwriting _allStats
     var tempRemoteStats = remoteStats;
 
-    //dev.log'StatsManager: Merging stats');
     // Pass the remote stats to merge instead of overwriting first
     await _merge(tempRemoteStats);
-
-    //dev.log
-    //  'StatsManager: Post-merge stats: ${_allStats?.totalTracksCompleted}');
 
     if (_allStats != null) {
       // Store the current streak values before recalculating
@@ -125,13 +121,15 @@ class StatsManager {
         //dev.log'StatsManager: Calculating streak');
         _allStats = calculateStreak(_allStats!);
       } catch (_) {
-        // For tests, preserve the streak values from the merge
-        //dev.log'StatsManager: Preserving streak values from merge');
         _allStats = _allStats!.copyWith(
           streakCurrent: currentStreak,
           streakLongest: longestStreak,
         );
       }
+
+      _allStats = _allStats!.copyWith(
+          consistencyScore: calculateConsistencyScore(_allStats!),
+        );
 
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
@@ -139,12 +137,13 @@ class StatsManager {
       throw Exception("Stats are null");
     }
 
+    
+
     //dev.log'StatsManager: Sync completed');
   }
 
   Future<LocalAllStats> get localAllStats async {
     if (_allStats == null) {
-      //dev.log'StatsManager: Loading local stats');
       _allStats = await _loadLocalAllStats();
 
       // If local stats are empty, sync with server to try to get valid stats
@@ -158,7 +157,6 @@ class StatsManager {
   }
 
   Future<void> _merge(LocalAllStats remoteStats) async {
-    //dev.log'StatsManager: Starting merge');
 
     // Check if remote stats contain recent dummy data
     var now = _getCurrentDate();
@@ -713,10 +711,62 @@ class StatsManager {
     await _saveLocalAllStatsToSharedPrefs();
     await _statsService.postStats(_allStats!);
 
-    //dev.log
-    //'Applied ${missedDays.length} streak freezes to: ${missedDays.map((d) => d.toIso8601String()).join(", ")}');
-
     return true;
+  }
+
+  double calculateConsistencyScore(LocalAllStats allStats) {
+    var now = _getCurrentDate();
+    var today = DateTime(now.year, now.month, now.day);
+
+    // Early return for empty audio completed list
+    if (allStats.audioCompleted == null || allStats.audioCompleted!.isEmpty) {
+      return 0.0;
+    }
+
+    // Convert audio completed to dates (year-month-day format)
+    var audioDates = allStats.audioCompleted!.map((audio) {
+      var date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+      return DateTime(date.year, date.month, date.day);
+    }).toList();
+
+    // Remove duplicate dates and future dates
+    audioDates =
+        audioDates.where((date) => !date.isAfter(today)).toSet().toList();
+
+    // If no valid dates, return 0
+    if (audioDates.isEmpty) {
+      return 0.0;
+    }
+
+    // Sort dates in ascending order to find first session
+    audioDates.sort();
+    var firstSessionDate = audioDates.first;
+
+    // Calculate days since first session (inclusive)
+    var daysSinceFirstSession = today.difference(firstSessionDate).inDays + 1;
+
+    // If first session is today, return 1.0 if meditated today, 0.0 otherwise
+    if (daysSinceFirstSession == 1) {
+      return audioDates.any((date) => date.isAtSameMomentAs(today)) ? 1.0 : 0.0;
+    }
+
+    // For users with less than 30 days history
+    if (daysSinceFirstSession < 30) {
+      var meditatedDays = audioDates.length;
+      return (meditatedDays / daysSinceFirstSession).clamp(0.0, 1.0);
+    }
+
+    // For users with 30+ days history, only look at last 30 days
+    var daysToCheck =
+        List.generate(30, (index) => today.subtract(Duration(days: index)));
+    var meditatedDaysInRange = daysToCheck
+        .where((date) => audioDates.any((audioDate) =>
+            audioDate.year == date.year &&
+            audioDate.month == date.month &&
+            audioDate.day == date.day))
+        .length;
+
+    return (meditatedDaysInRange / 30.0);
   }
 
   // Test helpers
