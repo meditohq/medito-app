@@ -30,7 +30,7 @@ class LocalAllStats {
   final int? streakFreezes;
   final int? maxStreakFreezes;
   final List<int> freezeUsageDates;
-  final double? consistencyScore;
+  final double consistencyScore;
 
   LocalAllStats({
     required this.streakCurrent,

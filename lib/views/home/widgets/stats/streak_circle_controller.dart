@@ -19,20 +19,19 @@ class StreakCircleController extends ChangeNotifier {
   bool get isAnimating => _isAnimating;
 
   bool shouldShowConsistencyScore(LocalAllStats stats) {
-    return stats.streakCurrent < _streakThreshold &&
-        stats.consistencyScore != null;
+    return stats.streakCurrent < _streakThreshold;
   }
 
   String getDisplayValue(LocalAllStats stats) {
     if (shouldShowConsistencyScore(stats)) {
-      return '${(stats.consistencyScore! * 100).round()}';
+      return '${(stats.consistencyScore * 100).round()}';
     }
     return '${stats.streakCurrent}';
   }
 
   double getProgressValue(LocalAllStats stats) {
     if (shouldShowConsistencyScore(stats)) {
-      return stats.consistencyScore ?? 0;
+      return stats.consistencyScore;
     }
     return 0; // No progress circle needed for streak
   }
@@ -53,13 +52,14 @@ class StreakCircleController extends ChangeNotifier {
       return false;
     }
 
-    final currentDate = now ?? DateTime.now();
-    final today =
-        DateTime(currentDate.year, currentDate.month, currentDate.day);
+    var currentDate = now ?? DateTime.now();
+    var today = DateTime(currentDate.year, currentDate.month, currentDate.day);
 
     return audioCompleted.any((audio) {
-      final audioDate = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-      return audioDate.isAtSameMomentAs(today) || audioDate.isAfter(today);
+      var audioDate = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+      var audioDateOnly =
+          DateTime(audioDate.year, audioDate.month, audioDate.day);
+      return audioDateOnly == today;
     });
   }
 

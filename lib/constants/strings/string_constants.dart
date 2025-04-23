@@ -670,5 +670,5 @@ class StringConstants {
 
   static const String statsWelcomeTitle = 'Introducing Consistency Score!';
   static const String statsWelcomeMessage =
-      'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication.\n\nYour home screen will show the higher score to keep you motivated.';
+      'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication.\n\nYour home screen will show your best score to keep you motivated.';
 }

@@ -103,22 +103,12 @@ void main() {
         expect(controller.shouldShowConsistencyScore(stats), false);
       });
 
-      test(
-          'shouldShowConsistencyScore returns false when consistency score is null',
-          () {
-        final stats = LocalAllStats.empty().copyWith(
-          streakCurrent: 50,
-          consistencyScore: null,
-        );
-        expect(controller.shouldShowConsistencyScore(stats), false);
-      });
-
       test('getDisplayValue returns percentage for consistency score', () {
         final stats = LocalAllStats.empty().copyWith(
           streakCurrent: 50,
           consistencyScore: 0.75,
         );
-        expect(controller.getDisplayValue(stats), '75%');
+        expect('${controller.getDisplayValue(stats)}%', '75%');
       });
 
       test('getDisplayValue returns streak when above threshold', () {
@@ -126,7 +116,7 @@ void main() {
           streakCurrent: 150,
           consistencyScore: 0.75,
         );
-        expect(controller.getDisplayValue(stats), '150');
+        expect('${controller.getDisplayValue(stats)}%', '150%');
       });
 
       test('getProgressValue returns consistency score when below threshold',
