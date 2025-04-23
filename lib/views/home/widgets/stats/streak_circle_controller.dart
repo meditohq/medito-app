@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/providers/streak_circle_display_provider.dart';
 
 class StreakCircleController extends ChangeNotifier {
   final TickerProvider vsync;
@@ -18,19 +20,35 @@ class StreakCircleController extends ChangeNotifier {
 
   bool get isAnimating => _isAnimating;
 
-  bool shouldShowConsistencyScore(LocalAllStats stats) {
+  bool shouldShowConsistencyScore(
+    LocalAllStats stats, [
+    StreakCircleDisplayType? displayType,
+  ]) {
+    // If display preference is explicitly set to currentStreak, always show streak
+    if (displayType == StreakCircleDisplayType.currentStreak) {
+      return false;
+    }
+
+    // If display preference is set to consistencyScore or not specified,
+    // use the threshold logic to determine what to show
     return stats.streakCurrent < _streakThreshold;
   }
 
-  String getDisplayValue(LocalAllStats stats) {
-    if (shouldShowConsistencyScore(stats)) {
+  String getDisplayValue(
+    LocalAllStats stats, [
+    StreakCircleDisplayType? displayType,
+  ]) {
+    if (shouldShowConsistencyScore(stats, displayType)) {
       return '${(stats.consistencyScore * 100).round()}';
     }
     return '${stats.streakCurrent}';
   }
 
-  double getProgressValue(LocalAllStats stats) {
-    if (shouldShowConsistencyScore(stats)) {
+  double getProgressValue(
+    LocalAllStats stats, [
+    StreakCircleDisplayType? displayType,
+  ]) {
+    if (shouldShowConsistencyScore(stats, displayType)) {
       return stats.consistencyScore;
     }
     return 0; // No progress circle needed for streak

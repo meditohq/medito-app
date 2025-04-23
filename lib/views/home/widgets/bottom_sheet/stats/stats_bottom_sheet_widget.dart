@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
@@ -277,6 +279,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                   '${stats.totalTracksCompleted}'),
               _buildStatRow(context, StringConstants.totalTimeListened,
                   _formatTotalTimeListened(stats.totalTimeListened)),
+              _buildStreakCircleDisplayPreference(context, ref),
               _buildFreezeInfo(stats, context, ref),
             ],
           ),
@@ -305,6 +308,71 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildStreakCircleDisplayPreference(
+      BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Consumer(
+        builder: (context, ref, _) {
+          final displayTypeAsync = ref.watch(streakCircleDisplayProvider);
+
+          return displayTypeAsync.when(
+            loading: () => const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (displayType) {
+              final isStreakSelected =
+                  displayType == StreakCircleDisplayType.currentStreak;
+
+              return Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: Checkbox(
+                      value: isStreakSelected,
+                      onChanged: (value) {
+                        final newType = value == true
+                            ? StreakCircleDisplayType.currentStreak
+                            : StreakCircleDisplayType.consistencyScore;
+                        ref
+                            .read(streakCircleDisplayProvider.notifier)
+                            .setDisplayType(newType);
+                        showSnackBar(
+                            context, StringConstants.displayPreferenceSaved);
+                      },
+                      activeColor: ColorConstants.lightPurple,
+                      checkColor: ColorConstants.white,
+                      side: BorderSide(
+                        color: ColorConstants.white.withOpacity(0.6),
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    StringConstants.alwaysShowStreakOnHomepage,
+                    style: TextStyle(
+                      color: ColorConstants.white,
+                      fontSize: 14,
+                      fontFamily: dmSans,
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 

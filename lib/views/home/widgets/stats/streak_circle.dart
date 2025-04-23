@@ -6,6 +6,7 @@ import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/stats/all_stats_model.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
+import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 import '../../../../constants/colors/color_constants.dart';
 import 'streak_circle_constants.dart';
@@ -44,6 +45,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
       builder: (context, ref, child) {
         final statsAsync = ref.watch(statsProvider);
         final hasSeenStreakCircle = ref.watch(streakCircleProvider);
+        final displayTypeAsync = ref.watch(streakCircleDisplayProvider);
 
         return statsAsync.when(
           loading: () => _buildShimmer(),
@@ -52,30 +54,58 @@ class StreakCircleState extends ConsumerState<StreakCircle>
               final stats = statsAsync.value!;
               final isStreakDoneToday =
                   _controller.isStreakDoneToday(stats.audioCompleted);
-              final displayValue = _controller.getDisplayValue(stats);
-              final progressValue = _controller.getProgressValue(stats);
-              final showConsistencyScore =
-                  _controller.shouldShowConsistencyScore(stats);
 
-              _controller.updateAnimation(isStreakDoneToday);
+              return displayTypeAsync.when(
+                loading: () => _buildShimmer(),
+                error: (_, __) {
+                  // Fallback to default behavior on error
+                  final displayValue = _controller.getDisplayValue(stats);
+                  final progressValue = _controller.getProgressValue(stats);
+                  final showConsistencyScore =
+                      _controller.shouldShowConsistencyScore(stats);
 
-              return _buildWithBadge(
-                hasSeenStreakCircle,
-                AnimatedBuilder(
-                  animation: _controller.animationController,
-                  builder: (context, child) => _buildStreakCircle(
-                      isStreakDoneToday,
-                      displayValue,
-                      progressValue,
-                      showConsistencyScore),
-                ),
+                  _controller.updateAnimation(isStreakDoneToday);
+
+                  return _buildWithBadge(
+                    hasSeenStreakCircle,
+                    AnimatedBuilder(
+                      animation: _controller.animationController,
+                      builder: (context, child) => _buildStreakCircle(
+                          isStreakDoneToday,
+                          displayValue,
+                          progressValue,
+                          showConsistencyScore),
+                    ),
+                  );
+                },
+                data: (displayType) {
+                  final displayValue =
+                      _controller.getDisplayValue(stats, displayType);
+                  final progressValue =
+                      _controller.getProgressValue(stats, displayType);
+                  final showConsistencyScore = _controller
+                      .shouldShowConsistencyScore(stats, displayType);
+
+                  _controller.updateAnimation(isStreakDoneToday);
+
+                  return _buildWithBadge(
+                    hasSeenStreakCircle,
+                    AnimatedBuilder(
+                      animation: _controller.animationController,
+                      builder: (context, child) => _buildStreakCircle(
+                          isStreakDoneToday,
+                          displayValue,
+                          progressValue,
+                          showConsistencyScore),
+                    ),
+                  );
+                },
               );
             } else {
               return _buildErrorState(ref);
             }
           },
           data: (stats) {
-
             final isPossiblyStillLoading = stats.updated == 0;
 
             if (isPossiblyStillLoading) {
@@ -86,23 +116,52 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
             final isStreakDoneToday =
                 _controller.isStreakDoneToday(stats.audioCompleted);
-            final displayValue = _controller.getDisplayValue(stats);
-            final progressValue = _controller.getProgressValue(stats);
-            final showConsistencyScore =
-                _controller.shouldShowConsistencyScore(stats);
 
-            _controller.updateAnimation(isStreakDoneToday);
+            return displayTypeAsync.when(
+              loading: () => _buildShimmer(),
+              error: (_, __) {
+                // Fallback to default behavior on error
+                final displayValue = _controller.getDisplayValue(stats);
+                final progressValue = _controller.getProgressValue(stats);
+                final showConsistencyScore =
+                    _controller.shouldShowConsistencyScore(stats);
 
-            return _buildWithBadge(
-              hasSeenStreakCircle,
-              AnimatedBuilder(
-                animation: _controller.animationController,
-                builder: (context, child) => _buildStreakCircle(
-                    isStreakDoneToday,
-                    displayValue,
-                    progressValue,
-                    showConsistencyScore),
-              ),
+                _controller.updateAnimation(isStreakDoneToday);
+
+                return _buildWithBadge(
+                  hasSeenStreakCircle,
+                  AnimatedBuilder(
+                    animation: _controller.animationController,
+                    builder: (context, child) => _buildStreakCircle(
+                        isStreakDoneToday,
+                        displayValue,
+                        progressValue,
+                        showConsistencyScore),
+                  ),
+                );
+              },
+              data: (displayType) {
+                final displayValue =
+                    _controller.getDisplayValue(stats, displayType);
+                final progressValue =
+                    _controller.getProgressValue(stats, displayType);
+                final showConsistencyScore =
+                    _controller.shouldShowConsistencyScore(stats, displayType);
+
+                _controller.updateAnimation(isStreakDoneToday);
+
+                return _buildWithBadge(
+                  hasSeenStreakCircle,
+                  AnimatedBuilder(
+                    animation: _controller.animationController,
+                    builder: (context, child) => _buildStreakCircle(
+                        isStreakDoneToday,
+                        displayValue,
+                        progressValue,
+                        showConsistencyScore),
+                  ),
+                );
+              },
             );
           },
         );
