@@ -460,14 +460,15 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         startForeground(NOTIFICATION_ID, initialNotification)
         Log.d(TAG, "🔊 Started foreground service with initial notification")
 
+        // Call super after starting foreground
+        super.onStartCommand(intent, flags, startId)
+        
         // Check for required permissions
         if (!hasRequiredPermissions()) {
             Log.e(TAG, "❌ Missing required permissions, stopping service")
             stopSelf()
             return START_NOT_STICKY
         }
-
-        super.onStartCommand(intent, flags, startId)
 
         // Move initialization off main thread
         CoroutineScope(Dispatchers.Default).launch {
