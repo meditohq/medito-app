@@ -34,8 +34,7 @@ class FirebaseAnalyticsService {
       'token_backup_after_error_result';
   static const String eventRefreshTokenRetrievalFailed =
       'refresh_token_retrieval_failed';
-       static const String eventEmailAddressSaveFailed =
-      'email_address_save_failed';
+  static const String eventEmailAddressSaveFailed = 'email_address_save_failed';
   static const String eventEmailAddressSaveFailed2 =
       'email_address_save_failed2';
   static const String eventAuthTokenStorageFailed = 'auth_token_storage_failed';
@@ -225,6 +224,35 @@ class FirebaseAnalyticsService {
     } catch (e) {
       if (kDebugMode) {
         print('Error logging event to Firebase Analytics: $e');
+      }
+    }
+  }
+
+  /// Log a screen view to Firebase Analytics
+  Future<void> logScreenView({
+    required String screenName,
+    String? screenClass,
+  }) async {
+    if (!_initialized) await initialize();
+
+    try {
+      // Only log screen view if analytics consent is granted
+      final prefs = await SharedPreferences.getInstance();
+      bool analyticsEnabled = prefs.getBool(analyticsEnabledKey) ?? true;
+
+      if (analyticsEnabled) {
+        await _analytics.logScreenView(
+          screenName: screenName,
+          screenClass: screenClass ?? 'Flutter',
+        );
+
+        if (kDebugMode) {
+          print('Screen view logged: $screenName');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error logging screen view in Firebase Analytics: $e');
       }
     }
   }

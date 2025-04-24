@@ -38,7 +38,7 @@ class _BottomNavigationBarViewState
       const HomeView(),
       ExploreView(key: _exploreViewKey, searchFocusNode: _searchFocusNode),
       const JourneyView(),
-      const SettingsScreen(),
+      SettingsScreen(),
     ];
 
     _initializeStats();

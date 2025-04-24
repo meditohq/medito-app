@@ -7,6 +7,7 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/explore/explore_list_item.dart';
 import 'package:medito/providers/explore/track_search_provider.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -27,6 +28,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   String _searchQuery = '';
   Timer? _debounce;
   bool _hasLoadedData = false;
+  final _analytics = FirebaseAnalyticsService();
 
   @override
   void dispose() {
@@ -53,6 +55,11 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   @override
   void initState() {
     super.initState();
+    _logScreenView();
+  }
+
+  Future<void> _logScreenView() async {
+    await _analytics.logScreenView(screenName: 'ExploreView');
   }
 
   void loadData() {

@@ -9,6 +9,7 @@ import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
@@ -34,6 +35,7 @@ class _TrackViewState extends ConsumerState<TrackView>
   TrackFilesModel? fileModel;
   final GlobalKey _contentKey = GlobalKey();
   bool _useCompactLayout = false;
+  final _analytics = FirebaseAnalyticsService();
 
   @override
   bool get wantKeepAlive => true;
@@ -44,7 +46,12 @@ class _TrackViewState extends ConsumerState<TrackView>
     _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkOverflow();
+      _logScreenView();
     });
+  }
+
+  Future<void> _logScreenView() async {
+    await _analytics.logScreenView(screenName: 'TrackView');
   }
 
   @override
@@ -450,6 +457,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       ref.read(durationPreferenceProvider.notifier).setDuration(value.duration);
     }
   }
+
   void _handlePlay(
     WidgetRef ref,
     TrackModel trackModel,

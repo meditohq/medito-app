@@ -8,6 +8,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
@@ -33,13 +34,19 @@ class PlayerView extends ConsumerStatefulWidget {
 class _PlayerViewState extends ConsumerState<PlayerView> {
   bool _endScreenOpened = false;
   bool _isClosing = false;
+  final _analytics = FirebaseAnalyticsService();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializePlayer();
+      _logScreenView();
     });
+  }
+
+  Future<void> _logScreenView() async {
+    await _analytics.logScreenView(screenName: 'PlayerView');
   }
 
   Future<void> _initializePlayer() async {

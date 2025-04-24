@@ -4,6 +4,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:medito/views/pack/widgets/pack_item_widget.dart';
@@ -27,11 +28,17 @@ class PackView extends ConsumerStatefulWidget {
 class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
   final ScrollController _scrollController = ScrollController();
+  final _analytics = FirebaseAnalyticsService();
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
+    _logScreenView();
+  }
+
+  Future<void> _logScreenView() async {
+    await _analytics.logScreenView(screenName: 'PackView');
   }
 
   @override

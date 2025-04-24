@@ -12,6 +12,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
@@ -69,11 +70,17 @@ class SettingsItem {
 class SettingsScreen extends ConsumerWidget {
   static final _isHealthSyncAvailable = Platform.isIOS;
   static final _isDndSupported = Platform.isAndroid;
+  final _analytics = FirebaseAnalyticsService();
 
-  const SettingsScreen({super.key});
+  SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Log screen view
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _logScreenView();
+    });
+
     final authRepository = ref.watch(authRepositorySyncProvider);
     final user = authRepository.currentUser;
 
@@ -199,6 +206,10 @@ class SettingsScreen extends ConsumerWidget {
       ),
       body: SafeArea(child: _buildMain(context, ref, settingsItems)),
     );
+  }
+
+  Future<void> _logScreenView() async {
+    await _analytics.logScreenView(screenName: 'SettingsScreen');
   }
 
   void handleItemPress(

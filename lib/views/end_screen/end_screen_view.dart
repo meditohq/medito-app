@@ -6,6 +6,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
@@ -31,11 +32,17 @@ class EndScreenView extends ConsumerStatefulWidget {
 class _EndScreenViewState extends ConsumerState<EndScreenView> {
   final _animatedSwitcherKey = GlobalKey();
   bool _hasFiredHapticFeedback = false;
+  final _analytics = FirebaseAnalyticsService();
 
   @override
   void initState() {
     super.initState();
     _loadStats();
+    _logScreenView();
+  }
+
+  Future<void> _logScreenView() async {
+    await _analytics.logScreenView(screenName: 'EndScreenView');
   }
 
   Future<void> _triggerHapticFeedback() async {
@@ -102,7 +109,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
             children: [
               _buildStatsArea(),
               _buildCard(),
-             // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
+              // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
             ],
           ),
         ),

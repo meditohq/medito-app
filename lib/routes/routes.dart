@@ -61,7 +61,7 @@ Future<void> handleNavigation(
       );
     }
   } else if (type.contains('settings')) {
-    await _pushRoute(const SettingsScreen(), ref);
+    await _pushRoute(SettingsScreen(), ref);
   } else if (type == TypeConstants.email) {
     await _handleEmailNavigation(ids, ref);
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
