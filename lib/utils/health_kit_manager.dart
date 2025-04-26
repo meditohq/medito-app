@@ -53,7 +53,7 @@ class HealthKitManager {
           startTime: start,
           endTime: end,
           unit: HealthDataUnit.NO_UNIT,
-          recordingMethod: RecordingMethod.manual,
+          recordingMethod: RecordingMethod.automatic,
         );
 
         return success;
