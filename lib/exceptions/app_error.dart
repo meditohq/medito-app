@@ -60,8 +60,13 @@ final class EmailExistsError extends AppError {
   });
 }
 
-final class InactiveEmailError extends AppError {
-  const InactiveEmailError({
-    super.message = StringConstants.inactiveEmailError,
-  });
+/// Error indicating an issue reading from local storage (SharedPreferences or SecureStorage).
+class StorageReadError extends AppError {
+  const StorageReadError(
+      {super.message = 'Failed to read data from local storage'});
+}
+
+/// Error indicating that the email provided is associated with an inactive account.
+class InactiveEmailError extends AppError {
+  const InactiveEmailError({super.message = 'Account is inactive'});
 }

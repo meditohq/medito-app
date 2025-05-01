@@ -12,7 +12,6 @@ import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/repositories/me/me_repository.dart';
 import 'package:flutter/foundation.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'dart:io';
 

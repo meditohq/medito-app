@@ -34,6 +34,10 @@ class FirebaseAnalyticsService {
       'token_backup_after_error_result';
   static const String eventRefreshTokenRetrievalFailed =
       'refresh_token_retrieval_failed';
+  static const String eventRefreshTokenReadErrorSharedPreferences =
+      'refresh_token_read_error_shared_preferences';
+  static const String eventRefreshTokenReadErrorSecureStorage =
+      'refresh_token_read_error_secure_storage';
   static const String eventEmailAddressSaveFailed = 'email_address_save_failed';
   static const String eventEmailAddressSaveFailed2 =
       'email_address_save_failed2';

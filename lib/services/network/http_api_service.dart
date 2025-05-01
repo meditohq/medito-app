@@ -11,6 +11,7 @@ import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/services/secure_storage_service.dart';
 
 // Event bus or callback type for auth events
 typedef AuthStateCallback = void Function(AuthEvent event);
@@ -357,6 +358,22 @@ class HttpApiService {
         // Still clear local state just to be safe
         _retryCount = 0;
         _headers.remove(kAuthorizationHeader);
+        // Ensure tokens are cleared even if already marked as logged out
+        try {
+          // Use SecureStorageService directly to ensure both storages are cleared
+          final secureStorage = SecureStorageService();
+          await secureStorage.clearRefreshToken();
+          await secureStorage
+              .clearUserEmail(); // Clear email too for consistency
+          AppLogger.d(
+              'HTTP', 'Cleared tokens during skipped force logout check');
+        } catch (e) {
+          AppLogger.e(
+            'HTTP',
+            'Error clearing tokens during skipped force logout check',
+            e,
+          );
+        }
         return;
       }
 
@@ -365,6 +382,20 @@ class HttpApiService {
       _headers.remove(kAuthorizationHeader);
       await StatsManager().clearAllStats();
 
+      // Mark as logged out in preferences
+      await prefs.setBool(SharedPreferenceConstants.isLoggedIn, false);
+      AppLogger.i('HTTP', 'Set isLoggedIn=false in SharedPreferences');
+
+      // Clear tokens from storage using SecureStorageService
+      try {
+        final secureStorage = SecureStorageService();
+        await secureStorage.clearRefreshToken();
+        AppLogger.i('HTTP', 'Cleared refresh token and email from storage');
+      } catch (e) {
+        AppLogger.e('HTTP',
+            'Error clearing tokens from storage during force logout', e);
+      }
+
       // Add debug log for force logout
       await _addHttpDebugLog(
           'FORCE LOGOUT triggered by HttpApiService - Reason: $reason');
@@ -372,11 +403,8 @@ class HttpApiService {
       // Notify listeners that a force logout has occurred
       _notifyAuthEvent(AuthEvent.forceLogout);
     } catch (e, stackTrace) {
-      AppLogger.e(
-          'HTTP',
-          'Error while checking login state during force logout',
-          e,
-          stackTrace);
+      AppLogger.e('HTTP', 'Error during force logout process', e, stackTrace);
+      // Still attempt to clear header and reset count as a safety measure
       _retryCount = 0;
       _headers.remove(kAuthorizationHeader);
     }
@@ -480,6 +508,7 @@ class HttpApiService {
     _isRefreshingToken = true;
     _refreshTokenCompleter = Completer<void>();
 
+    String? refreshToken;
     try {
       AppLogger.i('HTTP',
           'Starting token refresh through auth service, instance #$_instanceId');
@@ -493,17 +522,20 @@ class HttpApiService {
             stackTrace);
       }
 
-      // First check if user is already logged out
+      // First check if user is marked as logged in
       try {
         final prefs = await SharedPreferences.getInstance();
         final isLoggedIn =
             prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
 
         if (!isLoggedIn) {
-          AppLogger.w(
-              'HTTP', 'User is not logged in, no need to refresh token');
-          await _addHttpDebugLog('User not logged in, skipping token refresh');
-          throw const RefreshTokenError();
+          AppLogger.w('HTTP',
+              'User is not logged in (prefs), no need to refresh token');
+          await _addHttpDebugLog(
+              'User not logged in (prefs), skipping token refresh');
+          // Throw RefreshTokenError because functionally the user needs to sign in again
+          throw const RefreshTokenError(
+              message: 'User not marked as logged in');
         }
       } catch (e, stackTrace) {
         AppLogger.e('HTTP', 'Error checking login state during token refresh',
@@ -511,38 +543,53 @@ class HttpApiService {
         // Continue anyway, as we'll check the refresh token next
       }
 
-      final refreshToken = await _authService.getStoredRefreshToken();
-      if (refreshToken == null) {
-        AppLogger.w('HTTP', 'No refresh token available - skipping refresh');
-        await _addHttpDebugLog('No refresh token available - skipping refresh');
+      // Get the refresh token - this might throw StorageReadError
+      refreshToken = await _authService.getStoredRefreshToken();
 
-        // No force logout - just throw the error to be handled by UI
-        throw const RefreshTokenError();
+      // If token is null (but read didn't error), it means it's missing.
+      if (refreshToken == null) {
+        AppLogger.w(
+            'HTTP', 'No refresh token found in storage - skipping refresh');
+        await _addHttpDebugLog(
+            'No refresh token found in storage - skipping refresh');
+        // Treat missing token as functionally equivalent to an invalid one
+        throw const RefreshTokenError(
+            message: 'Refresh token not found in storage');
       }
 
       AppLogger.i('HTTP',
-          'Got refresh token (length ${refreshToken.length}), attempting to refresh');
+          'Got refresh token (length ${refreshToken.length}), attempting server refresh');
       await _addHttpDebugLog(
           'Using refresh token of length ${refreshToken.length}');
 
-      try {
-        final tokens = await _authService.refreshToken(refreshToken);
-        AppLogger.i('HTTP',
-            'Token refresh successful, updating auth header. Instance: $_instanceId');
-        setAuthHeader(tokens.accessToken);
-        await _addHttpDebugLog(
-            'Auth header updated successfully with new token');
-        _refreshTokenCompleter.complete();
-      } catch (e, stackTrace) {
-        AppLogger.e('HTTP', 'Exception during _authService.refreshToken call',
-            e, stackTrace);
-        await _addHttpDebugLog('Error refreshing token: ${e.runtimeType}');
-        _refreshTokenCompleter.completeError(e);
-        rethrow;
-      }
+      // Attempt the actual refresh with the server
+      // This might throw RefreshTokenError if server rejects it
+      final tokens = await _authService.refreshToken(refreshToken);
+
+      AppLogger.i('HTTP',
+          'Token refresh successful, updating auth header. Instance: $_instanceId');
+      setAuthHeader(tokens.accessToken);
+      await _addHttpDebugLog('Auth header updated successfully with new token');
+      _refreshTokenCompleter.complete();
+    } on StorageReadError catch (e, stackTrace) {
+      // Explicitly catch StorageReadError - means we couldn't read the token
+      AppLogger.e(
+          'HTTP', 'StorageReadError during token retrieval', e, stackTrace);
+      await _addHttpDebugLog('StorageReadError: ${e.message}');
+      _refreshTokenCompleter.completeError(e);
+      rethrow; // Rethrow so _handleUnauthorizedResponse can handle it
+    } on RefreshTokenError catch (e, stackTrace) {
+      // Catch RefreshTokenError - means token was missing or server rejected it
+      AppLogger.e('HTTP', 'RefreshTokenError during token refresh process', e,
+          stackTrace);
+      await _addHttpDebugLog('RefreshTokenError: ${e.message}');
+      _refreshTokenCompleter.completeError(e);
+      rethrow; // Rethrow so _handleUnauthorizedResponse can handle it
     } catch (e, stackTrace) {
-      AppLogger.e('HTTP', 'Error in _refreshTokenThroughAuthService outer try',
+      // Catch any other unexpected errors
+      AppLogger.e('HTTP', 'Unexpected error in _refreshTokenThroughAuthService',
           e, stackTrace);
+      await _addHttpDebugLog('Unexpected refresh error: ${e.runtimeType}');
       _refreshTokenCompleter.completeError(e);
       rethrow;
     } finally {
