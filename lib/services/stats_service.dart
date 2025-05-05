@@ -80,7 +80,7 @@ class StatsService {
   StatsBackupService _backupService;
 
   static const _lastSyncKey = 'last_stats_sync';
-  static const _minTimeBetweenRequests = 2000; // 2 seconds
+  static const _minTimeBetweenRequests = 2000; // 2 seconds minimum between syncs
 
   // Use this flag to toggle between real and mock backend
   static const useMockBackend = false;

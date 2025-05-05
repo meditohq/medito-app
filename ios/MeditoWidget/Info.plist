@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleShortVersionString</key>
+	<string>3.3.0</string>
+	<key>CFBundleVersion</key>
+	<string>30062</string>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.widgetkit-extension</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>$(PRODUCT_MODULE_NAME).StreakWidgetBundle</string>
+	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SourceSerif4-Bold.ttf</string>
+		<string>DMSerifDisplay-Regular.ttf</string>
+		<string>DMSerifDisplay-Italic.ttf</string>
+		<string>SourceSerif4-Medium.ttf</string>
+		<string>SourceSerif4-Regular.ttf</string>
+		<string>SourceSerif4-SemiBold.ttf</string>
+		<string>Teachers-Bold.ttf</string>
+		<string>Teachers-Medium.ttf</string>
+		<string>Teachers-Regular.ttf</string>
+		<string>Teachers-SemiBold.ttf</string>
+	</array>
+</dict>
+</plist>

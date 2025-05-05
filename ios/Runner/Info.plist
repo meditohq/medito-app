@@ -92,6 +92,7 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>medito_stats_thread_identifier</string>
+		<string>medito-widget-update</string>
 	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Medito</string>

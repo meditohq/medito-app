@@ -1,7 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="meditofoundation.medito">
-    <application
-        android:icon="@mipmap/ic_launcher">
+
+    <application android:icon="@mipmap/ic_launcher">
+
+        <receiver
+            android:name=".StatsWidgetReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/stats_widget_info" />
+        </receiver>
     </application>
 </manifest>
