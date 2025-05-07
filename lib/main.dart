@@ -5,14 +5,18 @@ import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/theme/app_theme.dart';
+import 'package:medito/constants/widget_constants.dart';
+import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
@@ -22,7 +26,9 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/utils/stats_updater.dart';
+import 'package:medito/utils/widget_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/network/http_api_service.dart';
@@ -31,11 +37,34 @@ import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 bool _hasInitialized = false;
 var appLinks = AppLinks();
+Timer? _widgetUpdateTimer;
+
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    if (task == WidgetConstants.taskName) {
+      try {
+        // You may need to re-initialize dependencies here
+        var statsManager = StatsManager();
+        await statsManager.initialize();
+        try {
+          await statsManager.sync();
+        } catch (e) {}
+        var stats = await statsManager.localAllStats;
+        await updateWidgets(stats);
+      } catch (e) {}
+    }
+
+    return Future.value(true);
+  });
+}
 
 void main() async {
   if (_hasInitialized) {
@@ -50,13 +79,30 @@ void main() async {
 
   var prefs = await initializeSharedPreferences();
 
+  // Set up widget background updates
+  _setUpWidget();
+
+  if (Platform.isAndroid) {
+    Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: kDebugMode,
+    );
+    Workmanager().registerPeriodicTask(
+      WidgetConstants.taskIdentifier,
+      WidgetConstants.taskName,
+      frequency: const Duration(minutes: 2),
+      initialDelay: const Duration(minutes: 0),
+      constraints: Constraints(
+        networkType: NetworkType.not_required,
+      ),
+    );
+  }
+
   runApp(
     DevicePreview(
       enabled: DebugOptions.enableDevicePreview,
       builder: (context) => ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
         child: const ParentWidget(),
       ),
     ),
@@ -106,15 +152,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void _setUpSystemUi() {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-          systemStatusBarContrastEnforced: false,
-          systemNavigationBarColor: Colors.transparent,
-          systemNavigationBarDividerColor: Colors.transparent,
-          systemNavigationBarIconBrightness: Brightness.dark,
-          statusBarIconBrightness: Brightness.light),
+        systemStatusBarContrastEnforced: false,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light,
+      ),
     );
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.edgeToEdge,
-    );
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 
   Future<void> _initDeepLinks() async {
@@ -147,18 +192,12 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
         pathSegments = uri.pathSegments;
       } else {
-        showSnackBar(
-          context,
-          StringConstants.invalidDeepLink,
-        );
+        showSnackBar(context, StringConstants.invalidDeepLink);
         return;
       }
 
       if (pathSegments.isEmpty) {
-        showSnackBar(
-          context,
-          StringConstants.invalidDeepLink,
-        );
+        showSnackBar(context, StringConstants.invalidDeepLink);
         return;
       }
 
@@ -174,20 +213,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
       AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
 
-      showSnackBar(
-        context,
-        StringConstants.followingDeepLink,
-      );
+      showSnackBar(context, StringConstants.followingDeepLink);
 
       Future.delayed(const Duration(seconds: 2), () {
         handleNavigation(path, [id], context);
       });
     } catch (e) {
       AppLogger.e('DEEPLINK', 'Error handling deep link', e);
-      showSnackBar(
-        context,
-        StringConstants.deepLinkError,
-      );
+      showSnackBar(context, StringConstants.deepLinkError);
     }
   }
 
@@ -206,17 +239,11 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
     return authRepo.when(
       loading: () => const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
+        home: Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
       error: (error, stack) => MaterialApp(
         home: Scaffold(
-          body: Center(
-            child: Text('Error initializing: $error'),
-          ),
+          body: Center(child: Text('Error initializing: $error')),
         ),
       ),
       data: (_) {
@@ -270,22 +297,28 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     }
   }
 
-  void _onAppForegrounded() {
+  void _onAppForegrounded() async {
     ref.read(firebaseMessagingProvider).ref.read(reminderProvider).clearBadge();
     ref.read(statsProvider.notifier).refresh();
 
     // Diagnose token state for debug purposes
     _diagnoseSecurity();
 
-    // Proactively refresh auth token when app comes to foreground
     _refreshAuthToken();
+
+    _updateWidgetsData();
 
     if (Platform.isIOS) {
       // Process any pending track completions when app comes back to foreground
       processPendingCompletedTracks().then((processedCount) {
         if (processedCount > 0) {
-          AppLogger.d('STATS',
-              'Processed $processedCount pending tracks on foreground');
+          AppLogger.d(
+            'STATS',
+            'Processed $processedCount pending tracks on foreground',
+          );
+
+          // Update widgets again if tracks were processed
+          _updateWidgetsData();
         }
       });
     }
@@ -369,8 +402,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           currentRoute.settings.name == SplashView.routeName;
 
       if (isAlreadyOnSplash) {
-        AppLogger.d('NAVIGATION',
-            'Already on splash screen, refreshing instead of navigating');
+        AppLogger.d(
+          'NAVIGATION',
+          'Already on splash screen, refreshing instead of navigating',
+        );
         // If already on splash, just reset state without navigating
         if (context.mounted) {
           final splash = context.findAncestorStateOfType<SplashViewState>();
@@ -390,5 +425,57 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         (route) => false,
       );
     });
+  }
+}
+
+void _setUpWidget() {
+  // Set the app group ID for HomeWidget usage
+  HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
+
+  // Schedule periodic updates for widgets
+  _widgetUpdateTimer?.cancel();
+  _widgetUpdateTimer = Timer.periodic(
+    kDebugMode ? const Duration(minutes: 5) : const Duration(minutes: 30),
+    (timer) async {
+      await _updateWidgetsData();
+    },
+  );
+
+  // Register for widget launcher
+  HomeWidget.widgetClicked.listen((uri) {
+    AppLogger.d('WIDGET', 'Widget clicked: $uri');
+    // Handle widget tap events if needed
+  });
+
+  // Initial update
+  _updateWidgetsData();
+}
+
+Future<void> _updateWidgetsData() async {
+  try {
+    AppLogger.d('WIDGET', 'Updating widget data');
+
+    // Initialize Firebase if needed
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+
+    var statsManager = StatsManager();
+    await statsManager.initialize();
+
+    try {
+      await statsManager.sync();
+    } catch (e) {
+      AppLogger.e('WIDGET', 'Stats sync failed', e);
+    }
+
+    var stats = await statsManager.localAllStats;
+    await updateWidgets(stats);
+
+    AppLogger.d('WIDGET', 'Widget data updated successfully');
+  } catch (e) {
+    AppLogger.e('WIDGET', 'Widget update failed', e);
   }
 }

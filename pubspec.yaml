@@ -69,6 +69,11 @@ dependencies:
   xml2json: ^6.2.7
   crypto: ^3.0.6
   home_widget: ^0.7.0
+  workmanager:
+    git:
+      url: https://github.com/fluttercommunity/flutter_workmanager.git
+      path: workmanager
+      ref: main
 
 
 dev_dependencies:

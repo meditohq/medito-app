@@ -3,7 +3,7 @@ import WidgetKit
 
 struct MeditoTimelineProvider: TimelineProvider {
     func placeholder(in context: Context) -> MeditoWidgetEntry{
-        MeditoWidgetEntry(date: Date(), streakValue: 0, audioCompleted: [], isMonthlyDonor: true, dailyQuote: "")
+        MeditoWidgetEntry(date: Date(), streakValue: 0, audioCompleted: [], isMonthlyDonor: true, dailyQuote: "", lastUpdated: nil)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (MeditoWidgetEntry) -> ()) {
@@ -12,7 +12,8 @@ struct MeditoTimelineProvider: TimelineProvider {
         let audioCompleted = prefs?.array(forKey: "audioCompleted") as? [TimeInterval] ?? []
         let isMonthlyDonor = prefs?.array(forKey: "isMonthlyDonor") as? Bool ?? false
         let dailyQuote = prefs?.string(forKey: "dailyQuote") as? String ?? ""
-        let entry = MeditoWidgetEntry(date: Date(), streakValue: streakValue, audioCompleted: audioCompleted, isMonthlyDonor: isMonthlyDonor, dailyQuote: dailyQuote)
+        let lastUpdated = prefs?.string(forKey: "last_updated_time")
+        let entry = MeditoWidgetEntry(date: Date(), streakValue: streakValue, audioCompleted: audioCompleted, isMonthlyDonor: isMonthlyDonor, dailyQuote: dailyQuote, lastUpdated: lastUpdated)
         completion(entry)
     }
     

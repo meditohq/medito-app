@@ -8,6 +8,13 @@ struct StreakWidgetMediumView: View {
         VStack(alignment: .center, spacing: 16) {
             topView
             weekView
+            
+            if let lastUpdated = entry.lastUpdated {
+                Text("Updated: \(lastUpdated)")
+                    .font(.system(size: 9))
+                    .foregroundColor(Color.white.opacity(0.7))
+                    .padding(.top, 5)
+            }
         }
         .widgetBackground(Color.deepBlue)
         .donationLayer(didDonate: entry.isMonthlyDonor)
@@ -115,7 +122,8 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
                     Date().addingTimeInterval(-345600).timeIntervalSince1970 * 1000
                 ],
                 isMonthlyDonor: true,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))  // Fixed widget family
             .previewDisplayName("Full week")
@@ -130,7 +138,8 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
                     Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000
                 ],
                 isMonthlyDonor: true,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("Broken")
@@ -141,7 +150,8 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
                 streakValue: 0,
                 audioCompleted: [],
                 isMonthlyDonor: true,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("No Streak")
@@ -157,7 +167,8 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
                     Date().addingTimeInterval(-345600).timeIntervalSince1970 * 1000  // 4 days ago
                 ],
                 isMonthlyDonor: true,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("Not Today")
@@ -172,7 +183,8 @@ struct StreakWidgetMediumView_Previews: PreviewProvider {
                     Date().addingTimeInterval(-259200).timeIntervalSince1970 * 1000
                 ],
                 isMonthlyDonor: false,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemMedium))
             .previewDisplayName("Donate")

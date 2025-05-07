@@ -7,4 +7,5 @@ struct MeditoWidgetEntry: TimelineEntry {
     var audioCompleted: [TimeInterval]
     var isMonthlyDonor: Bool
     var dailyQuote: String
+    var lastUpdated: String?
 }

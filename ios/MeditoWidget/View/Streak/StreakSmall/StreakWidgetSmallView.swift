@@ -17,6 +17,13 @@ struct StreakWidgetSmallView: View {
             Text("day streak")
                 .font(.custom(MeditoFont.teachersRegular, size: 16))
                 .foregroundColor(Color.white)
+            
+            if let lastUpdated = entry.lastUpdated {
+                Text("Updated: \(lastUpdated)")
+                    .font(.system(size: 9))
+                    .foregroundColor(Color.white.opacity(0.7))
+                    .padding(.top, 5)
+            }
         }
         .widgetBackground(Color.deepBlue)
         .donationLayer(didDonate: entry.isMonthlyDonor)
@@ -34,7 +41,8 @@ struct StreakWidgetSmallView_Previews: PreviewProvider {
                     Date().timeIntervalSince1970 * 1000  // today
                 ],
                 isMonthlyDonor: true,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
             .previewDisplayName("Done Today")
@@ -47,7 +55,8 @@ struct StreakWidgetSmallView_Previews: PreviewProvider {
                     Date().addingTimeInterval(-86400).timeIntervalSince1970 * 1000  // yesterday
                 ],
                 isMonthlyDonor: true,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
             .previewDisplayName("Not Done Today")
@@ -58,7 +67,8 @@ struct StreakWidgetSmallView_Previews: PreviewProvider {
                 streakValue: 0,
                 audioCompleted: [],
                 isMonthlyDonor: true,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
             .previewDisplayName("Zero Streak")
@@ -71,7 +81,8 @@ struct StreakWidgetSmallView_Previews: PreviewProvider {
                     Date().timeIntervalSince1970 * 1000  // today
                 ],
                 isMonthlyDonor: false,
-                dailyQuote: ""
+                dailyQuote: "",
+                lastUpdated: "01 Jun 2023, 14:30"
             ))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
             .previewDisplayName("Donate")

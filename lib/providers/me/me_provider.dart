@@ -5,6 +5,8 @@ import 'dart:developer' as dev;
 import '../../models/me/me_model.dart';
 import '../../repositories/me/me_repository.dart';
 import '../../repositories/auth/auth_repository.dart';
+import '../../constants/strings/shared_preference_constants.dart';
+import '../shared_preferences_provider.dart';
 
 part 'me_provider.g.dart';
 
@@ -35,6 +37,12 @@ Future<MeModel> me(Ref ref) async {
           await authRepo.migrateEmailToStorage();
         }
 
+        final prefs = await ref.read(sharedPreferencesProvider.future);
+        await prefs.setBool(
+          SharedPreferenceConstants.hasActiveSubscription,
+          meData.hasActiveSubscription,
+        );
+
         return meData;
       } catch (e) {
         dev.log('[ME_PROVIDER] Error fetching me data: $e',
@@ -47,6 +55,12 @@ Future<MeModel> me(Ref ref) async {
       if (currentUser != null && currentUser.email != null) {
         dev.log('[ME_PROVIDER] Using cached user data due to token error',
             level: 500);
+        final prefs = await ref.read(sharedPreferencesProvider.future);
+        await prefs.setBool(
+          SharedPreferenceConstants.hasActiveSubscription,
+          false,
+        );
+
         return MeModel(
           id: currentUser.id,
           email: currentUser.email,
@@ -63,6 +77,12 @@ Future<MeModel> me(Ref ref) async {
     // If we have an email, ensure it's stored in secure storage
     if (email != null && email.isNotEmpty) {
       await authRepo.migrateEmailToStorage();
+      final prefs = await ref.read(sharedPreferencesProvider.future);
+      await prefs.setBool(
+        SharedPreferenceConstants.hasActiveSubscription,
+        false,
+      );
+
       return MeModel(
         id: currentUser?.id ?? '',
         email: email,
@@ -73,6 +93,12 @@ Future<MeModel> me(Ref ref) async {
     // If no email found anywhere, return anonymous user
     dev.log('[ME_PROVIDER] No email found, user likely not authenticated',
         level: 500);
+    final prefs = await ref.read(sharedPreferencesProvider.future);
+    await prefs.setBool(
+      SharedPreferenceConstants.hasActiveSubscription,
+      false,
+    );
+
     return MeModel(
         id: currentUser?.id ?? '', email: null, hasActiveSubscription: false);
   } catch (e) {

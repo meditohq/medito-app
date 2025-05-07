@@ -14,7 +14,7 @@
 	<array/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.org.medito.widget</string>
+		<string>group.*</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>

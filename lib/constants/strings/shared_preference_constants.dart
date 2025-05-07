@@ -19,11 +19,14 @@ class SharedPreferenceConstants {
   // New constants for stats
   static const String localAllStatsKey = 'local_all_stats';
   static const String hasSeenStreakCircle = 'has_seen_streak_circle';
-  static const String streakCircleDisplayPreference = 'streak_circle_display_preference';
+  static const String streakCircleDisplayPreference =
+      'streak_circle_display_preference';
 
   static const String homeWidgetOrder = 'homeWidgetOrder';
 
   // DND settings
   static const String dndEnabled = 'dnd_enabled';
   static const String isLoggedIn = 'is_logged_in';
+
+  static const String hasActiveSubscription = 'has_active_subscription';
 }

@@ -128,16 +128,14 @@ class StatsManager {
       }
 
       _allStats = _allStats!.copyWith(
-          consistencyScore: calculateConsistencyScore(_allStats!),
-        );
+        consistencyScore: calculateConsistencyScore(_allStats!),
+      );
 
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
     } else {
       throw Exception("Stats are null");
     }
-
-    
 
     //dev.log'StatsManager: Sync completed');
   }
@@ -157,7 +155,6 @@ class StatsManager {
   }
 
   Future<void> _merge(LocalAllStats remoteStats) async {
-
     // Check if remote stats contain recent dummy data
     var now = _getCurrentDate();
     var today = DateTime(now.year, now.month, now.day);
