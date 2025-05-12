@@ -5,7 +5,7 @@ import home_widget
 import workmanager
 import app_links
 import Intents
-import IntentsUIA
+import IntentsUI
 import AppTrackingTransparency
 
 @main

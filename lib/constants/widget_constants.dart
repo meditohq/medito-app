@@ -3,7 +3,7 @@ class WidgetConstants {
       'meditationStatsWidgetUpdate'; // Used for periodic widget update
   static const String taskName =
       'updateMeditationStatsWidget'; // Used for periodic widget update
-  static const String widgetGroupId = 'group.org.meditofoundation.widget';
+  static const String widgetGroupId = 'group.org.medito.widget';
 
   // Widget kinds for iOS
   static const String quoteWidgetSmallKind = 'QuoteWidgetSmall';

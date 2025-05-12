@@ -66,6 +66,11 @@ post_install do |installer|
       config.build_settings['OTHER_LDFLAGS'] ||= '$(inherited)'
       config.build_settings['OTHER_LDFLAGS'] += ' -framework AppTrackingTransparency'
 
+      # Exclude arm64 for simulator builds (Apple Silicon workaround)
+      if config.name == 'Debug' || config.name == 'Release'
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      end
+
       # Finally, force Automatic signing for Pods targets AFTER other settings
       config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
       config.build_settings['DEVELOPMENT_TEAM'] = nil
