@@ -32,10 +32,14 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  pod 'Firebase/Core'
   
   target 'RunnerTests' do
     inherit! :search_paths
+  end
+
+  target 'MeditoWidgetExtension' do
+    inherit! :search_paths   # Inherit pods search paths for the widget extension
+    pod 'PromisesObjC'
   end
 end
 

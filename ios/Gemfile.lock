@@ -128,8 +128,8 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  cocoapods (~> 1.15)
-  xcodeproj (~> 1.26)
+  cocoapods (~> 1.16.2)
+  xcodeproj (= 1.27.0)
 
 BUNDLED WITH
    2.6.8
