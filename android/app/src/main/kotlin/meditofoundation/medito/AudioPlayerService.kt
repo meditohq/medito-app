@@ -106,8 +106,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                                         ?: "",
                                     imageUrl = mediaItem.mediaMetadata.artworkUri?.toString() ?: "",
                                     artist = mediaItem.mediaMetadata.artist?.toString() ?: "",
+                                    artistUrl = mediaItem.mediaMetadata.extras?.getString(KEY_ARTIST_URL)
                                 )
-                            } ?: Track("", "", "", "", "")
+                            } ?: Track(id = "", title = "", description = "", imageUrl = "", artist = null, artistUrl = null)
                         )
 
                         // Apply background sound volume on main thread
@@ -537,6 +538,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                         .setArtist(audioData.track.artist)
                         .setDescription(audioData.track.description)
                         .setArtworkUri(audioData.track.imageUrl?.let { Uri.parse(it) })
+                        .setExtras(android.os.Bundle().apply {
+                            putString(KEY_ARTIST_URL, audioData.track.artistUrl)
+                        })
                         .build()
                 )
                 .build()
@@ -954,5 +958,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         const val NOTIFICATION_ID = 101011
         private const val TAG = "MeditoAudioService"
         const val ACTION_BIND_SERVICE = "meditofoundation.medito.BIND_SERVICE"
+        private const val KEY_ARTIST_URL = "artistUrl"
     }
 }
