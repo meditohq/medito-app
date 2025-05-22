@@ -125,15 +125,6 @@ class SettingsScreen extends ConsumerWidget {
       SettingsItem(
         section: StringConstants.helpLegal,
         type: TypeConstants.url,
-        title: StringConstants.faqTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedNews01, color: ColorConstants.white),
-        path:
-            'https://medito.notion.site/FAQ-3edb3f0a4b984c069b9c401308d874bc?pvs=4',
-      ),
-      SettingsItem(
-        section: StringConstants.helpLegal,
-        type: TypeConstants.url,
         title: StringConstants.editStatsTitle,
         icon: HugeIcon(
           icon: HugeIcons.solidRoundedQuestion,
