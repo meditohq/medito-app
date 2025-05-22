@@ -1,7 +1,6 @@
 import 'dart:developer' as dev;
 import 'dart:io'; // Import Platform
-import 'package:flutter/foundation.dart'; // Import kIsWeb
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart' as fs;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/constants/http/http_constants.dart';
@@ -11,10 +10,18 @@ import 'package:meta/meta.dart';
 
 // Interface for FlutterSecureStorage to make testing easier
 class SecureStorage {
-  final FlutterSecureStorage storage;
+  final fs.FlutterSecureStorage storage;
 
-  SecureStorage({FlutterSecureStorage? storage})
-      : storage = storage ?? const FlutterSecureStorage();
+  SecureStorage({fs.FlutterSecureStorage? storage})
+      : storage = storage ??
+            fs.FlutterSecureStorage(
+              aOptions: fs.AndroidOptions(
+                encryptedSharedPreferences: true,
+              ),
+              iOptions: fs.IOSOptions(
+                accessibility: fs.KeychainAccessibility.first_unlock,
+              ),
+            );
 
   Future<void> write({required String key, required String? value}) {
     return storage.write(key: key, value: value);
@@ -27,12 +34,6 @@ class SecureStorage {
   Future<void> delete({required String key}) {
     return storage.delete(key: key);
   }
-}
-
-// Helper function to check if running in a test environment
-// This relies on the test runner setting the 'FLUTTER_TEST' environment variable.
-bool _isRunningInTestEnvironment() {
-  return Platform.environment.containsKey('FLUTTER_TEST');
 }
 
 class SecureStorageService {
@@ -48,16 +49,13 @@ class SecureStorageService {
   // Made public for testing purposes ONLY.
   @visibleForTesting
   String encryptToken(String token) {
-    // Use a default key for tests if apiKey is not available
+    // Use the real apiKey when available; fall back to a constant key for unit
+    // tests where apiKey is intentionally left empty.
     final String encryptionKey =
-        (_isRunningInTestEnvironment() ? 'test_key_1234567890' : apiKey);
-    // assert(encryptionKey.isNotEmpty, 'Encryption key must not be empty');
+        apiKey.isNotEmpty ? apiKey : 'test_key_1234567890';
     if (encryptionKey.isEmpty) {
-      // Handle case where key might still be empty outside tests
-      if (!_isRunningInTestEnvironment()) {
-        dev.log('[SECURE_STORAGE] CRITICAL: apiKey is empty during encryption!',
-            level: 1000);
-      }
+      dev.log('[SECURE_STORAGE] CRITICAL: apiKey is empty during encryption!',
+          level: 1000);
       // Potentially throw or return a default value, but using a test key
       // is safer for tests and avoids crashing if apiKey is missing in prod.
       return token; // Or throw an error
@@ -126,105 +124,77 @@ class SecureStorageService {
   }
 
   Future<void> storeRefreshToken(String token) async {
-    // Store in SharedPreferences
+    // 1. Attempt to persist in FlutterSecureStorage (primary, survives prefs-clears)
+    try {
+      await _retrySecureOperation(() async {
+        await _storage.write(key: _refreshTokenKey, value: token);
+      });
+    } catch (e, stack) {
+      // Severe – secure storage should rarely fail.  Log explicitly.
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventSecureStoragePersistentFailure,
+        parameters: {
+          'phase': 'write',
+          'error': e.toString(),
+          'stack_trace': stack.toString(),
+        },
+      );
+      // still continue to try backup so user isn't logged out entirely.
+    }
+
+    // 2. Emit analytics that we are about to write the backup copy.
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventTokenBackupStorageAttempt,
+      parameters: {
+        'timestamp': DateTime.now().toIso8601String(),
+        'token_length': token.length,
+      },
+    );
+
+    // 3. Write the XOR-encrypted backup to SharedPreferences.
     try {
       await _storeRefreshToken(token);
+
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventTokenBackupStorageResult,
+        parameters: {
+          'result': 'success',
+          'timestamp': DateTime.now().toIso8601String(),
+          'token_length': token.length,
+        },
+      );
     } catch (e) {
-      // Avoid Firebase calls in tests
-      if (!_isRunningInTestEnvironment()) {
-        await FirebaseAnalyticsService().logEvent(
-          name: FirebaseAnalyticsService.eventAuthTokenStorageFailed,
-          parameters: {
-            'error': e.toString(),
-            'stack_trace': StackTrace.current.toString(),
-          },
-        );
-      }
+      // Log and bubble up.
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventTokenBackupStorageResult,
+        parameters: {
+          'result': 'failure',
+          'error': e.toString(),
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
       rethrow;
     }
   }
 
-  Future<String?> getRefreshToken({bool logFailureToFirebase = true}) async {
-    String? token;
-    final bool logToFirebase =
-        logFailureToFirebase && !_isRunningInTestEnvironment();
-
-    // First try SharedPreferences
+  // Priority order for reads: secure-storage first, then backup SharedPrefs.
+  // NOTE: callers still go through getRefreshToken( ) which contains
+  // extra analytics and retry logic – we just swap fast-path order here.
+  Future<String?> _getRefreshTokenPrimaryFirst() async {
+    // 1. secure storage
     try {
-      token = await _getRefreshToken();
-      if (token != null) {
-        return token;
-      }
-    } on Exception catch (e, stack) {
-      if (logToFirebase) {
-        await FirebaseAnalyticsService().logEvent(
-          name: FirebaseAnalyticsService
-              .eventRefreshTokenReadErrorSharedPreferences,
-          parameters: {
-            'error': e.toString(),
-            'stack_trace': stack.toString(),
-          },
-        );
-      }
-      throw StorageReadError(
-          message:
-              'Failed to read token from SharedPreferences: ${e.toString()}');
-    }
-
-    // If SharedPreferences is empty, try secure storage fallback
-    try {
-      token = await _retrySecureOperation(() async {
+      final secured = await _retrySecureOperation(() async {
         return await _storage.read(key: _refreshTokenKey);
       });
-      if (token != null) {
-        if (logToFirebase) {
-          await FirebaseAnalyticsService().logEvent(
-            name: FirebaseAnalyticsService.eventTokenRetrievedFromBackup,
-            parameters: {
-              'timestamp': DateTime.now().toIso8601String(),
-            },
-          );
-        }
-      }
-    } on Exception catch (e, stack) {
-      if (logToFirebase) {
-        await FirebaseAnalyticsService().logEvent(
-          name:
-              FirebaseAnalyticsService.eventRefreshTokenReadErrorSecureStorage,
-          parameters: {
-            'error': e.toString(),
-            'stack_trace': stack.toString(),
-          },
-        );
-      }
-      throw StorageReadError(
-          message:
-              'Failed to read token from FlutterSecureStorage: ${e.toString()}');
+      if (secured != null && secured.isNotEmpty) return secured;
+    } catch (e) {
+      // Let exceptions propagate up to caller (getRefreshToken)
+      // so they can be properly logged and handled
+      rethrow;
     }
 
-    // Log if token not found anywhere and user is logged in
-    if (token == null && logToFirebase) {
-      try {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        bool isLoggedIn =
-            prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
-        if (isLoggedIn) {
-          await FirebaseAnalyticsService().logEvent(
-            name: FirebaseAnalyticsService.eventRefreshTokenRetrievalFailed,
-            parameters: {
-              'storage_type': 'none_found',
-              'error': 'Token not found in any storage, but isLoggedIn is true',
-              'stack_trace': StackTrace.current.toString(),
-            },
-          );
-        }
-      } catch (e) {
-        dev.log('[SECURE_STORAGE] Error checking isLoggedIn for analytics',
-            error: e);
-      }
-    }
-
-    return token;
+    // 2. SharedPreferences backup
+    return await _getRefreshToken();
   }
 
   Future<void> storeUserEmail(String email) async {
@@ -232,15 +202,13 @@ class SecureStorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_userEmailKey, email);
     } catch (e) {
-      if (!_isRunningInTestEnvironment()) {
-        await FirebaseAnalyticsService().logEvent(
-          name: FirebaseAnalyticsService.eventEmailAddressSaveFailed,
-          parameters: {
-            'error': e.toString(),
-            'stack_trace': StackTrace.current.toString(),
-          },
-        );
-      }
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventEmailAddressSaveFailed,
+        parameters: {
+          'error': e.toString(),
+          'stack_trace': StackTrace.current.toString(),
+        },
+      );
       rethrow;
     }
   }
@@ -263,16 +231,13 @@ class SecureStorageService {
         await prefs.setString(_userEmailKey, email);
       }
     } catch (e) {
-      if (!_isRunningInTestEnvironment()) {
-        // Check before logging
-        await FirebaseAnalyticsService().logEvent(
-          name: FirebaseAnalyticsService.eventEmailAddressSaveFailed2,
-          parameters: {
-            'error': e.toString(),
-            'stack_trace': StackTrace.current.toString(),
-          },
-        );
-      }
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventEmailAddressSaveFailed2,
+        parameters: {
+          'error': e.toString(),
+          'stack_trace': StackTrace.current.toString(),
+        },
+      );
     }
 
     return email;
@@ -367,5 +332,70 @@ class SecureStorageService {
         }
       }
     }
+  }
+
+  Future<String?> getRefreshToken({bool logFailureToFirebase = true}) async {
+    String? token;
+    final bool logToFirebase = logFailureToFirebase;
+
+    // First try secure-storage, then backup SharedPrefs
+    try {
+      token = await _getRefreshTokenPrimaryFirst();
+      if (token != null) {
+        // If token came from secure storage we label it.
+        if (logToFirebase) {
+          await FirebaseAnalyticsService().logEvent(
+            name: FirebaseAnalyticsService.eventTokenRetrievedFromBackup,
+            parameters: {
+              'timestamp': DateTime.now().toIso8601String(),
+              'source': 'secure_storage',
+            },
+          );
+        }
+        return token;
+      }
+    } on Exception catch (e, stack) {
+      // Determine which store failed based on message
+      if (logToFirebase) {
+        final eventName = e.toString().contains('SharedPreferences')
+            ? FirebaseAnalyticsService
+                .eventRefreshTokenReadErrorSharedPreferences
+            : FirebaseAnalyticsService.eventRefreshTokenReadErrorSecureStorage;
+
+        await FirebaseAnalyticsService().logEvent(
+          name: eventName,
+          parameters: {
+            'error': e.toString(),
+            'stack_trace': stack.toString(),
+          },
+        );
+      }
+      // Rethrow as StorageReadError to keep previous behaviour
+      throw StorageReadError(message: e.toString());
+    }
+
+    // Log if token not found anywhere and user is logged in
+    if (token == null && logToFirebase) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final isLoggedIn =
+            prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
+        if (isLoggedIn) {
+          await FirebaseAnalyticsService().logEvent(
+            name: FirebaseAnalyticsService.eventRefreshTokenRetrievalFailed,
+            parameters: {
+              'storage_type': 'none_found',
+              'error': 'Token not found in any storage, but isLoggedIn is true',
+              'stack_trace': StackTrace.current.toString(),
+            },
+          );
+        }
+      } catch (e) {
+        dev.log('[SECURE_STORAGE] Error checking isLoggedIn for analytics',
+            error: e);
+      }
+    }
+
+    return token;
   }
 }

@@ -152,8 +152,11 @@ class AuthRepositoryImpl extends AuthRepository {
           dev.log('[AUTH_REPO] No refresh token found despite logged in status',
               level: 800);
 
-          // Log a unique Firebase Analytics event for diagnostics
           try {
+            // Gather additional diagnostics so we can pinpoint why the token is missing.
+            final backupToken =
+                _preferences.getString('medito_backup_refresh_token');
+
             await FirebaseAnalyticsService().logEvent(
               name: FirebaseAnalyticsService
                   .eventUnexpectedLogoutRefreshTokenMissing,
@@ -164,6 +167,13 @@ class AuthRepositoryImpl extends AuthRepository {
                 'app_version': await PackageInfo.fromPlatform()
                     .then((info) => info.buildNumber),
                 'timestamp': DateTime.now().toIso8601String(),
+
+                // Extra context
+                'stored_email_present':
+                    (storedEmail != null && storedEmail.isNotEmpty).toString(),
+                'backup_token_present':
+                    (backupToken != null && backupToken.isNotEmpty).toString(),
+                'is_logged_in_flag': isLoggedIn.toString(),
               },
             );
           } catch (e, stack) {

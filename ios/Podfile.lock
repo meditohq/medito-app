@@ -128,7 +128,7 @@ PODS:
     - GoogleUtilities/Privacy
   - haptic_feedback (0.5.1):
     - Flutter
-  - health (12.1.0):
+  - health (12.2.0):
     - Flutter
   - in_app_review (2.0.0):
     - Flutter
@@ -275,7 +275,7 @@ SPEC CHECKSUMS:
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   haptic_feedback: fd1d8509833f58f164fc12122c0357fa9b2750e0
-  health: a27e55f6f9682483a8bb8fd280084d025b80b478
+  health: 5f06d2b77cede1909be85dcd588570668caa5be2
   in_app_review: 5596fe56fab799e8edb3561c03d053363ab13457
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed

@@ -5,13 +5,29 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
+// Lightweight stand-in so unit tests don't depend on firebase_core.
+class _NoopAnalytics {
+  Future<void> setConsent({
+    bool? analyticsStorageConsentGranted,
+    bool? adStorageConsentGranted,
+    bool? adUserDataConsentGranted,
+    bool? adPersonalizationSignalsConsentGranted,
+  }) async {}
+
+  Future<void> logEvent(
+      {required String name, Map<String, Object?>? parameters}) async {}
+
+  Future<void> logScreenView(
+      {required String screenName, String? screenClass}) async {}
+}
+
 /// Service for handling Firebase Analytics initialization and consent settings
 class FirebaseAnalyticsService {
   static final FirebaseAnalyticsService _instance =
       FirebaseAnalyticsService._internal();
   factory FirebaseAnalyticsService() => _instance;
 
-  late final FirebaseAnalytics _analytics;
+  late final dynamic _analytics; // FirebaseAnalytics or _NoopAnalytics
   bool _initialized = false;
 
   // Keys and constants
@@ -44,8 +60,17 @@ class FirebaseAnalyticsService {
   static const String eventAuthTokenStorageFailed = 'auth_token_storage_failed';
   static const String eventPostMeditationFeedback = 'post_meditation_feedback';
 
+  // Don't pollute Firebase from unit/widget tests executed via `flutter test`.
+  static bool get _runningInTest =>
+      Platform.environment.containsKey('FLUTTER_TEST');
+
   FirebaseAnalyticsService._internal() {
-    _analytics = FirebaseAnalytics.instance;
+    if (_runningInTest) {
+      _analytics = _NoopAnalytics() as dynamic; // cast to satisfy type
+      _initialized = true; // nothing else to set up
+    } else {
+      _analytics = FirebaseAnalytics.instance;
+    }
   }
 
   /// Initialize the Firebase Analytics service and check for user consent preferences
@@ -212,6 +237,7 @@ class FirebaseAnalyticsService {
     required String name,
     Map<String, Object>? parameters,
   }) async {
+    if (_runningInTest) return; // Skip in unit tests
     if (!_initialized) await initialize();
 
     try {
@@ -237,6 +263,7 @@ class FirebaseAnalyticsService {
     required String screenName,
     String? screenClass,
   }) async {
+    if (_runningInTest) return; // Skip in unit tests
     if (!_initialized) await initialize();
 
     try {

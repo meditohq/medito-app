@@ -62,10 +62,14 @@ void main() async {
 
     // --- Existing Tests (adapted slightly if needed) ---
 
-    test('storeRefreshToken stores token encrypted in SharedPreferences',
+    test(
+        'storeRefreshToken stores token in secure storage and SharedPreferences',
         () async {
       // Setup: Ensure initial state is empty
       SharedPreferences.setMockInitialValues({});
+      when(() => mockSecureStorage.write(
+          key: any(named: 'key'),
+          value: any(named: 'value'))).thenAnswer((_) async {});
 
       // Action
       await secureStorageService.storeRefreshToken(testToken);
@@ -80,22 +84,27 @@ void main() async {
       expect(actualStoredValue, isNot(equals(testToken)),
           reason: "Stored token should be encrypted");
 
-      // Verify FlutterSecureStorage was NOT called
-      verifyNever(() => mockSecureStorage.write(
-          key: any(named: 'key'), value: any(named: 'value')));
+      // Verify FlutterSecureStorage WAS called first
+      verify(() => mockSecureStorage.write(key: testKey, value: testToken))
+          .called(1);
     });
 
-    test('getRefreshToken retrieves from SharedPreferences first', () async {
+    test('getRefreshToken retrieves from secure storage first', () async {
       // Instantiate service locally ONLY to generate encrypted token for setup
       final tempServiceForEncryption = SecureStorageService();
       final encryptedToken =
           tempServiceForEncryption.encryptToken(testToken); // Use public method
       SharedPreferences.setMockInitialValues({backupTestKey: encryptedToken});
 
+      // Mock secure storage to return a token
+      when(() => mockSecureStorage.read(key: testKey))
+          .thenAnswer((_) async => testToken);
+
       final result = await secureStorageService.getRefreshToken();
 
       expect(result, equals(testToken));
-      verifyNever(() => mockSecureStorage.read(key: any(named: 'key')));
+      // Verify secure storage WAS called first
+      verify(() => mockSecureStorage.read(key: testKey)).called(1);
     });
 
     test(
@@ -150,13 +159,14 @@ void main() async {
       // Setup: SharedPreferences empty, SecureStorage read throws
       SharedPreferences.setMockInitialValues({});
       final exception = PlatformException(code: 'read_failed');
-      when(() => mockSecureStorage.read(key: testKey)).thenThrow(exception);
 
-      // Action & Assert
-      await expectLater(
-        secureStorageService.getRefreshToken(),
-        throwsA(isA<StorageReadError>()),
-      );
+      // Mock secure storage to throw when accessed via _retrySecureOperation
+      when(() => mockSecureStorage.read(key: any(named: 'key')))
+          .thenThrow(exception);
+
+      // Action & Assert - use proper async expectation
+      await expectLater(secureStorageService.getRefreshToken(),
+          throwsA(isA<StorageReadError>()));
 
       // Verify SecureStorage was called
       verify(() => mockSecureStorage.read(key: testKey)).called(1);
