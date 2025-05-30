@@ -42,8 +42,6 @@ abstract class AuthRepository {
   Future<bool> verifyOtp(String email, String otp);
   User? get currentUser;
   Future<bool> signOut();
-  Future<bool> markAccountForDeletion();
-  Future<bool> isAccountMarkedForDeletion();
   Future<void> signInAnonymously();
   void resetAuthState();
   Future<void> migrateEmailToStorage();
@@ -552,18 +550,6 @@ class AuthRepositoryImpl extends AuthRepository {
 
     dev.log('[AUTH_REPO] Sign out complete', level: 500);
     return true;
-  }
-
-  @override
-  Future<bool> markAccountForDeletion() async {
-    // We'll implement this when the server endpoint is ready
-    return false;
-  }
-
-  @override
-  Future<bool> isAccountMarkedForDeletion() async {
-    // We'll implement this when the server endpoint is ready
-    return false;
   }
 
   @override

@@ -19,6 +19,7 @@ import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
+import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -93,17 +94,6 @@ class SettingsScreen extends ConsumerWidget {
             icon: HugeIcons.solidRoundedHelpCircle,
             color: ColorConstants.white),
         path: RouteConstants.help,
-      ),
-      SettingsItem(
-        section: StringConstants.account,
-        type: TypeConstants.account,
-        title: user?.email != null && user?.email != ''
-            ? StringConstants.accountTitle
-            : 'Sign in/Sign up',
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedUserAccount,
-            color: ColorConstants.white),
-        path: 'account',
       ),
       SettingsItem(
         section: StringConstants.supportCommunity,
@@ -276,6 +266,10 @@ class SettingsScreen extends ConsumerWidget {
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
 
+    if (isAccountItem) {
+      return const SizedBox.shrink();
+    }
+
     if (isDndToggle) {
       final isDndEnabled = ref.watch(dndProvider);
 
@@ -331,11 +325,41 @@ class SettingsScreen extends ConsumerWidget {
     WidgetRef ref,
     List<SettingsItem> settingsItems,
   ) {
+    final authRepository = ref.watch(authRepositorySyncProvider);
+    final user = authRepository.currentUser;
+    final isEffectivelySignedIn =
+        user != null && user.email != null && user.email!.isNotEmpty;
+
     final customizationItems =
         _getItemsBySection(settingsItems, StringConstants.customization)
             .where((item) =>
                 !item.path.contains(TypeConstants.toggleDnd) || _isDndSupported)
             .toList();
+
+    var children = <Widget>[
+      _buildDailyNotificationTile(context, ref),
+      if (_isHealthSyncAvailable) const HealthSyncTile(),
+      if (!isEffectivelySignedIn) ...[
+        _buildSectionTitle(context, StringConstants.account),
+        const AccountSectionWidget(),
+      ],
+      _buildSectionTitle(context, StringConstants.supportCommunity),
+      ..._getItemsBySection(settingsItems, StringConstants.supportCommunity)
+          .map((item) => _buildMenuItemTile(context, ref, item)),
+      _buildSectionTitle(context, StringConstants.customization),
+      ...customizationItems
+          .map((item) => _buildMenuItemTile(context, ref, item)),
+      _buildSectionTitle(context, StringConstants.helpLegal),
+      ..._getItemsBySection(settingsItems, StringConstants.helpLegal)
+          .map((item) => _buildMenuItemTile(context, ref, item)),
+      if (isEffectivelySignedIn) ...[
+        _buildSectionTitle(context, StringConstants.account),
+        const AccountSectionWidget(),
+      ],
+      _buildSectionTitle(context, StringConstants.advanced),
+      _buildDebugTile(context, ref),
+      if (kDebugMode) _buildOnboardingTile(context, ref),
+    ];
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -343,26 +367,7 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.only(top: padding16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDailyNotificationTile(context, ref),
-            if (_isHealthSyncAvailable) const HealthSyncTile(),
-            _buildSectionTitle(context, StringConstants.account),
-            ..._getItemsBySection(settingsItems, StringConstants.account)
-                .map((item) => _buildMenuItemTile(context, ref, item)),
-            _buildSectionTitle(context, StringConstants.supportCommunity),
-            ..._getItemsBySection(
-                    settingsItems, StringConstants.supportCommunity)
-                .map((item) => _buildMenuItemTile(context, ref, item)),
-            _buildSectionTitle(context, StringConstants.customization),
-            ...customizationItems
-                .map((item) => _buildMenuItemTile(context, ref, item)),
-            _buildSectionTitle(context, StringConstants.helpLegal),
-            ..._getItemsBySection(settingsItems, StringConstants.helpLegal)
-                .map((item) => _buildMenuItemTile(context, ref, item)),
-            _buildSectionTitle(context, StringConstants.advanced),
-            _buildDebugTile(context, ref),
-            if (kDebugMode) _buildOnboardingTile(context, ref),
-          ],
+          children: children,
         ),
       ),
     );

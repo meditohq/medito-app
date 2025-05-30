@@ -13,7 +13,6 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/stats_manager.dart';
-import 'package:medito/views/settings/user_profile_page.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/routes/routes.dart' as routes;
@@ -43,9 +42,22 @@ class SignUpLogInPage extends ConsumerWidget {
     dev.log('[SIGN_UP] User email: ${user?.email}', level: 1000);
 
     if (user?.email != null && user?.email?.isNotEmpty == true) {
-      dev.log('[SIGN_UP] User has email, navigating to profile page',
+      dev.log('[SIGN_UP] User has email, navigating back or to home',
           level: 1000);
-      return const UserProfilePage();
+      // If opened from settings and user is already logged in, just pop.
+      // Otherwise, this case might not be reachable if auth guards are in place before this screen.
+      // However, to be safe, popping is a sensible default.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+      });
+      return const Scaffold(
+        backgroundColor: ColorConstants.ebony,
+        body: Center(
+            child:
+                CircularProgressIndicator(color: ColorConstants.lightPurple)),
+      ); // Show loading while popping
     } else {
       dev.log('[SIGN_UP] User has no email, showing sign-up form', level: 1000);
       return SignUpLogInForm(fromSettings: fromSettings);

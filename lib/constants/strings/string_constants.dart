@@ -85,6 +85,7 @@ class StringConstants {
       'Reminder notification scheduled at';
   static const String dailyReminderTitle = 'Daily Reminder';
   static const String setFor = 'Set for';
+  static const String signInSignUp = 'Sign in / Sign up';
 
   static const String settings = 'Settings';
   static const String reminderNotificationCleared = 'Reminder cancelled';
@@ -212,9 +213,8 @@ class StringConstants {
       'Are you sure you want to delete your account? This action cannot be undone.';
   static const String deleteAccountButtonText = 'Delete Account';
   static const String accountMarkedForDeletion =
-      'Your account has been marked for deletion and you have been signed out.';
-  static const String deleteAccountError =
-      'Failed to delete account. Please try again.';
+      'Your account has been marked for deletion.';
+  static const String deleteAccountError = 'Failed to delete account.';
 
   // Authentication and Account Management
   /// Error message shown when trying to log in to an account marked for deletion
@@ -679,4 +679,8 @@ class StringConstants {
   static const String statsWelcomeTitle = 'Introducing Consistency Score!';
   static const String statsWelcomeMessage =
       'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication.\n\nYour home screen will show your best score to keep you motivated.';
+
+  // Used in UserProfilePage when account deletion is initiated via external browser
+  static const String accountDeletionInitiated =
+      'Account deletion process initiated. Please complete the steps in your browser.';
 }

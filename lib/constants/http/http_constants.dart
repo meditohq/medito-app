@@ -6,6 +6,7 @@ class EnvConfig {
   final String authBaseUrl;
   final String apiKey;
   final String editStatsUrl;
+  final String deleteAccountBaseUrl;
 
   const EnvConfig({
     required this.environment,
@@ -13,6 +14,7 @@ class EnvConfig {
     required this.authBaseUrl,
     required this.apiKey,
     required this.editStatsUrl,
+    required this.deleteAccountBaseUrl,
   });
 }
 
@@ -23,6 +25,7 @@ class ProdEnv extends EnvConfig {
     required super.authBaseUrl,
     required super.apiKey,
     required super.editStatsUrl,
+    required super.deleteAccountBaseUrl,
   });
 }
 
@@ -33,6 +36,7 @@ class StagingEnv extends EnvConfig {
     required super.authBaseUrl,
     required super.apiKey,
     required super.editStatsUrl,
+    required super.deleteAccountBaseUrl,
   });
 }
 
@@ -42,6 +46,7 @@ const _prodEnv = ProdEnv(
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
   authBaseUrl: String.fromEnvironment('AUTH_URL'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
+  deleteAccountBaseUrl: 'https://accounts.medito.app/delete',
 );
 
 const _stagingEnv = StagingEnv(
@@ -50,6 +55,7 @@ const _stagingEnv = StagingEnv(
   contentBaseUrl: String.fromEnvironment('CONTENT_BASE_URL'),
   authBaseUrl: String.fromEnvironment('AUTH_URL'),
   editStatsUrl: String.fromEnvironment('EDIT_STATS_URL'),
+  deleteAccountBaseUrl: 'https://accounts.medito.dev/delete',
 );
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
@@ -59,6 +65,7 @@ String get environment => _currentEnv.environment;
 String get contentBaseUrl => _currentEnv.contentBaseUrl;
 String get authBaseUrl => _currentEnv.authBaseUrl;
 String get editStatsUrl => _currentEnv.editStatsUrl;
+String get deleteAccountUrl => _currentEnv.deleteAccountBaseUrl;
 
 class HTTPConstants {
   //END POINTS
