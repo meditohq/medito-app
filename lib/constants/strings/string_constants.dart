@@ -210,7 +210,7 @@ class StringConstants {
 
   static const String deleteAccountTitle = 'Delete Account';
   static const String deleteAccountConfirmation =
-      'Are you sure you want to delete your account? This action cannot be undone.';
+      'Are you sure you want to delete your account? This action cannot be undone and you must follow the instructions on the next page.';
   static const String deleteAccountButtonText = 'Delete Account';
   static const String accountMarkedForDeletion =
       'Your account has been marked for deletion.';
