@@ -1,16 +1,22 @@
 import SwiftUI
 import WidgetKit
 
-struct StreakWidgetSmall: Widget {
-    var body: some WidgetConfiguration {
-        StaticConfiguration(
-            kind: MeditoWidgetKind.streakSmall,
-            provider: MeditoTimelineProvider()
-        ) { entry in
-            StreakWidgetSmallView(entry: entry)
+struct StreakWidgetSmall: View {
+    let entry: MeditoWidgetEntry
+    
+    var body: some View {
+        VStack {
+            HStack {
+                FlameImageView()
+                Text("\(entry.currentStreak)")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                Spacer()
+            }
+            Text("Day Streak")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
-        .configurationDisplayName("Medito")
-        .description("Mindful streak count: one breath at a time.")
-        .supportedFamilies([.systemSmall])
+        .padding()
     }
-}
+} 

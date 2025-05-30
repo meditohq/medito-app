@@ -4,8 +4,19 @@ import SwiftUI
 @main
 struct MeditoWidgetBundle: WidgetBundle {
     var body: some Widget {
-        StreakWidgetSmall()
-        StreakWidgetMedium()
-        QuoteWidgetSmall()
+        MeditoStatsWidget()
     }
 }
+
+struct MeditoStatsWidget: Widget {
+    let kind: String = "MeditoStatsWidget"
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: MeditoTimelineProvider()) { entry in
+            StreakWidgetSmall(entry: entry)
+        }
+        .configurationDisplayName("Meditation Stats")
+        .description("View your meditation streak and progress")
+        .supportedFamilies([.systemSmall, .systemMedium])
+    }
+} 

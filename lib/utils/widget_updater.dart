@@ -80,7 +80,7 @@ Future<bool> updateWidgets(LocalAllStats stats) async {
 
     await HomeWidget.updateWidget(
       name: 'StatsWidgetProvider',
-      iOSName: 'StatsWidget',
+      iOSName: 'MeditoStatsWidget',
       qualifiedAndroidName: 'meditofoundation.medito.StatsWidgetReceiver',
     );
 
@@ -97,6 +97,11 @@ Future<bool> updateWidgets(LocalAllStats stats) async {
 
 Future<void> _updateIOSWidgets() async {
   try {
+    // The primary stats widget
+    await HomeWidget.updateWidget(
+      iOSName: 'MeditoStatsWidget',
+    );
+
     await HomeWidget.updateWidget(
       name: WidgetConstants.streakWidgetSmallKind,
       iOSName: WidgetConstants.streakWidgetSmallKind,

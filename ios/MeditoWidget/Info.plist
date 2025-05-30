@@ -2,29 +2,28 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>MeditoWidget</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.3.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>30062</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.widgetkit-extension</string>
-		<key>NSExtensionPrincipalClass</key>
-		<string>$(PRODUCT_MODULE_NAME).StreakWidgetBundle</string>
 	</dict>
-	<key>UIAppFonts</key>
-	<array>
-		<string>SourceSerif4-Bold.ttf</string>
-		<string>DMSerifDisplay-Regular.ttf</string>
-		<string>DMSerifDisplay-Italic.ttf</string>
-		<string>SourceSerif4-Medium.ttf</string>
-		<string>SourceSerif4-Regular.ttf</string>
-		<string>SourceSerif4-SemiBold.ttf</string>
-		<string>Teachers-Bold.ttf</string>
-		<string>Teachers-Medium.ttf</string>
-		<string>Teachers-Regular.ttf</string>
-		<string>Teachers-SemiBold.ttf</string>
-	</array>
 </dict>
-</plist>
+</plist> 
