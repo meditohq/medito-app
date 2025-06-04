@@ -153,7 +153,7 @@
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/logo" />
 
-        <receiver
+        <!-- <receiver
             android:name=".StatsWidgetReceiver"
             android:exported="true">
             <intent-filter>
@@ -164,6 +164,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/stats_widget_info" />
-        </receiver>
+        </receiver> -->
     </application>
 </manifest>

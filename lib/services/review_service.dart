@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ReviewService {
   static const _reviewRequestKey = 'last_review_request_timestamp';
   static const _minimumDaysBetweenRequests = 90; // 3 months
-  static const _minimumStreakForReview = 2;
+  static const _minimumStreakForReview = 10;
 
   final InAppReview _inAppReview = InAppReview.instance;
   final StatsManager _statsManager;

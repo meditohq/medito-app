@@ -4,7 +4,7 @@
 
     <application android:icon="@mipmap/ic_launcher">
         <!-- Widget configuration -->
-        <receiver
+        <!-- <receiver
             android:name=".StatsWidgetReceiver"
             android:exported="true"
             tools:replace="android:exported">
@@ -16,6 +16,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/stats_widget_info" />
-        </receiver>
+        </receiver> -->
     </application>
 </manifest>
