@@ -800,17 +800,17 @@ final authRepositorySyncProvider = Provider<AuthRepository>((ref) {
     return authRepo.value;
   }
 
-  // If the repository is loading or has an error, throw an exception
-  if (authRepo is AsyncLoading) {
-    dev.log('[AUTH_REPO_SYNC_PROVIDER] AuthRepository is still initializing.',
-        level: 700);
-    throw Exception('AuthRepository is still initializing');
-  } else if (authRepo is AsyncError) {
+  if (authRepo is AsyncError) {
     dev.log(
         '[AUTH_REPO_SYNC_PROVIDER] Failed to initialize AuthRepository due to AsyncError.',
         error: authRepo.error,
         stackTrace: authRepo.stackTrace,
-        level: 1200);
+        level: 1200);      
+    FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      authRepo.error,
+      authRepo.stackTrace,
+      reason: 'Failed to initialize AuthRepository',
+    );
     throw Exception('Failed to initialize AuthRepository: ${authRepo.error}');
   }
 
