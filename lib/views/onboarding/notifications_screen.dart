@@ -1,4 +1,3 @@
-
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
@@ -17,7 +16,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
   final VoidCallback? onNext;
 
   @override
-  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
@@ -38,15 +38,25 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }
 
   void _handleNotificationsPermission() async {
+    if (!mounted) return;
+
     setState(() => _isProcessing = true);
+    final handler = ref.read(firebaseMessagingProvider);
     final status = await Permission.notification.request();
 
+    if (!mounted) return;
+
     if (status.isGranted) {
-      final handler = ref.read(firebaseMessagingProvider);
       await handler.initialize(context, ref);
-      if (mounted) setState(() => _notificationsGranted = true);
+      if (mounted) {
+        setState(() {
+          _notificationsGranted = true;
+          _isProcessing = false;
+        });
+      }
+    } else if (mounted) {
+      setState(() => _isProcessing = false);
     }
-    setState(() => _isProcessing = false);
   }
 
   Future<void> _handleSetReminder() async {
@@ -66,7 +76,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     if (pickedTime != null && mounted) {
       await reminders.scheduleDailyNotification(pickedTime);
       await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
-      await prefs.setInt(SharedPreferenceConstants.savedMinutes, pickedTime.minute);
+      await prefs.setInt(
+          SharedPreferenceConstants.savedMinutes, pickedTime.minute);
       ref.read(reminderTimeProvider.notifier).state = pickedTime;
       _navigateNext();
     }
@@ -121,7 +132,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   else
                     _buildActionButton(
                       text: StringConstants.enableNotificationsCta,
-                      onPressed: _isProcessing ? null : _handleNotificationsPermission,
+                      onPressed:
+                          _isProcessing ? null : _handleNotificationsPermission,
                     ),
                   const SizedBox(height: 12),
                   SizedBox(
