@@ -139,6 +139,12 @@ class SecureStorageService {
           'stack_trace': stack.toString(),
         },
       );
+      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        stack,
+        reason:
+            'SecureStorage: Failed to write refresh token to primary secure storage',
+      );
       // still continue to try backup so user isn't logged out entirely.
     }
 
@@ -209,6 +215,11 @@ class SecureStorageService {
           'stack_trace': StackTrace.current.toString(),
         },
       );
+      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        StackTrace.current, // Capture stack trace at the point of error
+        reason: 'SecureStorage: Failed to save user email to SharedPreferences',
+      );
       rethrow;
     }
   }
@@ -237,6 +248,11 @@ class SecureStorageService {
           'error': e.toString(),
           'stack_trace': StackTrace.current.toString(),
         },
+      );
+      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        StackTrace.current, // Capture stack trace at the point of error
+        reason: 'SecureStorage: Failed to read user email from secure storage',
       );
     }
 
@@ -369,6 +385,12 @@ class SecureStorageService {
             'stack_trace': stack.toString(),
           },
         );
+        await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+          e,
+          stack,
+          reason:
+              'SecureStorage: Error reading refresh token from storage ($eventName)',
+        );
       }
       // Rethrow as StorageReadError to keep previous behaviour
       throw StorageReadError(message: e.toString());
@@ -388,6 +410,12 @@ class SecureStorageService {
               'error': 'Token not found in any storage, but isLoggedIn is true',
               'stack_trace': StackTrace.current.toString(),
             },
+          );
+          await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+            Exception('Token not found in any storage, but isLoggedIn is true'),
+            StackTrace.current,
+            reason:
+                'SecureStorage: Refresh token missing despite isLoggedIn=true',
           );
         }
       } catch (e) {

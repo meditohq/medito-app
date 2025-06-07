@@ -14,7 +14,7 @@ description: A meditation learning tool
 # Just build Android APK (used by the script above):
 # ./build_apk.sh
 
-version: 3.4.25+30125
+version: 3.4.26+30126
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -74,6 +74,7 @@ dependencies:
       url: https://github.com/fluttercommunity/flutter_workmanager.git
       path: workmanager
       ref: main
+  firebase_crashlytics: ^4.3.6
 
 
 dev_dependencies:

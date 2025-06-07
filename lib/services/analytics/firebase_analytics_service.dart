@@ -4,6 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 // Lightweight stand-in so unit tests don't depend on firebase_core.
 class _NoopAnalytics {
@@ -284,6 +285,34 @@ class FirebaseAnalyticsService {
     } catch (e) {
       if (kDebugMode) {
         print('Error logging screen view in Firebase Analytics: $e');
+      }
+    }
+  }
+
+  /// Record a non-fatal error to Firebase Crashlytics
+  Future<void> recordNonFatalCrashlyticsError(
+    dynamic exception,
+    StackTrace? stack, {
+    String? reason,
+    bool fatal = false, // Default to non-fatal as per method name
+  }) async {
+    if (_runningInTest) return; // Skip in unit tests
+    // No need to check _initialized for Crashlytics, it initializes separately
+
+    try {
+      await FirebaseCrashlytics.instance.recordError(
+        exception,
+        stack,
+        reason: reason,
+        fatal: fatal,
+      );
+
+      if (kDebugMode) {
+        print('Non-fatal error recorded to Crashlytics: $reason\n$exception');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error recording to Firebase Crashlytics: $e');
       }
     }
   }

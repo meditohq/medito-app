@@ -38,7 +38,7 @@ import 'package:medito/config/debug_options.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -74,12 +74,32 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Configure Crashlytics
+  if (kDebugMode) {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  } else {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  }
+
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
   await initializeAudioService();
   usePathUrlStrategy();
 
   var prefs = await initializeSharedPreferences();
 
-  // Set up widget background updates
   _setUpWidget();
 
   if (Platform.isAndroid) {

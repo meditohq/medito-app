@@ -109,6 +109,11 @@ class SplashViewState extends ConsumerState<SplashView>
       await _checkAuthAndInitialize();
     } catch (e, stackTrace) {
       AppLogger.e('SPLASH', 'Error initializing app', e, stackTrace);
+      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        stackTrace,
+        reason: 'Error in _initialiseApp (SplashNavigation)',
+      );
       if (!mounted) return;
 
       setState(() {
@@ -142,6 +147,11 @@ class SplashViewState extends ConsumerState<SplashView>
       // Log the error but don't prevent app startup
       AppLogger.e(
           'SPLASH', 'Error initializing Firebase Analytics', e, stackTrace);
+      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        stackTrace,
+        reason: 'Error initializing Firebase Analytics (SplashNavigation)',
+      );
     }
   }
 
@@ -184,7 +194,17 @@ class SplashViewState extends ConsumerState<SplashView>
         });
       }
     } catch (e, stackTrace) {
-      AppLogger.e('SPLASH', 'Error in _checkAuthAndInitialize', e, stackTrace);
+      AppLogger.e(
+          'SPLASH',
+          'Error in _checkAuthAndInitialize, navigating to DownloadsView',
+          e,
+          stackTrace);
+      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        stackTrace,
+        reason:
+            'Error in _checkAuthAndInitialize, navigating to DownloadsView (DownloadsNavigation)',
+      );
       if (!mounted) return;
 
       showSnackBar(context, StringConstants.offlineMode);
@@ -275,6 +295,12 @@ class SplashViewState extends ConsumerState<SplashView>
     } catch (e, stackTrace) {
       AppLogger.e('SPLASH', 'Failed to initialize user (anonymous sign-in)', e,
           stackTrace);
+      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        stackTrace,
+        reason:
+            'Failed to initialize user (anonymous sign-in) (SplashNavigation)',
+      );
       if (!mounted) return;
 
       showSnackBar(context, StringConstants.offlineMode);
@@ -308,12 +334,23 @@ class SplashViewState extends ConsumerState<SplashView>
         AppLogger.d('SPLASH', 'User data fetched: ${userData.toString()}');
       } catch (e, stackTrace) {
         AppLogger.e('SPLASH', 'Error fetching user data', e, stackTrace);
+        FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+          e,
+          stackTrace,
+          reason:
+              'Error fetching user data in _initializeServices (SplashNavigation)',
+        );
       }
 
       ref.read(rootCombineProvider(context));
       AppLogger.i('SPLASH', 'Services initialization complete');
     } catch (e, stackTrace) {
       AppLogger.e('SPLASH', 'Error initializing services', e, stackTrace);
+      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        stackTrace,
+        reason: 'Error initializing services (SplashNavigation)',
+      );
       showSnackBar(context, StringConstants.appInitError);
     }
   }

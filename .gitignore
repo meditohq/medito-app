@@ -115,3 +115,6 @@ upload_ios.sh
 build_and_upload_ios.sh
 *.cer
 /dated_apks
+
+# Scripts
+ios_credentials.sh

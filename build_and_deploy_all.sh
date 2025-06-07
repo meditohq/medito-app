@@ -48,4 +48,20 @@ echo "✅ All builds completed! Opening dated APKs directory..."
 open "$DATED_APKS_DIR"
 
 echo "🚀 Starting iOS build and upload..."
+
+# Source credentials from a separate, ignored file
+if [ -f "ios_credentials.sh" ]; then
+    source ios_credentials.sh
+else
+    echo "⚠️ 'ios_credentials.sh' not found. You may be prompted for credentials."
+fi
+
 ./build_and_upload_ios.sh
+
+# It's a good practice to unset the variables after use if set within the script
+if [ -n "$APPLE_ID_ENV" ]; then
+    unset APPLE_ID_ENV
+fi
+if [ -n "$APP_SPECIFIC_PASSWORD_ENV" ]; then
+    unset APP_SPECIFIC_PASSWORD_ENV
+fi

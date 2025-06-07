@@ -195,6 +195,12 @@ class AuthApiService {
               'build_number': packageInfo.buildNumber,
             },
           );
+          // Also log this critical failure to Crashlytics
+          await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+            e,
+            stack,
+            reason: 'CRITICAL: Failed to save refresh token to secure storage',
+          );
         } catch (analyticsError) {
           AppLogger.e(
               'AUTH_API',
