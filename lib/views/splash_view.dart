@@ -211,7 +211,7 @@ class SplashViewState extends ConsumerState<SplashView>
 
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const DownloadsView(),
+          builder: (context) => const DownloadsView(isRoot: true),
         ),
       );
     }
@@ -307,7 +307,7 @@ class SplashViewState extends ConsumerState<SplashView>
 
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const DownloadsView(),
+          builder: (context) => const DownloadsView(isRoot: true),
         ),
       );
     } finally {

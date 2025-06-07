@@ -22,7 +22,9 @@ import '../bottom_navigation/bottom_navigation_bar_view.dart';
 import '../player/player_view.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
-  const DownloadsView({super.key});
+  const DownloadsView({super.key, this.isRoot = false});
+
+  final bool isRoot;
 
   @override
   ConsumerState<DownloadsView> createState() => _DownloadsViewState();
@@ -40,11 +42,13 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     final downloadedTracks = ref.watch(downloadedTracksProvider);
 
     return Scaffold(
-      bottomNavigationBar: SingleBackButtonActionBar(
-        onBackPressed: () {
-          Navigator.pop(context);
-        },
-      ),
+      bottomNavigationBar: widget.isRoot
+          ? null
+          : SingleBackButtonActionBar(
+              onBackPressed: () {
+                Navigator.pop(context);
+              },
+            ),
       appBar: MeditoAppBarSmall(
         title: StringConstants.downloads,
         closePressed: () {
@@ -60,7 +64,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           }
         },
         isTransparent: true,
-        hasCloseButton: true,
+        hasCloseButton: !widget.isRoot,
       ),
       key: scaffoldKey,
       body: downloadedTracks.when(
