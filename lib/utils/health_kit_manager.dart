@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:health/health.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HealthKitManager {
   static final HealthKitManager _instance = HealthKitManager._internal();
+  final Health health = Health();
 
   factory HealthKitManager() {
     return _instance;
@@ -11,14 +14,24 @@ class HealthKitManager {
   HealthKitManager._internal();
 
   Future<bool?> isHealthSyncPermitted() async {
-    return await Health().hasPermissions(
-      [HealthDataType.MINDFULNESS],
-      permissions: [HealthDataAccess.READ_WRITE],
-    );
+    if (Platform.isAndroid) {
+      return false;
+    }
+    try {
+      return await health.hasPermissions(
+        [HealthDataType.MINDFULNESS],
+        permissions: [HealthDataAccess.READ_WRITE],
+      );
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<bool> requestAuthorization() async {
-    return await Health().requestAuthorization(
+    if (Platform.isAndroid) {
+      return false;
+    }
+    return await health.requestAuthorization(
       [HealthDataType.MINDFULNESS],
       permissions: [HealthDataAccess.READ_WRITE],
     );
@@ -39,6 +52,9 @@ class HealthKitManager {
   }
 
   Future<bool> writeMindfulnessData(DateTime start, DateTime end) async {
+    if (Platform.isAndroid) {
+      return false;
+    }
     try {
       var hasPermissions = await isHealthSyncPermitted();
 
@@ -47,7 +63,7 @@ class HealthKitManager {
       }
 
       if (hasPermissions) {
-        var success = await Health().writeHealthData(
+        var success = await health.writeHealthData(
           value: 0,
           type: HealthDataType.MINDFULNESS,
           startTime: start,
