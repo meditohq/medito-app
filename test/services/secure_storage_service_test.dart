@@ -197,40 +197,37 @@ void main() async {
 
     // --- New Tests for Error Handling ---
 
-    test('getRefreshToken throws StorageReadError on SharedPreferences error',
-        () async {
-      // Setup: Mock SharedPreferences internal call (getString) to throw
-      // We rely on the static mock setup here.
-      final exception = Exception('Prefs read error');
-      // This setup is tricky. Mocking the static SharedPreferences methods used INTERNALLY
-      // by the service might require more advanced mocking or restructuring.
-      // For now, let's assume the internal call fails and causes _getRefreshToken to throw.
-      // *This test might not be robust due to the static nature.*
-
-      // A potential way, if _getRefreshToken was refactored to accept SharedPreferences instance:
-      // when(() => mockSharedPreferences.getString(backupTestKey)).thenThrow(exception);
-
-      // Since we can't easily mock the internal call, we skip direct verification of the catch block
-      // and focus on the fallback mechanism test instead.
-      expect(true,
-          isTrue); // Placeholder assertion - needs refactoring for proper test
-    });
-
-    test('getRefreshToken throws StorageReadError on SecureStorage error',
+    test(
+        'getRefreshToken returns null if primary storage fails and backup is empty',
         () async {
       // Setup: SharedPreferences empty, SecureStorage read throws
       SharedPreferences.setMockInitialValues({});
       final exception = PlatformException(code: 'read_failed');
-
-      // Mock secure storage to throw when accessed via _retrySecureOperation
       when(() => mockSecureStorage.read(key: any(named: 'key')))
           .thenThrow(exception);
 
-      // Action & Assert - use proper async expectation
-      await expectLater(secureStorageService.getRefreshToken(),
-          throwsA(isA<StorageReadError>()));
+      // Action
+      final result = await secureStorageService.getRefreshToken();
 
-      // Verify SecureStorage was called
+      // Assert
+      expect(result, isNull);
+      verify(() => mockSecureStorage.read(key: testKey)).called(1);
+    });
+
+    test(
+        'getRefreshToken retrieves from backup when primary storage throws an error',
+        () async {
+      // Setup: SharedPreferences has a valid token, SecureStorage read throws
+      SharedPreferences.setMockInitialValues({backupTestKey: testToken});
+      final exception = PlatformException(code: 'read_failed');
+      when(() => mockSecureStorage.read(key: any(named: 'key')))
+          .thenThrow(exception);
+
+      // Action
+      final result = await secureStorageService.getRefreshToken();
+
+      // Assert
+      expect(result, equals(testToken));
       verify(() => mockSecureStorage.read(key: testKey)).called(1);
     });
 

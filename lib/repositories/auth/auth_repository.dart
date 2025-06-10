@@ -513,10 +513,10 @@ class AuthRepositoryImpl extends AuthRepository {
         message: e.message,
         tryAfterSeconds: e.tryAfterSeconds,
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
       FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
         e,
-        StackTrace.current,
+        stackTrace,
         reason: 'AuthRepo: Generic error requesting OTP',
       );
       rethrow;

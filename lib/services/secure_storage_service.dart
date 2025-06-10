@@ -220,19 +220,24 @@ class SecureStorageService {
   // NOTE: callers still go through getRefreshToken( ) which contains
   // extra analytics and retry logic – we just swap fast-path order here.
   Future<String?> _getRefreshTokenPrimaryFirst() async {
-    // 1. secure storage
+    // 1. Try reading from primary secure storage.
     try {
       final secured = await _retrySecureOperation(() async {
         return await _storage.read(key: _refreshTokenKey);
       });
       if (secured != null && secured.isNotEmpty) return secured;
-    } catch (e) {
-      // Let exceptions propagate up to caller (getRefreshToken)
-      // so they can be properly logged and handled
-      rethrow;
+    } catch (e, stack) {
+      // If primary storage fails (e.g., BadPaddingException), log it
+      // but don't rethrow. This allows us to fall back to the backup.
+      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        stack,
+        reason:
+            'SecureStorage: Failed to read from primary storage, attempting backup.',
+      );
     }
 
-    // 2. SharedPreferences backup
+    // 2. If primary storage fails or is empty, fall back to SharedPreferences backup.
     return await _getRefreshToken();
   }
 
@@ -422,28 +427,16 @@ class SecureStorageService {
         return token;
       }
     } on Exception catch (e, stack) {
-      // Determine which store failed based on message
-      if (logToFirebase) {
-        final eventName = e.toString().contains('SharedPreferences')
-            ? FirebaseAnalyticsService
-                .eventRefreshTokenReadErrorSharedPreferences
-            : FirebaseAnalyticsService.eventRefreshTokenReadErrorSecureStorage;
-
-        await FirebaseAnalyticsService().logEvent(
-          name: eventName,
-          parameters: {
-            'error': e.toString(),
-            'stack_trace': stack.toString(),
-          },
-        );
-        await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-          e,
-          stack,
-          reason:
-              'SecureStorage: Error reading refresh token from storage ($eventName)',
-        );
-      }
-      // Rethrow as StorageReadError to keep previous behaviour
+      // This catch block is now primarily for exceptions that might occur
+      // during the validation or logging phases within this function itself,
+      // as the primary read failure is handled in _getRefreshTokenPrimaryFirst.
+      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        e,
+        stack,
+        reason: 'SecureStorage: Unhandled error in getRefreshToken',
+      );
+      // Rethrow as StorageReadError to maintain a consistent error type for callers
+      // who need to handle storage failures explicitly.
       throw StorageReadError(message: e.toString());
     }
 
