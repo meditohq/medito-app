@@ -207,11 +207,16 @@ class SplashViewState extends ConsumerState<SplashView>
       );
       if (!mounted) return;
 
+      setState(() {
+          _showAccountButtons = true;
+          _isLoading = false;
+        });
+
       showSnackBar(context, StringConstants.offlineMode);
 
-      await Navigator.of(context).pushReplacement(
+      await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => const DownloadsView(isRoot: true),
+          builder: (context) => const DownloadsView(isRoot: false),
         ),
       );
     }
