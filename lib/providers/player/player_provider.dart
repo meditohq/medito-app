@@ -71,13 +71,19 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
         '🔊 Download path: \\${downloadPath ?? 'null'}, file path: \\${file.path}');
     AppLogger.d('PLAYER', '🔊 Will use path: \\${downloadPath ?? file.path}');
 
+    var imageUrl = track.coverUrl;
+    if (imageUrl.contains('images.medito.space')) {
+      imageUrl =
+          imageUrl.replaceFirst('images.medito.space', 'cdn.medito.app');
+    }
+
     var trackData = Track(
       id: track.id,
       title: track.title,
       artist: track.audio.first.guideName,
       artistUrl: track.artist?.path ?? '',
       description: track.description,
-      imageUrl: track.coverUrl,
+      imageUrl: imageUrl,
     );
 
     if (Platform.isAndroid) {
