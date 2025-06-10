@@ -81,34 +81,34 @@ void main() async {
 
       expect(actualStoredValue, isNotNull,
           reason: "Token should be stored in SharedPreferences");
-      expect(actualStoredValue, isNot(equals(testToken)),
-          reason: "Stored token should be encrypted");
+      expect(actualStoredValue, equals(testToken),
+          reason: "Stored token should be stored in plain text");
 
       // Verify FlutterSecureStorage WAS called first
       verify(() => mockSecureStorage.write(key: testKey, value: testToken))
           .called(1);
     });
 
-    test('getRefreshToken retrieves from secure storage first', () async {
-      // Instantiate service locally ONLY to generate encrypted token for setup
-      final tempServiceForEncryption = SecureStorageService();
-      final encryptedToken =
-          tempServiceForEncryption.encryptToken(testToken); // Use public method
-      SharedPreferences.setMockInitialValues({backupTestKey: encryptedToken});
+    test(
+        'getRefreshToken retrieves from secure storage first, ignoring SharedPreferences',
+        () async {
+      // Setup: Both storages have a token. Secure storage should be prioritized.
+      SharedPreferences.setMockInitialValues(
+          {backupTestKey: 'some-other-token'});
 
-      // Mock secure storage to return a token
+      // Mock secure storage to return the main test token
       when(() => mockSecureStorage.read(key: testKey))
           .thenAnswer((_) async => testToken);
 
       final result = await secureStorageService.getRefreshToken();
 
       expect(result, equals(testToken));
-      // Verify secure storage WAS called first
+      // Verify secure storage WAS called and its value was used.
       verify(() => mockSecureStorage.read(key: testKey)).called(1);
     });
 
     test(
-        'getRefreshToken retrieves from SecureStorage fallback if SharedPreferences empty',
+        'getRefreshToken retrieves from SharedPreferences fallback if secure storage is empty',
         () async {
       SharedPreferences.setMockInitialValues({});
       when(() => mockSecureStorage.read(key: testKey))
@@ -131,6 +131,68 @@ void main() async {
       verify(() => mockSecureStorage.delete(key: testKey)).called(1);
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.containsKey(backupTestKey), isFalse);
+    });
+
+    group('getRefreshToken fallback logic', () {
+      test(
+          'retrieves plain text token from SharedPreferences when secure storage is empty',
+          () async {
+        // Setup: Secure storage empty, SharedPreferences has plain text token
+        SharedPreferences.setMockInitialValues({backupTestKey: testToken});
+        when(() => mockSecureStorage.read(key: testKey))
+            .thenAnswer((_) async => null);
+
+        // Action
+        final result = await secureStorageService.getRefreshToken();
+
+        // Verify
+        expect(result, equals(testToken));
+        verify(() => mockSecureStorage.read(key: testKey))
+            .called(1); // Should check secure storage first
+      });
+
+      test(
+          'retrieves and decrypts token from SharedPreferences for backward compatibility',
+          () async {
+        // Setup: Secure storage empty, SharedPreferences has encrypted token
+        final tempService = SecureStorageService();
+        final encryptedToken = tempService.encryptToken(testToken);
+        SharedPreferences.setMockInitialValues({backupTestKey: encryptedToken});
+        when(() => mockSecureStorage.read(key: testKey))
+            .thenAnswer((_) async => null);
+
+        // Action
+        final result = await secureStorageService.getRefreshToken();
+
+        // Verify
+        expect(result, equals(testToken));
+        verify(() => mockSecureStorage.read(key: testKey)).called(1);
+      });
+
+      test(
+          'returns null and clears if token from SharedPreferences is corrupted',
+          () async {
+        // Setup: Secure storage empty, SharedPreferences has corrupted token
+        const corruptedToken = 'this-is-a-bad-token-\u0000';
+        SharedPreferences.setMockInitialValues({backupTestKey: corruptedToken});
+        when(() => mockSecureStorage.read(key: testKey))
+            .thenAnswer((_) async => null);
+        // Mock the clear operation, as it will be called on the primary storage too
+        when(() => mockSecureStorage.delete(key: testKey))
+            .thenAnswer((_) async {});
+
+        // Action
+        final result = await secureStorageService.getRefreshToken();
+
+        // Verify
+        expect(result, isNull);
+        verify(() => mockSecureStorage.read(key: testKey)).called(1);
+        // Verify that the clear function was called on secure storage
+        verify(() => mockSecureStorage.delete(key: testKey)).called(1);
+        // Verify that the corrupted token was cleared from the backup
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.containsKey(backupTestKey), isFalse);
+      });
     });
 
     // --- New Tests for Error Handling ---

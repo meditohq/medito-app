@@ -80,12 +80,34 @@ class SecureStorageService {
     return encryptToken(encryptedToken);
   }
 
+  // ---------------------------------------------------------------
+  // Token validation helpers
+  // ---------------------------------------------------------------
+
+  /// Whether every code unit in [token] is a printable ASCII character.
+  bool _isPrintableAscii(String token) {
+    for (final unit in token.codeUnits) {
+      if (unit < 32 || unit > 126) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Very loose validation to decide if [token] looks like a refresh token.
+  /// Currently we only check that it is printable ASCII and long enough.
+  bool _isTokenValid(String token) {
+    return token.length > 10 && _isPrintableAscii(token);
+  }
+
   // Store refresh token in SharedPreferences
   Future<void> _storeRefreshToken(String token) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final encryptedToken = encryptToken(token);
-      await prefs.setString(_backupRefreshTokenKey, encryptedToken);
+      // Store the token as-is (plain) to avoid corruption that can occur
+      // when using the previous XOR "encryption" scheme. We keep the same
+      // key so older versions of the app can still read their data.
+      await prefs.setString(_backupRefreshTokenKey, token);
       dev.log('[SECURE_STORAGE] Refresh token stored in SharedPreferences',
           level: 800);
     } catch (e) {
@@ -98,12 +120,23 @@ class SecureStorageService {
   Future<String?> _getRefreshToken() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final encryptedToken = prefs.getString(_backupRefreshTokenKey);
-      if (encryptedToken == null) {
+      final storedValue = prefs.getString(_backupRefreshTokenKey);
+      if (storedValue == null) {
         return null;
       }
-      final decryptedToken = _decryptToken(encryptedToken);
-      return decryptedToken;
+
+      // First, attempt to treat [storedValue] as an *encrypted* token coming
+      // from older versions of the app. If decrypting yields a *valid* token
+      // we prefer that.
+      final maybeDecrypted = _decryptToken(storedValue);
+      if (_isTokenValid(maybeDecrypted)) {
+        return maybeDecrypted;
+      }
+
+      // If decrypting failed to produce a valid token, we assume the stored
+      // value was already plain text (newer app versions) or is corrupted.
+      // We return it as-is and let the caller (`getRefreshToken`) validate.
+      return storedValue;
     } catch (e) {
       dev.log('[SECURE_STORAGE] Error retrieving refresh token',
           error: e, level: 800);
@@ -357,6 +390,24 @@ class SecureStorageService {
     // First try secure-storage, then backup SharedPrefs
     try {
       token = await _getRefreshTokenPrimaryFirst();
+
+      // Validate token – if corrupted, clear and treat as missing.
+      if (token != null && !_isTokenValid(token)) {
+        dev.log('[SECURE_STORAGE] Detected corrupted refresh token – clearing',
+            level: 1000);
+        if (logToFirebase) {
+          await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+            Exception('Corrupted characters detected, clearing token'),
+            StackTrace.current,
+            reason: 'Corrupted characters detected, clearing token',
+          );
+        }
+
+        // Wipe the corrupted value so we do not attempt to use it again.
+        await clearRefreshToken();
+        token = null;
+      }
+
       if (token != null) {
         // If token came from secure storage we label it.
         if (logToFirebase) {
