@@ -158,8 +158,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     var subTitle = guideName != null ? '$guideName — $duration' : duration;
     var imageUrl = item.coverUrl;
     if (imageUrl.contains('images.medito.space')) {
-      imageUrl =
-          imageUrl.replaceFirst('images.medito.space', 'cdn.medito.app');
+      imageUrl = imageUrl.replaceFirst('images.medito.space', 'cdn.medito.app');
     }
 
     return DownloadListItemWidget(

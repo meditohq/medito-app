@@ -73,8 +73,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
 
     var imageUrl = track.coverUrl;
     if (imageUrl.contains('images.medito.space')) {
-      imageUrl =
-          imageUrl.replaceFirst('images.medito.space', 'cdn.medito.app');
+      imageUrl = imageUrl.replaceFirst('images.medito.space', 'cdn.medito.app');
     }
 
     var trackData = Track(
