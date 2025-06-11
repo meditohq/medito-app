@@ -704,11 +704,8 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   // Generate a client ID using date + random string
-  String _generateClientId() {
-    var dateStr = DateFormat('ddMMyyyy').format(DateTime.now());
-    var randomStr = _uuid.v6().split('-')[0]; // Use first part of UUID
-    return '$dateStr-$randomStr';
-  }
+  String _generateClientId() =>
+    '${DateFormat('yyyyMMddHHmmssSSS').format(DateTime.now())}-${_uuid.v4()}';
 
   @override
   Future<void> migrateEmailToStorage() async {
