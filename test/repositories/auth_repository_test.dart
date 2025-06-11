@@ -396,7 +396,7 @@ void main() {
           callCount++;
           if (callCount < 3) {
             // First two calls fail with network error
-            throw const NoInternetError();
+            throw const NetworkConnectionError();
           } else {
             // Third call succeeds
             return AuthTokens(
@@ -539,11 +539,11 @@ void main() {
 
         // Always fail with network error
         when(() => mockAuthApiService.refreshToken(refreshToken))
-            .thenThrow(const NoInternetError());
+            .thenThrow(const NetworkConnectionError());
 
         // Action & Assert
         await expectLater(
-            authRepository.getToken(), throwsA(isA<NoInternetError>()));
+            authRepository.getToken(), throwsA(isA<NetworkConnectionError>()));
 
         // Verify called 3 times (max retries)
         verify(() => mockAuthApiService.refreshToken(refreshToken)).called(3);

@@ -13,9 +13,13 @@ final class UnknownError extends AppError {
   const UnknownError({super.message = StringConstants.errorUnknownMessage});
 }
 
-final class NoInternetError extends AppError {
-  const NoInternetError(
-      {super.message = StringConstants.errorNoInternetMessage});
+final class NetworkConnectionError extends AppError {
+  final Object? originalException;
+
+  const NetworkConnectionError({
+    super.message = StringConstants.errorNoInternetMessage,
+    this.originalException,
+  });
 }
 
 final class TimeoutError extends AppError {

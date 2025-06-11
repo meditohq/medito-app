@@ -276,7 +276,7 @@ class AuthRepositoryImpl extends AuthRepository {
             dev.log(
                 '[AUTH_REPO] Token refresh successful on attempt ${retryCount + 1}',
                 level: 800);
-          } on NoInternetError catch (e) {
+          } on NetworkConnectionError catch (e) {
             dev.log(
                 '[AUTH_REPO] No internet during token refresh attempt ${retryCount + 1}',
                 error: e,
@@ -286,7 +286,10 @@ class AuthRepositoryImpl extends AuthRepository {
               FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
                   e, StackTrace.current,
                   reason:
-                      'AuthRepo: Token refresh failed after max retries (NoInternetError)');
+                      'AuthRepo: Token refresh failed after max retries (NetworkConnectionError)',
+                  information: [
+                    e.originalException ?? 'No original exception'
+                  ]);
               rethrow;
             }
           } on TimeoutError catch (e) {
@@ -394,7 +397,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
         _httpApiService.setAuthHeader(_tokens!.accessToken);
         return _tokens!.accessToken;
-      } on NoInternetError catch (e) {
+      } on NetworkConnectionError catch (e) {
         dev.log('[AUTH_REPO] Network error refreshing token',
             error: e, level: 800);
         // For network errors, just propagate the error without clearing auth state
@@ -805,7 +808,7 @@ final authRepositorySyncProvider = Provider<AuthRepository>((ref) {
         '[AUTH_REPO_SYNC_PROVIDER] Failed to initialize AuthRepository due to AsyncError.',
         error: authRepo.error,
         stackTrace: authRepo.stackTrace,
-        level: 1200);      
+        level: 1200);
     FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
       authRepo.error,
       authRepo.stackTrace,

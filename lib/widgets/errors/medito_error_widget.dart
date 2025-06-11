@@ -30,7 +30,7 @@ class MeditoErrorWidget extends ConsumerWidget {
 
   String _getErrorMessage() {
     return switch (error) {
-      NoInternetError() => StringConstants.errorNoInternetMessage,
+      NetworkConnectionError() => StringConstants.errorNoInternetMessage,
       TimeoutError() => StringConstants.errorTimeoutMessage,
       UnauthorizedError() => StringConstants.errorUnauthorizedMessage,
       NotFoundError() => StringConstants.errorNotFoundMessage,

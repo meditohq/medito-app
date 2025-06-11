@@ -185,9 +185,9 @@ class HttpApiService {
 
       _retryCount = 0;
       return content.isEmpty ? {} : _parseResponseContent(content);
-    } on SocketException catch (e, stackTrace) {
+    } on NetworkConnectionError catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Network Error (SocketException)', e, stackTrace);
-      throw const NoInternetError();
+      throw NetworkConnectionError(originalException: e);
     } on TimeoutException catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Request Timeout', e, stackTrace);
       throw const TimeoutError();
@@ -296,7 +296,7 @@ class HttpApiService {
       AppLogger.i('HTTP', 'Request successful after token refresh');
       await _addHttpDebugLog('Request successful after token refresh');
       return content.isEmpty ? {} : _parseResponseContent(content);
-    } on NoInternetError catch (e, _) {
+    } on NetworkConnectionError catch (e, _) {
       // Don't log out on connection issues - let the user retry when connection is available
       AppLogger.w(
           'HTTP', 'No internet connection during token refresh attempt');

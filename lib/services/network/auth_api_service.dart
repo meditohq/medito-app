@@ -294,7 +294,7 @@ class AuthApiService {
       return content.isEmpty ? {} : jsonDecode(content) as Map<String, dynamic>;
     } on SocketException catch (e, stackTrace) {
       AppLogger.e('AUTH', 'Network error (SocketException)', e, stackTrace);
-      throw const NoInternetError();
+      throw const NetworkConnectionError();
     } on TimeoutException catch (e, stackTrace) {
       AppLogger.e('AUTH', 'Request timeout', e, stackTrace);
       throw const TimeoutError();

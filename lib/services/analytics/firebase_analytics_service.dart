@@ -294,6 +294,7 @@ class FirebaseAnalyticsService {
     dynamic exception,
     StackTrace? stack, {
     String? reason,
+    Iterable<Object> information = const [],
     bool fatal = false, // Default to non-fatal as per method name
   }) async {
     if (_runningInTest) return; // Skip in unit tests
@@ -304,6 +305,7 @@ class FirebaseAnalyticsService {
         exception,
         stack,
         reason: reason,
+        information: information,
         fatal: fatal,
       );
 
