@@ -275,12 +275,29 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
   Timer? _imageTimer;
   final _imageDuration = const Duration(seconds: 10);
   List<Map<String, dynamic>> _tshirtVariants = [];
+  List<String> _imageUrls = [];
 
   @override
   void initState() {
     super.initState();
     _organizeImages();
+    _updateImageUrls();
     _startImageTimer();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _precacheAllImages();
+  }
+
+  void _updateImageUrls() {
+    final isTshirt =
+        widget.productGroup.description?.toLowerCase().contains('shirt') ??
+            false;
+    _imageUrls = isTshirt
+        ? _tshirtVariants.map((v) => v['imageUrl'] as String).toList()
+        : widget.productGroup.allImageUrls;
   }
 
   @override
@@ -288,6 +305,10 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.productGroup != widget.productGroup) {
       _organizeImages();
+      setState(() {
+        _updateImageUrls();
+      });
+      _precacheAllImages();
       _startImageTimer();
     }
   }
@@ -349,15 +370,17 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
     }
   }
 
+  void _precacheAllImages() {
+    for (final url in _imageUrls) {
+      precacheImage(CachedNetworkImageProvider(url), context);
+    }
+  }
+
   void _startImageTimer() {
     // Cancel any existing timer
     _imageTimer?.cancel();
 
-    final isTshirt =
-        widget.productGroup.description?.toLowerCase().contains('shirt') ??
-            false;
-    final imageList =
-        isTshirt ? _tshirtVariants : widget.productGroup.allImageUrls;
+    final imageList = _imageUrls;
 
     // Start a new timer if we have multiple images
     if (imageList.length > 1) {
@@ -374,17 +397,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    // Check if this is a t-shirt
-    final isTshirt =
-        widget.productGroup.description?.toLowerCase().contains('shirt') ??
-            false;
-
-    // Get appropriate list to use
-    final List<String> imageUrls = isTshirt
-        ? _tshirtVariants.map((v) => v['imageUrl'] as String).toList()
-        : widget.productGroup.allImageUrls;
-
-    if (imageUrls.isEmpty) {
+    if (_imageUrls.isEmpty) {
       // If no images available, show placeholder
       return Container(
         color: ColorConstants.charcoal,
@@ -398,58 +411,35 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
     }
 
     // Make sure current index is within bounds for the active list
-    if (_currentImageIndex >= imageUrls.length) {
+    if (_currentImageIndex >= _imageUrls.length) {
       _currentImageIndex = 0; // Reset to first image if out of bounds
     }
 
     // Get current image URL (with bounds checking)
-    final String currentImageUrl = imageUrls[_currentImageIndex];
+    final String currentImageUrl = _imageUrls[_currentImageIndex];
 
     // Reset the timer if needed
-    if (_imageTimer == null && imageUrls.length > 1) {
+    if (_imageTimer == null && _imageUrls.length > 1) {
       _startImageTimer();
     }
 
-    // Pre-cache all images when building the widget to avoid loading spinners
-    for (final url in imageUrls) {
-      precacheImage(CachedNetworkImageProvider(url), context);
-    }
-
-    return Stack(
-      children: [
-        // Invisible layer for all images to preload them
-        Stack(
-          children: imageUrls.map((url) {
-            return Opacity(
-              opacity: 0.0, // Completely invisible
-              child: CachedNetworkImage(
-                imageUrl: url,
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 500),
+      child: Stack(
+        key: ValueKey(
+            'product_image_${widget.productGroup.groupId}_$_currentImageIndex'),
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              image: DecorationImage(
+                image: CachedNetworkImageProvider(currentImageUrl),
                 fit: BoxFit.cover,
-                width: widget.cardWidth,
               ),
-            );
-          }).toList(),
-        ),
-        // Visible animated layer
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 500),
-          child: Stack(
-            key: ValueKey(
-                'product_image_${widget.productGroup.groupId}_$_currentImageIndex'),
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(currentImageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
