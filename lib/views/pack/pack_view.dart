@@ -107,11 +107,7 @@ class _PackViewState extends ConsumerState<PackView>
             scrollController: _scrollController,
             title: pack.title,
             hasLeading: false,
-            coverUrl: pack.coverUrl?.replaceAll(
-                  'images.medito.space',
-                  'cdn.medito.app',
-                ) ??
-                '',
+            coverUrl: pack.coverUrl ?? '',
           ),
           SliverList(
             delegate: SliverChildListDelegate([

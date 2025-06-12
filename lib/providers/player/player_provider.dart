@@ -72,9 +72,6 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     AppLogger.d('PLAYER', '🔊 Will use path: \\${downloadPath ?? file.path}');
 
     var imageUrl = track.coverUrl;
-    if (imageUrl.contains('images.medito.space')) {
-      imageUrl = imageUrl.replaceFirst('images.medito.space', 'cdn.medito.app');
-    }
 
     var trackData = Track(
       id: track.id,

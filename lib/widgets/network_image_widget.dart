@@ -73,27 +73,6 @@ class NetworkImageWidget extends ConsumerWidget {
       ),
       placeholder: (_, __) => _shimmerLoading(),
       errorWidget: (context, url, error) {
-        if (url.endsWith('.png')) {
-          var webpUrl =
-              url.replaceAll('/png/', '/webp/').replaceAll('.png', '.webp');
-
-          return CachedNetworkImage(
-            imageUrl: webpUrl,
-            imageBuilder: (context, imageProvider) => Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              foregroundDecoration: BoxDecoration(gradient: gradient),
-            ),
-            placeholder: (_, __) => _shimmerLoading(),
-            errorWidget: (_, __, ___) =>
-                errorWidget ??
-                Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
-          );
-        }
         return errorWidget ??
             Image.asset(AssetConstants.placeholder, fit: BoxFit.cover);
       },
@@ -111,25 +90,6 @@ class NetworkImageWidget extends ConsumerWidget {
       loadingBuilder: (_, child, loadingProgress) =>
           loadingProgress == null ? child : _shimmerLoading(),
       errorBuilder: (context, error, stackTrace) {
-        if (scaledUrl.endsWith('.png')) {
-          var webpUrl = scaledUrl
-              .replaceAll('/png/', '/webp/')
-              .replaceAll('.png', '.webp');
-
-          return Image.network(
-            webpUrl,
-            fit: BoxFit.cover,
-            height: height,
-            width: width,
-            cacheHeight: height?.round(),
-            cacheWidth: width?.round(),
-            loadingBuilder: (_, child, loadingProgress) =>
-                loadingProgress == null ? child : _shimmerLoading(),
-            errorBuilder: (_, __, ___) =>
-                errorWidget ??
-                Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
-          );
-        }
         return errorWidget ??
             Image.asset(AssetConstants.placeholder, fit: BoxFit.cover);
       },
