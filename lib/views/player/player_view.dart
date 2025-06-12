@@ -275,13 +275,14 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   void _openEndScreen() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_endScreenOpened) {
+      if (!_endScreenOpened && mounted) {
         _resetState();
         final currentlyPlayingTrack = ref.read(playerProvider);
-        if (currentlyPlayingTrack != null && mounted) {
+        if (currentlyPlayingTrack != null) {
           Future.delayed(const Duration(milliseconds: 500), () {
+            if (!mounted) return;
+            
             ref.read(statsProvider.notifier).refresh();
-
             unawaited(ref.read(dndProvider.notifier).setDndMode(false));
 
             Navigator.pushReplacement(
