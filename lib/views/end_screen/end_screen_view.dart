@@ -55,13 +55,15 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
     }
   }
 
-  void _loadStats() {
+  void _loadStats() async {
     // Load stats immediately
-    ref.read(statsProvider.notifier).refresh().then((_) {
-      // Once stats are loaded, check for app review request
-      final reviewService = ref.read(reviewServiceProvider);
-      reviewService.checkAndRequestReview();
-    });
+    await ref.read(statsProvider.notifier).refresh();
+
+    if (!mounted) return;
+
+    // Once stats are loaded, check for app review request
+    final reviewService = ref.read(reviewServiceProvider);
+    reviewService.checkAndRequestReview();
   }
 
   void _navigateToHome() {
