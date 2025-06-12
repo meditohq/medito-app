@@ -93,6 +93,8 @@ class CustomiseHomeLayoutScreenState
         'desc': AnalyticsEventConstants.homeWidgetOrderChangedDesc,
       },
     );
+    ref.read(refreshHomeAPIsProvider);
+    Navigator.pop(context);
   }
 
   String _getTitleForType(HomeWidgetType type) {
