@@ -42,6 +42,8 @@ import android.media.AudioFocusRequest
 import android.content.Context
 import android.os.Binder
 import android.os.IBinder
+import android.content.pm.ServiceInfo
+import android.os.Build
 
 @UnstableApi
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi {
@@ -447,23 +449,20 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "🔊 Service onStartCommand called")
         // Create and show notification immediately
-        val initialNotification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Medito")
-            .setContentText("Preparing media playback...")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setSilent(true)
-            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setOngoing(true)
-            .build()
-
-        startForeground(NOTIFICATION_ID, initialNotification)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                createInitialNotification(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, createInitialNotification())
+        }
         Log.d(TAG, "🔊 Started foreground service with initial notification")
 
         // Call super after starting foreground
         super.onStartCommand(intent, flags, startId)
-        
+
         // Check for required permissions
         if (!hasRequiredPermissions()) {
             Log.e(TAG, "❌ Missing required permissions, stopping service")
@@ -503,6 +502,20 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         }
 
         return START_STICKY
+    }
+
+    private fun createInitialNotification(): Notification {
+        val initialNotification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Medito")
+            .setContentText("Preparing media playback...")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSilent(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
+            .build()
+        return initialNotification
     }
 
     private fun hasRequiredPermissions(): Boolean {
