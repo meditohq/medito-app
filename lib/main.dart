@@ -88,10 +88,9 @@ void main() async {
 
   final originalOnError = FlutterError.onError;
   FlutterError.onError = (errorDetails) {
-    if (errorDetails.exception is PathNotFoundException &&
-        errorDetails.exception.toString().contains('libCachedImageData')) {
-      debugPrint(
-          'Caught PathNotFoundException for cached image: ${errorDetails.exception}');
+    if ((errorDetails.exception is PathNotFoundException &&
+            errorDetails.exception.toString().contains('libCachedImageData')) ||
+        (errorDetails.exception.toString().contains('HandshakeException'))) {
       return;
     }
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
