@@ -7,6 +7,7 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:meta/meta.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 // Interface for FlutterSecureStorage to make testing easier
 class SecureStorage {
@@ -221,6 +222,7 @@ class SecureStorageService {
   // extra analytics and retry logic – we just swap fast-path order here.
   Future<String?> _getRefreshTokenPrimaryFirst() async {
     // 1. Try reading from primary secure storage.
+    bool secureStorageFailed = false;
     try {
       final secured = await _retrySecureOperation(() async {
         return await _storage.read(key: _refreshTokenKey);
@@ -229,16 +231,21 @@ class SecureStorageService {
     } catch (e, stack) {
       // If primary storage fails (e.g., BadPaddingException), log it
       // but don't rethrow. This allows us to fall back to the backup.
-      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-        e,
-        stack,
-        reason:
-            'SecureStorage: Failed to read from primary storage, attempting backup.',
-      );
+      secureStorageFailed = true;
     }
 
     // 2. If primary storage fails or is empty, fall back to SharedPreferences backup.
-    return await _getRefreshToken();
+    final backupToken = await _getRefreshToken();
+    if (secureStorageFailed && backupToken != null && backupToken.isNotEmpty) {
+      // Log recovery to Crashlytics via analytics service
+      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        'Refresh token recovered from backup after secure storage failure',
+        null,
+        reason:
+            'Refresh token recovered from backup after secure storage failure',
+      );
+    }
+    return backupToken;
   }
 
   Future<void> storeUserEmail(String email) async {
@@ -390,7 +397,6 @@ class SecureStorageService {
 
   Future<String?> getRefreshToken({bool logFailureToFirebase = true}) async {
     String? token;
-    final bool logToFirebase = logFailureToFirebase;
 
     // First try secure-storage, then backup SharedPrefs
     try {
@@ -400,30 +406,12 @@ class SecureStorageService {
       if (token != null && !_isTokenValid(token)) {
         dev.log('[SECURE_STORAGE] Detected corrupted refresh token – clearing',
             level: 1000);
-        if (logToFirebase) {
-          await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-            Exception('Corrupted characters detected, clearing token'),
-            StackTrace.current,
-            reason: 'Corrupted characters detected, clearing token',
-          );
-        }
-
         // Wipe the corrupted value so we do not attempt to use it again.
         await clearRefreshToken();
         token = null;
       }
 
       if (token != null) {
-        // If token came from secure storage we label it.
-        if (logToFirebase) {
-          await FirebaseAnalyticsService().logEvent(
-            name: FirebaseAnalyticsService.eventTokenRetrievedFromBackup,
-            parameters: {
-              'timestamp': DateTime.now().toIso8601String(),
-              'source': 'secure_storage',
-            },
-          );
-        }
         return token;
       }
     } on Exception catch (e, stack) {
@@ -441,29 +429,21 @@ class SecureStorageService {
     }
 
     // Log if token not found anywhere and user is logged in
-    if (token == null && logToFirebase) {
+    if (token == null && logFailureToFirebase) {
       try {
         final prefs = await SharedPreferences.getInstance();
         final isLoggedIn =
             prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
         if (isLoggedIn) {
-          await FirebaseAnalyticsService().logEvent(
-            name: FirebaseAnalyticsService.eventRefreshTokenRetrievalFailed,
-            parameters: {
-              'storage_type': 'none_found',
-              'error': 'Token not found in any storage, but isLoggedIn is true',
-              'stack_trace': StackTrace.current.toString(),
-            },
-          );
           await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-            Exception('Token not found in any storage, but isLoggedIn is true'),
-            StackTrace.current,
+            'Refresh token missing in both secure storage and backup but user is logged in',
+            null,
             reason:
-                'SecureStorage: Refresh token missing despite isLoggedIn=true',
+                'Refresh token missing in both secure storage and backup but user is logged in',
           );
         }
       } catch (e) {
-        dev.log('[SECURE_STORAGE] Error checking isLoggedIn for analytics',
+        dev.log('[SECURE_STORAGE] Error checking isLoggedIn for Crashlytics',
             error: e);
       }
     }
