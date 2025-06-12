@@ -26,9 +26,17 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   late List<ShortcutsModel> data;
 
   @override
-  void didChangeDependencies() {
-    data = widget.data;
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
+    data = widget.data.toList();
+  }
+
+  @override
+  void didUpdateWidget(covariant ShortcutsItemsWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.data != oldWidget.data) {
+      data = widget.data.toList();
+    }
   }
 
   void _handleChipPress(
