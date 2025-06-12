@@ -86,8 +86,16 @@ void main() async {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   }
 
+  final originalOnError = FlutterError.onError;
   FlutterError.onError = (errorDetails) {
+    if (errorDetails.exception is PathNotFoundException &&
+        errorDetails.exception.toString().contains('libCachedImageData')) {
+      debugPrint(
+          'Caught PathNotFoundException for cached image: ${errorDetails.exception}');
+      return;
+    }
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    originalOnError?.call(errorDetails);
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
