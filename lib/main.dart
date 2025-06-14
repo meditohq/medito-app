@@ -39,6 +39,7 @@ import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'exceptions/app_error.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -98,6 +99,11 @@ void main() async {
   };
 
   PlatformDispatcher.instance.onError = (error, stack) {
+    if (error is NetworkConnectionError) {
+      AppLogger.i('MAIN', 'Network error caught, not reporting to Crashlytics');
+      // Don't report network errors to Crashlytics, but let the app handle it
+      return false;
+    }
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
