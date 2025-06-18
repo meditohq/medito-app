@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
@@ -6,12 +7,16 @@ import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/models/me/me_model.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/repositories/me/me_repository.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/secure_storage_service.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter/services.dart';
+
+import '../helpers/firebase_test_helper.dart';
 
 // Mock dependencies
 class MockAuthApiService extends Mock implements AuthApiService {}
@@ -26,6 +31,8 @@ class MockUuid extends Mock implements Uuid {}
 
 class MockMeRepository extends Mock implements MeRepository {}
 
+class MockCrashlyticsService extends Mock implements CrashlyticsService {}
+
 void main() {
   late AuthRepositoryImpl authRepository;
   late MockAuthApiService mockAuthApiService;
@@ -33,6 +40,7 @@ void main() {
   late MockSecureStorageService mockSecureStorageService;
   late MockSharedPreferences mockPreferences;
   late MockUuid mockUuid;
+  late MockCrashlyticsService mockCrashlyticsService;
 
   setUp(() {
     mockAuthApiService = MockAuthApiService();
@@ -40,6 +48,7 @@ void main() {
     mockSecureStorageService = MockSecureStorageService();
     mockPreferences = MockSharedPreferences();
     mockUuid = MockUuid();
+    mockCrashlyticsService = MockCrashlyticsService();
 
     // Mock getUserEmail to return null by default
     when(() => mockSecureStorageService.getUserEmail())
@@ -51,11 +60,14 @@ void main() {
       secureStorage: mockSecureStorageService,
       preferences: mockPreferences,
       uuid: mockUuid,
+      crashlyticsService: mockCrashlyticsService,
     );
 
     // Register fallback values for mocktail
     registerFallbackValue(Uri.parse('http://example.com'));
     registerFallbackValue(<String, String>{});
+
+    when(() => mockUuid.v4()).thenReturn('test-uuid-value-1234');
   });
 
   group('AuthRepositoryImpl', () {
@@ -96,18 +108,25 @@ void main() {
           SharedPreferenceConstants.isLoggedIn, true)).called(1);
     });
 
-    test('signInAnonymously throws EmailExistsError when service throws it',
-        () async {
+    test('signInAnonymously calls crashlytics on EmailExistsError', () async {
       // Setup
       when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
           .thenReturn(clientId);
       when(() => mockAuthApiService.signIn(clientId: clientId))
           .thenThrow(const EmailExistsError(email: email));
+      when(() => mockCrashlyticsService.recordError(any(), any()))
+          .thenAnswer((_) {});
 
-      // Action & Assert
-      expect(() => authRepository.signInAnonymously(),
-          throwsA(isA<EmailExistsError>()));
+      // Action
+      await authRepository.signInAnonymously();
+
+      // Assert
       verify(() => mockAuthApiService.signIn(clientId: clientId)).called(1);
+      verify(() => mockCrashlyticsService.recordError(
+            isA<EmailExistsError>(),
+            any(),
+            reason: any(named: 'reason'),
+          )).called(1);
       verifyNever(() => mockHttpApiService.setAuthHeader(any()));
       verifyNever(() =>
           mockPreferences.setBool(SharedPreferenceConstants.isLoggedIn, any()));
@@ -236,7 +255,7 @@ void main() {
 
     test('initiateUser creates client ID with expected format', () async {
       // Setup
-      final dateStr = DateFormat('ddMMyyyy').format(DateTime.now());
+      final dateStr = DateFormat('yyyyMMdd').format(DateTime.now());
       when(() => mockUuid.v6()).thenReturn('test-uuid-value-123');
       when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
           .thenReturn(null);

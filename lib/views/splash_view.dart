@@ -11,6 +11,7 @@ import 'package:medito/providers/device_and_app_info/device_and_app_info_provide
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
@@ -109,10 +110,10 @@ class SplashViewState extends ConsumerState<SplashView>
       await _checkAuthAndInitialize();
     } catch (e, stackTrace) {
       AppLogger.e('SPLASH', 'Error initializing app', e, stackTrace);
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         stackTrace,
-        reason: 'Error in _initialiseApp (SplashNavigation)',
+        reason: 'SplashView: Error during initialization',
       );
       if (!mounted) return;
 
@@ -147,10 +148,10 @@ class SplashViewState extends ConsumerState<SplashView>
       // Log the error but don't prevent app startup
       AppLogger.e(
           'SPLASH', 'Error initializing Firebase Analytics', e, stackTrace);
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         stackTrace,
-        reason: 'Error initializing Firebase Analytics (SplashNavigation)',
+        reason: 'SplashView: Error initializing Firebase Analytics',
       );
     }
   }
@@ -199,18 +200,18 @@ class SplashViewState extends ConsumerState<SplashView>
           'Error in _checkAuthAndInitialize, navigating to DownloadsView',
           e,
           stackTrace);
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         stackTrace,
         reason:
-            'Error in _checkAuthAndInitialize, navigating to DownloadsView (DownloadsNavigation)',
+            'SplashView: Error in _checkAuthAndInitialize, navigating to DownloadsView',
       );
       if (!mounted) return;
 
       setState(() {
-          _showAccountButtons = true;
-          _isLoading = false;
-        });
+        _showAccountButtons = true;
+        _isLoading = false;
+      });
 
       showSnackBar(context, StringConstants.offlineMode);
 
@@ -300,11 +301,10 @@ class SplashViewState extends ConsumerState<SplashView>
     } catch (e, stackTrace) {
       AppLogger.e('SPLASH', 'Failed to initialize user (anonymous sign-in)', e,
           stackTrace);
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         stackTrace,
-        reason:
-            'Failed to initialize user (anonymous sign-in) (SplashNavigation)',
+        reason: 'SplashView: Failed to initialize user (anonymous sign-in)',
       );
       if (!mounted) return;
 
@@ -339,11 +339,10 @@ class SplashViewState extends ConsumerState<SplashView>
         AppLogger.d('SPLASH', 'User data fetched: ${userData.toString()}');
       } catch (e, stackTrace) {
         AppLogger.e('SPLASH', 'Error fetching user data', e, stackTrace);
-        FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        CrashlyticsService().recordError(
           e,
           stackTrace,
-          reason:
-              'Error fetching user data in _initializeServices (SplashNavigation)',
+          reason: 'SplashView: Error fetching user data in _initializeServices',
         );
       }
 
@@ -351,10 +350,10 @@ class SplashViewState extends ConsumerState<SplashView>
       AppLogger.i('SPLASH', 'Services initialization complete');
     } catch (e, stackTrace) {
       AppLogger.e('SPLASH', 'Error initializing services', e, stackTrace);
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         stackTrace,
-        reason: 'Error initializing services (SplashNavigation)',
+        reason: 'SplashView: Error initializing services',
       );
       showSnackBar(context, StringConstants.appInitError);
     }

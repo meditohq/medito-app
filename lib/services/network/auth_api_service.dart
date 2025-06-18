@@ -9,9 +9,9 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
 import 'package:medito/services/secure_storage_service.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 
 class HttpClientWrapper {
   HttpClient createClient() => HttpClient();
@@ -21,6 +21,7 @@ class AuthApiService {
   final SecureStorageService _secureStorage;
   final String _baseUrl;
   final String _apiKey;
+  final CrashlyticsService _crashlyticsService;
 
   final HttpClient _client;
   final _headers = <String, String>{};
@@ -32,11 +33,13 @@ class AuthApiService {
     HttpClientWrapper? httpClientWrapper,
     String? baseUrl,
     String? customApiKey,
+    CrashlyticsService? crashlyticsService,
   })  : _secureStorage = secureStorage ?? SecureStorageService(),
         _baseUrl = baseUrl ?? authBaseUrl,
         _apiKey =
             customApiKey ?? apiKey, // Use the global apiKey if none provided
-        _client = (httpClientWrapper ?? HttpClientWrapper()).createClient() {
+        _client = (httpClientWrapper ?? HttpClientWrapper()).createClient(),
+        _crashlyticsService = crashlyticsService ?? CrashlyticsService() {
     _client.connectionTimeout = kTimeoutDuration;
     _initializeHeaders();
   }
@@ -196,7 +199,7 @@ class AuthApiService {
             },
           );
           // Also log this critical failure to Crashlytics
-          await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+          _crashlyticsService.recordError(
             e,
             stack,
             reason: 'CRITICAL: Failed to save refresh token to secure storage',
@@ -351,6 +354,11 @@ class AuthApiService {
           if (errorMessage.contains('Invalid refresh token') ||
               errorMessage.contains('Expired refresh token') ||
               errorMessage.contains('Token has been revoked')) {
+            _crashlyticsService.recordError(
+              const RefreshTokenError(),
+              StackTrace.current,
+              reason: 'AuthAPI: Refresh token invalid, expired, or revoked',
+            );
             throw const RefreshTokenError();
           }
         }

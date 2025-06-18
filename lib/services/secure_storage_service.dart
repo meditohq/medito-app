@@ -8,6 +8,11 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:meta/meta.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:medito/utils/logger.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 // Interface for FlutterSecureStorage to make testing easier
 class SecureStorage {
@@ -165,7 +170,7 @@ class SecureStorageService {
       });
     } catch (e, stack) {
       // Severe – secure storage should rarely fail.  Log explicitly.
-      await FirebaseAnalyticsService().logEvent(
+      FirebaseAnalyticsService().logEvent(
         name: FirebaseAnalyticsService.eventSecureStoragePersistentFailure,
         parameters: {
           'phase': 'write',
@@ -173,7 +178,7 @@ class SecureStorageService {
           'stack_trace': stack.toString(),
         },
       );
-      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         stack,
         reason:
@@ -183,7 +188,7 @@ class SecureStorageService {
     }
 
     // 2. Emit analytics that we are about to write the backup copy.
-    await FirebaseAnalyticsService().logEvent(
+    FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventTokenBackupStorageAttempt,
       parameters: {
         'timestamp': DateTime.now().toIso8601String(),
@@ -195,7 +200,7 @@ class SecureStorageService {
     try {
       await _storeRefreshToken(token);
 
-      await FirebaseAnalyticsService().logEvent(
+      FirebaseAnalyticsService().logEvent(
         name: FirebaseAnalyticsService.eventTokenBackupStorageResult,
         parameters: {
           'result': 'success',
@@ -205,13 +210,19 @@ class SecureStorageService {
       );
     } catch (e) {
       // Log and bubble up.
-      await FirebaseAnalyticsService().logEvent(
+      FirebaseAnalyticsService().logEvent(
         name: FirebaseAnalyticsService.eventTokenBackupStorageResult,
         parameters: {
           'result': 'failure',
           'error': e.toString(),
           'timestamp': DateTime.now().toIso8601String(),
         },
+      );
+      CrashlyticsService().recordError(
+        e,
+        StackTrace.current,
+        reason:
+            'SecureStorage: Failed to write refresh token to backup storage',
       );
       rethrow;
     }
@@ -220,7 +231,7 @@ class SecureStorageService {
   // Priority order for reads: secure-storage first, then backup SharedPrefs.
   // NOTE: callers still go through getRefreshToken( ) which contains
   // extra analytics and retry logic – we just swap fast-path order here.
-  Future<String?> _getRefreshTokenPrimaryFirst() async {
+  Future<String?> _getRefreshTokenPrimaryFirst({bool logToFirebase = true}) async {
     // 1. Try reading from primary secure storage.
     bool secureStorageFailed = false;
     try {
@@ -237,13 +248,26 @@ class SecureStorageService {
     // 2. If primary storage fails or is empty, fall back to SharedPreferences backup.
     final backupToken = await _getRefreshToken();
     if (secureStorageFailed && backupToken != null && backupToken.isNotEmpty) {
-      // Log recovery to Crashlytics via analytics service
-      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-        'Refresh token recovered from backup after secure storage failure',
-        null,
-        reason:
-            'Refresh token recovered from backup after secure storage failure',
-      );
+      // Log that we are using a backup.
+      if (logToFirebase) {
+        FirebaseAnalyticsService().logEvent(
+          name: FirebaseAnalyticsService.eventTokenRetrievedFromBackup,
+        );
+      }
+
+      // Attempt to restore the token to secure storage.
+      try {
+        await _storage.write(key: _refreshTokenKey, value: backupToken);
+      } catch (e, stack) {
+        // Not fatal, as we already have a valid token in memory.
+        if (logToFirebase) {
+          CrashlyticsService().recordError(
+            e,
+            stack,
+            reason: 'SecureStorage: Failed to restore backup token to secure',
+          );
+        }
+      }
     }
     return backupToken;
   }
@@ -260,7 +284,7 @@ class SecureStorageService {
           'stack_trace': StackTrace.current.toString(),
         },
       );
-      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         StackTrace.current, // Capture stack trace at the point of error
         reason: 'SecureStorage: Failed to save user email to SharedPreferences',
@@ -294,7 +318,7 @@ class SecureStorageService {
           'stack_trace': StackTrace.current.toString(),
         },
       );
-      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         StackTrace.current, // Capture stack trace at the point of error
         reason: 'SecureStorage: Failed to read user email from secure storage',
@@ -320,26 +344,23 @@ class SecureStorageService {
 
   Future<void> clearRefreshToken() async {
     try {
-      await _retrySecureOperation(() async {
-        await _storage.delete(key: _refreshTokenKey);
-        var stackTrace = StackTrace.current.toString();
-        var maxLength = stackTrace.length < 500 ? stackTrace.length : 500;
+      await _storage.delete(key: _refreshTokenKey);
+    } catch (e, stack) {
+      CrashlyticsService().recordError(
+        e,
+        stack,
+        reason: 'SecureStorage: Failed to clear primary refresh token',
+      );
+    }
 
-        dev.log('[SECURE_STORAGE] Refresh token cleared from secure storage',
-            error: {
-              'timestamp': DateTime.now().toString(),
-              'reason': stackTrace.substring(0, maxLength),
-            });
-      });
-
-      // Also clear from backup storage
+    try {
       await _clearRefreshToken();
-    } catch (e) {
-      dev.log(
-          '[SECURE_STORAGE] Error clearing refresh token from secure storage',
-          error: e);
-      // Still try to clear from backup
-      await _clearRefreshToken();
+    } catch (e, stack) {
+      CrashlyticsService().recordError(
+        e,
+        stack,
+        reason: 'SecureStorage: Failed to clear backup refresh token',
+      );
     }
   }
 
@@ -400,7 +421,7 @@ class SecureStorageService {
 
     // First try secure-storage, then backup SharedPrefs
     try {
-      token = await _getRefreshTokenPrimaryFirst();
+      token = await _getRefreshTokenPrimaryFirst(logToFirebase: logFailureToFirebase);
 
       // Validate token – if corrupted, clear and treat as missing.
       if (token != null && !_isTokenValid(token)) {
@@ -418,7 +439,7 @@ class SecureStorageService {
       // This catch block is now primarily for exceptions that might occur
       // during the validation or logging phases within this function itself,
       // as the primary read failure is handled in _getRefreshTokenPrimaryFirst.
-      await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      CrashlyticsService().recordError(
         e,
         stack,
         reason: 'SecureStorage: Unhandled error in getRefreshToken',
@@ -435,16 +456,21 @@ class SecureStorageService {
         final isLoggedIn =
             prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
         if (isLoggedIn) {
-          await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+          CrashlyticsService().recordError(
             'Refresh token missing in both secure storage and backup but user is logged in',
             null,
             reason:
-                'Refresh token missing in both secure storage and backup but user is logged in',
+                'SecureStorage: Refresh token is null/empty for logged-in user',
           );
         }
-      } catch (e) {
-        dev.log('[SECURE_STORAGE] Error checking isLoggedIn for Crashlytics',
-            error: e);
+      } catch (e, stack) {
+        // It's very unlikely that SharedPreferences fails here, but if it
+        // does we should log it.
+        CrashlyticsService().recordError(
+          e,
+          stack,
+          reason: 'SecureStorage: Failed to check login state for logging',
+        );
       }
     }
 

@@ -144,8 +144,6 @@ class StringConstants {
   static const String minutes = 'minutes';
   static const String minute = 'minute';
 
-  // Streak circle display preference
-  static const String streakCircleDisplayTitle = 'Streak Circle Display';
   static const String showConsistencyScore = 'Show Consistency Score';
   static const String showCurrentStreak = 'Show Current Streak';
   static const String alwaysShowStreakOnHomepage =

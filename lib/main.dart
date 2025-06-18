@@ -24,6 +24,7 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -80,33 +81,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Configure Crashlytics
-  if (kDebugMode) {
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  } else {
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  }
-
-  final originalOnError = FlutterError.onError;
-  FlutterError.onError = (errorDetails) {
-    if ((errorDetails.exception is PathNotFoundException &&
-            errorDetails.exception.toString().contains('libCachedImageData')) ||
-        (errorDetails.exception.toString().contains('HandshakeException'))) {
-      return;
-    }
-    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-    originalOnError?.call(errorDetails);
-  };
-
-  PlatformDispatcher.instance.onError = (error, stack) {
-    if (error is NetworkConnectionError) {
-      AppLogger.i('MAIN', 'Network error caught, not reporting to Crashlytics');
-      // Don't report network errors to Crashlytics, but let the app handle it
-      return false;
-    }
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
+  // Initialize Crashlytics
+  await CrashlyticsService().initialize();
 
   await initializeAudioService();
   usePathUrlStrategy();

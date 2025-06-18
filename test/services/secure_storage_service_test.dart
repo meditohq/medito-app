@@ -224,7 +224,7 @@ void main() async {
           .thenThrow(exception);
 
       // Action
-      final result = await secureStorageService.getRefreshToken();
+      final result = await secureStorageService.getRefreshToken(logFailureToFirebase: false);
 
       // Assert
       expect(result, equals(testToken));
@@ -241,7 +241,7 @@ void main() async {
           .thenAnswer((_) async => null);
 
       // Action
-      final result = await secureStorageService.getRefreshToken();
+      final result = await secureStorageService.getRefreshToken(logFailureToFirebase: false);
 
       // Verify
       expect(result, isNull);

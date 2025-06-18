@@ -56,6 +56,7 @@ class NetworkImageWidget extends ConsumerWidget {
       fit: BoxFit.contain,
       height: height,
       width: width,
+      placeholderBuilder: (context) => _shimmerLoading(),
     );
   }
 
@@ -73,6 +74,25 @@ class NetworkImageWidget extends ConsumerWidget {
       ),
       placeholder: (_, __) => _shimmerLoading(),
       errorWidget: (context, url, error) {
+        // If scaled image fails, try original
+        if (url != originalUrl) {
+          return CachedNetworkImage(
+            imageUrl: originalUrl,
+            imageBuilder: (context, imageProvider) => Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              foregroundDecoration: BoxDecoration(gradient: gradient),
+            ),
+            placeholder: (_, __) => _shimmerLoading(),
+            errorWidget: (context, url, error) =>
+                errorWidget ??
+                Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
+          );
+        }
         return errorWidget ??
             Image.asset(AssetConstants.placeholder, fit: BoxFit.cover);
       },
@@ -90,6 +110,22 @@ class NetworkImageWidget extends ConsumerWidget {
       loadingBuilder: (_, child, loadingProgress) =>
           loadingProgress == null ? child : _shimmerLoading(),
       errorBuilder: (context, error, stackTrace) {
+        // If scaled image fails, try original
+        if (scaledUrl != originalUrl) {
+          return Image.network(
+            originalUrl,
+            fit: BoxFit.cover,
+            height: height,
+            width: width,
+            cacheHeight: height?.round(),
+            cacheWidth: width?.round(),
+            loadingBuilder: (_, child, loadingProgress) =>
+                loadingProgress == null ? child : _shimmerLoading(),
+            errorBuilder: (context, error, stackTrace) =>
+                errorWidget ??
+                Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),
+          );
+        }
         return errorWidget ??
             Image.asset(AssetConstants.placeholder, fit: BoxFit.cover);
       },

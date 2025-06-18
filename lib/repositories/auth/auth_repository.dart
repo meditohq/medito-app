@@ -14,6 +14,7 @@ import 'package:medito/repositories/me/me_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'dart:io';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 
 class User {
   final String id;
@@ -54,21 +55,24 @@ class AuthRepositoryImpl extends AuthRepository {
   final SecureStorageService _secureStorage;
   final SharedPreferences _preferences;
   final Uuid _uuid;
+  final CrashlyticsService _crashlyticsService;
 
   User? _currentUser;
   AuthTokens? _tokens;
 
   AuthRepositoryImpl({
+    required SharedPreferences preferences,
     AuthApiService? authService,
     HttpApiService? httpApiService,
     SecureStorageService? secureStorage,
-    required SharedPreferences preferences,
     Uuid? uuid,
-  })  : _authService = authService ?? AuthApiService(),
+    CrashlyticsService? crashlyticsService,
+  })  : _preferences = preferences,
+        _authService = authService ?? AuthApiService(),
         _httpApiService = httpApiService ?? HttpApiService(),
         _secureStorage = secureStorage ?? SecureStorageService(),
-        _preferences = preferences,
-        _uuid = uuid ?? const Uuid();
+        _uuid = uuid ?? const Uuid(),
+        _crashlyticsService = crashlyticsService ?? CrashlyticsService();
 
   @override
   User? get currentUser {
@@ -155,39 +159,24 @@ class AuthRepositoryImpl extends AuthRepository {
             final backupToken =
                 _preferences.getString('medito_backup_refresh_token');
 
-            await FirebaseAnalyticsService().logEvent(
-              name: FirebaseAnalyticsService
-                  .eventUnexpectedLogoutRefreshTokenMissing,
-              parameters: {
-                'os': Platform.operatingSystem,
-                'os_version': Platform.operatingSystemVersion,
-                'client_id': clientId,
-                'app_version': await PackageInfo.fromPlatform()
-                    .then((info) => info.buildNumber),
-                'timestamp': DateTime.now().toIso8601String(),
-
-                // Extra context
-                'stored_email_present':
-                    (storedEmail != null && storedEmail.isNotEmpty).toString(),
-                'backup_token_present':
-                    (backupToken != null && backupToken.isNotEmpty).toString(),
-                'is_logged_in_flag': isLoggedIn.toString(),
-              },
-            );
-            // Also log this unexpected state to Crashlytics
-            await FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+            _crashlyticsService.recordError(
               Exception('Refresh token missing despite loggedIn=true'),
               StackTrace.current,
+              information: [
+                'os: ${Platform.operatingSystem}',
+                'os_version: ${Platform.operatingSystemVersion}',
+                'client_id: $clientId',
+                'app_version: ${await PackageInfo.fromPlatform().then((info) => info.buildNumber)}',
+                'timestamp: ${DateTime.now().toIso8601String()}',
+                'stored_email_present: ${(storedEmail != null && storedEmail.isNotEmpty)}',
+                'backup_token_present: ${(backupToken != null && backupToken.isNotEmpty)}',
+                'is_logged_in_flag: $isLoggedIn',
+              ],
               reason:
                   'UnexpectedLogout: Refresh token missing despite loggedIn=true',
             );
           } catch (e, stack) {
-            dev.log(
-                '[AUTH_REPO] Failed to log analytics/Crashlytics event for unexpected logout',
-                error: e,
-                stackTrace: stack);
-            // Log this failure to Crashlytics as well
-            FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+            _crashlyticsService.recordError(
               e,
               stack,
               reason:
@@ -206,12 +195,12 @@ class AuthRepositoryImpl extends AuthRepository {
             level: 800);
       }
     } catch (e, stackTrace) {
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      _crashlyticsService.recordError(
         e,
         stackTrace,
-        reason: 'AuthRepo: Error initializing user',
+        reason: 'AuthRepo: Failed to initialize user',
       );
-      rethrow;
+      throw const UnknownError();
     }
   }
 
@@ -283,13 +272,9 @@ class AuthRepositoryImpl extends AuthRepository {
                 level: 800);
             retryCount++;
             if (retryCount >= maxRetries) {
-              FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-                  e, StackTrace.current,
+              _crashlyticsService.recordError(e, StackTrace.current,
                   reason:
-                      'AuthRepo: Token refresh failed after max retries (NetworkConnectionError)',
-                  information: [
-                    e.originalException ?? 'No original exception'
-                  ]);
+                      'AuthRepo: Token refresh failed after max retries (NetworkConnectionError)');
               rethrow;
             }
           } on TimeoutError catch (e) {
@@ -299,8 +284,7 @@ class AuthRepositoryImpl extends AuthRepository {
                 level: 800);
             retryCount++;
             if (retryCount >= maxRetries) {
-              FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-                  e, StackTrace.current,
+              _crashlyticsService.recordError(e, StackTrace.current,
                   reason:
                       'AuthRepo: Token refresh failed after max retries (TimeoutError)');
               rethrow;
@@ -312,8 +296,7 @@ class AuthRepositoryImpl extends AuthRepository {
                 level: 800);
             retryCount++;
             if (retryCount >= maxRetries) {
-              FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-                  e, StackTrace.current,
+              _crashlyticsService.recordError(e, StackTrace.current,
                   reason:
                       'AuthRepo: Token refresh failed after max retries (ServerError)');
               rethrow;
@@ -321,21 +304,18 @@ class AuthRepositoryImpl extends AuthRepository {
           } on RefreshTokenError catch (e) {
             dev.log('[AUTH_REPO] Refresh token invalid/expired',
                 error: e, level: 800);
-            FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-                e, StackTrace.current,
+            _crashlyticsService.recordError(e, StackTrace.current,
                 reason:
                     'AuthRepo: Refresh token invalid/expired (RefreshTokenError)');
-            // Don't retry for invalid refresh token
             rethrow;
-          } catch (e) {
+          } catch (e, stackTrace) {
             dev.log(
                 '[AUTH_REPO] Unexpected error during token refresh attempt ${retryCount + 1}',
                 error: e,
                 level: 800);
             retryCount++;
             if (retryCount >= maxRetries) {
-              FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-                  e, StackTrace.current,
+              _crashlyticsService.recordError(e, stackTrace,
                   reason:
                       'AuthRepo: Token refresh failed after max retries (UnknownError)');
               rethrow;
@@ -419,16 +399,14 @@ class AuthRepositoryImpl extends AuthRepository {
             error: e, level: 800);
         // This specific RefreshTokenError is critical as it leads to _resetAuth.
         // It might have already been logged by the inner catch, but this ensures it's logged if it came from a different path.
-        FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-            e, StackTrace.current,
+        _crashlyticsService.recordError(e, StackTrace.current,
             reason: 'AuthRepo: RefreshTokenError leading to auth reset');
         await _resetAuth();
         rethrow;
-      } catch (e) {
+      } catch (e, stackTrace) {
         dev.log('[AUTH_REPO] Error refreshing token', error: e, level: 800);
         // Catch-all for any other errors during token refresh not caught by specific handlers above
-        FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
-            e, StackTrace.current,
+        _crashlyticsService.recordError(e, stackTrace,
             reason: 'AuthRepo: Generic error refreshing token');
         // Let higher level code handle this error
         rethrow;
@@ -491,7 +469,7 @@ class AuthRepositoryImpl extends AuthRepository {
         dev.log('[AUTH_REPO] No email found in storage', level: 800);
       }
     } catch (e) {
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      _crashlyticsService.recordError(
         e,
         StackTrace.current,
         reason:
@@ -507,7 +485,7 @@ class AuthRepositoryImpl extends AuthRepository {
           _generateClientId();
       await _authService.requestOtp(email, clientId);
     } on RateLimitError catch (e) {
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      _crashlyticsService.recordError(
         e,
         StackTrace.current,
         reason: 'AuthRepo: RateLimitError requesting OTP',
@@ -517,7 +495,7 @@ class AuthRepositoryImpl extends AuthRepository {
         tryAfterSeconds: e.tryAfterSeconds,
       );
     } catch (e, stackTrace) {
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      _crashlyticsService.recordError(
         e,
         stackTrace,
         reason: 'AuthRepo: Generic error requesting OTP',
@@ -584,7 +562,7 @@ class AuthRepositoryImpl extends AuthRepository {
           level: 500);
       return true;
     } catch (e) {
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      _crashlyticsService.recordError(
         e,
         StackTrace.current,
         reason: 'AuthRepo: Error verifying OTP',
@@ -611,7 +589,7 @@ class AuthRepositoryImpl extends AuthRepository {
         onTimeout: () {
           dev.log('[AUTH_REPO] Server sign out timed out, continuing',
               level: 500);
-          FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+          _crashlyticsService.recordError(
             Exception('Server sign out timed out'),
             StackTrace.current,
             reason: 'AuthRepo: Server sign out timed out',
@@ -620,7 +598,7 @@ class AuthRepositoryImpl extends AuthRepository {
         },
       );
     } catch (e) {
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      _crashlyticsService.recordError(
         e,
         StackTrace.current,
         reason: 'AuthRepo: Error during server sign out (ignored)',
@@ -660,12 +638,12 @@ class AuthRepositoryImpl extends AuthRepository {
 
       dev.log('[AUTH_REPO] Anonymous sign in successful');
     } catch (e) {
-      FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+      _crashlyticsService.recordError(
         e,
         StackTrace.current,
         reason: 'AuthRepo: Error signing in anonymously',
       );
-      rethrow; // Rethrow the error (e.g., EmailExistsError, ServerError, etc.)
+      // Don't rethrow, this should not crash the app
     }
   }
 
@@ -705,7 +683,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
   // Generate a client ID using date + random string
   String _generateClientId() =>
-    '${DateFormat('yyyyMMddHHmmssSSS').format(DateTime.now())}-${_uuid.v4()}';
+      '${DateFormat('yyyyMMddHHmmssSSS').format(DateTime.now())}-${_uuid.v4()}';
 
   @override
   Future<void> migrateEmailToStorage() async {
@@ -740,7 +718,7 @@ class AuthRepositoryImpl extends AuthRepository {
         dev.log('[AUTH_REPO] Found email from /me endpoint: $email',
             level: 500);
       } catch (e) {
-        FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+        _crashlyticsService.recordError(
           e,
           StackTrace.current,
           reason: 'AuthRepo: Error fetching email from /me endpoint',
@@ -806,7 +784,7 @@ final authRepositorySyncProvider = Provider<AuthRepository>((ref) {
         error: authRepo.error,
         stackTrace: authRepo.stackTrace,
         level: 1200);
-    FirebaseAnalyticsService().recordNonFatalCrashlyticsError(
+    CrashlyticsService().recordError(
       authRepo.error,
       authRepo.stackTrace,
       reason: 'Failed to initialize AuthRepository',
