@@ -681,4 +681,8 @@ class StringConstants {
   // Used in UserProfilePage when account deletion is initiated via external browser
   static const String accountDeletionInitiated =
       'Account deletion process initiated. Please complete the steps in your browser.';
+
+  // Used in medito_error_widget
+  static const reportError = 'Report Error';
+  static const errorReportedMessage = 'Thank you, your report has been sent.';
 }

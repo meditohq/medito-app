@@ -1,7 +1,9 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/providers/error_widget/report_cooldown_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -54,6 +56,7 @@ class MeditoErrorWidget extends ConsumerWidget {
       uiState.message,
       uiState.shouldShowCheckDownloadButton,
       textStyle,
+      ref,
     );
 
     if (isScaffold) {
@@ -71,7 +74,10 @@ class MeditoErrorWidget extends ConsumerWidget {
     String message,
     bool isShowCheckDownload,
     TextStyle? textStyle,
+    WidgetRef ref,
   ) {
+    final isCoolingDown = ref.watch(isCoolingDownProvider);
+
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: Padding(
@@ -206,6 +212,34 @@ class MeditoErrorWidget extends ConsumerWidget {
                   ),
                 ],
               ),
+            SizedBox(
+              width: 300,
+              child: TextButton(
+                onPressed: isCoolingDown
+                    ? null
+                    : () {
+                        CrashlyticsService().recordAppError(error);
+                        ref
+                            .read(reportCooldownProvider.notifier)
+                            .startCooldown();
+                        showSnackBar(
+                          context,
+                          StringConstants.errorReportedMessage,
+                        );
+                      },
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                ),
+                child: Text(
+                  StringConstants.reportError,
+                  style: TextStyle(
+                    color: isCoolingDown
+                        ? ColorConstants.lightPurple.withOpacity(0.5)
+                        : ColorConstants.lightPurple,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

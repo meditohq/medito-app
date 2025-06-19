@@ -9,7 +9,6 @@ void main() {
   // Set up mocks for all required services
   setUpAll(() async {
     // Setup Firebase Core
-    FirebaseTestHelper.setupFirebaseCoreMocks();
     await FirebaseTestHelper.initializeFirebaseForTest();
 
     // Setup Firebase Analytics

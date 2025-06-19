@@ -97,4 +97,13 @@ class CrashlyticsService {
   Future<void> setCustomKey(String key, dynamic value) async {
     await FirebaseCrashlytics.instance.setCustomKey(key, value);
   }
+
+  void recordAppError(AppError error) {
+    FirebaseCrashlytics.instance.recordError(
+      error,
+      StackTrace.current,
+      reason: 'User reported error: ${error.toString()}',
+      fatal: false,
+    );
+  }
 }
