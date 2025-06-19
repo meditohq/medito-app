@@ -372,7 +372,18 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
 
   void _precacheAllImages() {
     for (final url in _imageUrls) {
-      precacheImage(CachedNetworkImageProvider(url), context);
+      try {
+        precacheImage(CachedNetworkImageProvider(url), context)
+            .catchError((error) {
+          // Silently handle precaching errors - they're not critical
+          AppLogger.d('ProductImageCarousel',
+              'Failed to precache image: $url, error: $error');
+        });
+      } catch (e) {
+        // Silently handle any synchronous errors from precaching
+        AppLogger.d('ProductImageCarousel',
+            'Failed to precache image: $url, error: $e');
+      }
     }
   }
 
@@ -425,20 +436,48 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 500),
-      child: Stack(
+      child: Container(
         key: ValueKey(
             'product_image_${widget.productGroup.groupId}_$_currentImageIndex'),
-        children: [
-          Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          color: ColorConstants.charcoal,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: CachedNetworkImage(
+          imageUrl: currentImageUrl,
+          fit: BoxFit.cover,
+          imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
               image: DecorationImage(
-                image: CachedNetworkImageProvider(currentImageUrl),
+                image: imageProvider,
                 fit: BoxFit.cover,
               ),
             ),
           ),
-        ],
+          placeholder: (context, url) => Container(
+            color: ColorConstants.charcoal,
+            child: const Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              ),
+            ),
+          ),
+          errorWidget: (context, url, error) => Container(
+            color: ColorConstants.charcoal,
+            child: Center(
+              child: Icon(
+                Icons.image_not_supported_outlined,
+                color: ColorConstants.white,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

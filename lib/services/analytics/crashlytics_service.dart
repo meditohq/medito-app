@@ -27,7 +27,8 @@ class CrashlyticsService {
       final isImageLoadingError =
           errorDetails.stack?.toString().contains('Image') == true ||
               errorDetails.stack?.toString().contains('CachedNetworkImage') ==
-                  true;
+                  true ||
+              errorDetails.stack?.toString().contains('NetworkImage') == true;
 
       // Filter out specific image loading errors
       if (isImageLoadingError &&
@@ -40,7 +41,19 @@ class CrashlyticsService {
                   .contains('HandshakeException') ||
               errorDetails.exception
                   .toString()
-                  .contains('Software caused connection abort'))) {
+                  .contains('Software caused connection abort') ||
+              errorDetails.exception
+                  .toString()
+                  .contains('HTTP request failed') ||
+              errorDetails.exception.toString().contains('statusCode: 404') ||
+              errorDetails.exception.toString().contains('statusCode: 403') ||
+              errorDetails.exception.toString().contains('statusCode: 500') ||
+              errorDetails.exception
+                  .toString()
+                  .contains('Connection refused') ||
+              errorDetails.exception
+                  .toString()
+                  .contains('Connection timed out'))) {
         return;
       }
 
@@ -57,11 +70,18 @@ class CrashlyticsService {
       // Check if this is a network image loading error
       final stackTrace = stack.toString();
       final isImageLoadingError = stackTrace.contains('Image') ||
-          stackTrace.contains('CachedNetworkImage');
+          stackTrace.contains('CachedNetworkImage') ||
+          stackTrace.contains('NetworkImage');
 
       if (isImageLoadingError &&
           (error.toString().contains('HandshakeException') ||
-              error.toString().contains('Software caused connection abort'))) {
+              error.toString().contains('Software caused connection abort') ||
+              error.toString().contains('HTTP request failed') ||
+              error.toString().contains('statusCode: 404') ||
+              error.toString().contains('statusCode: 403') ||
+              error.toString().contains('statusCode: 500') ||
+              error.toString().contains('Connection refused') ||
+              error.toString().contains('Connection timed out'))) {
         return false;
       }
 

@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -91,7 +92,17 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final imageUrl = playbackState.track.imageUrl;
 
     if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasScheme == true) {
-      precacheImage(NetworkImage(imageUrl), context);
+      try {
+        precacheImage(NetworkImage(imageUrl), context).catchError((error) {
+          // Silently handle precaching errors - they're not critical
+          AppLogger.d('PlayerView',
+              'Failed to precache image: $imageUrl, error: $error');
+        });
+      } catch (e) {
+        // Silently handle any synchronous errors from precaching
+        AppLogger.d(
+            'PlayerView', 'Failed to precache image: $imageUrl, error: $e');
+      }
     }
 
     return PopScope<void>(
@@ -281,7 +292,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         if (currentlyPlayingTrack != null) {
           Future.delayed(const Duration(milliseconds: 500), () {
             if (!mounted) return;
-            
+
             ref.read(statsProvider.notifier).refresh();
             unawaited(ref.read(dndProvider.notifier).setDndMode(false));
 
