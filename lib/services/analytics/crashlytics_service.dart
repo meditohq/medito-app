@@ -13,9 +13,26 @@ class CrashlyticsService {
 
   CrashlyticsService._internal();
 
+  static const _imageRelatedKeywords = [
+    'Image',
+    'CachedNetworkImage',
+    'NetworkImage'
+  ];
+
+  static const _networkErrorPatterns = [
+    'HandshakeException',
+    'Software caused connection abort',
+    'HTTP request failed',
+    'statusCode: 404',
+    'statusCode: 403',
+    'statusCode: 500',
+    'Connection refused',
+    'Connection timed out',
+  ];
+
   Future<void> initialize() async {
     if (kDebugMode) {
-      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     } else {
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     }
@@ -23,37 +40,10 @@ class CrashlyticsService {
     // Set up Flutter error handling
     final originalOnError = FlutterError.onError;
     FlutterError.onError = (errorDetails) {
-      // Check if this is a network image loading error
-      final isImageLoadingError =
-          errorDetails.stack?.toString().contains('Image') == true ||
-              errorDetails.stack?.toString().contains('CachedNetworkImage') ==
-                  true ||
-              errorDetails.stack?.toString().contains('NetworkImage') == true;
-
-      // Filter out specific image loading errors
-      if (isImageLoadingError &&
-          ((errorDetails.exception is PathNotFoundException &&
-                  errorDetails.exception
-                      .toString()
-                      .contains('libCachedImageData')) ||
-              errorDetails.exception
-                  .toString()
-                  .contains('HandshakeException') ||
-              errorDetails.exception
-                  .toString()
-                  .contains('Software caused connection abort') ||
-              errorDetails.exception
-                  .toString()
-                  .contains('HTTP request failed') ||
-              errorDetails.exception.toString().contains('statusCode: 404') ||
-              errorDetails.exception.toString().contains('statusCode: 403') ||
-              errorDetails.exception.toString().contains('statusCode: 500') ||
-              errorDetails.exception
-                  .toString()
-                  .contains('Connection refused') ||
-              errorDetails.exception
-                  .toString()
-                  .contains('Connection timed out'))) {
+      if (_shouldIgnoreImageLoadingError(
+        stack: errorDetails.stack?.toString(),
+        exception: errorDetails.exception,
+      )) {
         return;
       }
 
@@ -63,31 +53,49 @@ class CrashlyticsService {
 
     // Set up platform error handling
     PlatformDispatcher.instance.onError = (error, stack) {
-      if (error is NetworkConnectionError) {
+      if (error is SocketException) {
         return false;
       }
 
-      // Check if this is a network image loading error
-      final stackTrace = stack.toString();
-      final isImageLoadingError = stackTrace.contains('Image') ||
-          stackTrace.contains('CachedNetworkImage') ||
-          stackTrace.contains('NetworkImage');
-
-      if (isImageLoadingError &&
-          (error.toString().contains('HandshakeException') ||
-              error.toString().contains('Software caused connection abort') ||
-              error.toString().contains('HTTP request failed') ||
-              error.toString().contains('statusCode: 404') ||
-              error.toString().contains('statusCode: 403') ||
-              error.toString().contains('statusCode: 500') ||
-              error.toString().contains('Connection refused') ||
-              error.toString().contains('Connection timed out'))) {
+      if (_shouldIgnoreImageLoadingError(
+        stack: stack.toString(),
+        exception: error,
+      )) {
         return false;
       }
 
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+
       return true;
     };
+  }
+
+  bool _isImageLoadingError(String? stackTrace) {
+    if (stackTrace == null) return false;
+
+    return _imageRelatedKeywords.any((keyword) => stackTrace.contains(keyword));
+  }
+
+  bool _hasNetworkError(dynamic exception) {
+    final exceptionString = exception.toString();
+
+    return _networkErrorPatterns
+        .any((pattern) => exceptionString.contains(pattern));
+  }
+
+  bool _shouldIgnoreImageLoadingError({
+    String? stack,
+    dynamic exception,
+  }) {
+    if (!_isImageLoadingError(stack)) return false;
+
+    // Special case for PathNotFoundException
+    if (exception is PathNotFoundException &&
+        exception.toString().contains('libCachedImageData')) {
+      return true;
+    }
+
+    return _hasNetworkError(exception);
   }
 
   void recordError(
