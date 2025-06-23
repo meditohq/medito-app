@@ -16,9 +16,7 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var textColor = _label != StringConstants.x1
-        ? ColorConstants.lightPurple
-        : ColorConstants.white;
+    var isSelected = _label != StringConstants.x1;
 
     return GestureDetector(
       onTap: () {
@@ -36,15 +34,43 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
 
         widget.onSpeedChanged(_label.toDouble);
       },
-      child: Text(
-        _label,
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium
-            ?.copyWith(color: textColor, fontFamily: dmMono, fontSize: 18),
-        textAlign: TextAlign.center,
+      child: IntrinsicWidth(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: isSelected
+              ? BoxDecoration(
+                  color: ColorConstants.graphite.withAlpha(200),
+                  borderRadius: BorderRadius.circular(6),
+                )
+              : null,
+          child: Text(
+            _getFormattedLabel(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: ColorConstants.white,
+                  fontFamily: dmMono,
+                  fontSize: 18,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
+  }
+
+  String _getFormattedLabel() {
+    if (_label == StringConstants.x06) {
+      return '0.6×';
+    } else if (_label == StringConstants.x07) {
+      return '0.7×';
+    } else if (_label == StringConstants.x08) {
+      return '0.8×';
+    } else if (_label == StringConstants.x09) {
+      return '0.9×';
+    } else if (_label == StringConstants.x1) {
+      return '1.0×';
+    } else {
+      return _label;
+    }
   }
 }
 

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
@@ -43,24 +44,50 @@ class AudioDownloadWidget extends ConsumerWidget {
     AudioDownloaderProvider downloadAudioProvider,
     String downloadFileKey,
   ) {
-    if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
-        AudioDownloadState.downloaded) {
+    var isDownloaded =
+        downloadAudioProvider.audioDownloadState[downloadFileKey] ==
+            AudioDownloadState.downloaded;
+    var isDownloading =
+        downloadAudioProvider.audioDownloadState[downloadFileKey] ==
+            AudioDownloadState.downloading;
+
+    return Container(
+      decoration: isDownloaded
+          ? BoxDecoration(
+              color: ColorConstants.graphite.withAlpha(200),
+              borderRadius: BorderRadius.circular(6),
+            )
+          : null,
+      child: _buildDownloadContent(downloadAudioProvider, downloadFileKey,
+          isDownloaded, isDownloading, context, ref),
+    );
+  }
+
+  Widget _buildDownloadContent(
+    AudioDownloaderProvider downloadAudioProvider,
+    String downloadFileKey,
+    bool isDownloaded,
+    bool isDownloading,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    if (isDownloaded) {
       return IconButton(
         onPressed: () =>
             _handleRemoveDownload(downloadAudioProvider, ref, context),
         icon: const Icon(
-          Icons.downloading_outlined,
-          color: ColorConstants.lightPurple,
+          HugeIcons.solidStandardDownloadCircle02,
+          color: ColorConstants.white,
         ),
       );
-    } else if (downloadAudioProvider.audioDownloadState[downloadFileKey] ==
-        AudioDownloadState.downloading) {
+    } else if (isDownloading) {
       return showDownloadProgress(downloadAudioProvider, downloadFileKey);
     } else {
       return IconButton(
         onPressed: () => _handleDownload(downloadAudioProvider, context),
-        icon: const Icon(
-          Icons.downloading_outlined,
+        icon: HugeIcon(
+          icon: HugeIcons.twotoneRoundedDownloadCircle01,
+          color: ColorConstants.white,
         ),
       );
     }
@@ -70,19 +97,39 @@ class AudioDownloadWidget extends ConsumerWidget {
     AudioDownloaderProvider downloadAudioProvider,
     String downloadFileKey,
   ) {
+    var progress = _getDownloadProgress(downloadAudioProvider, downloadFileKey);
+
     return Stack(
       alignment: Alignment.center,
       children: [
-        const Icon(
-          Icons.downloading,
-          size: 24,
+        // Background container
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            color: ColorConstants.graphite.withAlpha(100),
+          ),
         ),
-        SizedBox(
-          height: 18,
-          width: 18,
+        // Progress fill from bottom to top
+        Positioned(
+          bottom: 0,
+          child: Container(
+            width: 48,
+            height: 48 * progress,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              color: ColorConstants.graphite.withAlpha(200),
+            ),
+          ),
+        ),
+        // Loading spinner icon
+        const SizedBox(
+          width: 16,
+          height: 16,
           child: CircularProgressIndicator(
-            strokeWidth: 3,
-            value: _getDownloadProgress(downloadAudioProvider, downloadFileKey),
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
           ),
         ),
       ],

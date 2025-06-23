@@ -76,9 +76,6 @@ class BottomActionBar extends StatelessWidget {
           _buildItem(rightCenterItem),
           const Spacer(),
           _buildItem(rightItem),
-          SizedBox.square(
-            dimension: 20,
-          )
         ];
     }
   }
