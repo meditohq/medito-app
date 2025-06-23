@@ -36,7 +36,9 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
       },
       child: IntrinsicWidth(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          height: 48,
+          alignment: Alignment.center,
           decoration: isSelected
               ? BoxDecoration(
                   color: ColorConstants.graphite.withAlpha(200),
