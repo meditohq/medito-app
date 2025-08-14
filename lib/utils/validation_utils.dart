@@ -1,4 +1,3 @@
-import 'package:medito/constants/constants.dart';
 import 'package:email_validator/email_validator.dart';
 
 class ValidationUtils {
@@ -14,31 +13,38 @@ class ValidationUtils {
     return regexName.hasMatch(digit);
   }
 
-  String? validateEmail(String? email, {String? errorMessage}) {
+  String? validateEmail(String? email,
+      {String? errorMessage,
+      String? fieldRequiredMessage,
+      String? invalidEmailMessage}) {
     if (email!.isEmpty) {
-      return StringConstants.fieldRequired;
+      return fieldRequiredMessage ?? 'Field is Required';
     } else if (isEmailValid(email)) {
       return null;
     } else {
-      return errorMessage ?? StringConstants.invalidEmail;
+      return errorMessage ?? invalidEmailMessage ?? 'Invalid Email.';
     }
   }
 
-  String? validateFieldEmpty(String? input, {String? errorMessage}) {
+  String? validateFieldEmpty(String? input,
+      {String? errorMessage, String? fieldRequiredMessage}) {
     return input!.isEmpty
-        ? errorMessage ?? StringConstants.fieldRequired
+        ? errorMessage ?? fieldRequiredMessage ?? 'Field is Required'
         : null;
   }
 
-  String? validateOTP(String? input, {String? errorMessage}) {
+  String? validateOTP(String? input,
+      {String? errorMessage,
+      String? fieldRequiredMessage,
+      String? invalidInputMessage}) {
     if (input!.isEmpty) {
-      return StringConstants.fieldRequired;
+      return fieldRequiredMessage ?? 'Field is Required';
     } else if (!isValidateDigit(input)) {
-      return StringConstants.invalidInput;
+      return invalidInputMessage ?? 'Invalid Input';
     } else if (isValidateDigit(input) && input.length == 6) {
       return null;
     } else {
-      return errorMessage ?? StringConstants.fieldRequired;
+      return errorMessage ?? fieldRequiredMessage ?? 'Field is Required';
     }
   }
 }

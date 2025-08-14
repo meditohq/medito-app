@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/explore/explore_list_item.dart';
 import 'package:medito/providers/explore/track_search_provider.dart';
 import 'package:medito/routes/routes.dart';
@@ -102,8 +103,8 @@ class ExploreViewState extends ConsumerState<ExploreView> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const HomeHeaderWidget(
-                            greeting: StringConstants.explore),
+                        HomeHeaderWidget(
+                            greeting: AppLocalizations.of(context)!.explore),
                         const SizedBox(height: 18.0),
                         SearchBox(
                           controller: _searchController,
@@ -189,7 +190,7 @@ class ExploreContentWidget extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: padding16, vertical: padding16),
                           child: Text(
-                            StringConstants.noResultsFound,
+                            AppLocalizations.of(context)!.noResultsFound,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -206,7 +207,8 @@ class ExploreContentWidget extends ConsumerWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: padding16),
                               child: Text(
-                                StringConstants.packsSectionHeader,
+                                AppLocalizations.of(context)!
+                                    .packsSectionHeader,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
@@ -227,7 +229,8 @@ class ExploreContentWidget extends ConsumerWidget {
                                 right: padding16,
                               ),
                               child: Text(
-                                StringConstants.tracksSectionHeader,
+                                AppLocalizations.of(context)!
+                                    .tracksSectionHeader,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
@@ -432,7 +435,7 @@ class SearchBox extends StatelessWidget {
       controller: controller,
       focusNode: focusNode,
       decoration: InputDecoration(
-        hintText: StringConstants.searchMeditations,
+        hintText: AppLocalizations.of(context)!.searchMeditations,
         prefixIcon: const Icon(Icons.search),
         suffixIcon: IconButton(
           icon: const Icon(Icons.clear),

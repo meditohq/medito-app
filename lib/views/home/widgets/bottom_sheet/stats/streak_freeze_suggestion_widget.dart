@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
 
 class StreakFreezeSuggestionWidget extends ConsumerStatefulWidget {
@@ -95,7 +96,7 @@ class StreakFreezeSuggestionWidgetState
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            StringConstants.streakAtRisk,
+            AppLocalizations.of(context)!.streakAtRisk,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: ColorConstants.white,
               fontSize: 28,
@@ -103,8 +104,8 @@ class StreakFreezeSuggestionWidgetState
           ),
           const SizedBox(height: 16),
           Text(
-            StringConstants.streakFreezesAvailableMessage
-                .replaceAll('{count}', availableCount.toString()),
+            AppLocalizations.of(context)!
+                .streakFreezesAvailableMessage(availableCount.toString()),
             style: theme.textTheme.bodyLarge?.copyWith(
               color: ColorConstants.white,
               fontSize: 16,
@@ -150,7 +151,7 @@ class StreakFreezeSuggestionWidgetState
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(StringConstants.useStreakFreeze),
+                  child: Text(AppLocalizations.of(context)!.useStreakFreeze),
                 ),
               ),
             ],

@@ -1,0 +1,1266 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Spanish Castilian (`es`).
+class AppLocalizationsEs extends AppLocalizations {
+  AppLocalizationsEs([String locale = 'es']) : super(locale);
+
+  @override
+  String get appName => 'Medito';
+
+  @override
+  String get privacyPolicyTitle => 'Política de Privacidad';
+
+  @override
+  String get unableToOpenPrivacyPolicy =>
+      'No se puede abrir la política de privacidad';
+
+  @override
+  String get meditoUrl => 'https://meditofoundation.org/';
+
+  @override
+  String get downloads => 'Descargas';
+
+  @override
+  String get volume => 'Volumen';
+
+  @override
+  String get home => 'Inicio';
+
+  @override
+  String get none => 'Ninguno';
+
+  @override
+  String get removed => 'Eliminado';
+
+  @override
+  String get meditationProducts => 'Tienda para Apoyar';
+
+  @override
+  String get fromPrefix => 'De ';
+
+  @override
+  String get emptyDownloadsMessage =>
+      'Parece que aún no has descargado nada. Las descargas son útiles para ahorrar datos móviles o para acceder a sesiones en lugares sin señal.';
+
+  @override
+  String get meanWhileListen => 'Mientras tanto, puedes escuchar tu';
+
+  @override
+  String get retrying => 'Reintentando...';
+
+  @override
+  String get tryAgain => 'Intentar de nuevo';
+
+  @override
+  String get retry => 'Reintentar';
+
+  @override
+  String get statsSuccess => 'Estadísticas actualizadas';
+
+  @override
+  String get shareStatsText =>
+      '¡Descubre la calma GRATIS con #Medito! He encontrado mi paz interior; ¡ahora es tu turno! Únete a mí en este viaje consciente y comienza a explorar hoy 💜 Descarga https://medito.app #Calma #Meditación #Headspace';
+
+  @override
+  String get backgroundSounds => 'Sonido de Fondo';
+
+  @override
+  String get x06 => 'x0.6';
+
+  @override
+  String get x07 => 'x0.7';
+
+  @override
+  String get x08 => 'x0.8';
+
+  @override
+  String get x09 => 'x0.9';
+
+  @override
+  String get x1 => 'x1';
+
+  @override
+  String get searchMeditations => 'Buscar meditaciones';
+
+  @override
+  String get share => 'Compartir';
+
+  @override
+  String get id => 'id';
+
+  @override
+  String get env => 'env';
+
+  @override
+  String get email => 'email';
+
+  @override
+  String get appVersion => 'appVersion';
+
+  @override
+  String get deviceModel => 'deviceModel';
+
+  @override
+  String get deviceOs => 'deviceOs';
+
+  @override
+  String get devicePlatform => 'devicePlatform';
+
+  @override
+  String get buildNumber => 'buildNumber';
+
+  @override
+  String get dismiss => 'Descartar';
+
+  @override
+  String get debugInfo => 'Información de depuración';
+
+  @override
+  String get writeBelowThisLine => '--- Escribe debajo de esta línea ---';
+
+  @override
+  String get explore => 'Explorar';
+
+  @override
+  String get welcome => '👋 Bienvenido';
+
+  @override
+  String get thanksForSharing => 'Gracias por compartir  💜';
+
+  @override
+  String get thanksForSharingNeutral => 'Cara feliz';
+
+  @override
+  String get thanksForSharingHappy => 'Cara neutral';
+
+  @override
+  String get thanksForSharingSad => 'Cara triste';
+
+  @override
+  String get min => 'min';
+
+  @override
+  String get hey => '👋 Hola';
+
+  @override
+  String get someThingWentWrong => 'Algo salió mal';
+
+  @override
+  String get invalidEmail => 'Correo electrónico inválido.';
+
+  @override
+  String get fieldRequired => 'Campo requerido';
+
+  @override
+  String get invalidInput => 'Entrada inválida';
+
+  @override
+  String get connectionTimeout => 'Error de tiempo de espera de conexión';
+
+  @override
+  String get noInternetConnection => 'Sin conexión a internet';
+
+  @override
+  String get badRequest => 'Solicitud incorrecta';
+
+  @override
+  String get unauthorizedRequest =>
+      'Sesión expirada - por favor inicia sesión de nuevo';
+
+  @override
+  String get accessForbidden => 'Acceso prohibido';
+
+  @override
+  String get apiNotFound => 'API no encontrada';
+
+  @override
+  String get anErrorOccurred =>
+      'Ocurrió un error desconocido. O tenemos problemas o estás sin conexión.';
+
+  @override
+  String get unableToLoadAudio =>
+      'No se puede cargar el audio. Por favor regresa e inténtalo de nuevo';
+
+  @override
+  String get loadingError =>
+      'Parece que estás sin conexión o hubo un pequeño problema de nuestro lado';
+
+  @override
+  String get timeout =>
+      '¡Ups! Parece que hubo un error. Si el problema persiste, cierra la aplicación e inténtalo de nuevo.';
+
+  @override
+  String get connectivityError =>
+      'Asegúrate de estar conectado a internet para usar Medito';
+
+  @override
+  String get howDoYouFeel => '¿Cómo te sientes después de esta sesión?';
+
+  @override
+  String get yourFeedbackHelpsUs =>
+      'Tus comentarios nos ayudan a mejorar nuestro contenido y te permiten reflexionar sobre tu experiencia.';
+
+  @override
+  String get didYouKnow => '¿Sabías que?';
+
+  @override
+  String get meditoReliesOnYourDonationsToSurvive =>
+      'Medito depende únicamente de tus donaciones para sobrevivir. Producimos contenido gratuito para ayudar a la humanidad.';
+
+  @override
+  String get reminderNotificationBody =>
+      'Es hora de tu meditación diaria. Tómate un momento para relajarte y concentrarte.';
+
+  @override
+  String get reminderNotificationTitle => 'Recordatorio de Meditación Diaria';
+
+  @override
+  String get pickTimeHelpText => 'Selecciona la hora de tu recordatorio diario';
+
+  @override
+  String get reminderNotificationScheduled =>
+      'Notificación de recordatorio programada a las';
+
+  @override
+  String get dailyReminderTitle => 'Recordatorio Diario';
+
+  @override
+  String get setFor => 'Configurado para';
+
+  @override
+  String get signInSignUp => 'Iniciar sesión / Registrarse';
+
+  @override
+  String get settings => 'Configuración';
+
+  @override
+  String get reminderNotificationCleared => 'Recordatorio cancelado';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get areYouSure => '¿Estás seguro?';
+
+  @override
+  String get requestPermission => 'Solicitar Permiso';
+
+  @override
+  String get mediaPlaybackPermissions => 'Permisos de Reproducción Multimedia';
+
+  @override
+  String get reminderPermissions => 'Permisos de Recordatorio';
+
+  @override
+  String get weNeedYourPermissionMedia =>
+      'Necesitamos permiso para mostrar controles multimedia en tus notificaciones. Esto te permite controlar la reproducción sin abrir la aplicación.';
+
+  @override
+  String get weNeedYourPermissionReminder =>
+      'Necesitamos permiso para enviarte recordatorios sobre el seguimiento de tu progreso de meditación. Esto te ayuda a mantener la consistencia en tu práctica.';
+
+  @override
+  String get syncWithHealth => 'Sincronizar con Apple Health';
+
+  @override
+  String get permissionExplanation =>
+      'Permisos configurados. Para cambiarlos, ve a Configuración > Privacidad y Seguridad > Salud > Medito';
+
+  @override
+  String get confirmDeletionTitle => 'Confirmar Eliminación';
+
+  @override
+  String get confirmDeletionFromPlayerTitle => 'Ya Descargado';
+
+  @override
+  String get confirmDeletionFromPlayerMessage =>
+      'Esta meditación ya está en tus descargas. ¿Quieres eliminarla?';
+
+  @override
+  String get confirmDeletionMessage => '¿Estás seguro de que quieres eliminar';
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String get copy => 'Copiar';
+
+  @override
+  String get debugInfoCopied =>
+      'Información de depuración copiada al portapapeles';
+
+  @override
+  String get goToDownloads => 'Ir a Descargas';
+
+  @override
+  String get signInSuccess => 'Inicio de sesión exitoso';
+
+  @override
+  String get signInError =>
+      'Error al iniciar sesión. Por favor inténtalo de nuevo.';
+
+  @override
+  String get backgroundSoundsDisabled =>
+      'Los sonidos de fondo están deshabilitados para esta pista';
+
+  @override
+  String get neww => 'Nuevo';
+
+  @override
+  String get statsLoadError =>
+      'No se pueden cargar las estadísticas. Por favor inténtalo más tarde.';
+
+  @override
+  String get statsLoading => 'Cargando estadísticas...';
+
+  @override
+  String get loading => 'Cargando...';
+
+  @override
+  String get statsErrorRetry => 'Reintentar';
+
+  @override
+  String get currentStreak => 'Racha Actual';
+
+  @override
+  String get longestStreak => 'Racha Más Larga';
+
+  @override
+  String get consistencyScore => 'Puntuación de Consistencia';
+
+  @override
+  String get totalTracksCompleted => 'Total de Pistas Completadas';
+
+  @override
+  String get totalTimeListened => 'Tiempo Total Escuchado';
+
+  @override
+  String get days => 'días';
+
+  @override
+  String get day => 'día';
+
+  @override
+  String get hours => 'h';
+
+  @override
+  String get hoursFull => 'horas';
+
+  @override
+  String get hourFull => 'hora';
+
+  @override
+  String get minutes => 'minutos';
+
+  @override
+  String get minute => 'minuto';
+
+  @override
+  String get showConsistencyScore => 'Mostrar Puntuación de Consistencia';
+
+  @override
+  String get showCurrentStreak => 'Mostrar Racha Actual';
+
+  @override
+  String get alwaysShowStreakOnHomepage =>
+      'Mostrar siempre la racha en la página de inicio';
+
+  @override
+  String get displayPreferenceSaved => 'Preferencia de visualización guardada';
+
+  @override
+  String get gotIt => 'Entendido';
+
+  @override
+  String get signUpLogInTitle => 'Iniciar sesión en Medito';
+
+  @override
+  String get createAccountTitle => 'Crear cuenta';
+
+  @override
+  String get signInAgain => 'Iniciar sesión de nuevo';
+
+  @override
+  String get emailLabel => 'Correo electrónico';
+
+  @override
+  String get invalidEmailError => 'Correo electrónico inválido.';
+
+  @override
+  String get createAccountButtonText => 'Crear Cuenta';
+
+  @override
+  String get createAccountLogInButtonText => 'Iniciar sesión o Registrarse';
+
+  @override
+  String get sendMeMyPasswordText => 'Continuar';
+
+  @override
+  String get logInButtonText => 'Iniciar Sesión';
+
+  @override
+  String get authenticationFailed => 'Autenticación fallida';
+
+  @override
+  String get emailVerificationText =>
+      'Te enviaremos un código por correo electrónico para verificar tu cuenta';
+
+  @override
+  String get createAccountBenefits =>
+      '◦ Rastrea tu viaje de atención plena \\n◦ Nunca pierdas tu progreso de meditación\\n◦ Construye una práctica de meditación duradera 💜';
+
+  @override
+  String get loginBenefits =>
+      '• Descarga tus datos guardados previamente\\n• Continúa tu viaje de meditación desde donde lo dejaste';
+
+  @override
+  String get accountTransitionWarningTitle => '¡Espera!';
+
+  @override
+  String get loginWarningQuestion =>
+      '¿Quieres continuar con este correo electrónico?';
+
+  @override
+  String get loginWarningExplanation =>
+      'Si ya tienes una cuenta de Medito:\\n• Tus datos de meditación anteriores se descargarán\\n• Tu progreso actual no guardado se perderá\\n\\nSi eres nuevo en Medito:\\n• Se creará una nueva cuenta\\n• Tu progreso actual se guardará en esta cuenta';
+
+  @override
+  String get createNewAccount => 'Crear Nueva Cuenta';
+
+  @override
+  String get continueLogin => 'Sí, continuar';
+
+  @override
+  String get cancelAction => 'Cancelar';
+
+  @override
+  String get goBack => 'Regresar';
+
+  @override
+  String get userProfileTitle => 'Perfil de Usuario';
+
+  @override
+  String get userProfileEmailLabel => 'Correo electrónico:';
+
+  @override
+  String get signOutButtonText => 'Cerrar Sesión';
+
+  @override
+  String get signOutSuccessMessage => 'Has cerrado sesión exitosamente';
+
+  @override
+  String get signOutErrorMessage =>
+      'Error al cerrar sesión. Por favor inténtalo de nuevo.';
+
+  @override
+  String get deleteAccountTitle => 'Eliminar Cuenta';
+
+  @override
+  String get deleteAccountConfirmation =>
+      '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y debes seguir las instrucciones en la siguiente página.';
+
+  @override
+  String get deleteAccountButtonText => 'Eliminar Cuenta';
+
+  @override
+  String get accountMarkedForDeletion =>
+      'Tu cuenta ha sido marcada para eliminación.';
+
+  @override
+  String get deleteAccountError => 'Error al eliminar la cuenta.';
+
+  @override
+  String get accountMarkedForDeletionError =>
+      'Esta cuenta ha sido marcada para eliminación y no se puede acceder.';
+
+  @override
+  String get faqTitle => 'Preguntas Frecuentes';
+
+  @override
+  String get editStatsTitle => 'Editar estadísticas';
+
+  @override
+  String get telegramTitle => 'Únete a nuestra comunidad de Telegram';
+
+  @override
+  String get donateTitle => 'Donar';
+
+  @override
+  String get contactUsTitle => 'Contáctanos';
+
+  @override
+  String get accountTitle => 'Cuenta';
+
+  @override
+  String get path => 'Ruta';
+
+  @override
+  String get stepTitle => 'Paso';
+
+  @override
+  String get completed => 'Completado';
+
+  @override
+  String get locked => 'Bloqueado';
+
+  @override
+  String get loadingPath => 'Cargando tu ruta...';
+
+  @override
+  String get pathLoadError =>
+      'Error al cargar la ruta. Por favor inténtalo de nuevo.';
+
+  @override
+  String get stepCompleted => '¡Paso completado!';
+
+  @override
+  String get stepCompletionError =>
+      'Error al completar el paso. Por favor inténtalo de nuevo.';
+
+  @override
+  String get meditatedOutsideApp =>
+      '¿Meditaste fuera de la aplicación? Escucha la última sesión desbloqueada para desbloquear el siguiente paso en la ruta';
+
+  @override
+  String get enterMeditationDuration =>
+      'Por favor ingresa la duración de tu meditación fuera de la aplicación';
+
+  @override
+  String get meditationMarkingError =>
+      'Error al marcar la meditación. Por favor inténtalo de nuevo.';
+
+  @override
+  String get listenToUnlockNextStep =>
+      'Escucha la última sesión desbloqueada para desbloquear el siguiente paso en la aplicación';
+
+  @override
+  String get unknownTaskType => 'Tipo de tarea desconocido';
+
+  @override
+  String get invalidDuration =>
+      'Duración inválida. Por favor ingresa un número positivo.';
+
+  @override
+  String get submit => 'Enviar';
+
+  @override
+  String get journalEntry => 'Entrada de Diario';
+
+  @override
+  String get writeYourJournalEntryHere =>
+      'Escribe tu entrada de diario aquí...';
+
+  @override
+  String get journalEntrySaved => 'Entrada de diario guardada';
+
+  @override
+  String get sessionCompleted => '¡Sesión completada exitosamente!';
+
+  @override
+  String get taskUpdateError =>
+      'Error al actualizar la tarea. Por favor inténtalo de nuevo.';
+
+  @override
+  String get syncingPath => 'Sincronizando tu progreso...';
+
+  @override
+  String get stepLocked => 'Completa los pasos anteriores para desbloquear';
+
+  @override
+  String get duration => 'Duración';
+
+  @override
+  String get tapToReadArticle => 'Toca para leer el artículo';
+
+  @override
+  String get monday => 'L';
+
+  @override
+  String get tuesday => 'M';
+
+  @override
+  String get wednesday => 'M';
+
+  @override
+  String get thursday => 'J';
+
+  @override
+  String get friday => 'V';
+
+  @override
+  String get saturday => 'S';
+
+  @override
+  String get sunday => 'D';
+
+  @override
+  String get dailyPracticeMessage =>
+      '¡Practicar diariamente aumenta tu racha, pero también te hace más consciente y feliz!';
+
+  @override
+  String get dayStreak => 'días de racha';
+
+  @override
+  String get dailyQuote => 'Cita Diaria';
+
+  @override
+  String get termsOfService => 'Términos de Servicio';
+
+  @override
+  String get privacyPolicy => 'Política de Privacidad';
+
+  @override
+  String get offlineMode =>
+      'Ahora estás en modo sin conexión debido a un error.';
+
+  @override
+  String get addToSiri => 'Agregar a Siri';
+
+  @override
+  String get shareTrack => 'Compartir Pista';
+
+  @override
+  String get open => 'Abrir';
+
+  @override
+  String shareTrackText(Object link, Object trackName) {
+    return 'Tómate un momento para respirar. Prueba esta sesión de meditación: \"$trackName\" en Medito. $link';
+  }
+
+  @override
+  String sharePackText(Object link, Object packName) {
+    return '¡Echa un vistazo a $packName en Medito! $link #Meditación #Mindfulness';
+  }
+
+  @override
+  String get followingDeepLink => 'Siguiendo enlace profundo...';
+
+  @override
+  String get invalidDeepLink => 'Enlace profundo inválido';
+
+  @override
+  String get deepLinkError => 'No se puede manejar el enlace profundo';
+
+  @override
+  String get statsInitError =>
+      'La sincronización de estadísticas puede haber fallado. Por favor verifica tu conexión.';
+
+  @override
+  String get appInitError =>
+      'Error en la inicialización de la aplicación. Entrando en modo sin conexión.';
+
+  @override
+  String get noConnection => 'Sin conexión';
+
+  @override
+  String get continueAsGuest => 'Continuar';
+
+  @override
+  String get isMonthlyDonor => 'd';
+
+  @override
+  String get otpLabel => 'Ingresa el código de verificación';
+
+  @override
+  String get invalidOtpError =>
+      'Por favor ingresa un código válido de 6 dígitos';
+
+  @override
+  String get otpSentSuccess =>
+      'Revisa tu correo electrónico para el código de verificación';
+
+  @override
+  String get otpInstructions => 'Ingresa el código que acabamos de enviar a';
+
+  @override
+  String get resendCode => '¿No recibiste el código? Reenvíalo';
+
+  @override
+  String get verifyOtpButtonText => 'Continuar';
+
+  @override
+  String get warningTitle => 'Advertencia';
+
+  @override
+  String get localStatsWarning =>
+      'Iniciar sesión en una nueva cuenta resultará en la pérdida de tus estadísticas locales actuales. ¿Deseas continuar?';
+
+  @override
+  String get proceed => 'Continuar';
+
+  @override
+  String get errorNotFound => 'Recurso no encontrado';
+
+  @override
+  String get shortcutsTitle => 'Accesos Directos';
+
+  @override
+  String get carouselTitle => 'Destacados';
+
+  @override
+  String get quoteTitle => 'Cita Diaria';
+
+  @override
+  String get customization => 'Personalización';
+
+  @override
+  String get customiseHomeLayout => 'Organizar Diseño de Inicio';
+
+  @override
+  String get featuresIntegrations => 'Características e Integraciones';
+
+  @override
+  String get account => 'Cuenta';
+
+  @override
+  String get supportCommunity => 'Apoyo y Comunidad';
+
+  @override
+  String get helpLegal => 'Ayuda y Legal';
+
+  @override
+  String get advanced => 'Avanzado';
+
+  @override
+  String get enableNotificationsTitle =>
+      'Mantente en el Camino con Recordatorios de Meditación';
+
+  @override
+  String get enableNotificationsBody =>
+      'Habilita las notificaciones para que nunca te pierdas una sesión.';
+
+  @override
+  String get enableNotificationsCta => 'Habilitar Notificaciones';
+
+  @override
+  String get skipForNow => 'Omitir por Ahora';
+
+  @override
+  String get donationTitle => 'Ayuda a Mantener Medito Gratis';
+
+  @override
+  String get donationBody =>
+      'Somos una iniciativa sin fines de lucro.\\nDependemos de donaciones para permanecer gratis y sin anuncios.\\nSi te gustaría contribuir, puedes donar cualquier cantidad. ¡Sin presión!';
+
+  @override
+  String get donateNow => 'Donar Ahora';
+
+  @override
+  String get noThanks => 'No gracias';
+
+  @override
+  String get next => 'Siguiente';
+
+  @override
+  String get remindLater => 'Recordármelo Más Tarde';
+
+  @override
+  String get allSetTitle => '¡Todo Listo!';
+
+  @override
+  String get startMeditating => 'Comenzar a Meditar';
+
+  @override
+  String get splashHeadline => 'Meditación Hecha Simple';
+
+  @override
+  String get splashBenefit1Title => 'Gratis para Todos, Para Siempre';
+
+  @override
+  String get splashBenefit1Subtitle =>
+      'Explora horas de meditaciones guiadas, cursos avanzados y más. Sin muro de pago.';
+
+  @override
+  String get splashBenefit2Title => 'Desafíos y Recordatorios';
+
+  @override
+  String get splashBenefit2Subtitle =>
+      'Mantente motivado diariamente, rastrea el progreso y construye hábitos duraderos.';
+
+  @override
+  String get splashBenefit3Title => 'Sin Fines de Lucro y Sin Anuncios';
+
+  @override
+  String get splashBenefit3Subtitle =>
+      'Las donaciones nos mantienen funcionando para que todos puedan acceder a la atención plena—sin necesidad de anuncios.';
+
+  @override
+  String get continueText => 'Continuar';
+
+  @override
+  String get setReminder => 'Configurar Recordatorio';
+
+  @override
+  String get donationThankYouTitle => '¡Gracias por Tu Apoyo!';
+
+  @override
+  String get donationThankYouBody =>
+      'Tu generosidad ayuda a mantener Medito gratis y accesible para todos. Estamos profundamente agradecidos por tu contribución a difundir la atención plena en todo el mundo.';
+
+  @override
+  String get donationVisitFoundation => 'Visitar Fundación Medito';
+
+  @override
+  String get donationContinue => 'Continuar';
+
+  @override
+  String get streakFreezesAvailable => 'Congelaciones de Racha Disponibles';
+
+  @override
+  String get freezeUsedMessage =>
+      '¡Se usó una congelación de racha para mantener tu racha!';
+
+  @override
+  String get streakAtRisk => 'Te perdiste un día';
+
+  @override
+  String get streakFreezeAvailable =>
+      'Tienes 1 congelación de racha disponible. ¿Te gustaría usarla para proteger tu racha actual?';
+
+  @override
+  String streakFreezesAvailableMessage(Object count) {
+    return '¡Pero está bien! Tienes $count congelaciones de racha disponibles. ¿Te gustaría usar una para proteger tu racha actual?';
+  }
+
+  @override
+  String get useStreakFreeze => 'Usar Congelación de Racha';
+
+  @override
+  String get notNow => 'Ahora No';
+
+  @override
+  String get helpTitle => 'Ayuda';
+
+  @override
+  String get meditationInterruptionTitle =>
+      'Las meditaciones se detienen inesperadamente';
+
+  @override
+  String get meditationInterruptionContent =>
+      'Esto probablemente se debe a la configuración de optimización de batería de tu teléfono. Visita DontKillMyApp.com para instrucciones específicas sobre cómo permitir que Medito funcione correctamente en segundo plano en tu dispositivo.';
+
+  @override
+  String get supportTitle => 'Quiero apoyarte';
+
+  @override
+  String get supportContent =>
+      'Puedes apoyar a la Fundación Medito a través de varios métodos';
+
+  @override
+  String get stopDonationTitle => 'Quiero detener mi donación mensual';
+
+  @override
+  String get stopDonationContent =>
+      'Ve al portal de donaciones. Necesitas la dirección de correo electrónico que usaste para configurarlas';
+
+  @override
+  String get statsWrongTitle => 'Mis estadísticas están mal';
+
+  @override
+  String get statsWrongContent =>
+      'Puedes editarlas en la página dedicada de edición de estadísticas.';
+
+  @override
+  String get contactUsContent =>
+      'Si tienes alguna pregunta no abordada en esta página, algún comentario, o si necesitas asistencia, intenta actualizar la aplicación. Si eso no ayuda, por favor contáctanos. ¡Estamos aquí para ayudar!';
+
+  @override
+  String get contactUsActionText => 'Contáctanos';
+
+  @override
+  String get downloadTracksTitle => 'Cómo descargar pistas';
+
+  @override
+  String get downloadTracksContent =>
+      'Para descargar una pista, comienza reproduciéndola y luego busca el ícono de descarga (una flecha hacia abajo) en la parte inferior de la pantalla del reproductor—es el segundo ícono.\\n\\nUna vez descargada, puedes acceder a tus pistas tocando el mosaico \"Descargas\" en la pantalla de inicio.';
+
+  @override
+  String get openBatterySettingsText => 'Visitar DontKillMyApp.com';
+
+  @override
+  String get dontKillMyAppUrl => 'https://dontkillmyapp.com';
+
+  @override
+  String get goToDonationPortalText => 'Ir al Portal de Donaciones';
+
+  @override
+  String get editStatsActionText => 'Editar Estadísticas';
+
+  @override
+  String get donateViaDonationFormText => 'Donar vía Formulario de Donación';
+
+  @override
+  String get donateViaPayPalText => 'Donar vía PayPal';
+
+  @override
+  String get donateViaBankTransferText => 'Donar vía Transferencia Bancaria';
+
+  @override
+  String get donationFormUrl => 'https://meditofoundation.org/donate';
+
+  @override
+  String get payPalDonationUrl => 'https://paypal.me/meditofoundation';
+
+  @override
+  String get bankTransferDetailsUrl =>
+      'https://meditofoundation.org/about/bank-details';
+
+  @override
+  String get donationPortalUrl => 'https://bit.ly/3yFqVbM';
+
+  @override
+  String get contactFormBaseUrl => 'https://tally.so/r/wLGBaO';
+
+  @override
+  String get batteryOptimizationTitle =>
+      'Tu dispositivo tiene optimización de batería adicional';
+
+  @override
+  String get batteryOptimizationDescription =>
+      'Sigue los pasos y deshabilita las optimizaciones para permitir el funcionamiento suave de esta aplicación';
+
+  @override
+  String get autoStartTitle => 'Habilitar Inicio Automático';
+
+  @override
+  String get autoStartDescription =>
+      'Sigue los pasos y habilita el inicio automático de esta aplicación';
+
+  @override
+  String get batteryOptimizationAlreadyDisabled =>
+      'La optimización de batería ya está deshabilitada para Medito';
+
+  @override
+  String get donationRetentionTitle => 'Por Favor Reconsidera';
+
+  @override
+  String get donationRetentionMainMessage =>
+      'Millones de personas dependen de Medito, y operamos únicamente con donaciones.';
+
+  @override
+  String get donationRetentionBenefitsHeading => 'Tu apoyo nos ayuda a:';
+
+  @override
+  String get donationRetentionBenefit1 =>
+      'Agregar contenido de meditación nuevo regularmente';
+
+  @override
+  String get donationRetentionBenefit2 =>
+      'Desarrollar nuevas características para mejorar tu experiencia';
+
+  @override
+  String get donationRetentionBenefit3 =>
+      'Mantener Medito gratis y accesible para todos';
+
+  @override
+  String get donationRetentionFinancialMessage =>
+      'Si estás experimentando dificultades financieras, lo entendemos. Pero si puedes continuar tu apoyo, incluso con una cantidad reducida, haría una diferencia significativa.';
+
+  @override
+  String get stayAsDonorButtonText => 'Permanecer como donante';
+
+  @override
+  String get continueToCancellationButtonText => 'Continuar a la cancelación';
+
+  @override
+  String get donationRetentionThankYouMessage =>
+      '¡Gracias! Tu apoyo continuo significa el mundo para nosotros y ayuda a millones de personas a acceder a la meditación.';
+
+  @override
+  String get errorNetworkMessage => 'No se puede conectar al servidor';
+
+  @override
+  String get errorNoInternetMessage => 'Sin conexión a internet';
+
+  @override
+  String get errorTimeoutMessage => 'Tiempo de conexión agotado';
+
+  @override
+  String get errorUnauthorizedMessage =>
+      'Sesión expirada, por favor inicia sesión de nuevo';
+
+  @override
+  String get errorNotFoundMessage => 'Contenido no encontrado';
+
+  @override
+  String get errorServerMessage =>
+      'Error del servidor, por favor inténtalo más tarde';
+
+  @override
+  String get errorUnknownMessage =>
+      'Algo salió mal, por favor inténtalo de nuevo';
+
+  @override
+  String get inactiveEmailError =>
+      'Esta dirección de correo electrónico actualmente no puede recibir mensajes debido a restricciones del proveedor de correo electrónico o problemas de entrega. Por favor intenta usar una dirección de correo electrónico diferente.';
+
+  @override
+  String get enableDndDuringMeditation =>
+      'Silenciar teléfono durante la meditación';
+
+  @override
+  String get donateToMedito => 'Donar Ahora';
+
+  @override
+  String get currency => 'Moneda';
+
+  @override
+  String get custom => 'Cantidad Personalizada';
+
+  @override
+  String get payWithPaypal => 'Donar con PayPal';
+
+  @override
+  String get bankTransfer => 'Transferencia Bancaria';
+
+  @override
+  String get changeCurrency => 'Cambiar Moneda';
+
+  @override
+  String get chooseAmount => 'Elige una cantidad';
+
+  @override
+  String get otherPaymentMethods => 'Otros métodos de donación';
+
+  @override
+  String get donationSecurityMessage =>
+      'Todas las donaciones se procesan de forma segura. Somos una organización sin fines de lucro registrada dedicada a hacer la meditación accesible para todos.';
+
+  @override
+  String get donationImpactTitle => 'Tu donación nos ayuda a:';
+
+  @override
+  String get donationImpactPoints =>
+      '• Crear contenido de meditación gratuito nuevo\\n• Mantener la aplicación sin anuncios\\n• Hacer el bienestar mental accesible para todos\\n• Nos ayuda a mantener la meditación gratis para todos';
+
+  @override
+  String get donationSecurityInfo =>
+      'No vendemos ni intercambiamos tu información con nadie.';
+
+  @override
+  String get foundationRegistrationInfo =>
+      'Fundación Medito o en holandés, Stichting Medito es una organización sin fines de lucro registrada en los Países Bajos.';
+
+  @override
+  String get foundationContactInfo =>
+      'KvK-nummer: 75284251 - RSIN: 860222627 - Email: hello@meditofoundation.org';
+
+  @override
+  String get redirectingToSecurePayment =>
+      'Redirigiendo a una página de pago segura...';
+
+  @override
+  String get couldNotOpenDonationPage =>
+      'No se pudo abrir la página de donación.';
+
+  @override
+  String get monthlyDonation => 'Mensual';
+
+  @override
+  String get singleDonation => 'Una vez';
+
+  @override
+  String get monthlyDonationImpact =>
+      '£10/mes puede llevar meditación a cientos, ayudando a combatir la depresión y la ansiedad.';
+
+  @override
+  String get oneTimeDonationImpact =>
+      'Tu donación apoya directamente recursos de atención plena gratuitos, trayendo paz a miles hoy.';
+
+  @override
+  String get impactCardHelpMessage =>
+      'Ayuda a millones en todo el mundo a acceder a meditación gratuita';
+
+  @override
+  String get impactCardTestimonial =>
+      '\"Medito me ayudó a superar un período realmente oscuro en mi vida\" - Meditador de Medito';
+
+  @override
+  String get favorites => 'Favoritos';
+
+  @override
+  String get noFavoriteTracksYet => 'Aún no hay pistas favoritas';
+
+  @override
+  String get noFavoritePacksYet => 'Aún no hay paquetes favoritos';
+
+  @override
+  String get noFavoritesYet => 'Aún no hay favoritos';
+
+  @override
+  String get addItemsToFavoritesMessage =>
+      'Agrega elementos a tus favoritos para verlos aquí';
+
+  @override
+  String get all => 'Todos';
+
+  @override
+  String get tracks => 'Pistas';
+
+  @override
+  String get packs => 'Paquetes';
+
+  @override
+  String get shopTitle => 'Tienda';
+
+  @override
+  String get emailExistsDialogTitle => 'Cuenta Existente Encontrada';
+
+  @override
+  String get emailExistsDialogMessage =>
+      'Parece que has iniciado sesión con una dirección de correo electrónico antes. ¿Te gustaría iniciar sesión con tu dirección de correo electrónico otra vez?';
+
+  @override
+  String get emailExistsContinueNewAccount => 'Continuar';
+
+  @override
+  String get emailExistsSignInWithEmail =>
+      'Iniciar sesión con Correo Electrónico';
+
+  @override
+  String get analyticsTrackingTitle => 'Recolección de Datos';
+
+  @override
+  String get analyticsTrackingContent =>
+      'Recopilamos datos de uso anónimos para ayudarnos a mejorar la aplicación. No se recopila información personal.';
+
+  @override
+  String get turnOffAnalyticsText => 'Desactivar Análisis';
+
+  @override
+  String get turnOnAnalyticsText => 'Activar Análisis';
+
+  @override
+  String get analyticsDisabledMessage =>
+      'El seguimiento de análisis ha sido deshabilitado';
+
+  @override
+  String get analyticsEnabledMessage =>
+      'El seguimiento de análisis ha sido habilitado';
+
+  @override
+  String get iosTrackingDialogTitle => 'Recolección de Datos';
+
+  @override
+  String get iosTrackingDialogContent =>
+      'Esto deshabilitará el seguimiento de análisis en la aplicación. Ten en cuenta que también puedes controlar los permisos de seguimiento a nivel del sistema en tu Configuración de iOS bajo Privacidad y Seguridad > Seguimiento.';
+
+  @override
+  String get iosTrackingDialogCancel => 'Cancelar';
+
+  @override
+  String get iosTrackingDialogDisable => 'Deshabilitar Seguimiento';
+
+  @override
+  String get newProductLabel => 'NUEVO';
+
+  @override
+  String get packsSectionHeader => 'Paquetes';
+
+  @override
+  String get tracksSectionHeader => 'Pistas';
+
+  @override
+  String get noResultsFound => 'No se encontraron resultados para tu búsqueda';
+
+  @override
+  String get statsWelcomeTitle => '¡Presentamos la Puntuación de Consistencia!';
+
+  @override
+  String get statsWelcomeMessage =>
+      'Hemos agregado una puntuación de consistencia para ayudarte a sentirte más realizado. A diferencia de las rachas, no se reinicia en días perdidos, reflejando tu dedicación general.\\n\\nTu pantalla de inicio mostrará tu mejor puntuación para mantenerte motivado.';
+
+  @override
+  String get accountDeletionInitiated =>
+      'Proceso de eliminación de cuenta iniciado. Por favor completa los pasos en tu navegador.';
+
+  @override
+  String get reportError => 'Reportar Error';
+
+  @override
+  String get errorReportedMessage => 'Gracias, tu reporte ha sido enviado.';
+
+  @override
+  String get language => 'Idioma';
+
+  @override
+  String get languageSubtitle => 'Cambiar idioma de la aplicación';
+
+  @override
+  String get selectLanguage => 'Seleccionar idioma';
+
+  @override
+  String get systemLanguage => 'Sistema';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get spanish => 'Español';
+
+  @override
+  String get reportTrack => 'Reportar Track';
+
+  @override
+  String get reportForThisTrack => 'Reportar para este track';
+
+  @override
+  String get reportAtCurrentPosition => 'Reportar en';
+
+  @override
+  String reportTrackDescription(String trackTitle) {
+    return 'Reportar un problema con \"$trackTitle\"';
+  }
+
+  @override
+  String get reportDialogQuestion => '¿Qué te gustaría reportar?';
+
+  @override
+  String get storageReadError => 'Error al leer datos del almacenamiento local';
+
+  @override
+  String get accountInactiveError => 'La cuenta está inactiva';
+
+  @override
+  String get rateLimitError => 'Algo salió mal';
+
+  @override
+  String get backgroundSoundNone => 'Ninguno';
+
+  @override
+  String get customAmount => 'Cantidad Personalizada';
+
+  @override
+  String get debugInfoLabel => 'Información de depuración';
+
+  @override
+  String get fieldRequiredError => 'Campo requerido';
+
+  @override
+  String get invalidInputError => 'Entrada inválida';
+
+  @override
+  String get connectivityErrorMessage =>
+      'Asegúrate de estar conectado a internet para usar Medito';
+
+  @override
+  String get timeoutErrorMessage =>
+      '¡Ups! Parece que hubo un error. Si el problema persiste, cierra la aplicación e inténtalo de nuevo.';
+
+  @override
+  String get anErrorOccurredMessage =>
+      'Ocurrió un error desconocido. O tenemos problemas o estás sin conexión.';
+
+  @override
+  String get helpLegalSection => 'Ayuda y Legal';
+
+  @override
+  String get supportCommunitySection => 'Apoyo y Comunidad';
+
+  @override
+  String get customizationSection => 'Personalización';
+}

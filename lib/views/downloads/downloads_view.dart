@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/utils/duration_extensions.dart';
@@ -50,7 +51,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
               },
             ),
       appBar: MeditoAppBarSmall(
-        title: StringConstants.downloads,
+        title: AppLocalizations.of(context)!.downloads,
         closePressed: () {
           if (Navigator.canPop(context)) {
             Navigator.pop(context);
@@ -111,8 +112,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  Widget _getEmptyWidget() => const EmptyStateWidget(
-        message: StringConstants.emptyDownloadsMessage,
+  Widget _getEmptyWidget() => EmptyStateWidget(
+        message: AppLocalizations.of(context)!.emptyDownloadsMessage,
       );
 
   Widget _getSlidingItem(TrackModel item) {
@@ -193,22 +194,22 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(StringConstants.confirmDeletionTitle),
+          title: Text(AppLocalizations.of(context)!.confirmDeletionTitle),
           content: Text(
-            '${StringConstants.confirmDeletionMessage} ${item.title}?',
+            '${AppLocalizations.of(context)!.confirmDeletionMessage} ${item.title}?',
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: const Text(StringConstants.cancel),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: const Text(StringConstants.delete),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         );
@@ -220,7 +221,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         ref.read(removeDownloadedTrackProvider(track: item));
       }
       createSnackBar(
-        '"${item.title}" ${StringConstants.removed.toLowerCase()}',
+        '"${item.title}" ${AppLocalizations.of(context)!.removed.toLowerCase()}',
         context,
         color: ColorConstants.white,
       );

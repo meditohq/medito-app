@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/main.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/track/track_model.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
@@ -46,7 +47,7 @@ class PlayerActionBar extends StatelessWidget {
         child: _buildBackgroundSoundWidget(),
         onTap: trackModel.hasBackgroundSound
             ? () {}
-            : _showBackgroundSoundDisabledMessage,
+            : () => _showBackgroundSoundDisabledMessage(context),
       ),
       rightItem: BottomActionBarItem(
         child: AudioSpeedWidget(onSpeedChanged: onSpeedChanged),
@@ -68,10 +69,10 @@ class PlayerActionBar extends StatelessWidget {
           );
   }
 
-  void _showBackgroundSoundDisabledMessage() {
+  void _showBackgroundSoundDisabledMessage(BuildContext context) {
     scaffoldMessengerKey.currentState?.showSnackBar(
-      const SnackBar(
-        content: Text(StringConstants.backgroundSoundsDisabled),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.backgroundSoundsDisabled),
       ),
     );
   }

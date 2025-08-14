@@ -12,7 +12,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:intl/intl.dart';
 
-import '../../constants/strings/string_constants.dart';
 import '../../models/device_info/device_and_app_info_model.dart';
 import '../../models/me/me_model.dart';
 import '../me/me_provider.dart';
@@ -104,20 +103,15 @@ String _formatBasicInfo(
   String? emailAddress,
 ) {
   var isProdString = contentBaseUrl.contains('dev') ? 'Dev' : 'Prod';
-  var env = '${StringConstants.env}: $isProdString';
-  var id = '${StringConstants.id}: ${me?.id ?? ''}';
-  var appVersion =
-      '${StringConstants.appVersion}: ${deviceInfo?.appVersion ?? ''}';
-  var buildNumber =
-      '${StringConstants.buildNumber}: ${deviceInfo?.buildNumber ?? ''}';
-  var deviceOs = '${StringConstants.deviceOs}: ${deviceInfo?.os ?? ''}';
-  var deviceModel =
-      '${StringConstants.deviceModel}: ${deviceInfo?.model ?? ''}';
-  var devicePlatform =
-      '${StringConstants.devicePlatform}: ${deviceInfo?.platform ?? ''}';
-  var email = '${StringConstants.email}: ${emailAddress ?? ''}';
-  var isMonthlyDonorString =
-      '${StringConstants.isMonthlyDonor}: ${me?.hasActiveSubscription ?? false}';
+  var env = 'env: $isProdString';
+  var id = 'id: ${me?.id ?? ''}';
+  var appVersion = 'appVersion: ${deviceInfo?.appVersion ?? ''}';
+  var buildNumber = 'buildNumber: ${deviceInfo?.buildNumber ?? ''}';
+  var deviceOs = 'deviceOs: ${deviceInfo?.os ?? ''}';
+  var deviceModel = 'deviceModel: ${deviceInfo?.model ?? ''}';
+  var devicePlatform = 'devicePlatform: ${deviceInfo?.platform ?? ''}';
+  var email = 'email: ${emailAddress ?? ''}';
+  var isMonthlyDonorString = 'd: ${me?.hasActiveSubscription ?? false}';
 
   return '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$isMonthlyDonorString';
 }

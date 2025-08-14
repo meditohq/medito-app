@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../constants/strings/string_constants.dart';
 import '../../models/background_sounds/background_sounds_model.dart';
 import '../../repositories/background_sounds/background_sounds_repository.dart';
 import '../../repositories/downloader/downloader_repository.dart';
@@ -83,7 +82,8 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
       bgSoundRepoProvider.saveSelectedBgSoundToSharedPreferences(sound);
       _updateItemsInSavedBgSoundList(sound);
 
-      if (sound.title != StringConstants.none) {
+      if (sound.title != 'None') {
+        // This will be localized in the UI layer
         var fileName = '${sound.title}.mp3';
         AppLogger.d('BG_SOUND', 'File name: $fileName');
         final downloadAudio = ref.read(downloaderRepositoryProvider);

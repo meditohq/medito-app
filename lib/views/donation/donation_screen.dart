@@ -11,6 +11,7 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:medito/widgets/impact_card.dart';
+import 'package:medito/l10n/app_localizations.dart';
 
 final _selectedCurrencyProvider = StateProvider<String>((ref) {
   final deviceInfoAsync = ref.watch(deviceAndAppInfoProvider);
@@ -84,7 +85,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                 color: Colors.white, size: 18),
             const SizedBox(width: 8),
             Text(
-              Platform.isIOS ? StringConstants.donateTitle : StringConstants.donateToMedito,
+              Platform.isIOS
+                  ? AppLocalizations.of(context)!.donateTitle
+                  : AppLocalizations.of(context)!.donateToMedito,
               style: Theme.of(context).textTheme.displayLarge,
             ),
           ],
@@ -126,9 +129,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                                   : BorderSide(color: ColorConstants.softGrey),
                               elevation: 0,
                             ),
-                            child: const Text(
-                              StringConstants.monthlyDonation,
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.monthlyDonation,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -157,7 +160,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                               elevation: 0,
                             ),
                             child: Text(
-                              StringConstants.singleDonation,
+                              AppLocalizations.of(context)!.singleDonation,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -172,7 +175,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                     Text(
                       isMonthlyDonationVisible
                           ? '$symbol$amount/month can help 100 people meditate every day.'
-                          : StringConstants.oneTimeDonationImpact,
+                          : AppLocalizations.of(context)!.oneTimeDonationImpact,
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
@@ -193,7 +196,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                     ),
                     const SizedBox(height: 32),
                     Text(
-                      StringConstants.otherPaymentMethods,
+                      AppLocalizations.of(context)!.otherPaymentMethods,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -243,7 +246,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  StringConstants.donationSecurityMessage,
+                  AppLocalizations.of(context)!.donationSecurityMessage,
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
@@ -324,8 +327,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       amounts['10'] = 'https://buy.stripe.com/5kAg0kbPT0zl2wE14G';
       amounts['15'] = 'https://buy.stripe.com/6oE01m6vzgyj0ow4gT';
       amounts['25'] = 'https://buy.stripe.com/14k6pK4nr1Dp9Z67t6';
-      amounts[StringConstants.custom] =
-          'https://donate.stripe.com/fZeg0kf25dm79Z63cx';
+      amounts['Custom Amount'] = 'https://donate.stripe.com/fZeg0kf25dm79Z63cx';
     }
 
     if (currency == 'GBP') {
@@ -334,8 +336,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       amounts['10'] = 'https://buy.stripe.com/aEU15qbPTfufdbi00H';
       amounts['15'] = 'https://buy.stripe.com/9AQ5lG7zDeqb6MU8xe';
       amounts['25'] = 'https://buy.stripe.com/28o3dy6vz95R0ow4gZ';
-      amounts[StringConstants.custom] =
-          'https://donate.stripe.com/aEUcO85rvbdZ1sA7sO';
+      amounts['Custom Amount'] = 'https://donate.stripe.com/aEUcO85rvbdZ1sA7sO';
     }
 
     if (currency == 'INR') {
@@ -344,8 +345,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       amounts['816'] = 'https://buy.stripe.com/eVaaG007b95RgnuaFA';
       amounts['1225'] = 'https://buy.stripe.com/cN27tO3jn2Htc7e151';
       amounts['2042'] = 'https://buy.stripe.com/28og0kdY11Dpb3a152';
-      amounts[StringConstants.custom] =
-          'https://donate.stripe.com/dR66pK8DH3Lxb3a8wU';
+      amounts['Custom Amount'] = 'https://donate.stripe.com/dR66pK8DH3Lxb3a8wU';
     }
 
     if (currency == 'EUR') {
@@ -354,8 +354,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       amounts['10'] = 'https://buy.stripe.com/28o9BW7zD0zlc7e14V';
       amounts['15'] = 'https://buy.stripe.com/6oE8xS9HLci3efm4h8';
       amounts['25'] = 'https://buy.stripe.com/14kcO807bdm73AIfZR';
-      amounts[StringConstants.custom] =
-          'https://donate.stripe.com/6oE7tOg696XJ7QYcN6';
+      amounts['Custom Amount'] = 'https://donate.stripe.com/6oE7tOg696XJ7QYcN6';
     }
 
     if (currency == 'AUD') {
@@ -364,8 +363,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       amounts['16'] = 'https://buy.stripe.com/28o15q3jn2Ht2wE3dd';
       amounts['24'] = 'https://buy.stripe.com/6oE8xScTX95R9Z67tu';
       amounts['40'] = 'https://buy.stripe.com/28o6pK3jn1Dp0ow157';
-      amounts[StringConstants.custom] =
-          'https://donate.stripe.com/cN215qaLP81N4EM8x5';
+      amounts['Custom Amount'] = 'https://donate.stripe.com/cN215qaLP81N4EM8x5';
     }
 
     if (currency == 'CAD') {
@@ -374,8 +372,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       amounts['10'] = 'https://buy.stripe.com/eVa15q9HLa9Vb3abJu';
       amounts['15'] = 'https://buy.stripe.com/4gweWg07ba9V2wE00N';
       amounts['25'] = 'https://buy.stripe.com/bIYcO88DH2Ht2wEfZM';
-      amounts[StringConstants.custom] =
-          'https://donate.stripe.com/28o4hCdY1gyj7QY14r';
+      amounts['Custom Amount'] = 'https://donate.stripe.com/28o4hCdY1gyj7QY14r';
     }
 
     final currencySymbols = {
@@ -401,7 +398,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
             mainAxisSpacing: 16,
             childAspectRatio: 2.5,
             children: amounts.entries
-                .where((entry) => entry.key != StringConstants.custom)
+                .where((entry) => entry.key != 'Custom Amount')
                 .toList()
                 .reversed
                 .map((entry) {
@@ -425,9 +422,8 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
         children: [
           _buildDonationAmountButton(
             context,
-            StringConstants.custom,
-            () => _handleDonationAction(
-                context, amounts[StringConstants.custom]!),
+            AppLocalizations.of(context)!.custom,
+            () => _handleDonationAction(context, amounts['Custom Amount']!),
           ),
         ],
       );
@@ -439,13 +435,13 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       children: [
         _buildOtherPaymentButton(
           context,
-          StringConstants.payWithPaypal,
+          AppLocalizations.of(context)!.payWithPaypal,
           'https://paypal.me/meditofoundation',
         ),
         const SizedBox(height: 12),
         _buildOtherPaymentButton(
           context,
-          StringConstants.bankTransfer,
+          AppLocalizations.of(context)!.bankTransfer,
           'https://meditofoundation.org/about/bank-details',
         ),
       ],
@@ -525,8 +521,8 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          StringConstants.donationSecurityInfo,
+        Text(
+          AppLocalizations.of(context)!.donationSecurityInfo,
           style: TextStyle(
             color: Colors.white70,
             fontSize: 12,
@@ -534,8 +530,8 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          StringConstants.foundationRegistrationInfo,
+        Text(
+          AppLocalizations.of(context)!.foundationRegistrationInfo,
           style: TextStyle(
             color: Colors.white70,
             fontSize: 12,
@@ -543,8 +539,8 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          StringConstants.foundationContactInfo,
+        Text(
+          AppLocalizations.of(context)!.foundationContactInfo,
           style: TextStyle(
             color: Colors.white70,
             fontSize: 12,
@@ -558,7 +554,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
   void _handleDonationAction(BuildContext context, String url) async {
     showSnackBar(
       context,
-      StringConstants.redirectingToSecurePayment,
+      AppLocalizations.of(context)!.redirectingToSecurePayment,
     );
 
     await Future.delayed(Duration(milliseconds: 2));
@@ -569,7 +565,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
     } else {
       showSnackBar(
         context,
-        StringConstants.couldNotOpenDonationPage,
+        AppLocalizations.of(context)!.couldNotOpenDonationPage,
       );
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/logger.dart';
 
 import '../../providers/home/home_provider.dart';
@@ -67,7 +68,8 @@ class _HomeViewState extends ConsumerState<HomeView>
           appBar: AppBar(
             toolbarHeight: 56.0,
             title: HeaderWidget(
-              greeting: homeData.greeting ?? StringConstants.welcome,
+              greeting:
+                  homeData.greeting ?? AppLocalizations.of(context)!.welcome,
               onStatsButtonTap: () => _onStatsButtonTapped(context),
             ),
             elevation: 0.0,
@@ -113,10 +115,7 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Widget _getProductsWidget() {
-    AppLogger.d('HomeView', '_getProductsWidget called');
     final products = ref.watch(productsProvider);
-
-    AppLogger.d('HomeView', 'productsProvider state: ${products.toString()}');
 
     return products.when(
       loading: () {
@@ -124,24 +123,15 @@ class _HomeViewState extends ConsumerState<HomeView>
         return const SizedBox(height: 230);
       },
       error: (err, stack) {
-        AppLogger.e('HomeView', 'Error loading products: ${err.toString()}',
-            err, stack);
         return const SizedBox.shrink();
       },
       data: (List<ProductGroupModel> productGroups) {
-        AppLogger.i('HomeView',
-            'Products loaded successfully, count: ${productGroups.length}');
-
+     
         // Shuffle the order of product groups
         var shuffledProducts = List<ProductGroupModel>.from(productGroups)
           ..shuffle();
 
-        AppLogger.d('HomeView', 'Products shuffled for display');
 
-        if (shuffledProducts.isNotEmpty) {
-          AppLogger.d('HomeView',
-              'First product group after shuffle: ${shuffledProducts.first.name}');
-        }
 
         return ProductsWidget(
           key: ValueKey(HomeWidgetType.products.name),

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/colors/color_constants.dart';
-import '../../constants/strings/string_constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 
 class MaintenanceView extends ConsumerStatefulWidget {
   const MaintenanceView({super.key, required this.maintenanceModel});
@@ -42,9 +42,9 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                       const SizedBox(
                         height: 24,
                       ),
-                      const Text(
-                        StringConstants.hey,
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.hey,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
                           fontWeight: FontWeight.w600,

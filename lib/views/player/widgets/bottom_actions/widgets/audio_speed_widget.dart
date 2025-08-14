@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,27 +13,22 @@ class AudioSpeedWidget extends ConsumerStatefulWidget {
 }
 
 class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
-  String _label = StringConstants.x1;
+  static const List<double> _speedOptions = [0.6, 0.7, 0.8, 0.9, 1.0];
+  int _currentIndex = 4; // Start at 1.0x
+
+  double get _currentSpeed => _speedOptions[_currentIndex];
 
   @override
   Widget build(BuildContext context) {
-    var isSelected = _label != StringConstants.x1;
+    var isSelected = _currentSpeed != 1.0;
 
     return GestureDetector(
       onTap: () {
-        if (_label == StringConstants.x06) {
-          _label = StringConstants.x07;
-        } else if (_label == StringConstants.x07) {
-          _label = StringConstants.x08;
-        } else if (_label == StringConstants.x08) {
-          _label = StringConstants.x09;
-        } else if (_label == StringConstants.x09) {
-          _label = StringConstants.x1;
-        } else if (_label == StringConstants.x1) {
-          _label = StringConstants.x06;
-        }
+        setState(() {
+          _currentIndex = (_currentIndex + 1) % _speedOptions.length;
+        });
 
-        widget.onSpeedChanged(_label.toDouble);
+        widget.onSpeedChanged(_currentSpeed);
       },
       child: IntrinsicWidth(
         child: Container(
@@ -46,7 +42,7 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
                 )
               : null,
           child: Text(
-            _getFormattedLabel(),
+            '${_currentSpeed.toStringAsFixed(1)}×',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: ColorConstants.white,
                   fontFamily: dmMono,
@@ -58,24 +54,4 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
       ),
     );
   }
-
-  String _getFormattedLabel() {
-    if (_label == StringConstants.x06) {
-      return '0.6×';
-    } else if (_label == StringConstants.x07) {
-      return '0.7×';
-    } else if (_label == StringConstants.x08) {
-      return '0.8×';
-    } else if (_label == StringConstants.x09) {
-      return '0.9×';
-    } else if (_label == StringConstants.x1) {
-      return '1.0×';
-    } else {
-      return _label;
-    }
-  }
-}
-
-extension on String {
-  double get toDouble => double.parse(substring(1));
 }

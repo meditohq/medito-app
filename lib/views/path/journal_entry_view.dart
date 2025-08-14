@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../constants/strings/string_constants.dart';
+import '../../l10n/app_localizations.dart';
 
 class JournalEntryView extends ConsumerStatefulWidget {
   final String taskId;
@@ -38,7 +38,7 @@ class JournalEntryViewState extends ConsumerState<JournalEntryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(StringConstants.journalEntry),
+        title: Text(AppLocalizations.of(context)!.journalEntry),
         actions: [
           _isSaving
               ? const Center(child: CircularProgressIndicator())
@@ -55,7 +55,7 @@ class JournalEntryViewState extends ConsumerState<JournalEntryView> {
           maxLines: null,
           expands: true,
           decoration: InputDecoration(
-            hintText: StringConstants.writeYourJournalEntryHere,
+            hintText: AppLocalizations.of(context)!.writeYourJournalEntryHere,
             border: InputBorder.none,
           ),
         ),
@@ -68,7 +68,6 @@ class JournalEntryViewState extends ConsumerState<JournalEntryView> {
       _isSaving = true;
     });
 
-   
     setState(() {
       _isSaving = false;
     });

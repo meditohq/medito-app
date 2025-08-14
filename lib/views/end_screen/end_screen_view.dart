@@ -1,5 +1,6 @@
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
@@ -187,8 +188,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 ),
               ),
             ),
-            const Text(
-              StringConstants.dayStreak,
+            Text(
+              AppLocalizations.of(context)!.dayStreak,
               style: TextStyle(
                 fontFamily: teachers,
                 fontSize: 40,
@@ -208,10 +209,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
               ),
             ),
             const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                StringConstants.dailyPracticeMessage,
+                AppLocalizations.of(context)!.dailyPracticeMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: teachers,
@@ -258,19 +259,19 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
     var dayLetters = lastFiveDays.map((day) {
       switch (day.weekday) {
         case 1:
-          return StringConstants.monday;
+          return AppLocalizations.of(context)!.monday;
         case 2:
-          return StringConstants.tuesday;
+          return AppLocalizations.of(context)!.tuesday;
         case 3:
-          return StringConstants.wednesday;
+          return AppLocalizations.of(context)!.wednesday;
         case 4:
-          return StringConstants.thursday;
+          return AppLocalizations.of(context)!.thursday;
         case 5:
-          return StringConstants.friday;
+          return AppLocalizations.of(context)!.friday;
         case 6:
-          return StringConstants.saturday;
+          return AppLocalizations.of(context)!.saturday;
         case 7:
-          return StringConstants.sunday;
+          return AppLocalizations.of(context)!.sunday;
         default:
           return '';
       }

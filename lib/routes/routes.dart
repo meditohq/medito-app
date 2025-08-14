@@ -50,7 +50,7 @@ Future<void> handleNavigation(
       await _pushRoute(PackView(id: packId), ref);
     }
   } else if (type == TypeConstants.url || type == TypeConstants.link) {
-    final url = ids.last ?? StringConstants.meditoUrl;
+    final url = ids.last ?? 'https://meditofoundation.org/';
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       Navigator.push(
@@ -90,11 +90,12 @@ Future<void> handleNavigation(
     await _pushRoute(const HelpScreen(), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.donation)) {
-         if (await canLaunchUrl(Uri.parse(StringConstants.donationFormUrl))) {
+    if (await canLaunchUrl(Uri.parse('https://meditofoundation.org/donate'))) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => _URLLauncherScreen(url: Uri.parse(StringConstants.donationFormUrl)),
+          builder: (context) => _URLLauncherScreen(
+              url: Uri.parse('https://meditofoundation.org/donate')),
         ),
       );
     }
@@ -126,7 +127,7 @@ Future<void> _handleEmailNavigation(List<String?> ids, WidgetRef? ref) async {
     var deviceAppAndUserInfo =
         await ref.read(deviceAppAndUserInfoProvider.future);
     var info =
-        '${StringConstants.debugInfo}\n$deviceAppAndUserInfo\n${StringConstants.writeBelowThisLine}';
+        'Debug info\n$deviceAppAndUserInfo\n--- Write below this line ---'; // These will be localized in the UI layer
     var emailAddress = ids.first!;
     await launchEmailSubmission(emailAddress, body: info);
   }

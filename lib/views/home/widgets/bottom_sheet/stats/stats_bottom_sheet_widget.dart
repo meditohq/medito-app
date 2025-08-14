@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
@@ -118,7 +118,8 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    StringConstants.statsWelcomeTitle,
+                                    AppLocalizations.of(context)!
+                                        .statsWelcomeTitle,
                                     style: TextStyle(
                                       color: ColorConstants.white,
                                       fontSize: 16,
@@ -130,7 +131,8 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                StringConstants.statsWelcomeMessage,
+                                AppLocalizations.of(context)!
+                                    .statsWelcomeMessage,
                                 style: TextStyle(
                                   color: ColorConstants.white,
                                   fontSize: 14,
@@ -152,8 +154,9 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Got it',
-                                      style: TextStyle(fontSize: 14)),
+                                  child: Text(
+                                      AppLocalizations.of(context)!.gotIt,
+                                      style: const TextStyle(fontSize: 14)),
                                 ),
                               ),
                             ],
@@ -242,14 +245,17 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
     var minutes = (milliseconds % (1000 * 60 * 60)) ~/ (1000 * 60);
 
     if (hours > 0) {
-      var hourText =
-          hours == 1 ? StringConstants.hourFull : StringConstants.hoursFull;
-      var minuteText =
-          minutes == 1 ? StringConstants.minute : StringConstants.minutes;
+      var hourText = hours == 1
+          ? AppLocalizations.of(context)!.hourFull
+          : AppLocalizations.of(context)!.hoursFull;
+      var minuteText = minutes == 1
+          ? AppLocalizations.of(context)!.minute
+          : AppLocalizations.of(context)!.minutes;
       return '$hours $hourText ${minutes.toString().padLeft(2, '0')} $minuteText';
     } else {
-      var minuteText =
-          minutes == 1 ? StringConstants.minute : StringConstants.minutes;
+      var minuteText = minutes == 1
+          ? AppLocalizations.of(context)!.minute
+          : AppLocalizations.of(context)!.minutes;
       return '$minutes $minuteText';
     }
   }
@@ -268,16 +274,24 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
             children: [
               _buildStatRow(
                 context,
-                StringConstants.consistencyScore,
+                AppLocalizations.of(context)!.consistencyScore,
                 '${(stats.consistencyScore! * 100).round()}%',
               ),
-              _buildStatRow(context, StringConstants.currentStreak,
-                  '${stats.streakCurrent} ${stats.streakCurrent == 1 ? StringConstants.day : StringConstants.days}'),
-              _buildStatRow(context, StringConstants.longestStreak,
-                  '${stats.streakLongest} ${stats.streakLongest == 1 ? StringConstants.day : StringConstants.days}'),
-              _buildStatRow(context, StringConstants.totalTracksCompleted,
+              _buildStatRow(
+                  context,
+                  AppLocalizations.of(context)!.currentStreak,
+                  '${stats.streakCurrent} ${stats.streakCurrent == 1 ? AppLocalizations.of(context)!.day : AppLocalizations.of(context)!.days}'),
+              _buildStatRow(
+                  context,
+                  AppLocalizations.of(context)!.longestStreak,
+                  '${stats.streakLongest} ${stats.streakLongest == 1 ? AppLocalizations.of(context)!.day : AppLocalizations.of(context)!.days}'),
+              _buildStatRow(
+                  context,
+                  AppLocalizations.of(context)!.totalTracksCompleted,
                   '${stats.totalTracksCompleted}'),
-              _buildStatRow(context, StringConstants.totalTimeListened,
+              _buildStatRow(
+                  context,
+                  AppLocalizations.of(context)!.totalTimeListened,
                   _formatTotalTimeListened(stats.totalTimeListened)),
               _buildStreakCircleDisplayPreference(context, ref),
               _buildFreezeInfo(stats, context, ref),
@@ -289,13 +303,14 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () => Share.share(StringConstants.shareStatsText),
+              onPressed: () =>
+                  Share.share(AppLocalizations.of(context)!.shareStatsText),
               icon: HugeIcon(
                 icon: HugeIcons.solidRoundedShare08,
                 size: 20,
                 color: ColorConstants.white,
               ),
-              label: Text(StringConstants.share),
+              label: Text(AppLocalizations.of(context)!.share),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorConstants.lightPurple,
                 foregroundColor: ColorConstants.white,
@@ -345,7 +360,9 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                             .read(streakCircleDisplayProvider.notifier)
                             .setDisplayType(newType);
                         showSnackBar(
-                            context, StringConstants.displayPreferenceSaved);
+                            context,
+                            AppLocalizations.of(context)!
+                                .displayPreferenceSaved);
                       },
                       activeColor: ColorConstants.lightPurple,
                       checkColor: ColorConstants.white,
@@ -360,7 +377,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    StringConstants.alwaysShowStreakOnHomepage,
+                    AppLocalizations.of(context)!.alwaysShowStreakOnHomepage,
                     style: TextStyle(
                       color: ColorConstants.white,
                       fontSize: 14,
@@ -396,7 +413,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: Text(
-            '${stats.streakFreezes}/${stats.maxStreakFreezes} ${StringConstants.streakFreezesAvailable}',
+            '${stats.streakFreezes}/${stats.maxStreakFreezes} ${AppLocalizations.of(context)!.streakFreezesAvailable}',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: ColorConstants.lightPurple,
                   fontWeight: FontWeight.w600,
@@ -414,7 +431,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
-              child: Text(StringConstants.useStreakFreeze),
+              child: Text(AppLocalizations.of(context)!.useStreakFreeze),
             ),
           ),
       ],
@@ -461,6 +478,6 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
 
     ref.read(streakFreezeSuggestionProvider.notifier).useStreakFreeze();
     // Show a confirmation message
-    showSnackBar(context, StringConstants.freezeUsedMessage);
+    showSnackBar(context, AppLocalizations.of(context)!.freezeUsedMessage);
   }
 }

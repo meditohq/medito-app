@@ -2,6 +2,7 @@
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -138,7 +139,7 @@ class _DebugBottomSheetWidgetState
       mainAxisSize: MainAxisSize.min,
       children: [
         ElevatedButton(
-          child: const Text(StringConstants.copy),
+          child: Text(AppLocalizations.of(context)!.copy),
           onPressed: () => _handleCopy(context, info),
         ),
         _debugRowItem(
@@ -163,7 +164,7 @@ class _DebugBottomSheetWidgetState
 
   void _handleCopy(BuildContext context, String deviceInfo) {
     var info =
-        '${StringConstants.debugInfo}\n$deviceInfo\n${StringConstants.writeBelowThisLine}';
+        '${AppLocalizations.of(context)!.debugInfo}\n$deviceInfo\n${AppLocalizations.of(context)!.writeBelowThisLine}';
 
     // Only include auth logs in debug mode
     if (kDebugMode && _authLogs.isNotEmpty) {
@@ -172,8 +173,8 @@ class _DebugBottomSheetWidgetState
 
     Clipboard.setData(ClipboardData(text: info)).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(StringConstants.debugInfoCopied),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.debugInfoCopied),
           backgroundColor: ColorConstants.ebony,
         ),
       );

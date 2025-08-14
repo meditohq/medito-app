@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../constants/strings/string_constants.dart';
+import '../l10n/app_localizations.dart';
 
 class PermissionHandler {
   static const String _alarmPermissionDialogKey =
@@ -52,20 +52,21 @@ class PermissionHandler {
         builder: (context) => LayoutBuilder(
           builder: (context, constraints) {
             return AlertDialog(
-              title: const Text(StringConstants.reminderPermissions),
+              title: Text(AppLocalizations.of(context)!.reminderPermissions),
               content: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxHeight: constraints.maxHeight * 0.7,
                   maxWidth: constraints.maxWidth * 0.7,
                 ),
-                child: const SingleChildScrollView(
-                  child: Text(StringConstants.weNeedYourPermissionReminder),
+                child: SingleChildScrollView(
+                  child: Text(AppLocalizations.of(context)!
+                      .weNeedYourPermissionReminder),
                 ),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text(StringConstants.requestPermission),
+                  child: Text(AppLocalizations.of(context)!.requestPermission),
                 ),
               ],
             );
@@ -113,20 +114,22 @@ class PermissionHandler {
         builder: (context) => LayoutBuilder(
           builder: (context, constraints) {
             return AlertDialog(
-              title: const Text(StringConstants.mediaPlaybackPermissions),
+              title:
+                  Text(AppLocalizations.of(context)!.mediaPlaybackPermissions),
               content: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxHeight: constraints.maxHeight * 0.7,
                   maxWidth: constraints.maxWidth * 0.7,
                 ),
-                child: const SingleChildScrollView(
-                  child: Text(StringConstants.weNeedYourPermissionMedia),
+                child: SingleChildScrollView(
+                  child: Text(
+                      AppLocalizations.of(context)!.weNeedYourPermissionMedia),
                 ),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text(StringConstants.requestPermission),
+                  child: Text(AppLocalizations.of(context)!.requestPermission),
                 ),
               ],
             );

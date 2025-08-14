@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -58,7 +59,7 @@ class AccountSectionWidget extends ConsumerWidget {
               color: ColorConstants.white,
               size: 24,
             ),
-            title: StringConstants.signOutButtonText,
+            title: AppLocalizations.of(context)!.signOutButtonText,
             titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: ColorConstants.white,
                 ),
@@ -80,8 +81,9 @@ class AccountSectionWidget extends ConsumerWidget {
                     (route) => false,
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(StringConstants.signOutSuccessMessage),
+                    SnackBar(
+                      content: Text(
+                          AppLocalizations.of(context)!.signOutSuccessMessage),
                     ),
                   );
                 }
@@ -89,7 +91,8 @@ class AccountSectionWidget extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(StringConstants.signOutErrorMessage),
+                      content: Text(
+                          AppLocalizations.of(context)!.signOutErrorMessage),
                     ),
                   );
                 }
@@ -103,7 +106,7 @@ class AccountSectionWidget extends ConsumerWidget {
               color: ColorConstants.white,
               size: 24,
             ),
-            title: StringConstants.deleteAccountButtonText,
+            title: AppLocalizations.of(context)!.deleteAccountButtonText,
             titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: ColorConstants.white,
                 ),
@@ -113,27 +116,28 @@ class AccountSectionWidget extends ConsumerWidget {
                     context: context,
                     builder: (context) => AlertDialog(
                       backgroundColor: ColorConstants.ebony,
-                      title: const Text(
-                        StringConstants.deleteAccountTitle,
-                        style: TextStyle(color: Colors.white),
+                      title: Text(
+                        AppLocalizations.of(context)!.deleteAccountTitle,
+                        style: const TextStyle(color: Colors.white),
                       ),
-                      content: const Text(
-                        StringConstants.deleteAccountConfirmation,
-                        style: TextStyle(color: Colors.white70),
+                      content: Text(
+                        AppLocalizations.of(context)!.deleteAccountConfirmation,
+                        style: const TextStyle(color: Colors.white70),
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text(
-                            StringConstants.cancel,
-                            style: TextStyle(color: ColorConstants.brightSky),
+                          child: Text(
+                            AppLocalizations.of(context)!.cancel,
+                            style: const TextStyle(
+                                color: ColorConstants.brightSky),
                           ),
                         ),
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(true),
-                          child: const Text(
-                            StringConstants.delete,
-                            style: TextStyle(color: Colors.red),
+                          child: Text(
+                            AppLocalizations.of(context)!.delete,
+                            style: const TextStyle(color: Colors.red),
                           ),
                         ),
                       ],
@@ -161,8 +165,9 @@ class AccountSectionWidget extends ConsumerWidget {
                       (route) => false,
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(StringConstants.accountDeletionInitiated),
+                      SnackBar(
+                        content: Text(AppLocalizations.of(context)!
+                            .accountDeletionInitiated),
                       ),
                     );
                   }
@@ -171,7 +176,7 @@ class AccountSectionWidget extends ConsumerWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                            '${StringConstants.deleteAccountError} ${e.toString()}'),
+                            '${AppLocalizations.of(context)!.deleteAccountError} ${e.toString()}'),
                       ),
                     );
                   }
@@ -194,7 +199,7 @@ class AccountSectionWidget extends ConsumerWidget {
             color: ColorConstants.white,
             size: 24,
           ),
-          title: StringConstants.signInSignUp,
+          title: AppLocalizations.of(context)!.signInSignUp,
           titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: ColorConstants.white,
               ),

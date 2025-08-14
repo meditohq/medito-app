@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/providers/providers.dart';
@@ -100,13 +101,13 @@ class CustomiseHomeLayoutScreenState
   String _getTitleForType(HomeWidgetType type) {
     switch (type) {
       case HomeWidgetType.shortcuts:
-        return StringConstants.shortcutsTitle;
+        return AppLocalizations.of(context)!.shortcutsTitle;
       case HomeWidgetType.carousel:
-        return StringConstants.carouselTitle;
+        return AppLocalizations.of(context)!.carouselTitle;
       case HomeWidgetType.quote:
-        return StringConstants.quoteTitle;
+        return AppLocalizations.of(context)!.quoteTitle;
       case HomeWidgetType.products:
-        return StringConstants.meditationProducts;
+        return AppLocalizations.of(context)!.meditationProducts;
     }
   }
 }

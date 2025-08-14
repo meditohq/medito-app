@@ -29,4 +29,7 @@ class SharedPreferenceConstants {
   static const String isLoggedIn = 'is_logged_in';
 
   static const String hasActiveSubscription = 'has_active_subscription';
+
+  // Locale preference - stores the user's preferred language setting
+  static const String localePreference = 'locale_preference';
 }

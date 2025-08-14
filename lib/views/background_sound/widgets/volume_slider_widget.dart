@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,7 +17,7 @@ class VolumeSliderWidget extends ConsumerWidget {
     return SliderTheme(
       data: SliderThemeData(
         trackShape: BackgroundSoundVolumeTrackShapeWidget(
-          leadingTitle: StringConstants.volume,
+          leadingTitle: AppLocalizations.of(context)!.volume,
           tralingText: '${currentVolume.toString().split('.').first}%',
         ),
         overlayShape: const RoundSliderOverlayShape(overlayRadius: 0.0),

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/permission_handler.dart';
@@ -70,7 +71,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: initialTime,
-      helpText: StringConstants.pickTimeHelpText,
+      helpText: AppLocalizations.of(context)!.pickTimeHelpText,
     );
 
     if (pickedTime != null && mounted) {
@@ -100,7 +101,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               Column(
                 children: [
                   Text(
-                    StringConstants.enableNotificationsTitle,
+                    AppLocalizations.of(context)!.enableNotificationsTitle,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -110,7 +111,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    StringConstants.enableNotificationsBody,
+                    AppLocalizations.of(context)!.enableNotificationsBody,
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
@@ -126,12 +127,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     _buildTimeButton(reminderTime)
                   else if (_notificationsGranted)
                     _buildActionButton(
-                      text: StringConstants.setReminder,
+                      text: AppLocalizations.of(context)!.setReminder,
                       onPressed: _handleSetReminder,
                     )
                   else
                     _buildActionButton(
-                      text: StringConstants.enableNotificationsCta,
+                      text:
+                          AppLocalizations.of(context)!.enableNotificationsCta,
                       onPressed:
                           _isProcessing ? null : _handleNotificationsPermission,
                     ),
@@ -146,7 +148,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         ),
                       ),
                       child: Text(
-                        StringConstants.skipForNow,
+                        AppLocalizations.of(context)!.skipForNow,
                         style: const TextStyle(
                           color: ColorConstants.lightPurple,
                           fontSize: 16,
@@ -177,7 +179,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           ),
         ),
         child: Text(
-          '${StringConstants.setFor} ${reminderTime.format(context)}',
+          '${AppLocalizations.of(context)!.setFor} ${reminderTime.format(context)}',
         ),
       ),
     );

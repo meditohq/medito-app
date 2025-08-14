@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -43,8 +44,8 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
     var backgroundSounds = ref.watch(backgroundSoundsProvider);
 
     return Scaffold(
-      appBar: const MeditoAppBarSmall(
-        title: StringConstants.backgroundSounds,
+      appBar: MeditoAppBarSmall(
+        title: AppLocalizations.of(context)!.backgroundSounds,
       ),
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),

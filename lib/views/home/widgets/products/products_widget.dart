@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
-import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -44,10 +44,10 @@ class ProductsWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              StringConstants.meditationProducts,
+              AppLocalizations.of(context)!.meditationProducts,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w400,
@@ -213,7 +213,7 @@ class ProductGroupCard extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        StringConstants.newProductLabel,
+                        AppLocalizations.of(context)!.newProductLabel,
                         style: TextStyle(
                           color: ColorConstants.white,
                           fontSize: 10,

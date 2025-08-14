@@ -50,7 +50,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
       final sounds = [
         const BackgroundSoundsModel(
           id: '0',
-          title: StringConstants.none,
+          title: 'None', // This will be localized in the UI layer
           duration: 0,
           path: '',
         ),

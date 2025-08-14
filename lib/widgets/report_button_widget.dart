@@ -1,0 +1,48 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../constants/colors/color_constants.dart';
+import '../models/track/track_model.dart';
+import '../providers/player/audio_state_provider.dart';
+import 'report_dialog_widget.dart';
+
+/// Button widget for reporting track issues
+class ReportButtonWidget extends ConsumerWidget {
+  final TrackModel track;
+
+  const ReportButtonWidget({
+    super.key,
+    required this.track,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      onPressed: () => _showReportDialog(context, ref),
+      icon: const Icon(
+        Icons.flag_outlined,
+        color: ColorConstants.white,
+        size: 24,
+      ),
+      padding: const EdgeInsets.all(12),
+      constraints: const BoxConstraints(
+        minWidth: 48,
+        minHeight: 48,
+      ),
+    );
+  }
+
+  void _showReportDialog(BuildContext context, WidgetRef ref) {
+    // Capture the current position when the dialog is opened
+    final playbackState = ref.read(audioStateProvider);
+    final currentPosition = playbackState.position;
+
+    showDialog(
+      context: context,
+      builder: (context) => ReportDialogWidget(
+        track: track,
+        timestampAtOpen: currentPosition,
+      ),
+    );
+  }
+}

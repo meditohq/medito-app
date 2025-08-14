@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -160,26 +161,26 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
             context: context,
             builder: (context) => AlertDialog(
               backgroundColor: ColorConstants.ebony,
-              title: const Text(
-                StringConstants.accountTransitionWarningTitle,
-                style: TextStyle(color: Colors.white),
+              title: Text(
+                AppLocalizations.of(context)!.accountTransitionWarningTitle,
+                style: const TextStyle(color: Colors.white),
               ),
               content: Text(
-                StringConstants.loginWarningExplanation,
-                style: TextStyle(color: Colors.white70),
+                AppLocalizations.of(context)!.loginWarningExplanation,
+                style: const TextStyle(color: Colors.white70),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text(
-                    StringConstants.cancelAction,
-                    style: TextStyle(color: ColorConstants.brightSky),
+                  child: Text(
+                    AppLocalizations.of(context)!.cancelAction,
+                    style: const TextStyle(color: ColorConstants.brightSky),
                   ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text(
-                    StringConstants.continueLogin,
+                  child: Text(
+                    AppLocalizations.of(context)!.continueLogin,
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -381,10 +382,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildBenefitsText(StringConstants.createAccountBenefits),
+        _buildBenefitsText(AppLocalizations.of(context)!.createAccountBenefits),
         height64,
         Text(
-          StringConstants.emailVerificationText,
+          AppLocalizations.of(context)!.emailVerificationText,
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.white,
@@ -412,7 +413,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                 )
               : _isRateLimited
                   ? Text('Retry in $_retryAfterSeconds s')
-                  : const Text(StringConstants.sendMeMyPasswordText),
+                  : Text(AppLocalizations.of(context)!.sendMeMyPasswordText),
         ),
         _buildPrivacyPolicyLink(),
         SizedBox.square(
@@ -431,7 +432,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           TextSpan(
             children: [
               TextSpan(
-                text: '${StringConstants.otpInstructions}\n',
+                text: '${AppLocalizations.of(context)!.otpInstructions}\n',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -467,7 +468,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 )
-              : const Text(StringConstants.verifyOtpButtonText),
+              : Text(AppLocalizations.of(context)!.verifyOtpButtonText),
         ),
         height16,
         TextButton(
@@ -480,7 +481,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           child: Text(
             _isRateLimited
                 ? 'Resend code in $_retryAfterSeconds s'
-                : StringConstants.resendCode,
+                : AppLocalizations.of(context)!.resendCode,
             style: TextStyle(
               color: _isLoading || _isRateLimited
                   ? Colors.white38
@@ -498,9 +499,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       controller: _emailController,
       enabled: !_hasRequestedOtp,
       decoration: getInputDecoration(
-        StringConstants.emailLabel,
+        AppLocalizations.of(context)!.emailLabel,
         _isEmailValid || _emailController.text.isEmpty,
-        StringConstants.invalidEmailError,
+        AppLocalizations.of(context)!.invalidEmailError,
       ).copyWith(
         fillColor: Colors.white,
         filled: true,
@@ -524,9 +525,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     return TextField(
       controller: _otpController,
       decoration: getInputDecoration(
-        StringConstants.otpLabel,
+        AppLocalizations.of(context)!.otpLabel,
         _isOtpValid || _otpController.text.isEmpty,
-        StringConstants.invalidOtpError,
+        AppLocalizations.of(context)!.invalidOtpError,
       ).copyWith(
         fillColor: Colors.white,
         filled: true,

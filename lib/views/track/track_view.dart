@@ -3,6 +3,7 @@ import '../../../utils/logger.dart';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
@@ -497,13 +498,13 @@ class _TrackViewState extends ConsumerState<TrackView>
       bottomRight: 7,
       bottomLeft: 7,
       disabledLabelText:
-          '${convertDurationToMinutes(milliseconds: selectedFile.first.duration)} ${StringConstants.min}',
+          '${convertDurationToMinutes(milliseconds: selectedFile.first.duration)} ${AppLocalizations.of(context)!.min}',
       items: files(selectedFile).map<DropdownMenuItem<TrackFilesModel>>(
         (TrackFilesModel value) {
           return DropdownMenuItem<TrackFilesModel>(
             value: value,
             child: Text(
-              '${convertDurationToMinutes(milliseconds: value.duration)} ${StringConstants.min}',
+              '${convertDurationToMinutes(milliseconds: value.duration)} ${AppLocalizations.of(context)!.min}',
             ),
           );
         },

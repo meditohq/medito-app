@@ -2,6 +2,7 @@
 
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/utils/utils.dart';
@@ -170,9 +171,10 @@ class AudioDownloadWidget extends ConsumerWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(StringConstants.confirmDeletionFromPlayerTitle),
+          title: Text(
+              AppLocalizations.of(context)!.confirmDeletionFromPlayerTitle),
           content: Text(
-            '${StringConstants.confirmDeletionFromPlayerMessage} "${trackModel.title}"?',
+            '${AppLocalizations.of(context)!.confirmDeletionFromPlayerMessage} "${trackModel.title}"?',
           ),
           actions: <Widget>[
             TextButton(
@@ -180,14 +182,14 @@ class AudioDownloadWidget extends ConsumerWidget {
                 // User pressed the cancel button
                 Navigator.of(context).pop(false);
               },
-              child: const Text(StringConstants.cancel),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
                 // User pressed the delete button
                 Navigator.of(context).pop(true);
               },
-              child: const Text(StringConstants.delete),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         );

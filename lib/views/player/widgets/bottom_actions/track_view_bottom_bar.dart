@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' show Platform;
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../constants/strings/string_constants.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../models/favorites/favorite_item.dart';
 import '../../../../models/track/track_model.dart';
 import '../../../../providers/favorites/favorites_provider.dart';
@@ -27,11 +27,10 @@ class TrackViewBottomBar extends ConsumerWidget {
     required this.onBackPressed,
   });
 
-  void _shareTrack() {
+  void _shareTrack(BuildContext context) {
     final deepLink = 'https://medito.app/tracks/$trackId';
-    final shareText = StringConstants.shareTrackText
-        .replaceAll('{trackName}', trackTitle)
-        .replaceAll('{link}', deepLink);
+    final shareText =
+        AppLocalizations.of(context)!.shareTrackText(trackTitle, deepLink);
     Share.share(shareText);
   }
 
@@ -48,10 +47,10 @@ class TrackViewBottomBar extends ConsumerWidget {
               _buildBottomSheetTile(
                 context,
                 icon: HugeIcons.solidRoundedSiri,
-                title: StringConstants.addToSiri,
+                title: AppLocalizations.of(context)!.addToSiri,
                 onTap: () {
                   addToSiri(
-                    title: '${StringConstants.open} $trackTitle',
+                    title: '${AppLocalizations.of(context)!.open} $trackTitle',
                     id: trackId,
                     url: 'org.meditofoundation://tracks/$trackId',
                   );
@@ -63,9 +62,9 @@ class TrackViewBottomBar extends ConsumerWidget {
               icon: Platform.isIOS
                   ? HugeIcons.strokeRoundedShare05
                   : HugeIcons.strokeRoundedShare08,
-              title: StringConstants.share,
+              title: AppLocalizations.of(context)!.share,
               onTap: () {
-                _shareTrack();
+                _shareTrack(context);
                 Navigator.pop(context);
               },
             ),
@@ -169,7 +168,9 @@ class TrackViewBottomBar extends ConsumerWidget {
               : HugeIcons.strokeRoundedShare08,
           color: ColorConstants.white,
         ),
-        onTap: Platform.isIOS ? () => _showBottomSheet(context) : _shareTrack,
+        onTap: Platform.isIOS
+            ? () => _showBottomSheet(context)
+            : () => _shareTrack(context),
       ),
       rightItem: isDailyMeditation
           ? null

@@ -28,3 +28,9 @@ class RouteConstants {
   static const String help = 'help';
   static const String donation = 'donation';
 }
+
+class LocaleConstants {
+  static const String system = 'system';
+  static const String english = 'en';
+  static const String spanish = 'es';
+}

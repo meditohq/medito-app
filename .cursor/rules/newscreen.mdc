@@ -1,5 +1,14 @@
----
-description: Use this rule if we are creating a new screen
+New screens should put [single_back_action_bar.dart](mdc:lib/views/player/widgets/bottom_actions/single_back_action_bar.dart) in the bottom nav bar unless otherwise specified. No action bar button at the top, just a title.
+
+**UI strings** should be added to the ARB files:
+- **English**: `lib/l10n/app_en.arb`
+- **Spanish**: `lib/l10n/app_es.arb`
+- Use `AppLocalizations.of(context)!.yourKeyName` in the code
+- Import: `import 'package:medito/l10n/app_localizations.dart';`
+
+**Technical constants** (URLs, keys, identifiers) go in [string_constants.dart](mdc:lib/constants/strings/string_constants.dart) with a description of how they are used.
+
+Top bar titles should be [medito_app_bar_small.dart](mdc:lib/widgets/headers/medito_app_bar_small.dart)
 globs: 
 alwaysApply: false
 ---

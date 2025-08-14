@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:health/health.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-import '../../constants/strings/string_constants.dart';
 import '../../widgets/snackbar_widget.dart';
+import '../../l10n/app_localizations.dart';
 import '../home/widgets/bottom_sheet/row_item_widget.dart';
 
 class HealthSyncTile extends StatelessWidget {
@@ -17,7 +17,7 @@ class HealthSyncTile extends StatelessWidget {
       permissions: [HealthDataAccess.READ_WRITE],
     );
 
-    showSnackBar(context, StringConstants.permissionExplanation);
+    showSnackBar(context, AppLocalizations.of(context)!.permissionExplanation);
   }
 
   @override
@@ -27,7 +27,7 @@ class HealthSyncTile extends StatelessWidget {
         icon: HugeIcons.solidRoundedHealth,
         color: Colors.white,
       ),
-      title: StringConstants.syncWithHealth,
+      title: AppLocalizations.of(context)!.syncWithHealth,
       hasUnderline: true,
       isSwitch: false,
       onTap: () => _handleHealthSync(context),

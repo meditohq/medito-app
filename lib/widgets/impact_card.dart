@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 
 class ImpactCard extends StatelessWidget {
   const ImpactCard({super.key});
@@ -15,7 +16,7 @@ class ImpactCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            StringConstants.impactCardHelpMessage,
+            AppLocalizations.of(context)!.impactCardHelpMessage,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -25,7 +26,7 @@ class ImpactCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            StringConstants.impactCardTestimonial,
+            AppLocalizations.of(context)!.impactCardTestimonial,
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 14,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/favorites/favorite_item.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/pack/pack_model.dart';
@@ -16,16 +17,18 @@ enum FavoritesFilter {
   tracks,
   packs;
 
-  String get label => switch (this) {
-        FavoritesFilter.all => StringConstants.all,
-        FavoritesFilter.tracks => StringConstants.tracks,
-        FavoritesFilter.packs => StringConstants.packs,
+  String label(BuildContext context) => switch (this) {
+        FavoritesFilter.all => AppLocalizations.of(context)!.all,
+        FavoritesFilter.tracks => AppLocalizations.of(context)!.tracks,
+        FavoritesFilter.packs => AppLocalizations.of(context)!.packs,
       };
 
-  String get emptyStateMessage => switch (this) {
-        FavoritesFilter.tracks => StringConstants.noFavoriteTracksYet,
-        FavoritesFilter.packs => StringConstants.noFavoritePacksYet,
-        FavoritesFilter.all => StringConstants.noFavoritesYet,
+  String emptyStateMessage(BuildContext context) => switch (this) {
+        FavoritesFilter.tracks =>
+          AppLocalizations.of(context)!.noFavoriteTracksYet,
+        FavoritesFilter.packs =>
+          AppLocalizations.of(context)!.noFavoritePacksYet,
+        FavoritesFilter.all => AppLocalizations.of(context)!.noFavoritesYet,
       };
 }
 
@@ -56,8 +59,8 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
     final statsState = ref.watch(statsProvider);
 
     return Scaffold(
-      appBar: const MeditoAppBarSmall(
-        title: StringConstants.favorites,
+      appBar: MeditoAppBarSmall(
+        title: AppLocalizations.of(context)!.favorites,
         hasBackButton: true,
       ),
       bottomNavigationBar: SingleBackButtonActionBar(
@@ -99,13 +102,13 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            StringConstants.someThingWentWrong,
+            AppLocalizations.of(context)!.someThingWentWrong,
             style: const TextStyle(color: ColorConstants.white),
           ),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _onRefresh,
-            child: const Text('Retry'),
+            child: Text(AppLocalizations.of(context)!.retry),
           ),
         ],
       ),
@@ -139,13 +142,13 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              _currentFilter.emptyStateMessage,
+              _currentFilter.emptyStateMessage(context),
               style: const TextStyle(color: ColorConstants.white),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              StringConstants.addItemsToFavoritesMessage,
+              AppLocalizations.of(context)!.addItemsToFavoritesMessage,
               style: TextStyle(
                 color: ColorConstants.white.withOpacity(0.7),
               ),
@@ -218,7 +221,7 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
 
     return ChoiceChip(
       label: Text(
-        filter.label,
+        filter.label(context),
         style: const TextStyle(color: ColorConstants.white),
       ),
       selected: isSelected,

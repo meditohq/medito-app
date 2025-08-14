@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/colors/color_constants.dart';
-import 'package:medito/constants/strings/string_constants.dart';
+
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
 class QuoteWidget extends ConsumerStatefulWidget {
@@ -41,9 +42,9 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
           padding: const EdgeInsets.only(left: padding16, right: padding16),
           child: Row(
             children: [
-              const Text(
-                StringConstants.dailyQuote,
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.dailyQuote,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
                   fontFamily: teachers,
@@ -93,7 +94,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
     if (widget.data == null) return;
 
     final shareText =
-        '${widget.data?.quote}\n- ${widget.data?.author}\n\n${StringConstants.shareStatsText}';
+        '${widget.data?.quote}\n- ${widget.data?.author}\n\n${AppLocalizations.of(context)!.shareStatsText}';
     Share.share(shareText);
   }
 

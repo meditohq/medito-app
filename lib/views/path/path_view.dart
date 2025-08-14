@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/player/next_track_provider.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/path/components/track_item_widget.dart';
 import 'package:medito/widgets/errors/medito_error_widget.dart';
@@ -52,10 +53,10 @@ class _JourneyViewState extends ConsumerState<JourneyView>
       appBar: AppBar(
         centerTitle: false,
         backgroundColor: ColorConstants.ebony,
-        title: const Column(
+        title: Column(
           children: [
             HomeHeaderWidget(
-              greeting: StringConstants.path,
+              greeting: AppLocalizations.of(context)!.path,
             ),
           ],
         ),

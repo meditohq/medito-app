@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -138,7 +139,8 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
             _isDonor
                 ? 'We rely on donors like you to continue providing mindfulness to everyone.'
                 : donationPageModel.text ??
-                    StringConstants.meditoReliesOnYourDonationsToSurvive,
+                    AppLocalizations.of(context)!
+                        .meditoReliesOnYourDonationsToSurvive,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 16,
@@ -194,7 +196,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 ),
               ),
               child: Text(
-                button.title ?? StringConstants.donateNow,
+                button.title ?? AppLocalizations.of(context)!.donateNow,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -225,7 +227,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 ),
               ),
               child: Text(
-                button.title ?? StringConstants.donateNow,
+                button.title ?? AppLocalizations.of(context)!.donateNow,
               ),
             ),
           ),

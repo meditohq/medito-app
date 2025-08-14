@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/me/me_repository.dart';
@@ -84,9 +85,9 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     if (Platform.isAndroid) {
       _helpItems.add(
         HelpItem(
-          title: StringConstants.meditationInterruptionTitle,
-          content: StringConstants.meditationInterruptionContent,
-          actionText: StringConstants.openBatterySettingsText,
+          title: AppLocalizations.of(context)!.meditationInterruptionTitle,
+          content: AppLocalizations.of(context)!.meditationInterruptionContent,
+          actionText: AppLocalizations.of(context)!.openBatterySettingsText,
           onActionPressed: _handleBatteryOptimization,
           icon: HugeIcons.solidRoundedVolumeMute02,
         ),
@@ -96,8 +97,8 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     // Add the rest of the help items
     _helpItems.add(
       HelpItem(
-        title: StringConstants.downloadTracksTitle,
-        content: StringConstants.downloadTracksContent,
+        title: AppLocalizations.of(context)!.downloadTracksTitle,
+        content: AppLocalizations.of(context)!.downloadTracksContent,
         icon: HugeIcons.solidRoundedDownloadSquare02,
       ),
     );
@@ -106,22 +107,24 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     if (!_isSubscriber) {
       _helpItems.add(
         HelpItem(
-          title: StringConstants.supportTitle,
-          content: StringConstants.supportContent,
+          title: AppLocalizations.of(context)!.supportTitle,
+          content: AppLocalizations.of(context)!.supportContent,
           icon: HugeIcons.solidSharpFavourite,
           multipleActions: [
             ActionButton(
-              text: StringConstants.donateViaDonationFormText,
-              onPressed: () => _launchUrl(StringConstants.donationFormUrl),
-            ),
-            ActionButton(
-              text: StringConstants.donateViaPayPalText,
-              onPressed: () => _launchUrl(StringConstants.payPalDonationUrl),
-            ),
-            ActionButton(
-              text: StringConstants.donateViaBankTransferText,
+              text: AppLocalizations.of(context)!.donateViaDonationFormText,
               onPressed: () =>
-                  _launchUrl(StringConstants.bankTransferDetailsUrl),
+                  _launchUrl(AppLocalizations.of(context)!.donationFormUrl),
+            ),
+            ActionButton(
+              text: AppLocalizations.of(context)!.donateViaPayPalText,
+              onPressed: () =>
+                  _launchUrl(AppLocalizations.of(context)!.payPalDonationUrl),
+            ),
+            ActionButton(
+              text: AppLocalizations.of(context)!.donateViaBankTransferText,
+              onPressed: () => _launchUrl(
+                  AppLocalizations.of(context)!.bankTransferDetailsUrl),
             ),
           ],
         ),
@@ -132,10 +135,11 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     if (_isSubscriber) {
       _helpItems.add(
         HelpItem(
-          title: StringConstants.stopDonationTitle,
-          content: StringConstants.stopDonationContent,
-          actionText: StringConstants.goToDonationPortalText,
-          onActionPressed: () => _launchUrl(StringConstants.donationPortalUrl),
+          title: AppLocalizations.of(context)!.stopDonationTitle,
+          content: AppLocalizations.of(context)!.stopDonationContent,
+          actionText: AppLocalizations.of(context)!.goToDonationPortalText,
+          onActionPressed: () =>
+              _launchUrl(AppLocalizations.of(context)!.donationPortalUrl),
           icon: HugeIcons.solidRoundedHeartbreak,
         ),
       );
@@ -144,11 +148,11 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     // Add analytics tracking toggle
     _helpItems.add(
       HelpItem(
-        title: StringConstants.analyticsTrackingTitle,
-        content: StringConstants.analyticsTrackingContent,
+        title: AppLocalizations.of(context)!.analyticsTrackingTitle,
+        content: AppLocalizations.of(context)!.analyticsTrackingContent,
         actionText: _isAnalyticsEnabled
-            ? StringConstants.turnOffAnalyticsText
-            : StringConstants.turnOnAnalyticsText,
+            ? AppLocalizations.of(context)!.turnOffAnalyticsText
+            : AppLocalizations.of(context)!.turnOnAnalyticsText,
         onActionPressed: _toggleAnalyticsTracking,
         icon: HugeIcons.solidSharpSettings03,
       ),
@@ -157,16 +161,16 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     // Add the remaining help items
     _helpItems.addAll([
       HelpItem(
-        title: StringConstants.statsWrongTitle,
-        content: StringConstants.statsWrongContent,
-        actionText: StringConstants.editStatsActionText,
+        title: AppLocalizations.of(context)!.statsWrongTitle,
+        content: AppLocalizations.of(context)!.statsWrongContent,
+        actionText: AppLocalizations.of(context)!.editStatsActionText,
         onActionPressed: _openStatsEditPage,
         icon: HugeIcons.solidSharpEdit02,
       ),
       HelpItem(
-        title: StringConstants.contactUsTitle,
-        content: StringConstants.contactUsContent,
-        actionText: StringConstants.contactUsActionText,
+        title: AppLocalizations.of(context)!.contactUsTitle,
+        content: AppLocalizations.of(context)!.contactUsContent,
+        actionText: AppLocalizations.of(context)!.contactUsActionText,
         onActionPressed: _openContactForm,
         icon: HugeIcons.solidRoundedQuestion,
       ),
@@ -185,9 +189,9 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: ColorConstants.onyx,
-        title: const Text(
-          StringConstants.donationRetentionTitle,
-          style: TextStyle(
+        title: Text(
+          AppLocalizations.of(context)!.donationRetentionTitle,
+          style: const TextStyle(
             color: ColorConstants.white,
             fontWeight: FontWeight.bold,
           ),
@@ -196,22 +200,25 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              StringConstants.donationRetentionMainMessage,
+            Text(
+              AppLocalizations.of(context)!.donationRetentionMainMessage,
               style: TextStyle(color: ColorConstants.white, height: 1.5),
             ),
             const SizedBox(height: 12),
-            const Text(
-              StringConstants.donationRetentionBenefitsHeading,
+            Text(
+              AppLocalizations.of(context)!.donationRetentionBenefitsHeading,
               style: TextStyle(color: ColorConstants.white, height: 1.5),
             ),
             const SizedBox(height: 8),
-            _buildBulletPoint(StringConstants.donationRetentionBenefit1),
-            _buildBulletPoint(StringConstants.donationRetentionBenefit2),
-            _buildBulletPoint(StringConstants.donationRetentionBenefit3),
+            _buildBulletPoint(
+                AppLocalizations.of(context)!.donationRetentionBenefit1),
+            _buildBulletPoint(
+                AppLocalizations.of(context)!.donationRetentionBenefit2),
+            _buildBulletPoint(
+                AppLocalizations.of(context)!.donationRetentionBenefit3),
             const SizedBox(height: 12),
-            const Text(
-              StringConstants.donationRetentionFinancialMessage,
+            Text(
+              AppLocalizations.of(context)!.donationRetentionFinancialMessage,
               style: TextStyle(color: ColorConstants.white, height: 1.5),
             ),
           ],
@@ -224,7 +231,8 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
                 Navigator.of(context).pop(false);
                 showSnackBar(
                   context,
-                  StringConstants.donationRetentionThankYouMessage,
+                  AppLocalizations.of(context)!
+                      .donationRetentionThankYouMessage,
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -235,7 +243,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text(StringConstants.stayAsDonorButtonText),
+              child: Text(AppLocalizations.of(context)!.stayAsDonorButtonText),
             ),
           ),
           const SizedBox(height: 8),
@@ -249,7 +257,8 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text(StringConstants.continueToCancellationButtonText),
+              child: Text(AppLocalizations.of(context)!
+                  .continueToCancellationButtonText),
             ),
           ),
         ],
@@ -257,7 +266,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     );
 
     if (result == true) {
-      await _launchUrl(StringConstants.donationPortalUrl);
+      await _launchUrl('https://bit.ly/3yFqVbM');
     }
   }
 
@@ -287,7 +296,8 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
         backgroundColor: ColorConstants.ebony,
         toolbarHeight: 56.0,
         automaticallyImplyLeading: false,
-        title: const HomeHeaderWidget(greeting: StringConstants.helpTitle),
+        title:
+            HomeHeaderWidget(greeting: AppLocalizations.of(context)!.helpTitle),
         elevation: 0.0,
       ),
       body: SafeArea(
@@ -384,7 +394,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
       );
     } else if (item.actionText != null && item.onActionPressed != null) {
       // Special handling for donation cancellation
-      if (item.title == StringConstants.stopDonationTitle) {
+      if (item.title == AppLocalizations.of(context)!.stopDonationTitle) {
         return _buildActionButton(
           item.actionText!,
           () => _showDonationRetentionDialog(),
@@ -459,7 +469,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
         .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
         .join('&');
 
-    final url = Uri.parse('${StringConstants.contactFormBaseUrl}?$queryString');
+    final url = Uri.parse('https://tally.so/r/wLGBaO?$queryString');
 
     await _launchUrl(url.toString());
   }
@@ -473,7 +483,7 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
   }
 
   Future<void> _handleBatteryOptimization() async {
-    await _launchUrl(StringConstants.dontKillMyAppUrl);
+    await _launchUrl('https://dontkillmyapp.com');
   }
 
   Future<void> _toggleAnalyticsTracking() async {
@@ -532,8 +542,8 @@ class HelpScreenState extends ConsumerState<HelpScreen> {
     showSnackBar(
       context,
       _isAnalyticsEnabled
-          ? StringConstants.analyticsEnabledMessage
-          : StringConstants.analyticsDisabledMessage,
+          ? AppLocalizations.of(context)!.analyticsEnabledMessage
+          : AppLocalizations.of(context)!.analyticsDisabledMessage,
     );
 
     // Refresh the help items to update the button text

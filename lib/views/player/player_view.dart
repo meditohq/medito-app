@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -16,6 +17,7 @@ import 'package:medito/views/player/widgets/artist_title_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/player_action_bar.dart';
 import 'package:medito/views/player/widgets/duration_indicator_widget.dart';
 import 'package:medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
+import 'package:medito/widgets/report_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -132,15 +134,25 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                   ),
                 ),
                 SafeArea(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                        child: orientation == Orientation.portrait
-                            ? _buildPortraitLayout(playbackState)
-                            : _buildLandscapeLayout(playbackState),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 32.0),
+                            child: orientation == Orientation.portrait
+                                ? _buildPortraitLayout(playbackState)
+                                : _buildLandscapeLayout(playbackState),
+                          ),
+                        ),
                       ),
-                    ),
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: ReportButtonWidget(track: currentlyPlayingTrack),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -249,7 +261,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
 
     return bgSoundNotifier.selectedBgSound != null &&
-        bgSoundNotifier.selectedBgSound?.title != StringConstants.none;
+        bgSoundNotifier.selectedBgSound?.title !=
+            AppLocalizations.of(context)!.none;
   }
 
   void _handleClose({bool shouldPop = true}) {

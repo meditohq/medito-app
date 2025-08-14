@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:medito/constants/strings/string_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,8 +53,8 @@ class ReminderProvider {
 
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         dailyNotificationId,
-        StringConstants.reminderNotificationTitle,
-        StringConstants.reminderNotificationBody,
+        'Daily Meditation Reminder', // This will be localized in the UI layer
+        'It\'s time for your daily meditation. Take a moment to relax and focus.', // This will be localized in the UI layer
         scheduledDateTz,
         const NotificationDetails(
           android: AndroidNotificationDetails(
@@ -81,11 +80,10 @@ class ReminderProvider {
   Future<void> clearBadge() async {
     if (Platform.isIOS) {
       const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
-        badgeNumber: 0,
-        presentAlert: false,
-        presentBadge: false,
-        presentSound: false
-      );
+          badgeNumber: 0,
+          presentAlert: false,
+          presentBadge: false,
+          presentSound: false);
       await _flutterLocalNotificationsPlugin.show(
         0,
         null,

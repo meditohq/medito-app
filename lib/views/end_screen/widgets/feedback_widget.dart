@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/l10n/app_localizations.dart';
 
 class FeedbackWidget extends StatefulWidget {
-
   const FeedbackWidget({
     super.key,
   });
@@ -28,8 +28,8 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
         spacing: 16,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
-            StringConstants.howDoYouFeel,
+          Text(
+            AppLocalizations.of(context)!.howDoYouFeel,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: teachers,
@@ -45,31 +45,33 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
                   children: [
                     Semantics(
                       button: true,
-                      label: StringConstants.thanksForSharingHappy,
+                      label:
+                          AppLocalizations.of(context)!.thanksForSharingHappy,
                       child: _buildEmotionButton(
                         context,
                         '😊',
-                        StringConstants.thanksForSharing,
+                        AppLocalizations.of(context)!.thanksForSharing,
                         _handlePositiveFeedback,
                       ),
                     ),
                     Semantics(
                       button: true,
-                      label: StringConstants.thanksForSharingNeutral,
+                      label:
+                          AppLocalizations.of(context)!.thanksForSharingNeutral,
                       child: _buildEmotionButton(
                         context,
                         '😐',
-                        StringConstants.thanksForSharing,
+                        AppLocalizations.of(context)!.thanksForSharing,
                         _handleNeutralFeedback,
                       ),
                     ),
                     Semantics(
                       button: true,
-                      label: StringConstants.thanksForSharingSad,
+                      label: AppLocalizations.of(context)!.thanksForSharingSad,
                       child: _buildEmotionButton(
                         context,
                         '☹️',
-                        StringConstants.thanksForSharing,
+                        AppLocalizations.of(context)!.thanksForSharing,
                         _handleNegativeFeedback,
                       ),
                     ),
@@ -83,8 +85,8 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
   Widget _buildThanksMessage() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: const Text(
-        StringConstants.thanksForSharing,
+      child: Text(
+        AppLocalizations.of(context)!.thanksForSharing,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 18,

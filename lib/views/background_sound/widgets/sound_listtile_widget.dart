@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,7 @@ class SoundListTileWidget extends ConsumerWidget {
     return InkWell(
       onTap: () => _handleItemTap(
         bgSoundNotifierProvider,
+        context,
       ),
       child: Container(
         decoration: const BoxDecoration(
@@ -86,8 +88,9 @@ class SoundListTileWidget extends ConsumerWidget {
 
   void _handleItemTap(
     BackgroundSoundsNotifier bgSoundNotifierProvider,
+    BuildContext context,
   ) {
-    if (sound.title == StringConstants.none) {
+    if (sound.title == AppLocalizations.of(context)!.none) {
       bgSoundNotifierProvider.stopBackgroundSound();
     }
     bgSoundNotifierProvider.handleOnChangeSound(sound);

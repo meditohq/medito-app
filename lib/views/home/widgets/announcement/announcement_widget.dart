@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -120,7 +121,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
           ),
         ),
         child: Text(
-          StringConstants.dismiss,
+          AppLocalizations.of(context)!.dismiss,
           style: TextStyle(
             color: textColor,
             fontSize: 16,

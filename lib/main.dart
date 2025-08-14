@@ -12,6 +12,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/theme/app_theme.dart';
@@ -19,6 +21,7 @@ import 'package:medito/constants/widget_constants.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/providers/locale_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -201,12 +204,12 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
         pathSegments = uri.pathSegments;
       } else {
-        showSnackBar(context, StringConstants.invalidDeepLink);
+        showSnackBar(context, AppLocalizations.of(context)!.invalidDeepLink);
         return;
       }
 
       if (pathSegments.isEmpty) {
-        showSnackBar(context, StringConstants.invalidDeepLink);
+        showSnackBar(context, AppLocalizations.of(context)!.invalidDeepLink);
         return;
       }
 
@@ -222,14 +225,14 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
       AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
 
-      showSnackBar(context, StringConstants.followingDeepLink);
+      showSnackBar(context, AppLocalizations.of(context)!.followingDeepLink);
 
       Future.delayed(const Duration(seconds: 2), () {
         handleNavigation(path, [id], context);
       });
     } catch (e) {
       AppLogger.e('DEEPLINK', 'Error handling deep link', e);
-      showSnackBar(context, StringConstants.deepLinkError);
+      showSnackBar(context, AppLocalizations.of(context)!.deepLinkError);
     }
   }
 
@@ -276,6 +279,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           // _checkForFreezeUsage(ref);
         }
 
+        final locale = ref.watch(localeProvider);
+
         return MediaQuery.withClampedTextScaling(
           minScaleFactor: 0.8,
           maxScaleFactor: 1.5,
@@ -286,6 +291,17 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
               navigatorKey: navigatorKey,
               theme: appTheme(context),
               title: ParentWidget._title,
+              locale: locale,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en'),
+                Locale('es'),
+              ],
               initialRoute: '/',
               routes: {
                 '/': (context) => const SplashView(),
@@ -394,7 +410,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       builder: (context) => Container(
         padding: const EdgeInsets.all(16),
         child: Text(
-          StringConstants.freezeUsedMessage,
+          AppLocalizations.of(context)!.freezeUsedMessage,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
       ),

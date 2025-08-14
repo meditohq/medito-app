@@ -1,5 +1,57 @@
----
-description: 
+## UI String Localization Rules
+
+When adding a new UI string that will be displayed to users:
+
+### 1. Add to ARB Files (Primary Method)
+- **English**: Add to `lib/l10n/app_en.arb`
+- **Spanish**: Add to `lib/l10n/app_es.arb`
+- Use descriptive keys like `newFeatureTitle`, `confirmationMessage`, etc.
+- Add a comment describing the context in which this string is used
+
+### 2. Use in Code
+- Import: `import 'package:medito/l10n/app_localizations.dart';`
+- Access: `AppLocalizations.of(context)!.yourKeyName`
+- For parameterized strings: `AppLocalizations.of(context)!.yourKeyName(parameter)`
+
+### 3. When to Use StringConstants
+Only use `lib/constants/strings/string_constants.dart` for:
+- **Technical constants** (URLs, API keys, identifiers)
+- **Backend/business logic** (providers, utils, exceptions without BuildContext)
+- **Debug/technical strings** (error codes, system messages)
+- **Section identifiers** (used as keys, not display text)
+
+### 4. Examples
+
+**✅ Correct - UI String:**
+```dart
+// In app_en.arb: "welcomeMessage": "Welcome to Medito"
+// In app_es.arb: "welcomeMessage": "Bienvenido a Medito"
+Text(AppLocalizations.of(context)!.welcomeMessage)
+```
+
+**✅ Correct - Technical Constant:**
+```dart
+// In string_constants.dart
+static const String apiBaseUrl = 'https://api.medito.app';
+static const String donationFormUrl = 'https://meditofoundation.org/donate';
+```
+
+**❌ Incorrect - UI String in StringConstants:**
+```dart
+// Don't do this for user-facing strings
+static const String welcomeMessage = 'Welcome to Medito';
+```
+
+### 5. Parameterized Strings
+For strings with variables:
+```dart
+// In app_en.arb: "greetingWithName": "Hello {name}!"
+// In app_es.arb: "greetingWithName": "¡Hola {name}!"
+Text(AppLocalizations.of(context)!.greetingWithName(userName))
+```
+
+### 6. After Adding New Strings
+Run `flutter pub get` to regenerate localization files after adding new ARB entries.
 globs: 
 alwaysApply: true
 ---

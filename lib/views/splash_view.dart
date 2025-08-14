@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/firebase_options.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -213,7 +214,7 @@ class SplashViewState extends ConsumerState<SplashView>
         _isLoading = false;
       });
 
-      showSnackBar(context, StringConstants.offlineMode);
+      showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
 
       await Navigator.of(context).push(
         MaterialPageRoute(
@@ -248,18 +249,18 @@ class SplashViewState extends ConsumerState<SplashView>
         builder: (context) => AlertDialog(
           backgroundColor: ColorConstants.ebony,
           title: Text(
-            StringConstants.emailExistsDialogTitle,
+            AppLocalizations.of(context)!.emailExistsDialogTitle,
             style: const TextStyle(color: Colors.white),
           ),
           content: Text(
-            StringConstants.emailExistsDialogMessage,
+            AppLocalizations.of(context)!.emailExistsDialogMessage,
             style: const TextStyle(color: Colors.white70),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
-                StringConstants.emailExistsContinueNewAccount,
+                AppLocalizations.of(context)!.emailExistsContinueNewAccount,
                 style: const TextStyle(
                     color: ColorConstants.brightSky, fontSize: 12),
               ),
@@ -267,7 +268,7 @@ class SplashViewState extends ConsumerState<SplashView>
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
-                StringConstants.emailExistsSignInWithEmail,
+                AppLocalizations.of(context)!.emailExistsSignInWithEmail,
                 style: const TextStyle(
                     color: ColorConstants.lightPurple, fontSize: 12),
               ),
@@ -308,7 +309,7 @@ class SplashViewState extends ConsumerState<SplashView>
       );
       if (!mounted) return;
 
-      showSnackBar(context, StringConstants.offlineMode);
+      showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
 
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -355,7 +356,7 @@ class SplashViewState extends ConsumerState<SplashView>
         stackTrace,
         reason: 'SplashView: Error initializing services',
       );
-      showSnackBar(context, StringConstants.appInitError);
+      showSnackBar(context, AppLocalizations.of(context)!.appInitError);
     }
   }
 
@@ -413,9 +414,9 @@ class SplashViewState extends ConsumerState<SplashView>
                                         width: 40,
                                       ),
                                       const SizedBox(width: 16),
-                                      const Text(
-                                        StringConstants.appName,
-                                        style: TextStyle(
+                                      Text(
+                                        AppLocalizations.of(context)!.appName,
+                                        style: const TextStyle(
                                           color: ColorConstants.white,
                                           fontSize: 24,
                                         ),
@@ -429,9 +430,10 @@ class SplashViewState extends ConsumerState<SplashView>
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        StringConstants.splashHeadline,
-                                        style: TextStyle(
+                                      Text(
+                                        AppLocalizations.of(context)!
+                                            .splashHeadline,
+                                        style: const TextStyle(
                                           color: ColorConstants.white,
                                           fontSize: 40,
                                           fontWeight: FontWeight.bold,
@@ -534,8 +536,8 @@ class SplashViewState extends ConsumerState<SplashView>
                                                     BorderRadius.circular(8),
                                               ),
                                             ),
-                                            child: const Text(
-                                              StringConstants
+                                            child: Text(
+                                              AppLocalizations.of(context)!
                                                   .createAccountLogInButtonText,
                                             ),
                                           ),
@@ -570,10 +572,11 @@ class SplashViewState extends ConsumerState<SplashView>
                                                       strokeWidth: 2,
                                                     ),
                                                   )
-                                                : const Text(
-                                                    StringConstants
+                                                : Text(
+                                                    AppLocalizations.of(
+                                                            context)!
                                                         .continueAsGuest,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                         color: ColorConstants
                                                             .lightPurple),
                                                   ),
@@ -599,11 +602,11 @@ class SplashViewState extends ConsumerState<SplashView>
   String _getBenefitTitle(int index) {
     switch (index) {
       case 0:
-        return StringConstants.splashBenefit1Title;
+        return AppLocalizations.of(context)!.splashBenefit1Title;
       case 1:
-        return StringConstants.splashBenefit2Title;
+        return AppLocalizations.of(context)!.splashBenefit2Title;
       case 2:
-        return StringConstants.splashBenefit3Title;
+        return AppLocalizations.of(context)!.splashBenefit3Title;
       default:
         return '';
     }
@@ -612,11 +615,11 @@ class SplashViewState extends ConsumerState<SplashView>
   String _getBenefitSubtitle(int index) {
     switch (index) {
       case 0:
-        return StringConstants.splashBenefit1Subtitle;
+        return AppLocalizations.of(context)!.splashBenefit1Subtitle;
       case 1:
-        return StringConstants.splashBenefit2Subtitle;
+        return AppLocalizations.of(context)!.splashBenefit2Subtitle;
       case 2:
-        return StringConstants.splashBenefit3Subtitle;
+        return AppLocalizations.of(context)!.splashBenefit3Subtitle;
       default:
         return '';
     }

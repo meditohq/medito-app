@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,8 +72,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                 children: [
                   Text(
                     isDonor
-                        ? StringConstants.donationThankYouTitle
-                        : StringConstants.donationTitle,
+                        ? AppLocalizations.of(context)!.donationThankYouTitle
+                        : AppLocalizations.of(context)!.donationTitle,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -83,8 +84,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                   const SizedBox(height: 24),
                   Text(
                     isDonor
-                        ? StringConstants.donationThankYouBody
-                        : StringConstants.donationBody,
+                        ? AppLocalizations.of(context)!.donationThankYouBody
+                        : AppLocalizations.of(context)!.donationBody,
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 16,
@@ -98,8 +99,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                 children: [
                   _buildActionButton(
                     text: isDonor
-                        ? StringConstants.donationContinue
-                        : StringConstants.donateNow,
+                        ? AppLocalizations.of(context)!.donationContinue
+                        : AppLocalizations.of(context)!.donateNow,
                     onPressed: isDonor
                         ? _handleNextAction
                         : () => _handleDonationAction(context, true),
@@ -116,7 +117,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                           ),
                         ),
                         child: Text(
-                          StringConstants.noThanks,
+                          AppLocalizations.of(context)!.noThanks,
                           style: const TextStyle(
                             color: ColorConstants.lightPurple,
                             fontSize: 16,

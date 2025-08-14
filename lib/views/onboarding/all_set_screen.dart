@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 
 class AllSetScreen extends StatelessWidget {
   const AllSetScreen({super.key, this.onComplete});
@@ -21,7 +22,7 @@ class AllSetScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                StringConstants.allSetTitle,
+                AppLocalizations.of(context)!.allSetTitle,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -30,7 +31,7 @@ class AllSetScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               _buildActionButton(
-                text: StringConstants.startMeditating,
+                text: AppLocalizations.of(context)!.startMeditating,
                 onPressed: () => _navigateToHome(context),
               ),
             ],

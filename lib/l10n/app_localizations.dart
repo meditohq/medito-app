@@ -1,0 +1,2425 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'l10n/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
+
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
+
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('es')
+  ];
+
+  /// No description provided for @appName.
+  ///
+  /// In en, this message translates to:
+  /// **'Medito'**
+  String get appName;
+
+  /// No description provided for @privacyPolicyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyTitle;
+
+  /// No description provided for @unableToOpenPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open privacy policy'**
+  String get unableToOpenPrivacyPolicy;
+
+  /// No description provided for @meditoUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://meditofoundation.org/'**
+  String get meditoUrl;
+
+  /// No description provided for @downloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloads'**
+  String get downloads;
+
+  /// No description provided for @volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get volume;
+
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
+  /// No description provided for @none.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get none;
+
+  /// No description provided for @removed.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed'**
+  String get removed;
+
+  /// No description provided for @meditationProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop to Support'**
+  String get meditationProducts;
+
+  /// No description provided for @fromPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'From '**
+  String get fromPrefix;
+
+  /// No description provided for @emptyDownloadsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'It looks like you haven\'t downloaded anything yet. Downloads are useful to save mobile data or to access sessions in places without signal.'**
+  String get emptyDownloadsMessage;
+
+  /// No description provided for @meanWhileListen.
+  ///
+  /// In en, this message translates to:
+  /// **'Meanwhile, you can listen to your'**
+  String get meanWhileListen;
+
+  /// No description provided for @retrying.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrying...'**
+  String get retrying;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgain;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @statsSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats updated'**
+  String get statsSuccess;
+
+  /// No description provided for @shareStatsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover calmness for FREE with #Medito I\'ve found my inner peace; now it\'s your turn! Join me on this mindful journey and start exploring today 💜 Download https://medito.app #Calm #Meditation #Headspace'**
+  String get shareStatsText;
+
+  /// No description provided for @backgroundSounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Background Sound'**
+  String get backgroundSounds;
+
+  /// No description provided for @x06.
+  ///
+  /// In en, this message translates to:
+  /// **'x0.6'**
+  String get x06;
+
+  /// No description provided for @x07.
+  ///
+  /// In en, this message translates to:
+  /// **'x0.7'**
+  String get x07;
+
+  /// No description provided for @x08.
+  ///
+  /// In en, this message translates to:
+  /// **'x0.8'**
+  String get x08;
+
+  /// No description provided for @x09.
+  ///
+  /// In en, this message translates to:
+  /// **'x0.9'**
+  String get x09;
+
+  /// No description provided for @x1.
+  ///
+  /// In en, this message translates to:
+  /// **'x1'**
+  String get x1;
+
+  /// No description provided for @searchMeditations.
+  ///
+  /// In en, this message translates to:
+  /// **'Search meditations'**
+  String get searchMeditations;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @id.
+  ///
+  /// In en, this message translates to:
+  /// **'id'**
+  String get id;
+
+  /// No description provided for @env.
+  ///
+  /// In en, this message translates to:
+  /// **'env'**
+  String get env;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'email'**
+  String get email;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'appVersion'**
+  String get appVersion;
+
+  /// No description provided for @deviceModel.
+  ///
+  /// In en, this message translates to:
+  /// **'deviceModel'**
+  String get deviceModel;
+
+  /// No description provided for @deviceOs.
+  ///
+  /// In en, this message translates to:
+  /// **'deviceOs'**
+  String get deviceOs;
+
+  /// No description provided for @devicePlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'devicePlatform'**
+  String get devicePlatform;
+
+  /// No description provided for @buildNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'buildNumber'**
+  String get buildNumber;
+
+  /// No description provided for @dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
+
+  /// No description provided for @debugInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug info'**
+  String get debugInfo;
+
+  /// Text indicating where to write in debug reports
+  ///
+  /// In en, this message translates to:
+  /// **'--- Write below this line ---'**
+  String get writeBelowThisLine;
+
+  /// No description provided for @explore.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get explore;
+
+  /// No description provided for @welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'👋 Welcome'**
+  String get welcome;
+
+  /// No description provided for @thanksForSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for sharing  💜'**
+  String get thanksForSharing;
+
+  /// No description provided for @thanksForSharingNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy face'**
+  String get thanksForSharingNeutral;
+
+  /// No description provided for @thanksForSharingHappy.
+  ///
+  /// In en, this message translates to:
+  /// **'Neutral face'**
+  String get thanksForSharingHappy;
+
+  /// No description provided for @thanksForSharingSad.
+  ///
+  /// In en, this message translates to:
+  /// **'Sad face'**
+  String get thanksForSharingSad;
+
+  /// No description provided for @min.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get min;
+
+  /// No description provided for @hey.
+  ///
+  /// In en, this message translates to:
+  /// **'👋 Hey'**
+  String get hey;
+
+  /// No description provided for @someThingWentWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get someThingWentWrong;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Email.'**
+  String get invalidEmail;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Field is Required'**
+  String get fieldRequired;
+
+  /// No description provided for @invalidInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Input'**
+  String get invalidInput;
+
+  /// No description provided for @connectionTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Error connection timeout'**
+  String get connectionTimeout;
+
+  /// No description provided for @noInternetConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get noInternetConnection;
+
+  /// No description provided for @badRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Bad request'**
+  String get badRequest;
+
+  /// No description provided for @unauthorizedRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired - please sign in again'**
+  String get unauthorizedRequest;
+
+  /// No description provided for @accessForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Access forbidden'**
+  String get accessForbidden;
+
+  /// No description provided for @apiNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Api not found'**
+  String get apiNotFound;
+
+  /// No description provided for @anErrorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'An unkown error occurred. Either we\'re having issues or you\'re offline.'**
+  String get anErrorOccurred;
+
+  /// No description provided for @unableToLoadAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load audio. Please go back and try again'**
+  String get unableToLoadAudio;
+
+  /// No description provided for @loadingError.
+  ///
+  /// In en, this message translates to:
+  /// **'It looks like you\'re offline or there was little hiccup from our end'**
+  String get loadingError;
+
+  /// No description provided for @timeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Oops! It seems like there was an error. If the problem persists, Close the app and try again.'**
+  String get timeout;
+
+  /// No description provided for @connectivityError.
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure you are connected to the internet to use Medito'**
+  String get connectivityError;
+
+  /// No description provided for @howDoYouFeel.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you feel after this session?'**
+  String get howDoYouFeel;
+
+  /// No description provided for @yourFeedbackHelpsUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Your feedback helps us improve our content and allows you to reflect on your experience.'**
+  String get yourFeedbackHelpsUs;
+
+  /// No description provided for @didYouKnow.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you know?'**
+  String get didYouKnow;
+
+  /// No description provided for @meditoReliesOnYourDonationsToSurvive.
+  ///
+  /// In en, this message translates to:
+  /// **'Medito relies only on your donations to survive. We produce free content to help humanity.'**
+  String get meditoReliesOnYourDonationsToSurvive;
+
+  /// Body text for daily meditation reminder notifications
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s time for your daily meditation. Take a moment to relax and focus.'**
+  String get reminderNotificationBody;
+
+  /// Title for daily meditation reminder notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Meditation Reminder'**
+  String get reminderNotificationTitle;
+
+  /// No description provided for @pickTimeHelpText.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your daily reminder time'**
+  String get pickTimeHelpText;
+
+  /// No description provided for @reminderNotificationScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder notification scheduled at'**
+  String get reminderNotificationScheduled;
+
+  /// No description provided for @dailyReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Reminder'**
+  String get dailyReminderTitle;
+
+  /// No description provided for @setFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Set for'**
+  String get setFor;
+
+  /// No description provided for @signInSignUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in / Sign up'**
+  String get signInSignUp;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @reminderNotificationCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder cancelled'**
+  String get reminderNotificationCleared;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @areYouSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure?'**
+  String get areYouSure;
+
+  /// No description provided for @requestPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Permission'**
+  String get requestPermission;
+
+  /// No description provided for @mediaPlaybackPermissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Media Playback Permissions'**
+  String get mediaPlaybackPermissions;
+
+  /// No description provided for @reminderPermissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Permissions'**
+  String get reminderPermissions;
+
+  /// No description provided for @weNeedYourPermissionMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'We need permission to show media controls in your notifications. This allows you to control playback without opening the app.'**
+  String get weNeedYourPermissionMedia;
+
+  /// No description provided for @weNeedYourPermissionReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.'**
+  String get weNeedYourPermissionReminder;
+
+  /// No description provided for @syncWithHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync with Apple Health'**
+  String get syncWithHealth;
+
+  /// No description provided for @permissionExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions set. To change them, go to Settings > Privacy and Security > Health > Medito'**
+  String get permissionExplanation;
+
+  /// No description provided for @confirmDeletionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Deletion'**
+  String get confirmDeletionTitle;
+
+  /// No description provided for @confirmDeletionFromPlayerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Already Downloaded'**
+  String get confirmDeletionFromPlayerTitle;
+
+  /// No description provided for @confirmDeletionFromPlayerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This meditation is already in your downloads. Do you want to delete it?'**
+  String get confirmDeletionFromPlayerMessage;
+
+  /// No description provided for @confirmDeletionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete'**
+  String get confirmDeletionMessage;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @debugInfoCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug info copied to clipboard'**
+  String get debugInfoCopied;
+
+  /// No description provided for @goToDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Downloads'**
+  String get goToDownloads;
+
+  /// No description provided for @signInSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in successful'**
+  String get signInSuccess;
+
+  /// No description provided for @signInError.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in failed. Please try again.'**
+  String get signInError;
+
+  /// No description provided for @backgroundSoundsDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Background sounds are disabled for this track'**
+  String get backgroundSoundsDisabled;
+
+  /// No description provided for @neww.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get neww;
+
+  /// No description provided for @statsLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load stats. Please try again later.'**
+  String get statsLoadError;
+
+  /// No description provided for @statsLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading stats...'**
+  String get statsLoading;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @statsErrorRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get statsErrorRetry;
+
+  /// No description provided for @currentStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Streak'**
+  String get currentStreak;
+
+  /// No description provided for @longestStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Streak'**
+  String get longestStreak;
+
+  /// No description provided for @consistencyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Consistency Score'**
+  String get consistencyScore;
+
+  /// No description provided for @totalTracksCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Tracks Completed'**
+  String get totalTracksCompleted;
+
+  /// No description provided for @totalTimeListened.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Time Listened'**
+  String get totalTimeListened;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get days;
+
+  /// No description provided for @day.
+  ///
+  /// In en, this message translates to:
+  /// **'day'**
+  String get day;
+
+  /// No description provided for @hours.
+  ///
+  /// In en, this message translates to:
+  /// **'h'**
+  String get hours;
+
+  /// No description provided for @hoursFull.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get hoursFull;
+
+  /// No description provided for @hourFull.
+  ///
+  /// In en, this message translates to:
+  /// **'hour'**
+  String get hourFull;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get minutes;
+
+  /// No description provided for @minute.
+  ///
+  /// In en, this message translates to:
+  /// **'minute'**
+  String get minute;
+
+  /// No description provided for @showConsistencyScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Consistency Score'**
+  String get showConsistencyScore;
+
+  /// No description provided for @showCurrentStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Current Streak'**
+  String get showCurrentStreak;
+
+  /// No description provided for @alwaysShowStreakOnHomepage.
+  ///
+  /// In en, this message translates to:
+  /// **'Always show streak on homepage'**
+  String get alwaysShowStreakOnHomepage;
+
+  /// No description provided for @displayPreferenceSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Display preference saved'**
+  String get displayPreferenceSaved;
+
+  /// No description provided for @gotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get gotIt;
+
+  /// No description provided for @signUpLogInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Medito'**
+  String get signUpLogInTitle;
+
+  /// No description provided for @createAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get createAccountTitle;
+
+  /// No description provided for @signInAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again'**
+  String get signInAgain;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// Error message for invalid email format
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Email.'**
+  String get invalidEmailError;
+
+  /// No description provided for @createAccountButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccountButtonText;
+
+  /// No description provided for @createAccountLogInButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or Sign up'**
+  String get createAccountLogInButtonText;
+
+  /// No description provided for @sendMeMyPasswordText.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get sendMeMyPasswordText;
+
+  /// No description provided for @logInButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get logInButtonText;
+
+  /// No description provided for @authenticationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed'**
+  String get authenticationFailed;
+
+  /// No description provided for @emailVerificationText.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send you a code by email to verify your account'**
+  String get emailVerificationText;
+
+  /// No description provided for @createAccountBenefits.
+  ///
+  /// In en, this message translates to:
+  /// **'◦ Track your mindfulness journey \\n◦ Never lose your meditation progress\\n◦ Build a lasting meditation practice 💜'**
+  String get createAccountBenefits;
+
+  /// No description provided for @loginBenefits.
+  ///
+  /// In en, this message translates to:
+  /// **'• Download your previously saved data\\n• Continue your meditation journey from where you left off'**
+  String get loginBenefits;
+
+  /// No description provided for @accountTransitionWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait!'**
+  String get accountTransitionWarningTitle;
+
+  /// No description provided for @loginWarningQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to continue with this email?'**
+  String get loginWarningQuestion;
+
+  /// No description provided for @loginWarningExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'If you already have a Medito account:\\n• Your previous meditation data will be downloaded\\n• Your current unsaved progress will be lost\\n\\nIf you\'re new to Medito:\\n• A new account will be created\\n• Your current progress will be saved to this account'**
+  String get loginWarningExplanation;
+
+  /// No description provided for @createNewAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Account'**
+  String get createNewAccount;
+
+  /// No description provided for @continueLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, continue'**
+  String get continueLogin;
+
+  /// No description provided for @cancelAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelAction;
+
+  /// No description provided for @goBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get goBack;
+
+  /// No description provided for @userProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'User Profile'**
+  String get userProfileTitle;
+
+  /// No description provided for @userProfileEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email:'**
+  String get userProfileEmailLabel;
+
+  /// No description provided for @signOutButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get signOutButtonText;
+
+  /// No description provided for @signOutSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have been signed out successfully'**
+  String get signOutSuccessMessage;
+
+  /// No description provided for @signOutErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to sign out. Please try again.'**
+  String get signOutErrorMessage;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete your account? This action cannot be undone and you must follow the instructions on the next page.'**
+  String get deleteAccountConfirmation;
+
+  /// No description provided for @deleteAccountButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountButtonText;
+
+  /// No description provided for @accountMarkedForDeletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been marked for deletion.'**
+  String get accountMarkedForDeletion;
+
+  /// No description provided for @deleteAccountError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete account.'**
+  String get deleteAccountError;
+
+  /// No description provided for @accountMarkedForDeletionError.
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been marked for deletion and cannot be accessed.'**
+  String get accountMarkedForDeletionError;
+
+  /// No description provided for @faqTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FAQ'**
+  String get faqTitle;
+
+  /// No description provided for @editStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit stats'**
+  String get editStatsTitle;
+
+  /// No description provided for @telegramTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join our Telegram community'**
+  String get telegramTitle;
+
+  /// No description provided for @donateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate'**
+  String get donateTitle;
+
+  /// No description provided for @contactUsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact us'**
+  String get contactUsTitle;
+
+  /// No description provided for @accountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get accountTitle;
+
+  /// No description provided for @path.
+  ///
+  /// In en, this message translates to:
+  /// **'Path'**
+  String get path;
+
+  /// No description provided for @stepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Step'**
+  String get stepTitle;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get locked;
+
+  /// No description provided for @loadingPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your path...'**
+  String get loadingPath;
+
+  /// No description provided for @pathLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load path. Please try again.'**
+  String get pathLoadError;
+
+  /// No description provided for @stepCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Step completed!'**
+  String get stepCompleted;
+
+  /// No description provided for @stepCompletionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to complete step. Please try again.'**
+  String get stepCompletionError;
+
+  /// No description provided for @meditatedOutsideApp.
+  ///
+  /// In en, this message translates to:
+  /// **'You meditated outside the app? Listen to the last unlocked session to unlock the next step in the path'**
+  String get meditatedOutsideApp;
+
+  /// No description provided for @enterMeditationDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the duration of your meditation outside the app'**
+  String get enterMeditationDuration;
+
+  /// No description provided for @meditationMarkingError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to mark meditation. Please try again.'**
+  String get meditationMarkingError;
+
+  /// No description provided for @listenToUnlockNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen to the last unlocked session to unlock the next step in the app'**
+  String get listenToUnlockNextStep;
+
+  /// No description provided for @unknownTaskType.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown task type'**
+  String get unknownTaskType;
+
+  /// No description provided for @invalidDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid duration. Please enter a positive number.'**
+  String get invalidDuration;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// No description provided for @journalEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal Entry'**
+  String get journalEntry;
+
+  /// No description provided for @writeYourJournalEntryHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your journal entry here...'**
+  String get writeYourJournalEntryHere;
+
+  /// No description provided for @journalEntrySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal entry saved'**
+  String get journalEntrySaved;
+
+  /// No description provided for @sessionCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Session completed successfully!'**
+  String get sessionCompleted;
+
+  /// No description provided for @taskUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update task. Please try again.'**
+  String get taskUpdateError;
+
+  /// No description provided for @syncingPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing your progress...'**
+  String get syncingPath;
+
+  /// No description provided for @stepLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete previous steps to unlock'**
+  String get stepLocked;
+
+  /// No description provided for @duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get duration;
+
+  /// No description provided for @tapToReadArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to read article'**
+  String get tapToReadArticle;
+
+  /// No description provided for @monday.
+  ///
+  /// In en, this message translates to:
+  /// **'M'**
+  String get monday;
+
+  /// No description provided for @tuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get tuesday;
+
+  /// No description provided for @wednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get wednesday;
+
+  /// No description provided for @thursday.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get thursday;
+
+  /// No description provided for @friday.
+  ///
+  /// In en, this message translates to:
+  /// **'F'**
+  String get friday;
+
+  /// No description provided for @saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get saturday;
+
+  /// No description provided for @sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get sunday;
+
+  /// No description provided for @dailyPracticeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Practicing daily grows your streak, but it also makes you more mindful and happier!'**
+  String get dailyPracticeMessage;
+
+  /// No description provided for @dayStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'day streak'**
+  String get dayStreak;
+
+  /// No description provided for @dailyQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Quote'**
+  String get dailyQuote;
+
+  /// No description provided for @termsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfService;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @offlineMode.
+  ///
+  /// In en, this message translates to:
+  /// **'You are now in offline mode due to an error.'**
+  String get offlineMode;
+
+  /// No description provided for @addToSiri.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Siri'**
+  String get addToSiri;
+
+  /// No description provided for @shareTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Track'**
+  String get shareTrack;
+
+  /// No description provided for @open.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get open;
+
+  /// No description provided for @shareTrackText.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment to breathe. Try this meditation session: \"{trackName}\" on Medito. {link}'**
+  String shareTrackText(Object link, Object trackName);
+
+  /// No description provided for @sharePackText.
+  ///
+  /// In en, this message translates to:
+  /// **'Check out {packName} on Medito! {link} #Meditation #Mindfulness'**
+  String sharePackText(Object link, Object packName);
+
+  /// No description provided for @followingDeepLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Following deep link...'**
+  String get followingDeepLink;
+
+  /// No description provided for @invalidDeepLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid deep link'**
+  String get invalidDeepLink;
+
+  /// No description provided for @deepLinkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to handle deep link'**
+  String get deepLinkError;
+
+  /// No description provided for @statsInitError.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats sync may have failed. Please check your connection.'**
+  String get statsInitError;
+
+  /// No description provided for @appInitError.
+  ///
+  /// In en, this message translates to:
+  /// **'App initialization failed. Entering offline mode.'**
+  String get appInitError;
+
+  /// No description provided for @noConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection'**
+  String get noConnection;
+
+  /// No description provided for @continueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueAsGuest;
+
+  /// No description provided for @isMonthlyDonor.
+  ///
+  /// In en, this message translates to:
+  /// **'d'**
+  String get isMonthlyDonor;
+
+  /// No description provided for @otpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter verification code'**
+  String get otpLabel;
+
+  /// No description provided for @invalidOtpError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid 6-digit code'**
+  String get invalidOtpError;
+
+  /// No description provided for @otpSentSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email for the verification code'**
+  String get otpSentSuccess;
+
+  /// No description provided for @otpInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code we just sent to'**
+  String get otpInstructions;
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t get the code? Resend it'**
+  String get resendCode;
+
+  /// No description provided for @verifyOtpButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get verifyOtpButtonText;
+
+  /// No description provided for @warningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warningTitle;
+
+  /// No description provided for @localStatsWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing into a new account will result in the loss of your current local stats. Do you wish to proceed?'**
+  String get localStatsWarning;
+
+  /// No description provided for @proceed.
+  ///
+  /// In en, this message translates to:
+  /// **'Proceed'**
+  String get proceed;
+
+  /// No description provided for @errorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Resource not found'**
+  String get errorNotFound;
+
+  /// No description provided for @shortcutsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shortcuts'**
+  String get shortcutsTitle;
+
+  /// No description provided for @carouselTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured'**
+  String get carouselTitle;
+
+  /// No description provided for @quoteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Quote'**
+  String get quoteTitle;
+
+  /// No description provided for @customization.
+  ///
+  /// In en, this message translates to:
+  /// **'Customisation'**
+  String get customization;
+
+  /// No description provided for @customiseHomeLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize Home Layout'**
+  String get customiseHomeLayout;
+
+  /// No description provided for @featuresIntegrations.
+  ///
+  /// In en, this message translates to:
+  /// **'Features & Integrations'**
+  String get featuresIntegrations;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @supportCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Support & Community'**
+  String get supportCommunity;
+
+  /// No description provided for @helpLegal.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Legal'**
+  String get helpLegal;
+
+  /// No description provided for @advanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get advanced;
+
+  /// No description provided for @enableNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay on Track with Meditation Reminders'**
+  String get enableNotificationsTitle;
+
+  /// No description provided for @enableNotificationsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications so you never miss a session.'**
+  String get enableNotificationsBody;
+
+  /// No description provided for @enableNotificationsCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Notifications'**
+  String get enableNotificationsCta;
+
+  /// No description provided for @skipForNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for Now'**
+  String get skipForNow;
+
+  /// No description provided for @donationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help Keep Medito Free'**
+  String get donationTitle;
+
+  /// No description provided for @donationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re a nonprofit initiative.\\nWe rely on donations to remain free and ad-free.\\nIf you\'d like to contribute, you can donate any amount. No pressure!'**
+  String get donationBody;
+
+  /// No description provided for @donateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate Now'**
+  String get donateNow;
+
+  /// No description provided for @noThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'No thanks'**
+  String get noThanks;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @remindLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind Me Later'**
+  String get remindLater;
+
+  /// No description provided for @allSetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re All Set!'**
+  String get allSetTitle;
+
+  /// No description provided for @startMeditating.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Meditating'**
+  String get startMeditating;
+
+  /// No description provided for @splashHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Meditation Made Simple'**
+  String get splashHeadline;
+
+  /// No description provided for @splashBenefit1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Free for Everyone, Forever'**
+  String get splashBenefit1Title;
+
+  /// No description provided for @splashBenefit1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore hours of guided meditations, advanced courses, and more. No paywall.'**
+  String get splashBenefit1Subtitle;
+
+  /// No description provided for @splashBenefit2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenges & Reminders'**
+  String get splashBenefit2Title;
+
+  /// No description provided for @splashBenefit2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay motivated daily, track progress, and build lasting habits.'**
+  String get splashBenefit2Subtitle;
+
+  /// No description provided for @splashBenefit3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Not-for-profit & Ad-Free'**
+  String get splashBenefit3Title;
+
+  /// No description provided for @splashBenefit3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Donations keep us going so everyone can access mindfulness—no ads needed.'**
+  String get splashBenefit3Subtitle;
+
+  /// No description provided for @continueText.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueText;
+
+  /// No description provided for @setReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Reminder'**
+  String get setReminder;
+
+  /// No description provided for @donationThankYouTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank You for Your Support!'**
+  String get donationThankYouTitle;
+
+  /// No description provided for @donationThankYouBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your generosity helps keep Medito free and accessible to everyone. We\'re deeply grateful for your contribution to spreading mindfulness worldwide.'**
+  String get donationThankYouBody;
+
+  /// No description provided for @donationVisitFoundation.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Medito Foundation'**
+  String get donationVisitFoundation;
+
+  /// No description provided for @donationContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get donationContinue;
+
+  /// No description provided for @streakFreezesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak Freezes Available'**
+  String get streakFreezesAvailable;
+
+  /// No description provided for @freezeUsedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A streak freeze was used to maintain your streak!'**
+  String get freezeUsedMessage;
+
+  /// No description provided for @streakAtRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'You missed a day'**
+  String get streakAtRisk;
+
+  /// No description provided for @streakFreezeAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'You have 1 streak freeze available. Would you like to use it to protect your current streak?'**
+  String get streakFreezeAvailable;
+
+  /// No description provided for @streakFreezesAvailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'But it\'s OK! You have {count} streak freezes available. Would you like to use one to protect your current streak?'**
+  String streakFreezesAvailableMessage(Object count);
+
+  /// No description provided for @useStreakFreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Streak Freeze'**
+  String get useStreakFreeze;
+
+  /// No description provided for @notNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Now'**
+  String get notNow;
+
+  /// No description provided for @helpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get helpTitle;
+
+  /// No description provided for @meditationInterruptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Meditations stop unexpectedly'**
+  String get meditationInterruptionTitle;
+
+  /// No description provided for @meditationInterruptionContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This is likely due to your phone\'s battery optimization settings. Visit DontKillMyApp.com for specific instructions on how to allow Medito to run properly in the background on your device.'**
+  String get meditationInterruptionContent;
+
+  /// No description provided for @supportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'I want to support you'**
+  String get supportTitle;
+
+  /// No description provided for @supportContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You can support Medito Foundation through several methods'**
+  String get supportContent;
+
+  /// No description provided for @stopDonationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'I want to stop my monthly donation'**
+  String get stopDonationTitle;
+
+  /// No description provided for @stopDonationContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to the donation portal. You need the email address you used to set them up'**
+  String get stopDonationContent;
+
+  /// No description provided for @statsWrongTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My stats are wrong'**
+  String get statsWrongTitle;
+
+  /// No description provided for @statsWrongContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You can edit them at the dedicated stats editing page.'**
+  String get statsWrongContent;
+
+  /// No description provided for @contactUsContent.
+  ///
+  /// In en, this message translates to:
+  /// **'If you have any questions not addressed on this page, any feedback, or if you need assistance, try updating the app. If that doesn\'t help, please reach out to us. We\'re here to help!'**
+  String get contactUsContent;
+
+  /// No description provided for @contactUsActionText.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Us'**
+  String get contactUsActionText;
+
+  /// No description provided for @downloadTracksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to download tracks'**
+  String get downloadTracksTitle;
+
+  /// No description provided for @downloadTracksContent.
+  ///
+  /// In en, this message translates to:
+  /// **'To download a track, start playing it and then look for the download icon (a down arrow) at the bottom of the player screen—it\'s the second icon.\\n\\nOnce downloaded, you can access your tracks by tapping the \"Downloads\" tile on the home screen.'**
+  String get downloadTracksContent;
+
+  /// No description provided for @openBatterySettingsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit DontKillMyApp.com'**
+  String get openBatterySettingsText;
+
+  /// No description provided for @dontKillMyAppUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://dontkillmyapp.com'**
+  String get dontKillMyAppUrl;
+
+  /// No description provided for @goToDonationPortalText.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Donation Portal'**
+  String get goToDonationPortalText;
+
+  /// No description provided for @editStatsActionText.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Stats'**
+  String get editStatsActionText;
+
+  /// No description provided for @donateViaDonationFormText.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate via Donation Form'**
+  String get donateViaDonationFormText;
+
+  /// No description provided for @donateViaPayPalText.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate via PayPal'**
+  String get donateViaPayPalText;
+
+  /// No description provided for @donateViaBankTransferText.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate via Bank Transfer'**
+  String get donateViaBankTransferText;
+
+  /// No description provided for @donationFormUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://meditofoundation.org/donate'**
+  String get donationFormUrl;
+
+  /// No description provided for @payPalDonationUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://paypal.me/meditofoundation'**
+  String get payPalDonationUrl;
+
+  /// No description provided for @bankTransferDetailsUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://meditofoundation.org/about/bank-details'**
+  String get bankTransferDetailsUrl;
+
+  /// No description provided for @donationPortalUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://bit.ly/3yFqVbM'**
+  String get donationPortalUrl;
+
+  /// No description provided for @contactFormBaseUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://tally.so/r/wLGBaO'**
+  String get contactFormBaseUrl;
+
+  /// No description provided for @batteryOptimizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device has additional battery optimization'**
+  String get batteryOptimizationTitle;
+
+  /// No description provided for @batteryOptimizationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the steps and disable the optimizations to allow smooth functioning of this app'**
+  String get batteryOptimizationDescription;
+
+  /// No description provided for @autoStartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Auto Start'**
+  String get autoStartTitle;
+
+  /// No description provided for @autoStartDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the steps and enable the auto start of this app'**
+  String get autoStartDescription;
+
+  /// No description provided for @batteryOptimizationAlreadyDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery optimization is already disabled for Medito'**
+  String get batteryOptimizationAlreadyDisabled;
+
+  /// No description provided for @donationRetentionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please Reconsider'**
+  String get donationRetentionTitle;
+
+  /// No description provided for @donationRetentionMainMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Millions of people rely on Medito, and we operate solely on donations.'**
+  String get donationRetentionMainMessage;
+
+  /// No description provided for @donationRetentionBenefitsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Your support helps us:'**
+  String get donationRetentionBenefitsHeading;
+
+  /// No description provided for @donationRetentionBenefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new meditation content regularly'**
+  String get donationRetentionBenefit1;
+
+  /// No description provided for @donationRetentionBenefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'Develop new features to improve your experience'**
+  String get donationRetentionBenefit2;
+
+  /// No description provided for @donationRetentionBenefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Medito free and accessible for everyone'**
+  String get donationRetentionBenefit3;
+
+  /// No description provided for @donationRetentionFinancialMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re experiencing financial difficulties, we understand. But if you can continue your support, even at a reduced amount, it would make a significant difference.'**
+  String get donationRetentionFinancialMessage;
+
+  /// No description provided for @stayAsDonorButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay as a donor'**
+  String get stayAsDonorButtonText;
+
+  /// No description provided for @continueToCancellationButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to cancellation'**
+  String get continueToCancellationButtonText;
+
+  /// No description provided for @donationRetentionThankYouMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you! Your continued support means the world to us and helps millions of people access meditation.'**
+  String get donationRetentionThankYouMessage;
+
+  /// No description provided for @errorNetworkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to connect to server'**
+  String get errorNetworkMessage;
+
+  /// No description provided for @errorNoInternetMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get errorNoInternetMessage;
+
+  /// No description provided for @errorTimeoutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out'**
+  String get errorTimeoutMessage;
+
+  /// No description provided for @errorUnauthorizedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired, please sign in again'**
+  String get errorUnauthorizedMessage;
+
+  /// No description provided for @errorNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Content not found'**
+  String get errorNotFoundMessage;
+
+  /// No description provided for @errorServerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error, please try again later'**
+  String get errorServerMessage;
+
+  /// No description provided for @errorUnknownMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong, please try again'**
+  String get errorUnknownMessage;
+
+  /// No description provided for @inactiveEmailError.
+  ///
+  /// In en, this message translates to:
+  /// **'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.'**
+  String get inactiveEmailError;
+
+  /// No description provided for @enableDndDuringMeditation.
+  ///
+  /// In en, this message translates to:
+  /// **'Silence phone during meditation'**
+  String get enableDndDuringMeditation;
+
+  /// No description provided for @donateToMedito.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate Now'**
+  String get donateToMedito;
+
+  /// No description provided for @currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currency;
+
+  /// No description provided for @custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Amount'**
+  String get custom;
+
+  /// No description provided for @payWithPaypal.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate with PayPal'**
+  String get payWithPaypal;
+
+  /// No description provided for @bankTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Transfer'**
+  String get bankTransfer;
+
+  /// No description provided for @changeCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Currency'**
+  String get changeCurrency;
+
+  /// No description provided for @chooseAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an amount'**
+  String get chooseAmount;
+
+  /// No description provided for @otherPaymentMethods.
+  ///
+  /// In en, this message translates to:
+  /// **'Other donation methods'**
+  String get otherPaymentMethods;
+
+  /// No description provided for @donationSecurityMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All donations are securely processed. We are a registered non-profit organisation dedicated to making meditation accessible to everyone.'**
+  String get donationSecurityMessage;
+
+  /// No description provided for @donationImpactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your donation helps us to:'**
+  String get donationImpactTitle;
+
+  /// No description provided for @donationImpactPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'• Create new free meditation content\\n• Maintain the app without ads\\n• Make mental wellbeing accessible to all\\n• Helps us keep meditation free for everyone'**
+  String get donationImpactPoints;
+
+  /// No description provided for @donationSecurityInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'We do not sell or trade your information with anyone.'**
+  String get donationSecurityInfo;
+
+  /// No description provided for @foundationRegistrationInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Medito Foundation or in Dutch, Stichting Medito is a non-profit organisation registered in the Netherlands.'**
+  String get foundationRegistrationInfo;
+
+  /// No description provided for @foundationContactInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'KvK-nummer: 75284251 - RSIN: 860222627 - Email: hello@meditofoundation.org'**
+  String get foundationContactInfo;
+
+  /// No description provided for @redirectingToSecurePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Redirecting to a secure payment page...'**
+  String get redirectingToSecurePayment;
+
+  /// No description provided for @couldNotOpenDonationPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the donation page.'**
+  String get couldNotOpenDonationPage;
+
+  /// No description provided for @monthlyDonation.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get monthlyDonation;
+
+  /// No description provided for @singleDonation.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time'**
+  String get singleDonation;
+
+  /// No description provided for @monthlyDonationImpact.
+  ///
+  /// In en, this message translates to:
+  /// **'£10/month can bring meditation to hundreds, helping fight depression and anxiety.'**
+  String get monthlyDonationImpact;
+
+  /// No description provided for @oneTimeDonationImpact.
+  ///
+  /// In en, this message translates to:
+  /// **'Your donation directly supports free mindfulness resources, bringing peace to thousands today.'**
+  String get oneTimeDonationImpact;
+
+  /// No description provided for @impactCardHelpMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Help millions worldwide access free meditation'**
+  String get impactCardHelpMessage;
+
+  /// No description provided for @impactCardTestimonial.
+  ///
+  /// In en, this message translates to:
+  /// **'\"Medito pulled me through a seriously dark period in my life\" - Medito meditator'**
+  String get impactCardTestimonial;
+
+  /// No description provided for @favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
+
+  /// No description provided for @noFavoriteTracksYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite tracks yet'**
+  String get noFavoriteTracksYet;
+
+  /// No description provided for @noFavoritePacksYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite packs yet'**
+  String get noFavoritePacksYet;
+
+  /// No description provided for @noFavoritesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites yet'**
+  String get noFavoritesYet;
+
+  /// No description provided for @addItemsToFavoritesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add items to your favorites to see them here'**
+  String get addItemsToFavoritesMessage;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @tracks.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks'**
+  String get tracks;
+
+  /// No description provided for @packs.
+  ///
+  /// In en, this message translates to:
+  /// **'Packs'**
+  String get packs;
+
+  /// No description provided for @shopTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get shopTitle;
+
+  /// No description provided for @emailExistsDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing Account Found'**
+  String get emailExistsDialogTitle;
+
+  /// No description provided for @emailExistsDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Looks like you have signed in with an email address before. Would you like to sign in with your email address again?'**
+  String get emailExistsDialogMessage;
+
+  /// No description provided for @emailExistsContinueNewAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get emailExistsContinueNewAccount;
+
+  /// No description provided for @emailExistsSignInWithEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Email'**
+  String get emailExistsSignInWithEmail;
+
+  /// No description provided for @analyticsTrackingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Collection'**
+  String get analyticsTrackingTitle;
+
+  /// No description provided for @analyticsTrackingContent.
+  ///
+  /// In en, this message translates to:
+  /// **'We collect anonymous usage data to help us improve the app. No personal information is collected.'**
+  String get analyticsTrackingContent;
+
+  /// No description provided for @turnOffAnalyticsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Off Analytics'**
+  String get turnOffAnalyticsText;
+
+  /// No description provided for @turnOnAnalyticsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn On Analytics'**
+  String get turnOnAnalyticsText;
+
+  /// No description provided for @analyticsDisabledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics tracking has been disabled'**
+  String get analyticsDisabledMessage;
+
+  /// No description provided for @analyticsEnabledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics tracking has been enabled'**
+  String get analyticsEnabledMessage;
+
+  /// No description provided for @iosTrackingDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Collection'**
+  String get iosTrackingDialogTitle;
+
+  /// No description provided for @iosTrackingDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will disable analytics tracking in the app. Note that you can also control tracking permissions at the system level in your iOS Settings under Privacy & Security > Tracking.'**
+  String get iosTrackingDialogContent;
+
+  /// No description provided for @iosTrackingDialogCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get iosTrackingDialogCancel;
+
+  /// No description provided for @iosTrackingDialogDisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable Tracking'**
+  String get iosTrackingDialogDisable;
+
+  /// No description provided for @newProductLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW'**
+  String get newProductLabel;
+
+  /// No description provided for @packsSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Packs'**
+  String get packsSectionHeader;
+
+  /// No description provided for @tracksSectionHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks'**
+  String get tracksSectionHeader;
+
+  /// No description provided for @noResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found for your search'**
+  String get noResultsFound;
+
+  /// No description provided for @statsWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Introducing Consistency Score!'**
+  String get statsWelcomeTitle;
+
+  /// No description provided for @statsWelcomeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication.\\n\\nYour home screen will show your best score to keep you motivated.'**
+  String get statsWelcomeMessage;
+
+  /// No description provided for @accountDeletionInitiated.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deletion process initiated. Please complete the steps in your browser.'**
+  String get accountDeletionInitiated;
+
+  /// No description provided for @reportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Error'**
+  String get reportError;
+
+  /// No description provided for @errorReportedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you, your report has been sent.'**
+  String get errorReportedMessage;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @languageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change app language'**
+  String get languageSubtitle;
+
+  /// No description provided for @selectLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguage;
+
+  /// No description provided for @systemLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get systemLanguage;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @spanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Español'**
+  String get spanish;
+
+  /// Title for reporting issues with a meditation track
+  ///
+  /// In en, this message translates to:
+  /// **'Report Track'**
+  String get reportTrack;
+
+  /// Button text to report issues for the entire track
+  ///
+  /// In en, this message translates to:
+  /// **'Report for this track'**
+  String get reportForThisTrack;
+
+  /// Button text to report issues at the current playback position
+  ///
+  /// In en, this message translates to:
+  /// **'Report at'**
+  String get reportAtCurrentPosition;
+
+  /// Dialog description text for reporting track issues
+  ///
+  /// In en, this message translates to:
+  /// **'Report an issue with \"{trackTitle}\"'**
+  String reportTrackDescription(String trackTitle);
+
+  /// Question shown in the report dialog
+  ///
+  /// In en, this message translates to:
+  /// **'What would you like to report?'**
+  String get reportDialogQuestion;
+
+  /// Error message when reading from local storage fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read data from local storage'**
+  String get storageReadError;
+
+  /// Error message when account is inactive
+  ///
+  /// In en, this message translates to:
+  /// **'Account is inactive'**
+  String get accountInactiveError;
+
+  /// Error message for rate limit errors
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get rateLimitError;
+
+  /// Title for the 'no background sound' option
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get backgroundSoundNone;
+
+  /// Label for custom donation amount
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Amount'**
+  String get customAmount;
+
+  /// Label for debug information
+  ///
+  /// In en, this message translates to:
+  /// **'Debug info'**
+  String get debugInfoLabel;
+
+  /// Error message when a required field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Field is Required'**
+  String get fieldRequiredError;
+
+  /// Error message for invalid input
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Input'**
+  String get invalidInputError;
+
+  /// Error message when there's no internet connection
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure you are connected to the internet to use Medito'**
+  String get connectivityErrorMessage;
+
+  /// Error message for timeout errors
+  ///
+  /// In en, this message translates to:
+  /// **'Oops! It seems like there was an error. If the problem persists, Close the app and try again.'**
+  String get timeoutErrorMessage;
+
+  /// Generic error message for unknown errors
+  ///
+  /// In en, this message translates to:
+  /// **'An unkown error occurred. Either we\'re having issues or you\'re offline.'**
+  String get anErrorOccurredMessage;
+
+  /// Section title for help and legal settings
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Legal'**
+  String get helpLegalSection;
+
+  /// Section title for support and community settings
+  ///
+  /// In en, this message translates to:
+  /// **'Support & Community'**
+  String get supportCommunitySection;
+
+  /// Section title for customization settings
+  ///
+  /// In en, this message translates to:
+  /// **'Customisation'**
+  String get customizationSection;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) =>
+      <String>['en', 'es'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+  }
+
+  throw FlutterError(
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
+}

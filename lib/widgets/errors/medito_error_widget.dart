@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/error_widget/report_cooldown_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
@@ -30,16 +31,19 @@ class MeditoErrorWidget extends ConsumerWidget {
   final bool shouldShowCheckDownloadButton;
   final bool isScaffold;
 
-  String _getErrorMessage() {
+  String _getErrorMessage(BuildContext context) {
     return switch (error) {
-      NetworkConnectionError() => StringConstants.errorNoInternetMessage,
-      TimeoutError() => StringConstants.errorTimeoutMessage,
-      UnauthorizedError() => StringConstants.errorUnauthorizedMessage,
-      NotFoundError() => StringConstants.errorNotFoundMessage,
-      ServerError() => StringConstants.errorServerMessage,
-      UnknownError() => StringConstants.errorUnknownMessage,
-      RefreshTokenError() => StringConstants.errorUnauthorizedMessage,
-      _ => StringConstants.errorUnknownMessage,
+      NetworkConnectionError() =>
+        AppLocalizations.of(context)!.errorNoInternetMessage,
+      TimeoutError() => AppLocalizations.of(context)!.errorTimeoutMessage,
+      UnauthorizedError() =>
+        AppLocalizations.of(context)!.errorUnauthorizedMessage,
+      NotFoundError() => AppLocalizations.of(context)!.errorNotFoundMessage,
+      ServerError() => AppLocalizations.of(context)!.errorServerMessage,
+      UnknownError() => AppLocalizations.of(context)!.errorUnknownMessage,
+      RefreshTokenError() =>
+        AppLocalizations.of(context)!.errorUnauthorizedMessage,
+      _ => AppLocalizations.of(context)!.errorUnknownMessage,
     };
   }
 
@@ -47,7 +51,7 @@ class MeditoErrorWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var uiState = ref.watch(meditoErrorWidgetProvider(
       MeditoErrorWidgetUIState(
-          shouldShowCheckDownloadButton, _getErrorMessage()),
+          shouldShowCheckDownloadButton, _getErrorMessage(context)),
     ));
     var textStyle = Theme.of(context).textTheme.headlineMedium;
 
@@ -97,12 +101,13 @@ class MeditoErrorWidget extends ConsumerWidget {
                 children: <TextSpan>[
                   if (isShowCheckDownload)
                     TextSpan(
-                      text: '${StringConstants.meanWhileListen} ',
+                      text: '${AppLocalizations.of(context)!.meanWhileListen} ',
                       style: textStyle,
                     ),
                   if (isShowCheckDownload)
                     TextSpan(
-                      text: StringConstants.downloads.toLowerCase(),
+                      text:
+                          AppLocalizations.of(context)!.downloads.toLowerCase(),
                       style: textStyle?.copyWith(
                         decoration: TextDecoration.underline,
                         color: ColorConstants.lightPurple,
@@ -132,14 +137,14 @@ class MeditoErrorWidget extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text(StringConstants.retry),
+                      child: Text(AppLocalizations.of(context)!.retry),
                     ),
                   ),
                   const SizedBox(height: 8),
                   SizedBox(
                     width: 300,
                     child: LoadingButtonWidget(
-                      btnText: StringConstants.signInAgain,
+                      btnText: AppLocalizations.of(context)!.signInAgain,
                       onPressed: () async {
                         final authRepository =
                             ProviderScope.containerOf(context)
@@ -187,7 +192,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text(StringConstants.retry),
+                      child: Text(AppLocalizations.of(context)!.retry),
                     ),
                   ),
                   SizedBox(
@@ -207,7 +212,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text(StringConstants.goToDownloads),
+                      child: Text(AppLocalizations.of(context)!.goToDownloads),
                     ),
                   ),
                 ],
@@ -224,14 +229,14 @@ class MeditoErrorWidget extends ConsumerWidget {
                             .startCooldown();
                         showSnackBar(
                           context,
-                          StringConstants.errorReportedMessage,
+                          AppLocalizations.of(context)!.errorReportedMessage,
                         );
                       },
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.transparent,
                 ),
                 child: Text(
-                  StringConstants.reportError,
+                  AppLocalizations.of(context)!.reportError,
                   style: TextStyle(
                     color: isCoolingDown
                         ? ColorConstants.lightPurple.withOpacity(0.5)

@@ -7,7 +7,8 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:medito/constants/strings/string_constants.dart';
+
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/network_image_widget.dart';
 
 const _kAutoScrollDelay = Duration(seconds: 10);
@@ -70,11 +71,11 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         height16,
-        const Padding(
-          padding: EdgeInsets.only(left: padding16),
+        Padding(
+          padding: const EdgeInsets.only(left: padding16),
           child: Text(
-            'Featured',
-            style: TextStyle(
+            AppLocalizations.of(context)!.carouselTitle,
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w400,
               fontFamily: teachers,
@@ -205,7 +206,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(_kCardBorderRadius),
       child: Banner(
-        message: bannerLabel ?? StringConstants.neww,
+        message: bannerLabel ?? AppLocalizations.of(context)!.neww,
         location: BannerLocation.topStart,
         color: bannerColor,
         textStyle: TextStyle(

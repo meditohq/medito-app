@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' show Platform;
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../constants/strings/string_constants.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../models/favorites/favorite_item.dart';
 import '../../../../models/pack/pack_model.dart';
 import '../../../../providers/favorites/favorites_provider.dart';
@@ -25,11 +25,10 @@ class PackViewBottomBar extends ConsumerWidget {
     required this.onBackPressed,
   });
 
-  void _sharePack() {
+  void _sharePack(BuildContext context) {
     final deepLink = 'https://medito.app/packs/$packId';
-    final shareText = StringConstants.sharePackText
-        .replaceAll('{packName}', packName)
-        .replaceAll('{link}', deepLink);
+    final shareText =
+        AppLocalizations.of(context)!.sharePackText(packName, deepLink);
     Share.share(shareText);
   }
 
@@ -46,10 +45,10 @@ class PackViewBottomBar extends ConsumerWidget {
               _buildBottomSheetTile(
                 context,
                 icon: HugeIcons.solidRoundedSiri,
-                title: StringConstants.addToSiri,
+                title: AppLocalizations.of(context)!.addToSiri,
                 onTap: () {
                   addToSiri(
-                    title: '${StringConstants.open} $packName',
+                    title: '${AppLocalizations.of(context)!.open} $packName',
                     id: packId,
                     url: 'org.meditofoundation://packs/$packId',
                   );
@@ -61,9 +60,9 @@ class PackViewBottomBar extends ConsumerWidget {
               icon: Platform.isIOS
                   ? HugeIcons.strokeRoundedShare05
                   : HugeIcons.strokeRoundedShare08,
-              title: StringConstants.share,
+              title: AppLocalizations.of(context)!.share,
               onTap: () {
-                _sharePack();
+                _sharePack(context);
                 Navigator.pop(context);
               },
             ),
@@ -160,7 +159,9 @@ class PackViewBottomBar extends ConsumerWidget {
               : HugeIcons.strokeRoundedShare08,
           color: ColorConstants.white,
         ),
-        onTap: Platform.isIOS ? () => _showBottomSheet(context) : _sharePack,
+        onTap: Platform.isIOS
+            ? () => _showBottomSheet(context)
+            : () => _sharePack(context),
       ),
       rightItem: BottomActionBarItem(
         child: HugeIcon(
