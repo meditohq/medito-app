@@ -25,7 +25,6 @@ class TypeConstants {
 }
 
 class RouteConstants {
-  static const String help = 'help';
   static const String donation = 'donation';
 }
 

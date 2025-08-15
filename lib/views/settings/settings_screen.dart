@@ -87,12 +87,12 @@ class SettingsScreen extends ConsumerWidget {
     final List<SettingsItem> settingsItems = [
       SettingsItem(
         section: AppLocalizations.of(context)!.helpLegalSection,
-        type: TypeConstants.route,
+        type: TypeConstants.url,
         title: AppLocalizations.of(context)!.helpTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedHelpCircle,
             color: ColorConstants.white),
-        path: RouteConstants.help,
+        path: 'https://medito.support.site/',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,
@@ -250,10 +250,89 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildDebugTile(BuildContext context, WidgetRef ref) {
-    return ListTile(
-      title: Text(AppLocalizations.of(context)!.debugInfo),
-      leading: const Icon(Icons.bug_report),
+    return RowItemWidget(
+      title: AppLocalizations.of(context)!.debugInfo,
+      icon: const Icon(Icons.bug_report),
       onTap: () => _showDebugBottomSheet(context, ref),
+    );
+  }
+
+  Widget _buildAnalyticsTile(BuildContext context, WidgetRef ref) {
+    final analyticsService = ref.read(analyticsServiceProvider);
+    final isAnalyticsEnabledAsync = ref.watch(analyticsEnabledProvider);
+
+    return isAnalyticsEnabledAsync.when(
+      data: (isAnalyticsEnabled) => RowItemWidget(
+        icon: HugeIcon(
+          icon: HugeIcons.solidSharpSettings03,
+          color: ColorConstants.white,
+        ),
+        title: AppLocalizations.of(context)!.analyticsTrackingTitle,
+        hasUnderline: true,
+        isSwitch: true,
+        switchValue: isAnalyticsEnabled,
+        onSwitchChanged: (value) async {
+          if (Platform.isIOS && isAnalyticsEnabled) {
+            final bool shouldProceed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: ColorConstants.ebony,
+                    title: Text(
+                      AppLocalizations.of(context)!.iosTrackingDialogTitle,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    content: Text(
+                      AppLocalizations.of(context)!.iosTrackingDialogContent,
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text(
+                          AppLocalizations.of(context)!.iosTrackingDialogCancel,
+                          style: const TextStyle(
+                              color: ColorConstants.lightPurple),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: Text(
+                          AppLocalizations.of(context)!
+                              .iosTrackingDialogDisable,
+                          style: const TextStyle(
+                              color: ColorConstants.lightPurple),
+                        ),
+                      ),
+                    ],
+                  ),
+                ) ??
+                false;
+
+            if (!shouldProceed) {
+              return;
+            }
+          }
+
+          await analyticsService.setConsent(
+            analyticsStorageConsentGranted: value,
+            adStorageConsentGranted: value,
+            adUserDataConsentGranted: value,
+            adPersonalizationSignalsConsentGranted: value,
+          );
+
+          // Invalidate the provider to refresh the state
+          ref.invalidate(analyticsEnabledProvider);
+
+          showSnackBar(
+            context,
+            value
+                ? AppLocalizations.of(context)!.analyticsEnabledMessage
+                : AppLocalizations.of(context)!.analyticsDisabledMessage,
+          );
+        },
+      ),
+      loading: () => const CircularProgressIndicator(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 
@@ -375,6 +454,7 @@ class SettingsScreen extends ConsumerWidget {
       ],
       _buildSectionTitle(context, AppLocalizations.of(context)!.advanced),
       _buildDebugTile(context, ref),
+      _buildAnalyticsTile(context, ref),
       if (kDebugMode) _buildOnboardingTile(context, ref),
     ];
 

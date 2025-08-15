@@ -18,3 +18,8 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 final analyticsServiceProvider = Provider<FirebaseAnalyticsService>(
   (ref) => FirebaseAnalyticsService(),
 );
+
+final analyticsEnabledProvider = FutureProvider<bool>((ref) async {
+  final analyticsService = ref.read(analyticsServiceProvider);
+  return analyticsService.isAnalyticsEnabled();
+});

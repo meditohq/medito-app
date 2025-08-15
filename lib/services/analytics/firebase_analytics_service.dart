@@ -159,6 +159,11 @@ class FirebaseAnalyticsService {
     }
   }
 
+  /// Get the user's analytics consent preference
+  Future<bool> isAnalyticsEnabled() async {
+    return await _getConsentPreference();
+  }
+
   /// Set all consent flags to true using consent mode v2
   Future<void> setConsentToTrue() async {
     try {
