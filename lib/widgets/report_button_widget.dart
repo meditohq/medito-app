@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 import '../constants/colors/color_constants.dart';
 import '../models/track/track_model.dart';
@@ -20,7 +21,7 @@ class ReportButtonWidget extends ConsumerWidget {
     return IconButton(
       onPressed: () => _showReportDialog(context, ref),
       icon: const Icon(
-        Icons.flag_outlined,
+        HugeIcons.strokeRoundedAlert01,
         color: ColorConstants.white,
         size: 24,
       ),

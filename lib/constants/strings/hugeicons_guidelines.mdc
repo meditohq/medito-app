@@ -1,0 +1,38 @@
+# HugeIcons Usage Guidelines
+
+## Overview
+Always use HugeIcons instead of standard Icons throughout the Medito project. HugeIcons provide better visual consistency and are the preferred icon set for the app.
+
+## Key Principles
+- **Never use standard Icons** (`Icons.*`) in new code
+- **Always use HugeIcons** (`HugeIcons.*`) for all icon implementations
+- **Maintain visual consistency** across the entire application
+
+## Common HugeIcons Examples
+- `HugeIcons.solidSharpRepeat` - For repeat functionality (inactive state)
+- `HugeIcons.solidStandardRepeatOne01` - For repeat functionality (active state)
+- `HugeIcons.strokeStandardGoBackward10Sec` - For skip backward 10 seconds
+- `HugeIcons.strokeStandardGoForward10Sec` - For skip forward 10 seconds
+- `HugeIcons.solidRoundedPlayCircle` - For play button
+- `HugeIcons.solidRoundedPauseCircle` - For pause button
+
+## Import Statement
+```dart
+import 'package:hugeicons/hugeicons.dart';
+```
+
+## Usage Pattern
+```dart
+Icon(
+  HugeIcons.solidSharpRepeat,
+  size: 40,
+  color: Colors.white,
+)
+```
+
+## Migration Notes
+When updating existing code, replace all instances of `Icons.*` with appropriate `HugeIcons.*` equivalents to maintain consistency.
+description:
+globs:
+alwaysApply: false
+---

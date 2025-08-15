@@ -21,6 +21,7 @@ class IosAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
   final _httpApiService = HttpApiService();
   bool _isInitialized = false;
+  RepeatMode _currentRepeatMode = RepeatMode.none;
 
   IosAudioHandler();
 
@@ -275,6 +276,19 @@ class IosAudioHandler extends BaseAudioHandler {
     return _player.setSpeed(speed);
   }
 
+  Future<void> setCustomRepeatMode(RepeatMode mode) async {
+    _currentRepeatMode = mode;
+
+    switch (mode) {
+      case RepeatMode.none:
+        await _player.setLoopMode(LoopMode.off);
+        break;
+      case RepeatMode.infinite:
+        await _player.setLoopMode(LoopMode.one);
+        break;
+    }
+  }
+
   @override
   Future<void> play() async {
     final session = await AudioSession.instance;
@@ -314,6 +328,9 @@ class IosAudioHandler extends BaseAudioHandler {
         downloadPath,
       );
     }
+
+    await setCustomRepeatMode(_currentRepeatMode);
+
     _trackStateSubject.add(trackData);
   }
 }

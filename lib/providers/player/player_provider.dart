@@ -76,8 +76,8 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     var trackData = Track(
       id: track.id,
       title: track.title,
-      artist: track.audio.first.guideName,
-      artistUrl: track.artist?.path ?? '',
+      artist: track.audio.first.guideName ?? '',
+      artistUrl: track.artist?.path,
       description: track.description,
       imageUrl: imageUrl,
     );
@@ -223,6 +223,14 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       _api.setSpeed(speed);
     } else {
       iosAudioHandler.setSpeed(speed);
+    }
+  }
+
+  void setRepeatMode(RepeatMode mode) {
+    if (Platform.isAndroid) {
+      _api.setRepeatMode(mode);
+    } else {
+      iosAudioHandler.setCustomRepeatMode(mode);
     }
   }
 

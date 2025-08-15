@@ -24,6 +24,11 @@ class AudioData {
   Track track;
 }
 
+enum RepeatMode {
+  none,
+  infinite,
+}
+
 @HostApi()
 abstract class MeditoAndroidAudioServiceManager {
   void startService();
@@ -47,6 +52,8 @@ abstract class MeditoAudioServiceApi {
   void skip10SecondsForward();
 
   void skip10SecondsBackward();
+
+  void setRepeatMode(RepeatMode mode);
 
   void setBackgroundSound(String? uri);
 
@@ -117,7 +124,7 @@ class Track {
     required this.title,
     required this.description,
     required this.imageUrl,
-    required this.artist,
+    this.artist,
     this.artistUrl,
   });
 }

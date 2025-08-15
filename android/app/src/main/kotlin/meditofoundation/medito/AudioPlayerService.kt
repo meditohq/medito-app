@@ -67,6 +67,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private var isServiceFullyInitialized = false
     private var flutterEngine: io.flutter.embedding.engine.FlutterEngine? = null
     private lateinit var audioManager: AudioManager
+    private var currentRepeatMode: RepeatMode = RepeatMode.NONE
 
     // Result callback when service is ready
     private var readinessCallback: ((Boolean) -> Unit)? = null
@@ -318,7 +319,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
             primaryPlayer.addListener(this)
 
-            primaryMediaSession = MediaSession.Builder(this, primaryPlayer)
+            primaryMediaSession = MediaSession.Builder(this, primaryPlayer) 
                 .setId("MeditoAudioSession_${System.currentTimeMillis()}")
                 .build()
             Log.d(TAG, "🔊 Media session created successfully")
@@ -560,6 +561,16 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
             primaryPlayer.setMediaItem(primaryMediaItem)
 
+            // Apply current repeat mode
+            when (currentRepeatMode) {
+                RepeatMode.NONE -> {
+                    primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
+                }
+                RepeatMode.INFINITE -> {
+                    primaryPlayer.repeatMode = Player.REPEAT_MODE_ONE
+                }
+            }
+
             // Request audio focus before preparing (but don't stop background sound)
             requestAudioFocus()
 
@@ -777,6 +788,24 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             return
         }
         primaryPlayer.seekTo(currentPosition - 10000)
+    }
+
+    override fun setRepeatMode(mode: RepeatMode) {
+        Log.d(TAG, "🔊 Setting repeat mode to: $mode")
+        currentRepeatMode = mode
+        
+        if (::primaryPlayer.isInitialized) {
+            when (mode) {
+                RepeatMode.NONE -> {
+                    primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
+                    Log.d(TAG, "🔊 Repeat mode set to OFF")
+                }
+                RepeatMode.INFINITE -> {
+                    primaryPlayer.repeatMode = Player.REPEAT_MODE_ONE
+                    Log.d(TAG, "🔊 Repeat mode set to ONE")
+                }
+            }
+        }
     }
 
     override fun stopAudio() {
