@@ -108,8 +108,11 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   HugeIcon(
                                     icon: HugeIcons.solidRoundedFire,
@@ -117,14 +120,16 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                     color: ColorConstants.white,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    AppLocalizations.of(context)!
-                                        .statsWelcomeTitle,
-                                    style: TextStyle(
-                                      color: ColorConstants.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: dmSans,
+                                  Expanded(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .statsWelcomeTitle,
+                                      style: TextStyle(
+                                        color: ColorConstants.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: dmSans,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -346,6 +351,8 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                   displayType == StreakCircleDisplayType.currentStreak;
 
               return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
                     width: 24,
@@ -376,12 +383,14 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    AppLocalizations.of(context)!.alwaysShowStreakOnHomepage,
-                    style: TextStyle(
-                      color: ColorConstants.white,
-                      fontSize: 14,
-                      fontFamily: dmSans,
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context)!.alwaysShowStreakOnHomepage,
+                      style: TextStyle(
+                        color: ColorConstants.white,
+                        fontSize: 14,
+                        fontFamily: dmSans,
+                      ),
                     ),
                   ),
                 ],
