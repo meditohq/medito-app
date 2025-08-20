@@ -20,9 +20,9 @@ class ReportButtonWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       onPressed: () => _showReportDialog(context, ref),
-      icon: const Icon(
+      icon: Icon(
         HugeIcons.strokeRoundedAlert01,
-        color: ColorConstants.white,
+        color: ColorConstants.white.withValues(alpha: 0.5),
         size: 24,
       ),
       padding: const EdgeInsets.all(12),
