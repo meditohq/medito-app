@@ -4,11 +4,11 @@ import 'package:medito/models/models.dart';
 import 'package:medito/services/network/http_api_service.dart';
 
 class HeaderService {
-  final DeviceAndAppInfoModel deviceInfo;
+  DeviceAndAppInfoModel _deviceInfo;
   String? _fcmToken;
   final _httpApiService = HttpApiService();
 
-  HeaderService(this.deviceInfo) {
+  HeaderService(this._deviceInfo) {
     _initFcmTokenListener();
   }
 
@@ -35,19 +35,28 @@ class HeaderService {
     }
   }
 
+  /// Update the device info and refresh headers
+  /// This is useful when the language changes
+  void updateDeviceInfo(DeviceAndAppInfoModel newDeviceInfo) {
+    _deviceInfo = newDeviceInfo;
+    _updateHeaders();
+    AppLogger.i('HEADER',
+        'Device info updated, headers refreshed. Language: ${_deviceInfo.languageCode}');
+  }
+
   void _updateHeaders() {
     var customHeaders = _createCustomHeaders();
     _httpApiService.addDeviceHeaders(customHeaders);
   }
 
   Map<String, String> _createCustomHeaders() => {
-        'device-os': deviceInfo.os,
-        'device-language': deviceInfo.languageCode,
-        'device-model': deviceInfo.model,
-        'app-version': deviceInfo.appVersion,
+        'device-os': _deviceInfo.os,
+        'device-language': _deviceInfo.languageCode,
+        'device-model': _deviceInfo.model,
+        'app-version': _deviceInfo.appVersion,
         'device-time': '${DateTime.now()}',
-        'device-platform': deviceInfo.platform,
+        'device-platform': _deviceInfo.platform,
         if (_fcmToken != null) 'fcmt': _fcmToken!,
-        'currency-name': deviceInfo.currencyName,
+        'currency-name': _deviceInfo.currencyName,
       };
 }

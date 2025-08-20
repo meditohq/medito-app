@@ -15,6 +15,7 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
@@ -24,6 +25,7 @@ import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/providers/locale_provider.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/services/network/header_service.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
 
@@ -581,9 +583,10 @@ class SettingsScreen extends ConsumerWidget {
                 title: Text(AppLocalizations.of(context)!.systemLanguage),
                 value: LocaleConstants.system,
                 groupValue: currentSetting,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value != null) {
-                    localeNotifier.setLocale(value);
+                    await localeNotifier.setLocale(value);
+                    await _refreshHeadersAfterLanguageChange(ref);
                     Navigator.of(context).pop();
                   }
                 },
@@ -592,9 +595,10 @@ class SettingsScreen extends ConsumerWidget {
                 title: Text(AppLocalizations.of(context)!.english),
                 value: LocaleConstants.english,
                 groupValue: currentSetting,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value != null) {
-                    localeNotifier.setLocale(value);
+                    await localeNotifier.setLocale(value);
+                    await _refreshHeadersAfterLanguageChange(ref);
                     Navigator.of(context).pop();
                   }
                 },
@@ -603,9 +607,10 @@ class SettingsScreen extends ConsumerWidget {
                 title: Text(AppLocalizations.of(context)!.spanish),
                 value: LocaleConstants.spanish,
                 groupValue: currentSetting,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value != null) {
-                    localeNotifier.setLocale(value);
+                    await localeNotifier.setLocale(value);
+                    await _refreshHeadersAfterLanguageChange(ref);
                     Navigator.of(context).pop();
                   }
                 },
@@ -621,5 +626,27 @@ class SettingsScreen extends ConsumerWidget {
         );
       },
     );
+  }
+
+  /// Refresh headers after language change to ensure the device-language header is updated
+  Future<void> _refreshHeadersAfterLanguageChange(WidgetRef ref) async {
+    try {
+      // Invalidate the device info provider to force a refresh with new language
+      ref.invalidate(deviceAndAppInfoProvider);
+
+      // Get the updated device info with new language
+      final updatedDeviceInfo = await ref.read(deviceAndAppInfoProvider.future);
+
+      // Create a new header service with updated device info
+      final headerService = HeaderService(updatedDeviceInfo);
+      await headerService.initialise();
+
+      // Log the language change for debugging
+      AppLogger.i('SETTINGS',
+          'Headers refreshed after language change. New language: ${updatedDeviceInfo.languageCode}');
+    } catch (e, stackTrace) {
+      AppLogger.e('SETTINGS', 'Error refreshing headers after language change',
+          e, stackTrace);
+    }
   }
 }

@@ -319,7 +319,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     dev.log('[SIGN_UP] Auth state before header init: ${authRepo.currentUser}',
         level: 1000);
 
-    // Then initialize headers with device info
+    // Then initialize headers with device info (which now includes user's language preference)
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
     await HeaderService(deviceInfo).initialise();
 

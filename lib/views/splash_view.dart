@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,20 +10,22 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/network/header_service.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
-import 'package:medito/views/root/root_page_view.dart';
-import 'package:medito/widgets/snackbar_widget.dart';
-import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
-import 'package:medito/providers/me/me_provider.dart';
+import 'package:medito/views/root/root_page_view.dart';
+import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:medito/utils/logger.dart';
+
 
 const _carouselHeight = 200.0;
 const _dotSize = 8.0;
@@ -327,7 +330,7 @@ class SplashViewState extends ConsumerState<SplashView>
     try {
       AppLogger.i('SPLASH', 'Starting services initialization');
 
-      // Initialize device info and headers
+      // Initialize device info and headers (which now includes user's language preference)
       final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
       final headerService = HeaderService(deviceInfo);
       await headerService.initialise();

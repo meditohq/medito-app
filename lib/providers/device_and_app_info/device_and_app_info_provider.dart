@@ -11,6 +11,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:intl/intl.dart';
+import 'package:medito/providers/locale_provider.dart';
 
 import '../../models/device_info/device_and_app_info_model.dart';
 import '../../models/me/me_model.dart';
@@ -24,7 +25,7 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(Ref ref) async {
 
   var packageInfo = await PackageInfo.fromPlatform();
   var deviceInfo = await _getDeviceInfo();
-  var localeInfo = _getLocaleInfo();
+  var localeInfo = _getLocaleInfo(ref);
 
   var data = <String, String>{
     'model': deviceInfo.model,
@@ -46,8 +47,13 @@ class _LocaleInfo {
   _LocaleInfo(this.languageCode, this.currencyName);
 }
 
-_LocaleInfo _getLocaleInfo() {
-  var languageCode = PlatformDispatcher.instance.locale.languageCode;
+_LocaleInfo _getLocaleInfo(Ref ref) {
+  // Get the current locale from the locale provider (user's preference)
+  final currentLocale = ref.watch(localeProvider);
+
+  // Use the user's selected locale, fallback to system locale if not set
+  var languageCode = currentLocale?.languageCode ??
+      PlatformDispatcher.instance.locale.languageCode;
   var currencyName =
       NumberFormat.simpleCurrency(locale: languageCode).currencyName ?? '';
 
