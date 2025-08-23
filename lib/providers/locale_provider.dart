@@ -1,5 +1,7 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/strings/shared_preference_constants.dart';
 import '../constants/types/type_constants.dart';
@@ -65,16 +67,16 @@ class LocaleNotifier extends StateNotifier<Locale?> {
         LocaleConstants.system;
   }
 
-  String getLocaleDisplayName(String localeCode) {
+  String getLocaleDisplayName(String localeCode, BuildContext context) {
     switch (localeCode) {
       case LocaleConstants.system:
-        return 'System';
+        return AppLocalizations.of(context)!.systemLanguage;
       case LocaleConstants.english:
-        return 'English';
+        return AppLocalizations.of(context)!.english;
       case LocaleConstants.spanish:
-        return 'Español';
+        return AppLocalizations.of(context)!.spanish;
       default:
-        return 'System';
+        return AppLocalizations.of(context)!.systemLanguage;
     }
   }
 }

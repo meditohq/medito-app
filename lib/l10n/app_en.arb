@@ -253,6 +253,8 @@
   "streakFreezeAvailable": "You have 1 streak freeze available. Would you like to use it to protect your current streak?",
   "streakFreezesAvailableMessage": "But it's OK! You have {count} streak freezes available. Would you like to use one to protect your current streak?",
   "useStreakFreeze": "Use Streak Freeze",
+  "streakFreezesBeta": "Streak Freezes (Beta)",
+  "streakFreezesBetaDescription": "Enable the ability to use streak freezes to maintain your meditation streak when you miss a day",
   "notNow": "Not Now",
   "helpTitle": "Help",
   "meditationInterruptionTitle": "Meditations stop unexpectedly",
@@ -362,7 +364,7 @@
   "selectLanguage": "Select Language",
   "systemLanguage": "System",
   "english": "English",
-  "spanish": "Español",
+  "spanish": "Español (beta)",
   "reportTrack": "Report Track",
   "@reportTrack": {
     "description": "Title for reporting issues with a meditation track"

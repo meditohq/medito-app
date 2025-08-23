@@ -1616,6 +1616,18 @@ abstract class AppLocalizations {
   /// **'Use Streak Freeze'**
   String get useStreakFreeze;
 
+  /// No description provided for @streakFreezesBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak Freezes (Beta)'**
+  String get streakFreezesBeta;
+
+  /// No description provided for @streakFreezesBetaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable the ability to use streak freezes to maintain your meditation streak when you miss a day'**
+  String get streakFreezesBetaDescription;
+
   /// No description provided for @notNow.
   ///
   /// In en, this message translates to:
@@ -2273,7 +2285,7 @@ abstract class AppLocalizations {
   /// No description provided for @spanish.
   ///
   /// In en, this message translates to:
-  /// **'Español'**
+  /// **'Español (beta)'**
   String get spanish;
 
   /// Title for reporting issues with a meditation track

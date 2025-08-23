@@ -16,6 +16,8 @@ class TypeConstants {
   static const String route = 'route';
   static const String toggle = 'toggle';
   static const String toggleDnd = 'toggle_dnd';
+  static const String toggleStreakFreeze = 'toggle_streak_freeze';
+  static const String languageSelector = 'language_selector';
 
   // New constants for path view
   static const String article = 'article';

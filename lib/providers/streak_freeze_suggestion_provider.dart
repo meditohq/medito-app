@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
-import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 
 // State class to hold streak freeze suggestion data
@@ -58,12 +57,6 @@ class StreakFreezeSuggestionNotifier
     // Check if streak freeze feature is enabled
     final featureFlags = ref.read(featureFlagsProvider);
     if (!featureFlags.isStreakFreezeEnabled) {
-      return;
-    }
-
-    // Check if user has active subscription
-    final meData = await ref.read(meProvider.future);
-    if (!meData.hasActiveSubscription) {
       return;
     }
 

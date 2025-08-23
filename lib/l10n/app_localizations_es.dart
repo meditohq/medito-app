@@ -830,6 +830,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get useStreakFreeze => 'Usar Congelación de Racha';
 
   @override
+  String get streakFreezesBeta => 'Congelaciones de Racha (Beta)';
+
+  @override
+  String get streakFreezesBetaDescription =>
+      'Habilita la capacidad de usar congelaciones de racha para mantener tu racha de meditación cuando te pierdas un día';
+
+  @override
   String get notNow => 'Ahora No';
 
   @override
@@ -1200,7 +1207,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get english => 'English';
 
   @override
-  String get spanish => 'Español';
+  String get spanish => 'Español (beta)';
 
   @override
   String get reportTrack => 'Reportar Track';

@@ -11,55 +11,53 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MockStatsBackend {
   static LocalAllStats? _mockStorage = LocalAllStats(
-    streakCurrent: 0,
+    streakCurrent: 5,
     streakLongest: 20,
     totalTracksCompleted: 15,
     totalTimeListened: 3600,
     tracksChecked: [],
     audioCompleted: [
+      // Activity 3 days ago (to create a current streak)
       LocalAudioCompleted(
-        timestamp: DateTime.utc(
-          2025,
-          2,
-          27,
-        ).millisecondsSinceEpoch,
+        timestamp: DateTime.now()
+            .subtract(const Duration(days: 3))
+            .millisecondsSinceEpoch,
         id: '1',
       ),
+      // Activity 4 days ago
       LocalAudioCompleted(
-        timestamp: DateTime.utc(
-          2025,
-          2,
-          26,
-        ).millisecondsSinceEpoch,
+        timestamp: DateTime.now()
+            .subtract(const Duration(days: 4))
+            .millisecondsSinceEpoch,
         id: '2',
       ),
+      // Activity 5 days ago
       LocalAudioCompleted(
-        timestamp: DateTime.utc(
-          2025,
-          2,
-          25,
-        ).millisecondsSinceEpoch,
+        timestamp: DateTime.now()
+            .subtract(const Duration(days: 5))
+            .millisecondsSinceEpoch,
         id: '3',
       ),
+      // Activity 6 days ago
       LocalAudioCompleted(
-        timestamp: DateTime.utc(
-          2025,
-          2,
-          22,
-        ).millisecondsSinceEpoch,
+        timestamp: DateTime.now()
+            .subtract(const Duration(days: 6))
+            .millisecondsSinceEpoch,
         id: '4',
       ),
+      // Activity 7 days ago
       LocalAudioCompleted(
-          timestamp: DateTime.utc(
-            2025,
-            2,
-            20,
-          ).millisecondsSinceEpoch,
-          id: '6'),
+        timestamp: DateTime.now()
+            .subtract(const Duration(days: 7))
+            .millisecondsSinceEpoch,
+        id: '5',
+      ),
+      // Gap: no activity yesterday (day -1) or today (day 0)
+      // This creates a scenario where streak freeze should be suggested
     ],
     updated: DateTime.now().millisecondsSinceEpoch,
-    streakFreezes: 2,
-    maxStreakFreezes: 2,
+    streakFreezes: 3,
+    maxStreakFreezes: 5,
     freezeUsageDates: [],
   );
 

@@ -10,6 +10,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -181,6 +182,16 @@ class SettingsScreen extends ConsumerWidget {
           color: ColorConstants.white,
         ),
         path: TypeConstants.toggleDnd,
+      ),
+      SettingsItem(
+        section: AppLocalizations.of(context)!.customizationSection,
+        type: TypeConstants.toggleStreakFreeze,
+        title: AppLocalizations.of(context)!.streakFreezesBeta,
+        icon: HugeIcon(
+          icon: HugeIcons.solidRoundedShield01,
+          color: ColorConstants.white,
+        ),
+        path: TypeConstants.toggleStreakFreeze,
       )
     ];
 
@@ -355,7 +366,8 @@ class SettingsScreen extends ConsumerWidget {
     final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
-    final isLanguageSelector = item.type == 'language_selector';
+    final isLanguageSelector = item.type == TypeConstants.languageSelector;
+    final isStreakFreezeToggle = item.type == TypeConstants.toggleStreakFreeze;
 
     if (isAccountItem) {
       return const SizedBox.shrink();
@@ -376,6 +388,22 @@ class SettingsScreen extends ConsumerWidget {
         switchValue: isDndEnabled,
         onSwitchChanged: (value) {
           ref.read(dndProvider.notifier).toggleDnd(value);
+        },
+      );
+    }
+
+    if (isStreakFreezeToggle) {
+      final featureFlags = ref.watch(featureFlagsProvider);
+
+      return RowItemWidget(
+        icon: item.icon,
+        title: item.title,
+        subTitle: AppLocalizations.of(context)!.streakFreezesBetaDescription,
+        hasUnderline: true,
+        isSwitch: true,
+        switchValue: featureFlags.isStreakFreezeEnabled,
+        onSwitchChanged: (value) {
+          ref.read(featureFlagsProvider.notifier).toggleStreakFreeze(value);
         },
       );
     }
@@ -561,7 +589,7 @@ class SettingsScreen extends ConsumerWidget {
         color: ColorConstants.white,
       ),
       title: AppLocalizations.of(context)!.language,
-      subTitle: localeNotifier.getLocaleDisplayName(currentSetting),
+      subTitle: localeNotifier.getLocaleDisplayName(currentSetting, context),
       hasUnderline: true,
       onTap: () => _showLanguageDialog(context, ref),
     );

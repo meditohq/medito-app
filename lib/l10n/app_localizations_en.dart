@@ -816,6 +816,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get useStreakFreeze => 'Use Streak Freeze';
 
   @override
+  String get streakFreezesBeta => 'Streak Freezes (Beta)';
+
+  @override
+  String get streakFreezesBetaDescription =>
+      'Enable the ability to use streak freezes to maintain your meditation streak when you miss a day';
+
+  @override
   String get notNow => 'Not Now';
 
   @override
@@ -1178,7 +1185,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
-  String get spanish => 'Español';
+  String get spanish => 'Español (beta)';
 
   @override
   String get reportTrack => 'Report Track';

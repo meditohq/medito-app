@@ -5,7 +5,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
-import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
@@ -280,7 +279,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
               _buildStatRow(
                 context,
                 AppLocalizations.of(context)!.consistencyScore,
-                '${(stats.consistencyScore! * 100).round()}%',
+                '${(stats.consistencyScore * 100).round()}%',
               ),
               _buildStatRow(
                   context,
@@ -407,15 +406,12 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
     BuildContext context,
     WidgetRef ref,
   ) {
-    final isDonor =
-        ref.watch(meProvider).valueOrNull?.hasActiveSubscription ?? false;
-
     // Check if streak freeze feature is enabled
     final isStreakFreezeEnabled =
         ref.watch(featureFlagsProvider).isStreakFreezeEnabled;
 
-    // Don't show streak freeze UI if feature is disabled or user is not a donor
-    if (!isDonor || !isStreakFreezeEnabled) return const SizedBox.shrink();
+    // Don't show streak freeze UI if feature is disabled
+    if (!isStreakFreezeEnabled) return const SizedBox.shrink();
 
     return Column(
       children: [
