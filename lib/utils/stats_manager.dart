@@ -527,6 +527,26 @@ class StatsManager {
     _allStats = LocalAllStats.empty();
   }
 
+  /// Awards a streak freeze to the user
+  Future<void> awardStreakFreeze() async {
+    if (_allStats == null) {
+      await sync();
+    }
+
+    final currentFreezes = _allStats?.streakFreezes ?? 0;
+    final maxFreezes = _allStats?.maxStreakFreezes ?? 0;
+
+    if (currentFreezes < maxFreezes) {
+      _allStats = _allStats?.copyWith(
+        streakFreezes: currentFreezes + 1,
+        updated: _getCurrentDate().millisecondsSinceEpoch,
+      );
+
+      await _saveLocalAllStatsToSharedPrefs();
+      await _statsService.postStats(_allStats!);
+    }
+  }
+
   bool get isInitialized => _isInitialized;
 
   Future<bool> hasLocalStats() async {

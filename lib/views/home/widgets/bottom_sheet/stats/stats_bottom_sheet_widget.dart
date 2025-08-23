@@ -8,7 +8,6 @@ import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
-import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:share_plus/share_plus.dart';
@@ -244,6 +243,38 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
     );
   }
 
+  Widget _buildStreakFreezeRow(
+      BuildContext context, LocalAllStats stats, WidgetRef ref) {
+    final isStreakFreezeEnabled =
+        ref.watch(featureFlagsProvider).isStreakFreezeEnabled;
+
+    if (!isStreakFreezeEnabled) {
+      return const SizedBox.shrink();
+    }
+
+    final currentFreezes = stats.streakFreezes ?? 0;
+    final maxFreezes = stats.maxStreakFreezes ?? 0;
+
+    return RowItemWidget(
+      icon: HugeIcon(
+        icon: HugeIcons.solidStandardSnow,
+        color: ColorConstants.white,
+        size: 20,
+      ),
+      iconColor: ColorConstants.white.toString(),
+      trailingIconSize: 20,
+      title: '$currentFreezes / $maxFreezes',
+      subTitle: 'Streak Freezes',
+      hasUnderline: true,
+      isTrailingIcon: false,
+      titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            fontFamily: dmSans,
+          ),
+    );
+  }
+
   String _formatTotalTimeListened(int milliseconds) {
     var hours = milliseconds ~/ (1000 * 60 * 60);
     var minutes = (milliseconds % (1000 * 60 * 60)) ~/ (1000 * 60);
@@ -297,8 +328,8 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                   context,
                   AppLocalizations.of(context)!.totalTimeListened,
                   _formatTotalTimeListened(stats.totalTimeListened)),
+              _buildStreakFreezeRow(context, stats, ref),
               _buildStreakCircleDisplayPreference(context, ref),
-              _buildFreezeInfo(stats, context, ref),
             ],
           ),
         ),
@@ -399,90 +430,5 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
         },
       ),
     );
-  }
-
-  Widget _buildFreezeInfo(
-    LocalAllStats stats,
-    BuildContext context,
-    WidgetRef ref,
-  ) {
-    // Check if streak freeze feature is enabled
-    final isStreakFreezeEnabled =
-        ref.watch(featureFlagsProvider).isStreakFreezeEnabled;
-
-    // Don't show streak freeze UI if feature is disabled
-    if (!isStreakFreezeEnabled) return const SizedBox.shrink();
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Text(
-            '${stats.streakFreezes}/${stats.maxStreakFreezes} ${AppLocalizations.of(context)!.streakFreezesAvailable}',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: ColorConstants.lightPurple,
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-        ),
-        if (_canUseStreakFreeze(stats))
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: ElevatedButton(
-              onPressed: () => _useStreakFreeze(context, ref),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorConstants.lightPurple,
-                foregroundColor: ColorConstants.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
-              child: Text(AppLocalizations.of(context)!.useStreakFreeze),
-            ),
-          ),
-      ],
-    );
-  }
-
-  bool _canUseStreakFreeze(LocalAllStats stats) {
-    // Check if user has streak freezes available and needs one
-    if ((stats.streakFreezes ?? 0) <= 0) return false;
-
-    final now = DateTime.now();
-    final yesterday = DateTime(now.year, now.month, now.day - 1);
-
-    // Check if there was activity yesterday
-    final hasActivityYesterday = stats.audioCompleted?.any((audio) {
-          final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-          return date.year == yesterday.year &&
-              date.month == yesterday.month &&
-              date.day == yesterday.day;
-        }) ??
-        false;
-
-    // Check if a freeze was already used for yesterday
-    final freezeUsedYesterday = stats.freezeUsageDates.any((timestamp) {
-      final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-      return date.year == yesterday.year &&
-          date.month == yesterday.month &&
-          date.day == yesterday.day;
-    });
-
-    // Can use a freeze if no activity yesterday and no freeze already used
-    return !hasActivityYesterday &&
-        !freezeUsedYesterday &&
-        stats.streakCurrent > 0;
-  }
-
-  void _useStreakFreeze(BuildContext context, WidgetRef ref) {
-    // Check if streak freeze feature is enabled
-    final isStreakFreezeEnabled =
-        ref.read(featureFlagsProvider).isStreakFreezeEnabled;
-
-    // Don't use streak freeze if feature is disabled
-    if (!isStreakFreezeEnabled) return;
-
-    ref.read(streakFreezeSuggestionProvider.notifier).useStreakFreeze();
-    // Show a confirmation message
-    showSnackBar(context, AppLocalizations.of(context)!.freezeUsedMessage);
   }
 }

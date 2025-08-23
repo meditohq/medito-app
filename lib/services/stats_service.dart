@@ -11,52 +11,58 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MockStatsBackend {
   static LocalAllStats? _mockStorage = LocalAllStats(
-    streakCurrent: 5,
+    streakCurrent: 6,
     streakLongest: 20,
-    totalTracksCompleted: 15,
-    totalTimeListened: 3600,
+    totalTracksCompleted: 18,
+    totalTimeListened: 4320, // 6 sessions * 720 seconds each
     tracksChecked: [],
     audioCompleted: [
-      // Activity 3 days ago (to create a current streak)
+      // Activity yesterday (day -1) - 6th day of current streak
+      LocalAudioCompleted(
+        timestamp: DateTime.now()
+            .subtract(const Duration(days: 1))
+            .millisecondsSinceEpoch,
+        id: '1',
+      ),
+      // Activity 2 days ago - 5th day of streak
+      LocalAudioCompleted(
+        timestamp: DateTime.now()
+            .subtract(const Duration(days: 2))
+            .millisecondsSinceEpoch,
+        id: '2',
+      ),
+      // Activity 3 days ago - 4th day of streak
       LocalAudioCompleted(
         timestamp: DateTime.now()
             .subtract(const Duration(days: 3))
             .millisecondsSinceEpoch,
-        id: '1',
+        id: '3',
       ),
-      // Activity 4 days ago
+      // Activity 4 days ago - 3rd day of streak
       LocalAudioCompleted(
         timestamp: DateTime.now()
             .subtract(const Duration(days: 4))
             .millisecondsSinceEpoch,
-        id: '2',
+        id: '4',
       ),
-      // Activity 5 days ago
+      // Activity 5 days ago - 2nd day of streak
       LocalAudioCompleted(
         timestamp: DateTime.now()
             .subtract(const Duration(days: 5))
             .millisecondsSinceEpoch,
-        id: '3',
+        id: '5',
       ),
-      // Activity 6 days ago
+      // Activity 6 days ago - 1st day of streak
       LocalAudioCompleted(
         timestamp: DateTime.now()
             .subtract(const Duration(days: 6))
             .millisecondsSinceEpoch,
-        id: '4',
+        id: '6',
       ),
-      // Activity 7 days ago
-      LocalAudioCompleted(
-        timestamp: DateTime.now()
-            .subtract(const Duration(days: 7))
-            .millisecondsSinceEpoch,
-        id: '5',
-      ),
-      // Gap: no activity yesterday (day -1) or today (day 0)
-      // This creates a scenario where streak freeze should be suggested
+      // No activity today (day 0) - when you meditate, this will become day 7!
     ],
     updated: DateTime.now().millisecondsSinceEpoch,
-    streakFreezes: 3,
+    streakFreezes: 2, // Start with 2 freezes so you can see it increase to 3
     maxStreakFreezes: 5,
     freezeUsageDates: [],
   );
@@ -82,7 +88,7 @@ class StatsService {
       2000; // 2 seconds minimum between syncs
 
   // Use this flag to toggle between real and mock backend
-  static const useMockBackend = false;
+  static const useMockBackend = true;
 
   StatsService({
     required HttpApiService httpApiService,

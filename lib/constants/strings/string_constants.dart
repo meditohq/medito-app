@@ -15,4 +15,8 @@ class StringConstants {
   static const String deviceOs = 'deviceOs';
   static const String devicePlatform = 'devicePlatform';
   static const String buildNumber = 'buildNumber';
+
+  // Snackbar message when user earns a new streak freeze at 7-day milestones
+  static const String streakFreezeEarned =
+      'Congratulations! You earned a streak freeze for reaching a 7-day milestone!';
 }
