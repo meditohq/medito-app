@@ -88,7 +88,7 @@ class StatsService {
       2000; // 2 seconds minimum between syncs
 
   // Use this flag to toggle between real and mock backend
-  static const useMockBackend = true;
+  static const useMockBackend = false;
 
   StatsService({
     required HttpApiService httpApiService,

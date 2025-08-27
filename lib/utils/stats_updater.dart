@@ -27,6 +27,7 @@ bool _isProcessingPendingTracks = false;
 Future<bool> handleStats(
   Map<String, dynamic> payload, {
   WidgetRef? ref,
+  StatsManager? statsManager, // For testing
 }) async {
   try {
     // First try to sync with HealthKit
@@ -36,7 +37,7 @@ Future<bool> handleStats(
     });
 
     // Then update local stats
-    var statsManager = StatsManager()..initialize();
+    statsManager ??= StatsManager()..initialize();
 
     var newAudioCompleted = LocalAudioCompleted(
       id: payload[TypeConstants.trackIdKey],
