@@ -215,8 +215,8 @@ Future<bool> _updateHealthKit(Map<String, dynamic> payload) async {
   return await HealthKitManager().writeMindfulnessData(start, end);
 }
 
-/// Checks if the user should earn a streak freeze based on reaching a 7-day milestone
-/// and awards it if conditions are met (max 1 per day)
+const int _streakFreezeInterval = 3;
+
 Future<void> _checkAndAwardStreakFreeze({
   required StatsManager statsManager,
   required int previousStreak,
@@ -236,17 +236,15 @@ Future<void> _checkAndAwardStreakFreeze({
     var currentStreak = currentStats.streakCurrent;
     AppLogger.d('STREAK_FREEZE', 'Current streak: $currentStreak');
 
-    // Check if user reached a new 7-day milestone
-    final previousMilestone = (previousStreak / 7).floor();
-    final currentMilestone = (currentStreak / 7).floor();
+    final previousMilestone = (previousStreak / _streakFreezeInterval).floor();
+    final currentMilestone = (currentStreak / _streakFreezeInterval).floor();
     AppLogger.d('STREAK_FREEZE',
         'Previous milestone: $previousMilestone, Current milestone: $currentMilestone');
-    AppLogger.d('STREAK_FREEZE', 'Streak % 7 = ${currentStreak % 7}');
-
-    // Only award if we crossed a new 7-day milestone and current streak is > 0
+    AppLogger.d('STREAK_FREEZE',
+        'Streak % $_streakFreezeInterval = ${currentStreak % _streakFreezeInterval}');
     if (currentStreak > 0 &&
         currentMilestone > previousMilestone &&
-        currentStreak % 7 == 0) {
+        currentStreak % _streakFreezeInterval == 0) {
       AppLogger.d('STREAK_FREEZE', 'Milestone conditions met!');
 
       // Check if user hasn't already reached max streak freezes

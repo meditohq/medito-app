@@ -20,6 +20,8 @@ part 'local_all_stats.g.dart';
 
 @JsonSerializable()
 class LocalAllStats {
+  static const int defaultMaxStreakFreezes = 2;
+
   final int streakCurrent;
   final int streakLongest;
   final int totalTracksCompleted;
@@ -55,8 +57,8 @@ class LocalAllStats {
       tracksChecked: [],
       audioCompleted: [],
       updated: 0,
-      streakFreezes: 0,
-      maxStreakFreezes: 0,
+      streakFreezes: 1,
+      maxStreakFreezes: defaultMaxStreakFreezes,
       freezeUsageDates: [],
       consistencyScore: 0,
     );
@@ -74,8 +76,10 @@ class LocalAllStats {
               .toList() ??
           [],
       updated: stats.updated,
-      streakFreezes: stats.streakFreezes,
-      maxStreakFreezes: stats.maxStreakFreezes,
+      streakFreezes: stats.streakFreezes > 0 ? stats.streakFreezes : 1,
+      maxStreakFreezes: stats.maxStreakFreezes > 0
+          ? stats.maxStreakFreezes
+          : defaultMaxStreakFreezes,
       freezeUsageDates: stats.freezeUsageDates,
       consistencyScore: 0,
     );
