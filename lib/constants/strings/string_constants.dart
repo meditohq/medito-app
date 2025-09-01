@@ -5,6 +5,7 @@ class StringConstants {
   static const String donationPortalUrl = 'https://bit.ly/3yFqVbM';
   static const String contactFormBaseUrl = 'https://tally.so/r/wLGBaO';
   static const String dontKillMyAppUrl = 'https://dontkillmyapp.com';
+  static const String shopUrl = 'https://shop.medito.app';
 
   // Technical constants for device info and debugging
   static const String id = 'id';

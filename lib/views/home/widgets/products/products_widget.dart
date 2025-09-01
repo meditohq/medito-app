@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/utils/logger.dart';
@@ -10,6 +11,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:medito/services/products_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class ProductsWidget extends StatelessWidget {
   final List<ProductGroupModel>? productGroups;
@@ -46,14 +48,28 @@ class ProductsWidget extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              AppLocalizations.of(context)!.meditationProducts,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w400,
-                fontFamily: 'teachers',
-                fontSize: 20,
-                height: 28 / 24,
+            child: GestureDetector(
+              onTap: () => _openShopUrl(),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.meditationProducts,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'teachers',
+                      fontSize: 20,
+                      height: 28 / 24,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    HugeIcons.solidSharpArrowRight02,
+                    color: Colors.white.withOpacity(0.7),
+                    size: 16,
+                  ),
+                ],
               ),
             ),
           ),
@@ -76,6 +92,13 @@ class ProductsWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _openShopUrl() async {
+    final uri = Uri.parse(StringConstants.shopUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }
 
