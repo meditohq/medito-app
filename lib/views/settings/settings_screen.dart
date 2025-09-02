@@ -10,13 +10,11 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:medito/utils/logger.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
@@ -24,9 +22,7 @@ import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:medito/providers/locale_provider.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/services/network/header_service.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
 
@@ -162,16 +158,6 @@ class SettingsScreen extends ConsumerWidget {
           color: ColorConstants.white,
         ),
         path: TypeConstants.customiseHomeLayout,
-      ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.customizationSection,
-        type: 'language_selector',
-        title: AppLocalizations.of(context)!.language,
-        icon: HugeIcon(
-          icon: HugeIcons.solidRoundedGlobe,
-          color: ColorConstants.white,
-        ),
-        path: 'language',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.customizationSection,
@@ -366,15 +352,10 @@ class SettingsScreen extends ConsumerWidget {
     final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
-    final isLanguageSelector = item.type == TypeConstants.languageSelector;
     final isStreakFreezeToggle = item.type == TypeConstants.toggleStreakFreeze;
 
     if (isAccountItem) {
       return const SizedBox.shrink();
-    }
-
-    if (isLanguageSelector) {
-      return _buildLanguageTile(context, ref);
     }
 
     if (isDndToggle) {
@@ -577,104 +558,5 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  Widget _buildLanguageTile(BuildContext context, WidgetRef ref) {
-    final localeNotifier = ref.read(localeProvider.notifier);
-    final currentSetting = localeNotifier.getCurrentLocaleSetting();
-
-    return RowItemWidget(
-      icon: HugeIcon(
-        icon: HugeIcons.solidRoundedGlobe,
-        color: ColorConstants.white,
-      ),
-      title: AppLocalizations.of(context)!.language,
-      subTitle: localeNotifier.getLocaleDisplayName(currentSetting, context),
-      hasUnderline: true,
-      onTap: () => _showLanguageDialog(context, ref),
-    );
-  }
-
-  void _showLanguageDialog(BuildContext context, WidgetRef ref) {
-    final localeNotifier = ref.read(localeProvider.notifier);
-    final currentSetting = localeNotifier.getCurrentLocaleSetting();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.selectLanguage),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<String>(
-                title: Text(AppLocalizations.of(context)!.systemLanguage),
-                value: LocaleConstants.system,
-                groupValue: currentSetting,
-                onChanged: (value) async {
-                  if (value != null) {
-                    await localeNotifier.setLocale(value);
-                    await _refreshHeadersAfterLanguageChange(ref);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-              RadioListTile<String>(
-                title: Text(AppLocalizations.of(context)!.english),
-                value: LocaleConstants.english,
-                groupValue: currentSetting,
-                onChanged: (value) async {
-                  if (value != null) {
-                    await localeNotifier.setLocale(value);
-                    await _refreshHeadersAfterLanguageChange(ref);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-              RadioListTile<String>(
-                title: Text(AppLocalizations.of(context)!.spanish),
-                value: LocaleConstants.spanish,
-                groupValue: currentSetting,
-                onChanged: (value) async {
-                  if (value != null) {
-                    await localeNotifier.setLocale(value);
-                    await _refreshHeadersAfterLanguageChange(ref);
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  /// Refresh headers after language change to ensure the device-language header is updated
-  Future<void> _refreshHeadersAfterLanguageChange(WidgetRef ref) async {
-    try {
-      // Invalidate the device info provider to force a refresh with new language
-      ref.invalidate(deviceAndAppInfoProvider);
-
-      // Get the updated device info with new language
-      final updatedDeviceInfo = await ref.read(deviceAndAppInfoProvider.future);
-
-      // Create a new header service with updated device info
-      final headerService = HeaderService(updatedDeviceInfo);
-      await headerService.initialise();
-
-      // Log the language change for debugging
-      AppLogger.i('SETTINGS',
-          'Headers refreshed after language change. New language: ${updatedDeviceInfo.languageCode}');
-    } catch (e, stackTrace) {
-      AppLogger.e('SETTINGS', 'Error refreshing headers after language change',
-          e, stackTrace);
-    }
   }
 }

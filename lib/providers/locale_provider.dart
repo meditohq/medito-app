@@ -29,15 +29,11 @@ class LocaleNotifier extends StateNotifier<Locale?> {
         _prefs!.getString(SharedPreferenceConstants.localePreference);
 
     if (savedLocale == null || savedLocale == LocaleConstants.system) {
-      // Use system locale
-      final systemLocale = PlatformDispatcher.instance.locale;
-      if (systemLocale.languageCode == LocaleConstants.spanish) {
-        state = const Locale(LocaleConstants.spanish);
-      } else {
-        state = const Locale(LocaleConstants.english);
-      }
+      // Force English until backend is ready for Spanish
+      state = const Locale(LocaleConstants.english);
     } else {
-      state = Locale(savedLocale);
+      // Force English even if Spanish was previously selected
+      state = const Locale(LocaleConstants.english);
     }
   }
 
@@ -49,17 +45,8 @@ class LocaleNotifier extends StateNotifier<Locale?> {
     await _prefs!
         .setString(SharedPreferenceConstants.localePreference, localeCode);
 
-    if (localeCode == LocaleConstants.system) {
-      // Use system locale
-      final systemLocale = PlatformDispatcher.instance.locale;
-      if (systemLocale.languageCode == LocaleConstants.spanish) {
-        state = const Locale(LocaleConstants.spanish);
-      } else {
-        state = const Locale(LocaleConstants.english);
-      }
-    } else {
-      state = Locale(localeCode);
-    }
+    // Force English until backend is ready for Spanish
+    state = const Locale(LocaleConstants.english);
   }
 
   String getCurrentLocaleSetting() {
