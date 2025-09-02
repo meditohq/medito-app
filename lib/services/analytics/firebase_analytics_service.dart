@@ -59,6 +59,8 @@ class FirebaseAnalyticsService {
       'email_address_save_failed2';
   static const String eventAuthTokenStorageFailed = 'auth_token_storage_failed';
   static const String eventPostMeditationFeedback = 'post_meditation_feedback';
+  static const String eventOnboardingNotificationsPermissionGranted =
+      'onboarding_notifications_permission_granted';
   static const String eventOnboardingNotificationsPermissionDenied =
       'onboarding_notifications_permission_denied';
 

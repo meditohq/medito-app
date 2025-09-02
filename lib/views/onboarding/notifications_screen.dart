@@ -50,6 +50,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
     if (status.isGranted) {
       await handler.initialize(context, ref);
+
+      // Log analytics event for permission granted in onboarding context
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService
+            .eventOnboardingNotificationsPermissionGranted,
+      );
+
       if (mounted) {
         setState(() {
           _notificationsGranted = true;
