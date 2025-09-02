@@ -63,6 +63,24 @@ class FirebaseAnalyticsService {
       'onboarding_notifications_permission_granted';
   static const String eventOnboardingNotificationsPermissionDenied =
       'onboarding_notifications_permission_denied';
+  static const String eventOnboardingSplashscreenSignupTap =
+      'onboarding_splashscreen_signup_tap';
+  static const String eventOnboardingSplashscreenContinueTap =
+      'onboarding_splashscreen_continue_tap';
+  static const String eventOnboardingSignupCompleted =
+      'onboarding_signup_completed';
+  static const String eventOnboardingReminderSetTap =
+      'onboarding_reminder_set_tap';
+  static const String eventOnboardingReminderSkipTap =
+      'onboarding_reminder_skip_tap';
+  static const String eventOnboardingReminderConfirmTap =
+      'onboarding_reminder_confirm_tap';
+  static const String eventOnboardingReminderCancelTap =
+      'onboarding_reminder_cancel_tap';
+  static const String eventOnboardingDonateNowTap = 'onboarding_donate_now_tap';
+  static const String eventOnboardingDonateNoThanksTap =
+      'onboarding_donate_no_thanks_tap';
+  static const String eventOnboardingCompleted = 'onboarding_completed';
 
   // Don't pollute Firebase from unit/widget tests executed via `flutter test`.
   static bool get _runningInTest =>

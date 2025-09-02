@@ -12,6 +12,7 @@ import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:email_validator/email_validator.dart';
@@ -268,6 +269,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
             level: 1000);
         dev.log('[SIGN_UP] User email after login: ${authRepo.getUserEmail()}',
             level: 1000);
+
+        // Log analytics event for completed signup
+        await FirebaseAnalyticsService().logEvent(
+          name: FirebaseAnalyticsService.eventOnboardingSignupCompleted,
+        );
 
         await StatsManager().clearAllStats();
         ref.read(statsProvider.notifier).refresh();

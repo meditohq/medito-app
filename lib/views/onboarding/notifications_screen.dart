@@ -83,6 +83,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }
 
   Future<void> _handleSetReminder() async {
+    // Log analytics event for set reminder tap
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
+    );
+
     final accepted = await PermissionHandler.requestAlarmPermission(context);
     if (!accepted || !mounted) return;
 
@@ -97,12 +102,26 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
 
     if (pickedTime != null && mounted) {
+      // Log analytics event for reminder confirmation
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventOnboardingReminderConfirmTap,
+        parameters: {
+          'reminder_hour': pickedTime.hour,
+          'reminder_minute': pickedTime.minute,
+        },
+      );
+
       await reminders.scheduleDailyNotification(pickedTime);
       await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
       await prefs.setInt(
           SharedPreferenceConstants.savedMinutes, pickedTime.minute);
       ref.read(reminderTimeProvider.notifier).state = pickedTime;
       _navigateNext();
+    } else if (mounted) {
+      // Log analytics event for reminder cancellation
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventOnboardingReminderCancelTap,
+      );
     }
   }
 
@@ -163,7 +182,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
-                      onPressed: _navigateNext,
+                      onPressed: () async {
+                        // Log analytics event for skip tap
+                        await FirebaseAnalyticsService().logEvent(
+                          name: FirebaseAnalyticsService
+                              .eventOnboardingReminderSkipTap,
+                        );
+                        _navigateNext();
+                      },
                       style: TextButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

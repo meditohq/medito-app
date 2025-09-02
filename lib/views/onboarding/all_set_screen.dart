@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 class AllSetScreen extends StatelessWidget {
   const AllSetScreen({super.key, this.onComplete});
 
   final VoidCallback? onComplete;
 
-  void _navigateToHome(BuildContext context) {
+  Future<void> _navigateToHome(BuildContext context) async {
+    // Log analytics event for onboarding completion
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventOnboardingCompleted,
+    );
+
     onComplete?.call();
   }
 
@@ -32,7 +38,7 @@ class AllSetScreen extends StatelessWidget {
               ),
               _buildActionButton(
                 text: AppLocalizations.of(context)!.startMeditating,
-                onPressed: () => _navigateToHome(context),
+                onPressed: () async => await _navigateToHome(context),
               ),
             ],
           ),

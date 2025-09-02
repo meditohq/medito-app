@@ -3,6 +3,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
@@ -39,8 +40,13 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
     }
   }
 
-  void _handleDonationAction(BuildContext context, bool didDonate) {
+  void _handleDonationAction(BuildContext context, bool didDonate) async {
     if (didDonate) {
+      // Log analytics event for donate now tap
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+      );
+
       _didAttemptDonation = true;
 
       handleNavigation(
@@ -110,7 +116,14 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                     SizedBox(
                       width: double.infinity,
                       child: TextButton(
-                        onPressed: _handleNextAction,
+                        onPressed: () async {
+                          // Log analytics event for no thanks tap
+                          await FirebaseAnalyticsService().logEvent(
+                            name: FirebaseAnalyticsService
+                                .eventOnboardingDonateNoThanksTap,
+                          );
+                          _handleNextAction();
+                        },
                         style: TextButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),

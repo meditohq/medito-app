@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,7 +24,6 @@ import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 const _carouselHeight = 200.0;
 const _dotSize = 8.0;
@@ -516,19 +514,27 @@ class SplashViewState extends ConsumerState<SplashView>
                                           width: double.infinity,
                                           height: 48,
                                           child: ElevatedButton(
-                                            onPressed: () =>
-                                                Navigator.of(context)
-                                                    .push(
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const SignUpLogInPage(),
-                                              ),
-                                            )
-                                                    .then((value) {
-                                              if (value == true) {
-                                                _checkAuthAndInitialize();
-                                              }
-                                            }),
+                                            onPressed: () async {
+                                              // Log analytics event for signup button tap
+                                              await FirebaseAnalyticsService()
+                                                  .logEvent(
+                                                name: FirebaseAnalyticsService
+                                                    .eventOnboardingSplashscreenSignupTap,
+                                              );
+
+                                              await Navigator.of(context)
+                                                  .push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const SignUpLogInPage(),
+                                                ),
+                                              )
+                                                  .then((value) {
+                                                if (value == true) {
+                                                  _checkAuthAndInitialize();
+                                                }
+                                              });
+                                            },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor:
                                                   ColorConstants.lightPurple,
@@ -552,7 +558,16 @@ class SplashViewState extends ConsumerState<SplashView>
                                           child: OutlinedButton(
                                             onPressed: _isSigningIn
                                                 ? null
-                                                : _handleAnonymousSignIn,
+                                                : () async {
+                                                    // Log analytics event for continue button tap
+                                                    await FirebaseAnalyticsService()
+                                                        .logEvent(
+                                                      name: FirebaseAnalyticsService
+                                                          .eventOnboardingSplashscreenContinueTap,
+                                                    );
+
+                                                    await _handleAnonymousSignIn();
+                                                  },
                                             style: OutlinedButton.styleFrom(
                                               backgroundColor:
                                                   ColorConstants.black,
