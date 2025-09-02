@@ -59,6 +59,8 @@ class FirebaseAnalyticsService {
       'email_address_save_failed2';
   static const String eventAuthTokenStorageFailed = 'auth_token_storage_failed';
   static const String eventPostMeditationFeedback = 'post_meditation_feedback';
+  static const String eventOnboardingNotificationsPermissionDenied =
+      'onboarding_notifications_permission_denied';
 
   // Don't pollute Firebase from unit/widget tests executed via `flutter test`.
   static bool get _runningInTest =>

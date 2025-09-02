@@ -23,8 +23,8 @@ class ReminderProvider {
     const initializationSettingsAndroid = AndroidInitializationSettings('logo');
     const initializationSettingsIOS = DarwinInitializationSettings(
       requestAlertPermission: false,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
     );
     const initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,

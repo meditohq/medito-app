@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/settings/settings_screen.dart';
@@ -55,8 +56,22 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           _isProcessing = false;
         });
       }
-    } else if (mounted) {
-      setState(() => _isProcessing = false);
+    } else {
+      // Permission denied - log analytics event for onboarding context
+      if (status.isDenied || status.isPermanentlyDenied) {
+        await FirebaseAnalyticsService().logEvent(
+          name: FirebaseAnalyticsService
+              .eventOnboardingNotificationsPermissionDenied,
+          parameters: {
+            'permission_status':
+                status.isPermanentlyDenied ? 'permanently_denied' : 'denied',
+          },
+        );
+      }
+
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
     }
   }
 
