@@ -125,6 +125,13 @@
   "sendMeMyPasswordText": "Continuar",
   "logInButtonText": "Iniciar Sesión",
   "authenticationFailed": "Autenticación fallida",
+  "invalidVerificationCode": "Código de verificación inválido. Por favor, inténtalo de nuevo.",
+  "errorPrefix": "Error: ",
+  "retryInSeconds": "Reintentar en {seconds} s",
+  "resendCodeInSeconds": "Reenviar código en {seconds} s",
+  "byContinuingAgreeTo": "Al continuar, aceptas nuestros ",
+  "andText": " y ",
+  "streakFreezeEarned": "¡Felicitaciones! Ganaste un congelamiento de racha por alcanzar un hito de 7 días.",
   "emailVerificationText": "Te enviaremos un código por correo electrónico para verificar tu cuenta",
   "createAccountBenefits": "◦ Rastrea tu viaje de atención plena \\n◦ Nunca pierdas tu progreso de meditación\\n◦ Construye una práctica de meditación duradera 💜",
   "loginBenefits": "• Descarga tus datos guardados previamente\\n• Continúa tu viaje de meditación desde donde lo dejaste",
@@ -149,6 +156,7 @@
   "faqTitle": "Preguntas Frecuentes",
   "editStatsTitle": "Editar estadísticas",
   "telegramTitle": "Únete a nuestra comunidad de Telegram",
+  "whatsappTitle": "Síguenos en WhatsApp",
   "donateTitle": "Donar",
   "contactUsTitle": "Contáctanos",
   "accountTitle": "Cuenta",
@@ -222,6 +230,10 @@
   "supportCommunity": "Apoyo y Comunidad",
   "helpLegal": "Ayuda y Legal",
   "advanced": "Avanzado",
+  "onboarding": "Incorporación",
+  "@onboarding": {
+    "description": "Título para la sección de incorporación en configuración"
+  },
   "enableNotificationsTitle": "Mantente en el Camino con Recordatorios de Meditación",
   "enableNotificationsBody": "Habilita las notificaciones para que nunca te pierdas una sesión.",
   "enableNotificationsCta": "Habilitar Notificaciones",
@@ -433,9 +445,9 @@
   "@reminderNotificationBody": {
     "description": "Body text for daily meditation reminder notifications"
   },
-  "helpLegalSection": "Ayuda y Legal",
+  "helpLegalSection": "Ayuda",
   "@helpLegalSection": {
-    "description": "Section title for help and legal settings"
+    "description": "Section title for help settings"
   },
   "supportCommunitySection": "Apoyo y Comunidad",
   "@supportCommunitySection": {

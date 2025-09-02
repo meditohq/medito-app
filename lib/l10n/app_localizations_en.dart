@@ -400,6 +400,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authenticationFailed => 'Authentication failed';
 
   @override
+  String get invalidVerificationCode =>
+      'Invalid verification code. Please try again.';
+
+  @override
+  String get errorPrefix => 'Error: ';
+
+  @override
+  String retryInSeconds(Object seconds) {
+    return 'Retry in $seconds s';
+  }
+
+  @override
+  String resendCodeInSeconds(Object seconds) {
+    return 'Resend code in $seconds s';
+  }
+
+  @override
+  String get byContinuingAgreeTo => 'By continuing, you agree to our ';
+
+  @override
+  String get andText => ' and ';
+
+  @override
+  String get streakFreezeEarned =>
+      'Congratulations! You earned a streak freeze for reaching a 7-day milestone!';
+
+  @override
   String get emailVerificationText =>
       'We\'ll send you a code by email to verify your account';
 
@@ -477,6 +504,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get telegramTitle => 'Join our Telegram community';
+
+  @override
+  String get whatsappTitle => 'Follow us on WhatsApp';
 
   @override
   String get donateTitle => 'Donate';
@@ -710,6 +740,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get advanced => 'Advanced';
+
+  @override
+  String get onboarding => 'Onboarding';
 
   @override
   String get enableNotificationsTitle =>
@@ -1241,7 +1274,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'An unkown error occurred. Either we\'re having issues or you\'re offline.';
 
   @override
-  String get helpLegalSection => 'Help & Legal';
+  String get helpLegalSection => 'Help';
 
   @override
   String get supportCommunitySection => 'Support & Community';

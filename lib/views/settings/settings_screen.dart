@@ -2,7 +2,6 @@
 
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -15,11 +14,10 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
-import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
+import 'package:medito/views/settings/widgets/expandable_section_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -133,21 +131,12 @@ class SettingsScreen extends ConsumerWidget {
         path: 'https://t.me/meditoapp',
       ),
       SettingsItem(
-        section: AppLocalizations.of(context)!.helpLegalSection,
+        section: AppLocalizations.of(context)!.supportCommunitySection,
         type: TypeConstants.url,
-        title: AppLocalizations.of(context)!.termsOfService,
+        title: AppLocalizations.of(context)!.whatsappTitle,
         icon: HugeIcon(
-            icon: HugeIcons.solidRoundedDocumentAttachment,
-            color: ColorConstants.white),
-        path: 'https://meditofoundation.org/terms-of-service',
-      ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.helpLegalSection,
-        type: 'url',
-        title: AppLocalizations.of(context)!.privacyPolicy,
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedShield01, color: ColorConstants.white),
-        path: 'https://meditofoundation.org/privacy',
+            icon: HugeIcons.solidStandardWhatsapp, color: ColorConstants.white),
+        path: 'https://whatsapp.com/channel/0029Vaov2lZ5kg77zmTZfd2X',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.customizationSection,
@@ -169,16 +158,6 @@ class SettingsScreen extends ConsumerWidget {
         ),
         path: TypeConstants.toggleDnd,
       ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.customizationSection,
-        type: TypeConstants.toggleStreakFreeze,
-        title: AppLocalizations.of(context)!.streakFreezesBeta,
-        icon: HugeIcon(
-          icon: HugeIcons.solidRoundedShield01,
-          color: ColorConstants.white,
-        ),
-        path: TypeConstants.toggleStreakFreeze,
-      )
     ];
 
     return Scaffold(
@@ -248,93 +227,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDebugTile(BuildContext context, WidgetRef ref) {
-    return RowItemWidget(
-      title: AppLocalizations.of(context)!.debugInfo,
-      icon: const Icon(Icons.bug_report),
-      onTap: () => _showDebugBottomSheet(context, ref),
-    );
-  }
-
-  Widget _buildAnalyticsTile(BuildContext context, WidgetRef ref) {
-    final analyticsService = ref.read(analyticsServiceProvider);
-    final isAnalyticsEnabledAsync = ref.watch(analyticsEnabledProvider);
-
-    return isAnalyticsEnabledAsync.when(
-      data: (isAnalyticsEnabled) => RowItemWidget(
-        icon: HugeIcon(
-          icon: HugeIcons.solidSharpSettings03,
-          color: ColorConstants.white,
-        ),
-        title: AppLocalizations.of(context)!.analyticsTrackingTitle,
-        hasUnderline: true,
-        isSwitch: true,
-        switchValue: isAnalyticsEnabled,
-        onSwitchChanged: (value) async {
-          if (Platform.isIOS && isAnalyticsEnabled) {
-            final bool shouldProceed = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    backgroundColor: ColorConstants.ebony,
-                    title: Text(
-                      AppLocalizations.of(context)!.iosTrackingDialogTitle,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    content: Text(
-                      AppLocalizations.of(context)!.iosTrackingDialogContent,
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: Text(
-                          AppLocalizations.of(context)!.iosTrackingDialogCancel,
-                          style: const TextStyle(
-                              color: ColorConstants.lightPurple),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: Text(
-                          AppLocalizations.of(context)!
-                              .iosTrackingDialogDisable,
-                          style: const TextStyle(
-                              color: ColorConstants.lightPurple),
-                        ),
-                      ),
-                    ],
-                  ),
-                ) ??
-                false;
-
-            if (!shouldProceed) {
-              return;
-            }
-          }
-
-          await analyticsService.setConsent(
-            analyticsStorageConsentGranted: value,
-            adStorageConsentGranted: value,
-            adUserDataConsentGranted: value,
-            adPersonalizationSignalsConsentGranted: value,
-          );
-
-          // Invalidate the provider to refresh the state
-          ref.invalidate(analyticsEnabledProvider);
-
-          showSnackBar(
-            context,
-            value
-                ? AppLocalizations.of(context)!.analyticsEnabledMessage
-                : AppLocalizations.of(context)!.analyticsDisabledMessage,
-          );
-        },
-      ),
-      loading: () => const CircularProgressIndicator(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
-
   Widget _buildMain(
       BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
     return _buildSettingsList(context, ref, settingsItems);
@@ -352,7 +244,6 @@ class SettingsScreen extends ConsumerWidget {
     final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
-    final isStreakFreezeToggle = item.type == TypeConstants.toggleStreakFreeze;
 
     if (isAccountItem) {
       return const SizedBox.shrink();
@@ -373,41 +264,12 @@ class SettingsScreen extends ConsumerWidget {
       );
     }
 
-    if (isStreakFreezeToggle) {
-      final featureFlags = ref.watch(featureFlagsProvider);
-
-      return RowItemWidget(
-        icon: item.icon,
-        title: item.title,
-        subTitle: AppLocalizations.of(context)!.streakFreezesBetaDescription,
-        hasUnderline: true,
-        isSwitch: true,
-        switchValue: featureFlags.isStreakFreezeEnabled,
-        onSwitchChanged: (value) {
-          ref.read(featureFlagsProvider.notifier).toggleStreakFreeze(value);
-        },
-      );
-    }
-
     return RowItemWidget(
       icon: item.icon,
       title: item.title,
       subTitle: isAccountItem && hasValidEmail ? userEmail : null,
       hasUnderline: true,
       onTap: () => handleItemPress(context, ref, item),
-    );
-  }
-
-  Widget _buildOnboardingTile(BuildContext context, WidgetRef ref) {
-    return ListTile(
-      title: const Text('Onboarding'),
-      leading: const Icon(Icons.arrow_right_alt),
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const OnboardingPagerScreen(),
-        ),
-      ),
     );
   }
 
@@ -463,10 +325,8 @@ class SettingsScreen extends ConsumerWidget {
         _buildSectionTitle(context, AppLocalizations.of(context)!.account),
         const AccountSectionWidget(),
       ],
-      _buildSectionTitle(context, AppLocalizations.of(context)!.advanced),
-      _buildDebugTile(context, ref),
-      _buildAnalyticsTile(context, ref),
-      if (kDebugMode) _buildOnboardingTile(context, ref),
+      const SizedBox(height: 16.0),
+      const ExpandableSectionWidget(),
     ];
 
     return SingleChildScrollView(
@@ -539,15 +399,6 @@ class SettingsScreen extends ConsumerWidget {
   void _showClearReminderSnackBar(BuildContext context) {
     showSnackBar(
         context, AppLocalizations.of(context)!.reminderNotificationCleared);
-  }
-
-  void _showDebugBottomSheet(BuildContext context, WidgetRef ref) {
-    ref.invalidate(meProvider);
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const DebugInfoScreen(),
-      ),
-    );
   }
 
   void _showSnackBar(BuildContext context, TimeOfDay pickedTime) {

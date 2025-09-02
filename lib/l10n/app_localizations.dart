@@ -848,6 +848,48 @@ abstract class AppLocalizations {
   /// **'Authentication failed'**
   String get authenticationFailed;
 
+  /// No description provided for @invalidVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid verification code. Please try again.'**
+  String get invalidVerificationCode;
+
+  /// No description provided for @errorPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: '**
+  String get errorPrefix;
+
+  /// No description provided for @retryInSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry in {seconds} s'**
+  String retryInSeconds(Object seconds);
+
+  /// No description provided for @resendCodeInSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds} s'**
+  String resendCodeInSeconds(Object seconds);
+
+  /// No description provided for @byContinuingAgreeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our '**
+  String get byContinuingAgreeTo;
+
+  /// No description provided for @andText.
+  ///
+  /// In en, this message translates to:
+  /// **' and '**
+  String get andText;
+
+  /// No description provided for @streakFreezeEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations! You earned a streak freeze for reaching a 7-day milestone!'**
+  String get streakFreezeEarned;
+
   /// No description provided for @emailVerificationText.
   ///
   /// In en, this message translates to:
@@ -991,6 +1033,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Join our Telegram community'**
   String get telegramTitle;
+
+  /// No description provided for @whatsappTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow us on WhatsApp'**
+  String get whatsappTitle;
 
   /// No description provided for @donateTitle.
   ///
@@ -1429,6 +1477,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Advanced'**
   String get advanced;
+
+  /// Title for the onboarding section in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Onboarding'**
+  String get onboarding;
 
   /// No description provided for @enableNotificationsTitle.
   ///
@@ -2384,10 +2438,10 @@ abstract class AppLocalizations {
   /// **'An unkown error occurred. Either we\'re having issues or you\'re offline.'**
   String get anErrorOccurredMessage;
 
-  /// Section title for help and legal settings
+  /// Section title for help settings
   ///
   /// In en, this message translates to:
-  /// **'Help & Legal'**
+  /// **'Help'**
   String get helpLegalSection;
 
   /// Section title for support and community settings

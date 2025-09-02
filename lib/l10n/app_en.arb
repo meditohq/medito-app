@@ -125,6 +125,13 @@
   "sendMeMyPasswordText": "Continue",
   "logInButtonText": "Sign In",
   "authenticationFailed": "Authentication failed",
+  "invalidVerificationCode": "Invalid verification code. Please try again.",
+  "errorPrefix": "Error: ",
+  "retryInSeconds": "Retry in {seconds} s",
+  "resendCodeInSeconds": "Resend code in {seconds} s",
+  "byContinuingAgreeTo": "By continuing, you agree to our ",
+  "andText": " and ",
+  "streakFreezeEarned": "Congratulations! You earned a streak freeze for reaching a 7-day milestone!",
   "emailVerificationText": "We'll send you a code by email to verify your account",
   "createAccountBenefits": "◦ Track your mindfulness journey \\n◦ Never lose your meditation progress\\n◦ Build a lasting meditation practice 💜",
   "loginBenefits": "• Download your previously saved data\\n• Continue your meditation journey from where you left off",
@@ -149,6 +156,7 @@
   "faqTitle": "FAQ",
   "editStatsTitle": "Edit stats",
   "telegramTitle": "Join our Telegram community",
+  "whatsappTitle": "Follow us on WhatsApp",
   "donateTitle": "Donate",
   "contactUsTitle": "Contact us",
   "accountTitle": "Account",
@@ -222,6 +230,10 @@
   "supportCommunity": "Support & Community",
   "helpLegal": "Help & Legal",
   "advanced": "Advanced",
+  "onboarding": "Onboarding",
+  "@onboarding": {
+    "description": "Title for the onboarding section in settings"
+  },
   "enableNotificationsTitle": "Stay on Track with Meditation Reminders",
   "enableNotificationsBody": "Enable notifications so you never miss a session.",
   "enableNotificationsCta": "Enable Notifications",
@@ -451,9 +463,9 @@
   "@reminderNotificationBody": {
     "description": "Body text for daily meditation reminder notifications"
   },
-  "helpLegalSection": "Help & Legal",
+  "helpLegalSection": "Help",
   "@helpLegalSection": {
-    "description": "Section title for help and legal settings"
+    "description": "Section title for help settings"
   },
   "supportCommunitySection": "Support & Community",
   "@supportCommunitySection": {

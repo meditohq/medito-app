@@ -406,6 +406,33 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authenticationFailed => 'Autenticación fallida';
 
   @override
+  String get invalidVerificationCode =>
+      'Código de verificación inválido. Por favor, inténtalo de nuevo.';
+
+  @override
+  String get errorPrefix => 'Error: ';
+
+  @override
+  String retryInSeconds(Object seconds) {
+    return 'Reintentar en $seconds s';
+  }
+
+  @override
+  String resendCodeInSeconds(Object seconds) {
+    return 'Reenviar código en $seconds s';
+  }
+
+  @override
+  String get byContinuingAgreeTo => 'Al continuar, aceptas nuestros ';
+
+  @override
+  String get andText => ' y ';
+
+  @override
+  String get streakFreezeEarned =>
+      '¡Felicitaciones! Ganaste un congelamiento de racha por alcanzar un hito de 7 días.';
+
+  @override
   String get emailVerificationText =>
       'Te enviaremos un código por correo electrónico para verificar tu cuenta';
 
@@ -485,6 +512,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get telegramTitle => 'Únete a nuestra comunidad de Telegram';
+
+  @override
+  String get whatsappTitle => 'Síguenos en WhatsApp';
 
   @override
   String get donateTitle => 'Donar';
@@ -724,6 +754,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get advanced => 'Avanzado';
+
+  @override
+  String get onboarding => 'Incorporación';
 
   @override
   String get enableNotificationsTitle =>
@@ -1263,7 +1296,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ocurrió un error desconocido. O tenemos problemas o estás sin conexión.';
 
   @override
-  String get helpLegalSection => 'Ayuda y Legal';
+  String get helpLegalSection => 'Ayuda';
 
   @override
   String get supportCommunitySection => 'Apoyo y Comunidad';

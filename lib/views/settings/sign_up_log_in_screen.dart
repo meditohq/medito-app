@@ -213,7 +213,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     } on InactiveEmailError catch (e) {
       showSnackBar(context, e.message);
     } catch (e) {
-      showSnackBar(context, 'Error: ${e.toString()}');
+      showSnackBar(context,
+          '${AppLocalizations.of(context)!.errorPrefix}${e.toString()}');
     } finally {
       setState(() {
         _isLoading = false;
@@ -291,14 +292,17 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           );
         }
       } else {
-        showSnackBar(context, 'Authentication failed');
+        showSnackBar(
+            context, AppLocalizations.of(context)!.authenticationFailed);
       }
     } catch (e) {
       dev.log('[SIGN_UP] Error during OTP verification', error: e, level: 1000);
       if (e.toString().contains('403')) {
-        showSnackBar(context, 'Invalid verification code. Please try again.');
+        showSnackBar(
+            context, AppLocalizations.of(context)!.invalidVerificationCode);
       } else {
-        showSnackBar(context, 'Error: ${e.toString()}');
+        showSnackBar(context,
+            '${AppLocalizations.of(context)!.errorPrefix}${e.toString()}');
       }
     } finally {
       setState(() {
@@ -412,7 +416,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                   ),
                 )
               : _isRateLimited
-                  ? Text('Retry in $_retryAfterSeconds s')
+                  ? Text(AppLocalizations.of(context)!
+                      .retryInSeconds(_retryAfterSeconds.toString()))
                   : Text(AppLocalizations.of(context)!.sendMeMyPasswordText),
         ),
         _buildPrivacyPolicyLink(),
@@ -480,7 +485,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           ),
           child: Text(
             _isRateLimited
-                ? 'Resend code in $_retryAfterSeconds s'
+                ? AppLocalizations.of(context)!
+                    .resendCodeInSeconds(_retryAfterSeconds.toString())
                 : AppLocalizations.of(context)!.resendCode,
             style: TextStyle(
               color: _isLoading || _isRateLimited
@@ -544,7 +550,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       child: Center(
         child: Text.rich(
           TextSpan(
-            text: 'By continuing, you agree to our ',
+            text: AppLocalizations.of(context)!.byContinuingAgreeTo,
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 12,
@@ -564,7 +570,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                         ref: ref,
                       ),
               ),
-              const TextSpan(text: ' and '),
+              TextSpan(text: AppLocalizations.of(context)!.andText),
               TextSpan(
                 text: 'Privacy Policy',
                 style: const TextStyle(

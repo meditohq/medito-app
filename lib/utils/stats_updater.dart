@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/types/type_constants.dart';
-import '../constants/strings/string_constants.dart';
 import '../providers/feature_flags_provider.dart';
 import '../routes/routes.dart';
 import '../widgets/snackbar_widget.dart';
+import '../l10n/app_localizations.dart';
 import 'completed_tracks_storage.dart';
 import 'health_kit_manager.dart';
 import 'stats_manager.dart';
@@ -278,7 +278,8 @@ Future<void> _checkAndAwardStreakFreeze({
               'Navigator context available: ${context != null}');
           if (context != null) {
             AppLogger.d('STREAK_FREEZE', 'Showing snackbar...');
-            showSnackBar(context, StringConstants.streakFreezeEarned);
+            showSnackBar(
+                context, AppLocalizations.of(context)!.streakFreezeEarned);
           } else {
             AppLogger.w('STREAK_FREEZE', 'No context available for snackbar');
           }
