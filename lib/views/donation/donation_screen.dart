@@ -70,19 +70,20 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
     final amount = amounts[selectedCurrency] ?? '10';
 
     return Scaffold(
-      backgroundColor: ColorConstants.ebony,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: ColorConstants.onyx,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back,
+              color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Row(
           children: [
             Icon(HugeIcons.solidSharpSquareLock02,
-                color: Colors.white, size: 18),
+                color: Theme.of(context).colorScheme.onSurface, size: 18),
             const SizedBox(width: 8),
             Text(
               Platform.isIOS
@@ -119,23 +120,27 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
-                              foregroundColor: Colors.white,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onSurface,
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(8))),
                               side: isMonthlyDonationVisible
                                   ? BorderSide(
-                                      color: ColorConstants.lightPurple)
+                                      color:
+                                          Theme.of(context).colorScheme.primary)
                                   : BorderSide(color: ColorConstants.softGrey),
                               elevation: 0,
                             ),
                             child: Text(
                               AppLocalizations.of(context)!.monthlyDonation,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayLarge
+                                  ?.copyWith(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ),
                         ),
@@ -149,23 +154,27 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
-                              foregroundColor: Colors.white,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onSurface,
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(8))),
                               side: !isMonthlyDonationVisible
                                   ? BorderSide(
-                                      color: ColorConstants.lightPurple)
+                                      color:
+                                          Theme.of(context).colorScheme.primary)
                                   : BorderSide(color: ColorConstants.softGrey),
                               elevation: 0,
                             ),
                             child: Text(
                               AppLocalizations.of(context)!.singleDonation,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displayLarge
+                                  ?.copyWith(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ),
                         ),
@@ -176,11 +185,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                       isMonthlyDonationVisible
                           ? '$symbol$amount/month can help 100 people meditate every day.'
                           : AppLocalizations.of(context)!.oneTimeDonationImpact,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            height: 1.5,
+                            color: Colors.white70,
+                          ),
                     ),
                     const SizedBox(height: 16),
                     if (isMonthlyDonationVisible)
@@ -197,11 +206,10 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                     const SizedBox(height: 32),
                     Text(
                       AppLocalizations.of(context)!.otherPaymentMethods,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                     const SizedBox(height: 16),
                     _buildOtherPaymentOptions(context),
@@ -237,9 +245,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 4.0),
-                child: const Icon(
+                child: Icon(
                   Icons.verified_user_outlined,
-                  color: ColorConstants.lightPurple,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 20,
                 ),
               ),
@@ -247,11 +255,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
               Expanded(
                 child: Text(
                   AppLocalizations.of(context)!.donationSecurityMessage,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    height: 1.4,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
+                        height: 1.4,
+                        color: Colors.white70,
+                      ),
                 ),
               ),
             ],
@@ -281,11 +289,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
         children: [
           Text(
             symbol,
-            style: TextStyle(
-              color: Colors.white54,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white54,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(width: 2),
           DropdownButtonHideUnderline(
@@ -294,7 +302,10 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
               dropdownColor: ColorConstants.greyIsTheNewBlack,
               icon: const Icon(Icons.arrow_drop_down,
                   color: Colors.white54, size: 20),
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
               isDense: true,
               underline: Container(),
               onChanged: (String? newValue) {
@@ -468,11 +479,10 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
           children: [
             Text(
               text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
           ],
         ),
@@ -498,10 +508,10 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
         ),
         child: Text(
           text,
-          style: const TextStyle(
-            color: ColorConstants.lightPurple,
-            fontSize: 16,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.primary,
+              ),
         ),
       ),
     );
@@ -523,29 +533,29 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       children: [
         Text(
           AppLocalizations.of(context)!.donationSecurityInfo,
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-            height: 1.5,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.white70,
+                fontSize: 12,
+                height: 1.5,
+              ),
         ),
         const SizedBox(height: 8),
         Text(
           AppLocalizations.of(context)!.foundationRegistrationInfo,
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-            height: 1.5,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.white70,
+                fontSize: 12,
+                height: 1.5,
+              ),
         ),
         const SizedBox(height: 8),
         Text(
           AppLocalizations.of(context)!.foundationContactInfo,
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-            height: 1.5,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.white70,
+                fontSize: 12,
+                height: 1.5,
+              ),
         ),
       ],
     );

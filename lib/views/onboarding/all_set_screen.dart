@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
@@ -20,7 +19,7 @@ class AllSetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConstants.ebony,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -29,11 +28,10 @@ class AllSetScreen extends StatelessWidget {
             children: [
               Text(
                 AppLocalizations.of(context)!.allSetTitle,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                    ),
                 textAlign: TextAlign.center,
               ),
               _buildActionButton(
@@ -53,14 +51,6 @@ class AllSetScreen extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: ColorConstants.lightPurple,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
         child: Text(text),
       ),
     );

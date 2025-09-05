@@ -248,30 +248,26 @@ class SplashViewState extends ConsumerState<SplashView>
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          backgroundColor: ColorConstants.ebony,
           title: Text(
             AppLocalizations.of(context)!.emailExistsDialogTitle,
-            style: const TextStyle(color: Colors.white),
           ),
           content: Text(
             AppLocalizations.of(context)!.emailExistsDialogMessage,
-            style: const TextStyle(color: Colors.white70),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 AppLocalizations.of(context)!.emailExistsContinueNewAccount,
-                style: const TextStyle(
-                    color: ColorConstants.brightSky, fontSize: 12),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: ColorConstants.brightSky,
+                    ),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 AppLocalizations.of(context)!.emailExistsSignInWithEmail,
-                style: const TextStyle(
-                    color: ColorConstants.lightPurple, fontSize: 12),
               ),
             ),
           ],
@@ -371,7 +367,9 @@ class SplashViewState extends ConsumerState<SplashView>
       },
       child: Scaffold(
         extendBody: true,
-        backgroundColor: _isLoading ? ColorConstants.black : Colors.transparent,
+        backgroundColor: _isLoading
+            ? Theme.of(context).colorScheme.background
+            : Colors.transparent,
         body: _isLoading
             ? Center(
                 child: SvgPicture.asset(
@@ -417,10 +415,12 @@ class SplashViewState extends ConsumerState<SplashView>
                                       const SizedBox(width: 16),
                                       Text(
                                         AppLocalizations.of(context)!.appName,
-                                        style: const TextStyle(
-                                          color: ColorConstants.white,
-                                          fontSize: 24,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayLarge
+                                            ?.copyWith(
+                                              fontSize: 24,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -434,12 +434,14 @@ class SplashViewState extends ConsumerState<SplashView>
                                       Text(
                                         AppLocalizations.of(context)!
                                             .splashHeadline,
-                                        style: const TextStyle(
-                                          color: ColorConstants.white,
-                                          fontSize: 40,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.2,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displayLarge
+                                            ?.copyWith(
+                                              fontSize: 40,
+                                              fontWeight: FontWeight.bold,
+                                              height: 1.2,
+                                            ),
                                       ),
                                       SizedBox(
                                         height: _carouselHeight,
@@ -462,25 +464,27 @@ class SplashViewState extends ConsumerState<SplashView>
                                                   children: [
                                                     Text(
                                                       _getBenefitTitle(index),
-                                                      style: const TextStyle(
-                                                        color: ColorConstants
-                                                            .white,
-                                                        fontSize: 28,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        height: 1.3,
-                                                      ),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .displayLarge
+                                                          ?.copyWith(
+                                                            fontSize: 28,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            height: 1.3,
+                                                          ),
                                                     ),
                                                     const SizedBox(height: 16),
                                                     Text(
                                                       _getBenefitSubtitle(
                                                           index),
-                                                      style: const TextStyle(
-                                                        color: ColorConstants
-                                                            .graphite,
-                                                        fontSize: 20,
-                                                        height: 1.4,
-                                                      ),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium
+                                                          ?.copyWith(
+                                                            fontSize: 20,
+                                                            height: 1.4,
+                                                          ),
                                                     ),
                                                   ],
                                                 ),
@@ -535,16 +539,6 @@ class SplashViewState extends ConsumerState<SplashView>
                                                 }
                                               });
                                             },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  ColorConstants.lightPurple,
-                                              foregroundColor:
-                                                  ColorConstants.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                            ),
                                             child: Text(
                                               AppLocalizations.of(context)!
                                                   .createAccountLogInButtonText,
@@ -568,25 +562,12 @@ class SplashViewState extends ConsumerState<SplashView>
 
                                                     await _handleAnonymousSignIn();
                                                   },
-                                            style: OutlinedButton.styleFrom(
-                                              backgroundColor:
-                                                  ColorConstants.black,
-                                              side: const BorderSide(
-                                                  color: ColorConstants
-                                                      .lightPurple),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                            ),
                                             child: _isSigningIn
                                                 ? const SizedBox(
                                                     width: 20,
                                                     height: 20,
                                                     child:
                                                         CircularProgressIndicator(
-                                                      color: ColorConstants
-                                                          .lightPurple,
                                                       strokeWidth: 2,
                                                     ),
                                                   )
@@ -594,9 +575,6 @@ class SplashViewState extends ConsumerState<SplashView>
                                                     AppLocalizations.of(
                                                             context)!
                                                         .continueAsGuest,
-                                                    style: const TextStyle(
-                                                        color: ColorConstants
-                                                            .lightPurple),
                                                   ),
                                           ),
                                         ),
@@ -650,8 +628,8 @@ class SplashViewState extends ConsumerState<SplashView>
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: _currentPageIndex == index
-            ? ColorConstants.lightPurple
-            : ColorConstants.white,
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.onSurface,
         shape: BoxShape.circle,
       ),
     );

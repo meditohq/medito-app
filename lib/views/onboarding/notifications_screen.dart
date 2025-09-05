@@ -132,7 +132,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final reminderTime = ref.watch(reminderTimeProvider);
 
     return Scaffold(
-      backgroundColor: ColorConstants.ebony,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -143,21 +143,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 children: [
                   Text(
                     AppLocalizations.of(context)!.enableNotificationsTitle,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                        ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
                   Text(
                     AppLocalizations.of(context)!.enableNotificationsBody,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      height: 1.5,
-                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 16,
+                          height: 1.5,
+                          color: Colors.white70,
+                        ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -190,17 +189,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         );
                         _navigateNext();
                       },
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
                       child: Text(
                         AppLocalizations.of(context)!.skipForNow,
-                        style: const TextStyle(
-                          color: ColorConstants.lightPurple,
-                          fontSize: 16,
-                        ),
                       ),
                     ),
                   ),
@@ -218,14 +208,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _navigateNext,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: ColorConstants.lightPurple,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
         child: Text(
           '${AppLocalizations.of(context)!.setFor} ${reminderTime.format(context)}',
         ),
@@ -241,14 +223,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: ColorConstants.lightPurple,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
         child: Text(text),
       ),
     );
