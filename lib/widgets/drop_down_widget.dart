@@ -37,9 +37,8 @@ class DropdownWidget<T> extends StatelessWidget {
       bottomLeft: Radius.circular(bottomLeft),
       bottomRight: Radius.circular(bottomRight),
     );
-    var textStyle = Theme.of(context).primaryTextTheme.bodyMedium?.copyWith(
+    var textStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
           fontFamily: dmMono,
-          color: ColorConstants.white,
           fontWeight: FontWeight.w400,
           fontSize: 16,
         );
@@ -71,7 +70,7 @@ class DropdownWidget<T> extends StatelessWidget {
               if (iconData != null)
                 Icon(
                   iconData,
-                  color: ColorConstants.white,
+                  color: Theme.of(context).iconTheme.color,
                 ),
               if (iconData != null) const SizedBox(width: 12),
               Expanded(
@@ -81,9 +80,9 @@ class DropdownWidget<T> extends StatelessWidget {
                 ),
               ),
               if (_isClickable)
-                const Icon(
+                Icon(
                   Icons.keyboard_arrow_down,
-                  color: ColorConstants.white,
+                  color: Theme.of(context).iconTheme.color,
                 ),
             ],
           ),

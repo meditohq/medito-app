@@ -235,7 +235,6 @@ class ProductGroupCard extends ConsumerWidget {
                           AppLocalizations.of(context)!.newProductLabel,
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: ColorConstants.white,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -254,7 +253,11 @@ class ProductGroupCard extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: ColorConstants.white.withOpacity(0.7),
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withOpacity(0.7),
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             height: 1.5,

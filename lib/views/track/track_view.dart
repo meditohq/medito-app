@@ -352,27 +352,21 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel, {
     required bool isFullWidth,
   }) {
-    var radius = const BorderRadius.all(Radius.circular(7));
-
-    return InkWell(
-      onTap: () {
-        var file = fileModel ?? trackModel.audio.first.files.first;
-        _handlePlay(ref, trackModel, file);
-      },
-      borderRadius: radius,
-      child: Ink(
-        height: 56,
-        width: isFullWidth ? double.infinity : null,
-        decoration: BoxDecoration(
-          color: ColorConstants.white,
-          borderRadius: radius,
+    return SizedBox(
+      height: 56,
+      width: isFullWidth ? double.infinity : null,
+      child: ElevatedButton(
+        onPressed: () {
+          var file = fileModel ?? trackModel.audio.first.files.first;
+          _handlePlay(ref, trackModel, file);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorConstants.white,
+          foregroundColor: ColorConstants.black,
         ),
-        child: const Center(
-          child: Icon(
-            Icons.play_arrow_rounded,
-            color: ColorConstants.black,
-            size: 32,
-          ),
+        child: const Icon(
+          Icons.play_arrow_rounded,
+          size: 32,
         ),
       ),
     );
@@ -381,34 +375,35 @@ class _TrackViewState extends ConsumerState<TrackView>
   Text _title(BuildContext context, String title) {
     return Text(
       title,
-      style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontFamily: sourceSerif,
-            color: ColorConstants.white,
             letterSpacing: 0.2,
             fontSize: 24,
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.normal,
           ),
     );
   }
 
   Widget _getSubTitle(BuildContext context, String? subTitle) {
     if (subTitle != null) {
-      var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
-
       return MarkdownWidget(
         body: subTitle,
         selectable: true,
         textAlign: WrapAlignment.start,
-        p: bodyLarge?.copyWith(
-          color: ColorConstants.white,
-          fontFamily: dmSans,
-          fontSize: 16,
-        ),
-        a: bodyLarge?.copyWith(
-          color: ColorConstants.white,
-          fontFamily: dmSans,
-          decoration: TextDecoration.underline,
-          fontSize: 16,
-        ),
+        p: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontFamily: dmSans,
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+        a: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontFamily: dmSans,
+              decoration: TextDecoration.underline,
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
         onTapLink: (text, href, title) {
           handleNavigation(
             TypeConstants.url,

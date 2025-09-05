@@ -10,6 +10,7 @@ ThemeData appTheme(BuildContext context) {
   return ThemeData(
     useMaterial3: true,
     splashColor: ColorConstants.ebony,
+    cardColor: ColorConstants.onyx,
     canvasColor: ColorConstants.ebony,
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {

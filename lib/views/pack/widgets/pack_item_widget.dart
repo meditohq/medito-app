@@ -11,7 +11,6 @@ class PackItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var bodyLarge = Theme.of(context).primaryTextTheme.bodyLarge;
     var hasSubtitle = item.subtitle.isNotNullAndNotEmpty();
 
     return Padding(
@@ -33,11 +32,13 @@ class PackItemWidget extends StatelessWidget {
                       if (item.title.isNotNullAndNotEmpty())
                         Text(
                           item.title,
-                          style: bodyLarge?.copyWith(
-                            color: ColorConstants.white,
-                            fontFamily: dmSans,
-                            fontSize: 16,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                fontFamily: dmSans,
+                                fontSize: 16,
+                              ),
                         ),
                       if (hasSubtitle)
                         Flexible(
@@ -45,12 +46,14 @@ class PackItemWidget extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               item.subtitle ?? '',
-                              style: bodyLarge?.copyWith(
-                                fontFamily: dmMono,
-                                color: ColorConstants.graphite,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontFamily: dmMono,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                             ),
                           ),
                         ),

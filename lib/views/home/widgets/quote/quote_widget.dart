@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:medito/constants/colors/color_constants.dart';
-
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -27,11 +25,10 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
           fontWeight: FontWeight.w300,
           fontSize: 18,
           height: 1.4,
-          color: ColorConstants.white,
         );
 
     final authorStyle = quoteStyle?.copyWith(
-      color: ColorConstants.white.withOpacity(0.6),
+      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
       fontSize: 16,
     );
 
