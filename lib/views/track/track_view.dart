@@ -52,7 +52,10 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   Future<void> _logScreenView() async {
-    await _analytics.logScreenView(screenName: 'TrackView');
+    await _analytics.logScreenView(
+      screenName: 'TrackView',
+      parameters: {'trackid': widget.trackId},
+    );
   }
 
   @override

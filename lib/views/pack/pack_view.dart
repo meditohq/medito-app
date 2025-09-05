@@ -38,7 +38,10 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   Future<void> _logScreenView() async {
-    await _analytics.logScreenView(screenName: 'PackView');
+    await _analytics.logScreenView(
+      screenName: 'PackView',
+      parameters: {'packid': widget.id},
+    );
   }
 
   @override

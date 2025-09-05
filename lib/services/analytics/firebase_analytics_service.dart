@@ -303,11 +303,12 @@ class FirebaseAnalyticsService {
   Future<void> logScreenView({
     required String screenName,
     String? screenClass,
+    Map<String, Object>? parameters,
   }) async {
     if (_runningInTest) return; // Skip in unit tests
     if (kDebugMode) {
       print(
-          'Firebase Analytics (DEBUG): Would log screen view "$screenName" with class: ${screenClass ?? 'Flutter'}');
+          'Firebase Analytics (DEBUG): Would log screen view "$screenName" with class: ${screenClass ?? 'Flutter'}${parameters != null ? ' and parameters: $parameters' : ''}');
       return; // Skip in debug mode
     }
     if (!_initialized) await initialize();
@@ -323,8 +324,21 @@ class FirebaseAnalyticsService {
           screenClass: screenClass ?? 'Flutter',
         );
 
+        // If custom parameters are provided, also log them as a custom event
+        if (parameters != null && parameters.isNotEmpty) {
+          await _analytics.logEvent(
+            name: 'screen_view_with_params',
+            parameters: {
+              'screen_name': screenName,
+              'screen_class': screenClass ?? 'Flutter',
+              ...parameters,
+            },
+          );
+        }
+
         if (kDebugMode) {
-          print('Screen view logged: $screenName');
+          print(
+              'Screen view logged: $screenName${parameters != null ? ' with parameters' : ''}');
         }
       }
     } catch (e) {

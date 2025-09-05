@@ -50,7 +50,15 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 
   Future<void> _logScreenView() async {
-    await _analytics.logScreenView(screenName: 'PlayerView');
+    final currentlyPlayingTrack = ref.read(playerProvider);
+    final parameters = currentlyPlayingTrack != null
+        ? {'trackid': currentlyPlayingTrack.id}
+        : null;
+
+    await _analytics.logScreenView(
+      screenName: 'PlayerView',
+      parameters: parameters,
+    );
   }
 
   Future<void> _initializePlayer() async {
