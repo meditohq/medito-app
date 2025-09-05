@@ -101,9 +101,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
           padding: const EdgeInsets.all(12),
           backgroundColor:
               e.isHighlighted ? ColorConstants.brightSky : ColorConstants.onyx,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
         ),
         child: Row(
           children: [
@@ -117,15 +114,12 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
             Expanded(
               child: Text(
                 e.title ?? '',
-                style: TextStyle(
-                  fontFamily: teachers,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  height: 22 / 16,
-                  color: e.isHighlighted
-                      ? ColorConstants.onyx
-                      : ColorConstants.white,
-                ),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontFamily: teachers,
+                      color: e.isHighlighted
+                          ? ColorConstants.onyx
+                          : ColorConstants.white,
+                    ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

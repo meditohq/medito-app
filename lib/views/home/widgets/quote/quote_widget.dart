@@ -32,6 +32,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
 
     final authorStyle = quoteStyle?.copyWith(
       color: ColorConstants.white.withOpacity(0.6),
+      fontSize: 16,
     );
 
     return Column(
@@ -44,46 +45,42 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
             children: [
               Text(
                 AppLocalizations.of(context)!.dailyQuote,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: teachers,
-                  fontSize: 20,
-                  height: 28 / 24,
-                ),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontFamily: teachers,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                      height: 28 / 24,
+                    ),
               ),
             ],
           ),
         ),
         height8,
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            color: ColorConstants.onyx,
-          ),
+        Card(
           margin: const EdgeInsets.symmetric(horizontal: padding16),
-          padding: const EdgeInsets.all(padding16),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              _buildQuoteContent(quoteStyle, authorStyle),
-              Positioned(
-                right: -12,
-                bottom: -12,
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: _shareQuote,
-                  icon: HugeIcon(
-                    icon: Platform.isIOS
-                        ? HugeIcons.solidRoundedShare03
-                        : HugeIcons.solidRoundedShare08,
-                    color: Colors.white.withOpacity(0.6),
-                    size: 16,
+          child: Padding(
+            padding: const EdgeInsets.all(padding16),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                _buildQuoteContent(quoteStyle, authorStyle),
+                Positioned(
+                  right: -12,
+                  bottom: -12,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _shareQuote,
+                    icon: HugeIcon(
+                      icon: Platform.isIOS
+                          ? HugeIcons.solidRoundedShare03
+                          : HugeIcons.solidRoundedShare08,
+                      color: Colors.white.withOpacity(0.6),
+                      size: 16,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

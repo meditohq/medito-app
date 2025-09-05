@@ -16,8 +16,6 @@ const _kScrollAnimationDuration = Duration(milliseconds: 500);
 const _kCardBorderRadius = 30.0;
 const _kCardAspectRatio = 16 / 9;
 const _kButtonHeight = 48.0;
-const _kButtonBorderRadius = 20.0;
-const _kButtonFontSize = 14.0;
 const _kBannerFontSize = 14.0;
 const _kSmallSpacing = 8.0;
 
@@ -75,13 +73,12 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
           padding: const EdgeInsets.only(left: padding16),
           child: Text(
             AppLocalizations.of(context)!.carouselTitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w400,
-              fontFamily: teachers,
-              fontSize: 20,
-              height: 28 / 24,
-            ),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontFamily: teachers,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  height: 28 / 24,
+                ),
           ),
         ),
         height8,
@@ -137,9 +134,6 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
             child: Card(
               margin: EdgeInsets.zero,
               color: ColorConstants.onyx,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(_kCardBorderRadius),
-              ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 child: Column(
@@ -158,24 +152,28 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                         children: [
                           Text(
                             item.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: sourceSerif,
-                              fontSize: 24,
-                              height: 28 / 24,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  fontFamily: sourceSerif,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w400,
+                                  height: 28 / 24,
+                                ),
                           ),
                           const SizedBox(height: _kSmallSpacing),
                           Text(
                             item.subtitle,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: teachers,
-                              fontSize: 16,
-                              height: 1.2,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium
+                                ?.copyWith(
+                                  fontFamily: teachers,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.2,
+                                ),
                           ),
                           const SizedBox(height: padding20),
                           if (item.buttons != null && item.buttons!.isNotEmpty)
@@ -237,10 +235,6 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorConstants.white,
                       foregroundColor: ColorConstants.onyx,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(_kButtonBorderRadius),
-                      ),
                     ),
                     onPressed: () {
                       handleNavigation(
@@ -253,13 +247,13 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                     child: Text(
                       button.title,
                       maxLines: 1,
-                      style: const TextStyle(
-                        fontFamily: teachers,
-                        fontSize: _kButtonFontSize,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                        color: ColorConstants.onyx,
-                      ),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontFamily: teachers,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2,
+                            color: ColorConstants.onyx,
+                          ),
                     ),
                   ),
                 ),
