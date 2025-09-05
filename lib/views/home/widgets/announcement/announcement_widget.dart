@@ -115,17 +115,11 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
     var actionWidgets = <Widget>[
       TextButton(
         onPressed: _handleDismiss,
-        style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
         child: Text(
           AppLocalizations.of(context)!.dismiss,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 16,
-          ),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: textColor,
+              ),
         ),
       ),
       width4,
@@ -138,17 +132,10 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
           style: ElevatedButton.styleFrom(
             backgroundColor: textColor,
             foregroundColor: bgColor,
-            elevation: 0,
             padding: const EdgeInsets.all(8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
           ),
           child: Text(
             widget.announcement.ctaTitle ?? '',
-            style: const TextStyle(
-              fontSize: 16,
-            ),
           ),
         ),
       );
@@ -161,11 +148,12 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
   }
 
   Flexible _text(BuildContext context) {
+    var textColor = ColorConstants.getColorFromString(
+      widget.announcement.colorText,
+    );
+
     var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: ColorConstants.getColorFromString(
-            widget.announcement.colorText,
-          ),
-          fontSize: 14,
+          color: textColor,
         );
 
     return Flexible(
