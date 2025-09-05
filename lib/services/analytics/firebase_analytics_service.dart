@@ -27,7 +27,8 @@ class FirebaseAnalyticsService {
       FirebaseAnalyticsService._internal();
   factory FirebaseAnalyticsService() => _instance;
 
-  late final dynamic _analytics; // FirebaseAnalytics or _NoopAnalytics
+  dynamic
+      _analytics; // FirebaseAnalytics or _NoopAnalytics - not late final anymore
   bool _initialized = false;
 
   // Keys and constants
@@ -87,12 +88,9 @@ class FirebaseAnalyticsService {
       Platform.environment.containsKey('FLUTTER_TEST');
 
   FirebaseAnalyticsService._internal() {
-    if (_runningInTest) {
-      _analytics = _NoopAnalytics() as dynamic; // cast to satisfy type
-      _initialized = true; // nothing else to set up
-    } else {
-      _analytics = FirebaseAnalytics.instance;
-    }
+    // Don't initialize _analytics here - defer until initialize() is called
+    // This prevents [core/no-app] errors when the service is instantiated
+    // before Firebase is fully initialized
   }
 
   /// Initialize the Firebase Analytics service and check for user consent preferences
@@ -101,6 +99,13 @@ class FirebaseAnalyticsService {
     if (_initialized) return;
 
     try {
+      // Initialize the analytics instance now that Firebase should be ready
+      if (_runningInTest) {
+        _analytics = _NoopAnalytics() as dynamic; // cast to satisfy type
+      } else {
+        _analytics = FirebaseAnalytics.instance;
+      }
+
       // For iOS, request App Tracking Transparency authorization if requested
       if (Platform.isIOS && requestAttPermissionImmediately) {
         await _requestIOSTrackingAuthorization();
@@ -189,12 +194,14 @@ class FirebaseAnalyticsService {
   /// Set all consent flags to true using consent mode v2
   Future<void> setConsentToTrue() async {
     try {
-      await _analytics.setConsent(
-        analyticsStorageConsentGranted: true,
-        adStorageConsentGranted: true,
-        adUserDataConsentGranted: true,
-        adPersonalizationSignalsConsentGranted: true,
-      );
+      if (_analytics != null) {
+        await _analytics.setConsent(
+          analyticsStorageConsentGranted: true,
+          adStorageConsentGranted: true,
+          adUserDataConsentGranted: true,
+          adPersonalizationSignalsConsentGranted: true,
+        );
+      }
 
       // Save preference
       final prefs = await SharedPreferences.getInstance();
@@ -218,13 +225,15 @@ class FirebaseAnalyticsService {
     bool? adPersonalizationSignalsConsentGranted,
   }) async {
     try {
-      await _analytics.setConsent(
-        analyticsStorageConsentGranted: analyticsStorageConsentGranted,
-        adStorageConsentGranted: adStorageConsentGranted,
-        adUserDataConsentGranted: adUserDataConsentGranted,
-        adPersonalizationSignalsConsentGranted:
-            adPersonalizationSignalsConsentGranted,
-      );
+      if (_analytics != null) {
+        await _analytics.setConsent(
+          analyticsStorageConsentGranted: analyticsStorageConsentGranted,
+          adStorageConsentGranted: adStorageConsentGranted,
+          adUserDataConsentGranted: adUserDataConsentGranted,
+          adPersonalizationSignalsConsentGranted:
+              adPersonalizationSignalsConsentGranted,
+        );
+      }
 
       // If all values are the same, save preference
       if (analyticsStorageConsentGranted != null &&
@@ -265,14 +274,19 @@ class FirebaseAnalyticsService {
     Map<String, Object>? parameters,
   }) async {
     if (_runningInTest) return; // Skip in unit tests
+    if (kDebugMode) {
+      print(
+          'Firebase Analytics (DEBUG): Would log event "$name" with parameters: $parameters');
+      return; // Skip in debug mode
+    }
     if (!_initialized) await initialize();
 
     try {
-      // Only log events if analytics consent is granted
+      // Only log events if analytics consent is granted and _analytics is initialized
       final prefs = await SharedPreferences.getInstance();
       bool analyticsEnabled = prefs.getBool(analyticsEnabledKey) ?? true;
 
-      if (analyticsEnabled) {
+      if (analyticsEnabled && _analytics != null) {
         await _analytics.logEvent(
           name: name,
           parameters: parameters,
@@ -291,14 +305,19 @@ class FirebaseAnalyticsService {
     String? screenClass,
   }) async {
     if (_runningInTest) return; // Skip in unit tests
+    if (kDebugMode) {
+      print(
+          'Firebase Analytics (DEBUG): Would log screen view "$screenName" with class: ${screenClass ?? 'Flutter'}');
+      return; // Skip in debug mode
+    }
     if (!_initialized) await initialize();
 
     try {
-      // Only log screen view if analytics consent is granted
+      // Only log screen view if analytics consent is granted and _analytics is initialized
       final prefs = await SharedPreferences.getInstance();
       bool analyticsEnabled = prefs.getBool(analyticsEnabledKey) ?? true;
 
-      if (analyticsEnabled) {
+      if (analyticsEnabled && _analytics != null) {
         await _analytics.logScreenView(
           screenName: screenName,
           screenClass: screenClass ?? 'Flutter',
