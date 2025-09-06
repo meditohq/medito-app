@@ -17,67 +17,66 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: ColorConstants.onyx,
-      ),
+    return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        spacing: 16,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.howDoYouFeel,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: teachers,
-              fontSize: 22,
-              color: ColorConstants.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          spacing: 16,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.howDoYouFeel,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontFamily: teachers,
+                    fontSize: 22,
+                    fontWeight: FontWeight.normal,
+                  ),
             ),
-          ),
-          _showThankYouMessage
-              ? _buildThanksMessage()
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 16,
-                  children: [
-                    Semantics(
-                      button: true,
-                      label:
-                          AppLocalizations.of(context)!.thanksForSharingHappy,
-                      child: _buildEmotionButton(
-                        context,
-                        '😊',
-                        AppLocalizations.of(context)!.thanksForSharing,
-                        _handlePositiveFeedback,
+            _showThankYouMessage
+                ? _buildThanksMessage()
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 16,
+                    children: [
+                      Semantics(
+                        button: true,
+                        label:
+                            AppLocalizations.of(context)!.thanksForSharingHappy,
+                        child: _buildEmotionButton(
+                          context,
+                          '😊',
+                          AppLocalizations.of(context)!.thanksForSharing,
+                          _handlePositiveFeedback,
+                        ),
                       ),
-                    ),
-                    Semantics(
-                      button: true,
-                      label:
-                          AppLocalizations.of(context)!.thanksForSharingNeutral,
-                      child: _buildEmotionButton(
-                        context,
-                        '😐',
-                        AppLocalizations.of(context)!.thanksForSharing,
-                        _handleNeutralFeedback,
+                      Semantics(
+                        button: true,
+                        label: AppLocalizations.of(context)!
+                            .thanksForSharingNeutral,
+                        child: _buildEmotionButton(
+                          context,
+                          '😐',
+                          AppLocalizations.of(context)!.thanksForSharing,
+                          _handleNeutralFeedback,
+                        ),
                       ),
-                    ),
-                    Semantics(
-                      button: true,
-                      label: AppLocalizations.of(context)!.thanksForSharingSad,
-                      child: _buildEmotionButton(
-                        context,
-                        '☹️',
-                        AppLocalizations.of(context)!.thanksForSharing,
-                        _handleNegativeFeedback,
+                      Semantics(
+                        button: true,
+                        label:
+                            AppLocalizations.of(context)!.thanksForSharingSad,
+                        child: _buildEmotionButton(
+                          context,
+                          '☹️',
+                          AppLocalizations.of(context)!.thanksForSharing,
+                          _handleNegativeFeedback,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-        ],
+                    ],
+                  ),
+          ],
+        ),
       ),
     );
   }
@@ -88,11 +87,10 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
       child: Text(
         AppLocalizations.of(context)!.thanksForSharing,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 18,
-          color: ColorConstants.white,
-          fontWeight: FontWeight.w500,
-        ),
+        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
       ),
     );
   }

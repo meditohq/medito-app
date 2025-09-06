@@ -29,8 +29,9 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       actions: actions,
       elevation: 0,
-      backgroundColor:
-          isTransparent ? ColorConstants.transparent : ColorConstants.onyx,
+      backgroundColor: isTransparent
+          ? ColorConstants.transparent
+          : Theme.of(context).colorScheme.surface,
       title: getTitleWidget(context),
     );
   }

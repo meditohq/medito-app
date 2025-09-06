@@ -103,12 +103,15 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
         children: [
           Text(
             AppLocalizations.of(context)!.someThingWentWrong,
-            style: const TextStyle(color: ColorConstants.white),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _onRefresh,
-            child: Text(AppLocalizations.of(context)!.retry),
+            child: Text(
+              AppLocalizations.of(context)!.retry,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ),
         ],
       ),
@@ -143,15 +146,19 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
           children: [
             Text(
               _currentFilter.emptyStateMessage(context),
-              style: const TextStyle(color: ColorConstants.white),
+              style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               AppLocalizations.of(context)!.addItemsToFavoritesMessage,
-              style: TextStyle(
-                color: ColorConstants.white.withOpacity(0.7),
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withOpacity(0.7),
+                  ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -222,11 +229,11 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
     return ChoiceChip(
       label: Text(
         filter.label(context),
-        style: const TextStyle(color: ColorConstants.white),
+        style: Theme.of(context).textTheme.bodyMedium,
       ),
       selected: isSelected,
       selectedColor: ColorConstants.softGrey,
-      iconTheme: const IconThemeData(color: ColorConstants.white),
+      iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
       onSelected: (selected) {
         if (selected) setState(() => _currentFilter = filter);
       },
@@ -236,7 +243,7 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
         side: const BorderSide(color: ColorConstants.softGrey),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      labelStyle: const TextStyle(color: ColorConstants.white),
+      labelStyle: Theme.of(context).textTheme.bodyMedium,
     );
   }
 

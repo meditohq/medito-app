@@ -3,7 +3,6 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import '../../../utils/logger.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';
@@ -127,12 +126,11 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 ? 'Thank You for Your Support'
                 : donationPageModel.title ?? 'Support Medito',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontFamily: sourceSerif,
-              fontSize: 22,
-              fontWeight: FontWeight.w400,
-              color: ColorConstants.white,
-            ),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontFamily: sourceSerif,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w400,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -142,11 +140,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                     AppLocalizations.of(context)!
                         .meditoReliesOnYourDonationsToSurvive,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 16,
-              color: ColorConstants.white,
-              fontWeight: FontWeight.w400,
-            ),
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
           ),
           height20,
           _buildButtonRow(donationPageModel.buttons, context),
@@ -156,11 +153,11 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
               child: Text(
                 donationPageModel.footerText!,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: textColor,
-                ),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: textColor,
+                    ),
               ),
             ),
         ],
@@ -191,16 +188,14 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 backgroundColor: ColorConstants.white,
                 foregroundColor: ColorConstants.lightPurple,
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
               child: Text(
                 button.title ?? AppLocalizations.of(context)!.donateNow,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
               ),
             ),
           ),
@@ -222,9 +217,6 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 backgroundColor: ColorConstants.lightPurple,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
               child: Text(
                 button.title ?? AppLocalizations.of(context)!.donateNow,

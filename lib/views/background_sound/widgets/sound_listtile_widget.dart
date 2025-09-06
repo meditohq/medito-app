@@ -33,27 +33,26 @@ class SoundListTileWidget extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
         child: Row(
           children: [
-            _radioButton(isSelected),
+            _radioButton(isSelected, context),
             width16,
             Text(
               sound.title,
-              style: Theme.of(context).primaryTextTheme.bodyLarge?.copyWith(
-                    color: ColorConstants.white,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontFamily: dmSans,
                     fontSize: 16,
                   ),
             ),
-            isDownloading ? _loadingSpinner() : const SizedBox.shrink(),
+            isDownloading ? _loadingSpinner(context) : const SizedBox.shrink(),
           ],
         ),
       ),
     );
   }
 
-  Expanded _loadingSpinner() {
-    return const Expanded(
+  Expanded _loadingSpinner(BuildContext context) {
+    return Expanded(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -62,7 +61,7 @@ class SoundListTileWidget extends ConsumerWidget {
               width: 16,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: ColorConstants.white,
+                color: Theme.of(context).colorScheme.onInverseSurface,
               ),
             ),
           ],
@@ -71,17 +70,19 @@ class SoundListTileWidget extends ConsumerWidget {
     );
   }
 
-  Container _radioButton(bool isSelected) {
+  Container _radioButton(bool isSelected, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(width: 2, color: ColorConstants.white),
+        border: Border.all(
+            width: 2, color: Theme.of(context).colorScheme.onSurface),
       ),
       padding: const EdgeInsets.all(4),
       child: CircleAvatar(
         radius: 6,
-        backgroundColor:
-            isSelected ? ColorConstants.white : ColorConstants.transparent,
+        backgroundColor: isSelected
+            ? Theme.of(context).colorScheme.onSurface
+            : ColorConstants.transparent,
       ),
     );
   }

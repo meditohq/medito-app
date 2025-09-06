@@ -115,19 +115,22 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                   HugeIcon(
                                     icon: HugeIcons.solidRoundedFire,
                                     size: 20,
-                                    color: ColorConstants.white,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       AppLocalizations.of(context)!
                                           .statsWelcomeTitle,
-                                      style: TextStyle(
-                                        color: ColorConstants.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: dmSans,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium
+                                          ?.copyWith(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            fontFamily: dmSans,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -136,12 +139,14 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                               Text(
                                 AppLocalizations.of(context)!
                                     .statsWelcomeMessage,
-                                style: TextStyle(
-                                  color: ColorConstants.white,
-                                  fontSize: 14,
-                                  height: 1.4,
-                                  fontFamily: dmSans,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      fontSize: 14,
+                                      height: 1.4,
+                                      fontFamily: dmSans,
+                                    ),
                               ),
                               const SizedBox(height: 16),
                               Align(
@@ -153,13 +158,16 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                     foregroundColor: ColorConstants.onyx,
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 12, vertical: 6),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
                                   ),
                                   child: Text(
                                       AppLocalizations.of(context)!.gotIt,
-                                      style: const TextStyle(fontSize: 14)),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(context).colorScheme.onInverseSurface,
+                                            fontSize: 14,
+                                          )),
                                 ),
                               ),
                             ],
@@ -191,7 +199,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                         onTap: () => ref.read(statsProvider.notifier).refresh(),
                         child: HugeIcon(
                             icon: HugeIcons.strokeRoundedHelpCircle,
-                            color: ColorConstants.white),
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                     );
                   }
@@ -258,7 +266,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
     return RowItemWidget(
       icon: HugeIcon(
         icon: HugeIcons.solidStandardSnow,
-        color: ColorConstants.white,
+        color: Theme.of(context).colorScheme.onSurface,
         size: 20,
       ),
       iconColor: ColorConstants.white.toString(),
@@ -343,16 +351,18 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
               icon: HugeIcon(
                 icon: HugeIcons.solidRoundedShare08,
                 size: 20,
-                color: ColorConstants.white,
+                color: Theme.of(context).colorScheme.inverseSurface,
               ),
-              label: Text(AppLocalizations.of(context)!.share),
+              label: Text(
+                AppLocalizations.of(context)!.share,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.inverseSurface,
+                    ),     
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorConstants.lightPurple,
-                foregroundColor: ColorConstants.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
             ),
           ),
@@ -404,7 +414,10 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                       activeColor: ColorConstants.lightPurple,
                       checkColor: ColorConstants.white,
                       side: BorderSide(
-                        color: ColorConstants.white.withOpacity(0.6),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.6),
                         width: 1.5,
                       ),
                       shape: RoundedRectangleBorder(
@@ -416,11 +429,10 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                   Expanded(
                     child: Text(
                       AppLocalizations.of(context)!.alwaysShowStreakOnHomepage,
-                      style: TextStyle(
-                        color: ColorConstants.white,
-                        fontSize: 14,
-                        fontFamily: dmSans,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            fontFamily: dmSans,
+                          ),
                     ),
                   ),
                 ],

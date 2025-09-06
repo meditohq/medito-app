@@ -194,22 +194,32 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.confirmDeletionTitle),
+          title: Text(
+            AppLocalizations.of(context)!.confirmDeletionTitle,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
           content: Text(
             '${AppLocalizations.of(context)!.confirmDeletionMessage} ${item.title}?',
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text(AppLocalizations.of(context)!.cancel),
+              child: Text(
+                AppLocalizations.of(context)!.cancel,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text(AppLocalizations.of(context)!.delete),
+              child: Text(
+                AppLocalizations.of(context)!.delete,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
           ],
         );

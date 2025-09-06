@@ -4,14 +4,12 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/root/root_page_view.dart';
@@ -85,7 +83,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         leftItem: BottomActionBarItem(
           child: HugeIcon(
             icon: HugeIcons.solidSharpMultiplicationSign,
-            color: ColorConstants.white,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           onTap: () => Navigator.pop(context),
         ),
@@ -100,7 +98,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         rightItem: BottomActionBarItem(
           child: HugeIcon(
             icon: HugeIcons.solidSharpHome01,
-            color: ColorConstants.white,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           onTap: _navigateToHome,
         ),
@@ -178,25 +176,24 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 key: ValueKey<int>(streak),
                 child: Text(
                   streak.toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontFamily: dmSerif,
-                    fontSize: 100,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontFamily: dmSerif,
+                        fontSize: 100,
+                        fontWeight: FontWeight.w400,
+                      ),
                   textAlign: TextAlign.left,
                 ),
               ),
             ),
             Text(
               AppLocalizations.of(context)!.dayStreak,
-              style: TextStyle(
-                fontFamily: teachers,
-                fontSize: 40,
-                fontWeight: FontWeight.w400,
-                height: 1,
-                color: ColorConstants.lightPurple,
-              ),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    fontFamily: teachers,
+                    fontSize: 40,
+                    fontWeight: FontWeight.w400,
+                    height: 1,
+                    color: ColorConstants.lightPurple,
+                  ),
               textAlign: TextAlign.left,
             ),
             const SizedBox(height: 24),
@@ -214,12 +211,12 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
               child: Text(
                 AppLocalizations.of(context)!.dailyPracticeMessage,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: teachers,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  height: 1.3,
-                ),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontFamily: teachers,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      height: 1.3,
+                    ),
               ),
             ),
             const SizedBox(height: 40),
@@ -309,19 +306,19 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
             children: [
               Text(
                 dayLetters[index],
-                style: TextStyle(
-                  fontFamily: teachers,
-                  fontSize: 14,
-                  fontWeight: (isMeditated || isFreeze)
-                      ? FontWeight.w600
-                      : FontWeight.w500,
-                  height: 1.2,
-                  color: isFreeze
-                      ? ColorConstants.graphite
-                      : isMeditated
-                          ? ColorConstants.lightPurple
-                          : ColorConstants.moon,
-                ),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontFamily: teachers,
+                      fontSize: 14,
+                      fontWeight: (isMeditated || isFreeze)
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                      height: 1.2,
+                      color: isFreeze
+                          ? ColorConstants.graphite
+                          : isMeditated
+                              ? ColorConstants.lightPurple
+                              : ColorConstants.moon,
+                    ),
               ),
               const SizedBox(height: 4),
               Stack(
@@ -331,7 +328,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                     HugeIcon(
                       size: 36,
                       icon: HugeIcons.solidSharpCircle,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   if (isFreeze)
                     HugeIcon(
@@ -355,58 +352,5 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         );
       }),
     );
-  }
-
-  Widget _buildFreezeRewardBanner(LocalAllStats stats) {
-    final isDonor =
-        ref.watch(meProvider).valueOrNull?.hasActiveSubscription ?? false;
-    final currentStreak = stats.streakCurrent;
-    final freezesEarned = currentStreak > 0 && currentStreak % 7 == 0 ? 2 : 0;
-
-    if (!isDonor || freezesEarned == 0) return const SizedBox.shrink();
-
-    return FutureBuilder(
-      future: _hasAwardedFreezes(stats, freezesEarned),
-      builder: (context, snapshot) {
-        if (snapshot.data == true) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: ColorConstants.lightPurple.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'You earned $freezesEarned streak freezes!',
-                style: TextStyle(
-                  color: ColorConstants.lightPurple,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          );
-        }
-        return const SizedBox.shrink();
-      },
-    );
-  }
-
-  Future<bool> _hasAwardedFreezes(
-      LocalAllStats stats, int freezesEarned) async {
-    final currentStreak = stats.streakCurrent;
-    if (freezesEarned == 0) return false;
-
-    final lastAwardedStreak = await SharedPreferences.getInstance()
-        .then((prefs) => prefs.getInt('last_freeze_award_streak') ?? 0);
-
-    if (currentStreak > lastAwardedStreak && currentStreak % 7 == 0) {
-      await SharedPreferences.getInstance().then((prefs) {
-        prefs.setInt('last_freeze_award_streak', currentStreak);
-      });
-      return true;
-    }
-    return false;
   }
 }

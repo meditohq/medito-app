@@ -16,4 +16,9 @@ class StringConstants {
   static const String deviceOs = 'deviceOs';
   static const String devicePlatform = 'devicePlatform';
   static const String buildNumber = 'buildNumber';
+
+  // Donation widget strings
+  static const String thankYouForSupport = 'Thank You for Your Support'; // Title shown to existing donors
+  static const String supportMedito = 'Support Medito'; // Fallback title for donation widget
+  static const String donorThankYouMessage = 'We rely on donors like you to continue providing mindfulness to everyone.'; // Message shown to existing donors
 }
