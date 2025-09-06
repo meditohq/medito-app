@@ -165,7 +165,9 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                           .textTheme
                                           .bodySmall
                                           ?.copyWith(
-                                            color: Theme.of(context).colorScheme.onInverseSurface,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onInverseSurface,
                                             fontSize: 14,
                                           )),
                                 ),
@@ -357,7 +359,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                 AppLocalizations.of(context)!.share,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: Theme.of(context).colorScheme.inverseSurface,
-                    ),     
+                    ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
