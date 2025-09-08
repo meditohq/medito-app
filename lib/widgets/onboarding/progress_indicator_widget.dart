@@ -13,6 +13,8 @@ class OnboardingProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 32),
       child: Row(
@@ -26,7 +28,9 @@ class OnboardingProgressIndicator extends StatelessWidget {
               shape: BoxShape.circle,
               color: index == currentIndex
                   ? ColorConstants.lightPurple
-                  : Colors.white24,
+                  : isDark
+                      ? Colors.white24
+                      : ColorConstants.lightGrey,
             ),
           );
         }),
