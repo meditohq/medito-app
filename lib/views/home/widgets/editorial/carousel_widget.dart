@@ -78,6 +78,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
                   height: 28 / 24,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
           ),
         ),
@@ -160,7 +161,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                                   fontSize: 24,
                                   fontWeight: FontWeight.w400,
                                   height: 28 / 24,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                           const SizedBox(height: _kSmallSpacing),
@@ -174,7 +176,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
                                   height: 1.2,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                           const SizedBox(height: padding20),

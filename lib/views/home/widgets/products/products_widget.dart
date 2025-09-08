@@ -22,8 +22,6 @@ class ProductsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.d('ProductsWidget',
-        'build called, productGroups: ${productGroups?.length ?? 0}');
 
     if (productGroups == null || productGroups!.isEmpty) {
       AppLogger.d('ProductsWidget', 'No product groups to display');
@@ -59,12 +57,13 @@ class ProductsWidget extends StatelessWidget {
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
                           height: 28 / 24,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                   ),
                   const SizedBox(width: 8),
                   Icon(
                     HugeIcons.solidSharpArrowRight02,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 16,
                   ),
                 ],
@@ -81,8 +80,6 @@ class ProductsWidget extends StatelessWidget {
               itemCount: sortedGroups.length,
               itemBuilder: (context, index) {
                 final productGroup = sortedGroups[index];
-                AppLogger.d('ProductsWidget',
-                    'Building product group card for ${productGroup.name} at index $index');
                 return ProductGroupCard(productGroup: productGroup);
               },
             ),
@@ -239,6 +236,7 @@ class ProductGroupCard extends ConsumerWidget {
                               Theme.of(context).textTheme.bodySmall?.copyWith(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                         ),
                       ),
@@ -255,11 +253,6 @@ class ProductGroupCard extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withOpacity(0.7),
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             height: 1.5,

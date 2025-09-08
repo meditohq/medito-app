@@ -25,10 +25,11 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
           fontWeight: FontWeight.w300,
           fontSize: 18,
           height: 1.4,
+          color: Theme.of(context).colorScheme.onSurface,
         );
 
     final authorStyle = quoteStyle?.copyWith(
-      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+      color: quoteStyle.color?.withOpacity(0.8),
       fontSize: 16,
     );
 
@@ -47,6 +48,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
                       height: 28 / 24,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
               ),
             ],
@@ -71,7 +73,10 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                       icon: Platform.isIOS
                           ? HugeIcons.solidRoundedShare03
                           : HugeIcons.solidRoundedShare08,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.8),
                       size: 16,
                     ),
                   ),
