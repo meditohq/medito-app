@@ -4,36 +4,40 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import '../constants.dart';
 
 TextTheme meditoTextTheme(BuildContext context) {
+  final brightness = MediaQuery.of(context).platformBrightness;
+  final isDark = brightness == Brightness.dark;
+
   return Theme.of(context).textTheme.copyWith(
-        displayLarge: const TextStyle(
+        displayLarge: TextStyle(
           // greetings text
           // btm bar text selected
           fontSize: 18,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
           height: 1.5,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
-        displayMedium: const TextStyle(
+        displayMedium: TextStyle(
           // btm bar text unselected
           fontSize: 18,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w700,
           height: 1.5,
-          color: ColorConstants.graphite,
+          color:
+              isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
           fontFamily: dmSans,
         ),
-        displaySmall: const TextStyle(
+        displaySmall: TextStyle(
           // header of rows on homepage
           fontSize: 18,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w800,
           height: 1.3,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
-        headlineMedium: const TextStyle(
+        headlineMedium: TextStyle(
           // packs title on home and packs screen
           // streak tile data (not title)
           // downloads tile session name
@@ -42,89 +46,92 @@ TextTheme meditoTextTheme(BuildContext context) {
           letterSpacing: 0.5,
           fontWeight: FontWeight.w600,
           height: 1.3,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
-        headlineSmall: const TextStyle(
+        headlineSmall: TextStyle(
           // stats widget
           fontSize: 20,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w700,
           height: 1.2,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
-        titleMedium: const TextStyle(
+        titleMedium: TextStyle(
           // packs subtitle on home
           // downloads subtitle
           fontSize: 14,
           letterSpacing: 0.4,
           fontWeight: FontWeight.w500,
           height: 1.5,
-          color: ColorConstants.graphite,
+          color:
+              isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
           fontFamily: dmSans,
         ),
-        titleSmall: const TextStyle(
+        titleSmall: TextStyle(
           // shortcut title
           fontSize: 14,
           letterSpacing: 0.2,
           fontWeight: FontWeight.w500,
           height: 1.5,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
-        bodySmall: const TextStyle(
+        bodySmall: TextStyle(
           // shortcut title
           fontSize: 12,
           letterSpacing: 0.8,
           fontWeight: FontWeight.w600,
           height: 1.5,
-          color: ColorConstants.graphite,
+          color:
+              isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
           fontFamily: dmSans,
         ),
-        bodyMedium: const TextStyle(
+        bodyMedium: TextStyle(
           // error widget
           fontSize: 16,
           letterSpacing: 0.5,
           fontWeight: FontWeight.normal,
           height: 1.3,
-          color: ColorConstants.graphite,
+          color:
+              isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
           fontFamily: dmSans,
         ),
-        bodyLarge: const TextStyle(
+        bodyLarge: TextStyle(
           // daily text and quote
           fontSize: 14,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w400,
           height: 1.5,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
-        labelLarge: const TextStyle(
+        labelLarge: TextStyle(
           // shortcut title
           fontSize: 20,
           letterSpacing: 0.8,
           fontWeight: FontWeight.w600,
           height: 1.5,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
-        labelMedium: const TextStyle(
+        labelMedium: TextStyle(
           // error widget
           fontSize: 16,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w500,
           height: 1.3,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
-        labelSmall: const TextStyle(
+        labelSmall: TextStyle(
           // daily text and quote
           fontSize: 14,
           letterSpacing: 0.5,
           fontWeight: FontWeight.w400,
           height: 1.5,
-          color: ColorConstants.white,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
       );

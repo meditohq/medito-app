@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-import '../../../../constants/colors/color_constants.dart';
 import 'bottom_action_bar.dart';
 
 class SingleBackButtonActionBar extends StatelessWidget {
@@ -20,7 +19,7 @@ class SingleBackButtonActionBar extends StatelessWidget {
       leftItem: BottomActionBarItem(
         child: HugeIcon(
           icon: showCloseIcon ? HugeIcons.solidSharpMultiplicationSign : HugeIcons.solidSharpArrowLeft02,
-          color: ColorConstants.white,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: onBackPressed,
       ),

@@ -64,7 +64,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
 
     return SafeArea(
       child: Container(
-        decoration: bottomSheetBoxDecoration,
+        decoration: bottomSheetBoxDecorationForTheme(context),
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
@@ -96,10 +96,13 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                             bottom: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: ColorConstants.white.withOpacity(0.1),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surface
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               width: 1,
                               style: BorderStyle.solid,
                             ),
@@ -130,6 +133,9 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                             fontFamily: dmSans,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
                                           ),
                                     ),
                                   ),
@@ -146,6 +152,9 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                       fontSize: 14,
                                       height: 1.4,
                                       fontFamily: dmSans,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                     ),
                               ),
                               const SizedBox(height: 16),
@@ -154,8 +163,10 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                 child: ElevatedButton(
                                   onPressed: _fadeAndHideCard,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: ColorConstants.white,
-                                    foregroundColor: ColorConstants.onyx,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.surface,
+                                    foregroundColor:
+                                        Theme.of(context).colorScheme.onSurface,
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 12, vertical: 6),
                                   ),
@@ -167,7 +178,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                           ?.copyWith(
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .onInverseSurface,
+                                                .onSurface,
                                             fontSize: 14,
                                           )),
                                 ),
@@ -239,7 +250,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
   Widget _buildStatRow(BuildContext context, String title, String value) {
     return RowItemWidget(
       icon: MeditoHugeIcon(icon: title),
-      iconColor: ColorConstants.white.toString(),
+      iconColor: Theme.of(context).colorScheme.onSurface,
       trailingIconSize: 20,
       title: value,
       subTitle: title,
@@ -271,7 +282,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
         color: Theme.of(context).colorScheme.onSurface,
         size: 20,
       ),
-      iconColor: ColorConstants.white.toString(),
+      iconColor: Theme.of(context).colorScheme.onSurface,
       trailingIconSize: 20,
       title: '$currentFreezes / $maxFreezes',
       subTitle: 'Streak Freezes',
@@ -314,7 +325,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          color: ColorConstants.onyx,
+          color: Theme.of(context).cardColor,
           child: Column(
             children: [
               _buildStatRow(
@@ -353,12 +364,12 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
               icon: HugeIcon(
                 icon: HugeIcons.solidRoundedShare08,
                 size: 20,
-                color: Theme.of(context).colorScheme.inverseSurface,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
               label: Text(
                 AppLocalizations.of(context)!.share,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.inverseSurface,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
               ),
               style: ElevatedButton.styleFrom(
@@ -414,7 +425,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                 .displayPreferenceSaved);
                       },
                       activeColor: ColorConstants.lightPurple,
-                      checkColor: ColorConstants.white,
+                      checkColor: Theme.of(context).colorScheme.onPrimary,
                       side: BorderSide(
                         color: Theme.of(context)
                             .colorScheme

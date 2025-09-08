@@ -899,7 +899,7 @@ abstract class AppLocalizations {
   /// No description provided for @createAccountBenefits.
   ///
   /// In en, this message translates to:
-  /// **'◦ Track your mindfulness journey \\n◦ Never lose your meditation progress\\n◦ Build a lasting meditation practice 💜'**
+  /// **'• Track your mindfulness journey\n• Never lose your meditation progress\n• Build a lasting meditation practice 💜'**
   String get createAccountBenefits;
 
   /// No description provided for @loginBenefits.

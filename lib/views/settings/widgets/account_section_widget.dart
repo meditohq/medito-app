@@ -49,19 +49,19 @@ class AccountSectionWidget extends ConsumerWidget {
               style: Theme.of(context)
                   .textTheme
                   .titleMedium
-                  ?.copyWith(color: ColorConstants.white),
+                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
           height16,
           RowItemWidget(
             icon: HugeIcon(
               icon: HugeIcons.solidRoundedLogout01,
-              color: ColorConstants.white,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 24,
             ),
             title: AppLocalizations.of(context)!.signOutButtonText,
             titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: ColorConstants.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
             hasUnderline: true,
             onTap: () async {
@@ -103,12 +103,12 @@ class AccountSectionWidget extends ConsumerWidget {
           RowItemWidget(
             icon: HugeIcon(
               icon: HugeIcons.solidRoundedDelete02,
-              color: ColorConstants.white,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 24,
             ),
             title: AppLocalizations.of(context)!.deleteAccountButtonText,
             titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: ColorConstants.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
             hasUnderline: true,
             onTap: () async {
@@ -118,11 +118,16 @@ class AccountSectionWidget extends ConsumerWidget {
                       backgroundColor: ColorConstants.ebony,
                       title: Text(
                         AppLocalizations.of(context)!.deleteAccountTitle,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                       content: Text(
                         AppLocalizations.of(context)!.deleteAccountConfirmation,
-                        style: const TextStyle(color: Colors.white70),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.7)),
                       ),
                       actions: [
                         TextButton(
@@ -196,12 +201,12 @@ class AccountSectionWidget extends ConsumerWidget {
         RowItemWidget(
           icon: HugeIcon(
             icon: HugeIcons.solidRoundedLogin01,
-            color: ColorConstants.white,
+            color: Theme.of(context).colorScheme.onSurface,
             size: 24,
           ),
           title: AppLocalizations.of(context)!.signInSignUp,
           titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: ColorConstants.white,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
           hasUnderline: true,
           onTap: () {

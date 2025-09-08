@@ -20,6 +20,18 @@ class ColorConstants {
   static const brightSky = Color(0xFFD4EDF7);
   static const puddle = Color(0xFFD1BDA9);
 
+  // Light theme colors
+  static const lightBackground = Color(0xFFF8F9FA);
+  static const lightSurface = Color(0xFFFFFFFF);
+  static const lightCard = Color(0xFFF1F3F4);
+  static const lightOnSurface = Color(0xFF1A1A1A);
+  static const lightOnBackground = Color(0xFF1A1A1A);
+  static const lightSecondary = Color(0xFF6B7280);
+  static const lightOnSecondary = Color(0xFFFFFFFF);
+  static const lightGrey = Color(0xFFE5E7EB);
+  static const lightSoftGrey = Color(0xFFD1D5DB);
+  static const lightGraphite = Color(0xFF6B7280);
+
   static Color getColorFromString(String? name) {
     if (name == null) {
       return ColorConstants.white;

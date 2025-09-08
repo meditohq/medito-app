@@ -223,7 +223,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                 BorderRadius.circular(StreakCircleConstants.borderRadius),
             child: Ink(
               decoration: BoxDecoration(
-                color: ColorConstants.onyx,
+                color: Theme.of(context).cardColor,
                 borderRadius:
                     BorderRadius.circular(StreakCircleConstants.borderRadius),
               ),
@@ -239,12 +239,14 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                         height: StreakCircleConstants.iconSize,
                         child: CircularProgressIndicator(
                           value: progressValue,
-                          backgroundColor:
-                              ColorConstants.white.withOpacity(0.2),
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.2),
                           valueColor: AlwaysStoppedAnimation<Color>(
                             isStreakDoneToday
                                 ? ColorConstants.lightPurple
-                                : ColorConstants.white,
+                                : Theme.of(context).colorScheme.onSurface,
                           ),
                           strokeWidth: 2,
                           strokeCap: StrokeCap.round,
@@ -258,13 +260,13 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                             HugeIcon(
                               icon: HugeIcons.solidRoundedFire,
                               size: StreakCircleConstants.iconSize,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           HugeIcon(
                             icon: HugeIcons.solidRoundedFire,
                             color: isStreakDoneToday
                                 ? ColorConstants.lightPurple
-                                : ColorConstants.white,
+                                : Theme.of(context).colorScheme.onSurface,
                             size: StreakCircleConstants.innerIconSize,
                           ),
                         ],
@@ -273,7 +275,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                     Text(
                       displayValue + (showConsistencyScore ? '%' : ''),
                       style: TextStyle(
-                        color: ColorConstants.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: StreakCircleConstants.fontSize,
                         fontWeight: isStreakDoneToday
                             ? FontWeight.bold

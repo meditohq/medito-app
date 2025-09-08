@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
@@ -34,7 +33,7 @@ class CustomiseHomeLayoutScreenState
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: ColorConstants.ebony,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
         ),
         body: Column(
@@ -59,7 +58,7 @@ class CustomiseHomeLayoutScreenState
                       key: ValueKey(widgetType.name),
                       leading: HugeIcon(
                         icon: HugeIcons.solidSharpMenu01,
-                        color: ColorConstants.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       title: Text(_getTitleForType(widgetType)),
                     );

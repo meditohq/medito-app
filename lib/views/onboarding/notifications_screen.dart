@@ -132,7 +132,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final reminderTime = ref.watch(reminderTimeProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -155,7 +155,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 16,
                           height: 1.5,
-                          color: Colors.white70,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.7),
                         ),
                     textAlign: TextAlign.center,
                   ),

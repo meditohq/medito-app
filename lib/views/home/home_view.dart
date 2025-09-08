@@ -4,7 +4,6 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/logger.dart';
 
 import '../../providers/home/home_provider.dart';
-import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
@@ -126,12 +125,9 @@ class _HomeViewState extends ConsumerState<HomeView>
         return const SizedBox.shrink();
       },
       data: (List<ProductGroupModel> productGroups) {
-     
         // Shuffle the order of product groups
         var shuffledProducts = List<ProductGroupModel>.from(productGroups)
           ..shuffle();
-
-
 
         return ProductsWidget(
           key: ValueKey(HomeWidgetType.products.name),
@@ -186,7 +182,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       ),
       isScrollControlled: true,
       useRootNavigator: true,
-      backgroundColor: ColorConstants.onyx,
+      backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
       builder: (BuildContext context) {
         return const StatsBottomSheetWidget();
       },

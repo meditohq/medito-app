@@ -99,16 +99,18 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
         onPressed: () => _handleChipPress(context, ref, e),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.all(12),
-          backgroundColor:
-              e.isHighlighted ? ColorConstants.brightSky : ColorConstants.onyx,
+          backgroundColor: e.isHighlighted
+              ? ColorConstants.brightSky
+              : Theme.of(context).cardColor,
         ),
         child: Row(
           children: [
             MeditoHugeIcon(
               icon: e.icon ?? '',
               size: 18,
-              color:
-                  e.isHighlighted ? ColorConstants.onyx : ColorConstants.white,
+              color: e.isHighlighted
+                  ? ColorConstants.onyx
+                  : Theme.of(context).colorScheme.onSurface,
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -118,7 +120,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
                       fontFamily: teachers,
                       color: e.isHighlighted
                           ? ColorConstants.onyx
-                          : ColorConstants.white,
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

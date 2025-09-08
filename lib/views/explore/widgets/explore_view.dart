@@ -90,7 +90,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                backgroundColor: ColorConstants.ebony,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 expandedHeight: 134.0,
                 collapsedHeight: 0,
                 toolbarHeight: 0,
@@ -194,7 +194,9 @@ class ExploreContentWidget extends ConsumerWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
-                                ?.copyWith(color: Colors.white70),
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                ),
                             textAlign: TextAlign.center,
                           ),
                         );
@@ -209,8 +211,8 @@ class ExploreContentWidget extends ConsumerWidget {
                               child: Text(
                                 AppLocalizations.of(context)!
                                     .packsSectionHeader,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -231,8 +233,8 @@ class ExploreContentWidget extends ConsumerWidget {
                               child: Text(
                                 AppLocalizations.of(context)!
                                     .tracksSectionHeader,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -436,15 +438,24 @@ class SearchBox extends StatelessWidget {
       focusNode: focusNode,
       decoration: InputDecoration(
         hintText: AppLocalizations.of(context)!.searchMeditations,
-        prefixIcon: const Icon(Icons.search),
+        prefixIcon: Icon(
+          Icons.search,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         suffixIcon: IconButton(
-          icon: const Icon(Icons.clear),
+          icon: Icon(
+            Icons.clear,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           onPressed: onClear,
         ),
         filled: true,
-        fillColor: ColorConstants.white.withOpacity(0.1),
+        fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.1),
+        hintStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        ),
       ),
-      style: const TextStyle(color: ColorConstants.white),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       onChanged: onChanged,
     );
   }
@@ -455,11 +466,13 @@ class LoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
       height: 100,
       child: Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            Theme.of(context).colorScheme.primary,
+          ),
         ),
       ),
     );

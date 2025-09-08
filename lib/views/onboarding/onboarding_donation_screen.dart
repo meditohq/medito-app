@@ -67,7 +67,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
     final isDonor = meAsync.value?.hasActiveSubscription ?? false;
 
     return Scaffold(
-      backgroundColor: ColorConstants.ebony,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -80,8 +80,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                     isDonor
                         ? AppLocalizations.of(context)!.donationThankYouTitle
                         : AppLocalizations.of(context)!.donationTitle,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
                     ),
@@ -92,8 +92,11 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                     isDonor
                         ? AppLocalizations.of(context)!.donationThankYouBody
                         : AppLocalizations.of(context)!.donationBody,
-                    style: const TextStyle(
-                      color: Colors.white70,
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.7),
                       fontSize: 16,
                       height: 1.5,
                     ),

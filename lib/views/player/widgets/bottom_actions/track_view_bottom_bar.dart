@@ -38,7 +38,7 @@ class TrackViewBottomBar extends ConsumerWidget {
     showModalBottomSheet(
       showDragHandle: true,
       context: context,
-      backgroundColor: ColorConstants.onyx,
+      backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
       builder: (context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -84,12 +84,12 @@ class TrackViewBottomBar extends ConsumerWidget {
     return ListTile(
       leading: HugeIcon(
         icon: icon,
-        color: ColorConstants.white,
+        color: Theme.of(context).colorScheme.onSurface,
         size: 20,
       ),
       title: Text(
         title,
-        style: const TextStyle(color: ColorConstants.white),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       ),
       onTap: onTap,
     );
@@ -148,7 +148,7 @@ class TrackViewBottomBar extends ConsumerWidget {
     bool isFavorite,
     bool isDailyMeditation,
   ) {
-    var colour = isFavorite ? ColorConstants.lightPurple : ColorConstants.white;
+    var colour = isFavorite ? ColorConstants.lightPurple : Theme.of(context).colorScheme.onSurface;
     var icon =
         isFavorite ? HugeIcons.solidRoundedStar : HugeIcons.strokeRoundedStar;
 
@@ -157,7 +157,7 @@ class TrackViewBottomBar extends ConsumerWidget {
       leftItem: BottomActionBarItem(
         child: HugeIcon(
           icon: HugeIcons.solidSharpArrowLeft02,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: onBackPressed,
       ),
@@ -166,7 +166,7 @@ class TrackViewBottomBar extends ConsumerWidget {
           icon: Platform.isIOS
               ? HugeIcons.strokeRoundedShare05
               : HugeIcons.strokeRoundedShare08,
-          color: ColorConstants.white,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: Platform.isIOS
             ? () => _showBottomSheet(context)

@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-import '../constants/colors/color_constants.dart';
-
 class MeditoHugeIcon extends StatelessWidget {
   static const String streakIcon = 'streak';
 
   const MeditoHugeIcon({
     super.key,
     required this.icon,
-    this.color = ColorConstants.white,
+    this.color,
     this.size = 24,
   });
 
   final String icon;
-  final Color color;
+  final Color? color;
   final double size;
 
   @override
@@ -23,7 +21,7 @@ class MeditoHugeIcon extends StatelessWidget {
 
     return HugeIcon(
       icon: _getIconData(icon),
-      color: color,
+      color: color ?? Theme.of(context).colorScheme.onSurface,
       size: size,
     );
   }

@@ -113,7 +113,7 @@ class _BottomNavigationBarViewState
         icon: HugeIcons.solidRoundedHome01,
         color: _currentPageIndex == 0
             ? ColorConstants.lightPurple
-            : ColorConstants.white,
+            : Theme.of(context).colorScheme.onSurface,
       ),
       onTap: () => _onDestinationSelected(0),
     );
@@ -136,7 +136,7 @@ class _BottomNavigationBarViewState
           icon: HugeIcons.solidRoundedLibraries,
           color: _currentPageIndex == 1
               ? ColorConstants.lightPurple
-              : ColorConstants.white,
+              : Theme.of(context).colorScheme.onSurface,
         ),
       ),
       onTap: () => _onDestinationSelected(1),
@@ -149,7 +149,7 @@ class _BottomNavigationBarViewState
         icon: HugeIcons.solidRoundedRoad02,
         color: _currentPageIndex == 2
             ? ColorConstants.lightPurple
-            : ColorConstants.white,
+            : Theme.of(context).colorScheme.onSurface,
       ),
       onTap: () => _onDestinationSelected(2),
     );
@@ -161,7 +161,7 @@ class _BottomNavigationBarViewState
         icon: HugeIcons.solidRoundedSettings01,
         color: _currentPageIndex == 3
             ? ColorConstants.lightPurple
-            : ColorConstants.white,
+            : Theme.of(context).colorScheme.onSurface,
       ),
       onTap: () => _onDestinationSelected(3),
     );

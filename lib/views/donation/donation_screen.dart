@@ -122,9 +122,6 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                               backgroundColor: Colors.transparent,
                               foregroundColor:
                                   Theme.of(context).colorScheme.onSurface,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8))),
                               side: isMonthlyDonationVisible
                                   ? BorderSide(
                                       color:
@@ -156,9 +153,6 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                               backgroundColor: Colors.transparent,
                               foregroundColor:
                                   Theme.of(context).colorScheme.onSurface,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8))),
                               side: !isMonthlyDonationVisible
                                   ? BorderSide(
                                       color:
@@ -188,7 +182,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             height: 1.5,
-                            color: Colors.white70,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.color
+                                ?.withOpacity(0.7),
                           ),
                     ),
                     const SizedBox(height: 16),
@@ -258,7 +256,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 14,
                         height: 1.4,
-                        color: Colors.white70,
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.color
+                            ?.withOpacity(0.7),
                       ),
                 ),
               ),
@@ -290,7 +292,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
           Text(
             symbol,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white54,
+                  color: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.color
+                      ?.withOpacity(0.54),
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -300,10 +306,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
             child: DropdownButton<String>(
               value: selectedCurrency,
               dropdownColor: ColorConstants.greyIsTheNewBlack,
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Colors.white54, size: 20),
+              icon: Icon(Icons.arrow_drop_down,
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                  size: 20),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.white,
                     fontSize: 14,
                   ),
               isDense: true,
@@ -467,24 +474,23 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(8),
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-          color: ColorConstants.greyIsTheNewGrey,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        alignment: Alignment.center,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ],
+      child: Card(
+        color: ColorConstants.greyIsTheNewGrey,
+        child: Container(
+          height: 50,
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -501,9 +507,6 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
         onPressed: () => _handleDonationAction(context, url),
         style: TextButton.styleFrom(
           backgroundColor: ColorConstants.charcoal,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
         child: Text(
@@ -519,11 +522,14 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
 
   List<Widget> _buildPaymentMethodIcons() {
     return [
-      Icon(HugeIcons.solidStandardCreditCardAccept, color: Colors.white70),
+      Icon(HugeIcons.solidStandardCreditCardAccept,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
       const SizedBox(width: 16),
-      Icon(FontAwesomeIcons.applePay, color: Colors.white70),
+      Icon(FontAwesomeIcons.applePay,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
       const SizedBox(width: 16),
-      Icon(FontAwesomeIcons.googlePay, color: Colors.white70),
+      Icon(FontAwesomeIcons.googlePay,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
     ];
   }
 
@@ -534,7 +540,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
         Text(
           AppLocalizations.of(context)!.donationSecurityInfo,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white70,
+                color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withOpacity(0.7),
                 fontSize: 12,
                 height: 1.5,
               ),
@@ -543,7 +553,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
         Text(
           AppLocalizations.of(context)!.foundationRegistrationInfo,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white70,
+                color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withOpacity(0.7),
                 fontSize: 12,
                 height: 1.5,
               ),
@@ -552,7 +566,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
         Text(
           AppLocalizations.of(context)!.foundationContactInfo,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white70,
+                color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withOpacity(0.7),
                 fontSize: 12,
                 height: 1.5,
               ),

@@ -144,16 +144,17 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
                   child: locked
                       ? HugeIcon(
                           icon: HugeIcons.strokeRoundedSquareLock02,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           size: 24,
                         )
                       : Text(
                           text,
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: textColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -164,7 +165,7 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
                   padding: EdgeInsets.only(right: 8),
                   child: HugeIcon(
                     icon: HugeIcons.strokeStandardTick02,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 24,
                   ),
                 ),

@@ -7,38 +7,54 @@ import '../styles/widget_styles.dart';
 import 'input_theme.dart';
 
 ThemeData appTheme(BuildContext context) {
+  final brightness = MediaQuery.of(context).platformBrightness;
+  final isDark = brightness == Brightness.dark;
+
   return ThemeData(
     useMaterial3: true,
-    splashColor: ColorConstants.ebony,
-    cardColor: ColorConstants.onyx,
-    canvasColor: ColorConstants.ebony,
+    brightness: brightness,
+    splashColor: isDark ? ColorConstants.ebony : ColorConstants.lightSurface,
+    cardColor: isDark ? ColorConstants.onyx : ColorConstants.lightCard,
+    canvasColor: isDark ? ColorConstants.ebony : ColorConstants.lightBackground,
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
         TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       },
     ),
-    colorScheme: const ColorScheme.dark(
-      primary: ColorConstants.lightPurple,
-      onPrimary: ColorConstants.white,
-      secondary: ColorConstants.white,
-      onSecondary: ColorConstants.black,
-      surface: ColorConstants.ebony,
-      onSurface: ColorConstants.white,
-      background: ColorConstants.black,
-      onBackground: ColorConstants.white,
-      error: ColorConstants.amber,
-      onError: ColorConstants.white,
-    ),
-    scaffoldBackgroundColor: ColorConstants.ebony,
+    colorScheme: isDark
+        ? const ColorScheme.dark(
+            primary: ColorConstants.lightPurple,
+            onPrimary: ColorConstants.white,
+            secondary: ColorConstants.white,
+            onSecondary: ColorConstants.black,
+            surface: ColorConstants.ebony,
+            onSurface: ColorConstants.white,
+            error: ColorConstants.amber,
+            onError: ColorConstants.white,
+          )
+        : const ColorScheme.light(
+            primary: ColorConstants.lightPurple,
+            onPrimary: ColorConstants.white,
+            secondary: ColorConstants.lightSecondary,
+            onSecondary: ColorConstants.lightOnSecondary,
+            surface: ColorConstants.lightSurface,
+            onSurface: ColorConstants.lightOnSurface,
+            error: ColorConstants.amber,
+            onError: ColorConstants.white,
+          ),
+    scaffoldBackgroundColor:
+        isDark ? ColorConstants.ebony : ColorConstants.lightBackground,
     textTheme: meditoTextTheme(context),
     inputDecorationTheme: inputDecorationTheme(),
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       systemOverlayStyle: SystemUiOverlayStyle(
-        systemNavigationBarColor: ColorConstants.ebony,
-        systemNavigationBarIconBrightness: Brightness.light,
+        systemNavigationBarColor:
+            isDark ? ColorConstants.ebony : ColorConstants.lightBackground,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
         statusBarColor: ColorConstants.transparent,
-        statusBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
     ),
     // Enhanced button themes
@@ -59,7 +75,8 @@ ThemeData appTheme(BuildContext context) {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        backgroundColor: ColorConstants.black,
+        backgroundColor:
+            isDark ? ColorConstants.black : ColorConstants.lightSurface,
         foregroundColor: ColorConstants.lightPurple,
         side: const BorderSide(color: ColorConstants.lightPurple),
         shape: RoundedRectangleBorder(
@@ -84,15 +101,16 @@ ThemeData appTheme(BuildContext context) {
     ),
     // Dialog theme
     dialogTheme: DialogThemeData(
-      backgroundColor: ColorConstants.ebony,
-      titleTextStyle: const TextStyle(
-        color: ColorConstants.white,
+      backgroundColor:
+          isDark ? ColorConstants.ebony : ColorConstants.lightSurface,
+      titleTextStyle: TextStyle(
+        color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
         fontSize: 18,
         fontWeight: FontWeight.w600,
         fontFamily: dmSans,
       ),
-      contentTextStyle: const TextStyle(
-        color: ColorConstants.white,
+      contentTextStyle: TextStyle(
+        color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         fontFamily: dmSans,
@@ -102,9 +120,9 @@ ThemeData appTheme(BuildContext context) {
       ),
     ),
     // Bottom sheet theme
-    bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: ColorConstants.onyx,
-      shape: RoundedRectangleBorder(
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: isDark ? ColorConstants.onyx : ColorConstants.lightCard,
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(14),
           topRight: Radius.circular(14),
@@ -113,7 +131,7 @@ ThemeData appTheme(BuildContext context) {
     ),
     // Card theme
     cardTheme: CardThemeData(
-      color: ColorConstants.onyx,
+      color: isDark ? ColorConstants.onyx : ColorConstants.lightCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
       ),
@@ -121,24 +139,30 @@ ThemeData appTheme(BuildContext context) {
     ),
     // Switch theme
     switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return ColorConstants.lightPurple;
         }
-        return ColorConstants.greyIsTheNewGrey;
+        return isDark
+            ? ColorConstants.greyIsTheNewGrey
+            : ColorConstants.lightGrey;
       }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
-          return ColorConstants.lightPurple.withOpacity(0.3);
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return ColorConstants.lightPurple.withValues(alpha: 0.3);
         }
-        return ColorConstants.greyIsTheNewGrey;
+        return isDark
+            ? ColorConstants.greyIsTheNewGrey
+            : ColorConstants.lightGrey;
       }),
     ),
     // Progress indicator theme
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
+    progressIndicatorTheme: ProgressIndicatorThemeData(
       color: ColorConstants.lightPurple,
-      linearTrackColor: ColorConstants.greyIsTheNewGrey,
-      circularTrackColor: ColorConstants.greyIsTheNewGrey,
+      linearTrackColor:
+          isDark ? ColorConstants.greyIsTheNewGrey : ColorConstants.lightGrey,
+      circularTrackColor:
+          isDark ? ColorConstants.greyIsTheNewGrey : ColorConstants.lightGrey,
     ),
   );
 }

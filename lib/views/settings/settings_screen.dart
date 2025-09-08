@@ -88,7 +88,7 @@ class SettingsScreen extends ConsumerWidget {
         title: AppLocalizations.of(context)!.helpTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedHelpCircle,
-            color: ColorConstants.white),
+            color: Theme.of(context).colorScheme.onSurface),
         path: 'https://medito.support.site/',
       ),
       SettingsItem(
@@ -96,7 +96,8 @@ class SettingsScreen extends ConsumerWidget {
         type: TypeConstants.route,
         title: AppLocalizations.of(context)!.donateTitle,
         icon: HugeIcon(
-            icon: HugeIcons.solidSharpFavourite, color: ColorConstants.white),
+            icon: HugeIcons.solidSharpFavourite,
+            color: Theme.of(context).colorScheme.onSurface),
         path: RouteConstants.donation,
       ),
       SettingsItem(
@@ -105,7 +106,7 @@ class SettingsScreen extends ConsumerWidget {
         title: AppLocalizations.of(context)!.shopTitle,
         icon: HugeIcon(
             icon: HugeIcons.solidRoundedShoppingBag01,
-            color: ColorConstants.white),
+            color: Theme.of(context).colorScheme.onSurface),
         path: 'https://shop.medito.app',
       ),
       SettingsItem(
@@ -114,7 +115,7 @@ class SettingsScreen extends ConsumerWidget {
         title: AppLocalizations.of(context)!.editStatsTitle,
         icon: HugeIcon(
           icon: HugeIcons.solidRoundedQuestion,
-          color: ColorConstants.white,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         path: ref.watch(editStatsUrlProvider).when(
               data: (url) => url,
@@ -127,7 +128,8 @@ class SettingsScreen extends ConsumerWidget {
         type: TypeConstants.url,
         title: AppLocalizations.of(context)!.telegramTitle,
         icon: HugeIcon(
-            icon: HugeIcons.solidRoundedTelegram, color: ColorConstants.white),
+            icon: HugeIcons.solidRoundedTelegram,
+            color: Theme.of(context).colorScheme.onSurface),
         path: 'https://t.me/meditoapp',
       ),
       SettingsItem(
@@ -135,7 +137,8 @@ class SettingsScreen extends ConsumerWidget {
         type: TypeConstants.url,
         title: AppLocalizations.of(context)!.whatsappTitle,
         icon: HugeIcon(
-            icon: HugeIcons.solidStandardWhatsapp, color: ColorConstants.white),
+            icon: HugeIcons.solidStandardWhatsapp,
+            color: Theme.of(context).colorScheme.onSurface),
         path: 'https://whatsapp.com/channel/0029Vaov2lZ5kg77zmTZfd2X',
       ),
       SettingsItem(
@@ -144,7 +147,7 @@ class SettingsScreen extends ConsumerWidget {
         title: AppLocalizations.of(context)!.customiseHomeLayout,
         icon: HugeIcon(
           icon: HugeIcons.solidSharpEdit02,
-          color: ColorConstants.white,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         path: TypeConstants.customiseHomeLayout,
       ),
@@ -154,7 +157,7 @@ class SettingsScreen extends ConsumerWidget {
         title: AppLocalizations.of(context)!.enableDndDuringMeditation,
         icon: HugeIcon(
           icon: HugeIcons.solidRoundedMoon,
-          color: ColorConstants.white,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         path: TypeConstants.toggleDnd,
       ),
@@ -163,7 +166,7 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        backgroundColor: ColorConstants.ebony,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         toolbarHeight: 56.0,
         title: Column(
           children: [
@@ -199,18 +202,18 @@ class SettingsScreen extends ConsumerWidget {
     return Card(
       borderOnForeground: true,
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      color: ColorConstants.onyx,
+      color: Theme.of(context).cardColor,
       child: RowItemWidget(
         icon: HugeIcon(
           icon: HugeIcons.solidRoundedNotification03,
           size: 24,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
         title: AppLocalizations.of(context)!.dailyReminderTitle,
         subTitle: reminderTime != null
             ? ('${AppLocalizations.of(context)!.setFor} ${reminderTime.format(context)}')
             : null,
-        hasUnderline: true,
+        hasUnderline: false,
         isSwitch: true,
         onTap: () {
           _selectTime(context, ref);
@@ -279,7 +282,7 @@ class SettingsScreen extends ConsumerWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: ColorConstants.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
       ),

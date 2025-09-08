@@ -432,7 +432,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createAccountBenefits =>
-      '◦ Track your mindfulness journey \\n◦ Never lose your meditation progress\\n◦ Build a lasting meditation practice 💜';
+      '• Track your mindfulness journey\n• Never lose your meditation progress\n• Build a lasting meditation practice 💜';
 
   @override
   String get loginBenefits =>

@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class RowItemWidget extends StatelessWidget {
   const RowItemWidget({
@@ -23,7 +24,7 @@ class RowItemWidget extends StatelessWidget {
   final String title;
   final String? subTitle;
   final Widget icon;
-  final String? iconColor;
+  final Color? iconColor;
   final bool hasUnderline;
   final void Function()? onTap;
   final bool isTrailingIcon;
@@ -39,9 +40,9 @@ class RowItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var border = Border(
       bottom: hasUnderline
-          ? const BorderSide(
+          ? BorderSide(
               width: 0.7,
-              color: ColorConstants.onyx,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
             )
           : BorderSide.none,
     );
@@ -65,7 +66,7 @@ class RowItemWidget extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    icon,
+                    _buildIconWithColor(),
                     width16,
                     Expanded(
                       child: Text.rich(
@@ -89,6 +90,7 @@ class RowItemWidget extends StatelessWidget {
                 Icon(
                   trailingIcon,
                   size: trailingIconSize,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               if (isSwitch)
                 Switch(
@@ -100,6 +102,18 @@ class RowItemWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildIconWithColor() {
+    if (iconColor != null && icon is MeditoHugeIcon) {
+      final meditoIcon = icon as MeditoHugeIcon;
+      return MeditoHugeIcon(
+        icon: meditoIcon.icon,
+        color: iconColor,
+        size: meditoIcon.size,
+      );
+    }
+    return icon;
   }
 
   TextSpan _subtitle(BuildContext context) {

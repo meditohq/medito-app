@@ -25,7 +25,7 @@ class HealthSyncTile extends StatelessWidget {
     return RowItemWidget(
       icon: HugeIcon(
         icon: HugeIcons.solidRoundedHealth,
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.onSurface,
       ),
       title: AppLocalizations.of(context)!.syncWithHealth,
       hasUnderline: true,

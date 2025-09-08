@@ -162,6 +162,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _setUpSystemUi() {
+    // Set default system UI style - will be updated in build method when theme is available
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         systemStatusBarContrastEnforced: false,
@@ -172,6 +173,22 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       ),
     );
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  }
+
+  void _updateSystemUiForTheme(BuildContext context) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final isDark = brightness == Brightness.dark;
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemStatusBarContrastEnforced: false,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      ),
+    );
   }
 
   Future<void> _initDeepLinks() async {
@@ -280,6 +297,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         }
 
         final locale = ref.watch(localeProvider);
+
+        // Update system UI to match current theme
+        _updateSystemUiForTheme(context);
 
         return MediaQuery.withClampedTextScaling(
           minScaleFactor: 0.8,

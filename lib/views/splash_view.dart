@@ -368,13 +368,22 @@ class SplashViewState extends ConsumerState<SplashView>
       child: Scaffold(
         extendBody: true,
         backgroundColor: _isLoading
-            ? Theme.of(context).colorScheme.background
+            ? Theme.of(context).scaffoldBackgroundColor
             : Colors.transparent,
         body: _isLoading
             ? Center(
-                child: SvgPicture.asset(
-                  AssetConstants.icLogo,
-                  width: 168,
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Colors.black.withOpacity(0.1)
+                        : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SvgPicture.asset(
+                    AssetConstants.icLogo,
+                    width: 168,
+                  ),
                 ),
               )
             : LayoutBuilder(
@@ -408,9 +417,19 @@ class SplashViewState extends ConsumerState<SplashView>
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
-                                      SvgPicture.asset(
-                                        AssetConstants.icLogo,
-                                        width: 40,
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Colors.black.withOpacity(0.1)
+                                              : Colors.transparent,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: SvgPicture.asset(
+                                          AssetConstants.icLogo,
+                                          width: 40,
+                                        ),
                                       ),
                                       const SizedBox(width: 16),
                                       Text(

@@ -54,8 +54,8 @@ class SignUpLogInPage extends ConsumerWidget {
           Navigator.pop(context);
         }
       });
-      return const Scaffold(
-        backgroundColor: ColorConstants.ebony,
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
             child:
                 CircularProgressIndicator(color: ColorConstants.lightPurple)),
@@ -161,28 +161,38 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       final proceed = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              backgroundColor: ColorConstants.ebony,
+              backgroundColor: Theme.of(context).dialogBackgroundColor,
               title: Text(
                 AppLocalizations.of(context)!.accountTransitionWarningTitle,
-                style: const TextStyle(color: Colors.white),
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               content: Text(
                 AppLocalizations.of(context)!.loginWarningExplanation,
-                style: const TextStyle(color: Colors.white70),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withOpacity(0.7),
+                    ),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: Text(
                     AppLocalizations.of(context)!.cancelAction,
-                    style: const TextStyle(color: ColorConstants.brightSky),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: ColorConstants.brightSky,
+                        ),
                   ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
                   child: Text(
                     AppLocalizations.of(context)!.continueLogin,
-                    style: TextStyle(color: Colors.red),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.red,
+                        ),
                   ),
                 ),
               ],
@@ -340,10 +350,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
   @override
   Widget build(BuildContext context) {
-    const inputTextStyle = TextStyle(color: ColorConstants.onyx);
+    final inputTextStyle =
+        TextStyle(color: Theme.of(context).colorScheme.onSurface);
 
     return Scaffold(
-      backgroundColor: ColorConstants.ebony,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         leading: _hasRequestedOtp
@@ -397,12 +408,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         Text(
           AppLocalizations.of(context)!.emailVerificationText,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 13,
-            height: 1.5,
-            fontWeight: FontWeight.normal,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontSize: 13,
+                height: 1.5,
+                fontWeight: FontWeight.normal,
+              ),
         ),
         height16,
         _buildEmailField(inputTextStyle),
@@ -444,21 +454,19 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
             children: [
               TextSpan(
                 text: '${AppLocalizations.of(context)!.otpInstructions}\n',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  height: 1.5,
-                  fontWeight: FontWeight.normal,
-                ),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontSize: 18,
+                      height: 1.5,
+                      fontWeight: FontWeight.normal,
+                    ),
               ),
               TextSpan(
                 text: _emailController.text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  height: 1.5,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontSize: 18,
+                      height: 1.5,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
             ],
           ),
@@ -494,12 +502,16 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                 ? AppLocalizations.of(context)!
                     .resendCodeInSeconds(_retryAfterSeconds.toString())
                 : AppLocalizations.of(context)!.resendCode,
-            style: TextStyle(
-              color: _isLoading || _isRateLimited
-                  ? Colors.white38
-                  : ColorConstants.brightSky,
-              fontSize: 14,
-            ),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: _isLoading || _isRateLimited
+                      ? Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withOpacity(0.38)
+                      : ColorConstants.brightSky,
+                  fontSize: 14,
+                ),
           ),
         ),
       ],
@@ -515,11 +527,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         _isEmailValid || _emailController.text.isEmpty,
         AppLocalizations.of(context)!.invalidEmailError,
       ).copyWith(
-        fillColor: Colors.white,
+        fillColor: Theme.of(context).colorScheme.surface,
         filled: true,
         suffixIcon: _emailController.text.isNotEmpty && !_hasRequestedOtp
             ? IconButton(
-                icon: const Icon(Icons.clear, color: Colors.white60),
+                icon: Icon(Icons.clear,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6)),
                 onPressed: () {
                   _emailController.clear();
                   _validateEmail();
@@ -528,7 +544,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
             : null,
       ),
       onChanged: (_) => setState(() {}),
-      style: const TextStyle(color: ColorConstants.onyx),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       keyboardType: TextInputType.emailAddress,
     );
   }
@@ -541,10 +557,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         _isOtpValid || _otpController.text.isEmpty,
         AppLocalizations.of(context)!.invalidOtpError,
       ).copyWith(
-        fillColor: Colors.white,
+        fillColor: Theme.of(context).colorScheme.surface,
         filled: true,
       ),
-      style: const TextStyle(color: ColorConstants.onyx),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       keyboardType: TextInputType.number,
       maxLength: 6,
     );
@@ -557,15 +573,19 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         child: Text.rich(
           TextSpan(
             text: AppLocalizations.of(context)!.byContinuingAgreeTo,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-            ),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withOpacity(0.7),
+                  fontSize: 12,
+                ),
             children: [
               TextSpan(
                 text: 'Terms of Service',
-                style: const TextStyle(
-                  color: ColorConstants.brightSky,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
                   decoration: TextDecoration.underline,
                 ),
                 recognizer: TapGestureRecognizer()
@@ -579,8 +599,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               TextSpan(text: AppLocalizations.of(context)!.andText),
               TextSpan(
                 text: 'Privacy Policy',
-                style: const TextStyle(
-                  color: ColorConstants.brightSky,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
                   decoration: TextDecoration.underline,
                 ),
                 recognizer: TapGestureRecognizer()
@@ -601,13 +621,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
   ButtonStyle _getButtonStyle() {
     return ElevatedButton.styleFrom(
-      foregroundColor: ColorConstants.onyx,
+      foregroundColor: Theme.of(context).colorScheme.onPrimary,
       backgroundColor: ColorConstants.lightPurple,
       disabledForegroundColor: Colors.white60,
       disabledBackgroundColor: ColorConstants.lightPurple.withOpacity(0.5),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-      ),
       minimumSize: const Size(double.infinity, 48),
     );
   }
@@ -618,9 +635,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: Colors.black38),
+      hintStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: Theme.of(context).colorScheme.surface,
       enabledBorder: const OutlineInputBorder(
         borderRadius: borderRadius,
         borderSide: BorderSide(color: ColorConstants.softGrey),
@@ -650,12 +668,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     return Text(
       text,
       textAlign: TextAlign.start,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-        height: 1.5,
-        fontWeight: FontWeight.w500,
-      ),
+      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontSize: 20,
+            height: 1.5,
+            fontWeight: FontWeight.w500,
+          ),
     );
   }
 }

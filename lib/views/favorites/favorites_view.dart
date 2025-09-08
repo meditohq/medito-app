@@ -185,8 +185,8 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
                     item: _buildPackItemModel(item, statsState),
                   ),
                   if (index < favorites.length - 1)
-                    const Divider(
-                      color: ColorConstants.charcoal,
+                    Divider(
+                      color: Theme.of(context).colorScheme.outline,
                       thickness: 2,
                       height: 2,
                     ),
@@ -229,21 +229,32 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
     return ChoiceChip(
       label: Text(
         filter.label(context),
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
       ),
       selected: isSelected,
-      selectedColor: ColorConstants.softGrey,
-      iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
+      selectedColor: Theme.of(context).colorScheme.primary,
       onSelected: (selected) {
         if (selected) setState(() => _currentFilter = filter);
       },
-      backgroundColor: ColorConstants.onyx,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      iconTheme: IconThemeData(
+        color: isSelected
+            ? Theme.of(context).colorScheme.onPrimary
+            : Theme.of(context).colorScheme.onSurface,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: ColorConstants.softGrey),
+        side: BorderSide(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline,
+        ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      labelStyle: Theme.of(context).textTheme.bodyMedium,
     );
   }
 

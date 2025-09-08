@@ -133,7 +133,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
             },
             child: Card(
               margin: EdgeInsets.zero,
-              color: ColorConstants.onyx,
+              color: Theme.of(context).cardColor,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 child: Column(
@@ -233,8 +233,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   height: _kButtonHeight,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorConstants.white,
-                      foregroundColor: ColorConstants.onyx,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
                     ),
                     onPressed: () {
                       handleNavigation(
@@ -252,7 +252,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             height: 1.2,
-                            color: ColorConstants.onyx,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                     ),
                   ),

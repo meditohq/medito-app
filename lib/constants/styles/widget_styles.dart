@@ -34,3 +34,13 @@ const bottomSheetBoxDecoration = BoxDecoration(
     topRight: Radius.circular(12),
   ),
 );
+
+BoxDecoration bottomSheetBoxDecorationForTheme(BuildContext context) {
+  return BoxDecoration(
+    color: Theme.of(context).bottomSheetTheme.backgroundColor,
+    borderRadius: const BorderRadius.only(
+      topLeft: Radius.circular(12),
+      topRight: Radius.circular(12),
+    ),
+  );
+}

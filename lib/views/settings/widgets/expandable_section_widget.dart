@@ -70,25 +70,35 @@ class _ExpandableSectionWidgetState
               backgroundColor: ColorConstants.ebony,
               title: Text(
                 AppLocalizations.of(context)!.iosTrackingDialogTitle,
-                style: const TextStyle(color: Colors.white),
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               content: Text(
                 AppLocalizations.of(context)!.iosTrackingDialogContent,
-                style: const TextStyle(color: Colors.white70),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withOpacity(0.7),
+                    ),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: Text(
                     AppLocalizations.of(context)!.iosTrackingDialogCancel,
-                    style: const TextStyle(color: ColorConstants.lightPurple),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: ColorConstants.lightPurple,
+                        ),
                   ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
                   child: Text(
                     AppLocalizations.of(context)!.iosTrackingDialogDisable,
-                    style: const TextStyle(color: ColorConstants.lightPurple),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: ColorConstants.lightPurple,
+                        ),
                   ),
                 ),
               ],
@@ -138,14 +148,13 @@ class _ExpandableSectionWidgetState
                 Text(
                   AppLocalizations.of(context)!.advanced,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: ColorConstants.white,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
                 const SizedBox(width: 8.0),
                 Icon(
                   _isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: ColorConstants.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 20.0,
                 ),
               ],
@@ -177,7 +186,7 @@ class _ExpandableSectionWidgetState
                         children: [
                           HugeIcon(
                             icon: HugeIcons.solidRoundedShield01,
-                            color: ColorConstants.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 24.0,
                           ),
                           width16,
@@ -188,12 +197,8 @@ class _ExpandableSectionWidgetState
                                 Text(
                                   AppLocalizations.of(context)!
                                       .streakFreezesBeta,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium
-                                      ?.copyWith(
-                                        color: ColorConstants.white,
-                                      ),
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium,
                                 ),
                                 const SizedBox(height: 4.0),
                                 Text(
@@ -246,26 +251,21 @@ class _ExpandableSectionWidgetState
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.bug_report,
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
                             width16,
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.debugInfo,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
-                                    ?.copyWith(
-                                      color: ColorConstants.white,
-                                    ),
+                                style: Theme.of(context).textTheme.labelMedium,
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.chevron_right_rounded,
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
                           ],
@@ -290,7 +290,7 @@ class _ExpandableSectionWidgetState
                         children: [
                           HugeIcon(
                             icon: HugeIcons.solidSharpSettings03,
-                            color: ColorConstants.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 24.0,
                           ),
                           width16,
@@ -298,12 +298,7 @@ class _ExpandableSectionWidgetState
                             child: Text(
                               AppLocalizations.of(context)!
                                   .analyticsTrackingTitle,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
-                                  ?.copyWith(
-                                    color: ColorConstants.white,
-                                  ),
+                              style: Theme.of(context).textTheme.labelMedium,
                             ),
                           ),
                           isAnalyticsEnabledAsync.when(
@@ -344,26 +339,21 @@ class _ExpandableSectionWidgetState
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.arrow_right_alt,
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
                             width16,
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.onboarding,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
-                                    ?.copyWith(
-                                      color: ColorConstants.white,
-                                    ),
+                                style: Theme.of(context).textTheme.labelMedium,
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.chevron_right_rounded,
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
                           ],
@@ -390,24 +380,19 @@ class _ExpandableSectionWidgetState
                           children: [
                             HugeIcon(
                               icon: HugeIcons.solidRoundedDocumentAttachment,
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
                             width16,
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.termsOfService,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
-                                    ?.copyWith(
-                                      color: ColorConstants.white,
-                                    ),
+                                style: Theme.of(context).textTheme.labelMedium,
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.chevron_right_rounded,
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
                           ],
@@ -434,24 +419,19 @@ class _ExpandableSectionWidgetState
                           children: [
                             HugeIcon(
                               icon: HugeIcons.solidRoundedShield01,
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
                             width16,
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.privacyPolicy,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
-                                    ?.copyWith(
-                                      color: ColorConstants.white,
-                                    ),
+                                style: Theme.of(context).textTheme.labelMedium,
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.chevron_right_rounded,
-                              color: ColorConstants.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
                           ],
