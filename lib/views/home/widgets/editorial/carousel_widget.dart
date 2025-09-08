@@ -233,8 +233,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   height: _kButtonHeight,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      foregroundColor: Theme.of(context).colorScheme.onSurface,
+                      backgroundColor: ColorConstants.brightSky,
+                      foregroundColor: ColorConstants.onyx,
                     ),
                     onPressed: () {
                       handleNavigation(
@@ -252,7 +252,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             height: 1.2,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: ColorConstants.onyx,
                           ),
                     ),
                   ),

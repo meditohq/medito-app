@@ -28,7 +28,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
         );
 
     final authorStyle = quoteStyle?.copyWith(
-      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
+      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
       fontSize: 16,
     );
 
@@ -71,7 +71,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                       icon: Platform.isIOS
                           ? HugeIcons.solidRoundedShare03
                           : HugeIcons.solidRoundedShare08,
-                      color: Colors.white.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                       size: 16,
                     ),
                   ),

@@ -148,6 +148,7 @@ class _ExpandableSectionWidgetState
                 Text(
                   AppLocalizations.of(context)!.advanced,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
