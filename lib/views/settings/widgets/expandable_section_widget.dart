@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -323,45 +324,47 @@ class _ExpandableSectionWidgetState
                       ),
                     ),
                   ),
-                  // Onboarding Item
-                  InkWell(
-                    onTap: () => _showOnboardingScreen(context),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              width: 0.7,
-                              color: ColorConstants.onyx,
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.arrow_right_alt,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              size: 24.0,
-                            ),
-                            width16,
-                            Expanded(
-                              child: Text(
-                                AppLocalizations.of(context)!.onboarding,
-                                style: Theme.of(context).textTheme.labelMedium,
+                  // Onboarding Item (only in debug mode)
+                  if (kDebugMode)
+                    InkWell(
+                      onTap: () => _showOnboardingScreen(context),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                width: 0.7,
+                                color: ColorConstants.onyx,
                               ),
                             ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              size: 24.0,
-                            ),
-                          ],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.arrow_right_alt,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                size: 24.0,
+                              ),
+                              width16,
+                              Expanded(
+                                child: Text(
+                                  AppLocalizations.of(context)!.onboarding,
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium,
+                                ),
+                              ),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                size: 24.0,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
                   // Terms of Service Item
                   InkWell(
                     onTap: () => _openTermsOfService(context),
