@@ -375,9 +375,7 @@ class SplashViewState extends ConsumerState<SplashView>
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.light
-                        ? Colors.black.withOpacity(0.1)
-                        : Colors.transparent,
+                    color: Colors.white.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
@@ -420,10 +418,7 @@ class SplashViewState extends ConsumerState<SplashView>
                                       Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.light
-                                              ? Colors.black.withOpacity(0.1)
-                                              : Colors.transparent,
+                                          color: Colors.white.withOpacity(0.1),
                                           shape: BoxShape.circle,
                                         ),
                                         child: SvgPicture.asset(
@@ -439,6 +434,7 @@ class SplashViewState extends ConsumerState<SplashView>
                                             .displayLarge
                                             ?.copyWith(
                                               fontSize: 24,
+                                              color: Colors.white,
                                             ),
                                       ),
                                     ],
@@ -460,6 +456,7 @@ class SplashViewState extends ConsumerState<SplashView>
                                               fontSize: 40,
                                               fontWeight: FontWeight.bold,
                                               height: 1.2,
+                                              color: Colors.white,
                                             ),
                                       ),
                                       SizedBox(
@@ -491,6 +488,7 @@ class SplashViewState extends ConsumerState<SplashView>
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             height: 1.3,
+                                                            color: Colors.white,
                                                           ),
                                                     ),
                                                     const SizedBox(height: 16),
@@ -503,6 +501,9 @@ class SplashViewState extends ConsumerState<SplashView>
                                                           ?.copyWith(
                                                             fontSize: 20,
                                                             height: 1.4,
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                    0.9),
                                                           ),
                                                     ),
                                                   ],

@@ -146,6 +146,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                     textAlign: TextAlign.center,
                   ),
@@ -155,10 +156,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 16,
                           height: 1.5,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.7),
+                          color: Colors.white.withOpacity(0.9),
                         ),
                     textAlign: TextAlign.center,
                   ),
@@ -194,6 +192,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       },
                       child: Text(
                         AppLocalizations.of(context)!.skipForNow,
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -213,6 +212,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         onPressed: _navigateNext,
         child: Text(
           '${AppLocalizations.of(context)!.setFor} ${reminderTime.format(context)}',
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );
@@ -226,7 +226,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        child: Text(text),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
     );
   }

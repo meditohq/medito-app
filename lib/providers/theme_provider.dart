@@ -11,7 +11,7 @@ final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
 class ThemeNotifier extends StateNotifier<ThemeMode> {
   SharedPreferences? _prefs;
 
-  ThemeNotifier() : super(ThemeMode.system) {
+  ThemeNotifier() : super(ThemeMode.dark) {
     _initPrefs();
   }
 
@@ -21,10 +21,8 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
   }
 
   void _loadTheme() {
-    if (_prefs == null) return;
-
     final savedTheme =
-        _prefs!.getString(SharedPreferenceConstants.themePreference);
+        _prefs?.getString(SharedPreferenceConstants.themePreference);
 
     switch (savedTheme) {
       case 'light':
@@ -34,13 +32,21 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
         state = ThemeMode.dark;
         break;
       case 'system':
+        state = ThemeMode.system;
+        break;
       default:
+        // Default to dark theme for new users
         state = ThemeMode.dark;
         break;
     }
   }
 
   Future<void> setTheme(ThemeMode themeMode) async {
+    // Ensure prefs are initialized
+    if (_prefs == null) {
+      _prefs = await SharedPreferences.getInstance();
+    }
+
     String themeString;
     switch (themeMode) {
       case ThemeMode.light:
