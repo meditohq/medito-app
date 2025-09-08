@@ -9,6 +9,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -18,6 +19,7 @@ import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/widgets/expandable_section_widget.dart';
+import 'package:medito/views/settings/widgets/theme_selection_dialog.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -143,6 +145,16 @@ class SettingsScreen extends ConsumerWidget {
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.customizationSection,
+        type: TypeConstants.theme,
+        title: AppLocalizations.of(context)!.themeTitle,
+        icon: HugeIcon(
+          icon: HugeIcons.solidRoundedSettings01,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        path: TypeConstants.theme,
+      ),
+      SettingsItem(
+        section: AppLocalizations.of(context)!.customizationSection,
         type: TypeConstants.route,
         title: AppLocalizations.of(context)!.customiseHomeLayout,
         icon: HugeIcon(
@@ -247,6 +259,7 @@ class SettingsScreen extends ConsumerWidget {
     final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
+    final isThemeItem = item.type == TypeConstants.theme;
 
     if (isAccountItem) {
       return const SizedBox.shrink();
@@ -263,6 +276,23 @@ class SettingsScreen extends ConsumerWidget {
         switchValue: isDndEnabled,
         onSwitchChanged: (value) {
           ref.read(dndProvider.notifier).toggleDnd(value);
+        },
+      );
+    }
+
+    if (isThemeItem) {
+      final themeNotifier = ref.read(themeProvider.notifier);
+
+      return RowItemWidget(
+        icon: item.icon,
+        title: item.title,
+        subTitle: themeNotifier.getThemeDisplayName(context),
+        hasUnderline: true,
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => const ThemeSelectionDialog(),
+          );
         },
       );
     }

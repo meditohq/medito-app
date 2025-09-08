@@ -32,4 +32,7 @@ class SharedPreferenceConstants {
 
   // Locale preference - stores the user's preferred language setting
   static const String localePreference = 'locale_preference';
+
+  // Theme preference - stores the user's preferred theme mode
+  static const String themePreference = 'theme_preference';
 }

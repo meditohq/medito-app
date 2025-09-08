@@ -474,5 +474,25 @@
   "customizationSection": "Customisation",
   "@customizationSection": {
     "description": "Section title for customization settings"
+  },
+  "themeTitle": "Theme",
+  "@themeTitle": {
+    "description": "Title for theme selection setting in customization section"
+  },
+  "systemTheme": "System",
+  "@systemTheme": {
+    "description": "System theme option that follows device settings"
+  },
+  "lightTheme": "Light",
+  "@lightTheme": {
+    "description": "Light theme option"
+  },
+  "darkTheme": "Dark",
+  "@darkTheme": {
+    "description": "Dark theme option"
+  },
+  "selectTheme": "Select Theme",
+  "@selectTheme": {
+    "description": "Dialog title for theme selection"
   }
 }

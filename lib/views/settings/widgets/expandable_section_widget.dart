@@ -199,8 +199,14 @@ class _ExpandableSectionWidgetState
                                 Text(
                                   AppLocalizations.of(context)!
                                       .streakFreezesBeta,
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
                                 ),
                                 const SizedBox(height: 4.0),
                                 Text(
@@ -210,7 +216,10 @@ class _ExpandableSectionWidgetState
                                       .textTheme
                                       .titleSmall
                                       ?.copyWith(
-                                        color: ColorConstants.graphite,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.7),
                                         letterSpacing: 0,
                                         height: 1.7,
                                       ),
@@ -262,7 +271,14 @@ class _ExpandableSectionWidgetState
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.debugInfo,
-                                style: Theme.of(context).textTheme.labelMedium,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
                               ),
                             ),
                             Icon(
@@ -300,7 +316,13 @@ class _ExpandableSectionWidgetState
                             child: Text(
                               AppLocalizations.of(context)!
                                   .analyticsTrackingTitle,
-                              style: Theme.of(context).textTheme.labelMedium,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
                             ),
                           ),
                           isAnalyticsEnabledAsync.when(
@@ -351,8 +373,14 @@ class _ExpandableSectionWidgetState
                               Expanded(
                                 child: Text(
                                   AppLocalizations.of(context)!.onboarding,
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
                                 ),
                               ),
                               Icon(
@@ -391,7 +419,14 @@ class _ExpandableSectionWidgetState
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.termsOfService,
-                                style: Theme.of(context).textTheme.labelMedium,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
                               ),
                             ),
                             Icon(
@@ -430,7 +465,14 @@ class _ExpandableSectionWidgetState
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.privacyPolicy,
-                                style: Theme.of(context).textTheme.labelMedium,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
                               ),
                             ),
                             Icon(

@@ -458,6 +458,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                       fontSize: 18,
                       height: 1.5,
                       fontWeight: FontWeight.normal,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
               ),
               TextSpan(
@@ -466,6 +467,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                       fontSize: 18,
                       height: 1.5,
                       fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
               ),
             ],

@@ -76,7 +76,14 @@ class RowItemWidget extends StatelessWidget {
                             TextSpan(
                               text: title,
                               style: titleStyle ??
-                                  Theme.of(context).textTheme.labelMedium,
+                                  Theme.of(context)
+                                      .textTheme
+                                      .labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
                             ),
                             if (subTitle != null) _subtitle(context),
                           ],
@@ -120,7 +127,8 @@ class RowItemWidget extends StatelessWidget {
     return TextSpan(
       text: subTitle != null ? '\n$subTitle' : '',
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: ColorConstants.graphite,
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             letterSpacing: 0,
             height: 1.7,
           ),

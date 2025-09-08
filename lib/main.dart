@@ -24,6 +24,7 @@ import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/locale_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
@@ -297,6 +298,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         }
 
         final locale = ref.watch(localeProvider);
+        final themeMode = ref.watch(themeProvider);
 
         // Update system UI to match current theme
         _updateSystemUiForTheme(context);
@@ -309,7 +311,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
               debugShowCheckedModeBanner: kDebugMode,
               scaffoldMessengerKey: scaffoldMessengerKey,
               navigatorKey: navigatorKey,
-              theme: appTheme(context),
+              theme: appTheme(context, ThemeMode.light),
+              darkTheme: appTheme(context, ThemeMode.dark),
+              themeMode: themeMode,
               title: ParentWidget._title,
               locale: locale,
               localizationsDelegates: const [

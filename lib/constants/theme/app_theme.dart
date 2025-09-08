@@ -6,13 +6,14 @@ import '../colors/color_constants.dart';
 import '../styles/widget_styles.dart';
 import 'input_theme.dart';
 
-ThemeData appTheme(BuildContext context) {
+ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
   final brightness = MediaQuery.of(context).platformBrightness;
-  final isDark = brightness == Brightness.dark;
+  final isDark = themeMode == ThemeMode.dark ||
+      (themeMode == ThemeMode.system && brightness == Brightness.dark);
 
   return ThemeData(
     useMaterial3: true,
-    brightness: brightness,
+    brightness: isDark ? Brightness.dark : Brightness.light,
     splashColor: isDark ? ColorConstants.ebony : ColorConstants.lightSurface,
     cardColor: isDark ? ColorConstants.onyx : ColorConstants.lightCard,
     canvasColor: isDark ? ColorConstants.ebony : ColorConstants.lightBackground,

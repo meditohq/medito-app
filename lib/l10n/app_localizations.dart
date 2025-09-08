@@ -2455,6 +2455,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Customisation'**
   String get customizationSection;
+
+  /// Title for theme selection setting in customization section
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeTitle;
+
+  /// System theme option that follows device settings
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get systemTheme;
+
+  /// Light theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get lightTheme;
+
+  /// Dark theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get darkTheme;
+
+  /// Dialog title for theme selection
+  ///
+  /// In en, this message translates to:
+  /// **'Select Theme'**
+  String get selectTheme;
 }
 
 class _AppLocalizationsDelegate
