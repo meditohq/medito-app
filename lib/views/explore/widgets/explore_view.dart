@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -195,7 +196,10 @@ class ExploreContentWidget extends ConsumerWidget {
                                 .textTheme
                                 .bodyMedium
                                 ?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.7),
                                 ),
                             textAlign: TextAlign.center,
                           ),
@@ -211,11 +215,16 @@ class ExploreContentWidget extends ConsumerWidget {
                               child: Text(
                                 AppLocalizations.of(context)!
                                     .packsSectionHeader,
-                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                 textAlign: TextAlign.left,
                               ),
                             ),
@@ -233,11 +242,16 @@ class ExploreContentWidget extends ConsumerWidget {
                               child: Text(
                                 AppLocalizations.of(context)!
                                     .tracksSectionHeader,
-                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                 textAlign: TextAlign.left,
                               ),
                             ),
@@ -439,7 +453,7 @@ class SearchBox extends StatelessWidget {
       decoration: InputDecoration(
         hintText: AppLocalizations.of(context)!.searchMeditations,
         prefixIcon: Icon(
-          Icons.search,
+          HugeIcons.solidStandardSearch02,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         suffixIcon: IconButton(
@@ -450,9 +464,33 @@ class SearchBox extends StatelessWidget {
           onPressed: onClear,
         ),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.1),
+        fillColor: Theme.of(context).colorScheme.surfaceTint.withOpacity(0.1),
         hintStyle: TextStyle(
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),

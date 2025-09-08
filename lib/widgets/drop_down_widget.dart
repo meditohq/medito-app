@@ -41,13 +41,14 @@ class DropdownWidget<T> extends StatelessWidget {
           fontFamily: dmMono,
           fontWeight: FontWeight.w400,
           fontSize: 16,
+          color: Theme.of(context).colorScheme.onSurface,
         );
 
     return Container(
       height: isLandscape ? 56 : 48, // Set height to 48 in portrait mode
       decoration: BoxDecoration(
         borderRadius: radius,
-        color: ColorConstants.onyx,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: _buildContent(context, radius, textStyle),
     );
@@ -130,7 +131,7 @@ class DropdownWidget<T> extends StatelessWidget {
             )
             .toList(),
         elevation: 8,
-        color: ColorConstants.onyx,
+        color: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),

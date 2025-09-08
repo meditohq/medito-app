@@ -383,7 +383,7 @@ class _FadingNetworkImageState extends State<_FadingNetworkImage> {
             fit: BoxFit.cover,
             cacheWidth: MediaQuery.of(context).size.width.toInt(),
             errorBuilder: (context, error, stackTrace) {
-              return Container(color: ColorConstants.black);
+              return Container(color: Theme.of(context).colorScheme.surface);
             },
             frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
               if (frame != null && !_imageLoaded) {

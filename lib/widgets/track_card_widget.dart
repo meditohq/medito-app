@@ -21,7 +21,7 @@ class TrackCardWidget extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: ColorConstants.onyx,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
       ),
       padding: const EdgeInsets.all(16),
@@ -72,7 +72,6 @@ class TrackCardWidget extends StatelessWidget {
         maxLines: 2,
         style: textTheme.titleMedium?.copyWith(
           letterSpacing: 0,
-          color: ColorConstants.graphite,
           fontSize: 14,
           height: 1.4,
         ),

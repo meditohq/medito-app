@@ -1,4 +1,3 @@
-import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -25,12 +24,12 @@ class BoxShimmerWidget extends StatelessWidget {
       width: width ?? size.width,
       height: height ?? size.height,
       child: Shimmer.fromColors(
-        baseColor: ColorConstants.greyIsTheNewBlack,
-        highlightColor: ColorConstants.greyIsTheNewGrey.withOpacity(0.4),
+        baseColor: Theme.of(context).colorScheme.surface,
+        highlightColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
         period: Duration(milliseconds: delayInMiliSeconds),
         child: Container(
           decoration: BoxDecoration(
-            color: ColorConstants.black,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.all(
               Radius.circular(borderRadius),
             ),

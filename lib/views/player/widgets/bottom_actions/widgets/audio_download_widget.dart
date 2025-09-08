@@ -82,11 +82,12 @@ class AudioDownloadWidget extends ConsumerWidget {
         ),
       );
     } else if (isDownloading) {
-      return showDownloadProgress(downloadAudioProvider, downloadFileKey);
+      return showDownloadProgress(
+          downloadAudioProvider, downloadFileKey, context);
     } else {
       return IconButton(
         onPressed: () => _handleDownload(downloadAudioProvider, context),
-        icon: HugeIcon(
+        icon: const HugeIcon(
           icon: HugeIcons.twotoneRoundedDownloadCircle01,
           color: ColorConstants.white,
         ),
@@ -97,6 +98,7 @@ class AudioDownloadWidget extends ConsumerWidget {
   Widget showDownloadProgress(
     AudioDownloaderProvider downloadAudioProvider,
     String downloadFileKey,
+    BuildContext context,
   ) {
     var progress = _getDownloadProgress(downloadAudioProvider, downloadFileKey);
 

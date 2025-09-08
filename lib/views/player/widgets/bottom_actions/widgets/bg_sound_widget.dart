@@ -78,7 +78,7 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
             ? _spinningIcon()
             : Icon(
                 HugeIcons.strokeRoundedMusicNote01,
-                color: Theme.of(context).colorScheme.onSurface,
+                color: Colors.white,
                 size: 23,
               ),
       ),

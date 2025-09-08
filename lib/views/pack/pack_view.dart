@@ -171,8 +171,8 @@ class _PackViewState extends ConsumerState<PackView>
         if (!isLast)
           const Divider(
             color: ColorConstants.charcoal,
-            thickness: 2,
-            height: 2,
+            thickness: 0.5,
+            height: 1,
           ),
       ],
     );

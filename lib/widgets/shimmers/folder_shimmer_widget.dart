@@ -17,20 +17,20 @@ class FolderShimmerWidget extends StatelessWidget {
           ),
           height8,
           Column(
-            children: List.generate(5, (index) => _shimmerList(size)),
+            children: List.generate(5, (index) => _shimmerList(context, size)),
           ),
         ],
       ),
     );
   }
 
-  Padding _shimmerList(Size size) {
+  Padding _shimmerList(BuildContext context, Size size) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(
         height: 100,
         width: size.width,
-        color: ColorConstants.greyIsTheNewGrey,
+        color: Theme.of(context).colorScheme.surface,
         child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,

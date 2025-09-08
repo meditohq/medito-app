@@ -76,6 +76,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
       icon: const Icon(
         HugeIcons.strokeStandardGoBackward10Sec,
         size: 40,
+        color: Colors.white,
       ),
     );
   }
@@ -86,6 +87,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
       icon: const Icon(
         HugeIcons.strokeStandardGoForward10Sec,
         size: 40,
+        color: Colors.white,
       ),
     );
   }
@@ -97,7 +99,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
     switch (repeatMode) {
       case RepeatMode.none:
         iconData = HugeIcons.solidSharpRepeat;
-        iconColor = null;
+        iconColor = Colors.white;
         break;
       case RepeatMode.infinite:
         iconData = HugeIcons.solidStandardRepeatOne01;

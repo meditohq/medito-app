@@ -1,4 +1,3 @@
-import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
 class HandleBarWidget extends StatelessWidget {
@@ -12,7 +11,7 @@ class HandleBarWidget extends StatelessWidget {
       height: 4,
       width: 44,
       decoration: BoxDecoration(
-        color: ColorConstants.white,
+        color: Theme.of(context).colorScheme.onSurface,
         borderRadius: BorderRadius.circular(12),
       ),
     );

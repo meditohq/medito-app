@@ -24,7 +24,7 @@ class ReportDialogWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Dialog(
-      backgroundColor: ColorConstants.onyx,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.85,
@@ -40,8 +40,8 @@ class ReportDialogWidget extends ConsumerWidget {
             // Title
             Text(
               AppLocalizations.of(context)!.reportTrack,
-              style: const TextStyle(
-                color: ColorConstants.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -57,8 +57,8 @@ class ReportDialogWidget extends ConsumerWidget {
                   Text(
                     AppLocalizations.of(context)!
                         .reportTrackDescription(track.title),
-                    style: const TextStyle(
-                      color: ColorConstants.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       height: 1.5,
                       fontSize: 14,
                     ),
@@ -69,7 +69,10 @@ class ReportDialogWidget extends ConsumerWidget {
                   Text(
                     AppLocalizations.of(context)!.reportDialogQuestion,
                     style: TextStyle(
-                      color: ColorConstants.white.withValues(alpha: 0.8),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
                   ),
@@ -92,7 +95,7 @@ class ReportDialogWidget extends ConsumerWidget {
                         _handleReport(context, ref, isFullTrack: true),
                     style: TextButton.styleFrom(
                       backgroundColor: ColorConstants.lightPurple,
-                      foregroundColor: ColorConstants.white,
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 16),
                       shape: RoundedRectangleBorder(
@@ -151,8 +154,10 @@ class ReportDialogWidget extends ConsumerWidget {
                   child: TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: TextButton.styleFrom(
-                      foregroundColor:
-                          ColorConstants.white.withValues(alpha: 0.7),
+                      foregroundColor: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 16),
                     ),
