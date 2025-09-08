@@ -98,7 +98,7 @@ class StreakFreezeSuggestionWidgetState
           Text(
             AppLocalizations.of(context)!.streakAtRisk,
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: ColorConstants.white,
+              color: theme.colorScheme.onSurface,
               fontSize: 28,
             ),
           ),
@@ -107,7 +107,7 @@ class StreakFreezeSuggestionWidgetState
             AppLocalizations.of(context)!
                 .streakFreezesAvailableMessage(availableCount.toString()),
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: ColorConstants.white,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               fontSize: 16,
             ),
             textAlign: TextAlign.center,

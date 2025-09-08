@@ -308,7 +308,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           maxScaleFactor: 1.5,
           child: MaintenanceChecker(
             child: MaterialApp(
-              debugShowCheckedModeBanner: kDebugMode,
+              debugShowCheckedModeBanner: false,
               scaffoldMessengerKey: scaffoldMessengerKey,
               navigatorKey: navigatorKey,
               theme: appTheme(context, ThemeMode.light),
