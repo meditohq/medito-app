@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -174,23 +173,26 @@ class ProductGroupCard extends ConsumerWidget {
                             key: ValueKey(
                                 'product_image_${productGroup.groupId}'),
                             placeholder: (context, url) => Container(
-                              color: ColorConstants.charcoal,
-                              child: const Center(
+                              color: Theme.of(context).colorScheme.surface,
+                              child: Center(
                                 child: SizedBox(
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                               ),
                             ),
                             errorWidget: (context, url, error) => Container(
-                              color: ColorConstants.charcoal,
+                              color: Theme.of(context).colorScheme.surface,
                               child: Center(
                                 child: Icon(
                                   Icons.image_not_supported_outlined,
-                                  color: ColorConstants.white,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -207,11 +209,11 @@ class ProductGroupCard extends ConsumerWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Container(
-                            color: ColorConstants.charcoal,
+                            color: Theme.of(context).colorScheme.surface,
                             child: Center(
                               child: Icon(
                                 Icons.image_not_supported_outlined,
-                                color: ColorConstants.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -228,7 +230,7 @@ class ProductGroupCard extends ConsumerWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: ColorConstants.onyx,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -438,11 +440,11 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
     if (_imageUrls.isEmpty) {
       // If no images available, show placeholder
       return Container(
-        color: ColorConstants.charcoal,
+        color: Theme.of(context).colorScheme.surface,
         child: Center(
           child: Icon(
             Icons.image_not_supported_outlined,
-            color: ColorConstants.white,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       );
@@ -468,7 +470,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
             'product_image_${widget.productGroup.groupId}_$_currentImageIndex'),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
-          color: ColorConstants.charcoal,
+          color: Theme.of(context).colorScheme.surface,
         ),
         clipBehavior: Clip.antiAlias,
         child: CachedNetworkImage(
@@ -484,23 +486,24 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
             ),
           ),
           placeholder: (context, url) => Container(
-            color: ColorConstants.charcoal,
-            child: const Center(
+            color: Theme.of(context).colorScheme.surface,
+            child: Center(
               child: SizedBox(
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
           ),
           errorWidget: (context, url, error) => Container(
-            color: ColorConstants.charcoal,
+            color: Theme.of(context).colorScheme.surface,
             child: Center(
               child: Icon(
                 Icons.image_not_supported_outlined,
-                color: ColorConstants.white,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
