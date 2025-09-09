@@ -177,8 +177,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   }
 
   void _updateSystemUiForTheme(BuildContext context) {
+    final themeMode = ref.watch(themeProvider);
     final brightness = MediaQuery.of(context).platformBrightness;
-    final isDark = brightness == Brightness.dark;
+    final isDark = themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system && brightness == Brightness.dark);
 
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(

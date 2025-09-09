@@ -46,7 +46,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
           ),
     scaffoldBackgroundColor:
         isDark ? ColorConstants.ebony : ColorConstants.lightBackground,
-    textTheme: meditoTextTheme(context),
+    textTheme: meditoTextTheme(context, themeMode),
     inputDecorationTheme: inputDecorationTheme(),
     appBarTheme: AppBarTheme(
       systemOverlayStyle: SystemUiOverlayStyle(

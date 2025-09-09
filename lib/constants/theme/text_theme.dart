@@ -3,9 +3,10 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../constants.dart';
 
-TextTheme meditoTextTheme(BuildContext context) {
+TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
   final brightness = MediaQuery.of(context).platformBrightness;
-  final isDark = brightness == Brightness.dark;
+  final isDark = themeMode == ThemeMode.dark ||
+      (themeMode == ThemeMode.system && brightness == Brightness.dark);
 
   return Theme.of(context).textTheme.copyWith(
         displayLarge: TextStyle(
