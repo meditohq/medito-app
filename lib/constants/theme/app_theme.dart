@@ -38,7 +38,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
             primary: ColorConstants.lightPurple,
             onPrimary: ColorConstants.white,
             secondary: ColorConstants.lightSecondary,
-            onSecondary: ColorConstants.lightOnSecondary,
+            onSecondary: ColorConstants.white,
             surface: ColorConstants.lightSurface,
             onSurface: ColorConstants.lightOnSurface,
             error: ColorConstants.amber,
@@ -76,8 +76,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        backgroundColor:
-            isDark ? ColorConstants.black : ColorConstants.lightSurface,
+        backgroundColor: Colors.transparent,
         foregroundColor: ColorConstants.lightPurple,
         side: const BorderSide(color: ColorConstants.lightPurple),
         shape: RoundedRectangleBorder(

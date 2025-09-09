@@ -1517,7 +1517,7 @@ abstract class AppLocalizations {
   /// No description provided for @donationBody.
   ///
   /// In en, this message translates to:
-  /// **'We\'re a nonprofit initiative.\\nWe rely on donations to remain free and ad-free.\\nIf you\'d like to contribute, you can donate any amount. No pressure!'**
+  /// **'We\'re a nonprofit initiative.\nWe rely on donations to remain free and ad-free.\nIf you\'d like to contribute, you can donate any amount. No pressure!'**
   String get donationBody;
 
   /// No description provided for @donateNow.
@@ -2045,7 +2045,7 @@ abstract class AppLocalizations {
   /// No description provided for @donationImpactPoints.
   ///
   /// In en, this message translates to:
-  /// **'• Create new free meditation content\\n• Maintain the app without ads\\n• Make mental wellbeing accessible to all\\n• Helps us keep meditation free for everyone'**
+  /// **'• Create new free meditation content\n• Maintain the app without ads\n• Make mental wellbeing accessible to all\n• Helps us keep meditation free for everyone'**
   String get donationImpactPoints;
 
   /// No description provided for @donationSecurityInfo.
@@ -2063,7 +2063,7 @@ abstract class AppLocalizations {
   /// No description provided for @foundationContactInfo.
   ///
   /// In en, this message translates to:
-  /// **'KvK-nummer: 75284251 - RSIN: 860222627 - Email: hello@meditofoundation.org'**
+  /// **'KvK-nummer: 75284251\nRSIN: 860222627\nEmail: hello@meditofoundation.org'**
   String get foundationContactInfo;
 
   /// No description provided for @redirectingToSecurePayment.
