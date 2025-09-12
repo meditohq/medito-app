@@ -85,6 +85,16 @@ These configurations are defined in:
 
 Ensure that your `android/app/build.gradle` file has the corresponding flavor configurations set up correctly.
 
+## Android Setup
+
+For Android APK signing, you need to create a `keystore.properties` file in the `android/` directory:
+
+1. Copy `android/keystore.properties.example` to `android/keystore.properties`
+2. Fill in your actual keystore information
+3. Generate or obtain a keystore file (`.jks`) for signing APKs
+
+**Note:** Never commit `keystore.properties` or your `.jks` files to version control.
+
 ## License
 
 - App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://github.com/meditohq/medito-app/blob/master/LICENSE).
