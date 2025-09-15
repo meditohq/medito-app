@@ -16,6 +16,10 @@
 	<array>
 		<string>group.org.medito.widget</string>
 	</array>
+	<key>com.apple.developer.in-app-payments</key>
+	<array>
+		<string>merchant.medito</string>
+	</array>
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)org.meditofoundation</string>

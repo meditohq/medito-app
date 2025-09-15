@@ -1,15 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/colors/color_constants.dart';
-import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
-import 'package:medito/providers/shared_preferences_provider.dart';
-import 'package:medito/utils/logger.dart';
-import 'package:medito/widgets/headers/medito_app_bar_small.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';

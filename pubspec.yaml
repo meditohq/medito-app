@@ -77,6 +77,9 @@ dependencies:
       path: workmanager
       ref: main
   firebase_crashlytics: ^4.3.6
+  pay: ^2.0.0
+  flutter_stripe: ^10.1.1
+  superwallkit_flutter: ^2.4.2
 
 
 dev_dependencies:

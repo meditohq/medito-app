@@ -1,0 +1,9 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+Always use debug printing in a way that is only active in debug mode (e.g. using Use AppLogger class).
+Debug prints must never leak into release builds or expose sensitive data.
+

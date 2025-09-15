@@ -39,3 +39,18 @@
 -keep class j$.util.IntSummaryStatistics { *; }
 -keep class j$.util.LongSummaryStatistics { *; }
 -keep class j$.util.DoubleSummaryStatistics { *; }
+
+# Stripe rules
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivity$g
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivityStarter$Args
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivityStarter$Error
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivityStarter
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningEphemeralKeyProvider
+# Keep Stripe classes
+-keep class com.stripe.** { *; }
+
+# Superwall rules
+-dontwarn com.superwall.**
+-keep class com.superwall.** { *; }
+-keep class com.superwall.sdk.** { *; }
+-keep class com.superwall.superwallkit_flutter.** { *; }

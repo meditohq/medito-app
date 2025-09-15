@@ -1,17 +1,12 @@
 import 'dart:developer' as dev;
-import 'dart:io'; // Import Platform
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as fs;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/exceptions/app_error.dart';
-import 'package:meta/meta.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
-import 'package:medito/utils/logger.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 // Interface for FlutterSecureStorage to make testing easier
@@ -231,7 +226,8 @@ class SecureStorageService {
   // Priority order for reads: secure-storage first, then backup SharedPrefs.
   // NOTE: callers still go through getRefreshToken( ) which contains
   // extra analytics and retry logic – we just swap fast-path order here.
-  Future<String?> _getRefreshTokenPrimaryFirst({bool logToFirebase = true}) async {
+  Future<String?> _getRefreshTokenPrimaryFirst(
+      {bool logToFirebase = true}) async {
     // 1. Try reading from primary secure storage.
     bool secureStorageFailed = false;
     try {
@@ -239,7 +235,7 @@ class SecureStorageService {
         return await _storage.read(key: _refreshTokenKey);
       });
       if (secured != null && secured.isNotEmpty) return secured;
-    } catch (e, stack) {
+    } catch (e) {
       // If primary storage fails (e.g., BadPaddingException), log it
       // but don't rethrow. This allows us to fall back to the backup.
       secureStorageFailed = true;
@@ -421,7 +417,8 @@ class SecureStorageService {
 
     // First try secure-storage, then backup SharedPrefs
     try {
-      token = await _getRefreshTokenPrimaryFirst(logToFirebase: logFailureToFirebase);
+      token = await _getRefreshTokenPrimaryFirst(
+          logToFirebase: logFailureToFirebase);
 
       // Validate token – if corrupted, clear and treat as missing.
       if (token != null && !_isTokenValid(token)) {

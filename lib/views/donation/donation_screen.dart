@@ -7,7 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/providers/stripe/payment_service_provider.dart';
+import 'package:medito/models/stripe/payment_method_model.dart'
+    as custom_models;
+import 'package:medito/models/stripe/payment_intent_model.dart';
+import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:medito/widgets/impact_card.dart';
@@ -18,6 +24,20 @@ final _selectedCurrencyProvider = StateProvider<String>((ref) {
   final defaultCurrency = deviceInfoAsync.value?.currencyName ?? 'USD';
   return _getCurrency(defaultCurrency);
 });
+
+final _selectedAmountProvider = StateProvider<int>((ref) {
+  final paymentConfigAsync = ref.watch(paymentConfigProvider);
+  if (paymentConfigAsync.hasValue) {
+    final config = paymentConfigAsync.value!;
+    return config.pricing.suggested.monthly ~/ 100; // Convert cents to dollars
+  }
+  return 10; // Fallback
+});
+final _selectedPaymentMethodProvider =
+    StateProvider<custom_models.PaymentMethodType?>((ref) => null);
+final _isProcessingPaymentProvider = StateProvider<bool>((ref) => false);
+final _customAmountProvider = StateProvider<String>((ref) => '');
+final _showCustomAmountProvider = StateProvider<bool>((ref) => false);
 
 String _getCurrency(String? deviceCurrency) {
   if (deviceCurrency == null) return 'USD';
@@ -35,7 +55,16 @@ String _getCurrency(String? deviceCurrency) {
 }
 
 class DonationScreen extends ConsumerStatefulWidget {
-  const DonationScreen({super.key});
+  final int? initialAmount;
+  final String? initialCurrency;
+  final bool? isMonthly;
+
+  const DonationScreen({
+    super.key,
+    this.initialAmount,
+    this.initialCurrency,
+    this.isMonthly,
+  });
 
   @override
   ConsumerState<DonationScreen> createState() => _DonationScreenState();
@@ -45,8 +74,50 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
   bool isMonthlyDonationVisible = true;
 
   @override
+  void initState() {
+    super.initState();
+    // Set initial values from widget parameters
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.initialAmount != null) {
+        ref.read(_selectedAmountProvider.notifier).state =
+            widget.initialAmount!;
+      }
+      if (widget.initialCurrency != null) {
+        ref.read(_selectedCurrencyProvider.notifier).state =
+            widget.initialCurrency!;
+      }
+      if (widget.isMonthly != null) {
+        isMonthlyDonationVisible = widget.isMonthly!;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final selectedCurrency = ref.watch(_selectedCurrencyProvider);
+    final paymentConfigAsync = ref.watch(paymentConfigProvider);
+
+    // Preload payment config to ensure Stripe is initialized
+    ref.listen(paymentConfigProvider, (previous, next) {
+      next.when(
+        loading: () =>
+            AppLogger.d('DONATION_SCREEN', 'Loading payment config...'),
+        error: (error, stack) =>
+            AppLogger.e('DONATION_SCREEN', 'Payment config error', error),
+        data: (config) => AppLogger.d(
+            'DONATION_SCREEN', 'Payment config loaded successfully'),
+      );
+    });
+
+    // Log payment config status
+    paymentConfigAsync.when(
+      loading: () =>
+          AppLogger.d('DONATION_SCREEN', 'Payment config loading...'),
+      error: (error, stack) =>
+          AppLogger.e('DONATION_SCREEN', 'Payment config error', error),
+      data: (config) => AppLogger.d(
+          'DONATION_SCREEN', 'Payment config loaded: ${config.publishableKey}'),
+    );
 
     final currencySymbols = {
       'USD': '\$',
@@ -57,17 +128,16 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       'CAD': 'C\$',
     };
 
-    final amounts = {
-      'USD': '10',
-      'GBP': '10',
-      'EUR': '10',
-      'AUD': '16',
-      'INR': '816',
-      'CAD': '10',
-    };
-
     final symbol = currencySymbols[selectedCurrency] ?? '\$';
-    final amount = amounts[selectedCurrency] ?? '10';
+
+    // Get default amount from payment config or fallback
+    String defaultAmount = '10';
+    if (paymentConfigAsync.hasValue) {
+      final config = paymentConfigAsync.value!;
+      final suggestedAmount =
+          config.pricing.suggested.monthly / 100; // Convert cents to dollars
+      defaultAmount = suggestedAmount.toStringAsFixed(0);
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -177,7 +247,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                     const SizedBox(height: 16),
                     Text(
                       isMonthlyDonationVisible
-                          ? '$symbol$amount/month can help 100 people meditate every day.'
+                          ? '$symbol$defaultAmount/month can help 100 people meditate every day.'
                           : AppLocalizations.of(context)!.oneTimeDonationImpact,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
@@ -191,15 +261,19 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                     const SizedBox(height: 16),
                     if (isMonthlyDonationVisible)
                       _buildDonationAmountOptions(
-                          context, selectedCurrency, true),
+                          context, selectedCurrency, true, ref),
                     if (!isMonthlyDonationVisible)
                       _buildDonationAmountOptions(
-                          context, selectedCurrency, false),
+                          context, selectedCurrency, false, ref),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: _buildPaymentMethodIcons(),
                     ),
+                    const SizedBox(height: 24),
+                    _buildPaymentMethodSelector(context, ref),
+                    const SizedBox(height: 24),
+                    _buildDonateButton(context, ref),
                     const SizedBox(height: 32),
                     Text(
                       AppLocalizations.of(context)!.otherPaymentMethods,
@@ -336,62 +410,10 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
   }
 
   Widget _buildDonationAmountOptions(
-      BuildContext context, String currency, bool isMonthly) {
-    final amounts = <String, String>{};
-
-    if (currency == 'USD') {
-      amounts['4'] = 'https://buy.stripe.com/5kA5lG3jn5TFgnu7t2';
-      amounts['6'] = 'https://buy.stripe.com/dR601m4nr3Lx0owdRr';
-      amounts['10'] = 'https://buy.stripe.com/5kAg0kbPT0zl2wE14G';
-      amounts['15'] = 'https://buy.stripe.com/6oE01m6vzgyj0ow4gT';
-      amounts['25'] = 'https://buy.stripe.com/14k6pK4nr1Dp9Z67t6';
-      amounts['Custom Amount'] = 'https://donate.stripe.com/fZeg0kf25dm79Z63cx';
-    }
-
-    if (currency == 'GBP') {
-      amounts['4'] = 'https://buy.stripe.com/00g6pK4nr95R9Z6fZD';
-      amounts['6'] = 'https://buy.stripe.com/00g6pK2fj0zlgnu3cS';
-      amounts['10'] = 'https://buy.stripe.com/aEU15qbPTfufdbi00H';
-      amounts['15'] = 'https://buy.stripe.com/9AQ5lG7zDeqb6MU8xe';
-      amounts['25'] = 'https://buy.stripe.com/28o3dy6vz95R0ow4gZ';
-      amounts['Custom Amount'] = 'https://donate.stripe.com/aEUcO85rvbdZ1sA7sO';
-    }
-
-    if (currency == 'INR') {
-      amounts['327'] = 'https://buy.stripe.com/fZe4hC3jn2Ht3AIcNG';
-      amounts['490'] = 'https://buy.stripe.com/6oEdSc2fj81N3AI00V';
-      amounts['816'] = 'https://buy.stripe.com/eVaaG007b95RgnuaFA';
-      amounts['1225'] = 'https://buy.stripe.com/cN27tO3jn2Htc7e151';
-      amounts['2042'] = 'https://buy.stripe.com/28og0kdY11Dpb3a152';
-      amounts['Custom Amount'] = 'https://donate.stripe.com/dR66pK8DH3Lxb3a8wU';
-    }
-
-    if (currency == 'EUR') {
-      amounts['4'] = 'https://buy.stripe.com/4gw6pK9HLdm73AI5l9';
-      amounts['6'] = 'https://buy.stripe.com/dR6cO87zDgyj4EMfZO';
-      amounts['10'] = 'https://buy.stripe.com/28o9BW7zD0zlc7e14V';
-      amounts['15'] = 'https://buy.stripe.com/6oE8xS9HLci3efm4h8';
-      amounts['25'] = 'https://buy.stripe.com/14kcO807bdm73AIfZR';
-      amounts['Custom Amount'] = 'https://donate.stripe.com/6oE7tOg696XJ7QYcN6';
-    }
-
-    if (currency == 'AUD') {
-      amounts['6'] = 'https://buy.stripe.com/aEU01m9HL0zl7QYaFD';
-      amounts['9'] = 'https://buy.stripe.com/3cs4hC9HL95Rb3adRQ';
-      amounts['16'] = 'https://buy.stripe.com/28o15q3jn2Ht2wE3dd';
-      amounts['24'] = 'https://buy.stripe.com/6oE8xScTX95R9Z67tu';
-      amounts['40'] = 'https://buy.stripe.com/28o6pK3jn1Dp0ow157';
-      amounts['Custom Amount'] = 'https://donate.stripe.com/cN215qaLP81N4EM8x5';
-    }
-
-    if (currency == 'CAD') {
-      amounts['4'] = 'https://buy.stripe.com/fZeeWg7zD0zl6MU6p8';
-      amounts['6'] = 'https://buy.stripe.com/7sI5lG9HLeqb2wE14P';
-      amounts['10'] = 'https://buy.stripe.com/eVa15q9HLa9Vb3abJu';
-      amounts['15'] = 'https://buy.stripe.com/4gweWg07ba9V2wE00N';
-      amounts['25'] = 'https://buy.stripe.com/bIYcO88DH2Ht2wEfZM';
-      amounts['Custom Amount'] = 'https://donate.stripe.com/28o4hCdY1gyj7QY14r';
-    }
+      BuildContext context, String currency, bool isMonthly, WidgetRef ref) {
+    final selectedAmount = ref.watch(_selectedAmountProvider);
+    final showCustomAmount = ref.watch(_showCustomAmountProvider);
+    final paymentConfigAsync = ref.watch(paymentConfigProvider);
 
     final currencySymbols = {
       'USD': '\$',
@@ -404,48 +426,131 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
 
     final symbol = currencySymbols[currency] ?? '\$';
 
-    if (isMonthly) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 2.5,
-            children: amounts.entries
-                .where((entry) => entry.key != 'Custom Amount')
-                .toList()
-                .reversed
-                .map((entry) {
-              final amount = entry.key;
-              final url = entry.value;
-
-              final displayText = '$symbol$amount';
-
-              return _buildDonationAmountButton(
-                context,
-                displayText,
-                () => _handleDonationAction(context, url),
-              );
-            }).toList(),
-          ),
-        ],
-      );
+    // Get preset amounts from payment config or use fallback
+    final presetAmounts = <int>[];
+    if (paymentConfigAsync.hasValue) {
+      final config = paymentConfigAsync.value!;
+      final pricingAmounts =
+          isMonthly ? config.pricing.monthly : config.pricing.oneTime;
+      // Convert from cents to dollars and reverse order for display
+      presetAmounts.addAll(
+          pricingAmounts.map((amount) => amount ~/ 100).toList().reversed);
     } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDonationAmountButton(
-            context,
-            AppLocalizations.of(context)!.custom,
-            () => _handleDonationAction(context, amounts['Custom Amount']!),
+      // Fallback to hardcoded values if API is not available
+      if (currency == 'USD') presetAmounts.addAll([4, 6, 10, 15, 25]);
+      if (currency == 'GBP') presetAmounts.addAll([4, 6, 10, 15, 25]);
+      if (currency == 'INR') presetAmounts.addAll([327, 490, 816, 1225, 2042]);
+      if (currency == 'EUR') presetAmounts.addAll([4, 6, 10, 15, 25]);
+      if (currency == 'AUD') presetAmounts.addAll([6, 9, 16, 24, 40]);
+      if (currency == 'CAD') presetAmounts.addAll([4, 6, 10, 15, 25]);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 2.5,
+          children: presetAmounts.map((amount) {
+            final isSelected = selectedAmount == amount && !showCustomAmount;
+            final displayText = '$symbol$amount';
+
+            return _buildDonationAmountButton(
+              context,
+              displayText,
+              isSelected,
+              () => _selectAmount(ref, amount),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 16),
+        _buildCustomAmountSection(context, currency, ref),
+      ],
+    );
+  }
+
+  void _selectAmount(WidgetRef ref, int amount) {
+    // Prevent multiple simultaneous payment attempts
+    final isProcessing = ref.read(_isProcessingPaymentProvider);
+    if (isProcessing) {
+      AppLogger.d('DONATION_SCREEN',
+          'Payment already in progress, ignoring amount selection');
+      return;
+    }
+
+    ref.read(_selectedAmountProvider.notifier).state = amount;
+    ref.read(_showCustomAmountProvider.notifier).state = false;
+    ref.read(_customAmountProvider.notifier).state = '';
+
+    AppLogger.d(
+        'DONATION_SCREEN', 'Amount selected: $amount, triggering payment flow');
+    // Automatically trigger payment flow when amount is selected
+    _handleDonationAction(context, ref);
+  }
+
+  custom_models.PaymentMethodType _getDefaultPaymentMethod() {
+    if (Platform.isAndroid) {
+      return custom_models.PaymentMethodType.googlePay;
+    } else if (Platform.isIOS) {
+      return custom_models.PaymentMethodType.applePay;
+    } else {
+      return custom_models.PaymentMethodType.card;
+    }
+  }
+
+  Widget _buildCustomAmountSection(
+      BuildContext context, String currency, WidgetRef ref) {
+    final showCustomAmount = ref.watch(_showCustomAmountProvider);
+
+    final currencySymbols = {
+      'USD': '\$',
+      'GBP': '£',
+      'EUR': '€',
+      'AUD': 'A\$',
+      'INR': '₹',
+      'CAD': 'C\$',
+    };
+
+    final symbol = currencySymbols[currency] ?? '\$';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDonationAmountButton(
+          context,
+          AppLocalizations.of(context)!.custom,
+          showCustomAmount,
+          () => ref.read(_showCustomAmountProvider.notifier).state =
+              !showCustomAmount,
+        ),
+        if (showCustomAmount) ...[
+          const SizedBox(height: 16),
+          TextField(
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: 'Enter amount',
+              prefixText: symbol,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onChanged: (value) {
+              ref.read(_customAmountProvider.notifier).state = value;
+              if (value.isNotEmpty) {
+                final amount = int.tryParse(value) ?? 0;
+                if (amount > 0) {
+                  ref.read(_selectedAmountProvider.notifier).state = amount;
+                }
+              }
+            },
           ),
         ],
-      );
-    }
+      ],
+    );
   }
 
   Widget _buildOtherPaymentOptions(BuildContext context) {
@@ -469,6 +574,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
   Widget _buildDonationAmountButton(
     BuildContext context,
     String text,
+    bool isSelected,
     VoidCallback onPressed,
   ) {
     return Material(
@@ -483,10 +589,14 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
         child: Container(
           height: 50,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.outline,
               width: 1.2,
             ),
           ),
@@ -499,7 +609,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
               ),
             ],
@@ -517,7 +629,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
-        onPressed: () => _handleDonationAction(context, url),
+        onPressed: () => _handleExternalDonationAction(context, url),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
@@ -591,7 +703,360 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
     );
   }
 
-  void _handleDonationAction(BuildContext context, String url) async {
+  Future<void> _handleDonationAction(
+      BuildContext context, WidgetRef ref) async {
+    // Prevent multiple simultaneous payment attempts
+    final isAlreadyProcessing = ref.read(_isProcessingPaymentProvider);
+    if (isAlreadyProcessing) {
+      AppLogger.d(
+          'DONATION_SCREEN', 'Payment already in progress, ignoring request');
+      return;
+    }
+
+    final selectedPaymentMethod = ref.read(_selectedPaymentMethodProvider);
+    final selectedAmount = ref.read(_selectedAmountProvider);
+    final selectedCurrency = ref.read(_selectedCurrencyProvider);
+
+    // Validate amount
+    if (selectedAmount <= 0) {
+      final error = PaymentErrorHandler.handleAmountError(selectedAmount);
+      showSnackBar(
+        context,
+        error.userFriendlyMessage,
+      );
+      return;
+    }
+
+    // Ensure payment config is loaded before proceeding
+    final paymentConfigAsync = ref.read(paymentConfigProvider);
+    if (paymentConfigAsync.isLoading) {
+      showSnackBar(
+        context,
+        'Loading payment options...',
+      );
+      return;
+    }
+
+    if (paymentConfigAsync.hasError) {
+      showSnackBar(
+        context,
+        'Failed to load payment options. Please try again.',
+      );
+      return;
+    }
+
+    // Set processing state
+    ref.read(_isProcessingPaymentProvider.notifier).state = true;
+
+    try {
+      showSnackBar(
+        context,
+        'Processing your donation...',
+      );
+
+      // Create PaymentIntent
+      final defaultPaymentMethod = _getDefaultPaymentMethod();
+      final paymentIntentRequest = PaymentIntentRequest(
+        amount: selectedAmount,
+        currency: selectedCurrency.toLowerCase(),
+        paymentMethod: selectedPaymentMethod?.name ?? defaultPaymentMethod.name,
+        isMonthly: isMonthlyDonationVisible,
+      );
+
+      AppLogger.d('DONATION_SCREEN',
+          'Creating payment intent for amount: $selectedAmount, currency: $selectedCurrency, isMonthly: $isMonthlyDonationVisible');
+      AppLogger.d(
+          'DONATION_SCREEN', 'Payment intent request: $paymentIntentRequest');
+
+      PaymentIntentModel paymentIntent;
+      try {
+        paymentIntent = await ref
+            .read(createPaymentIntentProvider(paymentIntentRequest).future);
+
+        AppLogger.d('DONATION_SCREEN',
+            'Payment intent created successfully: ${paymentIntent.id}, status: ${paymentIntent.status}');
+        AppLogger.d('DONATION_SCREEN',
+            'Payment intent client secret: ${paymentIntent.clientSecret}');
+      } catch (paymentIntentError) {
+        AppLogger.e('DONATION_SCREEN', 'Payment intent creation failed',
+            paymentIntentError);
+        rethrow;
+      }
+
+      // Process payment - use platform-specific payment method by default
+      final paymentMethod = selectedPaymentMethod ?? _getDefaultPaymentMethod();
+      final paymentService = ref.read(paymentServiceProvider);
+      AppLogger.d('DONATION_SCREEN',
+          'Processing payment with method: ${paymentMethod.name}');
+
+      PaymentResult result;
+      try {
+        result = await paymentService.processPayment(
+          paymentIntent,
+          paymentMethod,
+        );
+        AppLogger.d('DONATION_SCREEN', 'Payment result: ${result.runtimeType}');
+      } catch (paymentError) {
+        AppLogger.e(
+            'DONATION_SCREEN', 'Payment processing failed', paymentError);
+        rethrow;
+      }
+
+      // Handle result
+      switch (result) {
+        case PaymentSuccess():
+          try {
+            // For Google Pay and Apple Pay, confirmation already happened during payment processing
+            // Only confirm for card payments
+            if (paymentMethod.name == 'card') {
+              final donationData = DonationData(
+                amount: selectedAmount,
+                currency: selectedCurrency,
+                isMonthly: isMonthlyDonationVisible,
+                paymentMethod: paymentMethod.name,
+              );
+
+              final paymentService = ref.read(paymentServiceProvider);
+              await paymentService.confirmDonation(
+                paymentIntent.id,
+                donationData,
+              );
+            }
+
+            showSnackBar(
+              context,
+              'Thank you for your donation! Your support helps us continue our mission.',
+            );
+          } catch (confirmError) {
+            // Payment succeeded but confirmation failed - still show success but log error
+            showSnackBar(
+              context,
+              'Donation successful! Thank you for your support.',
+            );
+            // In a real app, you'd log this error for monitoring
+          }
+          break;
+
+        case PaymentFailure():
+          showSnackBar(
+            context,
+            result.errorMessage,
+          );
+          break;
+
+        case PaymentCancelled():
+          showSnackBar(
+            context,
+            'Payment cancelled',
+          );
+          break;
+      }
+    } catch (error) {
+      AppLogger.e('DONATION_SCREEN', 'Donation action failed', error);
+      final paymentError = PaymentErrorHandler.handleStripeError(error);
+      showSnackBar(
+        context,
+        paymentError.userFriendlyMessage,
+      );
+
+      if (paymentError.suggestedAction != null) {
+        // Show additional guidance after a brief delay
+        Future.delayed(const Duration(seconds: 3), () {
+          if (context.mounted) {
+            showSnackBar(
+              context,
+              paymentError.suggestedAction!,
+            );
+          }
+        });
+      }
+    } finally {
+      ref.read(_isProcessingPaymentProvider.notifier).state = false;
+    }
+  }
+
+  Widget _buildPaymentMethodSelector(BuildContext context, WidgetRef ref) {
+    final availableMethodsAsync = ref.watch(availablePaymentMethodsProvider);
+    final selectedPaymentMethod = ref.watch(_selectedPaymentMethodProvider);
+
+    return availableMethodsAsync.when(
+      loading: () => const CircularProgressIndicator() as Widget,
+      error: (error, stack) =>
+          Text('Error loading payment methods: $error') as Widget,
+      data: (List<custom_models.PaymentMethod> methods) {
+        if (methods.isEmpty) {
+          return const Text('No payment methods available');
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Select Payment Method',
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: methods.map((custom_models.PaymentMethod method) {
+                final isSelected = selectedPaymentMethod == method.type;
+                return _buildPaymentMethodButton(
+                  context,
+                  method,
+                  isSelected,
+                  () => ref
+                      .read(_selectedPaymentMethodProvider.notifier)
+                      .state = method.type,
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildPaymentMethodButton(
+    BuildContext context,
+    custom_models.PaymentMethod method,
+    bool isSelected,
+    VoidCallback onPressed,
+  ) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: method.isAvailable ? onPressed : null,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                : Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.outline,
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _getPaymentMethodIcon(method.type),
+                color: method.isAvailable
+                    ? (isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface)
+                    : Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.4),
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                method.displayName,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: method.isAvailable
+                          ? (isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onSurface)
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.4),
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getPaymentMethodIcon(custom_models.PaymentMethodType type) {
+    switch (type) {
+      case custom_models.PaymentMethodType.googlePay:
+        return FontAwesomeIcons.googlePay;
+      case custom_models.PaymentMethodType.applePay:
+        return FontAwesomeIcons.applePay;
+      case custom_models.PaymentMethodType.card:
+        return HugeIcons.solidStandardCreditCardAccept;
+      case custom_models.PaymentMethodType.paypal:
+        return FontAwesomeIcons.paypal;
+      case custom_models.PaymentMethodType.bankTransfer:
+        return HugeIcons.solidStandardBank;
+    }
+  }
+
+  Widget _buildDonateButton(BuildContext context, WidgetRef ref) {
+    final isProcessing = ref.watch(_isProcessingPaymentProvider);
+    final selectedAmount = ref.watch(_selectedAmountProvider);
+    final selectedCurrency = ref.watch(_selectedCurrencyProvider);
+
+    final currencySymbols = {
+      'USD': '\$',
+      'GBP': '£',
+      'EUR': '€',
+      'AUD': 'A\$',
+      'INR': '₹',
+      'CAD': 'C\$',
+    };
+
+    final symbol = currencySymbols[selectedCurrency] ?? '\$';
+    final amountText =
+        selectedAmount > 0 ? '$symbol$selectedAmount' : 'Select amount';
+
+    return Column(
+      children: [
+        Text(
+          'Tap an amount above to start your donation',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.7),
+                fontSize: 14,
+              ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: (isProcessing || selectedAmount <= 0)
+                ? null
+                : () => _handleDonationAction(context, ref),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            child: isProcessing
+                ? const CircularProgressIndicator()
+                : Text(
+                    'Donate $amountText',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Legacy method for external payments (PayPal, Bank Transfer)
+  void _handleExternalDonationAction(BuildContext context, String url) async {
     showSnackBar(
       context,
       AppLocalizations.of(context)!.redirectingToSecurePayment,

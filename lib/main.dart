@@ -15,10 +15,11 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/theme/app_theme.dart';
 import 'package:medito/constants/widget_constants.dart';
 import 'package:medito/firebase_options.dart';
+import 'package:medito/config/superwall_config.dart';
+import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/locale_provider.dart';
@@ -43,8 +44,7 @@ import 'package:medito/config/debug_options.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'exceptions/app_error.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
@@ -62,21 +62,52 @@ void callbackDispatcher() {
         await statsManager.initialize();
         try {
           await statsManager.sync();
-        } catch (e) {}
+        } catch (e) {
+          // Silently handle sync errors during widget updates
+        }
         var stats = await statsManager.localAllStats;
         await updateWidgets(stats);
-      } catch (e) {}
+      } catch (e) {
+        // Silently handle widget update errors
+      }
     }
 
     return Future.value(true);
   });
 }
 
+Future<void> _configureStripe() async {
+  // Configure Stripe settings - publishableKey and merchantIdentifier will be set from backend config
+  Stripe.urlScheme = 'medito'; // Update this to match your app's URL scheme
+
+  // Note: Stripe.instance.applySettings() and merchantIdentifier will be set after
+  // publishableKey is set from the backend config in PaymentServiceProvider.getPaymentConfig()
+}
+
+void _setupSuperwallDelegate() {
+  // Delegate setup is now handled by SuperwallService when paywall is triggered
+  AppLogger.d(
+      'MAIN', 'Superwall delegate setup will be handled by SuperwallService');
+}
+
+void _handleIncomingLinks() {
+  // Handle deep links for Superwall
+  appLinks.uriLinkStream.listen((Uri uri) {
+    debugPrint('Deep link received: $uri');
+    Superwall.shared.handleDeepLink(uri);
+  }, onError: (Object err) {
+    print('Error receiving incoming link: $err');
+  });
+}
+
 void main() async {
   if (_hasInitialized) {
+    AppLogger.d('MAIN', 'App already initialized, skipping main()');
     return;
   }
   _hasInitialized = true;
+
+  AppLogger.d('MAIN', 'Starting app initialization');
 
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -87,6 +118,18 @@ void main() async {
 
   // Initialize Crashlytics
   await CrashlyticsService().initialize();
+
+  // Initialize Stripe
+  await _configureStripe();
+
+  // Initialize Superwall
+  AppLogger.d('MAIN', 'Starting Superwall configuration');
+  await SuperwallConfig.configure();
+  AppLogger.d('MAIN', 'Superwall configuration completed');
+
+  // Set up deep links after configuration
+  // Delegate setup is handled by SuperwallService when needed
+  _handleIncomingLinks();
 
   await initializeAudioService();
   usePathUrlStrategy();
@@ -402,45 +445,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       AppLogger.e('AUTH', 'Error with auth token on foreground', e);
       // Don't reset auth state here - let normal API calls handle auth errors
     }
-  }
-
-  void _checkForFreezeUsage(WidgetRef ref) {
-    final stats = ref.watch(statsProvider).valueOrNull;
-    final isDonor =
-        ref.watch(meProvider).valueOrNull?.hasActiveSubscription ?? false;
-
-    if (stats != null && isDonor && stats.freezeUsageDates.isNotEmpty == true) {
-      final lastFreezeUse = stats.freezeUsageDates.last;
-      _hasShownFreezeAlert(lastFreezeUse).then((hasShown) {
-        if (!hasShown) {
-          _showFreezeUsedAlert(context);
-          _markFreezeAlertShown(lastFreezeUse);
-        }
-      });
-    }
-  }
-
-  Future<bool> _hasShownFreezeAlert(int timestamp) async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    return (prefs.getInt('last_freeze_alert') ?? 0) >= timestamp;
-  }
-
-  Future<void> _markFreezeAlertShown(int timestamp) async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    await prefs.setInt('last_freeze_alert', timestamp);
-  }
-
-  void _showFreezeUsedAlert(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Text(
-          AppLocalizations.of(context)!.freezeUsedMessage,
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      ),
-    );
   }
 
   // Handle force logout in UI layer

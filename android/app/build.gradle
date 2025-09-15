@@ -121,6 +121,9 @@ dependencies {
     implementation 'com.android.billingclient:billing:6.1.0'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 
+    // Google Pay dependencies
+    implementation 'com.google.android.gms:play-services-wallet:19.3.0'
+
     // Media3 dependencies
     def media3_version = "1.2.1"
     implementation "androidx.media3:media3-exoplayer:$media3_version"

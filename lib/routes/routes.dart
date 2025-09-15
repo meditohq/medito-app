@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -18,6 +19,7 @@ import 'package:medito/views/home/customise_home_layout_screen.dart';
 
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/donation/donation_screen.dart';
+import 'package:medito/views/donation/superwall_donation_screen.dart';
 import 'package:medito/views/favorites/favorites_view.dart';
 
 extension SanitisePath on String {
@@ -89,7 +91,11 @@ Future<void> handleNavigation(
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.donation)) {
-    await _pushRoute(const DonationScreen(), ref);
+    // Use Superwall on Android, Stripe on iOS for now
+    final donationScreen = Platform.isAndroid
+        ? const SuperwallDonationScreen()
+        : const DonationScreen();
+    await _pushRoute(donationScreen, ref);
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }

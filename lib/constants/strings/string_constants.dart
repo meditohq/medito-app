@@ -16,4 +16,24 @@ class StringConstants {
   static const String deviceOs = 'deviceOs';
   static const String devicePlatform = 'devicePlatform';
   static const String buildNumber = 'buildNumber';
+
+  // Donation service related strings
+  static const String donationInitiatedEvent = 'donation_initiated';
+  static const String donationSourceSuperwall = 'superwall';
+
+  // Paywall action names for monthly donations
+  static const String monthly1 = 'monthly_1';
+  static const String monthly2 = 'monthly_2';
+  static const String monthly3 = 'monthly_3';
+  static const String monthly4 = 'monthly_4';
+  static const String monthly5 = 'monthly_5';
+  static const String monthlySuggested = 'monthly_suggested';
+
+  // Paywall action names for one-time donations
+  static const String onetime1 = 'onetime_1';
+  static const String onetime2 = 'onetime_2';
+  static const String onetime3 = 'onetime_3';
+  static const String onetime4 = 'onetime_4';
+  static const String onetime5 = 'onetime_5';
+  static const String onetimeSuggested = 'one_time_suggested';
 }
