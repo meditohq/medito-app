@@ -49,11 +49,3 @@ For strings with variables:
 // In app_es.arb: "greetingWithName": "¡Hola {name}!"
 Text(AppLocalizations.of(context)!.greetingWithName(userName))
 ```
-
-### 6. After Adding New Strings
-Run `flutter pub get` to regenerate localization files after adding new ARB entries.
-globs: 
-alwaysApply: true
----
-
-When adding a new UI string, put it in [string_constants.dart](mdc:lib/constants/string_constants.dart) and add a comment describing the context in which this string is used.

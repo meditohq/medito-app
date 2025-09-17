@@ -1093,6 +1093,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your donation directly supports free mindfulness resources, bringing peace to thousands today.';
 
   @override
+  String get donationSuccessful => 'Donation Successful!';
+
+  @override
+  String get completePaymentInForm => 'Complete payment in the form below';
+
+  @override
+  String get pleaseCompletePayment =>
+      'Please complete your payment in the secure form';
+
+  @override
+  String get processingDonation => 'Processing your donation...';
+
+  @override
+  String get thankYouForSupport => 'Thank you for your support!';
+
+  @override
+  String get tapAmountToStart => 'Tap an amount above to start your donation';
+
+  @override
   String get impactCardHelpMessage =>
       'Help millions worldwide access free meditation';
 

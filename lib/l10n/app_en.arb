@@ -337,6 +337,30 @@
   "singleDonation": "One-time",
   "monthlyDonationImpact": "£10/month can bring meditation to hundreds, helping fight depression and anxiety.",
   "oneTimeDonationImpact": "Your donation directly supports free mindfulness resources, bringing peace to thousands today.",
+  "donationSuccessful": "Donation Successful!",
+  "@donationSuccessful": {
+    "description": "Shown in donate button when payment completes successfully"
+  },
+  "completePaymentInForm": "Complete payment in the form below",
+  "@completePaymentInForm": {
+    "description": "Shown in donate button when Stripe bottom sheet is open"
+  },
+  "pleaseCompletePayment": "Please complete your payment in the secure form",
+  "@pleaseCompletePayment": {
+    "description": "Helper text when Stripe bottom sheet is open"
+  },
+  "processingDonation": "Processing your donation...",
+  "@processingDonation": {
+    "description": "Helper text when payment is being processed"
+  },
+  "thankYouForSupport": "Thank you for your support!",
+  "@thankYouForSupport": {
+    "description": "Helper text shown after successful donation"
+  },
+  "tapAmountToStart": "Tap an amount above to start your donation",
+  "@tapAmountToStart": {
+    "description": "Default helper text in donate button"
+  },
   "impactCardHelpMessage": "Help millions worldwide access free meditation",
   "impactCardTestimonial": "\"Medito pulled me through a seriously dark period in my life\" - Medito meditator",
   "favorites": "Favorites",

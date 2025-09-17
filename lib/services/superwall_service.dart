@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
@@ -16,7 +17,23 @@ class SuperwallService {
   // Store the donation callback to handle custom actions
   Function(int amount, bool isMonthly)? _onDonationInitiated;
 
+  // Cache the payment config to avoid async calls in delegate methods
+  PaymentConfigModel? _cachedPaymentConfig;
+
   SuperwallService({required this.ref});
+
+  /// Loads and caches the payment config
+  Future<void> loadPaymentConfig() async {
+    try {
+      AppLogger.d('SUPERWALL_SERVICE', 'Loading payment config');
+      final paymentService = ref.read(paymentServiceProvider);
+      _cachedPaymentConfig = await paymentService.getPaymentConfig();
+      AppLogger.d('SUPERWALL_SERVICE', 'Payment config loaded and cached');
+    } catch (error, stackTrace) {
+      AppLogger.e('SUPERWALL_SERVICE', 'Failed to load payment config', error,
+          stackTrace);
+    }
+  }
 
   /// Sets up Superwall delegate and event handling
   void setupSuperwallDelegate(
@@ -32,6 +49,7 @@ class SuperwallService {
         getLastParams: () => _lastPaywallParams,
         ref: ref,
         onDonationInitiated: _onDonationInitiated,
+        getCachedPaymentConfig: () => _cachedPaymentConfig,
       ));
 
       AppLogger.d('SUPERWALL_SERVICE', 'Superwall delegate setup complete');
@@ -65,7 +83,7 @@ class SuperwallService {
       if (configStatus == ConfigurationStatus.pending) {
         AppLogger.w('SUPERWALL_SERVICE',
             'Superwall not fully configured yet, waiting...');
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 5));
 
         // Check again
         final newStatus = await Superwall.shared.getConfigurationStatus();
@@ -121,12 +139,14 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
   final Function(SuperwallEventInfo) onEvent;
   final Map<String, Object>? Function() getLastParams;
   final Function(int amount, bool isMonthly)? onDonationInitiated;
+  final PaymentConfigModel? Function() getCachedPaymentConfig;
   final Ref ref;
 
   CustomSuperwallDelegate({
     required this.onEvent,
     required this.getLastParams,
     required this.ref,
+    required this.getCachedPaymentConfig,
     this.onDonationInitiated,
   });
 
@@ -228,8 +248,12 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
   }
 
   int _getAmountForAction(String action) {
-    final paymentConfig = ref.read(paymentConfigProvider).value;
-    if (paymentConfig == null) return 10;
+    final paymentConfig = getCachedPaymentConfig();
+    if (paymentConfig == null) {
+      AppLogger.w('SUPERWALL_DELEGATE',
+          'Payment config not loaded, using fallback amount for action: $action');
+      return _getFallbackAmount(action);
+    }
 
     final pricing = paymentConfig.pricing;
 
@@ -255,6 +279,45 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
       return amounts[index];
     }
 
+    return _getFallbackAmount(action);
+  }
+
+  /// Provides fallback amounts when payment config is not available
+  int _getFallbackAmount(String action) {
+    // Handle suggested amounts
+    if (action == StringConstants.monthlySuggested) {
+      return 5; // Monthly suggested fallback
+    }
+    if (action == StringConstants.onetimeSuggested) {
+      return 10; // One-time suggested fallback
+    }
+
+    // Handle numbered actions with reasonable fallbacks
+    final numberMatch = RegExp(r'\d+').firstMatch(action);
+    if (numberMatch != null) {
+      final actionNumber = int.parse(numberMatch.group(0)!);
+      final isMonthly = action.startsWith('monthly');
+
+      if (isMonthly) {
+        // Monthly fallbacks: 3, 5, 10, 15, 25
+        const monthlyFallbacks = [3, 5, 10, 15, 25];
+        final index = actionNumber - 1;
+        if (index >= 0 && index < monthlyFallbacks.length) {
+          return monthlyFallbacks[index];
+        }
+        return 10; // Default monthly fallback
+      } else {
+        // One-time fallbacks: 5, 10, 25, 50, 100
+        const oneTimeFallbacks = [5, 10, 25, 50, 100];
+        final index = actionNumber - 1;
+        if (index >= 0 && index < oneTimeFallbacks.length) {
+          return oneTimeFallbacks[index];
+        }
+        return 25; // Default one-time fallback
+      }
+    }
+
+    // Default fallback
     return 10;
   }
 

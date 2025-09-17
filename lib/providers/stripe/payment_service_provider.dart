@@ -98,8 +98,9 @@ class PaymentServiceImpl implements PaymentService {
         }
       ],
       "merchantInfo": {
-        "merchantName": "Medito Foundation",
-        "merchantId": "medito_foundation"
+        "merchantName": "Medito Foundation"
+        // Note: merchantId is intentionally removed for TEST environment
+        // For PRODUCTION, you need a valid Google Pay merchant ID
       },
       "transactionInfo": {
         "totalPriceStatus": "FINAL",
@@ -205,13 +206,32 @@ class PaymentServiceImpl implements PaymentService {
   Future<PaymentResult> _processGooglePayPayment(
       PaymentIntentModel paymentIntent) async {
     try {
-      // Get the current publishable key from Stripe
+      // Get payment config to use dynamic Google Pay configuration
+      final config = await getPaymentConfig();
       final publishableKey = Stripe.publishableKey;
+
+      AppLogger.d('PAYMENT_SERVICE',
+          'Google Pay config loaded: merchant=${config.merchantIdentifier}, country=${config.countryCode}');
 
       // Initialize Google Pay with correct Stripe configuration
       final googlePayConfig = _deepCopyMap(_googlePayConfig);
+      final isDebugMode = kDebugMode;
+
       googlePayConfig['data']['environment'] =
-          kDebugMode ? "TEST" : "PRODUCTION";
+          isDebugMode ? "TEST" : "PRODUCTION";
+
+      // Use merchant identifier from config if available
+      if (config.merchantIdentifier.isNotEmpty) {
+        googlePayConfig['data']['merchantInfo']['merchantId'] =
+            config.merchantIdentifier;
+        AppLogger.d('PAYMENT_SERVICE',
+            'Using merchant ID: ${config.merchantIdentifier}');
+      } else if (!isDebugMode) {
+        AppLogger.w('PAYMENT_SERVICE',
+            'Google Pay production mode requires valid merchant ID. Falling back to card payment.');
+        return await _processCardPayment(paymentIntent);
+      }
+
       googlePayConfig['data']['allowedPaymentMethods'][0]
               ['tokenizationSpecification']['parameters']
           ['stripe:publishableKey'] = publishableKey;
@@ -531,19 +551,44 @@ class PaymentServiceImpl implements PaymentService {
 
   Future<bool> _isGooglePayAvailable() async {
     try {
+      // Get payment config to use dynamic Google Pay configuration
+      final paymentConfig = await getPaymentConfig();
       final config = _deepCopyMap(_googlePayConfig);
-      config['data']['environment'] = kDebugMode ? "TEST" : "PRODUCTION";
+      final isDebugMode = kDebugMode;
+
+      AppLogger.d('PAYMENT_SERVICE',
+          'Checking Google Pay availability with merchant ID: ${paymentConfig.merchantIdentifier}');
+
+      config['data']['environment'] = isDebugMode ? "TEST" : "PRODUCTION";
       config['data']['transactionInfo']['totalPriceStatus'] =
           "NOT_CURRENTLY_KNOWN";
       config['data']['transactionInfo']['currencyCode'] = "USD";
+
+      // Use merchant identifier from config if available
+      if (paymentConfig.merchantIdentifier.isNotEmpty) {
+        config['data']['merchantInfo']['merchantId'] =
+            paymentConfig.merchantIdentifier;
+        AppLogger.d('PAYMENT_SERVICE',
+            'Using merchant ID for availability check: ${paymentConfig.merchantIdentifier}');
+      } else if (!isDebugMode) {
+        AppLogger.d('PAYMENT_SERVICE',
+            'Google Pay not available in production without valid merchant ID');
+        return false;
+      }
 
       final googlePayClient = Pay({
         PayProvider.google_pay: PaymentConfiguration.fromJsonString(
           jsonEncode(config),
         ),
       });
-      return await googlePayClient.userCanPay(PayProvider.google_pay);
-    } catch (_) {
+
+      final canPay = await googlePayClient.userCanPay(PayProvider.google_pay);
+      AppLogger.d('PAYMENT_SERVICE', 'Google Pay available: $canPay');
+
+      return canPay;
+    } catch (error) {
+      AppLogger.e(
+          'PAYMENT_SERVICE', 'Error checking Google Pay availability', error);
       return false;
     }
   }

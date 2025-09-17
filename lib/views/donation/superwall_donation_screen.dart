@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
@@ -9,6 +11,11 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/donation/donation_screen.dart';
 import 'package:medito/services/paywall_manager_service.dart';
+import 'package:medito/models/stripe/payment_intent_model.dart';
+import 'package:medito/models/stripe/payment_method_model.dart'
+    as custom_models;
+import 'package:medito/models/stripe/payment_error_model.dart';
+import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 String _getCurrency(String? deviceCurrency) {
   if (deviceCurrency == null) return 'USD';
@@ -37,6 +44,7 @@ class _SuperwallDonationScreenState
     extends ConsumerState<SuperwallDonationScreen> {
   bool _hasTriggeredPaywall = false;
   bool _isLoading = true;
+  bool _isShowingPaymentSheet = false;
 
   @override
   void initState() {
@@ -77,7 +85,7 @@ class _SuperwallDonationScreenState
                 Navigator.of(context).pop(); // Close dialog
                 Navigator.of(context).pop(); // Go back
                 // Navigate to regular donation screen
-                Navigator.of(context).push(
+                Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => const DonationScreen(),
                   ),
@@ -92,6 +100,7 @@ class _SuperwallDonationScreenState
                 setState(() {
                   _isLoading = true;
                   _hasTriggeredPaywall = false;
+                  _isShowingPaymentSheet = false;
                 });
                 _triggerSuperwallPaywall();
                 _addTimeoutFallback(); // Reset timeout
@@ -119,7 +128,7 @@ class _SuperwallDonationScreenState
                 Navigator.of(context).pop(); // Close dialog
                 Navigator.of(context).pop(); // Go back to previous screen
                 // Navigate to regular donation screen
-                Navigator.of(context).push(
+                Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => const DonationScreen(),
                   ),
@@ -161,20 +170,32 @@ class _SuperwallDonationScreenState
         },
         onPaywallDismissed: () {
           AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Paywall dismissed');
+          // Only pop the screen if we're not about to show a payment sheet
+          if (mounted && !_isShowingPaymentSheet) {
+            Navigator.of(context).pop();
+          }
         },
         onError: (error) {
           if (mounted) {
             setState(() {
               _isLoading = false;
+              _isShowingPaymentSheet = false;
             });
             _handlePaywallError(error);
           }
         },
         onDonationInitiated: (amount, isMonthly) {
+          _isShowingPaymentSheet = true;
+          Superwall.shared.dismiss();
           AppLogger.d('SUPERWALL_DONATION_SCREEN',
               'Donation initiated: amount: $amount, isMonthly: $isMonthly');
+          // Add a small delay to ensure the paywall dismiss action from web console
+          // has time to complete before presenting the payment sheet
+          // This prevents the "Can not perform this action after onSaveInstanceState" error
           if (mounted) {
-            _showDonationSnackbar(amount, isMonthly, currency);
+            Future.delayed(const Duration(milliseconds: 500), () {
+              _processDonationPayment(amount, isMonthly, currency);
+            });
           }
         },
       );
@@ -184,6 +205,7 @@ class _SuperwallDonationScreenState
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _isShowingPaymentSheet = false;
         });
         showSnackBar(context, 'Unable to load donation options at this time.');
         Navigator.of(context).pop();
@@ -202,11 +224,107 @@ class _SuperwallDonationScreenState
     }
   }
 
-  void _showDonationSnackbar(int amount, bool isMonthly, String currency) {
-    final message = isMonthly
-        ? 'Monthly donation initiated: $currency $amount'
-        : 'One-time donation initiated: $currency $amount';
-    showSnackBar(context, message);
+  Future<void> _processDonationPayment(
+      int amount, bool isMonthly, String currency) async {
+    try {
+      AppLogger.d('SUPERWALL_DONATION_SCREEN',
+          'Processing donation payment: $amount $currency, monthly: $isMonthly');
+
+      showSnackBar(context, 'Processing...');
+
+      // Create PaymentIntent
+      final paymentIntentRequest = PaymentIntentRequest(
+        amount: amount ~/ 100, // Convert from cents to dollars
+        currency: currency.toLowerCase(),
+        paymentMethod: _getDefaultPaymentMethod().name,
+        isMonthly: isMonthly,
+      );
+
+      final paymentIntent = await ref
+          .read(createPaymentIntentProvider(paymentIntentRequest).future);
+
+      AppLogger.d('SUPERWALL_DONATION_SCREEN',
+          'Payment intent created: ${paymentIntent.id}');
+
+      // Get the best available payment method for the platform
+      final paymentMethod = _getDefaultPaymentMethod();
+      final paymentService = ref.read(paymentServiceProvider);
+
+      AppLogger.d('SUPERWALL_DONATION_SCREEN',
+          'Processing payment with method: ${paymentMethod.name}');
+
+      final result = await paymentService.processPayment(
+        paymentIntent,
+        paymentMethod,
+      );
+
+      // Handle payment result
+      switch (result) {
+        case PaymentSuccess():
+          // For Google Pay and Apple Pay, confirmation already happened during payment processing
+          // Only confirm for card payments
+          if (paymentMethod.name == 'card') {
+            final donationData = DonationData(
+              amount: amount,
+              currency: currency,
+              isMonthly: isMonthly,
+              paymentMethod: paymentMethod.name,
+            );
+
+            try {
+              await paymentService.confirmDonation(
+                paymentIntent.id,
+                donationData,
+              );
+            } catch (confirmError) {
+              AppLogger.e('SUPERWALL_DONATION_SCREEN',
+                  'Donation confirmation failed', confirmError);
+              Navigator.of(context).pop();
+              // Payment succeeded but confirmation failed - still show success
+            }
+          }
+
+          _isShowingPaymentSheet = false;
+          showSnackBar(
+            context,
+            'Thank you for your donation! Your support helps us continue our mission.',
+          );
+
+          Navigator.of(context).pop();
+
+          break;
+
+        case PaymentFailure():
+          _isShowingPaymentSheet = false;
+          showSnackBar(context, result.errorMessage);
+          Navigator.of(context).pop();
+          break;
+
+        case PaymentCancelled():
+          _isShowingPaymentSheet = false;
+          showSnackBar(context, 'Payment cancelled');
+          Navigator.of(context).pop();
+          break;
+      }
+    } catch (error) {
+      _isShowingPaymentSheet = false;
+      AppLogger.e(
+          'SUPERWALL_DONATION_SCREEN', 'Donation payment failed', error);
+      final paymentError = PaymentErrorHandler.handleStripeError(error);
+      showSnackBar(context, paymentError.userFriendlyMessage);
+      Navigator.of(context).pop();
+    }
+  }
+
+  custom_models.PaymentMethodType _getDefaultPaymentMethod() {
+    // Return platform-specific default payment method
+    if (Platform.isIOS) {
+      return custom_models.PaymentMethodType.applePay;
+    } else if (Platform.isAndroid) {
+      return custom_models.PaymentMethodType.googlePay;
+    } else {
+      return custom_models.PaymentMethodType.card;
+    }
   }
 
   @override

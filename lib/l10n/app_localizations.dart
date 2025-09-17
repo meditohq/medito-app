@@ -2102,6 +2102,42 @@ abstract class AppLocalizations {
   /// **'Your donation directly supports free mindfulness resources, bringing peace to thousands today.'**
   String get oneTimeDonationImpact;
 
+  /// Shown in donate button when payment completes successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Donation Successful!'**
+  String get donationSuccessful;
+
+  /// Shown in donate button when Stripe bottom sheet is open
+  ///
+  /// In en, this message translates to:
+  /// **'Complete payment in the form below'**
+  String get completePaymentInForm;
+
+  /// Helper text when Stripe bottom sheet is open
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete your payment in the secure form'**
+  String get pleaseCompletePayment;
+
+  /// Helper text when payment is being processed
+  ///
+  /// In en, this message translates to:
+  /// **'Processing your donation...'**
+  String get processingDonation;
+
+  /// Helper text shown after successful donation
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your support!'**
+  String get thankYouForSupport;
+
+  /// Default helper text in donate button
+  ///
+  /// In en, this message translates to:
+  /// **'Tap an amount above to start your donation'**
+  String get tapAmountToStart;
+
   /// No description provided for @impactCardHelpMessage.
   ///
   /// In en, this message translates to:

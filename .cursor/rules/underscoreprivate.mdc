@@ -1,9 +1,0 @@
-
-
-- [string_constants.dart](mdc:lib/constants/strings/string_constants.dart) - for technical constants only
-- When making a new **UI string**, add it to the ARB files:
-  - **English**: `lib/l10n/app_en.arb`
-  - **Spanish**: `lib/l10n/app_es.arb`
-  - Add a comment about what the string is used for
-- When using UI strings in a view, import `package:medito/l10n/app_localizations.dart` and use `AppLocalizations.of(context)!.yourKeyName`
-- Only use `string_constants.dart` for technical constants (URLs, keys, identifiers, backend logic)

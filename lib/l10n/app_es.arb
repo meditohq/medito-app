@@ -337,6 +337,30 @@
   "singleDonation": "Una vez",
   "monthlyDonationImpact": "£10/mes puede llevar meditación a cientos, ayudando a combatir la depresión y la ansiedad.",
   "oneTimeDonationImpact": "Tu donación apoya directamente recursos de atención plena gratuitos, trayendo paz a miles hoy.",
+  "donationSuccessful": "¡Donación Exitosa!",
+  "@donationSuccessful": {
+    "description": "Shown in donate button when payment completes successfully"
+  },
+  "completePaymentInForm": "Completa el pago en el formulario de abajo",
+  "@completePaymentInForm": {
+    "description": "Shown in donate button when Stripe bottom sheet is open"
+  },
+  "pleaseCompletePayment": "Por favor completa tu pago en el formulario seguro",
+  "@pleaseCompletePayment": {
+    "description": "Helper text when Stripe bottom sheet is open"
+  },
+  "processingDonation": "Procesando tu donación...",
+  "@processingDonation": {
+    "description": "Helper text when payment is being processed"
+  },
+  "thankYouForSupport": "¡Gracias por tu apoyo!",
+  "@thankYouForSupport": {
+    "description": "Helper text shown after successful donation"
+  },
+  "tapAmountToStart": "Toca una cantidad arriba para comenzar tu donación",
+  "@tapAmountToStart": {
+    "description": "Default helper text in donate button"
+  },
   "impactCardHelpMessage": "Ayuda a millones en todo el mundo a acceder a meditación gratuita",
   "impactCardTestimonial": "\"Medito me ayudó a superar un período realmente oscuro en mi vida\" - Meditador de Medito",
   "favorites": "Favoritos",

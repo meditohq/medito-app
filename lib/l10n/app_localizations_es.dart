@@ -1112,6 +1112,27 @@ class AppLocalizationsEs extends AppLocalizations {
       'Tu donación apoya directamente recursos de atención plena gratuitos, trayendo paz a miles hoy.';
 
   @override
+  String get donationSuccessful => '¡Donación Exitosa!';
+
+  @override
+  String get completePaymentInForm =>
+      'Completa el pago en el formulario de abajo';
+
+  @override
+  String get pleaseCompletePayment =>
+      'Por favor completa tu pago en el formulario seguro';
+
+  @override
+  String get processingDonation => 'Procesando tu donación...';
+
+  @override
+  String get thankYouForSupport => '¡Gracias por tu apoyo!';
+
+  @override
+  String get tapAmountToStart =>
+      'Toca una cantidad arriba para comenzar tu donación';
+
+  @override
   String get impactCardHelpMessage =>
       'Ayuda a millones en todo el mundo a acceder a meditación gratuita';
 
