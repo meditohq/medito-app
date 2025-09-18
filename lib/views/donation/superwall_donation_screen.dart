@@ -75,9 +75,9 @@ class _SuperwallDonationScreenState
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Connection Issue'),
-          content: const Text(
-            'Unable to load donation options. Would you like to try again or use our standard donation method?',
+          title: Text(AppLocalizations.of(context)!.connectionIssue),
+          content: Text(
+            AppLocalizations.of(context)!.unableToLoadDonationOptions,
           ),
           actions: [
             TextButton(
@@ -91,21 +91,21 @@ class _SuperwallDonationScreenState
                   ),
                 );
               },
-              child: const Text('Use Standard Method'),
+              child: Text(AppLocalizations.of(context)!.useStandardMethod),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                // Retry Superwall
+                Navigator.of(context).pop();
+               
                 setState(() {
                   _isLoading = true;
                   _hasTriggeredPaywall = false;
                   _isShowingPaymentSheet = false;
                 });
                 _triggerSuperwallPaywall();
-                _addTimeoutFallback(); // Reset timeout
+                _addTimeoutFallback();
               },
-              child: const Text('Try Again'),
+              child: Text(AppLocalizations.of(context)!.tryAgain),
             ),
           ],
         ),
@@ -118,23 +118,23 @@ class _SuperwallDonationScreenState
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Paywall Not Configured'),
-          content: const Text(
-            'The donation paywall is not yet configured in Superwall. Please configure the "donation_flow" event in your Superwall dashboard, or use our standard donation method.',
+          title: Text(AppLocalizations.of(context)!.paywallNotConfigured),
+          content: Text(
+            AppLocalizations.of(context)!.paywallNotConfiguredMessage,
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Go back to previous screen
-                // Navigate to regular donation screen
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => const DonationScreen(),
                   ),
                 );
               },
-              child: const Text('Use Standard Method'),
+              child: Text(AppLocalizations.of(context)!.useStandardMethod),
             ),
           ],
         ),
@@ -159,8 +159,6 @@ class _SuperwallDonationScreenState
           : fallbackCurrency;
 
       await paywallManager.triggerDonationPaywall(
-        currency: currency,
-        prices: paymentConfig.pricing,
         onPaywallPresented: () {
           if (mounted) {
             setState(() {
@@ -207,7 +205,10 @@ class _SuperwallDonationScreenState
           _isLoading = false;
           _isShowingPaymentSheet = false;
         });
-        showSnackBar(context, 'Unable to load donation options at this time.');
+        showSnackBar(
+            context,
+            AppLocalizations.of(context)!
+                .unableToLoadDonationOptionsAtThisTime);
         Navigator.of(context).pop();
       }
     }
@@ -218,7 +219,6 @@ class _SuperwallDonationScreenState
         error == 'Paywall placement not found') {
       _showPaywallNotConfiguredDialog();
     } else {
-      // For other errors, show fallback dialog
       AppLogger.w('SUPERWALL_DONATION_SCREEN', 'Paywall error: $error');
       _showRetryDialog();
     }
@@ -230,7 +230,7 @@ class _SuperwallDonationScreenState
       AppLogger.d('SUPERWALL_DONATION_SCREEN',
           'Processing donation payment: $amount $currency, monthly: $isMonthly');
 
-      showSnackBar(context, 'Processing...');
+      showSnackBar(context, AppLocalizations.of(context)!.processing);
 
       // Create PaymentIntent
       final paymentIntentRequest = PaymentIntentRequest(
@@ -246,7 +246,6 @@ class _SuperwallDonationScreenState
       AppLogger.d('SUPERWALL_DONATION_SCREEN',
           'Payment intent created: ${paymentIntent.id}');
 
-      // Get the best available payment method for the platform
       final paymentMethod = _getDefaultPaymentMethod();
       final paymentService = ref.read(paymentServiceProvider);
 
@@ -280,14 +279,13 @@ class _SuperwallDonationScreenState
               AppLogger.e('SUPERWALL_DONATION_SCREEN',
                   'Donation confirmation failed', confirmError);
               Navigator.of(context).pop();
-              // Payment succeeded but confirmation failed - still show success
             }
           }
 
           _isShowingPaymentSheet = false;
           showSnackBar(
             context,
-            'Thank you for your donation! Your support helps us continue our mission.',
+            AppLocalizations.of(context)!.thankYouForDonationMessage,
           );
 
           Navigator.of(context).pop();
@@ -302,7 +300,7 @@ class _SuperwallDonationScreenState
 
         case PaymentCancelled():
           _isShowingPaymentSheet = false;
-          showSnackBar(context, 'Payment cancelled');
+          showSnackBar(context, AppLocalizations.of(context)!.paymentCancelled);
           Navigator.of(context).pop();
           break;
       }
@@ -317,7 +315,6 @@ class _SuperwallDonationScreenState
   }
 
   custom_models.PaymentMethodType _getDefaultPaymentMethod() {
-    // Return platform-specific default payment method
     if (Platform.isIOS) {
       return custom_models.PaymentMethodType.applePay;
     } else if (Platform.isAndroid) {
@@ -347,19 +344,21 @@ class _SuperwallDonationScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircularProgressIndicator(),
+              if (!_isShowingPaymentSheet) const CircularProgressIndicator(),
               const SizedBox(height: 24),
               Text(
                 _isLoading
-                    ? 'Loading donation options...'
-                    : 'Preparing donation...',
+                    ? AppLocalizations.of(context)!.loadingDonationOptions
+                    : _isShowingPaymentSheet
+                        ? AppLocalizations.of(context)!.processingPayment
+                        : AppLocalizations.of(context)!.preparingDonation,
                 style: Theme.of(context).textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
               if (_isLoading) ...[
                 const SizedBox(height: 16),
                 Text(
-                  'This may take a moment',
+                  AppLocalizations.of(context)!.thisMayTakeAMoment,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context)
                             .colorScheme

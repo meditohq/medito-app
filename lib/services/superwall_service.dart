@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
@@ -10,9 +11,6 @@ import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 /// Separates Superwall concerns from UI components
 class SuperwallService {
   final Ref ref;
-
-  // Store the last paywall parameters to access them in custom actions
-  Map<String, Object>? _lastPaywallParams;
 
   // Store the donation callback to handle custom actions
   Function(int amount, bool isMonthly)? _onDonationInitiated;
@@ -46,7 +44,6 @@ class SuperwallService {
 
       Superwall.shared.setDelegate(CustomSuperwallDelegate(
         onEvent: _handleSuperwallEvent,
-        getLastParams: () => _lastPaywallParams,
         ref: ref,
         onDonationInitiated: _onDonationInitiated,
         getCachedPaymentConfig: () => _cachedPaymentConfig,
@@ -102,24 +99,18 @@ class SuperwallService {
     }
   }
 
-  /// Triggers Superwall paywall with the given parameters
+  /// Triggers Superwall paywall
   Future<void> triggerPaywall({
     required String placement,
-    required Map<String, Object> params,
     required PaywallPresentationHandler handler,
     required VoidCallback onFeature,
   }) async {
     try {
       AppLogger.d(
           'SUPERWALL_SERVICE', 'Triggering Superwall paywall: $placement');
-      AppLogger.d('SUPERWALL_SERVICE', 'Paywall params: $params');
-
-      // Store the parameters for access in custom actions
-      _lastPaywallParams = params;
 
       await Superwall.shared.registerPlacement(
         placement,
-        params: params,
         handler: handler,
         feature: onFeature,
       );
@@ -137,14 +128,12 @@ class SuperwallService {
 /// Custom delegate to handle Superwall events
 class CustomSuperwallDelegate implements SuperwallDelegate {
   final Function(SuperwallEventInfo) onEvent;
-  final Map<String, Object>? Function() getLastParams;
   final Function(int amount, bool isMonthly)? onDonationInitiated;
   final PaymentConfigModel? Function() getCachedPaymentConfig;
   final Ref ref;
 
   CustomSuperwallDelegate({
     required this.onEvent,
-    required this.getLastParams,
     required this.ref,
     required this.getCachedPaymentConfig,
     this.onDonationInitiated,
@@ -252,7 +241,7 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
     if (paymentConfig == null) {
       AppLogger.w('SUPERWALL_DELEGATE',
           'Payment config not loaded, using fallback amount for action: $action');
-      return _getFallbackAmount(action);
+      return 2500;
     }
 
     final pricing = paymentConfig.pricing;
@@ -279,46 +268,7 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
       return amounts[index];
     }
 
-    return _getFallbackAmount(action);
-  }
-
-  /// Provides fallback amounts when payment config is not available
-  int _getFallbackAmount(String action) {
-    // Handle suggested amounts
-    if (action == StringConstants.monthlySuggested) {
-      return 5; // Monthly suggested fallback
-    }
-    if (action == StringConstants.onetimeSuggested) {
-      return 10; // One-time suggested fallback
-    }
-
-    // Handle numbered actions with reasonable fallbacks
-    final numberMatch = RegExp(r'\d+').firstMatch(action);
-    if (numberMatch != null) {
-      final actionNumber = int.parse(numberMatch.group(0)!);
-      final isMonthly = action.startsWith('monthly');
-
-      if (isMonthly) {
-        // Monthly fallbacks: 3, 5, 10, 15, 25
-        const monthlyFallbacks = [3, 5, 10, 15, 25];
-        final index = actionNumber - 1;
-        if (index >= 0 && index < monthlyFallbacks.length) {
-          return monthlyFallbacks[index];
-        }
-        return 10; // Default monthly fallback
-      } else {
-        // One-time fallbacks: 5, 10, 25, 50, 100
-        const oneTimeFallbacks = [5, 10, 25, 50, 100];
-        final index = actionNumber - 1;
-        if (index >= 0 && index < oneTimeFallbacks.length) {
-          return oneTimeFallbacks[index];
-        }
-        return 25; // Default one-time fallback
-      }
-    }
-
-    // Default fallback
-    return 10;
+    return 2500;
   }
 
   @override
@@ -330,7 +280,15 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
   @override
   void willPresentPaywall(PaywallInfo paywallInfo) {
     AppLogger.d('SUPERWALL_DELEGATE',
-        'Will present paywall: ${paywallInfo.identifier}');
+        'Firing analytics: paywall_presented, id: ${paywallInfo.identifier}');
+
+    // Fire Firebase Analytics event
+    FirebaseAnalyticsService().logEvent(
+      name: 'paywall_presented',
+      parameters: {
+        'paywall_identifier': paywallInfo.identifier ?? 'unknown',
+      },
+    );
   }
 
   @override

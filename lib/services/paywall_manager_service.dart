@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/superwall_service.dart';
-import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 /// Service to manage paywall presentation and lifecycle
@@ -14,10 +13,12 @@ class PaywallManagerService {
   PaywallManagerService({required this.ref})
       : _superwallService = ref.read(superwallServiceProvider);
 
+  String getDonationPlacementId() {
+    return kReleaseMode ? 'donation_flow' : 'dev_donation_flow';
+  }
+
   /// Triggers the donation paywall with proper error handling
   Future<void> triggerDonationPaywall({
-    required String currency,
-    required PaymentPricing prices,
     required VoidCallback onPaywallPresented,
     required VoidCallback onPaywallDismissed,
     required Function(String) onError,
@@ -74,7 +75,7 @@ class PaywallManagerService {
         // Check the reason for skipping
         if (reason is PaywallSkippedReasonPlacementNotFound) {
           AppLogger.w('PAYWALL_MANAGER',
-              'Placement "donation_flow" not found in Superwall dashboard');
+              'Placement "${getDonationPlacementId()}" not found in Superwall dashboard');
           onError('Paywall placement not found');
         } else {
           AppLogger.d(
@@ -83,26 +84,9 @@ class PaywallManagerService {
         }
       });
 
-      // Trigger the paywall with currency and pricing data
+      // Trigger the paywall
       await _superwallService.triggerPaywall(
-        placement: 'donation_flow',
-        params: <String, Object>{
-          'currency': currency,
-          'currency_symbol': _getCurrencySymbol(currency),
-          'pricing_country': prices.country,
-          'one_time_1': prices.oneTime.isNotEmpty ? prices.oneTime[0] : 0,
-          'one_time_2': prices.oneTime.length > 1 ? prices.oneTime[1] : 0,
-          'one_time_3': prices.oneTime.length > 2 ? prices.oneTime[2] : 0,
-          'one_time_4': prices.oneTime.length > 3 ? prices.oneTime[3] : 0,
-          'one_time_5': prices.oneTime.length > 4 ? prices.oneTime[4] : 0,
-          'monthly_1': prices.monthly.isNotEmpty ? prices.monthly[0] : 0,
-          'monthly_2': prices.monthly.length > 1 ? prices.monthly[1] : 0,
-          'monthly_3': prices.monthly.length > 2 ? prices.monthly[2] : 0,
-          'monthly_4': prices.monthly.length > 3 ? prices.monthly[3] : 0,
-          'monthly_5': prices.monthly.length > 4 ? prices.monthly[4] : 0,
-          'suggested_one_time': prices.suggested.oneTime,
-          'suggested_monthly': prices.suggested.monthly,
-        },
+        placement: getDonationPlacementId(),
         handler: handler,
         onFeature: () {
           // Feature callback - not used in simplified flow
@@ -121,40 +105,3 @@ class PaywallManagerService {
 final paywallManagerServiceProvider = Provider<PaywallManagerService>((ref) {
   return PaywallManagerService(ref: ref);
 });
-
-// Returns the currency symbol for a given currency code.
-// If the code is not recognised, returns the code itself.
-String _getCurrencySymbol(String currencyCode) {
-  switch (currencyCode.toUpperCase()) {
-    case 'USD':
-      return '\$';
-    case 'EUR':
-      return '€';
-    case 'GBP':
-      return '£';
-    case 'INR':
-      return '₹';
-    case 'JPY':
-      return '¥';
-    case 'CNY':
-      return '¥';
-    case 'AUD':
-      return 'A\$';
-    case 'CAD':
-      return 'C\$';
-    case 'BRL':
-      return 'R\$';
-    case 'RUB':
-      return '₽';
-    case 'KRW':
-      return '₩';
-    case 'TRY':
-      return '₺';
-    case 'ZAR':
-      return 'R';
-    case 'CHF':
-      return 'CHF';
-    default:
-      return currencyCode;
-  }
-}

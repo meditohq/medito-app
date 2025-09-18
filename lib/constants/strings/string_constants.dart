@@ -36,4 +36,9 @@ class StringConstants {
   static const String onetime4 = 'onetime_4';
   static const String onetime5 = 'onetime_5';
   static const String onetimeSuggested = 'one_time_suggested';
+
+  // User attribute keys for Superwall
+  static const String currency = 'currency';
+  static const String currencySymbol = 'currency_symbol';
+  static const String pricingCountry = 'pricing_country';
 }

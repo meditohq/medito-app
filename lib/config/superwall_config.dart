@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/services/network/donation_api_service.dart';
@@ -136,41 +137,39 @@ class SuperwallConfig {
         return;
       }
 
-      // Create flattened user attributes matching PaymentConfigModel structure
+      final pricing = paymentConfig.pricing;
+      final currency = pricing.currency;
+
+      // Create user attributes with the same structure that was previously passed as params
       final userAttributes = <String, dynamic>{
-        // Flattened pricing arrays for easy template access
-        'one_time_prices': paymentConfig.pricing.oneTime,
-        'monthly_prices': paymentConfig.pricing.monthly,
-
-        // Individual price access (dynamic based on array length)
-        ..._createIndividualPriceFields(
-            'one_time', paymentConfig.pricing.oneTime),
-        ..._createIndividualPriceFields(
-            'monthly', paymentConfig.pricing.monthly),
-
-        // Basic config info
-        'currency': paymentConfig.currencyCode,
-        'currency_symbol': _getCurrencySymbol(paymentConfig.currencyCode),
-        'country': paymentConfig.countryCode,
-        'merchant_name': paymentConfig.merchantName,
-        'has_completed_purchase': false,
-        'preferred_payment_method': 'stripe',
-
+        StringConstants.currency: currency,
+        StringConstants.currencySymbol: _getCurrencySymbol(currency),
+        StringConstants.pricingCountry: pricing.country,
+        // One-time pricing
+        StringConstants.onetime1:
+            pricing.oneTime.isNotEmpty ? pricing.oneTime[0] : 0,
+        StringConstants.onetime2:
+            pricing.oneTime.length > 1 ? pricing.oneTime[1] : 0,
+        StringConstants.onetime3:
+            pricing.oneTime.length > 2 ? pricing.oneTime[2] : 0,
+        StringConstants.onetime4:
+            pricing.oneTime.length > 3 ? pricing.oneTime[3] : 0,
+        StringConstants.onetime5:
+            pricing.oneTime.length > 4 ? pricing.oneTime[4] : 0,
+        // Monthly pricing
+        StringConstants.monthly1:
+            pricing.monthly.isNotEmpty ? pricing.monthly[0] : 0,
+        StringConstants.monthly2:
+            pricing.monthly.length > 1 ? pricing.monthly[1] : 0,
+        StringConstants.monthly3:
+            pricing.monthly.length > 2 ? pricing.monthly[2] : 0,
+        StringConstants.monthly4:
+            pricing.monthly.length > 3 ? pricing.monthly[3] : 0,
+        StringConstants.monthly5:
+            pricing.monthly.length > 4 ? pricing.monthly[4] : 0,
         // Suggested amounts
-        'suggested_one_time': paymentConfig.pricing.suggested.oneTime,
-        'suggested_monthly': paymentConfig.pricing.suggested.monthly,
-
-        // Raw pricing data (keeping PaymentConfigModel structure)
-        'pricing': {
-          'one_time': paymentConfig.pricing.oneTime,
-          'monthly': paymentConfig.pricing.monthly,
-          'currency': paymentConfig.pricing.currency,
-          'country': paymentConfig.pricing.country,
-          'suggested': {
-            'one_time': paymentConfig.pricing.suggested.oneTime,
-            'monthly': paymentConfig.pricing.suggested.monthly,
-          },
-        },
+        StringConstants.monthlySuggested: pricing.suggested.monthly,
+        StringConstants.onetimeSuggested: pricing.suggested.oneTime,
       };
 
       await Superwall.shared
@@ -179,124 +178,6 @@ class SuperwallConfig {
           'User attributes set successfully with payment config data');
     } catch (err) {
       AppLogger.e('SUPERWALL_CONFIG', 'Failed to set user attributes', err);
-    }
-  }
-
-  /// Create individual price fields for easy template access
-  static Map<String, dynamic> _createIndividualPriceFields(
-      String type, List<int> prices) {
-    final fields = <String, dynamic>{};
-
-    for (int i = 0; i < prices.length; i++) {
-      fields['${type}_price_${i + 1}'] = prices[i];
-    }
-
-    return fields;
-  }
-
-  /// Get currency symbol for a given currency code
-  static String _getCurrencySymbol(String currencyCode) {
-    switch (currencyCode.toUpperCase()) {
-      case 'USD':
-        return '\$';
-      case 'GBP':
-        return '£';
-      case 'EUR':
-        return '€';
-      case 'CAD':
-        return 'C\$';
-      case 'AUD':
-        return 'A\$';
-      case 'INR':
-        return '₹';
-      case 'JPY':
-        return '¥';
-      case 'CHF':
-        return 'CHF';
-      case 'SEK':
-        return 'kr';
-      case 'NOK':
-        return 'kr';
-      case 'DKK':
-        return 'kr';
-      case 'PLN':
-        return 'zł';
-      case 'CZK':
-        return 'Kč';
-      case 'HUF':
-        return 'Ft';
-      case 'RUB':
-        return '₽';
-      case 'BRL':
-        return 'R\$';
-      case 'MXN':
-        return '\$';
-      case 'ARS':
-        return '\$';
-      case 'CLP':
-        return '\$';
-      case 'COP':
-        return '\$';
-      case 'PEN':
-        return 'S/';
-      case 'UYU':
-        return '\$';
-      case 'VEF':
-        return 'Bs';
-      case 'CNY':
-        return '¥';
-      case 'HKD':
-        return 'HK\$';
-      case 'SGD':
-        return 'S\$';
-      case 'KRW':
-        return '₩';
-      case 'TWD':
-        return 'NT\$';
-      case 'THB':
-        return '฿';
-      case 'MYR':
-        return 'RM';
-      case 'IDR':
-        return 'Rp';
-      case 'PHP':
-        return '₱';
-      case 'VND':
-        return '₫';
-      case 'ZAR':
-        return 'R';
-      case 'EGP':
-        return 'E£';
-      case 'MAD':
-        return 'MAD';
-      case 'NGN':
-        return '₦';
-      case 'KES':
-        return 'KSh';
-      case 'GHS':
-        return '₵';
-      case 'TRY':
-        return '₺';
-      case 'ILS':
-        return '₪';
-      case 'AED':
-        return 'د.إ';
-      case 'SAR':
-        return '﷼';
-      case 'QAR':
-        return '﷼';
-      case 'KWD':
-        return 'د.ك';
-      case 'BHD':
-        return 'د.ب';
-      case 'OMR':
-        return '﷼';
-      case 'JOD':
-        return 'د.ا';
-      case 'LBP':
-        return 'ل.ل';
-      default:
-        return currencyCode; // Fallback to currency code if symbol not found
     }
   }
 
@@ -318,6 +199,43 @@ class SuperwallConfig {
       AppLogger.e('SUPERWALL_CONFIG', 'Failed to fetch payment config', e);
       rethrow;
     }
+  }
+}
+
+// Returns the currency symbol for a given currency code.
+// If the code is not recognised, returns the code itself.
+String _getCurrencySymbol(String currencyCode) {
+  switch (currencyCode.toUpperCase()) {
+    case 'USD':
+      return '\$';
+    case 'EUR':
+      return '€';
+    case 'GBP':
+      return '£';
+    case 'INR':
+      return '₹';
+    case 'JPY':
+      return '¥';
+    case 'CNY':
+      return '¥';
+    case 'AUD':
+      return 'A\$';
+    case 'CAD':
+      return 'C\$';
+    case 'BRL':
+      return 'R\$';
+    case 'RUB':
+      return '₽';
+    case 'KRW':
+      return '₩';
+    case 'TRY':
+      return '₺';
+    case 'ZAR':
+      return 'R';
+    case 'CHF':
+      return 'CHF';
+    default:
+      return currencyCode;
   }
 }
 
