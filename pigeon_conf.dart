@@ -3,31 +3,26 @@ import 'package:pigeon/pigeon.dart';
 // to build the classes: flutter pub run pigeon --input pigeon_conf.dart
 
 // #docregion config
-@ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/src/audio_pigeon.g.dart',
-  dartOptions: DartOptions(),
-  kotlinOut:
-      'android/app/src/main/kotlin/meditofoundation/medito/AudioPigeon.g.kt',
-  kotlinOptions: KotlinOptions(),
-))
+@ConfigurePigeon(
+  PigeonOptions(
+    dartOut: 'lib/src/audio_pigeon.g.dart',
+    dartOptions: DartOptions(),
+    kotlinOut:
+        'android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt',
+    kotlinOptions: KotlinOptions(package: 'meditofoundation.medito.pigeon'),
+  ),
+)
 // #enddocregion config
-
 // #docregion host-definitions
 //ignore:prefer-match-file-name
 class AudioData {
-  AudioData({
-    required this.url,
-    required this.track,
-  });
+  AudioData({required this.url, required this.track});
 
   String url;
   Track track;
 }
 
-enum RepeatMode {
-  none,
-  infinite,
-}
+enum RepeatMode { none, infinite }
 
 @HostApi()
 abstract class MeditoAndroidAudioServiceManager {
@@ -99,10 +94,7 @@ class BackgroundSound {
   String? uri;
   String title;
 
-  BackgroundSound({
-    required this.uri,
-    required this.title,
-  });
+  BackgroundSound({required this.uri, required this.title});
 }
 
 class Speed {

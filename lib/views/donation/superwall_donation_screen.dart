@@ -4,18 +4,19 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/views/donation/donation_screen.dart';
 import 'package:medito/services/paywall_manager_service.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as custom_models;
 import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 String _getCurrency(String? deviceCurrency) {
   if (deviceCurrency == null) return 'USD';
@@ -61,85 +62,13 @@ class _SuperwallDonationScreenState
     Future.delayed(const Duration(seconds: 10), () {
       if (mounted && _isLoading) {
         AppLogger.w('SUPERWALL_DONATION_SCREEN',
-            'Paywall loading timeout - showing retry option');
-        _showRetryDialog();
+            'Paywall loading timeout - falling back to web donation');
+        setState(() {
+          _isLoading = false;
+        });
+        _fallbackToWebDonation();
       }
     });
-  }
-
-  void _showRetryDialog() {
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.connectionIssue),
-          content: Text(
-            AppLocalizations.of(context)!.unableToLoadDonationOptions,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Go back
-                // Navigate to regular donation screen
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const DonationScreen(),
-                  ),
-                );
-              },
-              child: Text(AppLocalizations.of(context)!.useStandardMethod),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-               
-                setState(() {
-                  _isLoading = true;
-                  _hasTriggeredPaywall = false;
-                  _isShowingPaymentSheet = false;
-                });
-                _triggerSuperwallPaywall();
-                _addTimeoutFallback();
-              },
-              child: Text(AppLocalizations.of(context)!.tryAgain),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  void _showPaywallNotConfiguredDialog() {
-    if (mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.paywallNotConfigured),
-          content: Text(
-            AppLocalizations.of(context)!.paywallNotConfiguredMessage,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const DonationScreen(),
-                  ),
-                );
-              },
-              child: Text(AppLocalizations.of(context)!.useStandardMethod),
-            ),
-          ],
-        ),
-      );
-    }
   }
 
   Future<void> _triggerSuperwallPaywall() async {
@@ -147,15 +76,36 @@ class _SuperwallDonationScreenState
     _hasTriggeredPaywall = true;
 
     try {
+      AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Starting paywall trigger');
+
       // Get payment config to pass currency and pricing data to Superwall
-      final paymentConfig = await ref.read(paymentConfigProvider.future);
+      // Add error handling for payment config loading failures
+      PaymentConfigModel? paymentConfig;
+      try {
+        paymentConfig = await ref.read(paymentConfigProvider.future);
+      } catch (paymentConfigError) {
+        AppLogger.e(
+            'SUPERWALL_DONATION_SCREEN',
+            'Failed to load payment config, falling back to web donation',
+            paymentConfigError);
+        // If payment config fails (e.g., API not deployed to prod),
+        // fall back to web donation
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          await _fallbackToWebDonation();
+          return;
+        }
+      }
+
       final paywallManager = ref.read(paywallManagerServiceProvider);
 
       // Get device currency as fallback
       final deviceInfo = ref.read(deviceAndAppInfoProvider).value;
       final fallbackCurrency = _getCurrency(deviceInfo?.currencyName);
-      final currency = paymentConfig.currencyCode.isNotEmpty
-          ? paymentConfig.currencyCode
+      final currency = paymentConfig?.currencyCode.isNotEmpty == true
+          ? paymentConfig!.currencyCode
           : fallbackCurrency;
 
       await paywallManager.triggerDonationPaywall(
@@ -198,30 +148,24 @@ class _SuperwallDonationScreenState
         },
       );
     } catch (error) {
-      AppLogger.e('SUPERWALL_DONATION_SCREEN',
-          'Failed to trigger Superwall paywall', error);
+      AppLogger.e(
+          'SUPERWALL_DONATION_SCREEN',
+          'Failed to trigger Superwall paywall, falling back to web donation',
+          error);
       if (mounted) {
         setState(() {
           _isLoading = false;
           _isShowingPaymentSheet = false;
         });
-        showSnackBar(
-            context,
-            AppLocalizations.of(context)!
-                .unableToLoadDonationOptionsAtThisTime);
-        Navigator.of(context).pop();
+        await _fallbackToWebDonation();
       }
     }
   }
 
   void _handlePaywallError(String error) {
-    if (error == 'Paywall not configured' ||
-        error == 'Paywall placement not found') {
-      _showPaywallNotConfiguredDialog();
-    } else {
-      AppLogger.w('SUPERWALL_DONATION_SCREEN', 'Paywall error: $error');
-      _showRetryDialog();
-    }
+    AppLogger.w('SUPERWALL_DONATION_SCREEN', 'Paywall error: $error');
+    // For any paywall error, fall back to web donation
+    _fallbackToWebDonation();
   }
 
   Future<void> _processDonationPayment(
@@ -311,6 +255,37 @@ class _SuperwallDonationScreenState
       final paymentError = PaymentErrorHandler.handleStripeError(error);
       showSnackBar(context, paymentError.userFriendlyMessage);
       Navigator.of(context).pop();
+    }
+  }
+
+  /// Fallback method to open web donation when API fails
+  Future<void> _fallbackToWebDonation() async {
+    try {
+      AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Opening web donation fallback');
+      final uri = Uri.parse('https://meditofoundation.org/donate');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          showSnackBar(
+            context,
+            AppLocalizations.of(context)!.unableToLoadDonationOptionsAtThisTime,
+          );
+        }
+      }
+    } catch (error) {
+      AppLogger.e(
+          'SUPERWALL_DONATION_SCREEN', 'Failed to open web donation', error);
+      if (mounted) {
+        showSnackBar(
+          context,
+          AppLocalizations.of(context)!.unableToLoadDonationOptionsAtThisTime,
+        );
+      }
+    } finally {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     }
   }
 

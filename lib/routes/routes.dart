@@ -18,7 +18,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/views/home/customise_home_layout_screen.dart';
 
 import 'package:medito/views/debug/debug_info_screen.dart';
-import 'package:medito/views/donation/donation_screen.dart';
 import 'package:medito/views/donation/superwall_donation_screen.dart';
 import 'package:medito/views/favorites/favorites_view.dart';
 
@@ -91,11 +90,14 @@ Future<void> handleNavigation(
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.donation)) {
-    // Use Superwall on Android, Stripe on iOS for now
-    final donationScreen = Platform.isAndroid
-        ? const SuperwallDonationScreen()
-        : const DonationScreen();
-    await _pushRoute(donationScreen, ref);
+    if (Platform.isAndroid) {
+      await _pushRoute(const SuperwallDonationScreen(), ref);
+    } else {
+      final uri = Uri.parse('https://meditofoundation.org/donate');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    }
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }

@@ -54,3 +54,18 @@
 -keep class com.superwall.** { *; }
 -keep class com.superwall.sdk.** { *; }
 -keep class com.superwall.superwallkit_flutter.** { *; }
+
+# Keep Flutter core error class
+-keep class io.flutter.plugin.common.FlutterError { *; }
+
+# Handle Kotlin version compatibility issues
+-dontwarn kotlin.**
+-dontwarn kotlinx.**
+-dontwarn kotlin.Metadata
+
+# Handle Google Play Services Kotlin compatibility
+-dontwarn com.google.android.gms.**
+-dontwarn com.google.firebase.**
+
+# Ignore all warnings to prevent build failure
+-ignorewarnings

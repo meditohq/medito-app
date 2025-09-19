@@ -1,5 +1,5 @@
 PODS:
-  - app_links (0.0.2):
+  - app_links (6.4.1):
     - Flutter
   - app_tracking_transparency (0.0.1):
     - Flutter
@@ -228,6 +228,12 @@ PODS:
     - StripeUICore (= 23.27.6)
   - StripeUICore (23.27.6):
     - StripeCore (= 23.27.6)
+  - Superscript (0.2.8)
+  - SuperwallKit (4.7.0):
+    - Superscript (= 0.2.8)
+  - superwallkit_flutter (0.0.1):
+    - Flutter
+    - SuperwallKit (= 4.7.0)
   - url_launcher_ios (0.0.1):
     - Flutter
   - workmanager (0.0.1):
@@ -262,6 +268,7 @@ DEPENDENCIES:
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
   - stripe_ios (from `.symlinks/plugins/stripe_ios/ios`)
+  - superwallkit_flutter (from `.symlinks/plugins/superwallkit_flutter/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - workmanager (from `.symlinks/plugins/workmanager/ios`)
 
@@ -291,6 +298,8 @@ SPEC REPOS:
     - StripePaymentSheet
     - StripePaymentsUI
     - StripeUICore
+    - Superscript
+    - SuperwallKit
 
 EXTERNAL SOURCES:
   app_links:
@@ -347,13 +356,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqflite_darwin/darwin"
   stripe_ios:
     :path: ".symlinks/plugins/stripe_ios/ios"
+  superwallkit_flutter:
+    :path: ".symlinks/plugins/superwallkit_flutter/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   workmanager:
     :path: ".symlinks/plugins/workmanager/ios"
 
 SPEC CHECKSUMS:
-  app_links: 76b66b60cc809390ca1ad69bfd66b998d2387ac7
+  app_links: 3dbc685f76b1693c66a6d9dd1e9ab6f73d97dc0a
   app_tracking_transparency: 3d84f147f67ca82d3c15355c36b1fa6b66ca7c92
   audio_service: aa99a6ba2ae7565996015322b0bb024e1d25c6fd
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
@@ -382,7 +393,7 @@ SPEC CHECKSUMS:
   haptic_feedback: fd1d8509833f58f164fc12122c0357fa9b2750e0
   health: fe206e65f13a9b88623605fbd8af8f029e23dc35
   home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
-  in_app_review: 5596fe56fab799e8edb3561c03d053363ab13457
+  in_app_review: 7dd1ea365263f834b8464673f9df72c80c17c937
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
@@ -404,6 +415,9 @@ SPEC CHECKSUMS:
   StripePaymentSheet: 3eaf870c4388e44b0cc37e4c69d00b6957fd8bd7
   StripePaymentsUI: 59ccddeacad592b09fa67e8d641340820ddb4751
   StripeUICore: 879bbf5889265db13f52fac8aad7a176ba62481f
+  Superscript: 82dbb40f502823160e75503ebc1b6bac756a503d
+  SuperwallKit: 239843161a144ad08af40906ec0307779abd7d12
+  superwallkit_flutter: 1a8f16ff97d3a3be52be3f6585279cd82209feb2
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
   workmanager: 01be2de7f184bd15de93a1812936a2b7f42ef07e
 

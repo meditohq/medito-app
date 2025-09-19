@@ -2,13 +2,6 @@
 
 package meditofoundation.medito
 
-import AudioData
-import CompletionData
-import MeditoAudioServiceApi
-import MeditoAudioServiceCallbackApi
-import PlaybackState
-import Speed
-import Track
 import android.app.Notification
 import android.content.Intent
 import android.graphics.Bitmap
@@ -44,6 +37,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.content.pm.ServiceInfo
 import android.os.Build
+import meditofoundation.medito.pigeon.*
 
 @UnstableApi
 class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioServiceApi {

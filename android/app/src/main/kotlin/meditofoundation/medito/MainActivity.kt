@@ -1,7 +1,6 @@
 package meditofoundation.medito
 
-import MeditoAndroidAudioServiceManager
-import MeditoAudioServiceCallbackApi
+import meditofoundation.medito.pigeon.*
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context

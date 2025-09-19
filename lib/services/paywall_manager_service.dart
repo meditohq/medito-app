@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/superwall_service.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 /// Service to manage paywall presentation and lifecycle
@@ -14,7 +15,11 @@ class PaywallManagerService {
       : _superwallService = ref.read(superwallServiceProvider);
 
   String getDonationPlacementId() {
-    return kReleaseMode ? 'donation_flow' : 'dev_donation_flow';
+    if (paywallEnvironment == 'live') {
+      return 'donation_flow';
+    } else {
+      return 'dev_donation_flow';
+    }
   }
 
   /// Triggers the donation paywall with proper error handling
@@ -84,9 +89,14 @@ class PaywallManagerService {
         }
       });
 
+      // Get the placement ID and log it
+      final placementId = getDonationPlacementId();
+      AppLogger.d(
+          'PAYWALL_MANAGER', 'Triggering paywall with placement: $placementId');
+
       // Trigger the paywall
       await _superwallService.triggerPaywall(
-        placement: getDonationPlacementId(),
+        placement: placementId,
         handler: handler,
         onFeature: () {
           // Feature callback - not used in simplified flow

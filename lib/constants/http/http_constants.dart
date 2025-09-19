@@ -11,6 +11,7 @@ class EnvConfig {
   final String donationToken;
   final String superwallIosApiKey;
   final String superwallAndroidApiKey;
+  final String paywallEnvironment;
 
   const EnvConfig({
     required this.environment,
@@ -23,6 +24,7 @@ class EnvConfig {
     required this.donationToken,
     required this.superwallIosApiKey,
     required this.superwallAndroidApiKey,
+    required this.paywallEnvironment,
   });
 }
 
@@ -38,6 +40,7 @@ class ProdEnv extends EnvConfig {
     required super.donationToken,
     required super.superwallIosApiKey,
     required super.superwallAndroidApiKey,
+    required super.paywallEnvironment,
   });
 }
 
@@ -53,6 +56,7 @@ class StagingEnv extends EnvConfig {
     required super.donationToken,
     required super.superwallIosApiKey,
     required super.superwallAndroidApiKey,
+    required super.paywallEnvironment,
   });
 }
 
@@ -67,6 +71,8 @@ const _prodEnv = ProdEnv(
   donationToken: String.fromEnvironment('DONATION_TOKEN'),
   superwallIosApiKey: String.fromEnvironment('SUPERWALL_IOS_API_KEY'),
   superwallAndroidApiKey: String.fromEnvironment('SUPERWALL_ANDROID_API_KEY'),
+  paywallEnvironment:
+      String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
 );
 
 const _stagingEnv = StagingEnv(
@@ -80,6 +86,8 @@ const _stagingEnv = StagingEnv(
   donationToken: String.fromEnvironment('DONATION_TOKEN'),
   superwallIosApiKey: String.fromEnvironment('SUPERWALL_IOS_API_KEY'),
   superwallAndroidApiKey: String.fromEnvironment('SUPERWALL_ANDROID_API_KEY'),
+  paywallEnvironment:
+      String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
 );
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
@@ -94,6 +102,7 @@ String get donationBaseUrl => _currentEnv.donationBaseUrl;
 String get donationToken => _currentEnv.donationToken;
 String get superwallIosApiKey => _currentEnv.superwallIosApiKey;
 String get superwallAndroidApiKey => _currentEnv.superwallAndroidApiKey;
+String get paywallEnvironment => _currentEnv.paywallEnvironment;
 
 class HTTPConstants {
   //END POINTS

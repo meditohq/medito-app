@@ -1,6 +1,6 @@
 package meditofoundation.medito
 
-import CompletionData
+import meditofoundation.medito.pigeon.CompletionData
 import android.content.Context
 import android.util.Log
 import org.json.JSONException

@@ -14,7 +14,7 @@ description: A meditation learning tool
 # Just build Android APK (used by the script above):
 # ./build_apk.sh
 
-version: 3.5.1+30138
+version: 3.5.2+30139
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -25,34 +25,34 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  audio_session: ^0.1.21
+  audio_session: ^0.1.25
   audio_service: ^0.18.15
   app_tracking_transparency: ^2.0.4
   cached_network_image: ^3.4.1
-  device_info_plus: ^11.3.3
+  device_info_plus: ^11.5.0
   email_validator: ^3.0.0
   equatable: ^2.0.5
-  firebase_core: ^3.10.1
-  firebase_messaging: ^15.2.1
-  firebase_analytics: ^11.0.0
-  flutter_local_notifications: ^19.0.0
+  firebase_core: ^3.14.0
+  firebase_messaging: ^15.2.7
+  firebase_analytics: ^11.5.0
+  flutter_local_notifications: ^19.2.1
   flutter_markdown: ^0.7.4+1
-  flutter_riverpod: ^2.4.9
+  flutter_riverpod: ^2.6.1
   flutter_secure_storage: ^9.0.0
-  flutter_svg: ^2.0.9
+  flutter_svg: ^2.2.0
   freezed_annotation: ^2.4.4
   haptic_feedback: ^0.5.1+1
-  health: ^12.1.0
-  http: ^1.3.0
+  health: ^12.2.1
+  http: ^1.4.0
   image: ^4.1.4
   in_app_review: ^2.0.10
   intl: ^0.20.2
-  just_audio: ^0.9.41
-  package_info_plus: ^8.0.1
+  just_audio: ^0.9.46
+  package_info_plus: ^8.3.0
   path_provider: ^2.1.2
-  permission_handler: ^11.3.1
+  permission_handler: ^11.4.0
   reorderables: ^0.6.0
-  riverpod_annotation: ^2.3.3
+  riverpod_annotation: ^2.6.1
   rxdart: ^0.28.0
   shimmer: ^3.0.0
   shared_preferences: ^2.2.2
@@ -61,41 +61,43 @@ dependencies:
   uuid: ^4.5.0
   hugeicons:
     hosted: https://onepub.dev/api/kdpxxpsdav
-    version: ^0.0.1
+    version: ^0.0.12
   flutter_staggered_grid_view: ^0.7.0
-  share_plus: ^10.1.3
+  share_plus: ^10.1.4
   app_links: ^6.4.0
   do_not_disturb: ^1.0.3
-  font_awesome_flutter: ^10.1.0
+  font_awesome_flutter: ^10.8.0
   xml: ^6.5.0
   xml2json: ^6.2.7
   crypto: ^3.0.6
-  home_widget: ^0.7.0
+  home_widget: ^0.7.0+1
   workmanager:
     git:
       url: https://github.com/fluttercommunity/flutter_workmanager.git
       path: workmanager
       ref: main
-  firebase_crashlytics: ^4.3.6
+  firebase_crashlytics: ^4.3.7
   pay: ^2.0.0
-  flutter_stripe: ^10.1.1
+  flutter_stripe: ^10.2.0
   superwallkit_flutter: ^2.4.2
 
+dependency_overrides:
+  superwallkit_flutter: ^2.4.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  pigeon: ^25.2.0
+  pigeon: ^25.4.0
   mocktail: ^1.0.2
-  build_runner: ^2.5.1
-  riverpod_generator: ^2.3.9
-  json_serializable: ^6.9.0
-  freezed: ^2.5.2
+  build_runner: ^2.5.2
+  riverpod_generator: ^2.6.4
+  json_serializable: ^6.9.5
+  freezed: ^2.5.8
   mockito: ^5.4.6
-  analyzer: ^7.3.0
+  analyzer: ^7.4.5
   json_annotation: ^4.9.0
-  device_preview: ^1.1.0
+  device_preview: ^1.2.0
   integration_test:
     sdk: flutter
 
