@@ -22,20 +22,14 @@ echo ""
 if [ -f "../.prod.json" ]; then
     print_colored $GREEN "✅ Production environment file found: ../.prod.json"
     
-    # Extract Superwall API keys
-    PROD_IOS_KEY=$(grep -o '"SUPERWALL_IOS_API_KEY": "[^"]*"' ../.prod.json | cut -d'"' -f4)
-    PROD_ANDROID_KEY=$(grep -o '"SUPERWALL_ANDROID_API_KEY": "[^"]*"' ../.prod.json | cut -d'"' -f4)
+    # Extract Superwall API key (same key used for both platforms)
+    PROD_SUPERWALL_KEY=$(grep -o '"SUPERWALL_API_KEY": "[^"]*"' ../.prod.json | cut -d'"' -f4)
     
-    if [ -n "$PROD_IOS_KEY" ]; then
-        print_colored $GREEN "  📱 iOS API Key: ${PROD_IOS_KEY:0:10}..."
+    if [ -n "$PROD_SUPERWALL_KEY" ]; then
+        print_colored $GREEN "  🔑 Superwall API Key: ${PROD_SUPERWALL_KEY:0:10}..."
+        print_colored $BLUE "    (Used for both iOS and Android)"
     else
-        print_colored $RED "  ❌ iOS API Key not found"
-    fi
-    
-    if [ -n "$PROD_ANDROID_KEY" ]; then
-        print_colored $GREEN "  🤖 Android API Key: ${PROD_ANDROID_KEY:0:10}..."
-    else
-        print_colored $RED "  ❌ Android API Key not found"
+        print_colored $RED "  ❌ Superwall API Key not found"
     fi
 else
     print_colored $RED "❌ Production environment file not found: ../.prod.json"
@@ -46,20 +40,14 @@ echo ""
 if [ -f "../.staging.json" ]; then
     print_colored $GREEN "✅ Staging environment file found: ../.staging.json"
     
-    # Extract Superwall API keys
-    STAGING_IOS_KEY=$(grep -o '"SUPERWALL_IOS_API_KEY": "[^"]*"' ../.staging.json | cut -d'"' -f4)
-    STAGING_ANDROID_KEY=$(grep -o '"SUPERWALL_ANDROID_API_KEY": "[^"]*"' ../.staging.json | cut -d'"' -f4)
-    
-    if [ -n "$STAGING_IOS_KEY" ]; then
-        print_colored $GREEN "  📱 iOS API Key: ${STAGING_IOS_KEY:0:10}..."
+    # Extract Superwall API key (same key used for both platforms)
+    STAGING_SUPERWALL_KEY=$(grep -o '"SUPERWALL_API_KEY": "[^"]*"' ../.staging.json | cut -d'"' -f4)
+
+    if [ -n "$STAGING_SUPERWALL_KEY" ]; then
+        print_colored $GREEN "  🔑 Superwall API Key: ${STAGING_SUPERWALL_KEY:0:10}..."
+        print_colored $BLUE "    (Used for both iOS and Android)"
     else
-        print_colored $RED "  ❌ iOS API Key not found"
-    fi
-    
-    if [ -n "$STAGING_ANDROID_KEY" ]; then
-        print_colored $GREEN "  🤖 Android API Key: ${STAGING_ANDROID_KEY:0:10}..."
-    else
-        print_colored $RED "  ❌ Android API Key not found"
+        print_colored $RED "  ❌ Superwall API Key not found"
     fi
 else
     print_colored $RED "❌ Staging environment file not found: ../.staging.json"
@@ -68,21 +56,12 @@ fi
 echo ""
 
 # Check if API keys are the same (which would be a problem)
-if [ -n "$PROD_IOS_KEY" ] && [ -n "$STAGING_IOS_KEY" ]; then
-    if [ "$PROD_IOS_KEY" = "$STAGING_IOS_KEY" ]; then
-        print_colored $YELLOW "⚠️  WARNING: Production and Staging iOS API keys are the same!"
+if [ -n "$PROD_SUPERWALL_KEY" ] && [ -n "$STAGING_SUPERWALL_KEY" ]; then
+    if [ "$PROD_SUPERWALL_KEY" = "$STAGING_SUPERWALL_KEY" ]; then
+        print_colored $YELLOW "⚠️  WARNING: Production and Staging Superwall API keys are the same!"
         print_colored $YELLOW "   This means both environments use the same paywall configuration."
     else
-        print_colored $GREEN "✅ Production and Staging iOS API keys are different (good)"
-    fi
-fi
-
-if [ -n "$PROD_ANDROID_KEY" ] && [ -n "$STAGING_ANDROID_KEY" ]; then
-    if [ "$PROD_ANDROID_KEY" = "$STAGING_ANDROID_KEY" ]; then
-        print_colored $YELLOW "⚠️  WARNING: Production and Staging Android API keys are the same!"
-        print_colored $YELLOW "   This means both environments use the same paywall configuration."
-    else
-        print_colored $GREEN "✅ Production and Staging Android API keys are different (good)"
+        print_colored $GREEN "✅ Production and Staging Superwall API keys are different (good)"
     fi
 fi
 

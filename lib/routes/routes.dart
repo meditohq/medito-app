@@ -90,14 +90,7 @@ Future<void> handleNavigation(
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.donation)) {
-    if (Platform.isAndroid) {
       await _pushRoute(const SuperwallDonationScreen(), ref);
-    } else {
-      final uri = Uri.parse('https://meditofoundation.org/donate');
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    }
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }

@@ -41,7 +41,7 @@ class PaywallManagerService {
       await _superwallService.loadPaymentConfig();
 
       // Set up Superwall delegate with donation callback
-      _superwallService.setupSuperwallDelegate(onDonationInitiated);
+      await _superwallService.setupSuperwallDelegate(onDonationInitiated);
 
       // Create paywall presentation handler
       final handler = PaywallPresentationHandler();

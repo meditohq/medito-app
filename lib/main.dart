@@ -49,7 +49,6 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 bool _hasInitialized = false;
-var appLinks = AppLinks();
 Timer? _widgetUpdateTimer;
 
 @pragma('vm:entry-point')
@@ -84,22 +83,6 @@ Future<void> _configureStripe() async {
   // publishableKey is set from the backend config in PaymentServiceProvider.getPaymentConfig()
 }
 
-void _setupSuperwallDelegate() {
-  // Delegate setup is now handled by SuperwallService when paywall is triggered
-  AppLogger.d(
-      'MAIN', 'Superwall delegate setup will be handled by SuperwallService');
-}
-
-void _handleIncomingLinks() {
-  // Handle deep links for Superwall
-  appLinks.uriLinkStream.listen((Uri uri) {
-    debugPrint('Deep link received: $uri');
-    Superwall.shared.handleDeepLink(uri);
-  }, onError: (Object err) {
-    print('Error receiving incoming link: $err');
-  });
-}
-
 void main() async {
   if (_hasInitialized) {
     AppLogger.d('MAIN', 'App already initialized, skipping main()');
@@ -110,6 +93,22 @@ void main() async {
   AppLogger.d('MAIN', 'Starting app initialization');
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Superwall
+  AppLogger.d('MAIN', 'Starting Superwall configuration');
+  AppLogger.d('MAIN', 'Current platform: ${Platform.operatingSystem}');
+  AppLogger.d(
+      'MAIN',
+      'Flutter build mode: ${kDebugMode ? 'debug' : kReleaseMode ? 'release' : 'profile'}');
+
+  try {
+    await SuperwallConfig.configure();
+    AppLogger.d('MAIN', 'Superwall configuration completed successfully');
+  } catch (e, stackTrace) {
+    AppLogger.e('MAIN', 'Superwall configuration failed with error: $e');
+    AppLogger.e('MAIN', 'Stack trace: $stackTrace');
+    // Don't re-throw - let the app continue without Superwall
+  }
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -122,14 +121,6 @@ void main() async {
   // Initialize Stripe
   await _configureStripe();
 
-  // Initialize Superwall
-  AppLogger.d('MAIN', 'Starting Superwall configuration');
-  await SuperwallConfig.configure();
-  AppLogger.d('MAIN', 'Superwall configuration completed');
-
-  // Set up deep links after configuration
-  // Delegate setup is handled by SuperwallService when needed
-  _handleIncomingLinks();
 
   await initializeAudioService();
   usePathUrlStrategy();
@@ -287,8 +278,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       var id = pathSegments.length > 1 ? pathSegments[1] : '';
 
       AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
-
-      showSnackBar(context, AppLocalizations.of(context)!.followingDeepLink);
 
       Future.delayed(const Duration(seconds: 2), () {
         handleNavigation(path, [id], context);

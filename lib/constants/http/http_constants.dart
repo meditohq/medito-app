@@ -9,8 +9,7 @@ class EnvConfig {
   final String deleteAccountBaseUrl;
   final String donationBaseUrl;
   final String donationToken;
-  final String superwallIosApiKey;
-  final String superwallAndroidApiKey;
+  final String superwallApiKey;
   final String paywallEnvironment;
 
   const EnvConfig({
@@ -22,8 +21,7 @@ class EnvConfig {
     required this.deleteAccountBaseUrl,
     required this.donationBaseUrl,
     required this.donationToken,
-    required this.superwallIosApiKey,
-    required this.superwallAndroidApiKey,
+    required this.superwallApiKey,
     required this.paywallEnvironment,
   });
 }
@@ -38,8 +36,7 @@ class ProdEnv extends EnvConfig {
     required super.deleteAccountBaseUrl,
     required super.donationBaseUrl,
     required super.donationToken,
-    required super.superwallIosApiKey,
-    required super.superwallAndroidApiKey,
+    required super.superwallApiKey,
     required super.paywallEnvironment,
   });
 }
@@ -54,8 +51,7 @@ class StagingEnv extends EnvConfig {
     required super.deleteAccountBaseUrl,
     required super.donationBaseUrl,
     required super.donationToken,
-    required super.superwallIosApiKey,
-    required super.superwallAndroidApiKey,
+    required super.superwallApiKey,
     required super.paywallEnvironment,
   });
 }
@@ -69,8 +65,7 @@ const _prodEnv = ProdEnv(
   deleteAccountBaseUrl: 'https://accounts.medito.app/delete',
   donationBaseUrl: String.fromEnvironment('DONATION_BASE_URL'),
   donationToken: String.fromEnvironment('DONATION_TOKEN'),
-  superwallIosApiKey: String.fromEnvironment('SUPERWALL_IOS_API_KEY'),
-  superwallAndroidApiKey: String.fromEnvironment('SUPERWALL_ANDROID_API_KEY'),
+  superwallApiKey: String.fromEnvironment('SUPERWALL_API_KEY'),
   paywallEnvironment:
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
 );
@@ -84,8 +79,7 @@ const _stagingEnv = StagingEnv(
   deleteAccountBaseUrl: 'https://accounts.medito.dev/delete',
   donationBaseUrl: String.fromEnvironment('DONATION_BASE_URL'),
   donationToken: String.fromEnvironment('DONATION_TOKEN'),
-  superwallIosApiKey: String.fromEnvironment('SUPERWALL_IOS_API_KEY'),
-  superwallAndroidApiKey: String.fromEnvironment('SUPERWALL_ANDROID_API_KEY'),
+  superwallApiKey: String.fromEnvironment('SUPERWALL_API_KEY'),
   paywallEnvironment:
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
 );
@@ -100,8 +94,7 @@ String get editStatsUrl => _currentEnv.editStatsUrl;
 String get deleteAccountUrl => _currentEnv.deleteAccountBaseUrl;
 String get donationBaseUrl => _currentEnv.donationBaseUrl;
 String get donationToken => _currentEnv.donationToken;
-String get superwallIosApiKey => _currentEnv.superwallIosApiKey;
-String get superwallAndroidApiKey => _currentEnv.superwallAndroidApiKey;
+String get superwallApiKey => _currentEnv.superwallApiKey;
 String get paywallEnvironment => _currentEnv.paywallEnvironment;
 
 class HTTPConstants {

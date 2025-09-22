@@ -34,10 +34,18 @@ class SuperwallService {
   }
 
   /// Sets up Superwall delegate and event handling
-  void setupSuperwallDelegate(
-      Function(int amount, bool isMonthly)? onDonationInitiated) {
+  Future<void> setupSuperwallDelegate(
+      Function(int amount, bool isMonthly)? onDonationInitiated) async {
     try {
       AppLogger.d('SUPERWALL_SERVICE', 'Setting up Superwall delegate');
+
+      // Ensure Superwall is configured before setting delegate
+      final isConfigured = await isSuperwallConfigured();
+      if (!isConfigured) {
+        AppLogger.e('SUPERWALL_SERVICE',
+            'Cannot setup delegate - Superwall not configured');
+        return;
+      }
 
       // Store the donation callback
       _onDonationInitiated = onDonationInitiated;
@@ -108,6 +116,14 @@ class SuperwallService {
     try {
       AppLogger.d(
           'SUPERWALL_SERVICE', 'Triggering Superwall paywall: $placement');
+
+      // Ensure Superwall is configured before triggering paywall
+      final isConfigured = await isSuperwallConfigured();
+      if (!isConfigured) {
+        AppLogger.e('SUPERWALL_SERVICE',
+            'Cannot trigger paywall - Superwall not configured');
+        throw Exception('Superwall not configured');
+      }
 
       await Superwall.shared.registerPlacement(
         placement,

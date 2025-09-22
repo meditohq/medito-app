@@ -12,6 +12,8 @@ class SuperwallConfig {
   static bool _isConfigured = false;
 
   static Future<Superwall> configure() async {
+    AppLogger.d('SUPERWALL_CONFIG', '=== Starting Superwall configuration ===');
+
     // Prevent multiple configurations
     if (_isConfigured) {
       AppLogger.d('SUPERWALL_CONFIG',
@@ -19,25 +21,18 @@ class SuperwallConfig {
       return Superwall.shared;
     }
 
-    // Double-check if Superwall is already configured by checking the shared instance
-    try {
-      final status = await Superwall.shared.getConfigurationStatus();
-      if (status != ConfigurationStatus.pending) {
-        AppLogger.d('SUPERWALL_CONFIG',
-            'Superwall already configured externally, skipping');
-        _isConfigured = true;
-        return Superwall.shared;
-      }
-    } catch (e) {
-      // If we get an error, Superwall might not be configured yet
-      AppLogger.d(
-          'SUPERWALL_CONFIG', 'Superwall not configured yet, proceeding');
-    }
+    // Note: We don't check Superwall.shared.getConfigurationStatus() here
+    // because accessing Superwall.shared before configuration triggers a fatal error
+    // in the native iOS SDK in debug builds. We proceed directly to configuration.
 
     try {
-      // Get the appropriate API key based on platform
-      final apiKey =
-          Platform.isIOS ? superwallIosApiKey : superwallAndroidApiKey;
+      AppLogger.d('SUPERWALL_CONFIG', 'Retrieving Superwall API key...');
+
+      // Use the unified Superwall API key for both platforms
+      final apiKey = superwallApiKey;
+      AppLogger.d('SUPERWALL_CONFIG',
+          'API key retrieved: ${apiKey.isNotEmpty ? 'present' : 'empty'}');
+      AppLogger.d('SUPERWALL_CONFIG', 'API key length: ${apiKey.length}');
 
       // Check if API key is valid
       if (apiKey.isEmpty) {
@@ -45,75 +40,146 @@ class SuperwallConfig {
             'SUPERWALL_CONFIG', 'Superwall API key is empty or not found');
         AppLogger.e('SUPERWALL_CONFIG',
             'Platform: ${Platform.isIOS ? 'iOS' : 'Android'}');
-        AppLogger.e('SUPERWALL_CONFIG', 'iOS API Key: $superwallIosApiKey');
+        AppLogger.e('SUPERWALL_CONFIG', 'API Key from env: $superwallApiKey');
         AppLogger.e(
-            'SUPERWALL_CONFIG', 'Android API Key: $superwallAndroidApiKey');
+            'SUPERWALL_CONFIG', 'superwallApiKey variable: $superwallApiKey');
         throw Exception('Superwall API key is empty');
       }
 
       AppLogger.d('SUPERWALL_CONFIG',
-          'Configuring Superwall with API key: ${apiKey.substring(0, min(10, apiKey.length))}...');
+          'API key validation passed. Key starts with: ${apiKey.substring(0, min(10, apiKey.length))}...');
+      AppLogger.d(
+          'SUPERWALL_CONFIG', 'Paywall environment: $paywallEnvironment');
+
+      AppLogger.d(
+          'SUPERWALL_CONFIG', 'Creating Superwall configuration options...');
 
       // Configure Superwall with options - no purchase controller needed since we handle payments via Stripe
       final logging = Logging();
       logging.level =
           LogLevel.warn; // Reduce noise but keep warnings and errors
       logging.scopes = {LogScope.all};
+      AppLogger.d('SUPERWALL_CONFIG',
+          'Logging configured: level=${logging.level}, scopes=${logging.scopes}');
 
       final options = SuperwallOptions();
       options.paywalls.shouldPreload = false;
       options.paywalls.shouldShowWebRestorationAlert = false;
       options.logging = logging;
+      AppLogger.d('SUPERWALL_CONFIG', 'Superwall options created');
 
       // Create a minimal purchase controller to prevent purchase query errors
       // This controller just returns empty results since we don't use native purchases
+      AppLogger.d('SUPERWALL_CONFIG', 'Creating purchase controller...');
       final purchaseController = _NoOpPurchaseController();
+      AppLogger.d('SUPERWALL_CONFIG', 'Purchase controller created');
 
       // Configure Superwall with minimal purchase controller
+      AppLogger.d(
+          'SUPERWALL_CONFIG', 'Calling Superwall.configure() with API key...');
       final superwall = Superwall.configure(
         apiKey,
         purchaseController: purchaseController,
         options: options,
-        completion: () async {
-          AppLogger.d('SUPERWALL_CONFIG',
-              'Superwall configuration completed successfully. Executing Superwall configure completion block');
-
-          // Set subscription status to inactive since we don't have subscriptions
-          try {
-            await Superwall.shared
-                .setSubscriptionStatus(SubscriptionStatus.inactive);
-            AppLogger.d(
-                'SUPERWALL_CONFIG', 'Subscription status set to inactive');
-          } catch (e) {
-            AppLogger.e(
-                'SUPERWALL_CONFIG', 'Failed to set subscription status', e);
-          }
-
-          // Automatically fetch payment config and set user attributes
-          try {
-            await _fetchAndSetPaymentConfig();
-          } catch (e) {
-            AppLogger.e('SUPERWALL_CONFIG',
-                'Failed to fetch payment config for user attributes', e);
-          }
-        },
       );
+      AppLogger.d(
+          'SUPERWALL_CONFIG', 'Superwall.configure() returned successfully');
 
-      // Mark as configured
-      _isConfigured = true;
+      // Wait for Superwall to be fully configured
+      AppLogger.d('SUPERWALL_CONFIG',
+          'Waiting for Superwall configuration to complete...');
 
-      AppLogger.d('SUPERWALL_CONFIG', 'Superwall configured successfully');
+      // Poll configuration status until it's ready
+      var configStatus = ConfigurationStatus.pending;
+      var attempts = 0;
+      const maxAttempts = 30; // 30 seconds max
+      AppLogger.d('SUPERWALL_CONFIG',
+          'Starting configuration polling loop (max $maxAttempts attempts)...');
+
+      while (configStatus == ConfigurationStatus.pending &&
+          attempts < maxAttempts) {
+        await Future.delayed(const Duration(seconds: 1));
+        attempts++;
+        AppLogger.d('SUPERWALL_CONFIG', 'Polling attempt $attempts...');
+
+        try {
+          configStatus = await Superwall.shared.getConfigurationStatus();
+          AppLogger.d('SUPERWALL_CONFIG',
+              'Configuration status: $configStatus (attempt $attempts)');
+        } catch (e) {
+          AppLogger.d('SUPERWALL_CONFIG',
+              'Still waiting for configuration... (attempt $attempts), error: $e');
+        }
+
+        if (attempts >= maxAttempts) {
+          AppLogger.w('SUPERWALL_CONFIG',
+              'Reached maximum polling attempts ($maxAttempts)');
+        }
+      }
+
+      AppLogger.d('SUPERWALL_CONFIG',
+          'Polling loop completed. Final status: $configStatus');
+
+      if (configStatus != ConfigurationStatus.pending) {
+        AppLogger.d('SUPERWALL_CONFIG',
+            'Configuration successful, setting up additional features...');
+
+        // Set subscription status to inactive since we don't have subscriptions
+        try {
+          AppLogger.d(
+              'SUPERWALL_CONFIG', 'Setting subscription status to inactive...');
+          await Superwall.shared
+              .setSubscriptionStatus(SubscriptionStatus.inactive);
+          AppLogger.d('SUPERWALL_CONFIG',
+              'Subscription status set to inactive successfully');
+        } catch (e) {
+          AppLogger.e(
+              'SUPERWALL_CONFIG', 'Failed to set subscription status', e);
+        }
+
+        // Automatically fetch payment config and set user attributes
+        try {
+          AppLogger.d('SUPERWALL_CONFIG',
+              'Fetching payment config for user attributes...');
+          await _fetchAndSetPaymentConfig();
+          AppLogger.d('SUPERWALL_CONFIG',
+              'Payment config fetched and user attributes set');
+        } catch (e) {
+          AppLogger.e('SUPERWALL_CONFIG',
+              'Failed to fetch payment config for user attributes', e);
+        }
+
+        // Mark as configured
+        _isConfigured = true;
+        AppLogger.d('SUPERWALL_CONFIG',
+            '=== Superwall configuration completed successfully ===');
+      } else {
+        AppLogger.e('SUPERWALL_CONFIG',
+            'Superwall configuration timed out after $maxAttempts attempts');
+        throw Exception('Superwall configuration timed out');
+      }
+
       return superwall;
     } catch (e, stackTrace) {
-      AppLogger.e('SUPERWALL_CONFIG', 'Failed to configure Superwall', e);
-      AppLogger.e('SUPERWALL_CONFIG', 'Stack trace', stackTrace);
+      AppLogger.e('SUPERWALL_CONFIG', '=== Superwall configuration failed ===');
+      AppLogger.e('SUPERWALL_CONFIG', 'Error: $e');
+      AppLogger.e('SUPERWALL_CONFIG', 'Stack trace: $stackTrace');
 
       // Try to provide more specific error information
-      if (e.toString().contains('createBridgeInstance')) {
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('createBridgeInstance') ||
+          errorString.contains('bridge')) {
         AppLogger.e('SUPERWALL_CONFIG',
             'Superwall bridge creation failed - check ProGuard rules and plugin registration');
-      } else if (e.toString().contains('apiKey')) {
+      } else if (errorString.contains('apikey') ||
+          errorString.contains('api_key')) {
         AppLogger.e('SUPERWALL_CONFIG', 'Invalid API key or API key not found');
+        AppLogger.e(
+            'SUPERWALL_CONFIG', 'Current API key value: "$superwallApiKey"');
+      } else if (errorString.contains('configure') &&
+          errorString.contains('not')) {
+        AppLogger.e('SUPERWALL_CONFIG',
+            'Superwall.configure() was not called successfully');
       } else {
         AppLogger.e(
             'SUPERWALL_CONFIG', 'Unknown Superwall configuration error');
@@ -121,7 +187,7 @@ class SuperwallConfig {
 
       // Don't re-throw the error to prevent app crash - Superwall is optional
       AppLogger.w('SUPERWALL_CONFIG',
-          'Superwall configuration failed, but app will continue');
+          'Superwall configuration failed, but app will continue without Superwall');
       return Superwall.shared;
     }
   }
