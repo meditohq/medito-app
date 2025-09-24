@@ -121,7 +121,6 @@ void main() async {
   // Initialize Stripe
   await _configureStripe();
 
-
   await initializeAudioService();
   usePathUrlStrategy();
 

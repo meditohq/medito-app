@@ -137,6 +137,9 @@ class SuperwallConfig {
               'SUPERWALL_CONFIG', 'Failed to set subscription status', e);
         }
 
+        // Mark as configured first
+        _isConfigured = true;
+
         // Automatically fetch payment config and set user attributes
         try {
           AppLogger.d('SUPERWALL_CONFIG',
@@ -148,9 +151,6 @@ class SuperwallConfig {
           AppLogger.e('SUPERWALL_CONFIG',
               'Failed to fetch payment config for user attributes', e);
         }
-
-        // Mark as configured
-        _isConfigured = true;
         AppLogger.d('SUPERWALL_CONFIG',
             '=== Superwall configuration completed successfully ===');
       } else {
@@ -197,9 +197,11 @@ class SuperwallConfig {
     required PaymentConfigModel paymentConfig,
   }) async {
     try {
-      if (!_isConfigured) {
+      // Check Superwall's actual configuration status instead of internal flag
+      final configStatus = await Superwall.shared.getConfigurationStatus();
+      if (configStatus != ConfigurationStatus.configured) {
         AppLogger.w('SUPERWALL_CONFIG',
-            'Superwall not configured yet, cannot set user attributes');
+            '⚠️ Superwall not configured yet, cannot set user attributes (status: $configStatus)');
         return;
       }
 
@@ -238,8 +240,12 @@ class SuperwallConfig {
         StringConstants.onetimeSuggested: pricing.suggested.oneTime,
       };
 
+      AppLogger.d('SUPERWALL_CONFIG',
+          'Setting user attributes: ${userAttributes.keys.join(', ')}');
+
       await Superwall.shared
           .setUserAttributes(userAttributes.cast<String, Object>());
+
       AppLogger.d('SUPERWALL_CONFIG',
           'User attributes set successfully with payment config data');
     } catch (err) {
