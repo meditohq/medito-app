@@ -58,6 +58,13 @@ class _SuperwallDonationScreenState
     });
   }
 
+  @override
+  void dispose() {
+    // Clean up Pay clients when the screen is disposed
+    // This helps prevent event channel conflicts
+    super.dispose();
+  }
+
   void _addTimeoutFallback() {
     Future.delayed(const Duration(seconds: 10), () {
       if (mounted && _isLoading) {
@@ -134,14 +141,18 @@ class _SuperwallDonationScreenState
         },
         onDonationInitiated: (amount, isMonthly) {
           _isShowingPaymentSheet = true;
-          Superwall.shared.dismiss();
           AppLogger.d('SUPERWALL_DONATION_SCREEN',
               'Donation initiated: amount: $amount, isMonthly: $isMonthly');
-          // Add a small delay to ensure the paywall dismiss action from web console
+          AppLogger.d(
+              'SUPERWALL_DONATION_SCREEN', 'Dismissing Superwall paywall...');
+          Superwall.shared.dismiss();
+          // Add a longer delay to ensure the paywall dismiss action from web console
           // has time to complete before presenting the payment sheet
           // This prevents the "Can not perform this action after onSaveInstanceState" error
           if (mounted) {
-            Future.delayed(const Duration(milliseconds: 500), () {
+            Future.delayed(const Duration(milliseconds: 1000), () {
+              AppLogger.d('SUPERWALL_DONATION_SCREEN',
+                  'Starting payment processing after delay...');
               _processDonationPayment(amount, isMonthly, currency);
             });
           }
@@ -176,11 +187,14 @@ class _SuperwallDonationScreenState
 
       showSnackBar(context, AppLocalizations.of(context)!.processing);
 
+      // Get the appropriate payment method (checking availability)
+      final paymentMethod = await _getDefaultPaymentMethod();
+
       // Create PaymentIntent
       final paymentIntentRequest = PaymentIntentRequest(
         amount: amount ~/ 100, // Convert from cents to dollars
         currency: currency.toLowerCase(),
-        paymentMethod: _getDefaultPaymentMethod().name,
+        paymentMethod: paymentMethod.name,
         isMonthly: isMonthly,
       );
 
@@ -190,7 +204,6 @@ class _SuperwallDonationScreenState
       AppLogger.d('SUPERWALL_DONATION_SCREEN',
           'Payment intent created: ${paymentIntent.id}');
 
-      final paymentMethod = _getDefaultPaymentMethod();
       final paymentService = ref.read(paymentServiceProvider);
 
       AppLogger.d('SUPERWALL_DONATION_SCREEN',
@@ -238,13 +251,20 @@ class _SuperwallDonationScreenState
 
         case PaymentFailure():
           _isShowingPaymentSheet = false;
-          showSnackBar(context, result.errorMessage);
+          // Check if it's a Google Pay event channel error and show a more helpful message
+          if (result.errorMessage.contains('illegalEventChannelState') ||
+              result.errorMessage.contains('event channel')) {
+            showSnackBar(context,
+                'Payment system is temporarily unavailable. Please try again or use a different payment method.');
+          } else {
+            showSnackBar(context, result.errorMessage);
+          }
           Navigator.of(context).pop();
           break;
 
         case PaymentCancelled():
           _isShowingPaymentSheet = false;
-          showSnackBar(context, AppLocalizations.of(context)!.paymentCancelled);
+          // User cancelled the payment - this is a valid action, no snackbar needed
           Navigator.of(context).pop();
           break;
       }
@@ -289,11 +309,49 @@ class _SuperwallDonationScreenState
     }
   }
 
-  custom_models.PaymentMethodType _getDefaultPaymentMethod() {
+  Future<custom_models.PaymentMethodType> _getDefaultPaymentMethod() async {
     if (Platform.isIOS) {
-      return custom_models.PaymentMethodType.applePay;
+      // Check if Apple Pay is available before defaulting to it
+      final paymentService = ref.read(paymentServiceProvider);
+      final availableMethods =
+          await paymentService.getAvailablePaymentMethods();
+
+      final applePayMethod = availableMethods.firstWhere(
+        (method) => method.type == custom_models.PaymentMethodType.applePay,
+        orElse: () => availableMethods.first,
+      );
+
+      AppLogger.d('SUPERWALL_DONATION_SCREEN',
+          'Selected payment method: ${applePayMethod.type.name}, available: ${applePayMethod.isAvailable}');
+
+      if (!applePayMethod.isAvailable) {
+        AppLogger.w('SUPERWALL_DONATION_SCREEN',
+            'Apple Pay not available, falling back to card payment');
+        return custom_models.PaymentMethodType.card;
+      }
+
+      return applePayMethod.type;
     } else if (Platform.isAndroid) {
-      return custom_models.PaymentMethodType.googlePay;
+      // Check if Google Pay is available before defaulting to it
+      final paymentService = ref.read(paymentServiceProvider);
+      final availableMethods =
+          await paymentService.getAvailablePaymentMethods();
+
+      final googlePayMethod = availableMethods.firstWhere(
+        (method) => method.type == custom_models.PaymentMethodType.googlePay,
+        orElse: () => availableMethods.first,
+      );
+
+      AppLogger.d('SUPERWALL_DONATION_SCREEN',
+          'Selected payment method: ${googlePayMethod.type.name}, available: ${googlePayMethod.isAvailable}');
+
+      if (!googlePayMethod.isAvailable) {
+        AppLogger.w('SUPERWALL_DONATION_SCREEN',
+            'Google Pay not available, falling back to card payment');
+        return custom_models.PaymentMethodType.card;
+      }
+
+      return googlePayMethod.type;
     } else {
       return custom_models.PaymentMethodType.card;
     }

@@ -4,6 +4,7 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'dart:io';
 import 'package:intl/intl.dart';
 
 // This file is the ONLY place where widget data for the home screen widget is written.
@@ -105,18 +106,21 @@ Future<void> _updateIOSWidgets() async {
       iOSName: WidgetConstants.streakWidgetSmallKind,
     );
 
-    await HomeWidget.updateWidget(
-      name: WidgetConstants.streakWidgetMediumKind,
-      iOSName: WidgetConstants.streakWidgetMediumKind,
-    );
+    // Only update iOS widgets on iOS platform
+    if (Platform.isIOS) {
+      await HomeWidget.updateWidget(
+        name: WidgetConstants.streakWidgetMediumKind,
+        iOSName: WidgetConstants.streakWidgetMediumKind,
+      );
 
-    await HomeWidget.updateWidget(
-      name: WidgetConstants.quoteWidgetSmallKind,
-      iOSName: WidgetConstants.quoteWidgetSmallKind,
-    );
+      await HomeWidget.updateWidget(
+        name: WidgetConstants.quoteWidgetSmallKind,
+        iOSName: WidgetConstants.quoteWidgetSmallKind,
+      );
+    }
 
     AppLogger.d('WIDGET', 'Widget data updated successfully');
   } catch (e) {
-    AppLogger.e('WIDGET', 'Error updating iOS widgets: $e');
+    AppLogger.e('WIDGET', 'Error updating widgets: $e');
   }
 }

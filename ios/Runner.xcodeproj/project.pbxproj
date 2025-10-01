@@ -8,6 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		27250C9B2E843752008B6308 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5BC52CCCDFCD0043D20A /* Fonts.swift */; };
+		27250C9C2E843752008B6308 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B822CCCDB4E0043D20A /* Colors.swift */; };
+		27250C9D2E843752008B6308 /* DonateModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA1F9DE2CD50D620062AD07 /* DonateModifier.swift */; };
+		27250C9E2E843752008B6308 /* WidgetBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */; };
+		27250C9F2E843752008B6308 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		27250CA32E843752008B6308 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		27250CA42E843752008B6308 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		27250CA52E843752008B6308 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BD257942AC4B7C80012213D /* GoogleService-Info.plist */; };
+		27250CA62E843752008B6308 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
+		27250CA72E843752008B6308 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
+		286F501132BCE08B5ED702C1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		34902A6B292214B6EB757F62 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9020A8043DD32631839BE6F /* Pods_RunnerTests.framework */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -53,6 +65,13 @@
 			remoteGlobalIDString = EDFD4CFC2C9359BE0066E874;
 			remoteInfo = MeditoWidgetExtension;
 		};
+		27250C962E843752008B6308 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EDFD4CFC2C9359BE0066E874;
+			remoteInfo = MeditoWidgetExtension;
+		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -68,6 +87,8 @@
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		270582582DE8CCDB00033AF9 /* MeditoWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtension.entitlements; sourceTree = "<group>"; };
 		270582592DE8CCDB00033AF9 /* MeditoWidgetExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtensionRelease.entitlements; sourceTree = "<group>"; };
+		27250CAF2E843752008B6308 /* Runner copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Runner copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		27250CB02E843752008B6308 /* Runner copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Runner copy-Info.plist"; path = "/Users/mike/Projects/Medito/medito_new/ios/Runner copy-Info.plist"; sourceTree = "<absolute>"; };
 		27523001D6F08A92B86EE240 /* Pods-MeditoWidgetExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MeditoWidgetExtension.debug.xcconfig"; path = "Target Support Files/Pods-MeditoWidgetExtension/Pods-MeditoWidgetExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		3003D9AA92FEE696D942646E /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
@@ -130,6 +151,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		27250CA02E843752008B6308 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7F86055C989C0E752D62AB3E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,6 +171,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F7C33FCECFCB2BD7A48BA96A /* Pods_Runner.framework in Frameworks */,
+				286F501132BCE08B5ED702C1 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,6 +244,7 @@
 				8EFE9E8010CFB1E2B50D23B4 /* Pods */,
 				ED43ED8D2CCBDB0D00648C2A /* Recovered References */,
 				571AF27B71021884340919D6 /* Frameworks */,
+				27250CB02E843752008B6308 /* Runner copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -224,6 +254,7 @@
 				97C146EE1CF9000F007C117D /* Medito Dev.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 				EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */,
+				27250CAF2E843752008B6308 /* Runner copy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -383,6 +414,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		27250C942E843752008B6308 /* Runner copy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 27250CAB2E843752008B6308 /* Build configuration list for PBXNativeTarget "Runner copy" */;
+			buildPhases = (
+				27250C982E843752008B6308 /* Run Script */,
+				27250C992E843752008B6308 /* Sources */,
+				27250CA02E843752008B6308 /* Frameworks */,
+				27250CA22E843752008B6308 /* Resources */,
+				27250CA82E843752008B6308 /* Thin Binary */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				27250C952E843752008B6308 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				ED8A5BC82CCCE1060043D20A /* Fonts */,
+			);
+			name = "Runner copy";
+			productName = Runner;
+			productReference = 27250CAF2E843752008B6308 /* Runner copy.app */;
+			productType = "com.apple.product-type.application";
+		};
 		331C8080294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
@@ -490,11 +544,24 @@
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */,
+				27250C942E843752008B6308 /* Runner copy */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		27250CA22E843752008B6308 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27250CA32E843752008B6308 /* LaunchScreen.storyboard in Resources */,
+				27250CA42E843752008B6308 /* AppFrameworkInfo.plist in Resources */,
+				27250CA52E843752008B6308 /* GoogleService-Info.plist in Resources */,
+				27250CA62E843752008B6308 /* Assets.xcassets in Resources */,
+				27250CA72E843752008B6308 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807F294A63A400263BE5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -563,6 +630,37 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		27250C982E843752008B6308 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
+		};
+		27250CA82E843752008B6308 /* Thin Binary */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}",
+			);
+			name = "Thin Binary";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin\n";
 		};
 		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -659,6 +757,19 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		27250C992E843752008B6308 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */,
+				27250C9B2E843752008B6308 /* Fonts.swift in Sources */,
+				27250C9C2E843752008B6308 /* Colors.swift in Sources */,
+				27250C9D2E843752008B6308 /* DonateModifier.swift in Sources */,
+				27250C9E2E843752008B6308 /* WidgetBackgroundModifier.swift in Sources */,
+				27250C9F2E843752008B6308 /* GeneratedPluginRegistrant.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807D294A63A400263BE5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -712,6 +823,11 @@
 			isa = PBXTargetDependency;
 			target = EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */;
 			targetProxy = 270582672DEA01D100033AF9 /* PBXContainerItemProxy */;
+		};
+		27250C952E843752008B6308 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */;
+			targetProxy = 27250C962E843752008B6308 /* PBXContainerItemProxy */;
 		};
 		331C8086294A63A400263BE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -815,6 +931,106 @@
 				MARKETING_VERSION = 3.1.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
 				PRODUCT_NAME = Medito;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Profile;
+		};
+		27250CAC2E843752008B6308 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 30045;
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = "Runner copy-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		27250CAD2E843752008B6308 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 30045;
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = "Runner copy-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		27250CAE2E843752008B6308 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 30045;
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = "Runner copy-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -1188,6 +1404,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		27250CAB2E843752008B6308 /* Build configuration list for PBXNativeTarget "Runner copy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				27250CAC2E843752008B6308 /* Debug */,
+				27250CAD2E843752008B6308 /* Release */,
+				27250CAE2E843752008B6308 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

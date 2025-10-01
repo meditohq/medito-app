@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:medito/utils/logger.dart';
@@ -43,35 +45,47 @@ class PaymentServiceImpl implements PaymentService {
   final Ref ref;
   final IDonationApiService donationClient;
 
+  // Singleton Pay instance for Apple Pay
+  static Pay? _applePayClient;
+
+  // Google Pay event channel subscription for Android
+  static StreamSubscription<Map<String, dynamic>>? _googlePayResultSubscription;
+  static Completer<Map<String, dynamic>?>? _googlePayResultCompleter;
+
   PaymentServiceImpl({required this.ref, required this.donationClient});
 
-  // Helper method to create deep copy of nested maps
-  static Map<String, dynamic> _deepCopyMap(Map<String, dynamic> original) {
-    final copy = <String, dynamic>{};
-    for (final entry in original.entries) {
-      if (entry.value is Map<String, dynamic>) {
-        copy[entry.key] = _deepCopyMap(entry.value as Map<String, dynamic>);
-      } else if (entry.value is List) {
-        copy[entry.key] = _deepCopyList(entry.value as List);
-      } else {
-        copy[entry.key] = entry.value;
+  /// Setup Google Pay event channel for Android
+  static void _setupGooglePayEventChannel() {
+    if (_googlePayResultSubscription != null) return;
+
+    const eventChannel = EventChannel('plugins.flutter.io/pay/payment_result');
+    _googlePayResultSubscription = eventChannel
+        .receiveBroadcastStream()
+        .map((result) => jsonDecode(result as String) as Map<String, dynamic>)
+        .listen((result) {
+      AppLogger.d('PAYMENT_SERVICE',
+          'Received Google Pay result from event channel: $result');
+      if (_googlePayResultCompleter != null &&
+          !_googlePayResultCompleter!.isCompleted) {
+        _googlePayResultCompleter!.complete(result);
       }
-    }
-    return copy;
+    }, onError: (error) {
+      AppLogger.e('PAYMENT_SERVICE', 'Google Pay event channel error: $error');
+      if (_googlePayResultCompleter != null &&
+          !_googlePayResultCompleter!.isCompleted) {
+        _googlePayResultCompleter!.completeError(error);
+      }
+    });
   }
 
-  static List _deepCopyList(List original) {
-    final copy = [];
-    for (final item in original) {
-      if (item is Map<String, dynamic>) {
-        copy.add(_deepCopyMap(item));
-      } else if (item is List) {
-        copy.add(_deepCopyList(item));
-      } else {
-        copy.add(item);
-      }
-    }
-    return copy;
+  /// Cleanup method to properly dispose of Pay clients
+  static void disposePayClients() {
+    AppLogger.d('PAYMENT_SERVICE', 'Disposing Pay clients...');
+    _applePayClient = null;
+    _googlePayResultSubscription?.cancel();
+    _googlePayResultSubscription = null;
+    _googlePayResultCompleter?.complete(null);
+    _googlePayResultCompleter = null;
   }
 
   static const _googlePayConfig = {
@@ -110,15 +124,46 @@ class PaymentServiceImpl implements PaymentService {
     }
   };
 
+  // Helper method to create deep copy of nested maps
+  static Map<String, dynamic> _deepCopyMap(Map<String, dynamic> original) {
+    final copy = <String, dynamic>{};
+    for (final entry in original.entries) {
+      if (entry.value is Map<String, dynamic>) {
+        copy[entry.key] = _deepCopyMap(entry.value as Map<String, dynamic>);
+      } else if (entry.value is List) {
+        copy[entry.key] = _deepCopyList(entry.value as List);
+      } else {
+        copy[entry.key] = entry.value;
+      }
+    }
+    return copy;
+  }
+
+  static List _deepCopyList(List original) {
+    final copy = [];
+    for (final item in original) {
+      if (item is Map<String, dynamic>) {
+        copy.add(_deepCopyMap(item));
+      } else if (item is List) {
+        copy.add(_deepCopyList(item));
+      } else {
+        copy.add(item);
+      }
+    }
+    return copy;
+  }
+
   Map<String, dynamic> _getApplePayConfig(PaymentConfigModel config) => {
         "provider": "apple_pay",
         "data": {
           "merchantIdentifier": config.merchantIdentifier,
           "displayName": config.merchantName,
-          "merchantCapabilities": ["3DS"],
+          "merchantCapabilities": ["3DS", "debit", "credit"],
           "supportedNetworks": config.supportedNetworks,
           "countryCode": config.countryCode,
-          "currencyCode": config.currencyCode
+          "currencyCode": config.currencyCode.toUpperCase(),
+          "requiredBillingContactFields": [],
+          "requiredShippingContactFields": []
         }
       };
 
@@ -196,6 +241,10 @@ class PaymentServiceImpl implements PaymentService {
       }
     } catch (error) {
       final paymentError = PaymentErrorHandler.handleStripeError(error);
+      // Check if this is a user cancellation
+      if (paymentError.type == PaymentErrorType.paymentCancelled) {
+        return const PaymentResult.cancelled();
+      }
       return PaymentResult.failure(
         errorMessage: paymentError.userFriendlyMessage,
         paymentIntentId: paymentIntent.id,
@@ -206,6 +255,8 @@ class PaymentServiceImpl implements PaymentService {
   Future<PaymentResult> _processGooglePayPayment(
       PaymentIntentModel paymentIntent) async {
     try {
+      AppLogger.d('PAYMENT_SERVICE', 'Starting Google Pay payment processing');
+
       // Get payment config to use dynamic Google Pay configuration
       final config = await getPaymentConfig();
       final publishableKey = Stripe.publishableKey;
@@ -240,6 +291,7 @@ class PaymentServiceImpl implements PaymentService {
       googlePayConfig['data']['transactionInfo']['currencyCode'] =
           paymentIntent.currency.toUpperCase();
 
+      // Create Pay instance for Google Pay
       final googlePayClient = Pay({
         PayProvider.google_pay: PaymentConfiguration.fromJsonString(
           jsonEncode(googlePayConfig),
@@ -248,7 +300,11 @@ class PaymentServiceImpl implements PaymentService {
 
       // Check if Google Pay is available
       final canPay = await googlePayClient.userCanPay(PayProvider.google_pay);
+      AppLogger.d('PAYMENT_SERVICE', 'Google Pay canPay result: $canPay');
+
       if (!canPay) {
+        AppLogger.d('PAYMENT_SERVICE',
+            'Google Pay not available, falling back to card payment');
         return await _processCardPayment(paymentIntent);
       }
 
@@ -261,11 +317,96 @@ class PaymentServiceImpl implements PaymentService {
         ),
       ];
 
-      // Present Google Pay
-      final result = await googlePayClient.showPaymentSelector(
+      AppLogger.d('PAYMENT_SERVICE',
+          'Payment items: ${paymentItems.map((item) => '${item.label}: ${item.amount}').join(', ')}');
+
+      // For Android, we need to use the event channel approach
+      if (Platform.isAndroid) {
+        return await _processGooglePayAndroid(
+            googlePayClient, paymentItems, paymentIntent);
+      } else {
+        // For other platforms, fall back to card payment
+        AppLogger.w(
+            'PAYMENT_SERVICE', 'Google Pay not supported on this platform');
+        return await _processCardPayment(paymentIntent);
+      }
+    } catch (error) {
+      AppLogger.e('PAYMENT_SERVICE', 'Google Pay payment failed: $error');
+
+      // Check if this is a user cancellation - don't fall back to card payment
+      final errorString = error.toString().toLowerCase();
+      if (errorString.contains('paymentcanceled') ||
+          errorString.contains('user canceled')) {
+        AppLogger.d('PAYMENT_SERVICE',
+            'User cancelled Google Pay - not falling back to card');
+        return const PaymentResult.cancelled();
+      }
+
+      // Check if this is a timeout error - don't fall back automatically to card payment
+      if (errorString.contains('timed out') ||
+          errorString.contains('timeout')) {
+        AppLogger.d('PAYMENT_SERVICE',
+            'Google Pay timed out - returning failure instead of fallback');
+        return PaymentResult.failure(
+          errorMessage: error.toString(),
+          paymentIntentId: paymentIntent.id,
+        );
+      }
+
+      // Fall back to card payment for other Google Pay errors (configuration issues, etc.)
+      AppLogger.d('PAYMENT_SERVICE',
+          'Falling back to card payment due to Google Pay error');
+      try {
+        return await _processCardPayment(paymentIntent);
+      } catch (fallbackError) {
+        AppLogger.e('PAYMENT_SERVICE',
+            'Card payment fallback also failed: $fallbackError');
+        return PaymentResult.failure(
+          errorMessage:
+              'Payment failed. Please try again or use a different payment method.',
+          paymentIntentId: paymentIntent.id,
+        );
+      }
+    }
+  }
+
+  Future<PaymentResult> _processGooglePayAndroid(Pay googlePayClient,
+      List<PaymentItem> paymentItems, PaymentIntentModel paymentIntent) async {
+    try {
+      // Set up the event channel for Android
+      _setupGooglePayEventChannel();
+
+      // Create a completer to wait for the payment result
+      _googlePayResultCompleter = Completer<Map<String, dynamic>?>();
+
+      AppLogger.d('PAYMENT_SERVICE',
+          'About to call showPaymentSelector for Android...');
+
+      // Initiate the payment process (doesn't return result directly on Android)
+      await googlePayClient.showPaymentSelector(
         PayProvider.google_pay,
         paymentItems,
       );
+
+      AppLogger.d('PAYMENT_SERVICE',
+          'Google Pay sheet initiated, waiting for result...');
+
+      // Wait for the result from the event channel with a reasonable timeout
+      final result = await _googlePayResultCompleter!.future.timeout(
+        const Duration(minutes: 5), // Increased timeout to 5 minutes
+        onTimeout: () {
+          AppLogger.e('PAYMENT_SERVICE',
+              'Google Pay payment timed out after 5 minutes');
+          throw Exception(
+              'Google Pay session timed out. Please try again or use card payment.');
+        },
+      );
+
+      AppLogger.d('PAYMENT_SERVICE', 'Received Google Pay result: $result');
+
+      if (result == null) {
+        throw Exception('Google Pay payment was cancelled or failed');
+      }
 
       // Extract token from result
       final token = result['paymentMethodData']['tokenizationData']['token'];
@@ -324,18 +465,12 @@ class PaymentServiceImpl implements PaymentService {
         );
       }
     } catch (error) {
-      // If Google Pay fails due to configuration issues, fall back to card payment
-      if (error.toString().contains('OR_BIBED') ||
-          error.toString().contains('merchant') ||
-          error.toString().contains('configuration')) {
-        final cardPaymentIntent = await _createCardPaymentIntent(paymentIntent);
-        return await _processCardPayment(cardPaymentIntent);
-      }
-
-      return PaymentResult.failure(
-        errorMessage: 'Google Pay payment failed: ${error.toString()}',
-        paymentIntentId: paymentIntent.id,
-      );
+      AppLogger.e(
+          'PAYMENT_SERVICE', 'Google Pay Android processing failed: $error');
+      rethrow; // Let the caller handle the fallback
+    } finally {
+      // Clean up the completer
+      _googlePayResultCompleter = null;
     }
   }
 
@@ -351,12 +486,13 @@ class PaymentServiceImpl implements PaymentService {
           'Apple Pay config loaded: merchant=${config.merchantIdentifier}, country=${config.countryCode}');
 
       // For flutter_stripe with Apple Pay, we need to use the native iOS SDK approach
-      // Initialize Apple Pay with dynamic config
-      final applePayClient = Pay({
+      // Initialize Apple Pay with dynamic config using singleton
+      _applePayClient ??= Pay({
         PayProvider.apple_pay: PaymentConfiguration.fromJsonString(
           jsonEncode(_getApplePayConfig(config)),
         ),
       });
+      final applePayClient = _applePayClient!;
 
       // Check if Apple Pay is available
       final canPay = await applePayClient.userCanPay(PayProvider.apple_pay);
@@ -369,19 +505,55 @@ class PaymentServiceImpl implements PaymentService {
       }
 
       // Create payment request
+      final amountInDollars = paymentIntent.amount / 100;
+      final amountString = amountInDollars.toStringAsFixed(2);
+
+      AppLogger.d('PAYMENT_SERVICE',
+          'Payment intent amount (cents): ${paymentIntent.amount}');
+      AppLogger.d('PAYMENT_SERVICE',
+          'Payment intent amount (dollars): $amountInDollars');
+      AppLogger.d('PAYMENT_SERVICE',
+          'Payment intent currency: ${paymentIntent.currency}');
+      AppLogger.d(
+          'PAYMENT_SERVICE', 'Amount string for Apple Pay: $amountString');
+
+      // Validate amount
+      if (amountInDollars <= 0) {
+        AppLogger.e(
+            'PAYMENT_SERVICE', 'Invalid payment amount: $amountInDollars');
+        throw Exception('Invalid payment amount');
+      }
+
       final paymentItems = [
         PaymentItem(
           label: 'Donation',
-          amount: (paymentIntent.amount / 100).toString(),
+          amount: amountString,
           status: PaymentItemStatus.final_price,
         ),
       ];
 
+      AppLogger.d('PAYMENT_SERVICE',
+          'Payment items: ${paymentItems.map((item) => '${item.label}: ${item.amount}').join(', ')}');
+
       // Present Apple Pay
-      final result = await applePayClient.showPaymentSelector(
-        PayProvider.apple_pay,
-        paymentItems,
-      );
+      AppLogger.d('PAYMENT_SERVICE', 'Presenting Apple Pay sheet...');
+      Map<String, dynamic> result;
+      try {
+        result = await applePayClient.showPaymentSelector(
+          PayProvider.apple_pay,
+          paymentItems,
+        );
+        AppLogger.d(
+            'PAYMENT_SERVICE', 'Apple Pay sheet presented successfully');
+      } catch (presentationError) {
+        AppLogger.e('PAYMENT_SERVICE',
+            'Failed to present Apple Pay sheet: $presentationError');
+        AppLogger.e(
+            'PAYMENT_SERVICE', 'Error type: ${presentationError.runtimeType}');
+        AppLogger.e('PAYMENT_SERVICE',
+            'Error details: ${presentationError.toString()}');
+        rethrow;
+      }
 
       // Extract token from Apple Pay result
       // The result contains the payment data that needs to be processed
@@ -444,6 +616,15 @@ class PaymentServiceImpl implements PaymentService {
         );
       }
     } catch (error) {
+      // Check if this is a user cancellation - don't fall back to card payment
+      final errorString = error.toString().toLowerCase();
+      if (errorString.contains('cancelled') ||
+          errorString.contains('user canceled')) {
+        AppLogger.d('PAYMENT_SERVICE',
+            'User cancelled Apple Pay - not falling back to card');
+        return const PaymentResult.cancelled();
+      }
+
       // If Apple Pay fails due to configuration issues, fall back to card payment
       if (error.toString().contains('merchant') ||
           error.toString().contains('configuration') ||
@@ -576,13 +757,14 @@ class PaymentServiceImpl implements PaymentService {
         return false;
       }
 
-      final googlePayClient = Pay({
+      // Create a temporary Pay instance for availability check
+      final payClient = Pay({
         PayProvider.google_pay: PaymentConfiguration.fromJsonString(
           jsonEncode(config),
         ),
       });
 
-      final canPay = await googlePayClient.userCanPay(PayProvider.google_pay);
+      final canPay = await payClient.userCanPay(PayProvider.google_pay);
       AppLogger.d('PAYMENT_SERVICE', 'Google Pay available: $canPay');
 
       return canPay;
@@ -600,20 +782,65 @@ class PaymentServiceImpl implements PaymentService {
 
       AppLogger.d('PAYMENT_SERVICE',
           'Checking Apple Pay availability with merchant ID: ${config.merchantIdentifier}');
+      AppLogger.d('PAYMENT_SERVICE', 'Merchant name: ${config.merchantName}');
+      AppLogger.d('PAYMENT_SERVICE', 'Country code: ${config.countryCode}');
+      AppLogger.d('PAYMENT_SERVICE', 'Currency code: ${config.currencyCode}');
+      AppLogger.d(
+          'PAYMENT_SERVICE', 'Supported networks: ${config.supportedNetworks}');
 
-      final applePayClient = Pay({
+      final applePayConfig = _getApplePayConfig(config);
+      AppLogger.d(
+          'PAYMENT_SERVICE', 'Apple Pay config: ${jsonEncode(applePayConfig)}');
+
+      // Use singleton Apple Pay client to avoid event channel conflicts
+      _applePayClient ??= Pay({
         PayProvider.apple_pay: PaymentConfiguration.fromJsonString(
-          jsonEncode(_getApplePayConfig(config)),
+          jsonEncode(applePayConfig),
         ),
       });
+      final applePayClient = _applePayClient!;
 
-      final canPay = await applePayClient.userCanPay(PayProvider.apple_pay);
-      AppLogger.d('PAYMENT_SERVICE', 'Apple Pay available: $canPay');
+      AppLogger.d('PAYMENT_SERVICE', 'Calling userCanPay for Apple Pay...');
+
+      bool canPay = false;
+      try {
+        canPay = await applePayClient.userCanPay(PayProvider.apple_pay);
+        AppLogger.d('PAYMENT_SERVICE', 'Apple Pay canPay result: $canPay');
+      } catch (userCanPayError) {
+        AppLogger.e(
+            'PAYMENT_SERVICE', 'userCanPay threw an error: $userCanPayError');
+        AppLogger.e(
+            'PAYMENT_SERVICE', 'Error type: ${userCanPayError.runtimeType}');
+        canPay = false;
+      }
+
+      // Additional debugging for iOS-specific issues
+      if (!canPay) {
+        AppLogger.d(
+            'PAYMENT_SERVICE', 'Apple Pay not available - possible reasons:');
+        AppLogger.d('PAYMENT_SERVICE',
+            '1. Merchant ID not registered in Apple Developer Portal');
+        AppLogger.d(
+            'PAYMENT_SERVICE', '2. Apple Pay capability not enabled in Xcode');
+        AppLogger.d('PAYMENT_SERVICE',
+            '3. Device/simulator does not support Apple Pay');
+        AppLogger.d(
+            'PAYMENT_SERVICE', '4. User region does not support Apple Pay');
+        AppLogger.d('PAYMENT_SERVICE', '5. Apple Pay not set up on device');
+
+        // Additional device info
+        AppLogger.d('PAYMENT_SERVICE', 'Device info:');
+        AppLogger.d(
+            'PAYMENT_SERVICE', '- Platform: ${Platform.operatingSystem}');
+        AppLogger.d('PAYMENT_SERVICE',
+            '- Is simulator: ${Platform.isIOS && !Platform.isAndroid}');
+      }
 
       return canPay;
     } catch (error) {
       AppLogger.e(
           'PAYMENT_SERVICE', 'Error checking Apple Pay availability', error);
+      AppLogger.e('PAYMENT_SERVICE', 'Error details: ${error.toString()}');
       return false;
     }
   }
