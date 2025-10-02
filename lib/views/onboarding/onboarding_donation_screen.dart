@@ -106,25 +106,16 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
               ),
               Column(
                 children: [
-                  _buildActionButton(
-                    text: isDonor
-                        ? AppLocalizations.of(context)!.donationContinue
-                        : AppLocalizations.of(context)!.donateNow,
-                    onPressed: isDonor
-                        ? _handleNextAction
-                        : () => _handleDonationAction(context, true),
+                 if(!isDonor) _buildActionButton(
+                    text: AppLocalizations.of(context)!.next,
+                    onPressed: () => _handleDonationAction(context, true),
                   ),
-                  if (!isDonor) ...[
+                  if (isDonor) ...[
                     const SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
                       child: TextButton(
                         onPressed: () async {
-                          // Log analytics event for no thanks tap
-                          await FirebaseAnalyticsService().logEvent(
-                            name: FirebaseAnalyticsService
-                                .eventOnboardingDonateNoThanksTap,
-                          );
                           _handleNextAction();
                         },
                         style: TextButton.styleFrom(
@@ -133,7 +124,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                           ),
                         ),
                         child: Text(
-                          AppLocalizations.of(context)!.noThanks,
+                          AppLocalizations.of(context)!.next,
                           style: const TextStyle(
                             color: ColorConstants.lightPurple,
                             fontSize: 16,

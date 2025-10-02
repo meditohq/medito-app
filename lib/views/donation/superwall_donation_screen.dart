@@ -363,15 +363,6 @@ class _SuperwallDonationScreenState
     // The actual paywall will appear as a full-screen overlay
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        elevation: 0,
-        automaticallyImplyLeading: true, // Allow back navigation while loading
-        title: Text(
-          AppLocalizations.of(context)!.donateToMedito,
-          style: Theme.of(context).textTheme.displayLarge,
-        ),
-      ),
       body: SafeArea(
         child: Center(
           child: Column(

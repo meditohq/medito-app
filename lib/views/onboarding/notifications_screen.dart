@@ -174,7 +174,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   else
                     _buildActionButton(
                       text:
-                          AppLocalizations.of(context)!.enableNotificationsCta,
+                          AppLocalizations.of(context)!.setReminder,
                       onPressed:
                           _isProcessing ? null : _handleNotificationsPermission,
                     ),
