@@ -125,12 +125,12 @@ class HTTPConstants {
   static const String donate = 'donations/asks?random=true';
 
   // STRIPE PAYMENT ENDPOINTS (using donation service)
-  static const String paymentConfig = 'api/config';
-  static const String createPaymentIntent = 'api/payment-intents';
-  static const String confirmPaymentIntent = 'api/payment-intents/confirm';
-  static const String createPaymentMethod = 'api/payment-methods';
+  static const String paymentConfig = 'config';
+  static const String createPaymentIntent = 'payment-intents';
+  static const String confirmPaymentIntent = 'payment-intents/confirm';
+  static const String createPaymentMethod = 'payment-methods';
   static String getPaymentIntentStatus(String id) =>
-      'api/payment-intents/status?id=$id';
+      'payment-intents/status?id=$id';
 }
 
 // Auth response models

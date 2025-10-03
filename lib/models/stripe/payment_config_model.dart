@@ -24,6 +24,7 @@ abstract class PaymentPricing with _$PaymentPricing {
   const factory PaymentPricing({
     required List<int> oneTime,
     required List<int> monthly,
+    required List<int> yearly,
     required String currency,
     required String country,
     required SuggestedPricing suggested,
@@ -38,6 +39,7 @@ abstract class SuggestedPricing with _$SuggestedPricing {
   const factory SuggestedPricing({
     required int oneTime,
     required int monthly,
+    required int yearly,
   }) = _SuggestedPricing;
 
   factory SuggestedPricing.fromJson(Map<String, Object?> json) =>
