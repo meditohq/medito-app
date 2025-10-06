@@ -241,6 +241,38 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
       actionType = 'One-time donation suggested';
       handled = true;
     }
+    // Yearly donation actions
+    else if (name == StringConstants.yearly1) {
+      amount = _getAmountForAction(name);
+      isRecurring = true;
+      actionType = 'Yearly donation 1';
+      handled = true;
+    } else if (name == StringConstants.yearly2) {
+      amount = _getAmountForAction(name);
+      isRecurring = true;
+      actionType = 'Yearly donation 2';
+      handled = true;
+    } else if (name == StringConstants.yearly3) {
+      amount = _getAmountForAction(name);
+      isRecurring = true;
+      actionType = 'Yearly donation 3';
+      handled = true;
+    } else if (name == StringConstants.yearly4) {
+      amount = _getAmountForAction(name);
+      isRecurring = true;
+      actionType = 'Yearly donation 4';
+      handled = true;
+    } else if (name == StringConstants.yearly5) {
+      amount = _getAmountForAction(name);
+      isRecurring = true;
+      actionType = 'Yearly donation 5';
+      handled = true;
+    } else if (name == StringConstants.yearlySuggested) {
+      amount = _getAmountForAction(name);
+      isRecurring = true;
+      actionType = 'Yearly donation suggested';
+      handled = true;
+    }
 
     if (handled) {
       AppLogger.d('SUPERWALL_DELEGATE', 'Custom paywall action: $name');
@@ -269,6 +301,9 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
     if (action == StringConstants.onetimeSuggested) {
       return pricing.suggested.oneTime;
     }
+    if (action == StringConstants.yearlySuggested) {
+      return pricing.suggested.yearly;
+    }
 
     // Handle numbered actions (monthly1, onetime3, etc.)
     final numberMatch = RegExp(r'\d+').firstMatch(action);
@@ -278,7 +313,12 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
     final index = actionNumber - 1;
 
     final isMonthly = action.startsWith('monthly');
-    final amounts = isMonthly ? pricing.monthly : pricing.oneTime;
+    final isYearly = action.startsWith('yearly');
+    final amounts = isMonthly
+        ? pricing.monthly
+        : isYearly
+            ? pricing.yearly
+            : pricing.oneTime;
 
     if (index >= 0 && index < amounts.length) {
       return amounts[index];

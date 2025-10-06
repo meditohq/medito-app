@@ -37,6 +37,14 @@ class StringConstants {
   static const String onetime5 = 'onetime_5';
   static const String onetimeSuggested = 'one_time_suggested';
 
+  // Paywall action names for yearly donations
+  static const String yearly1 = 'yearly_1';
+  static const String yearly2 = 'yearly_2';
+  static const String yearly3 = 'yearly_3';
+  static const String yearly4 = 'yearly_4';
+  static const String yearly5 = 'yearly_5';
+  static const String yearlySuggested = 'yearly_suggested';
+
   // User attribute keys for Superwall
   static const String currency = 'currency';
   static const String currencySymbol = 'currency_symbol';

@@ -235,9 +235,21 @@ class SuperwallConfig {
             pricing.monthly.length > 3 ? pricing.monthly[3] : 0,
         StringConstants.monthly5:
             pricing.monthly.length > 4 ? pricing.monthly[4] : 0,
+        // Yearly pricing
+        StringConstants.yearly1:
+            pricing.yearly.isNotEmpty ? pricing.yearly[0] : 0,
+        StringConstants.yearly2:
+            pricing.yearly.length > 1 ? pricing.yearly[1] : 0,
+        StringConstants.yearly3:
+            pricing.yearly.length > 2 ? pricing.yearly[2] : 0,
+        StringConstants.yearly4:
+            pricing.yearly.length > 3 ? pricing.yearly[3] : 0,
+        StringConstants.yearly5:
+            pricing.yearly.length > 4 ? pricing.yearly[4] : 0,
         // Suggested amounts
         StringConstants.monthlySuggested: pricing.suggested.monthly,
         StringConstants.onetimeSuggested: pricing.suggested.oneTime,
+        StringConstants.yearlySuggested: pricing.suggested.yearly,
       };
 
       AppLogger.d('SUPERWALL_CONFIG',

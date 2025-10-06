@@ -29,7 +29,17 @@ abstract class PaymentIntentModel with _$PaymentIntentModel {
         jsonWithId['id'] = jsonWithId['subscriptionId'];
       }
     }
-    return _$PaymentIntentModelFromJson(jsonWithId);
+    return _PaymentIntentModel(
+      id: jsonWithId['id'] as String,
+      clientSecret: jsonWithId['clientSecret'] as String,
+      status: jsonWithId['status'] as String,
+      amount: jsonWithId['amount'] as int,
+      currency: jsonWithId['currency'] as String,
+      paymentMethodId: jsonWithId['paymentMethodId'] as String?,
+      lastPaymentError: jsonWithId['lastPaymentError'] as String?,
+      subscriptionId: jsonWithId['subscriptionId'] as String?,
+      interval: jsonWithId['interval'] as String?,
+    );
   }
 }
 
