@@ -3,13 +3,13 @@ description: A meditation learning tool
 
 # Build and deploy/upload commands:
 # Check version, then build & deploy/upload both platforms:
-# ./build_and_deploy_all.sh
+# ./build_all.sh
 #
 # Build and upload iOS only:
-# ./build_and_upload_ios.sh
+# ./build_ios.sh
 #
-# Build and deploy Android only:
-# ./build_and_deploy_android.sh
+# Build and run Android on device:
+# ./build_android.sh
 #
 # Just build Android APK (used by the script above):
 # ./build_apk.sh

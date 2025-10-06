@@ -68,7 +68,7 @@ fi
 echo ""
 print_colored $BLUE "📋 Quick Reference:"
 print_colored $BLUE "==================="
-echo "• Use build_and_deploy_all.sh for all builds"
+echo "• Use build_all.sh for all builds"
 echo "• Script will ask you to choose: Live or Dev paywalls"
 echo "• Dev paywalls are safe for TestFlight and Play Store Internal Testing"
 echo "• Live paywalls are safe for production deployment"
