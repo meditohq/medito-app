@@ -13,7 +13,7 @@ import 'package:medito/widgets/network_image_widget.dart';
 
 const _kAutoScrollDelay = Duration(seconds: 10);
 const _kScrollAnimationDuration = Duration(milliseconds: 500);
-const _kCardBorderRadius = 30.0;
+const _kCardBorderRadius = 24.0;
 const _kCardAspectRatio = 16 / 9;
 const _kButtonHeight = 48.0;
 const _kBannerFontSize = 14.0;
@@ -133,6 +133,9 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
               );
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(_kCardBorderRadius),
+              ),
               margin: EdgeInsets.zero,
               color: Theme.of(context).cardColor,
               child: ClipRRect(
