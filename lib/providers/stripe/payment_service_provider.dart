@@ -29,7 +29,6 @@ abstract class PaymentService {
     PaymentIntentModel paymentIntent,
     custom_models.PaymentMethodType paymentMethod,
   );
-  Future<String> createPaymentMethod(String type, String token);
   Future<PaymentIntentModel> confirmPaymentIntent(
     String paymentIntentId,
     String paymentMethodId,
@@ -124,6 +123,34 @@ class PaymentServiceImpl implements PaymentService {
     }
   };
 
+  // Check if we're running in production environment
+  static bool get _isProductionEnvironment {
+    // Check multiple indicators for production
+    final isReleaseMode = kReleaseMode;
+    final isProfileMode = kProfileMode;
+    final isDebugMode = kDebugMode;
+
+    // If explicitly in release mode, consider it production
+    if (isReleaseMode) return true;
+
+    // If in profile mode, check environment variables
+    if (isProfileMode) {
+      final env = const String.fromEnvironment('ENVIRONMENT', defaultValue: '');
+      return env.toLowerCase() == 'production';
+    }
+
+    // For debug mode, check if we're using prod config
+    if (isDebugMode) {
+      final env = const String.fromEnvironment('ENVIRONMENT', defaultValue: '');
+      final paywallEnv =
+          const String.fromEnvironment('PAYWALL_ENV', defaultValue: '');
+      return env.toLowerCase() == 'production' ||
+          paywallEnv.toLowerCase() == 'live';
+    }
+
+    return false;
+  }
+
   // Helper method to create deep copy of nested maps
   static Map<String, dynamic> _deepCopyMap(Map<String, dynamic> original) {
     final copy = <String, dynamic>{};
@@ -170,14 +197,26 @@ class PaymentServiceImpl implements PaymentService {
   @override
   Future<PaymentConfigModel> getPaymentConfig() async {
     try {
+      AppLogger.d('PAYMENT_SERVICE', 'Fetching payment config...');
       final response =
           await donationClient.getRequest(HTTPConstants.paymentConfig);
-      final config =
-          PaymentConfigModel.fromJson(response['data'] as Map<String, dynamic>);
+      AppLogger.d('PAYMENT_SERVICE', 'Payment config response: $response');
+      final data = response['data'];
+      AppLogger.d('PAYMENT_SERVICE', 'Payment config data: $data');
+      if (data == null) {
+        AppLogger.e('PAYMENT_SERVICE', 'Payment config data is null');
+        throw const ServerError();
+      }
+      final config = PaymentConfigModel.fromJson(data as Map<String, dynamic>);
 
       // Initialize Stripe with the publishable key and merchant identifier from config
       Stripe.publishableKey = config.publishableKey;
       Stripe.merchantIdentifier = config.merchantIdentifier;
+
+      // Log the publishable key type for debugging (remove sensitive info)
+      final keyType =
+          config.publishableKey.startsWith('pk_live_') ? 'LIVE' : 'TEST';
+      AppLogger.d('PAYMENT_SERVICE', 'Stripe key type: $keyType');
 
       // Apply settings after setting the publishable key and merchant identifier
       await Stripe.instance.applySettings();
@@ -206,15 +245,23 @@ class PaymentServiceImpl implements PaymentService {
         'metadata': request.metadata ?? {},
       };
 
+      AppLogger.d('PAYMENT_SERVICE',
+          'Creating payment intent with request: $backendRequest');
       final response = await donationClient.postRequest(
         HTTPConstants.createPaymentIntent,
         body: backendRequest,
       );
+      AppLogger.d('PAYMENT_SERVICE', 'Payment intent response: $response');
 
       // The backend returns data wrapped in a 'data' field
-      final data = response['data'] as Map<String, dynamic>;
+      final data = response['data'];
+      AppLogger.d('PAYMENT_SERVICE', 'Payment intent data: $data');
+      if (data == null) {
+        AppLogger.e('PAYMENT_SERVICE', 'Payment intent data is null');
+        throw const ServerError();
+      }
 
-      return PaymentIntentModel.fromJson(data);
+      return PaymentIntentModel.fromJson(data as Map<String, dynamic>);
     } catch (error) {
       if (error is AppError) {
         rethrow;
@@ -266,10 +313,12 @@ class PaymentServiceImpl implements PaymentService {
 
       // Initialize Google Pay with correct Stripe configuration
       final googlePayConfig = _deepCopyMap(_googlePayConfig);
-      final isDebugMode = kDebugMode;
+      final isProduction = _isProductionEnvironment;
+      final googlePayEnvironment = isProduction ? "PRODUCTION" : "TEST";
 
-      googlePayConfig['data']['environment'] =
-          isDebugMode ? "TEST" : "PRODUCTION";
+      googlePayConfig['data']['environment'] = googlePayEnvironment;
+      AppLogger.d('PAYMENT_SERVICE',
+          'Google Pay environment: $googlePayEnvironment (isProduction: $isProduction, kReleaseMode: $kReleaseMode, kDebugMode: $kDebugMode)');
 
       // Use merchant identifier from config if available
       if (config.merchantIdentifier.isNotEmpty) {
@@ -277,7 +326,7 @@ class PaymentServiceImpl implements PaymentService {
             config.merchantIdentifier;
         AppLogger.d('PAYMENT_SERVICE',
             'Using merchant ID: ${config.merchantIdentifier}');
-      } else if (!isDebugMode) {
+      } else if (isProduction) {
         AppLogger.w('PAYMENT_SERVICE',
             'Google Pay production mode requires valid merchant ID. Falling back to card payment.');
         return await _processCardPayment(paymentIntent);
@@ -409,7 +458,18 @@ class PaymentServiceImpl implements PaymentService {
       }
 
       // Extract token from result
-      final token = result['paymentMethodData']['tokenizationData']['token'];
+      final paymentData = result['paymentMethodData'];
+      if (paymentData == null) {
+        throw Exception('Google Pay payment was cancelled or failed');
+      }
+      final tokenizationData = paymentData['tokenizationData'];
+      if (tokenizationData == null) {
+        throw Exception('Invalid Google Pay tokenization data');
+      }
+      final token = tokenizationData['token'];
+      if (token == null || token is! String) {
+        throw Exception('Invalid Google Pay token');
+      }
       final tokenJson = Map.castFrom(jsonDecode(token));
 
       // Confirm payment using Stripe
@@ -545,6 +605,7 @@ class PaymentServiceImpl implements PaymentService {
         );
         AppLogger.d(
             'PAYMENT_SERVICE', 'Apple Pay sheet presented successfully');
+        AppLogger.d('PAYMENT_SERVICE', 'Apple Pay result: $result');
       } catch (presentationError) {
         AppLogger.e('PAYMENT_SERVICE',
             'Failed to present Apple Pay sheet: $presentationError');
@@ -557,65 +618,60 @@ class PaymentServiceImpl implements PaymentService {
 
       // Extract token from Apple Pay result
       // The result contains the payment data that needs to be processed
-      final paymentData = result['paymentMethodData'] as Map<String, dynamic>;
-      final tokenizationData =
-          paymentData['tokenizationData'] as Map<String, dynamic>;
-      final token = tokenizationData['token'] as String;
+      AppLogger.d(
+          'PAYMENT_SERVICE', 'Extracting token from Apple Pay result...');
+      final token = result['token'];
+      AppLogger.d('PAYMENT_SERVICE',
+          'Token extracted: ${token != null ? 'present' : 'null'}, type: ${token?.runtimeType}');
+      if (token == null) {
+        AppLogger.e('PAYMENT_SERVICE', 'Apple Pay token is null');
+        throw Exception('Apple Pay payment was cancelled or failed');
+      }
 
-      // Decode the token to get the payment method data
-      final tokenJson = jsonDecode(token) as Map<String, dynamic>;
+      // Log the raw token for debugging
+      AppLogger.d('PAYMENT_SERVICE', 'Raw Apple Pay token: $token');
 
-      // Confirm payment using Stripe
-      final paymentIntentResult = await Stripe.instance.confirmPayment(
-        paymentIntentClientSecret: paymentIntent.clientSecret,
-        data: PaymentMethodParams.cardFromToken(
-          paymentMethodData: PaymentMethodDataCardFromToken(
-            token: tokenJson['id'],
-          ),
-        ),
+      // For Apple Pay, use Stripe SDK directly since backend doesn't handle Apple Pay tokens
+      AppLogger.d('PAYMENT_SERVICE',
+          'Creating Apple Pay payment method and confirming...');
+
+      // Handle the Apple Pay token - the Pay plugin returns it as a Map
+      final Map<String, dynamic> tokenJson;
+      if (token is Map<String, dynamic>) {
+        tokenJson = token;
+        AppLogger.d(
+            'PAYMENT_SERVICE', 'Token was already a Map, using directly');
+      } else if (token is String) {
+        tokenJson = jsonDecode(token);
+        AppLogger.d('PAYMENT_SERVICE', 'Token was a String, parsed to Map');
+      } else {
+        AppLogger.e('PAYMENT_SERVICE',
+            'Invalid Apple Pay token type: ${token.runtimeType}');
+        throw Exception('Invalid Apple Pay token format');
+      }
+
+      AppLogger.d('PAYMENT_SERVICE', 'Parsed tokenJson: $tokenJson');
+
+      // For Apple Pay, extract the data field which contains the encrypted payment data
+      final applePayData = tokenJson['data'] as String;
+
+      // Use server-side confirmation for Apple Pay tokens
+      // Send the encrypted data directly (backend should create token from this)
+      await confirmPaymentIntentWithToken(
+        paymentIntent.id,
+        'apple_pay',
+        applePayData, // Pass the encrypted data string directly
       );
 
-      // Check if payment succeeded
-      final statusString = paymentIntentResult.status.toString().toLowerCase();
-      final isSuccess = statusString == 'paymentintentsstatus.succeeded' ||
-          statusString == 'succeeded' ||
-          paymentIntentResult.status == PaymentIntentsStatus.Succeeded;
-
-      if (isSuccess) {
-        try {
-          // For recurring payments, extract payment intent ID from client secret
-          final paymentIntentIdForConfirm = paymentIntent.subscriptionId != null
-              ? paymentIntent.clientSecret.split('_secret_')[0]
-              : paymentIntent.id;
-
-          await confirmPaymentIntentWithToken(
-            paymentIntentIdForConfirm,
-            'apple_pay',
-            token,
-          );
-
-          return PaymentResult.success(
-            paymentIntentId: paymentIntent.id,
-            amount: paymentIntent.amount,
-            currency: paymentIntent.currency,
-          );
-        } catch (_) {
-          // Payment succeeded with Stripe but backend confirmation failed
-          // Still return success since the payment went through
-          return PaymentResult.success(
-            paymentIntentId: paymentIntent.id,
-            amount: paymentIntent.amount,
-            currency: paymentIntent.currency,
-          );
-        }
-      } else {
-        return PaymentResult.failure(
-          errorMessage:
-              'Apple Pay payment failed with status: ${paymentIntentResult.status}',
-          paymentIntentId: paymentIntent.id,
-        );
-      }
+      // If we reach here, the payment was successful
+      return PaymentResult.success(
+        paymentIntentId: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+      );
     } catch (error) {
+      AppLogger.e('PAYMENT_SERVICE', 'Apple Pay confirmation failed: $error');
+      AppLogger.e('PAYMENT_SERVICE', 'Error type: ${error.runtimeType}');
       // Check if this is a user cancellation - don't fall back to card payment
       final errorString = error.toString().toLowerCase();
       if (errorString.contains('cancelled') ||
@@ -735,12 +791,12 @@ class PaymentServiceImpl implements PaymentService {
       // Get payment config to use dynamic Google Pay configuration
       final paymentConfig = await getPaymentConfig();
       final config = _deepCopyMap(_googlePayConfig);
-      final isDebugMode = kDebugMode;
+      final isProduction = _isProductionEnvironment;
 
       AppLogger.d('PAYMENT_SERVICE',
           'Checking Google Pay availability with merchant ID: ${paymentConfig.merchantIdentifier}');
 
-      config['data']['environment'] = isDebugMode ? "TEST" : "PRODUCTION";
+      config['data']['environment'] = isProduction ? "PRODUCTION" : "TEST";
       config['data']['transactionInfo']['totalPriceStatus'] =
           "NOT_CURRENTLY_KNOWN";
       config['data']['transactionInfo']['currencyCode'] = "USD";
@@ -751,7 +807,7 @@ class PaymentServiceImpl implements PaymentService {
             paymentConfig.merchantIdentifier;
         AppLogger.d('PAYMENT_SERVICE',
             'Using merchant ID for availability check: ${paymentConfig.merchantIdentifier}');
-      } else if (!isDebugMode) {
+      } else if (isProduction) {
         AppLogger.d('PAYMENT_SERVICE',
             'Google Pay not available in production without valid merchant ID');
         return false;
@@ -860,25 +916,6 @@ class PaymentServiceImpl implements PaymentService {
   }
 
   @override
-  Future<String> createPaymentMethod(String type, String token) async {
-    try {
-      final response = await donationClient.postRequest(
-        HTTPConstants.createPaymentMethod,
-        body: {
-          'type': type,
-          'token': token,
-        },
-      );
-      return response['data']['paymentMethodId'] as String;
-    } catch (error) {
-      if (error is AppError) {
-        rethrow;
-      }
-      throw const ServerError();
-    }
-  }
-
-  @override
   Future<PaymentIntentModel> confirmPaymentIntent(
     String paymentIntentId,
     String paymentMethodId,
@@ -908,6 +945,13 @@ class PaymentServiceImpl implements PaymentService {
     dynamic token,
   ) async {
     try {
+      AppLogger.d('PAYMENT_SERVICE', 'Confirming payment intent with token...');
+      AppLogger.d('PAYMENT_SERVICE',
+          'Token received: type=${token.runtimeType}, length=${token.toString().length}');
+      final tokenString = token.toString();
+      AppLogger.d('PAYMENT_SERVICE',
+          'Token preview: ${tokenString.length > 100 ? tokenString.substring(0, 100) + "..." : tokenString}');
+
       final requestBody = {
         'paymentIntentId': paymentIntentId,
         'paymentMethod': {
@@ -916,10 +960,20 @@ class PaymentServiceImpl implements PaymentService {
         },
       };
 
+      AppLogger.d(
+          'PAYMENT_SERVICE', 'Confirm payment request body: $requestBody');
+      final paymentMethod =
+          requestBody['paymentMethod'] as Map<String, dynamic>;
+      AppLogger.d('PAYMENT_SERVICE',
+          'Request body paymentMethod token: type=${paymentMethod['token'].runtimeType}');
+      final tokenPreview = paymentMethod['token'].toString();
+      AppLogger.d('PAYMENT_SERVICE',
+          'Request body paymentMethod token preview: ${tokenPreview.length > 100 ? tokenPreview.substring(0, 100) + "..." : tokenPreview}');
       final response = await donationClient.postRequest(
         HTTPConstants.confirmPaymentIntent,
         body: requestBody,
       );
+      AppLogger.d('PAYMENT_SERVICE', 'Confirm payment response: $response');
 
       // Validate that the confirmation was successful
       if (response['success'] != true) {
@@ -928,9 +982,13 @@ class PaymentServiceImpl implements PaymentService {
 
       final data = response['data'];
       if (data == null || data['status'] != 'succeeded') {
+        AppLogger.e('PAYMENT_SERVICE',
+            'Payment confirmation failed: data=$data, status=${data?['status']}');
         throw const ServerError();
       }
     } catch (error) {
+      AppLogger.e(
+          'PAYMENT_SERVICE', 'Error in confirmPaymentIntentWithToken: $error');
       if (error is AppError) {
         rethrow;
       }
@@ -958,6 +1016,8 @@ class PaymentServiceImpl implements PaymentService {
   Future<void> confirmDonation(
       String paymentIntentId, DonationData donationData) async {
     try {
+      AppLogger.d('PAYMENT_SERVICE',
+          'Confirming donation for payment intent: $paymentIntentId');
       final metadataObject = {
         'paymentMethod': donationData.paymentMethod.toLowerCase(),
         'token': 'CARD_PAYMENT_COMPLETED', // Placeholder for card payments
@@ -968,10 +1028,13 @@ class PaymentServiceImpl implements PaymentService {
         'metadata': jsonEncode(metadataObject),
       };
 
-      await donationClient.postRequest(
+      AppLogger.d(
+          'PAYMENT_SERVICE', 'Confirm donation request body: $requestBody');
+      final response = await donationClient.postRequest(
         HTTPConstants.confirmPaymentIntent,
         body: requestBody,
       );
+      AppLogger.d('PAYMENT_SERVICE', 'Confirm donation response: $response');
     } catch (error) {
       if (error is AppError) {
         rethrow;
@@ -1003,16 +1066,6 @@ Future<PaymentIntentModel> createPaymentIntent(
 ) {
   final service = ref.watch(paymentServiceProvider);
   return service.createPaymentIntent(request);
-}
-
-@riverpod
-Future<String> createPaymentMethod(
-  Ref ref,
-  String type,
-  String token,
-) {
-  final service = ref.watch(paymentServiceProvider);
-  return service.createPaymentMethod(type, token);
 }
 
 @riverpod

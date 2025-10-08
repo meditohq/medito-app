@@ -23,7 +23,6 @@ abstract class IDonationApiService {
 /// Separate from the main HttpApiService to keep donation concerns isolated
 class DonationApiService implements IDonationApiService {
   static DonationApiService? _instance;
-  final _client = HttpClient();
   final _headers = <String, String>{};
 
   factory DonationApiService() {
@@ -35,7 +34,6 @@ class DonationApiService implements IDonationApiService {
     AppLogger.d('DONATION_API', 'Creating new DonationApiService instance');
     AppLogger.d('DONATION_API', 'Donation base URL: $donationBaseUrl');
     AppLogger.d('DONATION_API', 'Donation token: $donationToken');
-    _client.connectionTimeout = const Duration(seconds: 30);
     _initializeHeaders();
   }
 
@@ -51,7 +49,12 @@ class DonationApiService implements IDonationApiService {
     Map<String, dynamic>? queryParams,
   }) async =>
       _handleRequest(
-        () async => _client.getUrl(_buildUri(path, queryParams)),
+        () async {
+          final client = HttpClient();
+          client.connectionTimeout = const Duration(seconds: 30);
+          final request = await client.getUrl(_buildUri(path, queryParams));
+          return (request, client);
+        },
       );
 
   @override
@@ -60,7 +63,12 @@ class DonationApiService implements IDonationApiService {
     dynamic body,
   }) async =>
       _handleRequest(
-        () async => _client.postUrl(_buildUri(path)),
+        () async {
+          final client = HttpClient();
+          client.connectionTimeout = const Duration(seconds: 30);
+          final request = await client.postUrl(_buildUri(path));
+          return (request, client);
+        },
         body: body,
       );
 
@@ -73,13 +81,16 @@ class DonationApiService implements IDonationApiService {
   }
 
   Future<Map<String, dynamic>> _handleRequest(
-    Future<HttpClientRequest> Function() requestBuilder, {
+    Future<(HttpClientRequest, HttpClient)> Function() requestBuilder, {
     dynamic body,
   }) async {
     String? responseContent;
+    HttpClient? client;
+
     try {
       AppLogger.d('DONATION_API', 'Starting HTTP request');
-      final request = await requestBuilder();
+      final (request, requestClient) = await requestBuilder();
+      client = requestClient;
       _headers.forEach(request.headers.set);
 
       AppLogger.d(
@@ -142,6 +153,8 @@ class DonationApiService implements IDonationApiService {
             'DONATION_API', 'TLS/SSL error - check certificates or network');
       }
       throw const UnknownError();
+    } finally {
+      client?.close();
     }
   }
 

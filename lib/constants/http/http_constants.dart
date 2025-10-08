@@ -128,7 +128,6 @@ class HTTPConstants {
   static const String paymentConfig = 'config';
   static const String createPaymentIntent = 'payment-intents';
   static const String confirmPaymentIntent = 'payment-intents/confirm';
-  static const String createPaymentMethod = 'payment-methods';
   static String getPaymentIntentStatus(String id) =>
       'payment-intents/status?id=$id';
 }

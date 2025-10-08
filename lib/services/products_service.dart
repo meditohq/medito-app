@@ -206,8 +206,6 @@ class ProductsService {
           // New product, set firstSeenDate to now
           currentProducts[i] = product.copyWith(firstSeenDate: now);
           newCacheData[productId] = nowString; // Add new product to cache
-          dev.log(
-              'ProductsService: New product $productId seen now ($nowString)');
         }
       }
 

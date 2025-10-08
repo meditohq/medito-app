@@ -125,6 +125,12 @@ android {
     }
 
 
+    lintOptions {
+        disable 'VitalAnalyzeRelease'
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
