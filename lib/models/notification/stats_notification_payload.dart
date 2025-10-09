@@ -4,7 +4,7 @@ part 'stats_notification_payload.freezed.dart';
 part 'stats_notification_payload.g.dart';
 
 @freezed
-class StatsNotificationPayload with _$StatsNotificationPayload {
+abstract class StatsNotificationPayload with _$StatsNotificationPayload {
   const factory StatsNotificationPayload({
     required String trackId,
     required int duration,

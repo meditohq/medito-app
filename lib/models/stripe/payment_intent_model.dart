@@ -59,7 +59,7 @@ abstract class PaymentIntentRequest with _$PaymentIntentRequest {
 }
 
 @freezed
-abstract class PaymentResult with _$PaymentResult {
+sealed class PaymentResult with _$PaymentResult {
   const factory PaymentResult.success({
     required String paymentIntentId,
     required int amount,

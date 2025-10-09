@@ -4,7 +4,7 @@ part 'path_dto.freezed.dart';
 part 'path_dto.g.dart';
 
 @freezed
-class PathDTO with _$PathDTO {
+abstract class PathDTO with _$PathDTO {
   const factory PathDTO({
     required String id,
     required String title,
@@ -12,11 +12,12 @@ class PathDTO with _$PathDTO {
     required List<StepDTO> steps,
   }) = _PathDTO;
 
-  factory PathDTO.fromJson(Map<String, dynamic> json) => _$PathDTOFromJson(json);
+  factory PathDTO.fromJson(Map<String, dynamic> json) =>
+      _$PathDTOFromJson(json);
 }
 
 @freezed
-class StepDTO with _$StepDTO {
+abstract class StepDTO with _$StepDTO {
   const factory StepDTO({
     required String id,
     required String title,
@@ -26,11 +27,12 @@ class StepDTO with _$StepDTO {
     @Default(false) bool isCompleted,
   }) = _StepDTO;
 
-  factory StepDTO.fromJson(Map<String, dynamic> json) => _$StepDTOFromJson(json);
+  factory StepDTO.fromJson(Map<String, dynamic> json) =>
+      _$StepDTOFromJson(json);
 }
 
 @freezed
-class TaskDTO with _$TaskDTO {
+abstract class TaskDTO with _$TaskDTO {
   const factory TaskDTO({
     required String id,
     required String type,
@@ -42,5 +44,6 @@ class TaskDTO with _$TaskDTO {
     @Default({}) Map<String, dynamic> data,
   }) = _TaskDTO;
 
-  factory TaskDTO.fromJson(Map<String, dynamic> json) => _$TaskDTOFromJson(json);
+  factory TaskDTO.fromJson(Map<String, dynamic> json) =>
+      _$TaskDTOFromJson(json);
 }

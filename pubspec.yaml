@@ -40,7 +40,7 @@ dependencies:
   flutter_riverpod: ^2.6.1
   flutter_secure_storage: ^9.0.0
   flutter_svg: ^2.2.0
-  freezed_annotation: ^2.4.4
+  freezed_annotation: ^3.1.0
   haptic_feedback: ^0.5.1+1
   health: ^12.2.1
   http: ^1.4.0
@@ -48,6 +48,7 @@ dependencies:
   in_app_review: ^2.0.10
   intl: ^0.20.2
   just_audio: ^0.9.46
+  json_annotation: ^4.9.0
   package_info_plus: ^8.3.0
   path_provider: ^2.1.2
   permission_handler: ^11.4.0
@@ -78,7 +79,7 @@ dependencies:
       ref: main
   firebase_crashlytics: ^4.3.7
   pay: ^3.2.1
-  flutter_stripe: ^10.2.0
+  flutter_stripe: 12.0.2
   superwallkit_flutter: ^2.4.2
 
 dependency_overrides:
@@ -93,7 +94,7 @@ dev_dependencies:
   build_runner: ^2.5.2
   riverpod_generator: ^2.6.4
   json_serializable: ^6.9.5
-  freezed: ^2.5.8
+  freezed: ^3.1.0
   mockito: ^5.4.6
   analyzer: ^7.4.5
   json_annotation: ^4.9.0

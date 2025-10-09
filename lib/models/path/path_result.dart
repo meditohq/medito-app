@@ -17,7 +17,7 @@ class PathResultError extends JourneyResult {
 }
 
 @freezed
-class JourneyStep with _$JourneyStep {
+abstract class JourneyStep with _$JourneyStep {
   const factory JourneyStep({
     required String id,
     required String title,
@@ -28,7 +28,7 @@ class JourneyStep with _$JourneyStep {
 }
 
 @freezed
-class Task with _$Task {
+abstract class Task with _$Task {
   const factory Task({
     required String id,
     required TaskType type,

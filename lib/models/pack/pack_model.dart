@@ -4,7 +4,7 @@ part 'pack_model.freezed.dart';
 part 'pack_model.g.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
-class PackModel with _$PackModel {
+abstract class PackModel with _$PackModel {
   const factory PackModel({
     required String id,
     required String title,
@@ -21,7 +21,7 @@ class PackModel with _$PackModel {
 }
 
 @Freezed(makeCollectionsUnmodifiable: false)
-class PackItemsModel with _$PackItemsModel {
+abstract class PackItemsModel with _$PackItemsModel {
   const factory PackItemsModel({
     required String type,
     required String id,

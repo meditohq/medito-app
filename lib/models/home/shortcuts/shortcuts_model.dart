@@ -4,7 +4,7 @@ part 'shortcuts_model.freezed.dart';
 part 'shortcuts_model.g.dart';
 
 @freezed
-class ShortcutsModel with _$ShortcutsModel {
+abstract class ShortcutsModel with _$ShortcutsModel {
   const factory ShortcutsModel({
     required String? id,
     required String? type,

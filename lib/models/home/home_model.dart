@@ -5,7 +5,7 @@ part 'home_model.freezed.dart';
 part 'home_model.g.dart';
 
 @freezed
-class HomeModel with _$HomeModel {
+abstract class HomeModel with _$HomeModel {
   const factory HomeModel({
     String? greeting,
     @Default(<ShortcutsModel>[]) List<ShortcutsModel> shortcuts,
@@ -18,7 +18,7 @@ class HomeModel with _$HomeModel {
 }
 
 @freezed
-class HomeCarouselModel with _$HomeCarouselModel {
+abstract class HomeCarouselModel with _$HomeCarouselModel {
   const factory HomeCarouselModel({
     required String id,
     required String title,
@@ -38,7 +38,7 @@ class HomeCarouselModel with _$HomeCarouselModel {
 }
 
 @freezed
-class CarouselButton with _$CarouselButton {
+abstract class CarouselButton with _$CarouselButton {
   const factory CarouselButton({
     required String title,
     required String path,
@@ -50,7 +50,7 @@ class CarouselButton with _$CarouselButton {
 }
 
 @freezed
-class HomeQuoteModel with _$HomeQuoteModel {
+abstract class HomeQuoteModel with _$HomeQuoteModel {
   const factory HomeQuoteModel({
     required String id,
     required String quote,
