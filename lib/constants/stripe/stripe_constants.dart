@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'stripe_test_constants.dart';
 
 class StripeConstants {
@@ -17,26 +18,25 @@ class StripeConstants {
   static const List<String> androidPaymentMethods = [googlePay, card];
   static const List<String> iosPaymentMethods = [applePay, card];
 
-  // Google Pay Configuration
-  static const Map<String, dynamic> googlePayConfig = {
-    'merchantName': 'Medito',
-    'merchantId': 'BCR2DN4TXXXXXXXX', // Replace with actual merchant ID
-    'countryCode': 'US',
-    'currencyCode': 'USD',
-    'testEnv': true, // Set to false for production
-    'billingAddressRequired': false,
-    'emailRequired': false,
-    'shippingAddressRequired': false,
-    'allowedAuthMethods': ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
-    'allowedCardNetworks': [
-      'AMEX',
-      'DISCOVER',
-      'INTERAC',
-      'JCB',
-      'MASTERCARD',
-      'VISA'
-    ],
-  };
+  // Google Pay Configuration (env-aware)
+  static Map<String, dynamic> get googlePayConfig => {
+        'merchantName': 'Medito',
+        'countryCode': 'US',
+        // currencyCode intentionally driven by PaymentIntent
+        'testEnv': !kReleaseMode,
+        'billingAddressRequired': false,
+        'emailRequired': false,
+        'shippingAddressRequired': false,
+        'allowedAuthMethods': ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+        'allowedCardNetworks': [
+          'AMEX',
+          'DISCOVER',
+          'INTERAC',
+          'JCB',
+          'MASTERCARD',
+          'VISA'
+        ],
+      };
 
   // Apple Pay Configuration
   static const Map<String, dynamic> applePayConfig = {

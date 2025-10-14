@@ -170,8 +170,6 @@ class _SuperwallDonationScreenState
           await ref.read(availablePaymentMethodsProvider.future);
 
       if (availableMethods.isEmpty) {
-        AppLogger.w('SUPERWALL_DONATION_SCREEN',
-            'No payment methods available, falling back to web donation');
         await _fallbackToWebDonation();
         return;
       }
