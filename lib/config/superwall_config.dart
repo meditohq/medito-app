@@ -92,7 +92,7 @@ class SuperwallConfig {
       // Poll configuration status until it's ready
       var configStatus = ConfigurationStatus.pending;
       var attempts = 0;
-      const maxAttempts = 30; // 30 seconds max
+      const maxAttempts = 60; // 60 seconds max for iOS
       AppLogger.d('SUPERWALL_CONFIG',
           'Starting configuration polling loop (max $maxAttempts attempts)...');
 
@@ -106,9 +106,21 @@ class SuperwallConfig {
           configStatus = await Superwall.shared.getConfigurationStatus();
           AppLogger.d('SUPERWALL_CONFIG',
               'Configuration status: $configStatus (attempt $attempts)');
+
+          // Log additional details for iOS debugging
+          if (Platform.isIOS && configStatus == ConfigurationStatus.pending) {
+            AppLogger.d('SUPERWALL_CONFIG',
+                'iOS: Still pending after $attempts seconds. This may be normal for iOS.');
+          }
         } catch (e) {
           AppLogger.d('SUPERWALL_CONFIG',
               'Still waiting for configuration... (attempt $attempts), error: $e');
+
+          // Log more details for iOS errors
+          if (Platform.isIOS) {
+            AppLogger.d(
+                'SUPERWALL_CONFIG', 'iOS: Configuration error details: $e');
+          }
         }
 
         if (attempts >= maxAttempts) {
@@ -154,9 +166,16 @@ class SuperwallConfig {
         AppLogger.d('SUPERWALL_CONFIG',
             '=== Superwall configuration completed successfully ===');
       } else {
-        AppLogger.e('SUPERWALL_CONFIG',
+        AppLogger.w('SUPERWALL_CONFIG',
             'Superwall configuration timed out after $maxAttempts attempts');
-        throw Exception('Superwall configuration timed out');
+        AppLogger.w('SUPERWALL_CONFIG',
+            'Continuing app startup - Superwall will retry configuration in background');
+
+        // Mark as configured anyway to prevent blocking app startup
+        _isConfigured = true;
+
+        // Don't throw exception - let the app continue
+        // Superwall will retry configuration when needed
       }
 
       return superwall;

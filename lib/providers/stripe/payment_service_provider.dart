@@ -23,28 +23,17 @@ class PaymentServiceImpl implements PaymentService {
   @override
   Future<PaymentConfigModel> getPaymentConfig() async {
     try {
-      AppLogger.d('PAYMENT_SERVICE', 'Fetching payment config...');
       final response =
           await donationClient.getRequest(HTTPConstants.paymentConfig);
-      AppLogger.d('PAYMENT_SERVICE', 'Payment config response: $response');
       final data = response['data'];
-      AppLogger.d('PAYMENT_SERVICE', 'Payment config data: $data');
       if (data == null) {
-        AppLogger.e('PAYMENT_SERVICE', 'Payment config data is null');
         throw const ServerError();
       }
       final config = PaymentConfigModel.fromJson(data as Map<String, dynamic>);
 
-      // Initialize Stripe with the publishable key and merchant identifier from config
       Stripe.publishableKey = config.publishableKey;
       Stripe.merchantIdentifier = config.merchantIdentifier;
 
-      // Log the publishable key type for debugging (remove sensitive info)
-      final keyType =
-          config.publishableKey.startsWith('pk_live_') ? 'LIVE' : 'TEST';
-      AppLogger.d('PAYMENT_SERVICE', 'Stripe key type: $keyType');
-
-      // Apply settings after setting the publishable key and merchant identifier
       await Stripe.instance.applySettings();
 
       return config;

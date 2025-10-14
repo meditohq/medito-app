@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'payment_intent_model.freezed.dart';
 part 'payment_intent_model.g.dart';
@@ -17,30 +18,22 @@ abstract class PaymentIntentModel with _$PaymentIntentModel {
     String? interval,
   }) = _PaymentIntentModel;
 
-  factory PaymentIntentModel.fromJson(Map<String, Object?> json) {
-    // Handle API response format where 'paymentIntentId' maps to 'id'
-    // For recurring payments, we might not have a paymentIntentId, so we'll use subscriptionId
-    final jsonWithId = Map<String, Object?>.from(json);
-    if (!jsonWithId.containsKey('id')) {
-      if (jsonWithId.containsKey('paymentIntentId')) {
-        jsonWithId['id'] = jsonWithId['paymentIntentId'];
-      } else if (jsonWithId.containsKey('subscriptionId')) {
-        // For recurring payments, use subscriptionId as the id
-        jsonWithId['id'] = jsonWithId['subscriptionId'];
-      }
-    }
-    return _PaymentIntentModel(
-      id: jsonWithId['id'] as String,
-      clientSecret: jsonWithId['clientSecret'] as String,
-      status: jsonWithId['status'] as String,
-      amount: jsonWithId['amount'] as int,
-      currency: jsonWithId['currency'] as String,
-      paymentMethodId: jsonWithId['paymentMethodId'] as String?,
-      lastPaymentError: jsonWithId['lastPaymentError'] as String?,
-      subscriptionId: jsonWithId['subscriptionId'] as String?,
-      interval: jsonWithId['interval'] as String?,
-    );
-  }
+  factory PaymentIntentModel.fromJson(Map<String, Object?> json) =>
+      _$PaymentIntentModelFromJson(json);
+}
+
+enum PaymentType {
+  @JsonValue('one_time')
+  oneTime,
+  @JsonValue('subscription')
+  subscription,
+}
+
+enum SubscriptionInterval {
+  @JsonValue('month')
+  month,
+  @JsonValue('year')
+  year,
 }
 
 @freezed
@@ -49,8 +42,8 @@ abstract class PaymentIntentRequest with _$PaymentIntentRequest {
     required int amount,
     required String currency,
     required String paymentMethod,
-    required bool isMonthly,
-    String? customerId,
+    required PaymentType paymentType,
+    SubscriptionInterval? subscriptionInterval,
     Map<String, dynamic>? metadata,
   }) = _PaymentIntentRequest;
 
@@ -81,11 +74,42 @@ abstract class DonationData with _$DonationData {
     required String currency,
     required bool isMonthly,
     required String paymentMethod,
-    String? customerEmail,
-    String? customerName,
     Map<String, dynamic>? metadata,
   }) = _DonationData;
 
   factory DonationData.fromJson(Map<String, Object?> json) =>
       _$DonationDataFromJson(json);
+}
+
+@freezed
+abstract class SubscriptionData with _$SubscriptionData {
+  const factory SubscriptionData({
+    required String id,
+    required int amount,
+    required String currency,
+    required SubscriptionInterval interval,
+    required String status,
+    required DateTime currentPeriodStart,
+    required DateTime currentPeriodEnd,
+    DateTime? canceledAt,
+    DateTime? endedAt,
+    String? customerId,
+    Map<String, dynamic>? metadata,
+  }) = _SubscriptionData;
+
+  factory SubscriptionData.fromJson(Map<String, Object?> json) =>
+      _$SubscriptionDataFromJson(json);
+}
+
+@freezed
+abstract class PaymentConfirmationRequest with _$PaymentConfirmationRequest {
+  const factory PaymentConfirmationRequest({
+    required String paymentIntentId,
+    @Default('') String paymentMethodId,
+    String? customerId,
+    Map<String, dynamic>? metadata,
+  }) = _PaymentConfirmationRequest;
+
+  factory PaymentConfirmationRequest.fromJson(Map<String, Object?> json) =>
+      _$PaymentConfirmationRequestFromJson(json);
 }

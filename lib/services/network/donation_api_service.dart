@@ -31,14 +31,10 @@ class DonationApiService implements IDonationApiService {
   }
 
   DonationApiService._internal() {
-    AppLogger.d('DONATION_API', 'Creating new DonationApiService instance');
-    AppLogger.d('DONATION_API', 'Donation base URL: $donationBaseUrl');
-    AppLogger.d('DONATION_API', 'Donation token: $donationToken');
     _initializeHeaders();
   }
 
   void _initializeHeaders() {
-    AppLogger.d('DONATION_API', 'Initializing donation API headers');
     _headers['Content-Type'] = 'application/json';
     _headers['Authorization'] = 'Bearer $donationToken';
   }
@@ -73,10 +69,8 @@ class DonationApiService implements IDonationApiService {
       );
 
   Uri _buildUri(String path, [Map<String, dynamic>? queryParams]) {
-    AppLogger.d('DONATION_API', 'Base URL: "$donationBaseUrl"');
-    AppLogger.d('DONATION_API', 'Path: "$path"');
     final fullUrl = '$donationBaseUrl$path';
-    AppLogger.d('DONATION_API', 'Full URL: "$fullUrl"');
+
     return Uri.parse(fullUrl).replace(queryParameters: queryParams);
   }
 
@@ -88,39 +82,23 @@ class DonationApiService implements IDonationApiService {
     HttpClient? client;
 
     try {
-      AppLogger.d('DONATION_API', 'Starting HTTP request');
       final (request, requestClient) = await requestBuilder();
       client = requestClient;
       _headers.forEach(request.headers.set);
 
-      AppLogger.d(
-          'DONATION_API', 'Request headers set. Path: ${request.uri.path}');
-      AppLogger.d('DONATION_API', 'Full request URL: ${request.uri}');
-      AppLogger.d('DONATION_API', 'Request method: ${request.method}');
-
       if (body != null) {
         final encodedBody = jsonEncode(body);
-        AppLogger.d('DONATION_API', 'Request body: $encodedBody');
+        AppLogger.d('DONATION_API', 'REQUEST: $encodedBody');
         request.write(encodedBody);
-        AppLogger.d('DONATION_API', 'Request body written to request');
-      } else {
-        AppLogger.d('DONATION_API', 'No request body');
       }
 
-      AppLogger.d('DONATION_API', 'Sending request and waiting for response');
       final response =
           await request.close().timeout(const Duration(seconds: 30));
-      AppLogger.d('DONATION_API', 'Response received, reading content');
       responseContent = await utf8.decodeStream(response);
 
-      AppLogger.d('DONATION_API',
-          'Response received. Status: ${response.statusCode}, Length: ${responseContent.length}');
+      AppLogger.d('DONATION_API', 'RESPONSE: $responseContent');
 
       if (response.statusCode >= HttpStatus.badRequest) {
-        AppLogger.e('DONATION_API', 'HTTP Error ${response.statusCode}');
-        AppLogger.e('DONATION_API', 'Response content: $responseContent');
-        AppLogger.e('DONATION_API', 'Request URL: ${request.uri}');
-        AppLogger.e('DONATION_API', 'Request method: ${request.method}');
         throw _handleErrorResponse(response.statusCode);
       }
 
@@ -129,8 +107,6 @@ class DonationApiService implements IDonationApiService {
           : _parseResponseContent(responseContent);
     } on FormatException catch (e, stackTrace) {
       AppLogger.e('DONATION_API', 'JSON parsing error', e, stackTrace);
-      AppLogger.e('DONATION_API',
-          'Content that failed to parse: ${responseContent ?? "null"}');
       throw const UnknownError();
     } on NetworkConnectionError catch (e, stackTrace) {
       AppLogger.e('DONATION_API', 'Network Error', e, stackTrace);
@@ -144,14 +120,6 @@ class DonationApiService implements IDonationApiService {
     } catch (e, stackTrace) {
       AppLogger.e(
           'DONATION_API', 'Unexpected error in _handleRequest', e, stackTrace);
-      AppLogger.e('DONATION_API', 'Error type: ${e.runtimeType}');
-      AppLogger.e('DONATION_API', 'Error message: ${e.toString()}');
-      if (e is SocketException) {
-        AppLogger.e('DONATION_API', 'Socket error - check network connection');
-      } else if (e is TlsException) {
-        AppLogger.e(
-            'DONATION_API', 'TLS/SSL error - check certificates or network');
-      }
       throw const UnknownError();
     } finally {
       client?.close();
@@ -159,8 +127,6 @@ class DonationApiService implements IDonationApiService {
   }
 
   AppError _handleErrorResponse(int statusCode) {
-    AppLogger.w('DONATION_API', 'HTTP Error $statusCode');
-
     return switch (statusCode) {
       HttpStatus.notFound => const NotFoundError(),
       HttpStatus.unauthorized => const UnauthorizedError(),

@@ -88,14 +88,17 @@ class SuperwallService {
       if (configStatus == ConfigurationStatus.pending) {
         AppLogger.w('SUPERWALL_SERVICE',
             'Superwall not fully configured yet, waiting...');
-        await Future.delayed(const Duration(seconds: 5));
+        await Future.delayed(const Duration(seconds: 3));
 
         // Check again
         final newStatus = await Superwall.shared.getConfigurationStatus();
+        AppLogger.d('SUPERWALL_SERVICE', 'After waiting, status: $newStatus');
+
         if (newStatus == ConfigurationStatus.pending) {
-          AppLogger.e('SUPERWALL_SERVICE',
-              'Superwall still not configured after waiting');
-          return false;
+          AppLogger.w('SUPERWALL_SERVICE',
+              'Superwall still not configured after waiting, but will try anyway');
+          // Don't return false - let it try to use Superwall anyway
+          // Sometimes Superwall can still work even if status is pending
         }
       }
 
@@ -103,7 +106,8 @@ class SuperwallService {
     } catch (error, stackTrace) {
       AppLogger.e('SUPERWALL_SERVICE', 'Error checking Superwall status', error,
           stackTrace);
-      return false;
+      // Don't return false on error - let it try anyway
+      return true;
     }
   }
 
@@ -117,13 +121,13 @@ class SuperwallService {
       AppLogger.d(
           'SUPERWALL_SERVICE', 'Triggering Superwall paywall: $placement');
 
-      // Ensure Superwall is configured before triggering paywall
+      // Check Superwall configuration status
       final isConfigured = await isSuperwallConfigured();
-      if (!isConfigured) {
-        AppLogger.e('SUPERWALL_SERVICE',
-            'Cannot trigger paywall - Superwall not configured');
-        throw Exception('Superwall not configured');
-      }
+      AppLogger.d(
+          'SUPERWALL_SERVICE', 'Configuration check result: $isConfigured');
+
+      // Even if not fully configured, try to trigger the paywall
+      // Superwall might still work or provide a fallback
 
       await Superwall.shared.registerPlacement(
         placement,
@@ -276,7 +280,8 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
 
     if (handled) {
       AppLogger.d('SUPERWALL_DELEGATE', 'Custom paywall action: $name');
-      AppLogger.d('SUPERWALL_DELEGATE', '$actionType: \$$amount');
+      AppLogger.d('SUPERWALL_DELEGATE',
+          '$actionType: $amount cents (\$${(amount / 100).toStringAsFixed(2)})');
       onDonationInitiated!(amount, isRecurring);
     } else {
       AppLogger.d('SUPERWALL_DELEGATE', 'Custom paywall action: $name');
