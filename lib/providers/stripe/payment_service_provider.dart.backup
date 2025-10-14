@@ -539,7 +539,6 @@ class PaymentServiceImpl implements PaymentService {
         id: 'card',
         type: custom_models.PaymentMethodType.card,
         displayName: 'Credit/Debit Card',
-        iconAsset: 'assets/images/card_icon.png',
         isAvailable: true,
       ),
     );
@@ -552,7 +551,6 @@ class PaymentServiceImpl implements PaymentService {
           id: 'google_pay',
           type: custom_models.PaymentMethodType.googlePay,
           displayName: 'Google Pay',
-          iconAsset: 'assets/images/google_pay_icon.png',
           isAvailable: googlePayAvailable,
           unavailableReason: googlePayAvailable
               ? null
@@ -569,7 +567,6 @@ class PaymentServiceImpl implements PaymentService {
           id: 'apple_pay',
           type: custom_models.PaymentMethodType.applePay,
           displayName: 'Apple Pay',
-          iconAsset: 'assets/images/apple_pay_icon.png',
           isAvailable: applePayAvailable,
           unavailableReason: applePayAvailable
               ? null

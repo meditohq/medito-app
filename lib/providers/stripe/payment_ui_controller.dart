@@ -209,8 +209,6 @@ class PaymentUIController extends _$PaymentUIController {
         id: 'google_pay',
         type: local_models.PaymentMethodType.googlePay,
         displayName: 'Google Pay',
-        iconAsset:
-            'assets/images/google_pay_icon.png', // Update with actual asset
         isAvailable: true,
       ));
     }
@@ -223,8 +221,6 @@ class PaymentUIController extends _$PaymentUIController {
         id: 'apple_pay',
         type: local_models.PaymentMethodType.applePay,
         displayName: 'Apple Pay',
-        iconAsset:
-            'assets/images/apple_pay_icon.png', // Update with actual asset
         isAvailable: true,
       ));
     }
@@ -234,7 +230,6 @@ class PaymentUIController extends _$PaymentUIController {
       id: 'card',
       type: local_models.PaymentMethodType.card,
       displayName: 'Credit/Debit Card',
-      iconAsset: 'assets/images/card_icon.png', // Update with actual asset
       isAvailable: true,
     ));
 

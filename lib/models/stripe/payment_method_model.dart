@@ -22,7 +22,6 @@ abstract class PaymentMethod with _$PaymentMethod {
     required String id,
     required PaymentMethodType type,
     required String displayName,
-    required String iconAsset,
     required bool isAvailable,
     String? unavailableReason,
   }) = _PaymentMethod;
