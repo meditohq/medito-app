@@ -105,9 +105,6 @@ class FirebaseMessagingHandler {
 
     _isFlutterLocalNotificationsInitialized = true;
 
-    if (kDebugMode) {
-      print("Flutter notifications setup complete");
-    }
   }
 
   void _configureFirebaseMessaging(
