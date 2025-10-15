@@ -112,7 +112,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           if (!_hasRequestedOtp) {
             showSnackBar(
               context,
-              'Please request an OTP first before using a deep link',
+              AppLocalizations.of(context)!.requestOtpBeforeDeepLink,
             );
             return;
           }

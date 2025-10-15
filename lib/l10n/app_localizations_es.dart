@@ -726,6 +726,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorNotFound => 'Recurso no encontrado';
 
   @override
+  String get requestOtpBeforeDeepLink =>
+      'Solicita primero un código OTP antes de usar un enlace profundo';
+
+  @override
   String get shortcutsTitle => 'Accesos Directos';
 
   @override

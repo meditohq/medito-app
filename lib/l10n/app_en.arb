@@ -220,6 +220,7 @@
   "localStatsWarning": "Signing into a new account will result in the loss of your current local stats. Do you wish to proceed?",
   "proceed": "Proceed",
   "errorNotFound": "Resource not found",
+  "requestOtpBeforeDeepLink": "Please request an OTP first before using a deep link",
   "shortcutsTitle": "Shortcuts",
   "carouselTitle": "Featured",
   "quoteTitle": "Daily Quote",

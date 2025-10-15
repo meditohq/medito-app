@@ -712,6 +712,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorNotFound => 'Resource not found';
 
   @override
+  String get requestOtpBeforeDeepLink =>
+      'Please request an OTP first before using a deep link';
+
+  @override
   String get shortcutsTitle => 'Shortcuts';
 
   @override

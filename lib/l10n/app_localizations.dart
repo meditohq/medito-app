@@ -1418,6 +1418,12 @@ abstract class AppLocalizations {
   /// **'Resource not found'**
   String get errorNotFound;
 
+  /// No description provided for @requestOtpBeforeDeepLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Please request an OTP first before using a deep link'**
+  String get requestOtpBeforeDeepLink;
+
   /// No description provided for @shortcutsTitle.
   ///
   /// In en, this message translates to:

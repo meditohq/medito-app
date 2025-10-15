@@ -220,6 +220,7 @@
   "localStatsWarning": "Iniciar sesión en una nueva cuenta resultará en la pérdida de tus estadísticas locales actuales. ¿Deseas continuar?",
   "proceed": "Continuar",
   "errorNotFound": "Recurso no encontrado",
+  "requestOtpBeforeDeepLink": "Solicita primero un código OTP antes de usar un enlace profundo",
   "shortcutsTitle": "Accesos Directos",
   "carouselTitle": "Destacados",
   "quoteTitle": "Cita Diaria",
