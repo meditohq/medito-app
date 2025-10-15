@@ -603,5 +603,13 @@
   "paymentCancelledMessage": "Payment was cancelled.",
   "@paymentCancelledMessage": {
     "description": "Message shown when payment is cancelled by user"
+  },
+  "newMessageFallback": "New message",
+  "@newMessageFallback": {
+    "description": "Fallback text for notifications when no body is provided"
+  },
+  "viewAction": "View",
+  "@viewAction": {
+    "description": "Action label for notification actions"
   }
 }

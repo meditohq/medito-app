@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/l10n/app_localizations.dart';
 
 import '../../models/notification/notification_payload_model.dart';
 import '../../routes/routes.dart';
@@ -180,10 +181,12 @@ class FirebaseMessagingHandler {
 
     // Still show snackbar for in-app UX, but make sure the context is valid
     if (context.mounted) {
+      final localizations = AppLocalizations.of(context)!;
       final snackBar = SnackBar(
-        content: Text(message.notification?.body ?? 'New message'),
+        content: Text(
+            message.notification?.body ?? localizations.newMessageFallback),
         action: SnackBarAction(
-          label: 'View',
+          label: localizations.viewAction,
           onPressed: () {
             _navigate(context, ref, message.data);
           },

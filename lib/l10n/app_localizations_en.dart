@@ -1375,4 +1375,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paymentCancelledMessage => 'Payment was cancelled.';
+
+  @override
+  String get newMessageFallback => 'New message';
+
+  @override
+  String get viewAction => 'View';
 }

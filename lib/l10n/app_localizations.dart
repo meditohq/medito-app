@@ -2623,6 +2623,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Payment was cancelled.'**
   String get paymentCancelledMessage;
+
+  /// Fallback text for notifications when no body is provided
+  ///
+  /// In en, this message translates to:
+  /// **'New message'**
+  String get newMessageFallback;
+
+  /// Action label for notification actions
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get viewAction;
 }
 
 class _AppLocalizationsDelegate

@@ -1399,4 +1399,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get paymentCancelledMessage => 'El pago fue cancelado.';
+
+  @override
+  String get newMessageFallback => 'Nuevo mensaje';
+
+  @override
+  String get viewAction => 'Ver';
 }
