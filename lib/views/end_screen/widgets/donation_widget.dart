@@ -4,6 +4,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../utils/logger.dart';
+import '../../../services/analytics/firebase_analytics_service.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';
 import '../../../providers/donation/donation_page_provider.dart';
@@ -183,6 +184,9 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 button.type,
                 [button.path],
                 context,
+                sourceRouteName: button.path == RouteConstants.donation
+                    ? FirebaseAnalyticsService.paywallSourceEndScreen
+                    : null,
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorConstants.white,
@@ -212,6 +216,9 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 button.type,
                 [button.path],
                 context,
+                sourceRouteName: button.path == RouteConstants.donation
+                    ? FirebaseAnalyticsService.paywallSourceEndScreen
+                    : null,
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorConstants.lightPurple,

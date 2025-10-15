@@ -82,6 +82,14 @@ class FirebaseAnalyticsService {
   static const String eventOnboardingDonateNoThanksTap =
       'onboarding_donate_no_thanks_tap';
   static const String eventOnboardingCompleted = 'onboarding_completed';
+  static const String eventPaywallDismissedNoPayment =
+      'paywall_dismissed_no_payment';
+
+  // Paywall source constants
+  static const String paywallSourceOnboarding = 'onboarding';
+  static const String paywallSourceSettings = 'settings';
+  static const String paywallSourceEndScreen = 'end_screen';
+  static const String paywallSourceAnnouncement = 'announcement';
 
   // Don't pollute Firebase from unit/widget tests executed via `flutter test`.
   static bool get _runningInTest =>

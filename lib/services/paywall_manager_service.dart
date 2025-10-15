@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/superwall_service.dart';
@@ -24,8 +23,8 @@ class PaywallManagerService {
 
   /// Triggers the donation paywall with proper error handling
   Future<void> triggerDonationPaywall({
-    required VoidCallback onPaywallPresented,
-    required VoidCallback onPaywallDismissed,
+    required Function(String paywallId) onPaywallPresented,
+    required Function(String paywallId) onPaywallDismissed,
     required Function(String) onError,
     required Function(int amount, bool isMonthly) onDonationInitiated,
   }) async {
@@ -47,15 +46,15 @@ class PaywallManagerService {
       final handler = PaywallPresentationHandler();
 
       handler.onPresent((paywallInfo) {
-        AppLogger.d(
-            'PAYWALL_MANAGER', 'Paywall presented: ${paywallInfo.identifier}');
-        onPaywallPresented();
+        final paywallId = paywallInfo.identifier ?? 'unknown';
+        AppLogger.d('PAYWALL_MANAGER', 'Paywall presented: $paywallId');
+        onPaywallPresented(paywallId);
       });
 
       handler.onDismiss((paywallInfo, paywallResult) {
-        AppLogger.d('PAYWALL_MANAGER',
-            'Paywall dismissed: ${paywallInfo.identifier}, result: $paywallResult');
-        onPaywallDismissed();
+        final paywallId = paywallInfo.identifier ?? 'unknown';
+        AppLogger.d('PAYWALL_MANAGER', 'Paywall dismissed: $paywallId');
+        onPaywallDismissed(paywallId);
       });
 
       handler.onError((error) {

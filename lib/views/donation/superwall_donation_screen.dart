@@ -10,11 +10,15 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/paywall_manager_service.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SuperwallDonationScreen extends ConsumerStatefulWidget {
-  const SuperwallDonationScreen({super.key});
+  const SuperwallDonationScreen({super.key, this.source});
+
+  final String? source;
 
   @override
   ConsumerState<SuperwallDonationScreen> createState() =>
@@ -26,6 +30,8 @@ class _SuperwallDonationScreenState
   bool _hasTriggeredPaywall = false;
   bool _isLoading = true;
   bool _isProcessingPayment = false;
+  String? _currentPaywallId;
+  String? _completedPaywallId;
 
   @override
   void initState() {
@@ -88,15 +94,32 @@ class _SuperwallDonationScreenState
       final paywallManager = ref.read(paywallManagerServiceProvider);
 
       await paywallManager.triggerDonationPaywall(
-        onPaywallPresented: () {
+        onPaywallPresented: (String paywallId) {
           if (mounted) {
             setState(() {
               _isLoading = false;
+              _currentPaywallId = paywallId;
             });
           }
         },
-        onPaywallDismissed: () {
+        onPaywallDismissed: (String paywallId) {
           AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Paywall dismissed');
+
+          // Only track as "no payment" if we didn't complete a donation
+          if (_completedPaywallId != paywallId) {
+            final userId =
+                ref.read(authRepositorySyncProvider).currentUser?.id ??
+                    'unknown';
+
+            FirebaseAnalyticsService().logEvent(
+              name: FirebaseAnalyticsService.eventPaywallDismissedNoPayment,
+              parameters: {
+                'paywall_id': paywallId,
+                'user_id': userId,
+              },
+            );
+          }
+
           // Only close the screen if we're NOT processing a payment
           // If payment is being processed, let the payment flow handle screen closure
           if (mounted && !_isProcessingPayment) {
@@ -161,6 +184,9 @@ class _SuperwallDonationScreenState
           'Processing donation payment: amount=$amount, isMonthly=$isMonthly');
 
       final uiController = ref.read(paymentUIControllerProvider.notifier);
+      final paywallId = _currentPaywallId ?? 'unknown';
+      final userId =
+          ref.read(authRepositorySyncProvider).currentUser?.id ?? 'unknown';
 
       // Get payment config for currency
       final paymentConfig = await ref.read(paymentConfigProvider.future);
@@ -202,6 +228,12 @@ class _SuperwallDonationScreenState
           amount: amountInCents,
           currency: paymentConfig.pricing.currency,
           paymentMethod: selectedMethod.type,
+          paywallId: paywallId,
+          userId: userId,
+          paywallSource: widget.source,
+          onSuccess: () {
+            _completedPaywallId = paywallId;
+          },
         );
       } else {
         await uiController.initiateOneTimePayment(
@@ -209,6 +241,12 @@ class _SuperwallDonationScreenState
           amount: amountInCents,
           currency: paymentConfig.pricing.currency,
           paymentMethod: selectedMethod.type,
+          paywallId: paywallId,
+          userId: userId,
+          paywallSource: widget.source,
+          onSuccess: () {
+            _completedPaywallId = paywallId;
+          },
         );
       }
 

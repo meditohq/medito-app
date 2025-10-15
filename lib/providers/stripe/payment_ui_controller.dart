@@ -6,7 +6,9 @@ import 'package:medito/models/stripe/payment_method_model.dart' as local_models;
 import 'package:medito/providers/stripe/payment_providers.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../me/me_provider.dart';
 
 part 'payment_ui_controller.g.dart';
 
@@ -27,17 +29,26 @@ class PaymentUIController extends _$PaymentUIController {
     required int amount,
     required String currency,
     required local_models.PaymentMethodType paymentMethod,
+    String? paywallId,
+    String? userId,
+    String? paywallSource,
+    VoidCallback? onSuccess,
   }) async {
     try {
+      final me = await ref.read(meProvider.future);
+
       final oneTimeController =
           ref.read(oneTimePaymentControllerProvider.notifier);
       final result = await oneTimeController.processOneTimePayment(
         amount: amount,
         currency: currency,
         paymentMethod: paymentMethod,
+        userId: me.id,
+        userEmail: me.email,
       );
 
-      _handlePaymentResult(context, result);
+      _handlePaymentResult(context, result, paywallId, 'onetime', userId,
+          paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
     }
@@ -49,17 +60,26 @@ class PaymentUIController extends _$PaymentUIController {
     required int amount,
     required String currency,
     required local_models.PaymentMethodType paymentMethod,
+    String? paywallId,
+    String? userId,
+    String? paywallSource,
+    VoidCallback? onSuccess,
   }) async {
     try {
+      final me = await ref.read(meProvider.future);
+
       final monthlyController =
           ref.read(monthlySubscriptionControllerProvider.notifier);
       final result = await monthlyController.processMonthlySubscription(
         amount: amount,
         currency: currency,
         paymentMethod: paymentMethod,
+        userId: me.id,
+        userEmail: me.email,
       );
 
-      _handlePaymentResult(context, result);
+      _handlePaymentResult(context, result, paywallId, 'monthly', userId,
+          paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
     }
@@ -71,17 +91,26 @@ class PaymentUIController extends _$PaymentUIController {
     required int amount,
     required String currency,
     required local_models.PaymentMethodType paymentMethod,
+    String? paywallId,
+    String? userId,
+    String? paywallSource,
+    VoidCallback? onSuccess,
   }) async {
     try {
+      final me = await ref.read(meProvider.future);
+
       final yearlyController =
           ref.read(yearlySubscriptionControllerProvider.notifier);
       final result = await yearlyController.processYearlySubscription(
         amount: amount,
         currency: currency,
         paymentMethod: paymentMethod,
+        userId: me.id,
+        userEmail: me.email,
       );
 
-      _handlePaymentResult(context, result);
+      _handlePaymentResult(context, result, paywallId, 'yearly', userId,
+          paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
     }
@@ -121,9 +150,31 @@ class PaymentUIController extends _$PaymentUIController {
   }
 
   /// Handles payment results and shows appropriate success/error messages
-  void _handlePaymentResult(BuildContext context, PaymentResult result) {
+  void _handlePaymentResult(
+    BuildContext context,
+    PaymentResult result,
+    String? paywallId,
+    String frequency,
+    String? userId,
+    String? paywallSource,
+    VoidCallback? onSuccess,
+  ) {
     result.when(
       success: (paymentIntentId, amount, currency) {
+        // Track successful donation
+        FirebaseAnalyticsService().logEvent(
+          name: 'donation_$frequency',
+          parameters: {
+            'amount': amount,
+            'currency': currency,
+            'paywall_id': paywallId ?? 'unknown',
+            'user_id': userId ?? 'unknown',
+            'paywall_source': paywallSource ?? 'unknown',
+          },
+        );
+
+        onSuccess?.call(); // Notify screen
+
         final amountString = (amount / 100).toStringAsFixed(2);
         AppLogger.d('PAYMENT_UI',
             '✅ Showing success message: $amountString $currency (Intent: $paymentIntentId)');

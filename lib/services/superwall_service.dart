@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/string_constants.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
@@ -343,11 +344,16 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
     AppLogger.d('SUPERWALL_DELEGATE',
         'Firing analytics: paywall_presented, id: ${paywallInfo.identifier}');
 
+    // Get user ID from auth
+    final userId =
+        ref.read(authRepositorySyncProvider).currentUser?.id ?? 'unknown';
+
     // Fire Firebase Analytics event
     FirebaseAnalyticsService().logEvent(
       name: 'paywall_presented',
       parameters: {
         'paywall_identifier': paywallInfo.identifier ?? 'unknown',
+        'user_id': userId,
       },
     );
   }

@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -33,6 +32,7 @@ Future<void> handleNavigation(
   BuildContext context, {
   WidgetRef? ref,
   VoidCallback? onNavigationComplete,
+  String? sourceRouteName,
 }) async {
   ids.removeWhere((element) => element == null);
 
@@ -90,7 +90,7 @@ Future<void> handleNavigation(
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.donation)) {
-      await _pushRoute(const SuperwallDonationScreen(), ref);
+    await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }

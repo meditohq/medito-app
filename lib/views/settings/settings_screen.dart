@@ -205,6 +205,9 @@ class SettingsScreen extends ConsumerWidget {
       [item.path.toString().getIdFromPath(), item.path],
       context,
       ref: ref,
+      sourceRouteName: item.path == RouteConstants.donation
+          ? FirebaseAnalyticsService.paywallSourceSettings
+          : null,
     );
   }
 

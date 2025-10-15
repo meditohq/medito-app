@@ -53,6 +53,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
         TypeConstants.route,
         [RouteConstants.donation],
         context,
+        sourceRouteName: FirebaseAnalyticsService.paywallSourceOnboarding,
       );
     }
   }
@@ -106,10 +107,11 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
               ),
               Column(
                 children: [
-                 if(!isDonor) _buildActionButton(
-                    text: AppLocalizations.of(context)!.next,
-                    onPressed: () => _handleDonationAction(context, true),
-                  ),
+                  if (!isDonor)
+                    _buildActionButton(
+                      text: AppLocalizations.of(context)!.next,
+                      onPressed: () => _handleDonationAction(context, true),
+                    ),
                   if (isDonor) ...[
                     const SizedBox(height: 12),
                     SizedBox(

@@ -367,6 +367,8 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     required int amount,
     required String currency,
     required local_models.PaymentMethodType paymentMethod,
+    String? userId,
+    String? userEmail,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -374,11 +376,17 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     try {
       state = const AsyncValue.loading();
 
+      final metadata = <String, dynamic>{
+        if (userId != null) 'user_id': userId,
+        if (userEmail != null) 'email': userEmail,
+      };
+
       final request = PaymentIntentRequest(
         amount: amount,
         currency: currency,
         paymentMethod: _paymentMethodToString(paymentMethod),
         paymentType: PaymentType.oneTime,
+        metadata: metadata.isNotEmpty ? metadata : null,
       );
 
       late final PaymentMethodService paymentService;
@@ -421,6 +429,8 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     required int amount,
     required String currency,
     required local_models.PaymentMethodType paymentMethod,
+    String? userId,
+    String? userEmail,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -428,12 +438,18 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     try {
       state = const AsyncValue.loading();
 
+      final metadata = <String, dynamic>{
+        if (userId != null) 'user_id': userId,
+        if (userEmail != null) 'email': userEmail,
+      };
+
       final request = PaymentIntentRequest(
         amount: amount,
         currency: currency,
         paymentMethod: _paymentMethodToString(paymentMethod),
         paymentType: PaymentType.subscription,
         subscriptionInterval: SubscriptionInterval.month,
+        metadata: metadata.isNotEmpty ? metadata : null,
       );
 
       late final PaymentMethodService paymentService;
@@ -476,6 +492,8 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     required int amount,
     required String currency,
     required local_models.PaymentMethodType paymentMethod,
+    String? userId,
+    String? userEmail,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -483,12 +501,18 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     try {
       state = const AsyncValue.loading();
 
+      final metadata = <String, dynamic>{
+        if (userId != null) 'user_id': userId,
+        if (userEmail != null) 'email': userEmail,
+      };
+
       final request = PaymentIntentRequest(
         amount: amount,
         currency: currency,
         paymentMethod: _paymentMethodToString(paymentMethod),
         paymentType: PaymentType.subscription,
         subscriptionInterval: SubscriptionInterval.year,
+        metadata: metadata.isNotEmpty ? metadata : null,
       );
 
       late final PaymentMethodService paymentService;
