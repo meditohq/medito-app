@@ -1358,4 +1358,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get thisMayTakeAMoment => 'This may take a moment';
+
+  @override
+  String paymentSuccessMessage(String amount, String currency) {
+    return 'Payment successful! Thank you for your donation of $amount $currency.';
+  }
+
+  @override
+  String paymentFailedMessage(String paymentIntentId) {
+    return 'Payment failed for payment intent id: $paymentIntentId';
+  }
+
+  @override
+  String get paymentCancelledMessage => 'Payment was cancelled.';
 }

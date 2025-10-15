@@ -2599,6 +2599,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This may take a moment'**
   String get thisMayTakeAMoment;
+
+  /// Success message shown after successful payment
+  ///
+  /// In en, this message translates to:
+  /// **'Payment successful! Thank you for your donation of {amount} {currency}.'**
+  String paymentSuccessMessage(String amount, String currency);
+
+  /// Error message shown when payment fails
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed for payment intent id: {paymentIntentId}'**
+  String paymentFailedMessage(String paymentIntentId);
+
+  /// Message shown when payment is cancelled by user
+  ///
+  /// In en, this message translates to:
+  /// **'Payment was cancelled.'**
+  String get paymentCancelledMessage;
 }
 
 class _AppLocalizationsDelegate

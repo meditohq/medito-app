@@ -1382,4 +1382,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get thisMayTakeAMoment => 'Esto puede tomar un momento';
+
+  @override
+  String paymentSuccessMessage(String amount, String currency) {
+    return '¡Pago exitoso! Gracias por tu donación de $amount $currency.';
+  }
+
+  @override
+  String paymentFailedMessage(String paymentIntentId) {
+    return 'El pago falló para el ID de intención de pago: $paymentIntentId';
+  }
+
+  @override
+  String get paymentCancelledMessage => 'El pago fue cancelado.';
 }

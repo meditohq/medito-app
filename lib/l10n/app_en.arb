@@ -574,5 +574,33 @@
   "thisMayTakeAMoment": "This may take a moment",
   "@thisMayTakeAMoment": {
     "description": "Helper text shown while loading donation options"
+  },
+  "paymentSuccessMessage": "Payment successful! Thank you for your donation of {amount} {currency}.",
+  "@paymentSuccessMessage": {
+    "description": "Success message shown after successful payment",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "description": "The donation amount"
+      },
+      "currency": {
+        "type": "String", 
+        "description": "The currency code"
+      }
+    }
+  },
+  "paymentFailedMessage": "Payment failed for payment intent id: {paymentIntentId}",
+  "@paymentFailedMessage": {
+    "description": "Error message shown when payment fails",
+    "placeholders": {
+      "paymentIntentId": {
+        "type": "String",
+        "description": "The payment intent ID"
+      }
+    }
+  },
+  "paymentCancelledMessage": "Payment was cancelled.",
+  "@paymentCancelledMessage": {
+    "description": "Message shown when payment is cancelled by user"
   }
 }

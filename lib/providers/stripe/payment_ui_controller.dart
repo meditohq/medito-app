@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart' as local_models;
@@ -180,7 +181,8 @@ class PaymentUIController extends _$PaymentUIController {
             '✅ Showing success message: $amountString $currency (Intent: $paymentIntentId)');
         _showSuccessSnackbar(
           context,
-          'Payment successful! Thank you for your donation of $amountString $currency.',
+          AppLocalizations.of(context)!
+              .paymentSuccessMessage(amountString, currency),
         );
       },
       failure: (errorMessage, paymentIntentId) {
@@ -190,13 +192,15 @@ class PaymentUIController extends _$PaymentUIController {
             context,
             PaymentError(
               type: PaymentErrorType.genericError,
-              message: 'Payment failed for payment intent id: $paymentIntentId',
+              message: AppLocalizations.of(context)!
+                  .paymentFailedMessage(paymentIntentId ?? 'unknown'),
               userFriendlyMessage: errorMessage,
             ));
       },
       cancelled: () {
         AppLogger.d('PAYMENT_UI', 'ℹ️ Showing cancellation message');
-        _showInfoSnackbar(context, 'Payment was cancelled.');
+        _showInfoSnackbar(
+            context, AppLocalizations.of(context)!.paymentCancelledMessage);
       },
     );
   }

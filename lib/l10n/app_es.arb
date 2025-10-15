@@ -556,5 +556,33 @@
   "thisMayTakeAMoment": "Esto puede tomar un momento",
   "@thisMayTakeAMoment": {
     "description": "Helper text shown while loading donation options"
+  },
+  "paymentSuccessMessage": "¡Pago exitoso! Gracias por tu donación de {amount} {currency}.",
+  "@paymentSuccessMessage": {
+    "description": "Success message shown after successful payment",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "description": "The donation amount"
+      },
+      "currency": {
+        "type": "String", 
+        "description": "The currency code"
+      }
+    }
+  },
+  "paymentFailedMessage": "El pago falló para el ID de intención de pago: {paymentIntentId}",
+  "@paymentFailedMessage": {
+    "description": "Error message shown when payment fails",
+    "placeholders": {
+      "paymentIntentId": {
+        "type": "String",
+        "description": "The payment intent ID"
+      }
+    }
+  },
+  "paymentCancelledMessage": "El pago fue cancelado.",
+  "@paymentCancelledMessage": {
+    "description": "Message shown when payment is cancelled by user"
   }
 }
