@@ -1,4 +1,4 @@
-class StringConstants {
+class ConfigConstants {
   // URL constants
   static const String meditoUrl = 'https://meditofoundation.org/';
   static const String donationFormUrl = 'https://meditofoundation.org/donate';

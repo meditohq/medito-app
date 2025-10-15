@@ -13,8 +13,8 @@ When adding a new UI string that will be displayed to users:
 - Access: `AppLocalizations.of(context)!.yourKeyName`
 - For parameterized strings: `AppLocalizations.of(context)!.yourKeyName(parameter)`
 
-### 3. When to Use StringConstants
-Only use `lib/constants/strings/string_constants.dart` for:
+### 3. When to Use ConfigConstants
+Only use `lib/constants/config_constants.dart` for:
 - **Technical constants** (URLs, API keys, identifiers)
 - **Backend/business logic** (providers, utils, exceptions without BuildContext)
 - **Debug/technical strings** (error codes, system messages)
@@ -31,12 +31,12 @@ Text(AppLocalizations.of(context)!.welcomeMessage)
 
 **✅ Correct - Technical Constant:**
 ```dart
-// In string_constants.dart
+// In config_constants.dart
 static const String apiBaseUrl = 'https://api.medito.app';
 static const String donationFormUrl = 'https://meditofoundation.org/donate';
 ```
 
-**❌ Incorrect - UI String in StringConstants:**
+**❌ Incorrect - UI String in ConfigConstants:**
 ```dart
 // Don't do this for user-facing strings
 static const String welcomeMessage = 'Welcome to Medito';

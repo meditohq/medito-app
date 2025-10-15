@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 import 'package:medito/constants/http/http_constants.dart';
-import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/constants/config_constants.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/services/network/donation_api_service.dart';
@@ -229,46 +229,46 @@ class SuperwallConfig {
 
       // Create user attributes with the same structure that was previously passed as params
       final userAttributes = <String, dynamic>{
-        StringConstants.currency: currency,
-        StringConstants.currencySymbol: _getCurrencySymbol(currency),
-        StringConstants.pricingCountry: pricing.country,
+        ConfigConstants.currency: currency,
+        ConfigConstants.currencySymbol: _getCurrencySymbol(currency),
+        ConfigConstants.pricingCountry: pricing.country,
         // One-time pricing
-        StringConstants.onetime1:
+        ConfigConstants.onetime1:
             pricing.oneTime.isNotEmpty ? pricing.oneTime[0] : 0,
-        StringConstants.onetime2:
+        ConfigConstants.onetime2:
             pricing.oneTime.length > 1 ? pricing.oneTime[1] : 0,
-        StringConstants.onetime3:
+        ConfigConstants.onetime3:
             pricing.oneTime.length > 2 ? pricing.oneTime[2] : 0,
-        StringConstants.onetime4:
+        ConfigConstants.onetime4:
             pricing.oneTime.length > 3 ? pricing.oneTime[3] : 0,
-        StringConstants.onetime5:
+        ConfigConstants.onetime5:
             pricing.oneTime.length > 4 ? pricing.oneTime[4] : 0,
         // Monthly pricing
-        StringConstants.monthly1:
+        ConfigConstants.monthly1:
             pricing.monthly.isNotEmpty ? pricing.monthly[0] : 0,
-        StringConstants.monthly2:
+        ConfigConstants.monthly2:
             pricing.monthly.length > 1 ? pricing.monthly[1] : 0,
-        StringConstants.monthly3:
+        ConfigConstants.monthly3:
             pricing.monthly.length > 2 ? pricing.monthly[2] : 0,
-        StringConstants.monthly4:
+        ConfigConstants.monthly4:
             pricing.monthly.length > 3 ? pricing.monthly[3] : 0,
-        StringConstants.monthly5:
+        ConfigConstants.monthly5:
             pricing.monthly.length > 4 ? pricing.monthly[4] : 0,
         // Yearly pricing
-        StringConstants.yearly1:
+        ConfigConstants.yearly1:
             pricing.yearly.isNotEmpty ? pricing.yearly[0] : 0,
-        StringConstants.yearly2:
+        ConfigConstants.yearly2:
             pricing.yearly.length > 1 ? pricing.yearly[1] : 0,
-        StringConstants.yearly3:
+        ConfigConstants.yearly3:
             pricing.yearly.length > 2 ? pricing.yearly[2] : 0,
-        StringConstants.yearly4:
+        ConfigConstants.yearly4:
             pricing.yearly.length > 3 ? pricing.yearly[3] : 0,
-        StringConstants.yearly5:
+        ConfigConstants.yearly5:
             pricing.yearly.length > 4 ? pricing.yearly[4] : 0,
         // Suggested amounts
-        StringConstants.monthlySuggested: pricing.suggested.monthly,
-        StringConstants.onetimeSuggested: pricing.suggested.oneTime,
-        StringConstants.yearlySuggested: pricing.suggested.yearly,
+        ConfigConstants.monthlySuggested: pricing.suggested.monthly,
+        ConfigConstants.onetimeSuggested: pricing.suggested.oneTime,
+        ConfigConstants.yearlySuggested: pricing.suggested.yearly,
       };
 
       AppLogger.d('SUPERWALL_CONFIG',

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
-import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/constants/config_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/utils/logger.dart';
@@ -22,7 +22,6 @@ class ProductsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     if (productGroups == null || productGroups!.isEmpty) {
       AppLogger.d('ProductsWidget', 'No product groups to display');
       return const SizedBox.shrink();
@@ -90,7 +89,7 @@ class ProductsWidget extends StatelessWidget {
   }
 
   Future<void> _openShopUrl() async {
-    final uri = Uri.parse(StringConstants.shopUrl);
+    final uri = Uri.parse(ConfigConstants.shopUrl);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -232,12 +231,14 @@ class ProductGroupCard extends ConsumerWidget {
                         ),
                         child: Text(
                           AppLocalizations.of(context)!.newProductLabel,
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                       ),
                     ),

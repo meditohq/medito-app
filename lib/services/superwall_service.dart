@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/strings/string_constants.dart';
+import 'package:medito/constants/config_constants.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -183,96 +183,96 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
     var handled = false;
 
     // Monthly donation actions
-    if (name == StringConstants.monthly1) {
+    if (name == ConfigConstants.monthly1) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Monthly donation 1';
       handled = true;
-    } else if (name == StringConstants.monthly2) {
+    } else if (name == ConfigConstants.monthly2) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Monthly donation 2';
       handled = true;
-    } else if (name == StringConstants.monthly3) {
+    } else if (name == ConfigConstants.monthly3) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Monthly donation 3';
       handled = true;
-    } else if (name == StringConstants.monthly4) {
+    } else if (name == ConfigConstants.monthly4) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Monthly donation 4';
       handled = true;
-    } else if (name == StringConstants.monthly5) {
+    } else if (name == ConfigConstants.monthly5) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Monthly donation 5';
       handled = true;
-    } else if (name == StringConstants.monthlySuggested) {
+    } else if (name == ConfigConstants.monthlySuggested) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Monthly donation suggested';
       handled = true;
     }
     // One-time donation actions
-    else if (name == StringConstants.onetime1) {
+    else if (name == ConfigConstants.onetime1) {
       amount = _getAmountForAction(name);
       isRecurring = false;
       actionType = 'One-time donation 1';
       handled = true;
-    } else if (name == StringConstants.onetime2) {
+    } else if (name == ConfigConstants.onetime2) {
       amount = _getAmountForAction(name);
       isRecurring = false;
       actionType = 'One-time donation 2';
       handled = true;
-    } else if (name == StringConstants.onetime3) {
+    } else if (name == ConfigConstants.onetime3) {
       amount = _getAmountForAction(name);
       isRecurring = false;
       actionType = 'One-time donation 3';
       handled = true;
-    } else if (name == StringConstants.onetime4) {
+    } else if (name == ConfigConstants.onetime4) {
       amount = _getAmountForAction(name);
       isRecurring = false;
       actionType = 'One-time donation 4';
       handled = true;
-    } else if (name == StringConstants.onetime5) {
+    } else if (name == ConfigConstants.onetime5) {
       amount = _getAmountForAction(name);
       isRecurring = false;
       actionType = 'One-time donation 5';
       handled = true;
-    } else if (name == StringConstants.onetimeSuggested) {
+    } else if (name == ConfigConstants.onetimeSuggested) {
       amount = _getAmountForAction(name);
       isRecurring = false;
       actionType = 'One-time donation suggested';
       handled = true;
     }
     // Yearly donation actions
-    else if (name == StringConstants.yearly1) {
+    else if (name == ConfigConstants.yearly1) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Yearly donation 1';
       handled = true;
-    } else if (name == StringConstants.yearly2) {
+    } else if (name == ConfigConstants.yearly2) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Yearly donation 2';
       handled = true;
-    } else if (name == StringConstants.yearly3) {
+    } else if (name == ConfigConstants.yearly3) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Yearly donation 3';
       handled = true;
-    } else if (name == StringConstants.yearly4) {
+    } else if (name == ConfigConstants.yearly4) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Yearly donation 4';
       handled = true;
-    } else if (name == StringConstants.yearly5) {
+    } else if (name == ConfigConstants.yearly5) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Yearly donation 5';
       handled = true;
-    } else if (name == StringConstants.yearlySuggested) {
+    } else if (name == ConfigConstants.yearlySuggested) {
       amount = _getAmountForAction(name);
       isRecurring = true;
       actionType = 'Yearly donation suggested';
@@ -301,13 +301,13 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
     final pricing = paymentConfig.pricing;
 
     // Handle suggested amounts
-    if (action == StringConstants.monthlySuggested) {
+    if (action == ConfigConstants.monthlySuggested) {
       return pricing.suggested.monthly;
     }
-    if (action == StringConstants.onetimeSuggested) {
+    if (action == ConfigConstants.onetimeSuggested) {
       return pricing.suggested.oneTime;
     }
-    if (action == StringConstants.yearlySuggested) {
+    if (action == ConfigConstants.yearlySuggested) {
       return pricing.suggested.yearly;
     }
 
