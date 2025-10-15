@@ -14,7 +14,8 @@ description: A meditation learning tool
 # Just build Android APK (used by the script above):
 # ./build_apk.sh
 
-version: 3.5.5+30144
+version: 3.5.5+30145
+
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -97,7 +98,6 @@ dev_dependencies:
   freezed: ^3.1.0
   mockito: ^5.4.6
   analyzer: ^7.4.5
-  json_annotation: ^4.9.0
   device_preview: ^1.2.0
   integration_test:
     sdk: flutter

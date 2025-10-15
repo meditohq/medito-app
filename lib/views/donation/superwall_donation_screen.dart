@@ -203,10 +203,9 @@ class _SuperwallDonationScreenState
       // Choose the best payment method (prioritize platform pay)
       payment_models.PaymentMethod selectedMethod = availableMethods.first;
 
-      // Prefer Google Pay or Apple Pay over card payments
+      // Prefer Apple Pay over card payments
       for (final method in availableMethods) {
-        if (method.type == payment_models.PaymentMethodType.googlePay ||
-            method.type == payment_models.PaymentMethodType.applePay) {
+        if (method.type == payment_models.PaymentMethodType.applePay) {
           selectedMethod = method;
           break;
         }

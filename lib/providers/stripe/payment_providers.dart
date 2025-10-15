@@ -90,23 +90,6 @@ class PaymentState extends _$PaymentState {
 // =============================================================================
 
 @riverpod
-Future<bool> googlePayAvailable(Ref ref) async {
-  try {
-    if (!Platform.isAndroid) return false;
-
-    final isPlatformPaySupported = await Stripe.instance.isPlatformPaySupported(
-      googlePay: const IsGooglePaySupportedParams(),
-    );
-
-    AppLogger.d('PAYMENT', 'Google Pay supported: $isPlatformPaySupported');
-    return isPlatformPaySupported;
-  } catch (e) {
-    AppLogger.e('PAYMENT', 'Error checking Google Pay availability', e);
-    return false;
-  }
-}
-
-@riverpod
 Future<bool> applePayAvailable(Ref ref) async {
   try {
     if (!Platform.isIOS) return false;
@@ -133,18 +116,19 @@ abstract class PaymentMethodService {
 }
 
 @riverpod
-GooglePayService googlePayService(Ref ref) {
-  return GooglePayService(ref);
+CardPaymentService cardPaymentService(Ref ref) {
+  return CardPaymentService(ref);
 }
 
-class GooglePayService implements PaymentMethodService {
+class CardPaymentService implements PaymentMethodService {
   final Ref ref;
 
-  GooglePayService(this.ref);
+  CardPaymentService(this.ref);
 
   @override
   Future<bool> isAvailable() async {
-    return await ref.read(googlePayAvailableProvider.future);
+    // Card payment is always available
+    return true;
   }
 
   @override
@@ -180,31 +164,31 @@ class GooglePayService implements PaymentMethodService {
     paymentState.setStatus(PaymentStatus.presentingPaymentSheet);
 
     try {
-      AppLogger.d(
-          'PAYMENT', 'Presenting Google Pay sheet for ${paymentIntent.id}');
+      AppLogger.d('PAYMENT', 'Presenting PaymentSheet for ${paymentIntent.id}');
 
-      await Stripe.instance.confirmPlatformPayPaymentIntent(
-        clientSecret: paymentIntent.clientSecret,
-        confirmParams: PlatformPayConfirmParams.googlePay(
-          googlePay: GooglePayParams(
-            testEnv: StripeConstants.googlePayConfig['testEnv'] as bool,
-            merchantName:
-                StripeConstants.googlePayConfig['merchantName'] as String,
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: paymentIntent.clientSecret,
+          merchantDisplayName: 'Medito Foundation',
+          applePay: PaymentSheetApplePay(
             merchantCountryCode:
-                StripeConstants.googlePayConfig['countryCode'] as String,
-            currencyCode: paymentIntent.currency,
+                StripeConstants.applePayConfig['countryCode'] as String,
+          ),
+          googlePay: PaymentSheetGooglePay(
+            merchantCountryCode: 'NL',
+            testEnv: false, // Always use production environment
           ),
         ),
       );
 
-      AppLogger.d('PAYMENT',
-          'Google Pay payment confirmed successfully for ${paymentIntent.id}');
+      AppLogger.d('PAYMENT', 'Presenting PaymentSheet');
+      await Stripe.instance.presentPaymentSheet();
 
-      // Payment is already confirmed by Stripe SDK for Google Pay
-      // No need to call backend confirmation endpoint
+      AppLogger.d('PAYMENT',
+          'PaymentSheet completed successfully for ${paymentIntent.id}');
+
       paymentState.setStatus(PaymentStatus.success);
 
-      // Create success result
       final result = PaymentResult.success(
         paymentIntentId: paymentIntent.id,
         amount: paymentIntent.amount,
@@ -212,17 +196,17 @@ class GooglePayService implements PaymentMethodService {
       );
 
       AppLogger.d('PAYMENT',
-          'Google Pay payment complete: ${paymentIntent.amount} ${paymentIntent.currency}');
+          'Card payment complete: ${paymentIntent.amount} ${paymentIntent.currency}');
 
       return result;
     } catch (e) {
       if (e is StripeException && e.error.code == FailureCode.Canceled) {
-        AppLogger.d('PAYMENT', 'Google Pay payment cancelled by user');
+        AppLogger.d('PAYMENT', 'PaymentSheet cancelled by user');
         paymentState.setStatus(PaymentStatus.cancelled);
         return const PaymentResult.cancelled();
       }
 
-      AppLogger.e('PAYMENT', '❌ Google Pay payment failed', e);
+      AppLogger.e('PAYMENT', '❌ PaymentSheet failed', e);
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
       return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
@@ -392,7 +376,8 @@ class OneTimePaymentController extends _$OneTimePaymentController {
       late final PaymentMethodService paymentService;
       switch (paymentMethod) {
         case local_models.PaymentMethodType.googlePay:
-          paymentService = ref.read(googlePayServiceProvider);
+        case local_models.PaymentMethodType.card:
+          paymentService = ref.read(cardPaymentServiceProvider);
           break;
         case local_models.PaymentMethodType.applePay:
           paymentService = ref.read(applePayServiceProvider);
@@ -455,7 +440,8 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
       late final PaymentMethodService paymentService;
       switch (paymentMethod) {
         case local_models.PaymentMethodType.googlePay:
-          paymentService = ref.read(googlePayServiceProvider);
+        case local_models.PaymentMethodType.card:
+          paymentService = ref.read(cardPaymentServiceProvider);
           break;
         case local_models.PaymentMethodType.applePay:
           paymentService = ref.read(applePayServiceProvider);
@@ -518,7 +504,8 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
       late final PaymentMethodService paymentService;
       switch (paymentMethod) {
         case local_models.PaymentMethodType.googlePay:
-          paymentService = ref.read(googlePayServiceProvider);
+        case local_models.PaymentMethodType.card:
+          paymentService = ref.read(cardPaymentServiceProvider);
           break;
         case local_models.PaymentMethodType.applePay:
           paymentService = ref.read(applePayServiceProvider);
@@ -559,11 +546,10 @@ IDonationApiService donationService(Ref ref) {
 String _paymentMethodToString(local_models.PaymentMethodType method) {
   switch (method) {
     case local_models.PaymentMethodType.googlePay:
-      return 'google_pay';
-    case local_models.PaymentMethodType.applePay:
-      return 'apple_pay';
     case local_models.PaymentMethodType.card:
       return 'card';
+    case local_models.PaymentMethodType.applePay:
+      return 'apple_pay';
     case local_models.PaymentMethodType.paypal:
       return 'paypal';
     case local_models.PaymentMethodType.bankTransfer:

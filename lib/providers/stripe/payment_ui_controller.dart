@@ -242,11 +242,10 @@ class PaymentUIController extends _$PaymentUIController {
       local_models.PaymentMethodType method) async {
     switch (method) {
       case local_models.PaymentMethodType.googlePay:
-        return await ref.read(googlePayAvailableProvider.future);
+      case local_models.PaymentMethodType.card:
+        return true; // Card payments are always available (includes Google Pay)
       case local_models.PaymentMethodType.applePay:
         return await ref.read(applePayAvailableProvider.future);
-      case local_models.PaymentMethodType.card:
-        return true; // Card payments are always available
       default:
         return false;
     }
@@ -255,18 +254,6 @@ class PaymentUIController extends _$PaymentUIController {
   /// Gets available payment methods for the current platform
   Future<List<local_models.PaymentMethod>> getAvailablePaymentMethods() async {
     final methods = <local_models.PaymentMethod>[];
-
-    // Check Google Pay availability
-    final googlePayAvailable = await isPaymentMethodAvailable(
-        local_models.PaymentMethodType.googlePay);
-    if (googlePayAvailable) {
-      methods.add(local_models.PaymentMethod(
-        id: 'google_pay',
-        type: local_models.PaymentMethodType.googlePay,
-        displayName: 'Google Pay',
-        isAvailable: true,
-      ));
-    }
 
     // Check Apple Pay availability
     final applePayAvailable =
