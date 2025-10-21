@@ -122,3 +122,4 @@ class TikTokAnalyticsService {
     await logEvent(name: freqEvent, parameters: props);
   }
 }
+

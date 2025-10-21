@@ -1405,4 +1405,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get viewAction => 'Ver';
+
+  @override
+  String get thankYouForYourSupport => 'Gracias por Tu Apoyo';
+
+  @override
+  String get donorSupportMessage =>
+      'Dependemos de donantes como tú para seguir proporcionando mindfulness a todos.';
 }

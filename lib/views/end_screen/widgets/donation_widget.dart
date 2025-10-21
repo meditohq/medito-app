@@ -124,7 +124,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
         children: [
           Text(
             _isDonor
-                ? 'Thank You for Your Support'
+                ? AppLocalizations.of(context)!.thankYouForYourSupport
                 : donationPageModel.title ?? 'Support Medito',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -136,7 +136,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
           const SizedBox(height: 8),
           Text(
             _isDonor
-                ? 'We rely on donors like you to continue providing mindfulness to everyone.'
+                ? AppLocalizations.of(context)!.donorSupportMessage
                 : donationPageModel.text ??
                     AppLocalizations.of(context)!
                         .meditoReliesOnYourDonationsToSurvive,
@@ -181,12 +181,11 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
           Expanded(
             child: ElevatedButton(
               onPressed: () => handleNavigation(
-                button.type,
-                [button.path],
+                TypeConstants.route,
+                [RouteConstants.donation],
                 context,
-                sourceRouteName: button.path == RouteConstants.donation
-                    ? FirebaseAnalyticsService.paywallSourceEndScreen
-                    : null,
+                sourceRouteName:
+                    FirebaseAnalyticsService.paywallSourceEndScreen,
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorConstants.white,
@@ -213,12 +212,11 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
           Expanded(
             child: ElevatedButton(
               onPressed: () => handleNavigation(
-                button.type,
-                [button.path],
+                TypeConstants.route,
+                [RouteConstants.donation],
                 context,
-                sourceRouteName: button.path == RouteConstants.donation
-                    ? FirebaseAnalyticsService.paywallSourceEndScreen
-                    : null,
+                sourceRouteName:
+                    FirebaseAnalyticsService.paywallSourceEndScreen,
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorConstants.lightPurple,

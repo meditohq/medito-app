@@ -369,7 +369,7 @@ class _FadingNetworkImageState extends State<_FadingNetworkImage> {
 
     return Stack(
       fit: StackFit.expand,
-      children: [
+      children: [ 
         // Grey background while loading
         Container(
           color: backgroundColor,

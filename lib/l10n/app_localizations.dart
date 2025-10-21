@@ -2635,6 +2635,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View'**
   String get viewAction;
+
+  /// Title shown to existing donors in the donation widget
+  ///
+  /// In en, this message translates to:
+  /// **'Thank You for Your Support'**
+  String get thankYouForYourSupport;
+
+  /// Message shown to existing donors explaining their importance
+  ///
+  /// In en, this message translates to:
+  /// **'We rely on donors like you to continue providing mindfulness to everyone.'**
+  String get donorSupportMessage;
 }
 
 class _AppLocalizationsDelegate

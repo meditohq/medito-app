@@ -253,6 +253,10 @@ PODS:
   - superwallkit_flutter (0.0.1):
     - Flutter
     - SuperwallKit (= 4.7.0)
+  - tiktok_events_sdk (0.0.1):
+    - Flutter
+    - TikTokBusinessSDK
+  - TikTokBusinessSDK (1.5.1)
   - url_launcher_ios (0.0.1):
     - Flutter
   - workmanager (0.0.1):
@@ -288,6 +292,7 @@ DEPENDENCIES:
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
   - stripe_ios (from `.symlinks/plugins/stripe_ios/ios`)
   - superwallkit_flutter (from `.symlinks/plugins/superwallkit_flutter/ios`)
+  - tiktok_events_sdk (from `.symlinks/plugins/tiktok_events_sdk/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - workmanager (from `.symlinks/plugins/workmanager/ios`)
 
@@ -319,6 +324,7 @@ SPEC REPOS:
     - StripeUICore
     - Superscript
     - SuperwallKit
+    - TikTokBusinessSDK
 
 EXTERNAL SOURCES:
   app_links:
@@ -377,6 +383,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/stripe_ios/ios"
   superwallkit_flutter:
     :path: ".symlinks/plugins/superwallkit_flutter/ios"
+  tiktok_events_sdk:
+    :path: ".symlinks/plugins/tiktok_events_sdk/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   workmanager:
@@ -437,6 +445,8 @@ SPEC CHECKSUMS:
   Superscript: 82dbb40f502823160e75503ebc1b6bac756a503d
   SuperwallKit: 239843161a144ad08af40906ec0307779abd7d12
   superwallkit_flutter: 1a8f16ff97d3a3be52be3f6585279cd82209feb2
+  tiktok_events_sdk: a17263dc678931e4020dc26c499953851645fd7d
+  TikTokBusinessSDK: 6b59d8a69ee23fa714831e8c6f47c34831abc60b
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
   workmanager: 01be2de7f184bd15de93a1812936a2b7f42ef07e
 

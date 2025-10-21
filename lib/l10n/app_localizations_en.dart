@@ -1381,4 +1381,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get viewAction => 'View';
+
+  @override
+  String get thankYouForYourSupport => 'Thank You for Your Support';
+
+  @override
+  String get donorSupportMessage =>
+      'We rely on donors like you to continue providing mindfulness to everyone.';
 }

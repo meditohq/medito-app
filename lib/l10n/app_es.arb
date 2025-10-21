@@ -593,5 +593,13 @@
   "viewAction": "Ver",
   "@viewAction": {
     "description": "Action label for notification actions"
+  },
+  "thankYouForYourSupport": "Gracias por Tu Apoyo",
+  "@thankYouForYourSupport": {
+    "description": "Title shown to existing donors in the donation widget"
+  },
+  "donorSupportMessage": "Dependemos de donantes como tú para seguir proporcionando mindfulness a todos.",
+  "@donorSupportMessage": {
+    "description": "Message shown to existing donors explaining their importance"
   }
 }
