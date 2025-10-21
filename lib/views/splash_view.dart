@@ -8,12 +8,12 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/analytics/tiktok_analytics_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
@@ -146,6 +146,11 @@ class SplashViewState extends ConsumerState<SplashView>
           .initialize(requestAttPermissionImmediately: false);
       AppLogger.i(
           'SPLASH', 'Firebase Analytics initialized with consent mode v2');
+
+      // Initialize TikTok Analytics and log first open once
+      await TikTokAnalyticsService()
+          .initialize(requestAttPermissionImmediately: false);
+      await TikTokAnalyticsService().logAppFirstOpenOnce();
     } catch (e, stackTrace) {
       // Log the error but don't prevent app startup
       AppLogger.e(
@@ -372,16 +377,10 @@ class SplashViewState extends ConsumerState<SplashView>
             : Colors.transparent,
         body: _isLoading
             ? Center(
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: SvgPicture.asset(
-                    AssetConstants.icLogo,
-                    width: 168,
-                  ),
+                child: SvgPicture.asset(
+                  AssetConstants.icLogo,
+                  colorFilter: ColorFilter.mode(ColorConstants.lightPurple, BlendMode.srcIn),
+                  width: 168,
                 ),
               )
             : LayoutBuilder(

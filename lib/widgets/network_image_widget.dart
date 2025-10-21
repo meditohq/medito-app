@@ -133,15 +133,25 @@ class NetworkImageWidget extends ConsumerWidget {
   }
 
   Widget _shimmerLoading() {
-    return Shimmer.fromColors(
-      period: const Duration(seconds: 1),
-      baseColor: ColorConstants.black,
-      highlightColor: ColorConstants.greyIsTheNewBlack,
-      child: Container(
-        color: ColorConstants.black,
-        height: height,
-        width: width,
-      ),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final baseColor =
+            isDark ? ColorConstants.greyIsTheNewGrey : ColorConstants.lightGrey;
+        final backgroundColor =
+            isDark ? ColorConstants.onyx : ColorConstants.lightCard;
+
+        return Shimmer.fromColors(
+          period: const Duration(seconds: 1),
+          baseColor: baseColor,
+          highlightColor: backgroundColor,
+          child: Container(
+            color: backgroundColor,
+            height: height,
+            width: width,
+          ),
+        );
+      },
     );
   }
 }

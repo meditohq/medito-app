@@ -111,31 +111,40 @@ class HomeShimmerWidget extends StatelessWidget {
   Padding _rowCard() {
     return Padding(
       padding: const EdgeInsets.only(right: 15),
-      child: Container(
-        height: 154,
-        width: 154,
-        color: ColorConstants.greyIsTheNewGrey,
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-              child: BoxShimmerWidget(
-                height: 10,
-                width: 300,
-              ),
+      child: Builder(
+        builder: (context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final backgroundColor = isDark
+              ? ColorConstants.greyIsTheNewGrey
+              : ColorConstants.lightCard;
+
+          return Container(
+            height: 154,
+            width: 154,
+            color: backgroundColor,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                  child: BoxShimmerWidget(
+                    height: 10,
+                    width: 300,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                  child: BoxShimmerWidget(
+                    height: 10,
+                    width: 150,
+                  ),
+                ),
+                height8,
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-              child: BoxShimmerWidget(
-                height: 10,
-                width: 150,
-              ),
-            ),
-            height8,
-          ],
-        ),
+          );
+        },
       ),
     );
   }

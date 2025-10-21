@@ -134,7 +134,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 if (imageUrl.isNotEmpty)
                   _FadingNetworkImage(
                     imageUrl: imageUrl,
-                    placeholderAsset: AssetConstants.placeholder,
                   ),
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -349,11 +348,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
 class _FadingNetworkImage extends StatefulWidget {
   final String imageUrl;
-  final String placeholderAsset;
 
   const _FadingNetworkImage({
     required this.imageUrl,
-    required this.placeholderAsset,
   });
 
   @override
@@ -365,13 +362,17 @@ class _FadingNetworkImageState extends State<_FadingNetworkImage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark
+        ? ColorConstants.greyIsTheNewGrey
+        : ColorConstants.lightBackground;
+
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Placeholder image
-        Image.asset(
-          widget.placeholderAsset,
-          fit: BoxFit.cover,
+        // Grey background while loading
+        Container(
+          color: backgroundColor,
         ),
 
         // Network image with fade-in effect
@@ -383,7 +384,7 @@ class _FadingNetworkImageState extends State<_FadingNetworkImage> {
             fit: BoxFit.cover,
             cacheWidth: MediaQuery.of(context).size.width.toInt(),
             errorBuilder: (context, error, stackTrace) {
-              return Container(color: Theme.of(context).colorScheme.surface);
+              return Container(color: backgroundColor);
             },
             frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
               if (frame != null && !_imageLoaded) {
