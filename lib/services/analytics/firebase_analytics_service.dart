@@ -307,6 +307,30 @@ class FirebaseAnalyticsService {
     }
   }
 
+  /// Set the user ID for Firebase Analytics
+  Future<void> setUserId(String? userId) async {
+    if (_runningInTest) return; // Skip in unit tests
+    if (kDebugMode) {
+      print('Firebase Analytics (DEBUG): Would set user ID to: $userId');
+      return; // Skip in debug mode
+    }
+    if (!_initialized) await initialize();
+
+    try {
+      // Only set user ID if analytics consent is granted
+      final prefs = await SharedPreferences.getInstance();
+      bool analyticsEnabled = prefs.getBool(analyticsEnabledKey) ?? true;
+
+      if (analyticsEnabled && _analytics != null) {
+        await _analytics.setUserId(id: userId);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error setting user ID in Firebase Analytics: $e');
+      }
+    }
+  }
+
   /// Log a screen view to Firebase Analytics
   Future<void> logScreenView({
     required String screenName,

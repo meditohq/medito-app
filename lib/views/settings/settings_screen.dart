@@ -41,7 +41,20 @@ final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
 
 final userIdProvider = FutureProvider<String>((ref) async {
   final authRepository = ref.watch(authRepositorySyncProvider);
-  return authRepository.currentUser?.id ?? '';
+  final userId = authRepository.currentUser?.id ?? '';
+
+  // Set user ID for analytics when it changes
+  if (userId.isNotEmpty) {
+    ref.read(analyticsUserIdSetterProvider(userId));
+  }
+
+  return userId;
+});
+
+final analyticsUserIdSetterProvider =
+    FutureProvider.family<void, String>((ref, userId) async {
+  final analytics = FirebaseAnalyticsService();
+  await analytics.setUserId(userId);
 });
 
 TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {

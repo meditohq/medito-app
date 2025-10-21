@@ -185,8 +185,26 @@ class _SuperwallDonationScreenState
 
       final uiController = ref.read(paymentUIControllerProvider.notifier);
       final paywallId = _currentPaywallId ?? 'unknown';
-      final userId =
-          ref.read(authRepositorySyncProvider).currentUser?.id ?? 'unknown';
+      final authRepository = ref.read(authRepositorySyncProvider);
+      final userId = authRepository.currentUser?.id ?? 'unknown';
+
+      // Check if user is logged in
+      final isLoggedIn = await authRepository.isLoggedIn();
+      String? userEmail = authRepository.currentUser?.email;
+
+      // If user is not logged in, collect email for identification
+      if (!isLoggedIn || (userEmail == null || userEmail.isEmpty)) {
+        AppLogger.d('SUPERWALL_DONATION_SCREEN',
+            'User not logged in or no email - collecting email for payment identification');
+
+        userEmail = await _collectEmailForPayment(context);
+        if (userEmail == null) {
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+          return;
+        }
+      }
 
       // Get payment config for currency
       final paymentConfig = await ref.read(paymentConfigProvider.future);
@@ -229,6 +247,7 @@ class _SuperwallDonationScreenState
           paymentMethod: selectedMethod.type,
           paywallId: paywallId,
           userId: userId,
+          userEmail: userEmail,
           paywallSource: widget.source,
           onSuccess: () {
             _completedPaywallId = paywallId;
@@ -242,6 +261,7 @@ class _SuperwallDonationScreenState
           paymentMethod: selectedMethod.type,
           paywallId: paywallId,
           userId: userId,
+          userEmail: userEmail,
           paywallSource: widget.source,
           onSuccess: () {
             _completedPaywallId = paywallId;
@@ -274,6 +294,85 @@ class _SuperwallDonationScreenState
     } finally {
       _isProcessingPayment = false;
     }
+  }
+
+  /// Collect email address from anonymous users for payment identification
+  Future<String?> _collectEmailForPayment(BuildContext context) async {
+    final emailController = TextEditingController();
+    final focusNode = FocusNode();
+    String? email;
+
+    await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        // Use StatefulBuilder to request focus after build
+        return StatefulBuilder(
+          builder: (context, setState) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!focusNode.hasFocus) {
+                focusNode.requestFocus();
+              }
+            });
+
+            return PopScope(
+              canPop: false, // Prevent back button from dismissing dialog
+              child: AlertDialog(
+                title: Text(AppLocalizations.of(context)!.emailForReceipt),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(AppLocalizations.of(context)!
+                        .emailForReceiptDescription),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: emailController,
+                      focusNode: focusNode,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.email,
+                        border: const OutlineInputBorder(),
+                      ),
+                      autofocus: true,
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      final enteredEmail = emailController.text.trim();
+                      if (_isValidEmail(enteredEmail)) {
+                        Navigator.of(dialogContext).pop(enteredEmail);
+                      } else {
+                        ScaffoldMessenger.of(dialogContext).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                AppLocalizations.of(context)!.invalidEmail),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text(AppLocalizations.of(context)!.next),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    ).then((result) {
+      email = result;
+      focusNode.dispose();
+    });
+
+    return email;
+  }
+
+  /// Simple email validation
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
   }
 
   /// Fallback method to open web donation when API fails

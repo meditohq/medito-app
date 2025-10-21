@@ -33,6 +33,7 @@ class PaymentUIController extends _$PaymentUIController {
     required local_models.PaymentMethodType paymentMethod,
     String? paywallId,
     String? userId,
+    String? userEmail,
     String? paywallSource,
     VoidCallback? onSuccess,
   }) async {
@@ -46,7 +47,7 @@ class PaymentUIController extends _$PaymentUIController {
         currency: currency,
         paymentMethod: paymentMethod,
         userId: me.id,
-        userEmail: me.email,
+        userEmail: userEmail ?? me.email,
       );
 
       _handlePaymentResult(context, result, paywallId, 'onetime', userId,
@@ -64,6 +65,7 @@ class PaymentUIController extends _$PaymentUIController {
     required local_models.PaymentMethodType paymentMethod,
     String? paywallId,
     String? userId,
+    String? userEmail,
     String? paywallSource,
     VoidCallback? onSuccess,
   }) async {
@@ -77,7 +79,7 @@ class PaymentUIController extends _$PaymentUIController {
         currency: currency,
         paymentMethod: paymentMethod,
         userId: me.id,
-        userEmail: me.email,
+        userEmail: userEmail ?? me.email,
       );
 
       _handlePaymentResult(context, result, paywallId, 'monthly', userId,
@@ -95,6 +97,7 @@ class PaymentUIController extends _$PaymentUIController {
     required local_models.PaymentMethodType paymentMethod,
     String? paywallId,
     String? userId,
+    String? userEmail,
     String? paywallSource,
     VoidCallback? onSuccess,
   }) async {
@@ -108,7 +111,7 @@ class PaymentUIController extends _$PaymentUIController {
         currency: currency,
         paymentMethod: paymentMethod,
         userId: me.id,
-        userEmail: me.email,
+        userEmail: userEmail ?? me.email,
       );
 
       _handlePaymentResult(context, result, paywallId, 'yearly', userId,

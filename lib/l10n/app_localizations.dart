@@ -380,6 +380,18 @@ abstract class AppLocalizations {
   /// **'Invalid Email.'**
   String get invalidEmail;
 
+  /// No description provided for @emailForReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Email for Receipt'**
+  String get emailForReceipt;
+
+  /// No description provided for @emailForReceiptDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send your donation receipt to this email address. This helps us identify your payment for support and records.'**
+  String get emailForReceiptDescription;
+
   /// No description provided for @fieldRequired.
   ///
   /// In en, this message translates to:

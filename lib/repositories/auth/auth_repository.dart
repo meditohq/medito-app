@@ -15,6 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'dart:io';
 import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class User {
   final String id;

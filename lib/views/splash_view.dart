@@ -20,6 +20,7 @@ import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/root/root_page_view.dart';
+import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -349,6 +350,18 @@ class SplashViewState extends ConsumerState<SplashView>
         );
       }
 
+      // Set user ID for analytics after user initialization
+      try {
+        final userId = await ref.read(userIdProvider.future);
+        if (userId.isNotEmpty) {
+          await FirebaseAnalyticsService().setUserId(userId);
+          AppLogger.i('SPLASH', 'User ID set for analytics: $userId');
+        }
+      } catch (e, stackTrace) {
+        AppLogger.e(
+            'SPLASH', 'Error setting user ID for analytics', e, stackTrace);
+      }
+
       ref.read(rootCombineProvider(context));
       AppLogger.i('SPLASH', 'Services initialization complete');
     } catch (e, stackTrace) {
@@ -379,7 +392,8 @@ class SplashViewState extends ConsumerState<SplashView>
             ? Center(
                 child: SvgPicture.asset(
                   AssetConstants.icLogo,
-                  colorFilter: ColorFilter.mode(ColorConstants.lightPurple, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                      ColorConstants.lightPurple, BlendMode.srcIn),
                   width: 168,
                 ),
               )

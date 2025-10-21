@@ -153,6 +153,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get invalidEmail => 'Correo electrónico inválido.';
 
   @override
+  String get emailForReceipt => 'Correo electrónico para recibo';
+
+  @override
+  String get emailForReceiptDescription =>
+      'Enviaremos el recibo de tu donación a esta dirección de correo electrónico. Esto nos ayuda a identificar tu pago para soporte y registros.';
+
+  @override
   String get fieldRequired => 'Campo requerido';
 
   @override
