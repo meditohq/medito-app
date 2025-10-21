@@ -11,6 +11,8 @@ class EnvConfig {
   final String donationToken;
   final String superwallApiKey;
   final String paywallEnvironment;
+  final String tiktokAndroidAppId;
+  final String tiktokIosAppId;
 
   const EnvConfig({
     required this.environment,
@@ -23,6 +25,8 @@ class EnvConfig {
     required this.donationToken,
     required this.superwallApiKey,
     required this.paywallEnvironment,
+    required this.tiktokAndroidAppId,
+    required this.tiktokIosAppId,
   });
 }
 
@@ -38,6 +42,8 @@ class ProdEnv extends EnvConfig {
     required super.donationToken,
     required super.superwallApiKey,
     required super.paywallEnvironment,
+    required super.tiktokAndroidAppId,
+    required super.tiktokIosAppId,
   });
 }
 
@@ -53,6 +59,8 @@ class StagingEnv extends EnvConfig {
     required super.donationToken,
     required super.superwallApiKey,
     required super.paywallEnvironment,
+    required super.tiktokAndroidAppId,
+    required super.tiktokIosAppId,
   });
 }
 
@@ -68,6 +76,8 @@ const _prodEnv = ProdEnv(
   superwallApiKey: String.fromEnvironment('SUPERWALL_API_KEY'),
   paywallEnvironment:
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
+  tiktokAndroidAppId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
+  tiktokIosAppId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
 );
 
 const _stagingEnv = StagingEnv(
@@ -82,6 +92,8 @@ const _stagingEnv = StagingEnv(
   superwallApiKey: String.fromEnvironment('SUPERWALL_API_KEY'),
   paywallEnvironment:
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
+  tiktokAndroidAppId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
+  tiktokIosAppId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
 );
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
@@ -96,6 +108,8 @@ String get donationBaseUrl => _currentEnv.donationBaseUrl;
 String get donationToken => _currentEnv.donationToken;
 String get superwallApiKey => _currentEnv.superwallApiKey;
 String get paywallEnvironment => _currentEnv.paywallEnvironment;
+String get tiktokAndroidAppId => _currentEnv.tiktokAndroidAppId;
+String get tiktokIosAppId => _currentEnv.tiktokIosAppId;
 
 class HTTPConstants {
   //END POINTS

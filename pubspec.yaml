@@ -14,7 +14,7 @@ description: A meditation learning tool
 # Just build Android APK (used by the script above):
 # ./build_apk.sh
 
-version: 3.5.5+30145
+version: 3.5.6+30146
 
 
 environment:
@@ -50,6 +50,7 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   freezed_annotation: ^3.1.0
   haptic_feedback: ^0.5.1+1
+  tiktok_events_sdk: ^1.0.9
   health: ^12.2.1
   home_widget: ^0.7.0+1
   http: ^1.4.0
