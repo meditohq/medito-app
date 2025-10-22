@@ -1,11 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/storefront_provider.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
@@ -90,7 +92,7 @@ Future<void> handleNavigation(
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.donation)) {
-    await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
+    await _handleDonationNavigation(context, ref, sourceRouteName);
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }
@@ -122,6 +124,27 @@ Future<void> _handleEmailNavigation(List<String?> ids, WidgetRef? ref) async {
         'Debug info\n$deviceAppAndUserInfo\n--- Write below this line ---'; // These will be localized in the UI layer
     var emailAddress = ids.first!;
     await launchEmailSubmission(emailAddress, body: info);
+  }
+}
+
+Future<void> _handleDonationNavigation(
+    BuildContext context, WidgetRef? ref, String? sourceRouteName) async {
+  if (ref == null) return;
+
+  final isUSStorefront = ref.read(isUSStorefrontProvider);
+
+  if (!Platform.isIOS || isUSStorefront) {
+    await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
+  } else {
+    final uri = Uri.parse('https://meditofoundation.org/donate');
+    if (await canLaunchUrl(uri)) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => _URLLauncherScreen(url: uri),
+        ),
+      );
+    }
   }
 }
 

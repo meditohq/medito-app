@@ -69,19 +69,9 @@ class _SuperwallDonationScreenState
     _hasTriggeredPaywall = true;
 
     try {
-      AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Starting paywall trigger');
-
-      // Get payment config to pass currency and pricing data to Superwall
-      // Add error handling for payment config loading failures
       try {
         await ref.read(paymentConfigProvider.future);
       } catch (paymentConfigError) {
-        AppLogger.e(
-            'SUPERWALL_DONATION_SCREEN',
-            'Failed to load payment config, falling back to web donation',
-            paymentConfigError);
-        // If payment config fails (e.g., API not deployed to prod),
-        // fall back to web donation
         if (mounted) {
           setState(() {
             _isLoading = false;
