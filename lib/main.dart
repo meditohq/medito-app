@@ -110,12 +110,17 @@ void main() async {
   }
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  // Initialize Crashlytics
-  await CrashlyticsService().initialize();
+    // Initialize Crashlytics
+    await CrashlyticsService().initialize();
+  } catch (e) {
+    AppLogger.e('MAIN', 'Firebase initialization failed: $e');
+    // Continue without Firebase for development
+  }
 
   // Initialize Stripe
   await _configureStripe();

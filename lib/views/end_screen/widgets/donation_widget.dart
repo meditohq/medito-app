@@ -184,6 +184,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 TypeConstants.route,
                 [RouteConstants.donation],
                 context,
+                ref: ref,
                 sourceRouteName:
                     FirebaseAnalyticsService.paywallSourceEndScreen,
               ),
