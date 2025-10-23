@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
   const OnboardingDonationScreen({super.key, this.onNext});
@@ -41,32 +40,24 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
   }
 
   void _handleDonationAction(BuildContext context, bool didDonate) async {
-    if (didDonate) {
-      // Log analytics event for donate now tap
-      await FirebaseAnalyticsService().logEvent(
-        name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
-      );
+    // Log analytics event for donate now tap
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+    );
 
-      _didAttemptDonation = true;
+    _didAttemptDonation = true;
 
-      handleNavigation(
-        TypeConstants.route,
-        [RouteConstants.donation],
-        context,
-        sourceRouteName: FirebaseAnalyticsService.paywallSourceOnboarding,
-      );
-    }
-  }
-
-  void _handleNextAction() {
-    widget.onNext?.call();
+    handleNavigation(
+      TypeConstants.route,
+      [RouteConstants.donation],
+      context,
+      ref: ref,
+      sourceRouteName: FirebaseAnalyticsService.paywallSourceOnboarding,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final meAsync = ref.watch(meProvider);
-    final isDonor = meAsync.value?.hasActiveSubscription ?? false;
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -78,9 +69,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
               Column(
                 children: [
                   Text(
-                    isDonor
-                        ? AppLocalizations.of(context)!.donationThankYouTitle
-                        : AppLocalizations.of(context)!.donationTitle,
+                    AppLocalizations.of(context)!.donationTitle,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 24,
@@ -90,9 +79,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    isDonor
-                        ? AppLocalizations.of(context)!.donationThankYouBody
-                        : AppLocalizations.of(context)!.donationBody,
+                    AppLocalizations.of(context)!.donationBody,
                     style: TextStyle(
                       color: Theme.of(context)
                           .colorScheme
@@ -105,37 +92,9 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                   ),
                 ],
               ),
-              Column(
-                children: [
-                  if (!isDonor)
-                    _buildActionButton(
-                      text: AppLocalizations.of(context)!.next,
-                      onPressed: () => _handleDonationAction(context, true),
-                    ),
-                  if (isDonor) ...[
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: TextButton(
-                        onPressed: () async {
-                          _handleNextAction();
-                        },
-                        style: TextButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.next,
-                          style: const TextStyle(
-                            color: ColorConstants.lightPurple,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
+              _buildActionButton(
+                text: AppLocalizations.of(context)!.next,
+                onPressed: () => _handleDonationAction(context, false),
               ),
             ],
           ),

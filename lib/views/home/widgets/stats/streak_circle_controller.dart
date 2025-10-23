@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';

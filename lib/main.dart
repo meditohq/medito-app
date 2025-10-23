@@ -19,7 +19,6 @@ import 'package:medito/constants/theme/app_theme.dart';
 import 'package:medito/constants/widget_constants.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/config/superwall_config.dart';
-import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/locale_provider.dart';

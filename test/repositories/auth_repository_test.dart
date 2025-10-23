@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
@@ -14,9 +13,6 @@ import 'package:medito/services/secure_storage_service.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'package:flutter/services.dart';
-
-import '../helpers/firebase_test_helper.dart';
 
 // Mock dependencies
 class MockAuthApiService extends Mock implements AuthApiService {}

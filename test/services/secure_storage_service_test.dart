@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
-import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/services/secure_storage_service.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter/services.dart';
@@ -224,7 +223,8 @@ void main() async {
           .thenThrow(exception);
 
       // Action
-      final result = await secureStorageService.getRefreshToken(logFailureToFirebase: false);
+      final result = await secureStorageService.getRefreshToken(
+          logFailureToFirebase: false);
 
       // Assert
       expect(result, equals(testToken));
@@ -241,7 +241,8 @@ void main() async {
           .thenAnswer((_) async => null);
 
       // Action
-      final result = await secureStorageService.getRefreshToken(logFailureToFirebase: false);
+      final result = await secureStorageService.getRefreshToken(
+          logFailureToFirebase: false);
 
       // Verify
       expect(result, isNull);

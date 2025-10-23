@@ -2,11 +2,10 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
-import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/config_constants.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
-import 'package:medito/services/network/donation_api_service.dart';
 
 class SuperwallConfig {
   static bool _isConfigured = false;
@@ -152,17 +151,9 @@ class SuperwallConfig {
         // Mark as configured first
         _isConfigured = true;
 
-        // Automatically fetch payment config and set user attributes
-        try {
-          AppLogger.d('SUPERWALL_CONFIG',
-              'Fetching payment config for user attributes...');
-          await _fetchAndSetPaymentConfig();
-          AppLogger.d('SUPERWALL_CONFIG',
-              'Payment config fetched and user attributes set');
-        } catch (e) {
-          AppLogger.e('SUPERWALL_CONFIG',
-              'Failed to fetch payment config for user attributes', e);
-        }
+        // Do not fetch payment config here; it is provided via Riverpod cache
+        AppLogger.d('SUPERWALL_CONFIG',
+            'Skipping payment config fetch; will use cached provider value');
         AppLogger.d('SUPERWALL_CONFIG',
             '=== Superwall configuration completed successfully ===');
       } else {
@@ -284,25 +275,8 @@ class SuperwallConfig {
     }
   }
 
-  /// Fetch payment config and set user attributes automatically
-  static Future<void> _fetchAndSetPaymentConfig() async {
-    try {
-      final donationClient = DonationApiService();
-      final response =
-          await donationClient.getRequest(HTTPConstants.paymentConfig);
-      final config =
-          PaymentConfigModel.fromJson(response['data'] as Map<String, dynamic>);
-
-      AppLogger.d(
-          'SUPERWALL_CONFIG', 'Fetched payment config for user attributes');
-
-      // Set user attributes with the fetched config
-      await setUserAttributes(paymentConfig: config);
-    } catch (e) {
-      AppLogger.e('SUPERWALL_CONFIG', 'Failed to fetch payment config', e);
-      rethrow;
-    }
-  }
+  // Removed network fetch here to avoid duplicate calls; user attributes are
+  // set by services that already cache the payment config.
 }
 
 // Returns the currency symbol for a given currency code.

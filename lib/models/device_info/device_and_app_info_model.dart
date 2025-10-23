@@ -13,6 +13,8 @@ abstract class DeviceAndAppInfoModel with _$DeviceAndAppInfoModel {
     required String appVersion,
     required String languageCode,
     required String currencyName,
+    String? currency,
+    String? country,
   }) = _DeviceAndAppInfoModel;
 
   factory DeviceAndAppInfoModel.fromJson(Map<String, Object?> json) =>

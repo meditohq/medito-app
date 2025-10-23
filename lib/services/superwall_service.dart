@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/config_constants.dart';
+import 'package:medito/config/superwall_config.dart';
 import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -24,12 +25,38 @@ class SuperwallService {
   /// Loads and caches the payment config
   Future<void> loadPaymentConfig() async {
     try {
-      AppLogger.d('SUPERWALL_SERVICE', 'Loading payment config');
-      final paymentService = ref.read(paymentServiceProvider);
-      _cachedPaymentConfig = await paymentService.getPaymentConfig();
+      if (_cachedPaymentConfig != null) {
+        AppLogger.d('SUPERWALL_SERVICE', 'Payment config already cached');
+        return;
+      }
+
+      AppLogger.d('SUPERWALL_SERVICE', 'Loading payment config via provider');
+      _cachedPaymentConfig = await ref.read(paymentConfigProvider.future);
       AppLogger.d('SUPERWALL_SERVICE', 'Payment config loaded and cached');
     } catch (error, stackTrace) {
       AppLogger.e('SUPERWALL_SERVICE', 'Failed to load payment config', error,
+          stackTrace);
+    }
+  }
+
+  /// Applies Superwall user attributes from the cached payment config
+  Future<void> applyUserAttributesIfAvailable() async {
+    try {
+      if (_cachedPaymentConfig == null) {
+        AppLogger.d('SUPERWALL_SERVICE',
+            'No cached payment config available to apply user attributes');
+        return;
+      }
+
+      await SuperwallConfig.setUserAttributes(
+        paymentConfig: _cachedPaymentConfig!,
+      );
+      AppLogger.d('SUPERWALL_SERVICE', 'Applied user attributes to Superwall');
+    } catch (error, stackTrace) {
+      AppLogger.e(
+          'SUPERWALL_SERVICE',
+          'Failed to apply user attributes from cached config',
+          error,
           stackTrace);
     }
   }

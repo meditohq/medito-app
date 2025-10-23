@@ -32,14 +32,9 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  
+
   target 'RunnerTests' do
     inherit! :search_paths
-  end
-
-  target 'MeditoWidgetExtension' do
-    inherit! :search_paths   # Inherit pods search paths for the widget extension
-    pod 'PromisesObjC'
   end
 end
 
@@ -65,14 +60,16 @@ post_install do |installer|
         # dart: PermissionGroup.notification
         'PERMISSION_NOTIFICATIONS=1',
       ]
-      
+
       # Add app tracking transparency framework
       config.build_settings['OTHER_LDFLAGS'] ||= '$(inherited)'
       config.build_settings['OTHER_LDFLAGS'] += ' -framework AppTrackingTransparency'
 
-      # Exclude arm64 for simulator builds (Apple Silicon workaround)
-      if config.name == 'Debug' || config.name == 'Release'
-        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      # Fix architecture exclusions for Apple Silicon Macs
+      excluded_archs = config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]']
+      if excluded_archs && excluded_archs.include?('arm64')
+        # Remove arm64 from exclusion on Apple Silicon Macs
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = excluded_archs.gsub('arm64', '').strip
       end
 
       # Finally, force Automatic signing for Pods targets AFTER other settings
@@ -81,6 +78,20 @@ post_install do |installer|
       config.build_settings['CODE_SIGN_IDENTITY'] = ''
       config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ''
       config.build_settings['PROVISIONING_PROFILE'] = ''
-    end 
+    end
+  end
+
+  # Also apply architecture exclusion to the main project targets
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+      target.build_configurations.each do |config|
+        # Fix architecture exclusions for Apple Silicon Macs
+        excluded_archs = config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]']
+        if excluded_archs && excluded_archs.include?('arm64')
+          # Remove arm64 from exclusion on Apple Silicon Macs
+          config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = excluded_archs.gsub('arm64', '').strip
+        end
+      end
+    end
   end
 end

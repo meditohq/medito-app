@@ -39,6 +39,9 @@ class PaywallManagerService {
       // Load payment config before setting up delegate
       await _superwallService.loadPaymentConfig();
 
+      // Apply user attributes from cached payment config
+      await _superwallService.applyUserAttributesIfAvailable();
+
       // Set up Superwall delegate with donation callback
       await _superwallService.setupSuperwallDelegate(onDonationInitiated);
 

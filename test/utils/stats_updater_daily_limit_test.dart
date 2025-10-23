@@ -1,15 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/types/type_constants.dart';
-import 'package:medito/models/local_all_stats.dart';
-import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/services/network/http_api_service.dart';
-import 'package:medito/services/stats_service.dart';
 import 'package:medito/utils/stats_manager.dart';
-import 'package:medito/utils/stats_updater.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Test implementation of FeatureFlagsNotifier
@@ -60,4 +52,3 @@ void main() {
     });
   });
 }
-

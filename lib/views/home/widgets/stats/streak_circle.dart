@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
-import 'package:medito/models/local_audio_completed.dart';
-import 'package:medito/models/stats/all_stats_model.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';

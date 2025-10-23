@@ -69,18 +69,6 @@ class _SuperwallDonationScreenState
     _hasTriggeredPaywall = true;
 
     try {
-      try {
-        await ref.read(paymentConfigProvider.future);
-      } catch (paymentConfigError) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-          await _fallbackToWebDonation();
-          return;
-        }
-      }
-
       final paywallManager = ref.read(paywallManagerServiceProvider);
 
       await paywallManager.triggerDonationPaywall(

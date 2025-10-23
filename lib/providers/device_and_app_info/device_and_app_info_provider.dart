@@ -27,7 +27,7 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(Ref ref) async {
   var deviceInfo = await _getDeviceInfo();
   var localeInfo = _getLocaleInfo(ref);
 
-  var data = <String, String>{
+  var data = <String, dynamic>{
     'model': deviceInfo.model,
     'os': deviceInfo.os,
     'platform': deviceInfo.platform,
@@ -35,6 +35,8 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(Ref ref) async {
     'appVersion': packageInfo.version,
     'languageCode': localeInfo.languageCode,
     'currencyName': localeInfo.currencyName,
+    'currency': localeInfo.currency,
+    'country': localeInfo.country,
   };
 
   return DeviceAndAppInfoModel.fromJson(data);
@@ -43,8 +45,11 @@ Future<DeviceAndAppInfoModel> deviceAndAppInfo(Ref ref) async {
 class _LocaleInfo {
   final String languageCode;
   final String currencyName;
+  final String? currency;
+  final String? country;
 
-  _LocaleInfo(this.languageCode, this.currencyName);
+  _LocaleInfo(
+      this.languageCode, this.currencyName, this.currency, this.country);
 }
 
 _LocaleInfo _getLocaleInfo(Ref ref) {
@@ -57,7 +62,14 @@ _LocaleInfo _getLocaleInfo(Ref ref) {
   var currencyName =
       NumberFormat.simpleCurrency(locale: languageCode).currencyName ?? '';
 
-  return _LocaleInfo(languageCode, currencyName);
+  // Get country code (ISO format like "US", "GB")
+  var country = currentLocale?.countryCode ??
+      PlatformDispatcher.instance.locale.countryCode;
+
+  // Get currency code (ISO format like "usd", "eur")
+  var currency = _getCurrencyCode(country);
+
+  return _LocaleInfo(languageCode, currencyName, currency, country);
 }
 
 class _DeviceInfo {
@@ -87,6 +99,92 @@ Future<_DeviceInfo> _getDeviceInfo() async {
   }
 
   return _DeviceInfo(deviceModel, deviceOS, devicePlatform);
+}
+
+String? _getCurrencyCode(String? countryCode) {
+  if (countryCode == null) return null;
+
+  // Basic mapping of country codes to currency codes
+  final currencyMap = {
+    'US': 'usd',
+    'GB': 'gbp',
+    'UK': 'gbp', // Alternative for UK
+    'DE': 'eur',
+    'FR': 'eur',
+    'IT': 'eur',
+    'ES': 'eur',
+    'NL': 'eur',
+    'BE': 'eur',
+    'AT': 'eur',
+    'PT': 'eur',
+    'FI': 'eur',
+    'IE': 'eur',
+    'GR': 'eur',
+    'LU': 'eur',
+    'SI': 'eur',
+    'MT': 'eur',
+    'CY': 'eur',
+    'SK': 'eur',
+    'EE': 'eur',
+    'LV': 'eur',
+    'LT': 'eur',
+    'HR': 'eur',
+    'CA': 'cad',
+    'AU': 'aud',
+    'NZ': 'nzd',
+    'JP': 'jpy',
+    'CN': 'cny',
+    'IN': 'inr',
+    'BR': 'brl',
+    'MX': 'mxn',
+    'AR': 'ars',
+    'CL': 'clp',
+    'CO': 'cop',
+    'PE': 'pen',
+    'VE': 'ves',
+    'UY': 'uyu',
+    'PY': 'pyg',
+    'BO': 'bob',
+    'EC': 'usd', // Ecuador uses USD
+    'ZA': 'zar',
+    'EG': 'egp',
+    'NG': 'ngn',
+    'KE': 'kes',
+    'GH': 'ghs',
+    'MA': 'mad',
+    'TN': 'tnd',
+    'TR': 'try',
+    'IL': 'ils',
+    'SA': 'sar',
+    'AE': 'aed',
+    'QA': 'qar',
+    'KW': 'kwd',
+    'BH': 'bhd',
+    'OM': 'omr',
+    'JO': 'jod',
+    'LB': 'lbp',
+    'IQ': 'iqd',
+    'SY': 'syp',
+    'YE': 'yer',
+    'IR': 'irr',
+    'PK': 'pkr',
+    'BD': 'bdt',
+    'LK': 'lkr',
+    'NP': 'npr',
+    'MM': 'mmk',
+    'TH': 'thb',
+    'VN': 'vnd',
+    'MY': 'myr',
+    'SG': 'sgd',
+    'ID': 'idr',
+    'PH': 'php',
+    'KR': 'krw',
+    'TW': 'twd',
+    'HK': 'hkd',
+    'MO': 'mop',
+  };
+
+  return currencyMap[countryCode.toUpperCase()];
 }
 
 @riverpod
