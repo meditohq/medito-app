@@ -583,6 +583,19 @@ class SplashViewState extends ConsumerState<SplashView>
                                           width: double.infinity,
                                           height: 48,
                                           child: OutlinedButton(
+                                            style: OutlinedButton.styleFrom(
+                                              backgroundColor: Theme.of(context)
+                                                  .colorScheme
+                                                  .surface,
+                                              foregroundColor: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                              side: BorderSide(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .outline,
+                                              ),
+                                            ),
                                             onPressed: _isSigningIn
                                                 ? null
                                                 : () async {
