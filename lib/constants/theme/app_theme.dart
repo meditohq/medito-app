@@ -143,7 +143,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
         if (states.contains(WidgetState.selected)) {
           return ColorConstants.lightPurple;
         }
-        return isDark ? ColorConstants.greyIsTheNewGrey : ColorConstants.white;
+        return ColorConstants.white;
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
