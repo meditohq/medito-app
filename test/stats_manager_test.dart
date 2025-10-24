@@ -326,6 +326,101 @@ void main() {
   });
 
   group('StatsManager Sync Tests', () {
+    test('sync - skips network when within TTL and not dirty', () async {
+      // Arrange - set up a scenario where last synced is recent and not dirty
+      var testDate = DateTime(2025, 1, 15, 12, 0, 0);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      // Set last synced to be within TTL (recent)
+      statsManager.setStatsForTesting(
+        LocalAllStats.empty().copyWith(
+          updated: testDate
+              .subtract(const Duration(seconds: 30))
+              .millisecondsSinceEpoch,
+        ),
+      );
+
+      // Mock stats service to verify it's not called
+      when(mockStatsService.fetchAllStats()).thenAnswer((_) async {
+        fail(
+            'fetchAllStats should not be called when within TTL and not dirty');
+      });
+
+      // Act - sync without force
+      await statsManager.sync();
+
+      // Assert - no network call made, no exception thrown
+      // Test passes if we reach here without failing
+    });
+
+    test('sync - makes network call when forced', () async {
+      // Arrange
+      var testDate = DateTime(2025, 1, 15, 12, 0, 0);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      statsManager.setStatsForTesting(LocalAllStats.empty());
+
+      var remoteStats = LocalAllStats.empty().copyWith(
+        totalTracksCompleted: 5,
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'test-track',
+            timestamp: testDate.millisecondsSinceEpoch,
+          ),
+        ],
+      );
+
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => remoteStats);
+      when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+      // Act - sync with force
+      await statsManager.sync(force: true);
+
+      // Assert - network call was made and stats were updated
+      var result = await statsManager.localAllStats;
+      expect(result.totalTracksCompleted, 5);
+      expect(result.audioCompleted?.length, 1);
+      expect(result.audioCompleted?.first.id, 'test-track');
+
+      verify(mockStatsService.fetchAllStats()).called(1);
+    });
+
+    test('sync - makes network call when outside TTL', () async {
+      // Arrange
+      var testDate = DateTime(2025, 1, 15, 12, 0, 0);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      // Set last synced more than 60 seconds ago (outside TTL)
+      statsManager.setStatsForTesting(
+        LocalAllStats.empty().copyWith(
+          updated: testDate
+              .subtract(const Duration(seconds: 70))
+              .millisecondsSinceEpoch,
+        ),
+      );
+
+      var remoteStats = LocalAllStats.empty().copyWith(
+        totalTracksCompleted: 3,
+        audioCompleted: [
+          LocalAudioCompleted(
+            id: 'remote-track',
+            timestamp: testDate.millisecondsSinceEpoch,
+          ),
+        ],
+      );
+
+      when(mockStatsService.fetchAllStats())
+          .thenAnswer((_) async => remoteStats);
+      when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+      // Act - sync without force, should make network call when outside TTL
+      await statsManager.sync();
+
+      // Assert - network call was made because outside TTL
+      verify(mockStatsService.fetchAllStats()).called(1);
+    });
+
     test('sync - handles complex merging scenarios correctly', () async {
       // Create a fresh StatsManager instance
       var testStatsManager = StatsManager();
@@ -2146,6 +2241,10 @@ void main() {
       // Now change mock to return second edit stats
       when(mockStatsService.fetchAllStats())
           .thenAnswer((_) async => secondEditRemoteStats);
+
+      // Move time forward to be outside TTL
+      statsManager
+          .setCurrentDateForTesting(today.add(const Duration(seconds: 65)));
 
       // Second sync to process second edit
       await statsManager.sync();

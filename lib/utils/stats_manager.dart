@@ -32,11 +32,14 @@ class StatsManager {
 
   static const _syncLockKey = 'stats_sync_lock';
   static const _syncLockTimeout = Duration(seconds: 30);
+  static const _syncTtl = Duration(seconds: 60);
 
   late StatsService _statsService;
   LocalAllStats? _allStats;
   bool _isInitialized = false;
   DateTime? _testDate;
+  DateTime? _lastSyncedAt;
+  bool _dirty = false;
 
   StatsManager._internal();
 
@@ -70,10 +73,21 @@ class StatsManager {
     }
   }
 
-  Future<void> sync() async {
-    //dev.log'StatsManager: Starting sync');
+  Future<void> sync({bool force = false}) async {
+    //dev.log'StatsManager: Starting sync (force: $force)');
     if (!_isInitialized) {
       await initialize();
+    }
+
+    // Early return if not forced and not dirty and within TTL
+    if (!force) {
+      final now = _getCurrentDate();
+      final withinTtl =
+          _lastSyncedAt != null && now.difference(_lastSyncedAt!) < _syncTtl;
+      if (!_dirty && withinTtl) {
+        //dev.log'StatsManager: Skipping sync - within TTL and not dirty');
+        return;
+      }
     }
 
     for (var i = 0; i < 3; i++) {
@@ -133,6 +147,9 @@ class StatsManager {
 
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
+      // Mark as synced and clear dirty flag after successful POST
+      _lastSyncedAt = _getCurrentDate();
+      _dirty = false;
     } else {
       throw Exception("Stats are null");
     }
@@ -143,6 +160,11 @@ class StatsManager {
   Future<LocalAllStats> get localAllStats async {
     if (_allStats == null) {
       _allStats = await _loadLocalAllStats();
+
+      // Initialize _lastSyncedAt from the updated field if available
+      if (_allStats!.updated > 0) {
+        _lastSyncedAt = DateTime.fromMillisecondsSinceEpoch(_allStats!.updated);
+      }
 
       // If local stats are empty, sync with server to try to get valid stats
       if (_allStats!.totalTracksCompleted == 0 &&
@@ -460,6 +482,9 @@ class StatsManager {
       await sync();
     }
 
+    // Mark as dirty since we're about to modify stats
+    _dirty = true;
+
     if (AudioCompletionTracker.checkTrackCrossedMidnight(
       endTimestamp: audioCompleted.timestamp,
       duration: duration,
@@ -481,6 +506,9 @@ class StatsManager {
       _allStats = calculateStreak(_allStats!);
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
+      // Mark as synced and clear dirty flag after successful POST
+      _lastSyncedAt = _getCurrentDate();
+      _dirty = false;
     }
   }
 
@@ -489,6 +517,9 @@ class StatsManager {
     if (_allStats == null) {
       await sync();
     }
+
+    // Mark as dirty since we're about to modify stats
+    _dirty = true;
 
     var updatedTracksChecked = _allStats?.tracksChecked ?? [];
     if (!updatedTracksChecked.contains(id)) {
@@ -508,6 +539,9 @@ class StatsManager {
     if (_allStats == null) {
       await sync();
     }
+
+    // Mark as dirty since we're about to modify stats
+    _dirty = true;
 
     var updatedTracksChecked = _allStats?.tracksChecked ?? [];
     if (updatedTracksChecked.remove(trackId)) {
@@ -532,6 +566,9 @@ class StatsManager {
     if (_allStats == null) {
       await sync();
     }
+
+    // Mark as dirty since we're about to modify stats
+    _dirty = true;
 
     final currentFreezes = _allStats?.streakFreezes ?? 0;
     final maxFreezes = _allStats?.maxStreakFreezes ?? 0;
@@ -623,6 +660,9 @@ class StatsManager {
     if (_allStats == null) {
       return false;
     }
+
+    // Mark as dirty since we're about to modify stats
+    _dirty = true;
 
     var availableStreakFreezes = _allStats!.streakFreezes ?? 0;
     if (availableStreakFreezes <= 0) {
@@ -790,6 +830,12 @@ class StatsManager {
   @visibleForTesting
   void setStatsForTesting(LocalAllStats stats) {
     _allStats = stats;
+    // Initialize _lastSyncedAt from the updated field if available
+    if (stats.updated > 0) {
+      _lastSyncedAt = DateTime.fromMillisecondsSinceEpoch(stats.updated);
+    } else {
+      _lastSyncedAt = null;
+    }
   }
 
   @visibleForTesting
@@ -809,6 +855,8 @@ class StatsManager {
     _allStats = null;
     _isInitialized = false;
     _testDate = null;
+    _lastSyncedAt = null;
+    _dirty = false;
   }
 
   DateTime _getCurrentDate() {

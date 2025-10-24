@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/storefront_provider.dart';
@@ -57,12 +58,18 @@ Future<void> handleNavigation(
     final url = ids.last ?? 'https://meditofoundation.org/';
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      Navigator.push(
+      final isEditStatsUrl = url.startsWith(editStatsUrl);
+      await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (context) => _URLLauncherScreen(url: uri),
         ),
       );
+      // After returning from edit stats web form, force sync to get updated stats
+      if (isEditStatsUrl && ref != null) {
+        ref.read(statsManagerProvider).sync(force: true);
+        ref.read(statsProvider.notifier).refresh();
+      }
     }
   } else if (type.contains('settings')) {
     await _pushRoute(SettingsScreen(), ref);
@@ -100,17 +107,14 @@ Future<void> handleNavigation(
 
 Future<bool?> _pushRoute(Widget route, WidgetRef? ref) async {
   return await navigatorKey.currentState
-      ?.push<bool>(MaterialPageRoute(builder: (context) => route))
-      .then((success) {
-    ref?.read(statsProvider.notifier).refresh();
-    return success;
-  });
+      ?.push<bool>(MaterialPageRoute(builder: (context) => route));
 }
 
 Future<void> _handleTrackNavigation(List<String?> ids, WidgetRef? ref) async {
   try {
     var trackId = ids.first!;
     await _pushRoute(TrackView(trackId: trackId), ref);
+    ref?.read(statsProvider.notifier).refresh();
   } catch (e, s) {
     AppLogger.d('ROUTES', s.toString());
   }
