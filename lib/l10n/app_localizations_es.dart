@@ -1428,4 +1428,148 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get donorSupportMessage =>
       'Dependemos de donantes como tú para seguir proporcionando mindfulness a todos.';
+
+  @override
+  String get smartReminderDay1TitleVar1 => 'Hasta mañana 🌱';
+
+  @override
+  String smartReminderDay1BodyVar1(String streak) {
+    return 'Tienes una racha de $streak días. ¿Hasta mañana?';
+  }
+
+  @override
+  String get smartReminderDay1TitleVar2 => 'Paso fuerte ✨';
+
+  @override
+  String smartReminderDay1BodyVar2(String consistency) {
+    return 'Consistencia $consistency%. Sigamos adelante.';
+  }
+
+  @override
+  String get smartReminderDay1TitleVar3 => 'Las victorias pequeñas suman 💜';
+
+  @override
+  String get smartReminderDay1BodyVar3 =>
+      'Unos minutos mañana mantienen tu impulso vivo.';
+
+  @override
+  String get smartReminderDay2TitleVar1 => 'Mantén el flujo 🔁';
+
+  @override
+  String get smartReminderDay2BodyVar1 =>
+      'Recuperemos esa racha. Unos minutos pueden marcar una gran diferencia.';
+
+  @override
+  String get smartReminderDay2TitleVar2 => 'Construye tu ritmo 🧘';
+
+  @override
+  String get smartReminderDay2BodyVar2 => 'Otra práctica suave te espera.';
+
+  @override
+  String get smartReminderDay2TitleVar3 => 'Tú puedes 🌟';
+
+  @override
+  String get smartReminderDay2BodyVar3 =>
+      'Regresa a tu respiración, un momento a la vez.';
+
+  @override
+  String get smartReminderDay3TitleVar1 => 'Construye el hábito 📆';
+
+  @override
+  String get smartReminderDay3BodyVar1 => 'El impulso importa. Tú puedes.';
+
+  @override
+  String get smartReminderDay3TitleVar2 => ' Chispa de tres días ✴️';
+
+  @override
+  String get smartReminderDay3BodyVar2 => 'Tu práctica está tomando forma.';
+
+  @override
+  String get smartReminderDay3TitleVar3 => 'Un suave empujón 🤍';
+
+  @override
+  String get smartReminderDay3BodyVar3 =>
+      'Dos minutos conscientes son suficientes.';
+
+  @override
+  String get smartReminderDay4Title => 'Pasos pequeños 🪴';
+
+  @override
+  String get smartReminderDay4Body =>
+      'Han pasado 4 días. Reinicia tu práctica con una sesión corta.';
+
+  @override
+  String get smartReminderDay5Title => 'Lo estás haciendo genial 💪';
+
+  @override
+  String get smartReminderDay5Body =>
+      'Una pausa calmada hoy te mantiene en el camino.';
+
+  @override
+  String get smartReminderDay6Title => 'Casi una semana 📈';
+
+  @override
+  String get smartReminderDay6Body =>
+      'Cierra el ciclo. Haz de hoy un momento consciente.';
+
+  @override
+  String get smartReminderDay7Title => 'Revisión semanal 🎉';
+
+  @override
+  String get smartReminderDay7Body =>
+      'Ha pasado una semana. ¿Listo para regresar?';
+
+  @override
+  String get smartReminderDay8Title => 'Nuevo comienzo 🌤️';
+
+  @override
+  String get smartReminderDay8Body =>
+      'Energía de nueva semana. Solo unos minutos conscientes.';
+
+  @override
+  String get smartReminderDay9Title => 'Encuentra tu centro 🎯';
+
+  @override
+  String get smartReminderDay9Body => 'Una sesión corta puede resetear tu día.';
+
+  @override
+  String get smartReminderDay10Title => 'Dos dígitos 🔟';
+
+  @override
+  String get smartReminderDay10Body =>
+      'Han pasado 10 días. Continúa donde lo dejaste.';
+
+  @override
+  String get smartReminderDay11Title => 'Suave empujón 🤍';
+
+  @override
+  String get smartReminderDay11Body =>
+      'Detente, respira y nota cómo te sientes.';
+
+  @override
+  String get smartReminderDay12Title => 'Mantén la estabilidad 🧭';
+
+  @override
+  String get smartReminderDay12Body => 'Un momento calmado te espera.';
+
+  @override
+  String get smartReminderDay13Title => 'Casi llegas ✨';
+
+  @override
+  String get smartReminderDay13Body =>
+      'Dos semanas están cerca. Intenta un reinicio de dos minutos.';
+
+  @override
+  String get smartReminderDay14Title => 'Revisión de dos semanas 🔔';
+
+  @override
+  String get smartReminderDay14Body =>
+      'Han pasado 14 días. Comienza de nuevo hoy, gentilmente.';
+
+  @override
+  String get smartReminderDay15Title => 'Pausaremos los recordatorios 🌿';
+
+  @override
+  String get smartReminderDay15Body =>
+      'Estos recordatorios no parecen estar funcionando, así que los pausaremos por ahora.';
 }

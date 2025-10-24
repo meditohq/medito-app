@@ -111,6 +111,9 @@ Future<bool> handleStats(
           durationMs: durationMs,
           streak: streak,
           consistency: consistency,
+          l10n: ref != null
+              ? AppLocalizations.of(navigatorKey.currentContext!)
+              : null,
         );
         AppLogger.d('STATS', 'Smart Reminder series scheduled');
       } else {

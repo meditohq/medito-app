@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../constants/constants.dart';
+import '../../l10n/app_localizations.dart';
+import '../../l10n/app_localizations_en.dart';
 import '../../providers/notification/reminder_provider.dart';
 
 class SmartRemindersService {
@@ -60,13 +62,16 @@ class SmartRemindersScheduler {
     DateTime anchorLocal, {
     required int streak,
     required double consistency,
+    AppLocalizations? l10n,
   }) async {
+    final localizations = l10n ?? _getFallbackLocalizations();
     final items = <_SeriesItem>[];
 
     for (var i = 0; i < 15; i++) {
       final when = anchorLocal.add(Duration(days: i));
       final tzWhen = tz.TZDateTime.from(when, tz.local);
-      final copy = _copyForDay(i + 1, streak: streak, consistency: consistency);
+      final copy = _copyForDay(i + 1,
+          streak: streak, consistency: consistency, l10n: localizations);
       items.add(_SeriesItem(
           id: smartBaseId + i, when: tzWhen, title: copy.$1, body: copy.$2));
     }
@@ -91,6 +96,7 @@ class SmartRemindersScheduler {
     required int durationMs,
     required int streak,
     required double consistency,
+    AppLocalizations? l10n,
   }) async {
     final end = DateTime.fromMillisecondsSinceEpoch(endMs);
     final start = end.subtract(Duration(milliseconds: durationMs));
@@ -98,106 +104,81 @@ class SmartRemindersScheduler {
         .add(const Duration(days: 1))
         .subtract(const Duration(minutes: 15));
     await scheduleSeriesFromAnchor(anchor,
-        streak: streak, consistency: consistency);
+        streak: streak, consistency: consistency, l10n: l10n);
   }
 
   (String, String) _copyForDay(int day,
-      {required int streak, required double consistency}) {
+      {required int streak,
+      required double consistency,
+      required AppLocalizations l10n}) {
     final percent = (consistency * 100).round();
     switch (day) {
       case 1:
         final variants = [
           (
-            'See you tomorrow 🌱',
-            'You are on a $streak day streak. See you tomorrow?'
+            l10n.smartReminderDay1TitleVar1,
+            l10n.smartReminderDay1BodyVar1(streak.toString())
           ),
-          ('Strong step ✨', 'Consistency $percent%. Let’s keep it going.'),
           (
-            'Tiny wins add up 💜',
-            'A few minutes tomorrow keeps your momentum alive.'
+            l10n.smartReminderDay1TitleVar2,
+            l10n.smartReminderDay1BodyVar2(percent.toString())
           ),
+          (l10n.smartReminderDay1TitleVar3, l10n.smartReminderDay1BodyVar3),
         ];
         final idx = (DateTime.now().day + streak) % variants.length;
         return variants[idx];
       case 2:
         final variants = [
-          (
-            'Keep the flow 🔁',
-            'Let’s get that streak going again. Just a few minutes can make a big difference.'
-          ),
-          ('Build your rhythm 🧘', 'Another gentle practice awaits.'),
-          (
-            'You have got this 🌟',
-            'Return to your breath, one moment at a time.'
-          ),
+          (l10n.smartReminderDay2TitleVar1, l10n.smartReminderDay2BodyVar1),
+          (l10n.smartReminderDay2TitleVar2, l10n.smartReminderDay2BodyVar2),
+          (l10n.smartReminderDay2TitleVar3, l10n.smartReminderDay2BodyVar3),
         ];
         final idx = (DateTime.now().day + streak + 1) % variants.length;
         return variants[idx];
       case 3:
         final variants = [
-          ('Build the habit 📆', 'Momentum matters. You have got this.'),
-          ('Three day spark ✴️', 'Your practice is taking shape.'),
-          ('A gentle nudge 🤍', 'Two mindful minutes is enough.'),
+          (l10n.smartReminderDay3TitleVar1, l10n.smartReminderDay3BodyVar1),
+          (l10n.smartReminderDay3TitleVar2, l10n.smartReminderDay3BodyVar2),
+          (l10n.smartReminderDay3TitleVar3, l10n.smartReminderDay3BodyVar3),
         ];
         final idx = (DateTime.now().day + streak + 2) % variants.length;
         return variants[idx];
       case 4:
-        return (
-          'Small steps 🪴',
-          'It has been 4 days. Restart your practice with a short session.'
-        );
+        return (l10n.smartReminderDay4Title, l10n.smartReminderDay4Body);
       case 5:
-        return (
-          'You are doing great 💪',
-          'A calm pause today keeps you on track.'
-        );
+        return (l10n.smartReminderDay5Title, l10n.smartReminderDay5Body);
       case 6:
-        return (
-          'Nearly a week 📈',
-          'Close the loop. Make today a mindful moment.'
-        );
+        return (l10n.smartReminderDay6Title, l10n.smartReminderDay6Body);
       case 7:
-        return (
-          'One week check in 🎉',
-          'It has been a week. Ready to come back?'
-        );
+        return (l10n.smartReminderDay7Title, l10n.smartReminderDay7Body);
       case 8:
-        return (
-          'Fresh start 🌤️',
-          'New week energy. Just a few mindful minutes.'
-        );
+        return (l10n.smartReminderDay8Title, l10n.smartReminderDay8Body);
       case 9:
-        return ('Find your centre 🎯', 'A short session can reset your day.');
+        return (l10n.smartReminderDay9Title, l10n.smartReminderDay9Body);
       case 10:
-        return (
-          'Double digits 🔟',
-          'It has been 10 days. Pick up where you left off.'
-        );
+        return (l10n.smartReminderDay10Title, l10n.smartReminderDay10Body);
       case 11:
-        return ('Gentle nudge 🤍', 'Pause, breathe, and notice how you feel.');
+        return (l10n.smartReminderDay11Title, l10n.smartReminderDay11Body);
       case 12:
-        return ('Keep steady 🧭', 'A calm moment is waiting for you.');
+        return (l10n.smartReminderDay12Title, l10n.smartReminderDay12Body);
       case 13:
-        return (
-          'Almost there ✨',
-          'Two weeks is near. Try a two minute restart.'
-        );
+        return (l10n.smartReminderDay13Title, l10n.smartReminderDay13Body);
       case 14:
-        return (
-          'Two week check in 🔔',
-          'It has been 14 days. Start again today, gently.'
-        );
+        return (l10n.smartReminderDay14Title, l10n.smartReminderDay14Body);
       case 15:
-        return (
-          'We will pause reminders 🌿',
-          'These reminders do not seem to be working, so we will stop for now.'
-        );
+        return (l10n.smartReminderDay15Title, l10n.smartReminderDay15Body);
       default:
-        return ('Gentle nudge 🤍', 'Pause, breathe, and notice how you feel.');
+        return (l10n.smartReminderDay11Title, l10n.smartReminderDay11Body);
     }
   }
 
-  // Placeholder no-op since we switched to embedded strings for now to keep changes minimal.
+  AppLocalizations _getFallbackLocalizations() {
+    // For background operations where we don't have a BuildContext,
+    // we return a fallback that should work for most cases
+    // This is a simple implementation - in a production app you might
+    // want to store the user's language preference and load accordingly
+    return AppLocalizationsEn();
+  }
 }
 
 class _SeriesItem {

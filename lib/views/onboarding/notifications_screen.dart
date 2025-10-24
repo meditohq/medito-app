@@ -120,6 +120,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       anchorLocal,
       streak: stats.streakCurrent,
       consistency: stats.consistencyScore,
+      l10n: AppLocalizations.of(context),
     );
 
     ref.read(reminderTimeProvider.notifier).state = TimeOfDay(
