@@ -20,9 +20,9 @@ import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/widgets/expandable_section_widget.dart';
 import 'package:medito/views/settings/widgets/theme_selection_dialog.dart';
-import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/services/reminders/smart_reminders_service.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
 
@@ -38,6 +38,26 @@ final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
 
   return _getReminderTimeFromPrefs(prefs);
 });
+
+class ReminderEnabledNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
+    final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
+    return prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
+        (savedHour != null && savedMinute != null);
+  }
+
+  Future<void> setEnabled(bool value) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, value);
+    state = value;
+  }
+}
+
+final reminderEnabledProvider = NotifierProvider<ReminderEnabledNotifier, bool>(
+    () => ReminderEnabledNotifier());
 
 final userIdProvider = FutureProvider<String>((ref) async {
   final authRepository = ref.watch(authRepositorySyncProvider);
@@ -225,7 +245,7 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildDailyNotificationTile(BuildContext context, WidgetRef ref) {
-    final reminderTime = ref.watch(reminderTimeProvider);
+    final isEnabled = ref.watch(reminderEnabledProvider);
 
     return Card(
       borderOnForeground: true,
@@ -237,21 +257,34 @@ class SettingsScreen extends ConsumerWidget {
           size: 24,
           color: Theme.of(context).colorScheme.onSurface,
         ),
-        title: AppLocalizations.of(context)!.dailyReminderTitle,
-        subTitle: reminderTime != null
-            ? ('${AppLocalizations.of(context)!.setFor} ${reminderTime.format(context)}')
-            : null,
+        title: AppLocalizations.of(context)!.smartReminders,
+        subTitle: null,
         hasUnderline: false,
         isSwitch: true,
-        onTap: () {
-          _selectTime(context, ref);
-        },
-        switchValue: reminderTime != null,
-        onSwitchChanged: (value) {
+        switchValue: isEnabled,
+        onSwitchChanged: (value) async {
           if (value) {
-            _selectTime(context, ref);
+            var accepted =
+                await PermissionHandler.requestAlarmPermission(context);
+            if (!accepted) return;
+
+            final prefs = ref.read(sharedPreferencesProvider);
+            final service = SmartRemindersService(
+              prefs: prefs,
+              reminders: ref.read(reminderProvider),
+            );
+
+            final time = await service.enable();
+            await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
+            ref.read(reminderTimeProvider.notifier).state = time;
           } else {
-            _clearReminder(context, ref);
+            final prefs = ref.read(sharedPreferencesProvider);
+            final service = SmartRemindersService(
+              prefs: prefs,
+              reminders: ref.read(reminderProvider),
+            );
+            await ref.read(reminderEnabledProvider.notifier).setEnabled(false);
+            await service.disable();
           }
         },
       ),
@@ -390,73 +423,8 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _clearReminder(BuildContext context, WidgetRef ref) async {
-    final reminders = ref.read(reminderProvider);
-    final prefs = ref.read(sharedPreferencesProvider);
-
-    await reminders.cancelDailyNotification();
-    await _clearSavedTime(prefs);
-    ref.read(reminderTimeProvider.notifier).state = null;
-    _showClearReminderSnackBar(context);
-  }
-
-  Future<void> _clearSavedTime(SharedPreferences prefs) async {
-    await prefs.remove(SharedPreferenceConstants.savedHours);
-    await prefs.remove(SharedPreferenceConstants.savedMinutes);
-  }
-
   List<SettingsItem> _getItemsBySection(
       List<SettingsItem> items, String section) {
     return items.where((item) => item.section == section).toList();
-  }
-
-  Future<void> _savePickedTime(
-    SharedPreferences prefs,
-    TimeOfDay pickedTime,
-  ) async {
-    await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
-    await prefs.setInt(
-      SharedPreferenceConstants.savedMinutes,
-      pickedTime.minute,
-    );
-  }
-
-  Future<void> _selectTime(BuildContext context, WidgetRef ref) async {
-    var accepted = await PermissionHandler.requestAlarmPermission(context);
-
-    if (!accepted) return;
-
-    final reminders = ref.read(reminderProvider);
-    final prefs = ref.read(sharedPreferencesProvider);
-
-    final initialTime = ref.read(reminderTimeProvider) ?? TimeOfDay.now();
-
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: initialTime,
-      helpText: AppLocalizations.of(context)!.pickTimeHelpText,
-    );
-
-    if (pickedTime != null) {
-      await reminders.scheduleDailyNotification(pickedTime);
-      await _savePickedTime(prefs, pickedTime);
-      ref.read(reminderTimeProvider.notifier).state = pickedTime;
-      _showSnackBar(context, pickedTime);
-    }
-  }
-
-  void _showClearReminderSnackBar(BuildContext context) {
-    showSnackBar(
-        context, AppLocalizations.of(context)!.reminderNotificationCleared);
-  }
-
-  void _showSnackBar(BuildContext context, TimeOfDay pickedTime) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '${AppLocalizations.of(context)!.reminderNotificationScheduled} ${pickedTime.format(context)}',
-        ),
-      ),
-    );
   }
 }

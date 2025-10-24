@@ -4,6 +4,9 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/types/type_constants.dart';
+import '../constants/strings/shared_preference_constants.dart';
+import '../providers/notification/reminder_provider.dart';
+import '../services/reminders/smart_reminders_service.dart';
 import '../providers/feature_flags_provider.dart';
 import '../routes/routes.dart';
 import '../widgets/snackbar_widget.dart';
@@ -79,6 +82,42 @@ Future<bool> handleStats(
     } catch (widgetError) {
       // Don't fail the whole operation if widget update fails
       AppLogger.e('STATS', 'Failed to update widgets', widgetError);
+    }
+
+    // Schedule or reschedule Smart Reminders based on latest session time
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hasSaved =
+          prefs.getInt(SharedPreferenceConstants.savedHours) != null &&
+              prefs.getInt(SharedPreferenceConstants.savedMinutes) != null;
+      final enabled =
+          prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
+              hasSaved;
+
+      if (enabled) {
+        final endMs = payload[TypeConstants.timestampIdKey] as int;
+        final durationMs = payload[TypeConstants.durationIdKey] as int;
+
+        final currentStats = await statsManager.localAllStats;
+        final streak = currentStats.streakCurrent;
+        final consistency = currentStats.consistencyScore;
+
+        final scheduler = SmartRemindersScheduler(
+          prefs: prefs,
+          reminders: ReminderProvider(),
+        );
+        await scheduler.rescheduleAfterSession(
+          endMs: endMs,
+          durationMs: durationMs,
+          streak: streak,
+          consistency: consistency,
+        );
+        AppLogger.d('STATS', 'Smart Reminder series scheduled');
+      } else {
+        AppLogger.d('STATS', 'Smart Reminders disabled; skipping scheduling');
+      }
+    } catch (reminderError) {
+      AppLogger.e('STATS', 'Failed to schedule Smart Reminder', reminderError);
     }
 
     return true;

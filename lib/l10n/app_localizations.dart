@@ -1526,6 +1526,24 @@ abstract class AppLocalizations {
   /// **'Skip for Now'**
   String get skipForNow;
 
+  /// No description provided for @smartReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Reminders'**
+  String get smartReminders;
+
+  /// No description provided for @turnOnSmartReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on Smart Reminders'**
+  String get turnOnSmartReminders;
+
+  /// No description provided for @smartRemindersOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Reminders On'**
+  String get smartRemindersOn;
+
   /// No description provided for @donationTitle.
   ///
   /// In en, this message translates to:
@@ -2339,7 +2357,7 @@ abstract class AppLocalizations {
   /// No description provided for @statsWelcomeMessage.
   ///
   /// In en, this message translates to:
-  /// **'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication.\\n\\nYour home screen will show your best score to keep you motivated.'**
+  /// **'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication. Your home screen will show your best score to keep you motivated.'**
   String get statsWelcomeMessage;
 
   /// No description provided for @accountDeletionInitiated.

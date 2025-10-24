@@ -97,6 +97,38 @@ class ReminderProvider {
     await _flutterLocalNotificationsPlugin.cancel(dailyNotificationId);
     await clearBadge();
   }
+
+  Future<void> scheduleSmartReminderSeries(
+      List<ScheduledReminder> items) async {
+    try {
+      for (final item in items) {
+        await _flutterLocalNotificationsPlugin.zonedSchedule(
+          item.id,
+          item.title,
+          item.body,
+          item.scheduledDate,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              androidNotificationChannelId,
+              androidNotificationChannelName,
+              icon: androidNotificationIcon,
+              channelDescription: androidNotificationChannelDescription,
+              importance: Importance.max,
+              priority: Priority.high,
+            ),
+          ),
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        );
+      }
+    } catch (_) {}
+  }
+
+  Future<void> cancelSmartReminderSeries() async {
+    for (var i = 0; i < smartSeriesCount; i++) {
+      await _flutterLocalNotificationsPlugin.cancel(smartBaseId + i);
+    }
+    await clearBadge();
+  }
 }
 
 const androidNotificationChannelId = 'medito_reminder_channel';
@@ -105,3 +137,20 @@ const androidNotificationIcon = 'logo';
 const androidNotificationChannelDescription =
     'Notification for meditation reminders';
 const dailyNotificationId = 10101024;
+
+const smartBaseId = 10102000;
+const smartSeriesCount = 15;
+
+class ScheduledReminder {
+  final int id;
+  final tz.TZDateTime scheduledDate;
+  final String title;
+  final String body;
+
+  ScheduledReminder({
+    required this.id,
+    required this.scheduledDate,
+    required this.title,
+    required this.body,
+  });
+}

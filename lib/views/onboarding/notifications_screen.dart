@@ -11,6 +11,8 @@ import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/utils/stats_manager.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key, this.onNext});
@@ -82,7 +84,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
   }
 
-  Future<void> _handleSetReminder() async {
+  Future<void> _handleEnableSmartReminders() async {
     // Log analytics event for set reminder tap
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
@@ -91,38 +93,40 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final accepted = await PermissionHandler.requestAlarmPermission(context);
     if (!accepted || !mounted) return;
 
-    final reminders = ref.read(reminderProvider);
     final prefs = await SharedPreferences.getInstance();
-    final initialTime = ref.read(reminderTimeProvider) ?? TimeOfDay.now();
+    await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
 
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: initialTime,
-      helpText: AppLocalizations.of(context)!.pickTimeHelpText,
+    final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
+    final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
+    final now = DateTime.now();
+    DateTime anchorLocal;
+    if (savedHour != null && savedMinute != null) {
+      final candidate =
+          DateTime(now.year, now.month, now.day, savedHour, savedMinute);
+      anchorLocal = candidate.isBefore(now)
+          ? candidate.add(const Duration(days: 1))
+          : candidate;
+    } else {
+      anchorLocal = now.add(const Duration(days: 1));
+    }
+
+    final statsManager = StatsManager()..initialize();
+    final stats = await statsManager.localAllStats;
+    final scheduler = SmartRemindersScheduler(
+      prefs: prefs,
+      reminders: ref.read(reminderProvider),
+    );
+    await scheduler.scheduleSeriesFromAnchor(
+      anchorLocal,
+      streak: stats.streakCurrent,
+      consistency: stats.consistencyScore,
     );
 
-    if (pickedTime != null && mounted) {
-      // Log analytics event for reminder confirmation
-      await FirebaseAnalyticsService().logEvent(
-        name: FirebaseAnalyticsService.eventOnboardingReminderConfirmTap,
-        parameters: {
-          'reminder_hour': pickedTime.hour,
-          'reminder_minute': pickedTime.minute,
-        },
-      );
-
-      await reminders.scheduleDailyNotification(pickedTime);
-      await prefs.setInt(SharedPreferenceConstants.savedHours, pickedTime.hour);
-      await prefs.setInt(
-          SharedPreferenceConstants.savedMinutes, pickedTime.minute);
-      ref.read(reminderTimeProvider.notifier).state = pickedTime;
-      _navigateNext();
-    } else if (mounted) {
-      // Log analytics event for reminder cancellation
-      await FirebaseAnalyticsService().logEvent(
-        name: FirebaseAnalyticsService.eventOnboardingReminderCancelTap,
-      );
-    }
+    ref.read(reminderTimeProvider.notifier).state = TimeOfDay(
+      hour: anchorLocal.hour,
+      minute: anchorLocal.minute,
+    );
+    _navigateNext();
   }
 
   void _navigateNext() => widget.onNext?.call();
@@ -165,16 +169,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               Column(
                 children: [
                   if (reminderTime != null)
-                    _buildTimeButton(reminderTime)
+                    _buildSmartRemindersOnButton()
                   else if (_notificationsGranted)
                     _buildActionButton(
-                      text: AppLocalizations.of(context)!.setReminder,
-                      onPressed: _handleSetReminder,
+                      text: AppLocalizations.of(context)!.turnOnSmartReminders,
+                      onPressed: _handleEnableSmartReminders,
                     )
                   else
                     _buildActionButton(
-                      text:
-                          AppLocalizations.of(context)!.setReminder,
+                      text: AppLocalizations.of(context)!.setReminder,
                       onPressed:
                           _isProcessing ? null : _handleNotificationsPermission,
                     ),
@@ -205,13 +208,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
   }
 
-  Widget _buildTimeButton(TimeOfDay reminderTime) {
+  Widget _buildSmartRemindersOnButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _navigateNext,
         child: Text(
-          '${AppLocalizations.of(context)!.setFor} ${reminderTime.format(context)}',
+          AppLocalizations.of(context)!.smartRemindersOn,
           style: const TextStyle(color: Colors.white),
         ),
       ),

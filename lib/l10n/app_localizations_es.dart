@@ -784,6 +784,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get skipForNow => 'Omitir por Ahora';
 
   @override
+  String get smartReminders => 'Recordatorios Inteligentes';
+
+  @override
+  String get turnOnSmartReminders => 'Activar Recordatorios Inteligentes';
+
+  @override
+  String get smartRemindersOn => 'Recordatorios Inteligentes Activados';
+
+  @override
   String get donationTitle => 'Ayuda a Mantener Medito Gratis';
 
   @override
@@ -1244,7 +1253,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get statsWelcomeMessage =>
-      'Hemos agregado una puntuación de consistencia para ayudarte a sentirte más realizado. A diferencia de las rachas, no se reinicia en días perdidos, reflejando tu dedicación general.\\n\\nTu pantalla de inicio mostrará tu mejor puntuación para mantenerte motivado.';
+      'Hemos agregado una puntuación de consistencia para ayudarte a sentirte más realizado. A diferencia de las rachas, no se reinicia en días perdidos, reflejando tu dedicación general. Tu pantalla de inicio mostrará tu mejor puntuación para mantenerte motivado.';
 
   @override
   String get accountDeletionInitiated =>

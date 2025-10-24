@@ -770,6 +770,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skipForNow => 'Skip for Now';
 
   @override
+  String get smartReminders => 'Smart Reminders';
+
+  @override
+  String get turnOnSmartReminders => 'Turn on Smart Reminders';
+
+  @override
+  String get smartRemindersOn => 'Smart Reminders On';
+
+  @override
   String get donationTitle => 'Help Keep Medito Free';
 
   @override
@@ -1220,7 +1229,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsWelcomeMessage =>
-      'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication.\\n\\nYour home screen will show your best score to keep you motivated.';
+      'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication. Your home screen will show your best score to keep you motivated.';
 
   @override
   String get accountDeletionInitiated =>
