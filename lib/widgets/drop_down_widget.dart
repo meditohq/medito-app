@@ -48,7 +48,9 @@ class DropdownWidget<T> extends StatelessWidget {
       height: isLandscape ? 56 : 48, // Set height to 48 in portrait mode
       decoration: BoxDecoration(
         borderRadius: radius,
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).cardColor
+            : Theme.of(context).colorScheme.surface,
       ),
       child: _buildContent(context, radius, textStyle),
     );
@@ -131,7 +133,9 @@ class DropdownWidget<T> extends StatelessWidget {
             )
             .toList(),
         elevation: 8,
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).cardColor
+            : Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
