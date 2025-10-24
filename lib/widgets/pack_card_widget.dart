@@ -80,6 +80,8 @@ class PackCardWidget extends StatelessWidget {
           throw TimeoutException('ColorScheme generation timed out');
         });
       } catch (e) {
+        // Silently handle image loading errors for color scheme generation
+        // This prevents crashes when pack cover images are missing or fail to load
         return null;
       }
     }

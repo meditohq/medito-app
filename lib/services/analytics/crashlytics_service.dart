@@ -23,9 +23,9 @@ class CrashlyticsService {
     'HandshakeException',
     'Software caused connection abort',
     'HTTP request failed',
-    'statusCode: 404',
-    'statusCode: 403',
-    'statusCode: 500',
+    'Invalid statusCode: 404',
+    'Invalid statusCode: 403',
+    'Invalid statusCode: 500',
     'Connection refused',
     'Connection timed out',
   ];
@@ -79,8 +79,23 @@ class CrashlyticsService {
   bool _hasNetworkError(dynamic exception) {
     final exceptionString = exception.toString();
 
-    return _networkErrorPatterns
-        .any((pattern) => exceptionString.contains(pattern));
+    // Check for network error patterns in the exception string
+    if (_networkErrorPatterns
+        .any((pattern) => exceptionString.contains(pattern))) {
+      return true;
+    }
+
+    // Also check if the exception is an HttpException with status code 404, 403, or 500
+    if (exception is HttpException) {
+      final message = exception.message;
+      if (message.contains('404') ||
+          message.contains('403') ||
+          message.contains('500')) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   bool _shouldIgnoreImageLoadingError({
