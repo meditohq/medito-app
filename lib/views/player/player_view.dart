@@ -104,15 +104,19 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasScheme == true) {
       try {
-        precacheImage(NetworkImage(imageUrl), context).catchError((error) {
-          // Silently handle precaching errors - they're not critical
-          AppLogger.d('PlayerView',
-              'Failed to precache image: $imageUrl, error: $error');
-        });
+        final networkImage = NetworkImage(imageUrl);
+        // Use unawaited to avoid blocking the build method
+        unawaited(
+          precacheImage(networkImage, context).catchError((error) {
+            // Silently handle precaching errors - they're not critical
+            AppLogger.d('PlayerView',
+                'Failed to precache image: $imageUrl, error: $error');
+          }),
+        );
       } catch (e) {
-        // Silently handle any synchronous errors from precaching
-        AppLogger.d(
-            'PlayerView', 'Failed to precache image: $imageUrl, error: $e');
+        // Silently handle any synchronous errors from NetworkImage constructor or precaching
+        AppLogger.d('PlayerView',
+            'Failed to create or precache image: $imageUrl, error: $e');
       }
     }
 
@@ -369,7 +373,7 @@ class _FadingNetworkImageState extends State<_FadingNetworkImage> {
 
     return Stack(
       fit: StackFit.expand,
-      children: [ 
+      children: [
         // Grey background while loading
         Container(
           color: backgroundColor,
