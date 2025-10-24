@@ -45,14 +45,14 @@ class StatsManager {
 
   Future<bool> _acquireLock() async {
     var prefs = await SharedPreferences.getInstance();
-    var lastLockTime = prefs.getInt(_syncLockKey) ?? 0;
+    var lastLockTime = await prefs.getInt(_syncLockKey) ?? 0;
     var now = _getCurrentDate().millisecondsSinceEpoch;
 
     if (now - lastLockTime > _syncLockTimeout.inMilliseconds) {
       var success = await prefs.setInt(_syncLockKey, now);
       if (!success) return false;
 
-      var checkLock = prefs.getInt(_syncLockKey);
+      var checkLock = await prefs.getInt(_syncLockKey);
       return checkLock == now;
     }
     return false;
@@ -211,7 +211,7 @@ class StatsManager {
     if (localAllStats == null) {
       var prefs = await SharedPreferences.getInstance();
       var localAllStatsJson =
-          prefs.getString(SharedPreferenceConstants.localAllStatsKey);
+          await prefs.getString(SharedPreferenceConstants.localAllStatsKey);
 
       if (localAllStatsJson != null && localAllStatsJson != 'null') {
         localAllStats = LocalAllStats.fromJson(
@@ -459,7 +459,8 @@ class StatsManager {
   Future<LocalAllStats> _loadLocalAllStats() async {
     try {
       var prefs = await SharedPreferences.getInstance();
-      var json = prefs.getString(SharedPreferenceConstants.localAllStatsKey);
+      var json =
+          await prefs.getString(SharedPreferenceConstants.localAllStatsKey);
       if (json != null) {
         var decodedJson = jsonDecode(json);
         if (decodedJson is Map<String, dynamic>) {
