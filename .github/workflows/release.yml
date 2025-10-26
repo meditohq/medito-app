@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  android-release:
+    name: Android Release (APK to GitHub Release)
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Generate code (build_runner)
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Generate Pigeon
+        run: flutter pub run pigeon --input pigeon_conf.dart
+
+      - name: Write .prod.json from secret
+        env:
+          PROD_ENV: ${{ secrets.PROD_ENV }}
+        run: |
+          printf "%s" "$PROD_ENV" > .prod.json
+
+      - name: Build APK (prod, live paywall)
+        run: |
+          flutter build apk --flavor prod --release \
+            --dart-define-from-file=.prod.json \
+            --dart-define=PAYWALL_ENV=live \
+            --obfuscate --split-debug-info=./symbols
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/app/outputs/apk/prod/release/app-prod-release.apk
+
+  ios-release:
+    name: iOS Release (TestFlight)
+    runs-on: macos-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install Fastlane
+        run: gem install fastlane --no-document
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Generate code (build_runner)
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Generate Pigeon
+        run: flutter pub run pigeon --input pigeon_conf.dart
+
+      - name: Fastlane Match + Build + TestFlight upload
+        working-directory: ios
+        env:
+          MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
+          MEDITO_APPSTORE_CERTIFICATES_REPO: ${{ secrets.MEDITO_APPSTORE_CERTIFICATES_REPO }}
+          DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
+          DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
+          APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+          TEMP_KEYCHAIN_USER: ${{ secrets.TEMP_KEYCHAIN_USER }}
+          TEMP_KEYCHAIN_PASSWORD: ${{ secrets.TEMP_KEYCHAIN_PASSWORD }}
+          PROVISIONING_PROFILE_SPECIFIER: ${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
+        run: |
+          fastlane beta
+

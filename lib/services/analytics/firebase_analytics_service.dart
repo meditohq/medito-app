@@ -79,8 +79,6 @@ class FirebaseAnalyticsService {
   static const String eventOnboardingReminderCancelTap =
       'onboarding_reminder_cancel_tap';
   static const String eventOnboardingDonateNowTap = 'onboarding_donate_now_tap';
-  static const String eventOnboardingDonateNoThanksTap =
-      'onboarding_donate_no_thanks_tap';
   static const String eventOnboardingCompleted = 'onboarding_completed';
   static const String eventPaywallDismissedNoPayment =
       'paywall_dismissed_no_payment';
