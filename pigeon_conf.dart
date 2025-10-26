@@ -6,7 +6,7 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(
   PigeonOptions(
     dartOut: 'lib/src/audio_pigeon.g.dart',
-    dartOptions: DartOptions(),
+    dartOptions: DartOptions(dartPackageName: 'medito'),
     kotlinOut:
         'android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt',
     kotlinOptions: KotlinOptions(package: 'meditofoundation.medito.pigeon'),

@@ -87,7 +87,7 @@ jobs:
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
       - name: Run Pigeon generator
-        run: flutter pub run pigeon --input pigeon_conf.dart
+        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Run Unit Tests
         run: flutter test --coverage

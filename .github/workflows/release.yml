@@ -31,7 +31,7 @@ jobs:
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
       - name: Generate Pigeon
-        run: flutter pub run pigeon --input pigeon_conf.dart
+        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Write .prod.json from secret
         env:
@@ -78,7 +78,9 @@ jobs:
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
       - name: Generate Pigeon
-        run: flutter pub run pigeon --input pigeon_conf.dart
+        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+      - name: Generate Pigeon
+        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Fastlane Match + Build + TestFlight upload
         working-directory: ios
