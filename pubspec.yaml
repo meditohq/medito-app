@@ -14,7 +14,7 @@ description: A meditation learning tool
 # Just build Android APK (used by the script above):
 # ./build_apk.sh
 
-version: 3.5.14+30154
+version: 3.5.14+30155
 
 
 environment:

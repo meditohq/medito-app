@@ -9,7 +9,7 @@ on:
   push:
     branches: [ develop ]
     tags-ignore:
-      - 'v*'
+      - '**'
   pull_request:
     branches: [ develop ]
 
@@ -77,11 +77,40 @@ jobs:
           DART_PATH=$(dirname $(which dart))
           echo "DART_PATH=$DART_PATH" >> $GITHUB_ENV
 
-      - name: Create a dummy .prod.env file
-        run: echo -e "var BASE_URL = ''; \nvar INIT_TOKEN = '';" > .prod.env
+      - name: Write .prod.json (stub values for tests)
+        run: |
+          cat > .prod.json <<'JSON'
+          {
+            "APP_KEY": "test",
+            "ENVIRONMENT": "debug",
+            "CONTENT_BASE_URL": "https://example.invalid/",
+            "AUTH_URL": "https://example.invalid/",
+            "EDIT_STATS_URL": "https://example.invalid/",
+            "DONATION_BASE_URL": "https://example.invalid/",
+            "DONATION_TOKEN": "test",
+            "SUPERWALL_API_KEY": "test",
+            "TIKTOK_ANDROID_APP_ID": "0",
+            "TIKTOK_IOS_APP_ID": "0"
+          }
+          JSON
 
-      - name: Create a dummy .staging.env file
-        run: echo -e "var BASE_URL = ''; \nvar INIT_TOKEN = '';" > .staging.env
+      - name: Create stub firebase_options.dart for tests
+        run: |
+          mkdir -p lib
+          cat > lib/firebase_options.dart <<'DART'
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform {
+              return const FirebaseOptions(
+                apiKey: 'test',
+                appId: 'test',
+                messagingSenderId: 'test',
+                projectId: 'test',
+              );
+            }
+          }
+          DART
 
       - name: Run Riverpod generator
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
@@ -90,7 +119,7 @@ jobs:
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Run Unit Tests
-        run: flutter test --coverage
+        run: flutter test --coverage --dart-define-from-file=.prod.json
 
       - name: Upload Test Coverage
         uses: codecov/codecov-action@v4
