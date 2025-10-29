@@ -73,7 +73,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
   IconButton _rewindButton() {
     return IconButton(
       onPressed: onSkip10SecondsBackward,
-      icon: const Icon(
+      icon: Icon(
         HugeIcons.strokeStandardGoBackward10Sec,
         size: 40,
         color: Colors.white,
@@ -84,7 +84,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
   IconButton _forwardButton() {
     return IconButton(
       onPressed: onSkip10SecondsForward,
-      icon: const Icon(
+      icon: Icon(
         HugeIcons.strokeStandardGoForward10Sec,
         size: 40,
         color: Colors.white,

@@ -91,7 +91,7 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
       builder: (context, child) {
         return Transform.rotate(
           angle: _animationController.value * 2 * 3.1415926535897932,
-          child: const Icon(
+          child: Icon(
             HugeIcons.solidRoundedVynil01,
             color: ColorConstants.white,
           ),

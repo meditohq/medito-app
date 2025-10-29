@@ -307,10 +307,10 @@ class FirebaseAnalyticsService {
 
   /// Set the user ID for Firebase Analytics
   Future<void> setUserId(String? userId) async {
-    if (_runningInTest) return; // Skip in unit tests
+    if (_runningInTest) return; 
     if (kDebugMode) {
       print('Firebase Analytics (DEBUG): Would set user ID to: $userId');
-      return; // Skip in debug mode
+      return;
     }
     if (!_initialized) await initialize();
 

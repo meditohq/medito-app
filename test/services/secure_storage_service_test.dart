@@ -36,17 +36,16 @@ void main() async {
         case 'delete':
           return null;
         default:
+          return null;
       }
     },
   );
 
   late SecureStorageService secureStorageService;
   late MockSecureStorage mockSecureStorage;
-  late MockSharedPreferences mockSharedPreferences;
 
   setUp(() {
     mockSecureStorage = MockSecureStorage();
-    mockSharedPreferences = MockSharedPreferences();
 
     // Inject mock SharedPreferences instance
     SharedPreferences.setMockInitialValues({});

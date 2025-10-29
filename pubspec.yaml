@@ -1,5 +1,6 @@
 name: medito
 description: A meditation learning tool
+publish_to: none
 
 # Build and deploy/upload commands:
 # Check version, then build & deploy/upload both platforms:
@@ -29,21 +30,21 @@ dependencies:
   app_links: ^6.4.0
   app_tracking_transparency: ^2.0.4
   audio_service: ^0.18.15
-  audio_session: ^0.1.25
+  audio_session: ^0.2.2
   cached_network_image: ^3.4.1
   crypto: ^3.0.6
-  device_info_plus: ^11.5.0
+  device_info_plus: ^12.2.0
   do_not_disturb: ^1.0.3
   email_validator: ^3.0.0
   equatable: ^2.0.5
-  firebase_analytics: ^11.5.0
-  firebase_core: ^3.14.0
-  firebase_crashlytics: ^4.3.7
-  firebase_messaging: ^15.2.7
+  firebase_analytics: ^12.0.3
+  firebase_core: ^4.2.0
+  firebase_crashlytics: ^5.0.3
+  firebase_messaging: ^16.0.3
   flutter_local_notifications: ^19.2.1
   flutter_markdown: ^0.7.4+1
   flutter_riverpod: ^2.6.1
-  flutter_secure_storage: ^9.0.0
+  flutter_secure_storage: ^9.2.4
   flutter_staggered_grid_view: ^0.7.0
   flutter_stripe: 12.0.2
   flutter_svg: ^2.2.0
@@ -51,8 +52,8 @@ dependencies:
   freezed_annotation: ^3.1.0
   haptic_feedback: ^0.5.1+1
   tiktok_events_sdk: ^1.0.9
-  health: ^12.2.1
-  home_widget: ^0.7.0+1
+  health: ^13.2.1
+  home_widget: ^0.8.1
   http: ^1.4.0
   hugeicons:
     hosted: https://onepub.dev/api/kdpxxpsdav
@@ -61,15 +62,15 @@ dependencies:
   in_app_review: ^2.0.10
   intl: ^0.20.2
   json_annotation: ^4.9.0
-  just_audio: ^0.9.46
-  package_info_plus: ^8.3.0
+  just_audio: ^0.10.5
+  package_info_plus: ^9.0.0
   path_provider: ^2.1.2
   pay: ^3.2.1
-  permission_handler: ^11.4.0
+  permission_handler: ^12.0.1
   reorderables: ^0.6.0
   riverpod_annotation: ^2.6.1
   rxdart: ^0.28.0
-  share_plus: ^10.1.4
+  share_plus: ^12.0.1
   shared_preferences: ^2.2.2
   shimmer: ^3.0.0
   superwallkit_flutter: ^2.4.2
@@ -93,13 +94,13 @@ dev_dependencies:
   analyzer: ^7.4.5
   build_runner: ^2.5.2
   device_preview: ^1.2.0
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   freezed: ^3.1.0
   json_serializable: ^6.9.5
   mocktail: ^1.0.2
   mockito: ^5.4.6
   pigeon: ^25.4.0
-  riverpod_generator: ^2.6.4
+  riverpod_generator: ^2.6.1
   integration_test:
     sdk: flutter
 

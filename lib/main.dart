@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -93,16 +94,8 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Superwall
-  AppLogger.d('MAIN', 'Starting Superwall configuration');
-  AppLogger.d('MAIN', 'Current platform: ${Platform.operatingSystem}');
-  AppLogger.d(
-      'MAIN',
-      'Flutter build mode: ${kDebugMode ? 'debug' : kReleaseMode ? 'release' : 'profile'}');
-
   try {
     await SuperwallConfig.configure();
-    AppLogger.d('MAIN', 'Superwall configuration completed successfully');
   } catch (e, stackTrace) {
     AppLogger.e('MAIN', 'Superwall configuration failed with error: $e');
     AppLogger.e('MAIN', 'Stack trace: $stackTrace');
@@ -135,7 +128,6 @@ void main() async {
   if (Platform.isAndroid) {
     Workmanager().initialize(
       callbackDispatcher,
-      isInDebugMode: kDebugMode,
     );
     Workmanager().registerPeriodicTask(
       WidgetConstants.taskIdentifier,
@@ -143,7 +135,7 @@ void main() async {
       frequency: const Duration(minutes: 2),
       initialDelay: const Duration(minutes: 0),
       constraints: Constraints(
-        networkType: NetworkType.not_required,
+        networkType: NetworkType.notRequired,
       ),
     );
   }

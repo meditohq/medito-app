@@ -34,7 +34,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     namespace "meditofoundation.medito"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion = "26.3.11579264"
 
     compileOptions {
@@ -73,7 +73,7 @@ android {
     defaultConfig {
         applicationId project.APP_ID
         minSdkVersion Math.max(flutter.minSdkVersion, 26)
-        targetSdkVersion 35 
+        targetSdkVersion 36 
         versionCode project.VERSION_CODE
         versionName project.VERSION_NAME
         multiDexEnabled true

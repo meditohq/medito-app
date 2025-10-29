@@ -89,11 +89,6 @@ class _TestFirebaseDelegate implements FirebasePlatform {
     return MockFirebaseAppPlatform(); // Use Mocktail mock with mixin
   }
 
-  @override
-  // ignore: invalid_use_of_internal_member
-  void setPlatformDelegate(FirebasePlatform delegate) {
-    // No-op
-  }
 }
 
 // Minimal app implementing the platform interface using Mocktail and mixin
