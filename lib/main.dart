@@ -5,7 +5,6 @@ import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -95,14 +94,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await SuperwallConfig.configure();
-  } catch (e, stackTrace) {
-    AppLogger.e('MAIN', 'Superwall configuration failed with error: $e');
-    AppLogger.e('MAIN', 'Stack trace: $stackTrace');
+    // Make Superwall configuration non-blocking with shorter timeout when offline
+    await SuperwallConfig.configure().timeout(const Duration(seconds: 5));
+  } catch (e) {
+    AppLogger.w('MAIN', 'Superwall configuration failed/timed out: $e');
     // Don't re-throw - let the app continue without Superwall
   }
 
-  // Initialize Firebase
+  // Initialize Firebase (non-blocking when offline)
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -112,13 +111,24 @@ void main() async {
     await CrashlyticsService().initialize();
   } catch (e) {
     AppLogger.e('MAIN', 'Firebase initialization failed: $e');
-    // Continue without Firebase for development
+    // Continue without Firebase - app should still work offline
   }
 
   // Initialize Stripe
   await _configureStripe();
 
-  await initializeAudioService();
+  try {
+    await initializeAudioService().timeout(
+      const Duration(seconds: 3),
+      onTimeout: () {
+        AppLogger.w('MAIN', 'Audio service initialization timed out');
+        // Don't throw - audio service is not critical for basic app functionality
+      },
+    );
+  } catch (e) {
+    AppLogger.e('MAIN', 'Audio service initialization failed: $e');
+    // Continue without audio service
+  }
   usePathUrlStrategy();
 
   var prefs = await initializeSharedPreferences();

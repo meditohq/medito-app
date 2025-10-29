@@ -91,7 +91,7 @@ class SuperwallConfig {
       // Poll configuration status until it's ready
       var configStatus = ConfigurationStatus.pending;
       var attempts = 0;
-      const maxAttempts = 60; // 60 seconds max for iOS
+      const maxAttempts = 5; // Reduced from 60 to 5 seconds for faster offline startup
       AppLogger.d('SUPERWALL_CONFIG',
           'Starting configuration polling loop (max $maxAttempts attempts)...');
 

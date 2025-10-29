@@ -103,11 +103,23 @@ class SplashViewState extends ConsumerState<SplashView>
 
   Future<void> _initialiseApp() async {
     try {
-      // First initialize Firebase
-      await _initializeFirebase();
+      // First initialize Firebase (non-blocking when offline)
+      try {
+        await _initializeFirebase();
+      } catch (e) {
+        AppLogger.w(
+            'SPLASH', 'Firebase initialization failed, continuing offline: $e');
+        // Continue without Firebase - app should still work offline
+      }
 
-      // Then initialize Firebase Analytics separately
-      await _initializeAnalytics();
+      // Then initialize Firebase Analytics separately (non-blocking when offline)
+      try {
+        await _initializeAnalytics();
+      } catch (e) {
+        AppLogger.w('SPLASH',
+            'Analytics initialization failed, continuing offline: $e');
+        // Continue without analytics - app should still work offline
+      }
 
       // Continue with app initialization
       await _checkAuthAndInitialize();
@@ -132,6 +144,12 @@ class SplashViewState extends ConsumerState<SplashView>
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          AppLogger.w('SPLASH', 'Firebase initialization timed out');
+          throw Exception('Firebase initialization timeout');
+        },
       );
       AppLogger.i('SPLASH', 'Firebase initialized successfully');
     } else {
@@ -144,14 +162,34 @@ class SplashViewState extends ConsumerState<SplashView>
       // Initialize Firebase Analytics with consent enabled using consent mode v2
       // Don't request ATT permission yet - we'll do that later for better UX
       await FirebaseAnalyticsService()
-          .initialize(requestAttPermissionImmediately: false);
+          .initialize(requestAttPermissionImmediately: false)
+          .timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          AppLogger.w('SPLASH', 'Firebase Analytics initialization timed out');
+          throw Exception('Firebase Analytics initialization timeout');
+        },
+      );
       AppLogger.i(
           'SPLASH', 'Firebase Analytics initialized with consent mode v2');
 
       // Initialize TikTok Analytics and log first open once
       await TikTokAnalyticsService()
-          .initialize(requestAttPermissionImmediately: false);
-      await TikTokAnalyticsService().logAppFirstOpenOnce();
+          .initialize(requestAttPermissionImmediately: false)
+          .timeout(
+        const Duration(seconds: 3),
+        onTimeout: () {
+          AppLogger.w('SPLASH', 'TikTok Analytics initialization timed out');
+          throw Exception('TikTok Analytics initialization timeout');
+        },
+      );
+      await TikTokAnalyticsService().logAppFirstOpenOnce().timeout(
+        const Duration(seconds: 2),
+        onTimeout: () {
+          AppLogger.w('SPLASH', 'TikTok logAppFirstOpenOnce timed out');
+          // Don't throw here as this is not critical
+        },
+      );
     } catch (e, stackTrace) {
       // Log the error but don't prevent app startup
       AppLogger.e(
@@ -181,19 +219,36 @@ class SplashViewState extends ConsumerState<SplashView>
 
       if (isLoggedIn && currentUser != null) {
         AppLogger.i('SPLASH', 'Initializing services for verified user...');
-        await _initializeServices();
-        AppLogger.i('SPLASH', 'Services initialized');
+        // Try to initialize services, but don't fail if network is unavailable
+        try {
+          await _initializeServices();
+          AppLogger.i('SPLASH', 'Services initialized');
 
-        if (!mounted) return;
+          if (!mounted) return;
 
-        AppLogger.i('SPLASH', 'Navigation to main app...');
-        await Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const RootPageView(
-              firstChild: BottomNavigationBarView(),
+          AppLogger.i('SPLASH', 'Navigation to main app...');
+          await Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const RootPageView(
+                firstChild: BottomNavigationBarView(),
+              ),
             ),
-          ),
-        );
+          );
+        } catch (e) {
+          // If services initialization fails (likely due to network issues),
+          // navigate to downloads view for offline access
+          AppLogger.w(
+              'SPLASH', 'Services initialization failed, going offline: $e');
+          if (!mounted) return;
+
+          showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
+
+          await Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const DownloadsView(isRoot: true),
+            ),
+          );
+        }
       } else {
         AppLogger.i('SPLASH', 'No verified user, showing auth buttons');
         if (!mounted) return;
@@ -336,21 +391,30 @@ class SplashViewState extends ConsumerState<SplashView>
       await headerService.initialise();
       AppLogger.i('SPLASH', 'Header service initialized');
 
-      // Initialize user data
+      // Initialize user data (don't fail if network is unavailable)
       try {
         AppLogger.i('SPLASH', 'Fetching user data...');
         final userData = await ref.read(meProvider.future);
         AppLogger.d('SPLASH', 'User data fetched: ${userData.toString()}');
       } catch (e, stackTrace) {
-        AppLogger.e('SPLASH', 'Error fetching user data', e, stackTrace);
-        CrashlyticsService().recordError(
-          e,
-          stackTrace,
-          reason: 'SplashView: Error fetching user data in _initializeServices',
-        );
+        // Check if this is a network error - if so, don't prevent app initialization
+        if (e is NetworkConnectionError || e is TimeoutError) {
+          AppLogger.w('SPLASH',
+              'Network error fetching user data, continuing offline: $e');
+        } else {
+          AppLogger.e('SPLASH', 'Error fetching user data', e, stackTrace);
+          CrashlyticsService().recordError(
+            e,
+            stackTrace,
+            reason:
+                'SplashView: Error fetching user data in _initializeServices',
+          );
+          // For non-network errors, re-throw to prevent app initialization
+          rethrow;
+        }
       }
 
-      // Set user ID for analytics after user initialization
+      // Set user ID for analytics after user initialization (skip if analytics not available)
       try {
         final userId = await ref.read(userIdProvider.future);
         if (userId.isNotEmpty) {
@@ -372,6 +436,8 @@ class SplashViewState extends ConsumerState<SplashView>
         reason: 'SplashView: Error initializing services',
       );
       showSnackBar(context, AppLocalizations.of(context)!.appInitError);
+      // Re-throw to allow caller to handle offline scenario
+      rethrow;
     }
   }
 
