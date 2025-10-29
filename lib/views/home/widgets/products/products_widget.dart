@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/config_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -395,6 +396,11 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
 
   void _precacheAllImages() {
     for (final url in _imageUrls) {
+      // Skip precaching images from dead domains
+      if (HTTPConstants.isDeadDomain(url)) {
+        continue;
+      }
+
       try {
         precacheImage(CachedNetworkImageProvider(url), context)
             .catchError((error) {

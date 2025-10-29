@@ -39,6 +39,12 @@ class NetworkImageWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Skip loading images from dead domains
+    if (HTTPConstants.isDeadDomain(url)) {
+      return errorWidget ??
+          Image.asset(AssetConstants.placeholder, fit: BoxFit.cover);
+    }
+
     var scaledImageUrl =
         url.startsWith('http') ? url : _getWebPImageUrl(context, url);
     var originalImageUrl = url.startsWith('http') ? url : '$contentBaseUrl$url';

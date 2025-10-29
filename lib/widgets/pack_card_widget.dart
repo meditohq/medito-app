@@ -69,6 +69,11 @@ class PackCardWidget extends StatelessWidget {
 
   Future<ColorScheme?> _generateColorScheme(BuildContext context) async {
     if (coverUrlPath != null && coverUrlPath!.isNotEmpty) {
+      // Skip processing images from dead domains
+      if (HTTPConstants.isDeadDomain(coverUrlPath!)) {
+        return null;
+      }
+
       try {
         var image = CachedNetworkImageProvider(coverUrlPath!);
 

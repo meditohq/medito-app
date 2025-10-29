@@ -103,20 +103,25 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final imageUrl = playbackState.track.imageUrl;
 
     if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasScheme == true) {
-      try {
-        final networkImage = NetworkImage(imageUrl);
-        // Use unawaited to avoid blocking the build method
-        unawaited(
-          precacheImage(networkImage, context).catchError((error) {
-            // Silently handle precaching errors - they're not critical
-            AppLogger.d('PlayerView',
-                'Failed to precache image: $imageUrl, error: $error');
-          }),
-        );
-      } catch (e) {
-        // Silently handle any synchronous errors from NetworkImage constructor or precaching
-        AppLogger.d('PlayerView',
-            'Failed to create or precache image: $imageUrl, error: $e');
+      // Skip precaching images from dead domains
+      if (HTTPConstants.isDeadDomain(imageUrl)) {
+        // Skip precaching for dead domain
+      } else {
+        try {
+          final networkImage = NetworkImage(imageUrl);
+          // Use unawaited to avoid blocking the build method
+          unawaited(
+            precacheImage(networkImage, context).catchError((error) {
+              // Silently handle precaching errors - they're not critical
+              AppLogger.d('PlayerView',
+                  'Failed to precache image: $imageUrl, error: $error');
+            }),
+          );
+        } catch (e) {
+          // Silently handle any synchronous errors from NetworkImage constructor or precaching
+          AppLogger.d('PlayerView',
+              'Failed to create or precache image: $imageUrl, error: $e');
+        }
       }
     }
 

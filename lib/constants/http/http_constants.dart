@@ -142,6 +142,17 @@ class HTTPConstants {
   static const String paymentConfig = 'config';
   static const String createPaymentIntent = 'payment-intents';
   static const String confirmPaymentIntent = 'payment-intents/confirm';
+
+  // DEAD DOMAINS - domains that no longer exist and should be avoided
+  static const List<String> _deadDomains = [
+    'images.medito.space',
+    // Add other dead domains here as they are discovered
+  ];
+
+  /// Checks if a URL is from a dead/unavailable domain
+  static bool isDeadDomain(String url) {
+    return _deadDomains.any((domain) => url.contains(domain));
+  }
 }
 
 // Auth response models

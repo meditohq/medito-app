@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 
 class CrashlyticsService {
@@ -102,6 +103,21 @@ class CrashlyticsService {
     String? stack,
     dynamic exception,
   }) {
+    // Special case for HttpException with 404/403/500 from image URLs
+    if (exception is HttpException) {
+      final uriString = exception.uri?.toString() ?? '';
+      if ((uriString.contains('cdn.medito.app') ||
+              HTTPConstants.isDeadDomain(uriString) ||
+              uriString.contains('png/') ||
+              uriString.contains('jpg/') ||
+              uriString.contains('webp/')) &&
+          (exception.message.contains('404') ||
+              exception.message.contains('403') ||
+              exception.message.contains('500'))) {
+        return true;
+      }
+    }
+
     if (!_isImageLoadingError(stack)) return false;
 
     // Special case for PathNotFoundException
