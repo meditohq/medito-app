@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 import Firebase
 import home_widget
-import workmanager
+import workmanager_apple
 import app_links
 import Intents
 import IntentsUI
