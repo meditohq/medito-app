@@ -29,7 +29,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
         );
 
     final authorStyle = quoteStyle?.copyWith(
-      color: quoteStyle.color?.withOpacity(0.8),
+      color: quoteStyle.color?.withAlpha(((0.8).clamp(0.0, 1.0) * 255).round()),
       fontSize: 16,
     );
 
@@ -76,7 +76,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.8),
+                          .withAlpha(((0.8).clamp(0.0, 1.0) * 255).round()),
                       size: 16,
                     ),
                   ),

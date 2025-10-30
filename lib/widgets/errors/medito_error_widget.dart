@@ -239,7 +239,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                   AppLocalizations.of(context)!.reportError,
                   style: TextStyle(
                     color: isCoolingDown
-                        ? ColorConstants.lightPurple.withOpacity(0.5)
+                        ? ColorConstants.lightPurple.withAlpha(((0.5).clamp(0.0, 1.0) * 255).round())
                         : ColorConstants.lightPurple,
                   ),
                 ),

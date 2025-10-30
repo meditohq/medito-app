@@ -84,7 +84,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.7),
+                          .withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
                       fontSize: 16,
                       height: 1.5,
                     ),

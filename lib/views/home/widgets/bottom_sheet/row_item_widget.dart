@@ -42,7 +42,7 @@ class RowItemWidget extends StatelessWidget {
       bottom: hasUnderline
           ? BorderSide(
               width: 0.7,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
             )
           : BorderSide.none,
     );

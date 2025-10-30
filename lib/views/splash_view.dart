@@ -497,7 +497,7 @@ class SplashViewState extends ConsumerState<SplashView>
                                       Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.1),
+                                          color: Colors.white.withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
                                           shape: BoxShape.circle,
                                         ),
                                         child: SvgPicture.asset(
@@ -581,8 +581,8 @@ class SplashViewState extends ConsumerState<SplashView>
                                                             fontSize: 20,
                                                             height: 1.4,
                                                             color: Colors.white
-                                                                .withOpacity(
-                                                                    0.9),
+                                                                .withAlpha(((
+                                                                    0.9).clamp(0.0, 1.0) * 255).round()),
                                                           ),
                                                     ),
                                                   ],

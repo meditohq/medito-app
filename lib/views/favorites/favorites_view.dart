@@ -157,7 +157,7 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
                         .textTheme
                         .bodyMedium
                         ?.color
-                        ?.withOpacity(0.7),
+                        ?.withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
                   ),
               textAlign: TextAlign.center,
             ),

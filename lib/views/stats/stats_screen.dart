@@ -104,7 +104,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                             decoration: BoxDecoration(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.surface.withOpacity(0.1),
+                              ).colorScheme.surface.withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -358,7 +358,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(((0.08).clamp(0.0, 1.0) * 255).round()),
               width: 1,
             ),
           ),
@@ -478,7 +478,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                           side: BorderSide(
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.6),
+                            ).colorScheme.onSurface.withAlpha(((0.6).clamp(0.0, 1.0) * 255).round()),
                             width: 1.5,
                           ),
                           shape: RoundedRectangleBorder(

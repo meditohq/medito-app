@@ -197,11 +197,11 @@ class StreakCircleState extends ConsumerState<StreakCircle>
           ? BoxDecoration(
               gradient: SweepGradient(
                 colors: [
-                  ColorConstants.lightPurple.withOpacity(0.2),
-                  ColorConstants.lightPurple.withOpacity(0.35),
-                  ColorConstants.lightPurple.withOpacity(1),
-                  ColorConstants.lightPurple.withOpacity(0.3),
-                  ColorConstants.lightPurple.withOpacity(0.25),
+                  ColorConstants.lightPurple.withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple.withAlpha(((0.35).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple.withAlpha(((1).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple.withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple.withAlpha(((0.25).clamp(0.0, 1.0) * 255).round()),
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
                 transform: GradientRotation(
@@ -240,7 +240,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                           backgroundColor: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.2),
+                              .withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
                           valueColor: AlwaysStoppedAnimation<Color>(
                             isStreakDoneToday
                                 ? ColorConstants.lightPurple

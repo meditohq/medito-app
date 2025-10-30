@@ -99,7 +99,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                             color: Theme.of(context)
                                 .colorScheme
                                 .surface
-                                .withOpacity(0.1),
+                                .withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: Theme.of(context).colorScheme.onSurface,
@@ -430,7 +430,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.6),
+                            .withAlpha(((0.6).clamp(0.0, 1.0) * 255).round()),
                         width: 1.5,
                       ),
                       shape: RoundedRectangleBorder(

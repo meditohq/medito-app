@@ -199,7 +199,7 @@ class ExploreContentWidget extends ConsumerWidget {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurface
-                                      .withOpacity(0.7),
+                                      .withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
                                 ),
                             textAlign: TextAlign.center,
                           ),
@@ -464,9 +464,9 @@ class SearchBox extends StatelessWidget {
           onPressed: onClear,
         ),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceTint.withOpacity(0.1),
+        fillColor: Theme.of(context).colorScheme.surfaceTint.withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
         hintStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          color: Theme.of(context).colorScheme.onSurface.withAlpha(((0.6).clamp(0.0, 1.0) * 255).round()),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

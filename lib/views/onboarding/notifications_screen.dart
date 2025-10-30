@@ -156,7 +156,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 16,
                           height: 1.5,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withAlpha(((0.9).clamp(0.0, 1.0) * 255).round()),
                         ),
                     textAlign: TextAlign.center,
                   ),

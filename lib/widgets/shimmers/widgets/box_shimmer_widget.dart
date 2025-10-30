@@ -25,7 +25,7 @@ class BoxShimmerWidget extends StatelessWidget {
       height: height ?? size.height,
       child: Shimmer.fromColors(
         baseColor: Theme.of(context).colorScheme.surface,
-        highlightColor: Theme.of(context).colorScheme.surface.withOpacity(0.4),
+        highlightColor: Theme.of(context).colorScheme.surface.withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
         period: Duration(milliseconds: delayInMiliSeconds),
         child: Container(
           decoration: BoxDecoration(

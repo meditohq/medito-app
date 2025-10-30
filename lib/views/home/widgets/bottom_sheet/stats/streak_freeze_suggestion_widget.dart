@@ -144,7 +144,7 @@ class StreakFreezeSuggestionWidgetState
                     backgroundColor: ColorConstants.lightPurple,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor:
-                        theme.colorScheme.onSurface.withOpacity(0.2),
+                        theme.colorScheme.onSurface.withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -172,7 +172,7 @@ class StreakFreezeSuggestionWidgetState
         size: 50,
         color: index < availableCount
             ? ColorConstants.lightPurple
-            : theme.colorScheme.onSurface.withOpacity(0.4),
+            : theme.colorScheme.onSurface.withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
       );
     }
 
@@ -220,7 +220,7 @@ class StreakFreezeSuggestionWidgetState
         // Color transition
         final colorAnimation = ColorTween(
           begin: ColorConstants.lightPurple,
-          end: theme.colorScheme.onSurface.withOpacity(0.4),
+          end: theme.colorScheme.onSurface.withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
         ).animate(iconTransition);
 
         return Transform.scale(

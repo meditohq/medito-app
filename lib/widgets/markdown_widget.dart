@@ -27,7 +27,7 @@ class MarkdownWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var titleMedium = Theme.of(context).textTheme.titleMedium;
-    var walterWhite = ColorConstants.white.withOpacity(0.9);
+    var walterWhite = ColorConstants.white.withAlpha(((0.9).clamp(0.0, 1.0) * 255).round());
 
     return Markdown(
       data: body,
