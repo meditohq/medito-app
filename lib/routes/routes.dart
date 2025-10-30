@@ -49,8 +49,8 @@ Future<void> handleNavigation(
     var packId = type.contains('pack3')
         ? ids[2]!
         : type.contains('pack2')
-        ? ids[1]!
-        : ids.first!;
+            ? ids[1]!
+            : ids.first!;
     if (packId == 'favorites') {
       await _pushRoute(const FavoritesView(), ref);
     } else {
@@ -147,7 +147,8 @@ Future<void> _handleDonationNavigation(
 
   final isUSStorefront = ref.read(isUSStorefrontProvider);
 
-  if (!Platform.isIOS || isUSStorefront) {
+  if (!Platform.isIOS || (isUSStorefront && false)) {
+    // Temporarily disable iOS Superwall
     await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
   } else {
     final uri = Uri.parse('https://meditofoundation.org/donate');
