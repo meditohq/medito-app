@@ -29,6 +29,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -116,6 +117,10 @@ void main() async {
 
   // Initialize Stripe
   await _configureStripe();
+
+  // Initialize Meta (Facebook) App Events
+  await MetaSdkService.instance.init();
+  unawaited(MetaSdkService.instance.logEvent('app_launch', const {}));
 
   try {
     await initializeAudioService().timeout(

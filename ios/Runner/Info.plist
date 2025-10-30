@@ -110,7 +110,19 @@
 				<string>org.meditofoundation</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1010105867856519</string>
+			</array>
+		</dict>
 	</array>
+	<key>FacebookAppID</key>
+	<string>1010105867856519</string>
+	<key>FacebookClientToken</key>
+	<string>c1673e8cbf48dae1ffed9e0fb4f5d72b</string>
+	<key>FacebookDisplayName</key>
+	<string>Medito</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:medito.app</string>

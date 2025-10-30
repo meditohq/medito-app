@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Medito</string>
+    <string name="facebook_app_id">1010105867856519</string>
+    <string name="facebook_client_token">c1673e8cbf48dae1ffed9e0fb4f5d72b</string>
 </resources>

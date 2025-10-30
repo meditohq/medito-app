@@ -13,6 +13,8 @@ class EnvConfig {
   final String paywallEnvironment;
   final String tiktokAndroidAppId;
   final String tiktokIosAppId;
+  final String facebookAppId;
+  final String facebookClientToken;
 
   const EnvConfig({
     required this.environment,
@@ -27,6 +29,8 @@ class EnvConfig {
     required this.paywallEnvironment,
     required this.tiktokAndroidAppId,
     required this.tiktokIosAppId,
+    required this.facebookAppId,
+    required this.facebookClientToken,
   });
 }
 
@@ -44,6 +48,8 @@ class ProdEnv extends EnvConfig {
     required super.paywallEnvironment,
     required super.tiktokAndroidAppId,
     required super.tiktokIosAppId,
+    required super.facebookAppId,
+    required super.facebookClientToken,
   });
 }
 
@@ -61,6 +67,8 @@ class StagingEnv extends EnvConfig {
     required super.paywallEnvironment,
     required super.tiktokAndroidAppId,
     required super.tiktokIosAppId,
+    required super.facebookAppId,
+    required super.facebookClientToken,
   });
 }
 
@@ -78,6 +86,8 @@ const _prodEnv = ProdEnv(
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
   tiktokAndroidAppId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
   tiktokIosAppId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
+  facebookAppId: String.fromEnvironment('FACEBOOK_APP_ID'),
+  facebookClientToken: String.fromEnvironment('FACEBOOK_CLIENT_TOKEN'),
 );
 
 const _stagingEnv = StagingEnv(
@@ -94,6 +104,8 @@ const _stagingEnv = StagingEnv(
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
   tiktokAndroidAppId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
   tiktokIosAppId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
+  facebookAppId: String.fromEnvironment('FACEBOOK_APP_ID'),
+  facebookClientToken: String.fromEnvironment('FACEBOOK_CLIENT_TOKEN'),
 );
 
 EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
@@ -110,6 +122,8 @@ String get superwallApiKey => _currentEnv.superwallApiKey;
 String get paywallEnvironment => _currentEnv.paywallEnvironment;
 String get tiktokAndroidAppId => _currentEnv.tiktokAndroidAppId;
 String get tiktokIosAppId => _currentEnv.tiktokIosAppId;
+String get facebookAppId => _currentEnv.facebookAppId;
+String get facebookClientToken => _currentEnv.facebookClientToken;
 
 class HTTPConstants {
   //END POINTS
