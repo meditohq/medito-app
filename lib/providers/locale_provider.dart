@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -38,9 +37,6 @@ class LocaleNotifier extends StateNotifier<Locale?> {
   }
 
   Future<void> setLocale(String localeCode) async {
-    if (_prefs == null) {
-      _prefs = await SharedPreferences.getInstance();
-    }
 
     await _prefs!
         .setString(SharedPreferenceConstants.localePreference, localeCode);

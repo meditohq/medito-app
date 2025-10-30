@@ -1,4 +1,4 @@
-import 'dart:io';
+// removed unused dart:io import
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
-import 'package:medito/widgets/snackbar_widget.dart';
+// removed unused snackbar import
 
 class ExpandableSectionWidget extends ConsumerStatefulWidget {
   const ExpandableSectionWidget({super.key});
@@ -53,80 +53,10 @@ class _ExpandableSectionWidgetState
 
   void _openPrivacyPolicy(BuildContext context) async {
     await handleNavigation(
-      'url',
-      ['https://meditofoundation.org/privacy'],
+      TypeConstants.route,
+      [RouteConstants.analytics],
       context,
       ref: _ref,
-    );
-  }
-
-  Future<void> _handleAnalyticsToggle(
-      BuildContext context, bool value, bool isCurrentlyEnabled) async {
-    final analyticsService = _ref.read(analyticsServiceProvider);
-
-    if (Platform.isIOS && isCurrentlyEnabled) {
-      final bool shouldProceed = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              backgroundColor: ColorConstants.ebony,
-              title: Text(
-                AppLocalizations.of(context)!.iosTrackingDialogTitle,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              content: Text(
-                AppLocalizations.of(context)!.iosTrackingDialogContent,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.color
-                          ?.withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
-                    ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(
-                    AppLocalizations.of(context)!.iosTrackingDialogCancel,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: ColorConstants.lightPurple,
-                        ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(
-                    AppLocalizations.of(context)!.iosTrackingDialogDisable,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: ColorConstants.lightPurple,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-          ) ??
-          false;
-
-      if (!shouldProceed) {
-        return;
-      }
-    }
-
-    await analyticsService.setConsent(
-      analyticsStorageConsentGranted: value,
-      adStorageConsentGranted: value,
-      adUserDataConsentGranted: value,
-      adPersonalizationSignalsConsentGranted: value,
-    );
-
-    // Invalidate the provider to refresh the state
-    _ref.invalidate(analyticsEnabledProvider);
-
-    showSnackBar(
-      context,
-      value
-          ? AppLocalizations.of(context)!.analyticsEnabledMessage
-          : AppLocalizations.of(context)!.analyticsDisabledMessage,
     );
   }
 
@@ -166,9 +96,6 @@ class _ExpandableSectionWidgetState
         if (_isExpanded)
           Consumer(
             builder: (context, ref, child) {
-              final isAnalyticsEnabledAsync =
-                  ref.watch(analyticsEnabledProvider);
-
               return Column(
                 children: [
                   // Streak Freeze Beta Item
@@ -291,61 +218,7 @@ class _ExpandableSectionWidgetState
                       ),
                     ),
                   ),
-                  // Data Collection Item
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            width: 0.7,
-                            color: ColorConstants.onyx,
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          HugeIcon(
-                            icon: HugeIcons.solidSharpSettings03,
-                            color: Theme.of(context).colorScheme.onSurface,
-                            size: 24.0,
-                          ),
-                          width16,
-                          Expanded(
-                            child: Text(
-                              AppLocalizations.of(context)!
-                                  .analyticsTrackingTitle,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
-                                  ?.copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                            ),
-                          ),
-                          isAnalyticsEnabledAsync.when(
-                            data: (isAnalyticsEnabled) => Switch(
-                              value: isAnalyticsEnabled,
-                              onChanged: (value) => _handleAnalyticsToggle(
-                                  context, value, isAnalyticsEnabled),
-                            ),
-                            loading: () => const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                            error: (_, __) => const Icon(
-                              Icons.error,
-                              color: Colors.red,
-                              size: 24.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Data Collection switch removed
                   // Onboarding Item (only in debug mode)
                   if (kDebugMode)
                     InkWell(

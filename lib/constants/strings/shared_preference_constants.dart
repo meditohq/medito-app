@@ -38,4 +38,9 @@ class SharedPreferenceConstants {
 
   // Smart Reminders
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
+
+  // Analytics consent flags
+  static const String analyticsFirebaseEnabled = 'analytics_firebase_enabled';
+  static const String analyticsMetaEnabled = 'analytics_meta_enabled';
+  static const String analyticsTiktokEnabled = 'analytics_tiktok_enabled';
 }

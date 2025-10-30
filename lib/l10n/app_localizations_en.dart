@@ -1188,7 +1188,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyticsTrackingContent =>
-      'We collect anonymous usage data to help us improve the app. No personal information is collected.';
+      'We collect usage data and limited identifiers (such as a user ID and, where permitted, device or advertising identifiers) to help us improve the app and understand feature usage. You can turn analytics off at any time. See our Privacy Policy for details.';
 
   @override
   String get turnOffAnalyticsText => 'Turn Off Analytics';
@@ -1207,7 +1207,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get iosTrackingDialogContent =>
-      'This will disable analytics tracking in the app. Note that you can also control tracking permissions at the system level in your iOS Settings under Privacy & Security > Tracking.';
+      'This will disable analytics tracking in the app. We may collect limited identifiers (e.g. user ID and, where permitted, device/advertising IDs) to measure usage and improve features. You can also control tracking permissions in iOS Settings > Privacy & Security > Tracking.';
+
+  @override
+  String get androidTrackingDialogContent =>
+      'This will disable analytics tracking in the app. We may collect limited identifiers (e.g. user ID and, where permitted, device/advertising IDs) to measure usage and improve features.';
 
   @override
   String get iosTrackingDialogCancel => 'Cancel';

@@ -2279,7 +2279,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyticsTrackingContent.
   ///
   /// In en, this message translates to:
-  /// **'We collect anonymous usage data to help us improve the app. No personal information is collected.'**
+  /// **'We collect usage data and limited identifiers (such as a user ID and, where permitted, device or advertising identifiers) to help us improve the app and understand feature usage. You can turn analytics off at any time. See our Privacy Policy for details.'**
   String get analyticsTrackingContent;
 
   /// No description provided for @turnOffAnalyticsText.
@@ -2315,8 +2315,14 @@ abstract class AppLocalizations {
   /// No description provided for @iosTrackingDialogContent.
   ///
   /// In en, this message translates to:
-  /// **'This will disable analytics tracking in the app. Note that you can also control tracking permissions at the system level in your iOS Settings under Privacy & Security > Tracking.'**
+  /// **'This will disable analytics tracking in the app. We may collect limited identifiers (e.g. user ID and, where permitted, device/advertising IDs) to measure usage and improve features. You can also control tracking permissions in iOS Settings > Privacy & Security > Tracking.'**
   String get iosTrackingDialogContent;
+
+  /// No description provided for @androidTrackingDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will disable analytics tracking in the app. We may collect limited identifiers (e.g. user ID and, where permitted, device/advertising IDs) to measure usage and improve features.'**
+  String get androidTrackingDialogContent;
 
   /// No description provided for @iosTrackingDialogCancel.
   ///

@@ -59,23 +59,7 @@ class ReminderEnabledNotifier extends Notifier<bool> {
 final reminderEnabledProvider = NotifierProvider<ReminderEnabledNotifier, bool>(
     () => ReminderEnabledNotifier());
 
-final userIdProvider = FutureProvider<String>((ref) async {
-  final authRepository = ref.watch(authRepositorySyncProvider);
-  final userId = authRepository.currentUser?.id ?? '';
-
-  // Set user ID for analytics when it changes
-  if (userId.isNotEmpty) {
-    ref.read(analyticsUserIdSetterProvider(userId));
-  }
-
-  return userId;
-});
-
-final analyticsUserIdSetterProvider =
-    FutureProvider.family<void, String>((ref, userId) async {
-  final analytics = FirebaseAnalyticsService();
-  await analytics.setUserId(userId);
-});
+// Analytics user providers moved to a dedicated module
 
 TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
   final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
@@ -157,6 +141,15 @@ class SettingsScreen extends ConsumerWidget {
               loading: () => '$editStatsUrl?clientid=',
               error: (_, __) => '$editStatsUrl?clientid=',
             ),
+      ),
+      SettingsItem(
+        section: AppLocalizations.of(context)!.helpLegalSection,
+        type: TypeConstants.url,
+        title: AppLocalizations.of(context)!.contactUsTitle,
+        icon: HugeIcon(
+            icon: HugeIcons.solidRoundedHelpCircle,
+            color: Theme.of(context).colorScheme.onSurface),
+        path: 'https://meditofoundation.org/contact',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,

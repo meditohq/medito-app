@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'report_cooldown_provider.g.dart';
@@ -21,7 +22,7 @@ class ReportCooldown extends _$ReportCooldown {
 }
 
 @riverpod
-bool isCoolingDown(ref) {
+bool isCoolingDown(Ref ref) {
   final cooldownStartTime = ref.watch(reportCooldownProvider);
   if (cooldownStartTime == null) return false;
 

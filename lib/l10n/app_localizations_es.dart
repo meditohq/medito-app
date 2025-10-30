@@ -1234,6 +1234,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esto deshabilitará el seguimiento de análisis en la aplicación. Ten en cuenta que también puedes controlar los permisos de seguimiento a nivel del sistema en tu Configuración de iOS bajo Privacidad y Seguridad > Seguimiento.';
 
   @override
+  String get androidTrackingDialogContent =>
+      'This will disable analytics tracking in the app. We may collect limited identifiers (e.g. user ID and, where permitted, device/advertising IDs) to measure usage and improve features.';
+
+  @override
   String get iosTrackingDialogCancel => 'Cancelar';
 
   @override

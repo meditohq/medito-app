@@ -23,6 +23,7 @@ import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/donation/superwall_donation_screen.dart';
 import 'package:medito/views/favorites/favorites_view.dart';
 import 'package:medito/views/stats/stats_screen.dart';
+import 'package:medito/views/settings/analytics_settings_screen.dart';
 
 extension SanitisePath on String {
   String sanitisePath() => replaceFirst('/', '');
@@ -101,6 +102,9 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.stats)) {
     await _pushRoute(const StatsScreen(), ref);
+  } else if (type == TypeConstants.route &&
+      ids.contains(RouteConstants.analytics)) {
+    await _pushRoute(const AnalyticsSettingsScreen(), ref);
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }

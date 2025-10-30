@@ -10,6 +10,7 @@ import 'package:medito/firebase_options.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -21,7 +22,6 @@ import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/root/root_page_view.dart';
-import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -418,7 +418,7 @@ class SplashViewState extends ConsumerState<SplashView>
       // Set user ID for analytics after user initialization (skip if analytics not available)
       try {
         final userId = await ref.read(userIdProvider.future);
-        if (userId.isNotEmpty) {
+        if (userId != null && userId.isNotEmpty) {
           await FirebaseAnalyticsService().setUserId(userId);
           await MetaSdkService.instance.setUserId(userId);
           AppLogger.i('SPLASH', 'User ID set for analytics: $userId');
@@ -499,7 +499,9 @@ class SplashViewState extends ConsumerState<SplashView>
                                       Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
+                                          color: Colors.white.withAlpha(
+                                              ((0.1).clamp(0.0, 1.0) * 255)
+                                                  .round()),
                                           shape: BoxShape.circle,
                                         ),
                                         child: SvgPicture.asset(
@@ -583,8 +585,11 @@ class SplashViewState extends ConsumerState<SplashView>
                                                             fontSize: 20,
                                                             height: 1.4,
                                                             color: Colors.white
-                                                                .withAlpha(((
-                                                                    0.9).clamp(0.0, 1.0) * 255).round()),
+                                                                .withAlpha(((0.9).clamp(
+                                                                            0.0,
+                                                                            1.0) *
+                                                                        255)
+                                                                    .round()),
                                                           ),
                                                     ),
                                                   ],
