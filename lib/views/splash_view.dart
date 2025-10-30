@@ -14,6 +14,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/tiktok_analytics_service.dart';
+import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
@@ -419,6 +420,7 @@ class SplashViewState extends ConsumerState<SplashView>
         final userId = await ref.read(userIdProvider.future);
         if (userId.isNotEmpty) {
           await FirebaseAnalyticsService().setUserId(userId);
+          await MetaSdkService.instance.setUserId(userId);
           AppLogger.i('SPLASH', 'User ID set for analytics: $userId');
         }
       } catch (e, stackTrace) {

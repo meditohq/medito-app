@@ -120,7 +120,6 @@ void main() async {
 
   // Initialize Meta (Facebook) App Events
   await MetaSdkService.instance.init();
-  unawaited(MetaSdkService.instance.logEvent('app_launch', const {}));
 
   try {
     await initializeAudioService().timeout(
