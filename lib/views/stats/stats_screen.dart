@@ -9,7 +9,6 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
-import 'package:medito/widgets/widgets.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
@@ -75,204 +74,212 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              height16,
-              if (_isCardVisible)
-                hasSeenStreakCircle.when(
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
-                  data: (seen) {
-                    if (seen) return const SizedBox.shrink();
-                    return AnimatedOpacity(
-                      opacity: _animation.value,
-                      duration: const Duration(milliseconds: 300),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          right: 16,
-                          bottom: 0,
-                        ),
-                        child: Container(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_isCardVisible)
+                  hasSeenStreakCircle.when(
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                    data: (seen) {
+                      if (seen) return const SizedBox.shrink();
+                      return AnimatedOpacity(
+                        opacity: _animation.value,
+                        duration: const Duration(milliseconds: 300),
+                        child: Padding(
                           padding: const EdgeInsets.only(
-                            top: 16,
                             left: 16,
                             right: 16,
-                            bottom: 12,
+                            bottom: 0,
                           ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.surface.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              width: 1,
-                              style: BorderStyle.solid,
+                          child: Container(
+                            padding: const EdgeInsets.only(
+                              top: 16,
+                              left: 16,
+                              right: 16,
+                              bottom: 12,
                             ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  HugeIcon(
-                                    icon: HugeIcons.solidRoundedFire,
-                                    size: 20,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      AppLocalizations.of(
-                                        context,
-                                      )!
-                                          .statsWelcomeTitle,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineMedium
-                                          ?.copyWith(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: dmSans,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                          ),
-                                    ),
-                                  ),
-                                ],
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surface.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                width: 1,
+                                style: BorderStyle.solid,
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!
-                                    .statsWelcomeMessage,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      fontSize: 14,
-                                      height: 1.4,
-                                      fontFamily: dmSans,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    HugeIcon(
+                                      icon: HugeIcons.solidRoundedFire,
+                                      size: 20,
                                       color: Theme.of(
                                         context,
                                       ).colorScheme.onSurface,
                                     ),
-                              ),
-                              const SizedBox(height: 16),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: ElevatedButton(
-                                  onPressed: _fadeAndHideCard,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.surface,
-                                    foregroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!
+                                            .statsWelcomeTitle,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineMedium
+                                            ?.copyWith(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: dmSans,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!
+                                      .statsWelcomeMessage,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        fontSize: 14,
+                                        height: 1.4,
+                                        fontFamily: dmSans,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                ),
+                                const SizedBox(height: 16),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: ElevatedButton(
+                                    onPressed: _fadeAndHideCard,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.surface,
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      AppLocalizations.of(context)!.gotIt,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                            fontSize: 14,
+                                          ),
                                     ),
                                   ),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.gotIt,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                          fontSize: 14,
-                                        ),
-                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
+                      );
+                    },
+                  ),
+                statsAsync.when(
+                  loading: () => const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       ),
-                    );
-                  },
-                ),
-              statsAsync.when(
-                loading: () => const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                   ),
-                ),
-                error: (error, stack) {
-                  if (statsAsync.hasValue) {
-                    final stats = statsAsync.value!;
-                    return _statsList(context, stats, ref);
-                  } else {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: GestureDetector(
-                          onTap: () =>
-                              ref.read(statsProvider.notifier).refresh(),
-                          child: HugeIcon(
-                            icon: HugeIcons.strokeRoundedHelpCircle,
-                            color: Theme.of(context).colorScheme.onSurface,
+                  error: (error, stack) {
+                    if (statsAsync.hasValue) {
+                      final stats = statsAsync.value!;
+                      return _statsList(context, stats, ref);
+                    } else {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: GestureDetector(
+                            onTap: () =>
+                                ref.read(statsProvider.notifier).refresh(),
+                            child: HugeIcon(
+                              icon: HugeIcons.strokeRoundedHelpCircle,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }
-                },
-                data: (stats) {
-                  final isPossiblyStillLoading = stats.updated == 0;
+                      );
+                    }
+                  },
+                  data: (stats) {
+                    final isPossiblyStillLoading = stats.updated == 0;
 
-                  if (isPossiblyStillLoading) {
-                    Future.microtask(
-                      () => ref.read(statsProvider.notifier).refresh(),
-                    );
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32.0),
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                    if (isPossiblyStillLoading) {
+                      Future.microtask(
+                        () => ref.read(statsProvider.notifier).refresh(),
+                      );
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(32.0),
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
 
-                  return _statsList(context, stats, ref);
-                },
-              ),
-            ],
+                    return _statsList(context, stats, ref);
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildStatRow(BuildContext context, String title, String value) {
+  Widget _buildStatRow(
+    BuildContext context,
+    String title,
+    String value, {
+    bool hasUnderline = true,
+  }) {
     return RowItemWidget(
       icon: MeditoHugeIcon(icon: title),
       iconColor: Theme.of(context).colorScheme.onSurface,
       trailingIconSize: 20,
       title: value,
       subTitle: title,
-      hasUnderline: true,
+      hasUnderline: hasUnderline,
       isTrailingIcon: false,
       titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
             fontSize: 20,
@@ -307,7 +314,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       trailingIconSize: 20,
       title: '$currentFreezes / $maxFreezes',
       subTitle: 'Streak Freezes',
-      hasUnderline: true,
+      hasUnderline: false,
       isTrailingIcon: false,
       titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
             fontSize: 20,
@@ -338,11 +345,23 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
   }
 
   Column _statsList(BuildContext context, LocalAllStats stats, WidgetRef ref) {
+    final isStreakFreezeEnabled =
+        ref.watch(featureFlagsProvider).isStreakFreezeEnabled;
+    final shouldShowTotalTimeUnderline = isStreakFreezeEnabled;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        const SizedBox(height: 8),
         Container(
-          color: Theme.of(context).cardColor,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08),
+              width: 1,
+            ),
+          ),
           child: Column(
             children: [
               _buildStatRow(
@@ -369,14 +388,14 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                 context,
                 AppLocalizations.of(context)!.totalTimeListened,
                 _formatTotalTimeListened(stats.totalTimeListened),
+                hasUnderline: shouldShowTotalTimeUnderline,
               ),
               _buildStreakFreezeRow(context, stats, ref),
-              _buildStreakCircleDisplayPreference(context, ref),
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -396,11 +415,15 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                minimumSize: const Size.fromHeight(48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ),
         ),
+        _buildStreakCircleDisplayPreference(context, ref),
       ],
     );
   }
@@ -410,7 +433,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
     WidgetRef ref,
   ) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: const EdgeInsets.fromLTRB(4, 8, 0, 8),
       child: Consumer(
         builder: (context, ref, _) {
           final displayTypeAsync = ref.watch(streakCircleDisplayProvider);
@@ -426,51 +449,58 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
               final isStreakSelected =
                   displayType == StreakCircleDisplayType.currentStreak;
 
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: Checkbox(
-                      value: isStreakSelected,
-                      onChanged: (value) {
-                        final newType = value == true
-                            ? StreakCircleDisplayType.currentStreak
-                            : StreakCircleDisplayType.consistencyScore;
-                        ref
-                            .read(streakCircleDisplayProvider.notifier)
-                            .setDisplayType(newType);
-                        showSnackBar(
-                          context,
-                          AppLocalizations.of(context)!.displayPreferenceSaved,
-                        );
-                      },
-                      activeColor: ColorConstants.lightPurple,
-                      checkColor: Theme.of(context).colorScheme.onPrimary,
-                      side: BorderSide(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
-                        width: 1.5,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context)!.alwaysShowStreakOnHomepage,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontSize: 14,
-                            fontFamily: dmSans,
+              void handleToggle() {
+                final newType = !isStreakSelected
+                    ? StreakCircleDisplayType.currentStreak
+                    : StreakCircleDisplayType.consistencyScore;
+                ref
+                    .read(streakCircleDisplayProvider.notifier)
+                    .setDisplayType(newType);
+              }
+
+              return InkWell(
+                onTap: handleToggle,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: Checkbox(
+                          value: isStreakSelected,
+                          onChanged: (_) => handleToggle(),
+                          activeColor: ColorConstants.lightPurple,
+                          checkColor: Theme.of(context).colorScheme.onPrimary,
+                          side: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.6),
+                            width: 1.5,
                           ),
-                    ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          AppLocalizations.of(context)!
+                              .alwaysShowStreakOnHomepage,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontSize: 14,
+                                    fontFamily: dmSans,
+                                  ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               );
             },
           );
