@@ -12,7 +12,6 @@ import 'package:medito/views/settings/settings_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
-import 'package:medito/utils/stats_manager.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key, this.onNext});
@@ -110,16 +109,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       anchorLocal = now.add(const Duration(days: 1));
     }
 
-    final statsManager = StatsManager()..initialize();
-    final stats = await statsManager.localAllStats;
     final scheduler = SmartRemindersScheduler(
       prefs: prefs,
       reminders: ref.read(reminderProvider),
     );
     await scheduler.scheduleSeriesFromAnchor(
       anchorLocal,
-      streak: stats.streakCurrent,
-      consistency: stats.consistencyScore,
       l10n: AppLocalizations.of(context),
     );
 

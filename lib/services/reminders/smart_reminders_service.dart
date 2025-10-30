@@ -60,8 +60,6 @@ class SmartRemindersScheduler {
 
   Future<void> scheduleSeriesFromAnchor(
     DateTime anchorLocal, {
-    required int streak,
-    required double consistency,
     AppLocalizations? l10n,
   }) async {
     final localizations = l10n ?? _getFallbackLocalizations();
@@ -70,8 +68,7 @@ class SmartRemindersScheduler {
     for (var i = 0; i < 15; i++) {
       final when = anchorLocal.add(Duration(days: i));
       final tzWhen = tz.TZDateTime.from(when, tz.local);
-      final copy = _copyForDay(i + 1,
-          streak: streak, consistency: consistency, l10n: localizations);
+      final copy = _copyForDay(i + 1, l10n: localizations);
       items.add(_SeriesItem(
           id: smartBaseId + i, when: tzWhen, title: copy.$1, body: copy.$2));
     }
@@ -94,8 +91,6 @@ class SmartRemindersScheduler {
   Future<void> rescheduleAfterSession({
     required int endMs,
     required int durationMs,
-    required int streak,
-    required double consistency,
     AppLocalizations? l10n,
   }) async {
     final end = DateTime.fromMillisecondsSinceEpoch(endMs);
@@ -103,29 +98,16 @@ class SmartRemindersScheduler {
     final anchor = start
         .add(const Duration(days: 1))
         .subtract(const Duration(minutes: 15));
-    await scheduleSeriesFromAnchor(anchor,
-        streak: streak, consistency: consistency, l10n: l10n);
+    await scheduleSeriesFromAnchor(anchor, l10n: l10n);
   }
 
-  (String, String) _copyForDay(int day,
-      {required int streak,
-      required double consistency,
-      required AppLocalizations l10n}) {
-    final percent = (consistency * 100).round();
+  (String, String) _copyForDay(int day, {required AppLocalizations l10n}) {
     switch (day) {
       case 1:
         final variants = [
-          (
-            l10n.smartReminderDay1TitleVar1,
-            l10n.smartReminderDay1BodyVar1(streak.toString())
-          ),
-          (
-            l10n.smartReminderDay1TitleVar2,
-            l10n.smartReminderDay1BodyVar2(percent.toString())
-          ),
           (l10n.smartReminderDay1TitleVar3, l10n.smartReminderDay1BodyVar3),
         ];
-        final idx = (DateTime.now().day + streak) % variants.length;
+        final idx = DateTime.now().day % variants.length;
         return variants[idx];
       case 2:
         final variants = [
@@ -133,7 +115,7 @@ class SmartRemindersScheduler {
           (l10n.smartReminderDay2TitleVar2, l10n.smartReminderDay2BodyVar2),
           (l10n.smartReminderDay2TitleVar3, l10n.smartReminderDay2BodyVar3),
         ];
-        final idx = (DateTime.now().day + streak + 1) % variants.length;
+        final idx = (DateTime.now().day + 1) % variants.length;
         return variants[idx];
       case 3:
         final variants = [
@@ -141,7 +123,7 @@ class SmartRemindersScheduler {
           (l10n.smartReminderDay3TitleVar2, l10n.smartReminderDay3BodyVar2),
           (l10n.smartReminderDay3TitleVar3, l10n.smartReminderDay3BodyVar3),
         ];
-        final idx = (DateTime.now().day + streak + 2) % variants.length;
+        final idx = (DateTime.now().day + 2) % variants.length;
         return variants[idx];
       case 4:
         return (l10n.smartReminderDay4Title, l10n.smartReminderDay4Body);

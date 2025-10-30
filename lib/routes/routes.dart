@@ -22,6 +22,7 @@ import 'package:medito/views/home/customise_home_layout_screen.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/donation/superwall_donation_screen.dart';
 import 'package:medito/views/favorites/favorites_view.dart';
+import 'package:medito/views/stats/stats_screen.dart';
 
 extension SanitisePath on String {
   String sanitisePath() => replaceFirst('/', '');
@@ -47,8 +48,8 @@ Future<void> handleNavigation(
     var packId = type.contains('pack3')
         ? ids[2]!
         : type.contains('pack2')
-            ? ids[1]!
-            : ids.first!;
+        ? ids[1]!
+        : ids.first!;
     if (packId == 'favorites') {
       await _pushRoute(const FavoritesView(), ref);
     } else {
@@ -61,9 +62,7 @@ Future<void> handleNavigation(
       final isEditStatsUrl = url.startsWith(editStatsUrl);
       await Navigator.push<bool>(
         context,
-        MaterialPageRoute(
-          builder: (context) => _URLLauncherScreen(url: uri),
-        ),
+        MaterialPageRoute(builder: (context) => _URLLauncherScreen(url: uri)),
       );
       // After returning from edit stats web form, force sync to get updated stats
       if (isEditStatsUrl && ref != null) {
@@ -78,36 +77,39 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
     await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.account) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const SignUpLogInPage(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const SignUpLogInPage()));
   } else if (type == TypeConstants.journalEntry) {
     var id = ids.first ?? '';
     var content = ids.length > 1 ? ids[1] ?? '' : '';
     var isCompleted = ids.length > 2 ? ids[2] == 'true' : false;
     await _pushRoute(
-        JournalEntryView(
-          taskId: id,
-          isCompleted: isCompleted,
-          initialText: content,
-        ),
-        ref);
+      JournalEntryView(
+        taskId: id,
+        isCompleted: isCompleted,
+        initialText: content,
+      ),
+      ref,
+    );
   } else if (type == TypeConstants.route &&
       ids.contains(TypeConstants.customiseHomeLayout)) {
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.donation)) {
     await _handleDonationNavigation(context, ref, sourceRouteName);
+  } else if (type == TypeConstants.route &&
+      ids.contains(RouteConstants.stats)) {
+    await _pushRoute(const StatsScreen(), ref);
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }
 }
 
 Future<bool?> _pushRoute(Widget route, WidgetRef? ref) async {
-  return await navigatorKey.currentState
-      ?.push<bool>(MaterialPageRoute(builder: (context) => route));
+  return await navigatorKey.currentState?.push<bool>(
+    MaterialPageRoute(builder: (context) => route),
+  );
 }
 
 Future<void> _handleTrackNavigation(List<String?> ids, WidgetRef? ref) async {
@@ -122,8 +124,9 @@ Future<void> _handleTrackNavigation(List<String?> ids, WidgetRef? ref) async {
 
 Future<void> _handleEmailNavigation(List<String?> ids, WidgetRef? ref) async {
   if (ref != null) {
-    var deviceAppAndUserInfo =
-        await ref.read(deviceAppAndUserInfoProvider.future);
+    var deviceAppAndUserInfo = await ref.read(
+      deviceAppAndUserInfoProvider.future,
+    );
     var info =
         'Debug info\n$deviceAppAndUserInfo\n--- Write below this line ---'; // These will be localized in the UI layer
     var emailAddress = ids.first!;
@@ -132,7 +135,10 @@ Future<void> _handleEmailNavigation(List<String?> ids, WidgetRef? ref) async {
 }
 
 Future<void> _handleDonationNavigation(
-    BuildContext context, WidgetRef? ref, String? sourceRouteName) async {
+  BuildContext context,
+  WidgetRef? ref,
+  String? sourceRouteName,
+) async {
   if (ref == null) return;
 
   final isUSStorefront = ref.read(isUSStorefrontProvider);
@@ -144,20 +150,14 @@ Future<void> _handleDonationNavigation(
     if (await canLaunchUrl(uri)) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => _URLLauncherScreen(url: uri),
-        ),
+        MaterialPageRoute(builder: (context) => _URLLauncherScreen(url: uri)),
       );
     }
   }
 }
 
 Future<void> launchEmailSubmission(String email, {String? body}) async {
-  final uri = Uri(
-    scheme: 'mailto',
-    path: email,
-    query: 'body=$body',
-  );
+  final uri = Uri(scheme: 'mailto', path: email, query: 'body=$body');
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri);
   } else {
@@ -203,8 +203,6 @@ class _URLLauncherScreenState extends State<_URLLauncherScreen>
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.transparent,
-    );
+    return const Scaffold(backgroundColor: Colors.transparent);
   }
 }

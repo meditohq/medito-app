@@ -542,6 +542,12 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @stats.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get stats;
+
   /// No description provided for @reminderNotificationCleared.
   ///
   /// In en, this message translates to:

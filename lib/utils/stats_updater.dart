@@ -98,10 +98,6 @@ Future<bool> handleStats(
         final endMs = payload[TypeConstants.timestampIdKey] as int;
         final durationMs = payload[TypeConstants.durationIdKey] as int;
 
-        final currentStats = await statsManager.localAllStats;
-        final streak = currentStats.streakCurrent;
-        final consistency = currentStats.consistencyScore;
-
         final scheduler = SmartRemindersScheduler(
           prefs: prefs,
           reminders: ReminderProvider(),
@@ -109,8 +105,6 @@ Future<bool> handleStats(
         await scheduler.rescheduleAfterSession(
           endMs: endMs,
           durationMs: durationMs,
-          streak: streak,
-          consistency: consistency,
           l10n: ref != null
               ? AppLocalizations.of(navigatorKey.currentContext!)
               : null,

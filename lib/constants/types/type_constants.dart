@@ -28,6 +28,7 @@ class TypeConstants {
 
 class RouteConstants {
   static const String donation = 'donation';
+  static const String stats = 'stats';
 }
 
 class LocaleConstants {

@@ -12,8 +12,9 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/home/products_provider.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:medito/routes/routes.dart';
+import 'package:medito/constants/constants.dart';
 import 'widgets/announcement/announcement_widget.dart';
-import 'widgets/bottom_sheet/stats/stats_bottom_sheet_widget.dart';
 import 'widgets/editorial/carousel_widget.dart';
 import 'widgets/header_widget.dart';
 import 'widgets/products/products_widget.dart';
@@ -172,20 +173,11 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   void _onStatsButtonTapped(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(14.0),
-          topRight: Radius.circular(14.0),
-        ),
-      ),
-      isScrollControlled: true,
-      useRootNavigator: true,
-      backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
-      builder: (BuildContext context) {
-        return const StatsBottomSheetWidget();
-      },
+    handleNavigation(
+      TypeConstants.route,
+      [RouteConstants.stats],
+      context,
+      ref: ref,
     );
   }
 
