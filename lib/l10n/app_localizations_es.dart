@@ -1308,6 +1308,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reportDialogQuestion => '¿Qué te gustaría reportar?';
 
   @override
+  String get reportDialogHelpLink =>
+      'Por favor, revisa la página de ayuda si tu problema ya ha sido resuelto';
+
+  @override
+  String get helpPage => 'Ayuda';
+
+  @override
   String get storageReadError => 'Error al leer datos del almacenamiento local';
 
   @override

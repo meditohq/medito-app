@@ -9,13 +9,25 @@ class ReportService {
     required String locale,
     required String trackId,
     required int timestamp,
+    String? trackName,
+    String? guideName,
   }) {
+    final queryParams = {
+      'locale': locale,
+      'track_id': trackId,
+      'timestamp': timestamp.toString(),
+    };
+
+    if (trackName != null && trackName.isNotEmpty) {
+      queryParams['track_name'] = trackName;
+    }
+
+    if (guideName != null && guideName.isNotEmpty) {
+      queryParams['guide_name'] = guideName;
+    }
+
     final uri = Uri.parse(_tallyFormBaseUrl).replace(
-      queryParameters: {
-        'locale': locale,
-        'track_id': trackId,
-        'timestamp': timestamp.toString(),
-      },
+      queryParameters: queryParams,
     );
 
     return uri.toString();
@@ -26,11 +38,15 @@ class ReportService {
     required String locale,
     required String trackId,
     required int timestamp,
+    String? trackName,
+    String? guideName,
   }) async {
     final url = generateReportUrl(
       locale: locale,
       trackId: trackId,
       timestamp: timestamp,
+      trackName: trackName,
+      guideName: guideName,
     );
 
     await launchURLInBrowser(url);

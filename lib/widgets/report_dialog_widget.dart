@@ -7,6 +7,8 @@ import '../models/track/track_model.dart';
 import '../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../services/report_service.dart';
 import '../utils/duration_extensions.dart';
+import '../utils/utils.dart';
+import '../widgets/snackbar_widget.dart';
 
 /// Dialog widget for reporting track issues
 class ReportDialogWidget extends ConsumerWidget {
@@ -74,6 +76,19 @@ class ReportDialogWidget extends ConsumerWidget {
                           .onSurface
                           .withValues(alpha: 0.8),
                       fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () =>
+                        launchURLInBrowser('https://medito.support.site/'),
+                    child: Text(
+                      AppLocalizations.of(context)!.reportDialogHelpLink,
+                      style: TextStyle(
+                        color: ColorConstants.lightPurple,
+                        fontSize: 14,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ],
@@ -195,6 +210,16 @@ class ReportDialogWidget extends ConsumerWidget {
         locale: locale,
         trackId: track.id,
         timestamp: timestamp,
+        trackName: track.title,
+        guideName: track.audio.isNotEmpty ? track.audio.first.guideName : null,
+      );
+
+      showSnackBar(
+        context,
+        AppLocalizations.of(context)!.reportDialogHelpLink,
+        onActionPressed: () =>
+            launchURLInBrowser('https://medito.support.site/'),
+        actionLabel: AppLocalizations.of(context)!.helpPage,
       );
     } catch (e) {
       // Handle error silently for better UX

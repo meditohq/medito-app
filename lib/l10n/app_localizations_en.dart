@@ -1284,6 +1284,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportDialogQuestion => 'What would you like to report?';
 
   @override
+  String get reportDialogHelpLink =>
+      'Please check the help page if your issue has been addressed';
+
+  @override
+  String get helpPage => 'Help';
+
+  @override
   String get storageReadError => 'Failed to read data from local storage';
 
   @override

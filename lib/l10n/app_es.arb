@@ -416,6 +416,14 @@
   "@reportDialogQuestion": {
     "description": "Question shown in the report dialog"
   },
+  "reportDialogHelpLink": "Por favor, revisa la página de ayuda si tu problema ya ha sido resuelto",
+  "@reportDialogHelpLink": {
+    "description": "Help link text in the report dialog"
+  },
+  "helpPage": "Ayuda",
+  "@helpPage": {
+    "description": "Label for the help page link"
+  },
   "storageReadError": "Error al leer datos del almacenamiento local",
   "@storageReadError": {
     "description": "Error message when reading from local storage fails"

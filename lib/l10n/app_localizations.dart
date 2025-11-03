@@ -2456,6 +2456,18 @@ abstract class AppLocalizations {
   /// **'What would you like to report?'**
   String get reportDialogQuestion;
 
+  /// Help link text in the report dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the help page if your issue has been addressed'**
+  String get reportDialogHelpLink;
+
+  /// Label for the help page link
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get helpPage;
+
   /// Error message when reading from local storage fails
   ///
   /// In en, this message translates to:
