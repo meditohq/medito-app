@@ -334,7 +334,7 @@ void main() {
       // Set last synced to be within TTL (recent) - use separate lastSyncAt time
       var lastSyncedTime = testDate.subtract(const Duration(seconds: 30));
       await statsManager.setLastSyncedAtForTesting(lastSyncedTime);
-      
+
       statsManager.setStatsForTesting(
         LocalAllStats.empty().copyWith(
           updated: testDate
@@ -397,7 +397,7 @@ void main() {
       // Set last synced more than 60 seconds ago (outside TTL)
       var lastSyncedTime = testDate.subtract(const Duration(seconds: 70));
       await statsManager.setLastSyncedAtForTesting(lastSyncedTime);
-      
+
       statsManager.setStatsForTesting(
         LocalAllStats.empty().copyWith(
           updated: testDate
@@ -1443,7 +1443,8 @@ void main() {
         // Mock stats service to verify sync() doesn't make network call
         // when within TTL and not dirty (after applyStreakFreeze cleanup)
         when(mockStatsService.fetchAllStats()).thenAnswer((_) async {
-          fail('fetchAllStats should not be called when within TTL and not dirty');
+          fail(
+              'fetchAllStats should not be called when within TTL and not dirty');
         });
 
         // Act - sync immediately after applyStreakFreeze should skip
@@ -1454,7 +1455,8 @@ void main() {
         // The sync should have skipped because dirty is false and within TTL
       });
 
-      test('awardStreakFreeze - clears dirty flag and sets lastSyncedAt after posting',
+      test(
+          'awardStreakFreeze - clears dirty flag and sets lastSyncedAt after posting',
           () async {
         // Arrange
         var testDate = DateTime(2025, 3, 15, 12, 0, 0);
@@ -1478,7 +1480,8 @@ void main() {
         // Mock stats service to verify sync() doesn't make network call
         // when within TTL and not dirty (after awardStreakFreeze cleanup)
         when(mockStatsService.fetchAllStats()).thenAnswer((_) async {
-          fail('fetchAllStats should not be called when within TTL and not dirty');
+          fail(
+              'fetchAllStats should not be called when within TTL and not dirty');
         });
 
         // Act - sync immediately after awardStreakFreeze should skip
