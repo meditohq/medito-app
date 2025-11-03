@@ -9,6 +9,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/tiktok_analytics_service.dart';
+import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../me/me_provider.dart';
 
@@ -180,6 +181,13 @@ class PaymentUIController extends _$PaymentUIController {
 
         // TikTok donation events (all revenue in cents)
         TikTokAnalyticsService().logDonationEvents(
+          revenueCents: amount,
+          currency: currency,
+          frequency: frequency,
+        );
+
+        // Meta donation events (all revenue in cents)
+        MetaSdkService.instance.logDonationEvents(
           revenueCents: amount,
           currency: currency,
           frequency: frequency,

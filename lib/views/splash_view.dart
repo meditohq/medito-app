@@ -191,6 +191,22 @@ class SplashViewState extends ConsumerState<SplashView>
           // Don't throw here as this is not critical
         },
       );
+
+      // Initialize Meta SDK and log first open once
+      await MetaSdkService.instance.init().timeout(
+        const Duration(seconds: 3),
+        onTimeout: () {
+          AppLogger.w('SPLASH', 'Meta SDK initialization timed out');
+          throw Exception('Meta SDK initialization timeout');
+        },
+      );
+      await MetaSdkService.instance.logAppFirstOpenOnce().timeout(
+        const Duration(seconds: 3),
+        onTimeout: () {
+          AppLogger.w('SPLASH', 'Meta logAppFirstOpenOnce timed out');
+          // Don't throw here as this is not critical
+        },
+      );
     } catch (e, stackTrace) {
       // Log the error but don't prevent app startup
       AppLogger.e(
