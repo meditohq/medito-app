@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -59,6 +60,13 @@ class Pack extends _$Pack {
       await StatsManager().removeTrackChecked(trackId);
     } else {
       await StatsManager().addTrackChecked(trackId);
+    }
+
+    // Refresh stats provider from local to ensure UI shows updated stats
+    try {
+      await ref.read(statsProvider.notifier).refreshFromLocal();
+    } catch (_) {
+      // Silently fail if refresh fails - the local state update is more important
     }
 
     state = state.whenData((pack) {

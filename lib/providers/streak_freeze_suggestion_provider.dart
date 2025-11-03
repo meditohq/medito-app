@@ -108,8 +108,8 @@ class StreakFreezeSuggestionNotifier
 
     final success = await statsManager.applyStreakFreeze();
     if (success) {
-      // Refresh the stats provider
-      ref.invalidate(statsProvider);
+      // Refresh the stats provider from local stats without syncing
+      await ref.read(statsProvider.notifier).refreshFromLocal();
     }
 
     // Mark suggestion as handled

@@ -533,6 +533,9 @@ class StatsManager {
 
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
+      // Mark as synced and clear dirty flag after successful POST
+      _lastSyncedAt = _getCurrentDate();
+      _dirty = false;
     }
   }
 
@@ -553,6 +556,9 @@ class StatsManager {
 
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
+      // Mark as synced and clear dirty flag after successful POST
+      _lastSyncedAt = _getCurrentDate();
+      _dirty = false;
     }
   }
 
@@ -582,6 +588,9 @@ class StatsManager {
 
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
+      // Mark as synced and clear dirty flag after successful POST
+      _lastSyncedAt = _getCurrentDate();
+      _dirty = false;
     }
   }
 
@@ -768,6 +777,9 @@ class StatsManager {
 
     await _saveLocalAllStatsToSharedPrefs();
     await _statsService.postStats(_allStats!);
+    // Mark as synced and clear dirty flag after successful POST
+    _lastSyncedAt = _getCurrentDate();
+    _dirty = false;
 
     return true;
   }

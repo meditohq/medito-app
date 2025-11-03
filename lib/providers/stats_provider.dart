@@ -142,4 +142,24 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     state = await AsyncValue.guard(() => _fetchStatsWithRetry());
     dev.log('StatsNotifier: Refresh completed');
   }
+
+  Future<void> refreshFromLocal() async {
+    dev.log('StatsNotifier: Starting refresh from local stats');
+    var statsManager = ref.read(statsManagerProvider);
+
+    try {
+      await statsManager.initialize();
+      var localStats = await statsManager.localAllStats;
+      state = AsyncValue.data(localStats);
+      dev.log('StatsNotifier: Refresh from local completed');
+    } catch (error) {
+      dev.log('StatsNotifier: Error during refresh from local', error: error);
+
+      if (error is AppError) {
+        state = AsyncValue.error(error, StackTrace.current);
+      } else {
+        state = AsyncValue.error(const UnknownError(), StackTrace.current);
+      }
+    }
+  }
 }

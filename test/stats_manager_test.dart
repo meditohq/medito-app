@@ -1404,6 +1404,84 @@ void main() {
         expect(statsManager.currentStats?.streakFreezes,
             2); // Freeze count unchanged
       });
+
+      test(
+          'applyStreakFreeze - clears dirty flag and sets lastSyncedAt after posting',
+          () async {
+        // Arrange
+        var testDate = DateTime(2025, 3, 15, 12, 0, 0);
+        var day2ago = DateTime(2025, 3, 13);
+        statsManager.setCurrentDateForTesting(testDate);
+
+        var stats = LocalAllStats.empty().copyWith(
+          streakFreezes: 1,
+          audioCompleted: [
+            LocalAudioCompleted(
+              id: '1',
+              timestamp: day2ago.millisecondsSinceEpoch,
+            ),
+          ],
+        );
+
+        statsManager.setStatsForTesting(stats);
+        when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+        // Act - apply streak freeze
+        var result = await statsManager.applyStreakFreeze();
+        expect(result, true);
+
+        // Verify stats were updated
+        var updatedStats = statsManager.currentStats;
+        expect(updatedStats?.streakFreezes, 0);
+
+        // Mock stats service to verify sync() doesn't make network call
+        // when within TTL and not dirty (after applyStreakFreeze cleanup)
+        when(mockStatsService.fetchAllStats()).thenAnswer((_) async {
+          fail('fetchAllStats should not be called when within TTL and not dirty');
+        });
+
+        // Act - sync immediately after applyStreakFreeze should skip
+        // because dirty flag was cleared and lastSyncedAt was set
+        await statsManager.sync();
+
+        // Assert - no network call made, test passes if we reach here
+        // The sync should have skipped because dirty is false and within TTL
+      });
+
+      test('awardStreakFreeze - clears dirty flag and sets lastSyncedAt after posting',
+          () async {
+        // Arrange
+        var testDate = DateTime(2025, 3, 15, 12, 0, 0);
+        statsManager.setCurrentDateForTesting(testDate);
+
+        var stats = LocalAllStats.empty().copyWith(
+          streakFreezes: 0,
+          maxStreakFreezes: 2,
+        );
+
+        statsManager.setStatsForTesting(stats);
+        when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+        // Act - award streak freeze
+        await statsManager.awardStreakFreeze();
+
+        // Verify stats were updated
+        var updatedStats = statsManager.currentStats;
+        expect(updatedStats?.streakFreezes, 1);
+
+        // Mock stats service to verify sync() doesn't make network call
+        // when within TTL and not dirty (after awardStreakFreeze cleanup)
+        when(mockStatsService.fetchAllStats()).thenAnswer((_) async {
+          fail('fetchAllStats should not be called when within TTL and not dirty');
+        });
+
+        // Act - sync immediately after awardStreakFreeze should skip
+        // because dirty flag was cleared and lastSyncedAt was set
+        await statsManager.sync();
+
+        // Assert - no network call made, test passes if we reach here
+        // The sync should have skipped because dirty is false and within TTL
+      });
     });
 
     group('StatsManager Track Checked Tests', () {

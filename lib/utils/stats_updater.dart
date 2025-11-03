@@ -8,6 +8,7 @@ import '../constants/strings/shared_preference_constants.dart';
 import '../providers/notification/reminder_provider.dart';
 import '../services/reminders/smart_reminders_service.dart';
 import '../providers/feature_flags_provider.dart';
+import '../providers/stats_provider.dart';
 import '../routes/routes.dart';
 import '../widgets/snackbar_widget.dart';
 import '../l10n/app_localizations.dart';
@@ -73,6 +74,18 @@ Future<bool> handleStats(
       previousStreak: previousStreak,
       isStreakFreezeEnabled: isStreakFreezeEnabled,
     );
+
+    // Refresh the stats provider from local stats without syncing
+    // This ensures the UI shows updated stats immediately
+    if (ref != null) {
+      try {
+        await ref.read(statsProvider.notifier).refreshFromLocal();
+        AppLogger.d('STATS', 'Stats provider refreshed from local');
+      } catch (refreshError) {
+        // Don't fail the whole operation if provider refresh fails
+        AppLogger.e('STATS', 'Failed to refresh stats provider', refreshError);
+      }
+    }
 
     // Update widgets with new stats data
     try {
