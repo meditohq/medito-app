@@ -112,7 +112,9 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       if (authRepository.currentUser != null) {
         dev.log('StatsNotifier: Starting fetch');
         await statsManager.initialize();
-        await statsManager.sync();
+        // Always sync on startup to ensure we have latest data from server
+        // The sync() method will skip if within TTL and not dirty, which is fine
+        await statsManager.sync(force: false);
       } else {
         dev.log('StatsNotifier: User not signed in, skipping stats sync');
       }

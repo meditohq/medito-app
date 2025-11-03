@@ -331,7 +331,10 @@ void main() {
       var testDate = DateTime(2025, 1, 15, 12, 0, 0);
       statsManager.setCurrentDateForTesting(testDate);
 
-      // Set last synced to be within TTL (recent)
+      // Set last synced to be within TTL (recent) - use separate lastSyncAt time
+      var lastSyncedTime = testDate.subtract(const Duration(seconds: 30));
+      await statsManager.setLastSyncedAtForTesting(lastSyncedTime);
+      
       statsManager.setStatsForTesting(
         LocalAllStats.empty().copyWith(
           updated: testDate
@@ -392,6 +395,9 @@ void main() {
       statsManager.setCurrentDateForTesting(testDate);
 
       // Set last synced more than 60 seconds ago (outside TTL)
+      var lastSyncedTime = testDate.subtract(const Duration(seconds: 70));
+      await statsManager.setLastSyncedAtForTesting(lastSyncedTime);
+      
       statsManager.setStatsForTesting(
         LocalAllStats.empty().copyWith(
           updated: testDate

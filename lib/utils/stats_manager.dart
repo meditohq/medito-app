@@ -69,7 +69,29 @@ class StatsManager {
         httpApiService: HttpApiService(),
         prefs: await SharedPreferences.getInstance(),
       );
+      await _loadLastSyncedAt();
       _isInitialized = true;
+    }
+  }
+
+  Future<void> _loadLastSyncedAt() async {
+    var prefs = await SharedPreferences.getInstance();
+    var lastSyncedTimestamp =
+        prefs.getInt(SharedPreferenceConstants.statsLastSyncedAt);
+    if (lastSyncedTimestamp != null && lastSyncedTimestamp > 0) {
+      _lastSyncedAt = DateTime.fromMillisecondsSinceEpoch(lastSyncedTimestamp);
+    } else {
+      _lastSyncedAt = null;
+    }
+  }
+
+  Future<void> _saveLastSyncedAt() async {
+    var prefs = await SharedPreferences.getInstance();
+    if (_lastSyncedAt != null) {
+      await prefs.setInt(SharedPreferenceConstants.statsLastSyncedAt,
+          _lastSyncedAt!.millisecondsSinceEpoch);
+    } else {
+      await prefs.remove(SharedPreferenceConstants.statsLastSyncedAt);
     }
   }
 
@@ -149,6 +171,7 @@ class StatsManager {
       await _statsService.postStats(_allStats!);
       // Mark as synced and clear dirty flag after successful POST
       _lastSyncedAt = _getCurrentDate();
+      await _saveLastSyncedAt();
       _dirty = false;
     } else {
       throw Exception("Stats are null");
@@ -161,10 +184,9 @@ class StatsManager {
     if (_allStats == null) {
       _allStats = await _loadLocalAllStats();
 
-      // Initialize _lastSyncedAt from the updated field if available
-      if (_allStats!.updated > 0) {
-        _lastSyncedAt = DateTime.fromMillisecondsSinceEpoch(_allStats!.updated);
-      }
+      // Load last synced time from SharedPreferences (not from stats.updated)
+      // This is the actual last sync time, not the last modification time
+      await _loadLastSyncedAt();
 
       // If local stats are empty, sync with server to try to get valid stats
       if (_allStats!.totalTracksCompleted == 0 &&
@@ -509,6 +531,7 @@ class StatsManager {
       await _statsService.postStats(_allStats!);
       // Mark as synced and clear dirty flag after successful POST
       _lastSyncedAt = _getCurrentDate();
+      await _saveLastSyncedAt();
       _dirty = false;
     }
   }
@@ -535,6 +558,7 @@ class StatsManager {
       await _statsService.postStats(_allStats!);
       // Mark as synced and clear dirty flag after successful POST
       _lastSyncedAt = _getCurrentDate();
+      await _saveLastSyncedAt();
       _dirty = false;
     }
   }
@@ -558,6 +582,7 @@ class StatsManager {
       await _statsService.postStats(_allStats!);
       // Mark as synced and clear dirty flag after successful POST
       _lastSyncedAt = _getCurrentDate();
+      await _saveLastSyncedAt();
       _dirty = false;
     }
   }
@@ -590,6 +615,7 @@ class StatsManager {
       await _statsService.postStats(_allStats!);
       // Mark as synced and clear dirty flag after successful POST
       _lastSyncedAt = _getCurrentDate();
+      await _saveLastSyncedAt();
       _dirty = false;
     }
   }
@@ -779,6 +805,7 @@ class StatsManager {
     await _statsService.postStats(_allStats!);
     // Mark as synced and clear dirty flag after successful POST
     _lastSyncedAt = _getCurrentDate();
+    await _saveLastSyncedAt();
     _dirty = false;
 
     return true;
@@ -843,12 +870,6 @@ class StatsManager {
   @visibleForTesting
   void setStatsForTesting(LocalAllStats stats) {
     _allStats = stats;
-    // Initialize _lastSyncedAt from the updated field if available
-    if (stats.updated > 0) {
-      _lastSyncedAt = DateTime.fromMillisecondsSinceEpoch(stats.updated);
-    } else {
-      _lastSyncedAt = null;
-    }
   }
 
   @visibleForTesting
@@ -872,6 +893,19 @@ class StatsManager {
     _dirty = false;
   }
 
+  @visibleForTesting
+  Future<void> setLastSyncedAtForTesting(DateTime? dateTime) async {
+    _lastSyncedAt = dateTime;
+    if (dateTime != null) {
+      var prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(SharedPreferenceConstants.statsLastSyncedAt,
+          dateTime.millisecondsSinceEpoch);
+    } else {
+      var prefs = await SharedPreferences.getInstance();
+      await prefs.remove(SharedPreferenceConstants.statsLastSyncedAt);
+    }
+  }
+
   DateTime _getCurrentDate() {
     return _testDate ?? DateTime.now();
   }
@@ -885,6 +919,7 @@ class StatsManager {
             httpApiService: HttpApiService(),
             prefs: await SharedPreferences.getInstance(),
           );
+      await _loadLastSyncedAt();
       _isInitialized = true;
     }
   }
