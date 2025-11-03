@@ -72,7 +72,7 @@ class ProductsWidget extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 180,
+            height: 200,
             child: ListView.builder(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
@@ -134,6 +134,9 @@ class ProductGroupCard extends ConsumerWidget {
         child: Card(
           margin: const EdgeInsets.only(right: 12),
           clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -143,11 +146,11 @@ class ProductGroupCard extends ConsumerWidget {
                   if (productGroup.allImageUrls.isNotEmpty)
                     ClipRRect(
                       borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(12)),
+                          const BorderRadius.vertical(top: Radius.circular(14)),
                       child: AspectRatio(
                         aspectRatio: 1,
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: ProductImageCarousel(
                             productGroup: productGroup,
                             cardWidth: cardWidth,
@@ -158,14 +161,14 @@ class ProductGroupCard extends ConsumerWidget {
                   else if (productGroup.imageUrl != null)
                     ClipRRect(
                       borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(12)),
+                          const BorderRadius.vertical(top: Radius.circular(14)),
                       child: AspectRatio(
                         aspectRatio: 1,
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: CachedNetworkImage(
                             imageUrl: productGroup.imageUrl!,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                             width: cardWidth,
                             key: ValueKey(
                                 'product_image_${productGroup.groupId}'),
@@ -200,11 +203,11 @@ class ProductGroupCard extends ConsumerWidget {
                   else
                     ClipRRect(
                       borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(12)),
+                          const BorderRadius.vertical(top: Radius.circular(14)),
                       child: AspectRatio(
                         aspectRatio: 1,
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: Container(
                             color: Theme.of(context).colorScheme.surface,
                             child: Center(
@@ -229,6 +232,13 @@ class ProductGroupCard extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Text(
                           AppLocalizations.of(context)!.newProductLabel,
@@ -246,21 +256,16 @@ class ProductGroupCard extends ConsumerWidget {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      productGroup.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            height: 1.5,
-                          ),
-                    ),
-                  ],
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                child: Text(
+                  productGroup.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        height: 1.4,
+                      ),
                 ),
               ),
             ],
@@ -465,23 +470,29 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 500),
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
       child: Container(
         key: ValueKey(
             'product_image_${widget.productGroup.groupId}_$_currentImageIndex'),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(10.0),
           color: Theme.of(context).colorScheme.surface,
         ),
         clipBehavior: Clip.antiAlias,
         child: CachedNetworkImage(
           imageUrl: currentImageUrl,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(10.0),
               image: DecorationImage(
                 image: imageProvider,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
               ),
             ),
           ),
