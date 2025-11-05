@@ -93,7 +93,7 @@ class _SuperwallDonationScreenState
               name: FirebaseAnalyticsService.eventPaywallDismissedNoPayment,
               parameters: {
                 'paywall_id': paywallId,
-                'user_id': userId,
+                'medito_user_id': userId,
               },
             );
           }

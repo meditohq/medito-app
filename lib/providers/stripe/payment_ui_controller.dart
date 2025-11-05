@@ -172,9 +172,9 @@ class PaymentUIController extends _$PaymentUIController {
           name: 'donation_$frequency',
           parameters: {
             'amount': amount.toDouble(),
-            'currency': currency,
+            'donation_currency': currency,
             'paywall_id': paywallId ?? 'unknown',
-            'user_id': userId ?? 'unknown',
+            'medito_user_id': userId ?? 'unknown',
             'paywall_source': paywallSource ?? 'unknown',
           },
         );

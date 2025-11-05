@@ -379,8 +379,8 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
     FirebaseAnalyticsService().logEvent(
       name: 'paywall_presented',
       parameters: {
-        'paywall_identifier': paywallInfo.identifier ?? 'unknown',
-        'user_id': userId,
+        'paywall_id': paywallInfo.identifier ?? 'unknown',
+        'medito_user_id': userId,
       },
     );
   }
