@@ -279,12 +279,7 @@ class FirebaseAnalyticsService {
     required String name,
     Map<String, Object>? parameters,
   }) async {
-    if (_runningInTest) return; // Skip in unit tests
-    if (kDebugMode) {
-      print(
-          'Firebase Analytics (DEBUG): Would log event "$name" with parameters: $parameters');
-      return; // Skip in debug mode
-    }
+    if (_runningInTest) return;
     if (!_initialized) await initialize();
 
     try {
@@ -307,11 +302,7 @@ class FirebaseAnalyticsService {
 
   /// Set the user ID for Firebase Analytics
   Future<void> setUserId(String? userId) async {
-    if (_runningInTest) return; 
-    if (kDebugMode) {
-      print('Firebase Analytics (DEBUG): Would set user ID to: $userId');
-      return;
-    }
+    if (_runningInTest) return;
     if (!_initialized) await initialize();
 
     try {
@@ -335,12 +326,7 @@ class FirebaseAnalyticsService {
     String? screenClass,
     Map<String, Object>? parameters,
   }) async {
-    if (_runningInTest) return; // Skip in unit tests
-    if (kDebugMode) {
-      print(
-          'Firebase Analytics (DEBUG): Would log screen view "$screenName" with class: ${screenClass ?? 'Flutter'}${parameters != null ? ' and parameters: $parameters' : ''}');
-      return; // Skip in debug mode
-    }
+    if (_runningInTest) return;
     if (!_initialized) await initialize();
 
     try {

@@ -171,7 +171,7 @@ class PaymentUIController extends _$PaymentUIController {
         FirebaseAnalyticsService().logEvent(
           name: 'donation_$frequency',
           parameters: {
-            'amount': amount,
+            'amount': amount.toDouble(),
             'currency': currency,
             'paywall_id': paywallId ?? 'unknown',
             'user_id': userId ?? 'unknown',
