@@ -9,10 +9,6 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
-		27250C9B2E843752008B6308 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5BC52CCCDFCD0043D20A /* Fonts.swift */; };
-		27250C9C2E843752008B6308 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B822CCCDB4E0043D20A /* Colors.swift */; };
-		27250C9D2E843752008B6308 /* DonateModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA1F9DE2CD50D620062AD07 /* DonateModifier.swift */; };
-		27250C9E2E843752008B6308 /* WidgetBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */; };
 		27250C9F2E843752008B6308 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		27250CA32E843752008B6308 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		27250CA42E843752008B6308 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -29,49 +25,13 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		EC2DAB2B4AB3F57ED82D87C2 /* Pods_MeditoWidgetExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D254B14FB671A44EA78C4DCE /* Pods_MeditoWidgetExtension.framework */; };
-		ED73D7B82CD607DF005EB56D /* QuoteWidgetSmallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7B72CD607DF005EB56D /* QuoteWidgetSmallView.swift */; };
-		ED73D7BB2CD60830005EB56D /* QuoteWidgetSmall.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7BA2CD60828005EB56D /* QuoteWidgetSmall.swift */; };
-		ED73D7BE2CD60AC0005EB56D /* QuoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7BD2CD60AC0005EB56D /* QuoteView.swift */; };
-		ED73D7C42CD60C28005EB56D /* QuoteWidgetMedium.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7C32CD60C25005EB56D /* QuoteWidgetMedium.swift */; };
-		ED73D7C62CD60C31005EB56D /* QuoteWidgetMediumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED73D7C52CD60C2D005EB56D /* QuoteWidgetMediumView.swift */; };
-		ED8A5B3D2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */; };
-		ED8A5B3E2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */; };
-		ED8A5B832CCCDB540043D20A /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B822CCCDB4E0043D20A /* Colors.swift */; };
-		ED8A5BC42CCCDED70043D20A /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5B822CCCDB4E0043D20A /* Colors.swift */; };
-		ED8A5BC62CCCDFCF0043D20A /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5BC52CCCDFCD0043D20A /* Fonts.swift */; };
-		ED8A5BC72CCCDFCF0043D20A /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8A5BC52CCCDFCD0043D20A /* Fonts.swift */; };
-		EDA1F9DF2CD50D620062AD07 /* DonateModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA1F9DE2CD50D620062AD07 /* DonateModifier.swift */; };
-		EDA1F9E02CD50D620062AD07 /* DonateModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA1F9DE2CD50D620062AD07 /* DonateModifier.swift */; };
-		EDBD61082C942FA500C578AF /* MeditoWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD61052C941F8400C578AF /* MeditoWidgetEntry.swift */; };
-		EDBD610E2C943F0100C578AF /* StreakWidgetMediumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD610C2C943EBD00C578AF /* StreakWidgetMediumView.swift */; };
-		EDBD61122C943F4500C578AF /* MeditoTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBD61102C943F3C00C578AF /* MeditoTimelineProvider.swift */; };
-		EDC71F9F2CD2892100B81AA9 /* FlameImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC71F9E2CD2892100B81AA9 /* FlameImageView.swift */; };
-		EDCBF1112CCD1AD300EEC22A /* StreakWidgetSmall.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCBF1102CCD1AD300EEC22A /* StreakWidgetSmall.swift */; };
-		EDCBF1132CCE699200EEC22A /* StreakWidgetSmallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCBF1122CCE699200EEC22A /* StreakWidgetSmallView.swift */; };
-		EDCBF1382CCF607300EEC22A /* MeditoWidgetKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCBF1372CCF607300EEC22A /* MeditoWidgetKind.swift */; };
 		EDFD4CFF2C9359BF0066E874 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDFD4CFE2C9359BF0066E874 /* WidgetKit.framework */; };
 		EDFD4D012C9359BF0066E874 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDFD4D002C9359BF0066E874 /* SwiftUI.framework */; };
-		EDFD4D042C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D032C9359BF0066E874 /* MeditoWidgetBundle.swift */; };
-		EDFD4D062C9359BF0066E874 /* StreakWidgetMedium.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D052C9359BF0066E874 /* StreakWidgetMedium.swift */; };
 		EDFD4D082C9359BF0066E874 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDFD4D072C9359BF0066E874 /* Assets.xcassets */; };
 		F7C33FCECFCB2BD7A48BA96A /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		270582672DEA01D100033AF9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = EDFD4CFC2C9359BE0066E874;
-			remoteInfo = MeditoWidgetExtension;
-		};
-		27250C962E843752008B6308 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = EDFD4CFC2C9359BE0066E874;
-			remoteInfo = MeditoWidgetExtension;
-		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -115,27 +75,9 @@
 		B87160DAA714472B587ACACB /* Pods-MeditoWidgetExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MeditoWidgetExtension.release.xcconfig"; path = "Target Support Files/Pods-MeditoWidgetExtension/Pods-MeditoWidgetExtension.release.xcconfig"; sourceTree = "<group>"; };
 		BC957D59D1CBF4ED522FE216 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		D254B14FB671A44EA78C4DCE /* Pods_MeditoWidgetExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MeditoWidgetExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED73D7B72CD607DF005EB56D /* QuoteWidgetSmallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetSmallView.swift; sourceTree = "<group>"; };
-		ED73D7BA2CD60828005EB56D /* QuoteWidgetSmall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetSmall.swift; sourceTree = "<group>"; };
-		ED73D7BD2CD60AC0005EB56D /* QuoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteView.swift; sourceTree = "<group>"; };
-		ED73D7C32CD60C25005EB56D /* QuoteWidgetMedium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetMedium.swift; sourceTree = "<group>"; };
-		ED73D7C52CD60C2D005EB56D /* QuoteWidgetMediumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuoteWidgetMediumView.swift; sourceTree = "<group>"; };
-		ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBackgroundModifier.swift; sourceTree = "<group>"; };
-		ED8A5B822CCCDB4E0043D20A /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
-		ED8A5BC52CCCDFCD0043D20A /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
-		EDA1F9DE2CD50D620062AD07 /* DonateModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonateModifier.swift; sourceTree = "<group>"; };
-		EDBD61052C941F8400C578AF /* MeditoWidgetEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoWidgetEntry.swift; sourceTree = "<group>"; };
-		EDBD610C2C943EBD00C578AF /* StreakWidgetMediumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetMediumView.swift; sourceTree = "<group>"; };
-		EDBD61102C943F3C00C578AF /* MeditoTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoTimelineProvider.swift; sourceTree = "<group>"; };
-		EDC71F9E2CD2892100B81AA9 /* FlameImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlameImageView.swift; sourceTree = "<group>"; };
-		EDCBF1102CCD1AD300EEC22A /* StreakWidgetSmall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetSmall.swift; sourceTree = "<group>"; };
-		EDCBF1122CCE699200EEC22A /* StreakWidgetSmallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetSmallView.swift; sourceTree = "<group>"; };
-		EDCBF1372CCF607300EEC22A /* MeditoWidgetKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoWidgetKind.swift; sourceTree = "<group>"; };
 		EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MeditoWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDFD4CFE2C9359BF0066E874 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		EDFD4D002C9359BF0066E874 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		EDFD4D032C9359BF0066E874 /* MeditoWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoWidgetBundle.swift; sourceTree = "<group>"; };
-		EDFD4D052C9359BF0066E874 /* StreakWidgetMedium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidgetMedium.swift; sourceTree = "<group>"; };
 		EDFD4D072C9359BF0066E874 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EDFD4D092C9359BF0066E874 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -288,8 +230,6 @@
 		ED73D7B62CD607B3005EB56D /* QuoteWidgetSmall */ = {
 			isa = PBXGroup;
 			children = (
-				ED73D7BA2CD60828005EB56D /* QuoteWidgetSmall.swift */,
-				ED73D7B72CD607DF005EB56D /* QuoteWidgetSmallView.swift */,
 			);
 			path = QuoteWidgetSmall;
 			sourceTree = "<group>";
@@ -297,7 +237,6 @@
 		ED73D7C02CD60BF1005EB56D /* Quote */ = {
 			isa = PBXGroup;
 			children = (
-				ED73D7BD2CD60AC0005EB56D /* QuoteView.swift */,
 				ED73D7C22CD60C1A005EB56D /* QuoteWidgetMedium */,
 				ED73D7B62CD607B3005EB56D /* QuoteWidgetSmall */,
 			);
@@ -307,7 +246,6 @@
 		ED73D7C12CD60BFB005EB56D /* Streak */ = {
 			isa = PBXGroup;
 			children = (
-				EDC71F9E2CD2892100B81AA9 /* FlameImageView.swift */,
 				EDCBF1362CCF605900EEC22A /* StreakMedium */,
 				EDCBF1352CCF605100EEC22A /* StreakSmall */,
 			);
@@ -317,8 +255,6 @@
 		ED73D7C22CD60C1A005EB56D /* QuoteWidgetMedium */ = {
 			isa = PBXGroup;
 			children = (
-				ED73D7C52CD60C2D005EB56D /* QuoteWidgetMediumView.swift */,
-				ED73D7C32CD60C25005EB56D /* QuoteWidgetMedium.swift */,
 			);
 			path = QuoteWidgetMedium;
 			sourceTree = "<group>";
@@ -326,8 +262,6 @@
 		ED8A5B3B2CCCCB800043D20A /* Modifier */ = {
 			isa = PBXGroup;
 			children = (
-				ED8A5B3C2CCCCB940043D20A /* WidgetBackgroundModifier.swift */,
-				EDA1F9DE2CD50D620062AD07 /* DonateModifier.swift */,
 			);
 			path = Modifier;
 			sourceTree = "<group>";
@@ -335,8 +269,6 @@
 		ED8A5B812CCCDB480043D20A /* Design */ = {
 			isa = PBXGroup;
 			children = (
-				ED8A5B822CCCDB4E0043D20A /* Colors.swift */,
-				ED8A5BC52CCCDFCD0043D20A /* Fonts.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
@@ -352,7 +284,6 @@
 		EDBD61072C941F9000C578AF /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				EDBD61052C941F8400C578AF /* MeditoWidgetEntry.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -362,7 +293,6 @@
 			children = (
 				ED73D7C12CD60BFB005EB56D /* Streak */,
 				ED73D7C02CD60BF1005EB56D /* Quote */,
-				EDCBF1372CCF607300EEC22A /* MeditoWidgetKind.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -370,7 +300,6 @@
 		EDBD610F2C943F2F00C578AF /* Timeline */ = {
 			isa = PBXGroup;
 			children = (
-				EDBD61102C943F3C00C578AF /* MeditoTimelineProvider.swift */,
 			);
 			path = Timeline;
 			sourceTree = "<group>";
@@ -378,8 +307,6 @@
 		EDCBF1352CCF605100EEC22A /* StreakSmall */ = {
 			isa = PBXGroup;
 			children = (
-				EDCBF1102CCD1AD300EEC22A /* StreakWidgetSmall.swift */,
-				EDCBF1122CCE699200EEC22A /* StreakWidgetSmallView.swift */,
 			);
 			path = StreakSmall;
 			sourceTree = "<group>";
@@ -387,8 +314,6 @@
 		EDCBF1362CCF605900EEC22A /* StreakMedium */ = {
 			isa = PBXGroup;
 			children = (
-				EDFD4D052C9359BF0066E874 /* StreakWidgetMedium.swift */,
-				EDBD610C2C943EBD00C578AF /* StreakWidgetMediumView.swift */,
 			);
 			path = StreakMedium;
 			sourceTree = "<group>";
@@ -404,7 +329,6 @@
 				EDBD610F2C943F2F00C578AF /* Timeline */,
 				EDBD610B2C943E6F00C578AF /* View */,
 				EDBD61072C941F9000C578AF /* Model */,
-				EDFD4D032C9359BF0066E874 /* MeditoWidgetBundle.swift */,
 				EDFD4D072C9359BF0066E874 /* Assets.xcassets */,
 				EDFD4D092C9359BF0066E874 /* Info.plist */,
 			);
@@ -426,10 +350,7 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-				27250C952E843752008B6308 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
+				fileSystemSynchronizedGroups = (
 				ED8A5BC82CCCE1060043D20A /* Fonts */,
 			);
 			name = "Runner copy";
@@ -471,37 +392,13 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-				270582682DEA01D100033AF9 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
+				fileSystemSynchronizedGroups = (
 				ED8A5BC82CCCE1060043D20A /* Fonts */,
 			);
 			name = Runner;
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Medito Dev.app */;
 			productType = "com.apple.product-type.application";
-		};
-		EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = EDFD4D112C9359BF0066E874 /* Build configuration list for PBXNativeTarget "MeditoWidgetExtension" */;
-			buildPhases = (
-				EB8614A4075B72C932E64CFB /* [CP] Check Pods Manifest.lock */,
-				EDFD4CF92C9359BE0066E874 /* Sources */,
-				EDFD4CFA2C9359BE0066E874 /* Frameworks */,
-				EDFD4CFB2C9359BE0066E874 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				ED8A5BC82CCCE1060043D20A /* Fonts */,
-			);
-			name = MeditoWidgetExtension;
-			productName = MeditoWidgetExtension;
-			productReference = EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -543,7 +440,6 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
-				EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */,
 				27250C942E843752008B6308 /* Runner copy */,
 			);
 		};
@@ -762,10 +658,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */,
-				27250C9B2E843752008B6308 /* Fonts.swift in Sources */,
-				27250C9C2E843752008B6308 /* Colors.swift in Sources */,
-				27250C9D2E843752008B6308 /* DonateModifier.swift in Sources */,
-				27250C9E2E843752008B6308 /* WidgetBackgroundModifier.swift in Sources */,
 				27250C9F2E843752008B6308 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -783,10 +675,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
-				ED8A5BC62CCCDFCF0043D20A /* Fonts.swift in Sources */,
-				ED8A5BC42CCCDED70043D20A /* Colors.swift in Sources */,
-				EDA1F9E02CD50D620062AD07 /* DonateModifier.swift in Sources */,
-				ED8A5B3E2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -795,40 +683,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED8A5BC72CCCDFCF0043D20A /* Fonts.swift in Sources */,
-				EDFD4D042C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */,
-				EDBD61082C942FA500C578AF /* MeditoWidgetEntry.swift in Sources */,
-				ED73D7BE2CD60AC0005EB56D /* QuoteView.swift in Sources */,
-				ED73D7C62CD60C31005EB56D /* QuoteWidgetMediumView.swift in Sources */,
-				ED73D7C42CD60C28005EB56D /* QuoteWidgetMedium.swift in Sources */,
-				ED73D7B82CD607DF005EB56D /* QuoteWidgetSmallView.swift in Sources */,
-				EDBD610E2C943F0100C578AF /* StreakWidgetMediumView.swift in Sources */,
-				EDCBF1112CCD1AD300EEC22A /* StreakWidgetSmall.swift in Sources */,
-				ED8A5B832CCCDB540043D20A /* Colors.swift in Sources */,
-				EDCBF1132CCE699200EEC22A /* StreakWidgetSmallView.swift in Sources */,
-				EDCBF1382CCF607300EEC22A /* MeditoWidgetKind.swift in Sources */,
-				ED73D7BB2CD60830005EB56D /* QuoteWidgetSmall.swift in Sources */,
-				EDBD61122C943F4500C578AF /* MeditoTimelineProvider.swift in Sources */,
-				EDA1F9DF2CD50D620062AD07 /* DonateModifier.swift in Sources */,
-				ED8A5B3D2CCCCB940043D20A /* WidgetBackgroundModifier.swift in Sources */,
-				EDC71F9F2CD2892100B81AA9 /* FlameImageView.swift in Sources */,
-				EDFD4D062C9359BF0066E874 /* StreakWidgetMedium.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		270582682DEA01D100033AF9 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */;
-			targetProxy = 270582672DEA01D100033AF9 /* PBXContainerItemProxy */;
-		};
-		27250C952E843752008B6308 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */;
-			targetProxy = 27250C962E843752008B6308 /* PBXContainerItemProxy */;
-		};
 		331C8086294A63A400263BE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;

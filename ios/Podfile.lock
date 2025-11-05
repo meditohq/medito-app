@@ -169,8 +169,6 @@ PODS:
     - Flutter
   - health (13.2.1):
     - Flutter
-  - home_widget (0.0.1):
-    - Flutter
   - in_app_review (2.0.0):
     - Flutter
   - integration_test (0.0.1):
@@ -270,8 +268,6 @@ PODS:
   - TikTokBusinessSDK (1.5.1)
   - url_launcher_ios (0.0.1):
     - Flutter
-  - workmanager_apple (0.0.1):
-    - Flutter
 
 DEPENDENCIES:
   - app_links (from `.symlinks/plugins/app_links/ios`)
@@ -290,7 +286,6 @@ DEPENDENCIES:
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - haptic_feedback (from `.symlinks/plugins/haptic_feedback/ios`)
   - health (from `.symlinks/plugins/health/ios`)
-  - home_widget (from `.symlinks/plugins/home_widget/ios`)
   - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/darwin`)
@@ -298,7 +293,6 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - pay_ios (from `.symlinks/plugins/pay_ios/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - PromisesObjC
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
@@ -306,7 +300,6 @@ DEPENDENCIES:
   - superwallkit_flutter (from `.symlinks/plugins/superwallkit_flutter/ios`)
   - tiktok_events_sdk (from `.symlinks/plugins/tiktok_events_sdk/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
-  - workmanager_apple (from `.symlinks/plugins/workmanager_apple/ios`)
 
 SPEC REPOS:
   trunk:
@@ -375,8 +368,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/haptic_feedback/ios"
   health:
     :path: ".symlinks/plugins/health/ios"
-  home_widget:
-    :path: ".symlinks/plugins/home_widget/ios"
   in_app_review:
     :path: ".symlinks/plugins/in_app_review/ios"
   integration_test:
@@ -405,8 +396,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/tiktok_events_sdk/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
-  workmanager_apple:
-    :path: ".symlinks/plugins/workmanager_apple/ios"
 
 SPEC CHECKSUMS:
   app_links: 3dbc685f76b1693c66a6d9dd1e9ab6f73d97dc0a
@@ -442,7 +431,6 @@ SPEC CHECKSUMS:
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   haptic_feedback: fd1d8509833f58f164fc12122c0357fa9b2750e0
   health: e310387222e199d4b3261337490a67aaff6d18eb
-  home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
   in_app_review: 7dd1ea365263f834b8464673f9df72c80c17c937
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
@@ -471,8 +459,7 @@ SPEC CHECKSUMS:
   tiktok_events_sdk: a17263dc678931e4020dc26c499953851645fd7d
   TikTokBusinessSDK: 6b59d8a69ee23fa714831e8c6f47c34831abc60b
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
-  workmanager_apple: 904529ae31e97fc5be632cf628507652294a0778
 
-PODFILE CHECKSUM: 8d9a1b789c159a27af0cf4e8c30ca576200eee89
+PODFILE CHECKSUM: a5e1fa29d58bcc7321670fac38c05b0d7b8f61d9
 
 COCOAPODS: 1.16.2

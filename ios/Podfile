@@ -36,11 +36,6 @@ target 'Runner' do
   target 'RunnerTests' do
     inherit! :search_paths
   end
-
-  target 'MeditoWidgetExtension' do
-    inherit! :search_paths   # Inherit pods search paths for the widget extension
-    pod 'PromisesObjC'
-  end
 end
 
 post_install do |installer|
