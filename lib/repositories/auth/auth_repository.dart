@@ -14,6 +14,8 @@ import 'package:medito/repositories/me/me_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/analytics/meta_sdk_service.dart';
 
 class User {
   final String id;
@@ -667,6 +669,16 @@ class AuthRepositoryImpl extends AuthRepository {
 
     // Clear HTTP auth header
     _httpApiService.clearAuthHeader();
+
+    // Clear Firebase Analytics user ID and reset analytics data
+    try {
+      await FirebaseAnalyticsService().clearUserId();
+      await FirebaseAnalyticsService().resetAnalyticsData();
+      await MetaSdkService.instance.setUserId(null);
+      dev.log('[AUTH_REPO] Firebase Analytics user ID cleared', level: 500);
+    } catch (e) {
+      dev.log('[AUTH_REPO] Error clearing Firebase Analytics user ID: $e', level: 800);
+    }
 
     // Reset current user to null
     _currentUser = null;

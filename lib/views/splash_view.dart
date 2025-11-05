@@ -229,6 +229,20 @@ class SplashViewState extends ConsumerState<SplashView>
           'SPLASH', 'Auth initialized, current user: ${auth.currentUser}');
       AppLogger.i('SPLASH', 'User email from auth: ${auth.getUserEmail()}');
 
+      // Set user ID for analytics immediately after user initialization
+      // This ensures user ID is set before any events are logged
+      try {
+        final userId = await ref.read(userIdProvider.future);
+        if (userId != null && userId.isNotEmpty) {
+          await FirebaseAnalyticsService().setUserId(userId);
+          await MetaSdkService.instance.setUserId(userId);
+          AppLogger.i('SPLASH', 'User ID set for analytics: $userId');
+        }
+      } catch (e, stackTrace) {
+        AppLogger.e(
+            'SPLASH', 'Error setting user ID for analytics', e, stackTrace);
+      }
+
       final currentUser = auth.currentUser;
       final isLoggedIn = await auth.isLoggedIn();
       AppLogger.i('SPLASH',
@@ -309,6 +323,20 @@ class SplashViewState extends ConsumerState<SplashView>
 
     try {
       await auth.signInAnonymously();
+
+      // Set user ID for analytics immediately after anonymous sign in
+      try {
+        final userId = await ref.read(userIdProvider.future);
+        if (userId != null && userId.isNotEmpty) {
+          await FirebaseAnalyticsService().setUserId(userId);
+          await MetaSdkService.instance.setUserId(userId);
+          AppLogger.i('SPLASH', 'User ID set for analytics after anonymous sign in: $userId');
+        }
+      } catch (e, stackTrace) {
+        AppLogger.e(
+            'SPLASH', 'Error setting user ID for analytics after anonymous sign in', e, stackTrace);
+      }
+
       await _initializeServices();
       ref.read(meRefreshProvider)();
 
@@ -429,19 +457,6 @@ class SplashViewState extends ConsumerState<SplashView>
           // For non-network errors, re-throw to prevent app initialization
           rethrow;
         }
-      }
-
-      // Set user ID for analytics after user initialization (skip if analytics not available)
-      try {
-        final userId = await ref.read(userIdProvider.future);
-        if (userId != null && userId.isNotEmpty) {
-          await FirebaseAnalyticsService().setUserId(userId);
-          await MetaSdkService.instance.setUserId(userId);
-          AppLogger.i('SPLASH', 'User ID set for analytics: $userId');
-        }
-      } catch (e, stackTrace) {
-        AppLogger.e(
-            'SPLASH', 'Error setting user ID for analytics', e, stackTrace);
       }
 
       ref.read(rootCombineProvider(context));

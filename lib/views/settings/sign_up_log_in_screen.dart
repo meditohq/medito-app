@@ -13,6 +13,7 @@ import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:email_validator/email_validator.dart';
@@ -279,6 +280,19 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
             level: 1000);
         dev.log('[SIGN_UP] User email after login: ${authRepo.getUserEmail()}',
             level: 1000);
+
+        // Set user ID for analytics immediately after successful sign-in
+        // This ensures user ID is set before any events are logged
+        try {
+          final userId = await ref.read(userIdProvider.future);
+          if (userId != null && userId.isNotEmpty) {
+            await FirebaseAnalyticsService().setUserId(userId);
+            await MetaSdkService.instance.setUserId(userId);
+            dev.log('[SIGN_UP] User ID set for analytics: $userId', level: 1000);
+          }
+        } catch (e) {
+          dev.log('[SIGN_UP] Error setting user ID for analytics: $e', level: 1000);
+        }
 
         // Log analytics event for completed signup
         await FirebaseAnalyticsService().logEvent(

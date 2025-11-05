@@ -19,6 +19,10 @@ class _NoopAnalytics {
 
   Future<void> logScreenView(
       {required String screenName, String? screenClass}) async {}
+
+  Future<void> setUserId({String? id}) async {}
+
+  Future<void> resetAnalyticsData() async {}
 }
 
 /// Service for handling Firebase Analytics initialization and consent settings
@@ -316,6 +320,31 @@ class FirebaseAnalyticsService {
     } catch (e) {
       if (kDebugMode) {
         print('Error setting user ID in Firebase Analytics: $e');
+      }
+    }
+  }
+
+  /// Clear the user ID from Firebase Analytics
+  Future<void> clearUserId() async {
+    await setUserId(null);
+  }
+
+  /// Reset all analytics data for this app instance
+  Future<void> resetAnalyticsData() async {
+    if (_runningInTest) return;
+    if (!_initialized) await initialize();
+
+    try {
+      if (_analytics != null) {
+        await _analytics.resetAnalyticsData();
+      }
+
+      if (kDebugMode) {
+        print('Firebase Analytics data reset');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error resetting Firebase Analytics data: $e');
       }
     }
   }
