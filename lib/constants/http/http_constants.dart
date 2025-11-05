@@ -160,6 +160,7 @@ class HTTPConstants {
   // DEAD DOMAINS - domains that no longer exist and should be avoided
   static const List<String> _deadDomains = [
     'images.medito.space',
+    'cdn.medito.app',
     // Add other dead domains here as they are discovered
   ];
 

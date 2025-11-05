@@ -29,6 +29,8 @@ class CrashlyticsService {
     'Invalid statusCode: 500',
     'Connection refused',
     'Connection timed out',
+    'Failed host lookup',
+    'No address associated with hostname',
   ];
 
   Future<void> initialize() async {
@@ -115,6 +117,24 @@ class CrashlyticsService {
               exception.message.contains('403') ||
               exception.message.contains('500'))) {
         return true;
+      }
+    }
+
+    // Special case for SocketException from image URLs (DNS failures, host lookup failures, etc.)
+    if (exception is SocketException) {
+      final exceptionString = exception.toString();
+      // Check if it's related to cdn.medito.app or contains DNS error patterns
+      if (exceptionString.contains('cdn.medito.app') ||
+          exceptionString.contains('Failed host lookup') ||
+          exceptionString.contains('No address associated with hostname')) {
+        // If it's an image loading error, ignore it
+        if (_isImageLoadingError(stack)) {
+          return true;
+        }
+        // Also check if the stack trace contains URLs from dead domains
+        if (stack != null && HTTPConstants.isDeadDomain(stack)) {
+          return true;
+        }
       }
     }
 
