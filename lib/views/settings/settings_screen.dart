@@ -86,20 +86,30 @@ class SettingsItem {
   });
 }
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   static final _isHealthSyncAvailable = Platform.isIOS;
   static final _isDndSupported = Platform.isAndroid;
   final _analytics = FirebaseAnalyticsService();
 
-  SettingsScreen({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _logScreenView();
+  }
+
+  Future<void> _logScreenView() async {
+    await _analytics.logScreenView(screenName: 'SettingsScreen');
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Log screen view
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _logScreenView();
-    });
-
+  Widget build(BuildContext context) {
     final List<SettingsItem> settingsItems = [
       SettingsItem(
         section: AppLocalizations.of(context)!.helpLegalSection,
@@ -141,15 +151,6 @@ class SettingsScreen extends ConsumerWidget {
               loading: () => '$editStatsUrl?clientid=',
               error: (_, __) => '$editStatsUrl?clientid=',
             ),
-      ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.helpLegalSection,
-        type: TypeConstants.url,
-        title: AppLocalizations.of(context)!.contactUsTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedHelpCircle,
-            color: Theme.of(context).colorScheme.onSurface),
-        path: 'https://meditofoundation.org/contact',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,
@@ -217,13 +218,8 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _logScreenView() async {
-    await _analytics.logScreenView(screenName: 'SettingsScreen');
-  }
-
   void handleItemPress(
     BuildContext context,
-    WidgetRef ref,
     SettingsItem item,
   ) async {
     await handleNavigation(
@@ -344,7 +340,7 @@ class SettingsScreen extends ConsumerWidget {
       title: item.title,
       subTitle: isAccountItem && hasValidEmail ? userEmail : null,
       hasUnderline: true,
-      onTap: () => handleItemPress(context, ref, item),
+      onTap: () => handleItemPress(context, item),
     );
   }
 
