@@ -45,9 +45,9 @@ class _TrackViewState extends ConsumerState<TrackView>
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
+    _logScreenView();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkOverflow();
-      _logScreenView();
     });
   }
 

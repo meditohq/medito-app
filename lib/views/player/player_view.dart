@@ -43,9 +43,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   @override
   void initState() {
     super.initState();
+    _logScreenView();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializePlayer();
-      _logScreenView();
     });
   }
 

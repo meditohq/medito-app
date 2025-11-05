@@ -22,6 +22,7 @@ import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
 
 import '../../providers/home/announcement_provider.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -32,10 +33,17 @@ class HomeView extends ConsumerStatefulWidget {
 
 class _HomeViewState extends ConsumerState<HomeView>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+  final _analytics = FirebaseAnalyticsService();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _logScreenView();
+  }
+
+  Future<void> _logScreenView() async {
+    await _analytics.logScreenView(screenName: 'HomeView');
   }
 
   @override
