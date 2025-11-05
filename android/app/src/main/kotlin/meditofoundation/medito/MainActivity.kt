@@ -35,24 +35,6 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         super.configureFlutterEngine(flutterEngine)
         GeneratedPluginRegistrant.registerWith(flutterEngine)
         
-        // Register workmanager callback
-        try {
-            val workmanagerClass = Class.forName("dev.fluttercommunity.workmanager.WorkmanagerPlugin")
-            val registerMethod = workmanagerClass.getDeclaredMethod("setPluginRegistrantCallback", Class.forName("io.flutter.plugin.common.PluginRegistry\$PluginRegistrantCallback"))
-            val callbackClass = Class.forName("io.flutter.plugin.common.PluginRegistry\$PluginRegistrantCallback")
-            val callbackImpl = java.lang.reflect.Proxy.newProxyInstance(
-                callbackClass.classLoader,
-                arrayOf(callbackClass)
-            ) { _, _, _ ->
-                // This is a no-op implementation
-                null
-            }
-            registerMethod.invoke(null, callbackImpl)
-        } catch (e: Exception) {
-            // Plugin registration failed, but that's ok for our purposes
-            println("Workmanager plugin registration skipped: ${e.message}")
-        }
-        
         MeditoAndroidAudioServiceManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)

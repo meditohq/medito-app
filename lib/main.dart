@@ -14,9 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:medito/constants/theme/app_theme.dart';
-import 'package:medito/constants/widget_constants.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/config/superwall_config.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
@@ -32,9 +30,7 @@ import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/utils/stats_updater.dart';
-import 'package:medito/utils/widget_updater.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/network/http_api_service.dart';
@@ -43,37 +39,11 @@ import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 bool _hasInitialized = false;
-Timer? _widgetUpdateTimer;
-
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    if (task == WidgetConstants.taskName) {
-      try {
-        // You may need to re-initialize dependencies here
-        var statsManager = StatsManager();
-        await statsManager.initialize();
-        try {
-          await statsManager.sync();
-        } catch (e) {
-          // Silently handle sync errors during widget updates
-        }
-        var stats = await statsManager.localAllStats;
-        await updateWidgets(stats);
-      } catch (e) {
-        // Silently handle widget update errors
-      }
-    }
-
-    return Future.value(true);
-  });
-}
 
 Future<void> _configureStripe() async {
   // Configure Stripe settings - publishableKey and merchantIdentifier will be set from backend config
@@ -136,23 +106,6 @@ void main() async {
   usePathUrlStrategy();
 
   var prefs = await initializeSharedPreferences();
-
-  _setUpWidget();
-
-  if (Platform.isAndroid) {
-    Workmanager().initialize(
-      callbackDispatcher,
-    );
-    Workmanager().registerPeriodicTask(
-      WidgetConstants.taskIdentifier,
-      WidgetConstants.taskName,
-      frequency: const Duration(minutes: 2),
-      initialDelay: const Duration(minutes: 0),
-      constraints: Constraints(
-        networkType: NetworkType.notRequired,
-      ),
-    );
-  }
 
   runApp(
     DevicePreview(
@@ -398,8 +351,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
     _refreshAuthToken();
 
-    _updateWidgetsData();
-
     if (Platform.isIOS) {
       // Process any pending track completions when app comes back to foreground
       processPendingCompletedTracks().then((processedCount) {
@@ -408,9 +359,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
             'STATS',
             'Processed $processedCount pending tracks on foreground',
           );
-
-          // Update widgets again if tracks were processed
-          _updateWidgetsData();
         }
       });
     }
@@ -478,57 +426,5 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         (route) => false,
       );
     });
-  }
-}
-
-void _setUpWidget() {
-  // Set the app group ID for HomeWidget usage
-  HomeWidget.setAppGroupId(WidgetConstants.widgetGroupId);
-
-  // Schedule periodic updates for widgets
-  _widgetUpdateTimer?.cancel();
-  _widgetUpdateTimer = Timer.periodic(
-    kDebugMode ? const Duration(minutes: 5) : const Duration(minutes: 30),
-    (timer) async {
-      await _updateWidgetsData();
-    },
-  );
-
-  // Register for widget launcher
-  HomeWidget.widgetClicked.listen((uri) {
-    AppLogger.d('WIDGET', 'Widget clicked: $uri');
-    // Handle widget tap events if needed
-  });
-
-  // Initial update
-  _updateWidgetsData();
-}
-
-Future<void> _updateWidgetsData() async {
-  try {
-    AppLogger.d('WIDGET', 'Updating widget data');
-
-    // Initialize Firebase if needed
-    if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-    }
-
-    var statsManager = StatsManager();
-    await statsManager.initialize();
-
-    try {
-      await statsManager.sync();
-    } catch (e) {
-      AppLogger.e('WIDGET', 'Stats sync failed', e);
-    }
-
-    var stats = await statsManager.localAllStats;
-    await updateWidgets(stats);
-
-    AppLogger.d('WIDGET', 'Widget data updated successfully');
-  } catch (e) {
-    AppLogger.e('WIDGET', 'Widget update failed', e);
   }
 }

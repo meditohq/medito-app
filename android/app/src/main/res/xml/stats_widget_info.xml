@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/stats_widget_layout"
-    android:minWidth="180dp"
-    android:minHeight="40dp"
-    android:previewImage="@drawable/widget_preview"
-    android:resizeMode="horizontal"
-    android:updatePeriodMillis="1800000"
-    android:widgetCategory="home_screen" />

@@ -17,16 +17,12 @@ import 'health_kit_manager.dart';
 import 'stats_manager.dart';
 import '../models/local_audio_completed.dart';
 import 'logger.dart';
-import 'widget_updater.dart';
 
 // Export the key for backward compatibility if needed
 const String completedTracksKey = CompletedTracksStorage.completedTracksKey;
 
 // Static flag to prevent concurrent processing
 bool _isProcessingPendingTracks = false;
-
-// Widget updates are handled exclusively by widget_updater.dart.
-// This file should only call updateWidgets when stats change, and should not contain widget update logic itself.
 
 Future<bool> handleStats(
   Map<String, dynamic> payload, {
@@ -85,16 +81,6 @@ Future<bool> handleStats(
         // Don't fail the whole operation if provider refresh fails
         AppLogger.e('STATS', 'Failed to refresh stats provider', refreshError);
       }
-    }
-
-    // Update widgets with new stats data
-    try {
-      var allStats = await statsManager.localAllStats;
-      await updateWidgets(allStats);
-      AppLogger.d('STATS', 'Widgets updated with latest stats');
-    } catch (widgetError) {
-      // Don't fail the whole operation if widget update fails
-      AppLogger.e('STATS', 'Failed to update widgets', widgetError);
     }
 
     // Schedule or reschedule Smart Reminders based on latest session time
@@ -194,22 +180,6 @@ Future<int> processPendingCompletedTracks([SharedPreferences? prefs]) async {
     // Update storage with the tracks that failed to process
     await storage.updatePendingTracks(failedTracks);
 
-    // If any tracks were processed successfully, update the widgets
-    if (successCount > 0) {
-      try {
-        var statsManager = StatsManager()..initialize();
-        var allStats = await statsManager.localAllStats;
-        await updateWidgets(allStats);
-        AppLogger.d('STATS',
-            'Widgets updated after processing $successCount pending tracks');
-      } catch (widgetError) {
-        AppLogger.e(
-            'STATS',
-            'Failed to update widgets after processing pending tracks',
-            widgetError);
-      }
-    }
-
     return successCount;
   } catch (e) {
     AppLogger.e('STATS', 'Error processing pending tracks', e);
@@ -225,20 +195,6 @@ Future<void> storeTrackCompletion(
     SharedPreferences prefs, Map<String, dynamic> payload) async {
   final storage = CompletedTracksStorage(prefs);
   await storage.addCompletedTrack(payload);
-
-  // Even though we couldn't process the stats now,
-  // try to update the widgets with current stats
-  try {
-    var statsManager = StatsManager()..initialize();
-    var allStats = await statsManager.localAllStats;
-    await updateWidgets(allStats);
-    AppLogger.d('STATS',
-        'Widgets updated with current stats after storing track for later processing');
-  } catch (widgetError) {
-    // Don't fail if widget update fails
-    AppLogger.e(
-        'STATS', 'Failed to update widgets after storing track', widgetError);
-  }
 }
 
 Future<void> _syncHealthKit(Map<String, dynamic> payload) async {

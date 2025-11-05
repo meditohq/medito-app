@@ -3,19 +3,5 @@
     package="meditofoundation.medito">
 
     <application android:icon="@mipmap/ic_launcher">
-        <!-- Widget configuration -->
-        <!-- <receiver
-            android:name=".StatsWidgetReceiver"
-            android:exported="true"
-            tools:replace="android:exported">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/stats_widget_info" />
-        </receiver> -->
     </application>
 </manifest>

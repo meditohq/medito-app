@@ -54,7 +54,6 @@ dependencies:
   haptic_feedback: ^0.5.1+1
   tiktok_events_sdk: ^1.0.9
   health: ^13.2.1
-  home_widget: ^0.8.1
   http: ^1.4.0
   hugeicons:
     hosted: https://onepub.dev/api/kdpxxpsdav
@@ -78,11 +77,6 @@ dependencies:
   timezone: ^0.10.0
   url_launcher: ^6.3.1
   uuid: ^4.5.0
-  workmanager:
-    git:
-      url: https://github.com/fluttercommunity/flutter_workmanager.git
-      path: workmanager
-      ref: main
   xml: ^6.5.0
   xml2json: ^6.2.7
 

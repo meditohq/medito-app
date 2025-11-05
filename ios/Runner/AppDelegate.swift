@@ -1,8 +1,6 @@
 import Flutter
 import UIKit
 import Firebase
-import home_widget
-import workmanager_apple
 import app_links
 import Intents
 import IntentsUI
@@ -47,18 +45,6 @@ class AppDelegate: FlutterAppDelegate {
         
         // Set background fetch interval
         UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60 * 15)) // 15 minutes
-        
-        // Set up Workmanager callback
-        WorkmanagerPlugin.setPluginRegistrantCallback { registry in
-            GeneratedPluginRegistrant.register(with: registry)
-        }
-        
-        // Set up HomeWidget callback for iOS 17+
-        if #available(iOS 17, *) {
-            HomeWidgetBackgroundWorker.setPluginRegistrantCallback { registry in
-                GeneratedPluginRegistrant.register(with: registry)
-            }
-        }
         
         // Set notification delegate for iOS 10+
         if #available(iOS 10.0, *) {
