@@ -176,7 +176,7 @@ class CardPaymentService implements PaymentMethodService {
           ),
           googlePay: PaymentSheetGooglePay(
             merchantCountryCode: 'NL',
-            testEnv: !kDebugMode,
+            testEnv: kDebugMode,
           ),
         ),
       );
