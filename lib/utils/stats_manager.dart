@@ -730,25 +730,47 @@ class StatsManager {
     audioActivities.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
     // Convert timestamps to DateTime objects for easier comparison
+    // Deduplicate dates to match calculateStreak() behavior
     var audioDates = audioActivities
         .map((activity) =>
             DateTime.fromMillisecondsSinceEpoch(activity.timestamp))
         .map((date) => DateTime(date.year, date.month, date.day))
+        .toSet()
         .toList();
 
     // Get existing freeze usage dates as DateTime objects for easier comparison
+    // Deduplicate dates to match calculateStreak() behavior
     var existingFreezeDates = _allStats!.freezeUsageDates
         .map((timestamp) => DateTime.fromMillisecondsSinceEpoch(timestamp))
         .map((date) => DateTime(date.year, date.month, date.day))
+        .toSet()
         .toList();
 
-    // If yesterday already has a freeze, we should return false
-    var yesterdayHasFreeze = existingFreezeDates.any((date) =>
-        date.year == yesterday.year &&
-        date.month == yesterday.month &&
-        date.day == yesterday.day);
+    // Check if yesterday has activity (audio or freeze)
+    var yesterdayHasActivity = audioDates.any((date) =>
+            date.year == yesterday.year &&
+            date.month == yesterday.month &&
+            date.day == yesterday.day) ||
+        existingFreezeDates.any((date) =>
+            date.year == yesterday.year &&
+            date.month == yesterday.month &&
+            date.day == yesterday.day);
 
-    if (yesterdayHasFreeze) {
+    // If yesterday already has activity (audio or freeze), there's no gap to fill
+    // Only apply freezes when there's an actual gap in the streak
+    if (yesterdayHasActivity) {
+      return false;
+    }
+
+    // Verify there's activity today or recently to preserve a streak
+    // Don't apply freezes if there's no recent activity (no streak to preserve)
+    var hasRecentActivity = audioDates.any((date) =>
+            !date.isBefore(today.subtract(const Duration(days: 7)))) ||
+        existingFreezeDates.any((date) =>
+            !date.isBefore(today.subtract(const Duration(days: 7))));
+
+    if (!hasRecentActivity) {
+      // No recent activity, so no streak to preserve
       return false;
     }
 

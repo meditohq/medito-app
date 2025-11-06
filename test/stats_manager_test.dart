@@ -1412,6 +1412,46 @@ void main() {
       });
 
       test(
+          'applyStreakFreeze - should not apply freeze when there is activity yesterday',
+          () async {
+        // Arrange - user has activity yesterday, so no gap to fill
+        var testDate = DateTime(2025, 3, 15);
+        var yesterday = DateTime(2025, 3, 14);
+        var day2ago = DateTime(2025, 3, 13);
+        statsManager.setCurrentDateForTesting(testDate);
+
+        var stats = LocalAllStats.empty().copyWith(
+          streakFreezes: 2,
+          audioCompleted: [
+            LocalAudioCompleted(
+              id: '1',
+              timestamp: yesterday.millisecondsSinceEpoch, // Activity yesterday
+            ),
+            LocalAudioCompleted(
+              id: '2',
+              timestamp: day2ago.millisecondsSinceEpoch,
+            ),
+          ],
+        );
+
+        statsManager.setStatsForTesting(stats);
+        when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+        // Act
+        var result = await statsManager.applyStreakFreeze();
+
+        // Assert - should NOT apply freeze because yesterday has activity
+        expect(result, false,
+            reason:
+                'Should not apply freeze when there is activity yesterday');
+        var updatedStats = statsManager.currentStats;
+        expect(updatedStats?.streakFreezes, 2,
+            reason: 'Freeze count should remain unchanged');
+        expect(updatedStats?.freezeUsageDates.length, 0,
+            reason: 'No freeze usage dates should be added');
+      });
+
+      test(
           'applyStreakFreeze - clears dirty flag and sets lastSyncedAt after posting',
           () async {
         // Arrange
