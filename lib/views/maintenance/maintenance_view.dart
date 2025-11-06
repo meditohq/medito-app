@@ -8,9 +8,14 @@ import '../../constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
 class MaintenanceView extends ConsumerStatefulWidget {
-  const MaintenanceView({super.key, required this.maintenanceModel});
+  const MaintenanceView({
+    super.key,
+    required this.maintenanceModel,
+    this.onClose,
+  });
 
   final MaintenanceModel maintenanceModel;
+  final VoidCallback? onClose;
 
   @override
   ConsumerState createState() => _MaintenanceViewState();
@@ -104,7 +109,11 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                   size: 24,
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  if (widget.onClose != null) {
+                    widget.onClose!();
+                  } else {
+                    Navigator.of(context).pop();
+                  }
                 },
               ),
             ),
