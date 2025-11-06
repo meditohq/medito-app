@@ -347,19 +347,19 @@ void main() {
           reason:
               'Should NOT suggest freeze when there is no recent activity (no streak to preserve)');
 
-      // STEP 3: Try to apply freeze (will succeed because it finds gaps in the last 7 days to fill)
+      // STEP 3: Try to apply freeze (should fail because there's no recent activity to preserve)
       var freezeApplied = await statsManager.applyStreakFreeze();
-      expect(freezeApplied, true,
+      expect(freezeApplied, false,
           reason:
-              'Freeze application will succeed when it finds gaps in the last 7 days, even without recent activity');
+              'Freeze application should fail when there is no recent activity (no streak to preserve)');
 
-      // STEP 4: Verify freezes were used to fill gaps in the last 7 days
+      // STEP 4: Verify freezes were NOT used (since application failed)
       var afterFreeze = statsManager.currentStats;
       expect(afterFreeze, isNotNull);
-      expect(afterFreeze!.streakFreezes, 0,
-          reason: 'All freezes should be used to fill gaps in the last 7 days');
-      expect(afterFreeze.freezeUsageDates.length, 2,
-          reason: 'Two freeze usage dates should be added for the last 2 days');
+      expect(afterFreeze!.streakFreezes, 2,
+          reason: 'Freezes should remain unused since application failed');
+      expect(afterFreeze.freezeUsageDates.length, 0,
+          reason: 'No freeze usage dates should be added when application fails');
     });
   });
 }

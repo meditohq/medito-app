@@ -457,9 +457,9 @@ void main() {
       statsManager.setCurrentDateForTesting(testDate);
 
       // Define dates for clarity
-      // No activity: today, yesterday, day before yesterday (3 days)
-      // Activity: 4 and 5 days ago
-      var threeDaysAgo = DateTime(2025, 3, 7);
+      // No activity: today (Mar 10), yesterday (Mar 9), day before yesterday (Mar 8)
+      // Activity: Mar 7, Mar 6, Mar 5
+      var threeDaysAgo = DateTime(2025, 3, 7); // Has activity
       var fourDaysAgo = DateTime(2025, 3, 6); // Has activity
       var fiveDaysAgo = DateTime(2025, 3, 5); // Has activity
 
@@ -502,20 +502,20 @@ void main() {
       statsManager.setStatsForTesting(initialStats);
       var beforeFreeze = statsManager.calculateStreak(initialStats);
 
-      // Before applying freezes, streak should be 0 (no activity in last 3 days)
+      // Before applying freezes, streak should be 0 (no activity today or yesterday)
       expect(beforeFreeze.streakCurrent, 0);
 
-      // Apply first streak freeze
+      // Apply streak freezes (applies all 2 freezes to consecutive missed days)
       var firstFreezeSuccess = await statsManager.applyStreakFreeze();
       expect(firstFreezeSuccess, true);
 
-      // Check stats after first freeze
+      // Check stats after applying freezes
       var afterFirstFreeze = statsManager.currentStats;
       expect(afterFirstFreeze, isNotNull);
       expect(afterFirstFreeze!.freezeUsageDates.length, 2);
       expect(afterFirstFreeze.streakFreezes, 0);
 
-      // After first freeze, streak should be 5 (3 days of activity + 2 freeze day)
+      // After applying freezes, streak should be 5 (3 days of activity + 2 freeze days)
       expect(afterFirstFreeze.streakCurrent, 5);
     });
   });
