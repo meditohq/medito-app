@@ -21,6 +21,7 @@ class MaintenanceChecker extends ConsumerStatefulWidget {
 
 class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
   OverlayEntry? _maintenanceOverlay;
+  MaintenanceModel? _dismissedMaintenanceModel;
 
   @override
   void dispose() {
@@ -34,27 +35,26 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
 
     return maintenanceState.when(
       data: (maintenanceModel) {
-        // Show maintenance view if model is not null
-        if (maintenanceModel != null) {
-          // Use post frame callback to ensure overlay is added after the frame is built
-          // This ensures the navigator overlay is ready
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (_maintenanceOverlay == null && mounted) {
-              _showMaintenanceOverlay(maintenanceModel);
-            }
-          });
-        } else {
-          // Remove overlay if maintenance is no longer needed
+        if (maintenanceModel == null) {
+          _dismissedMaintenanceModel = null;
           if (_maintenanceOverlay != null) {
             _maintenanceOverlay?.remove();
             _maintenanceOverlay = null;
+          }
+        } else {
+          if (_isDifferentMaintenance(maintenanceModel) &&
+              _maintenanceOverlay == null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_maintenanceOverlay == null && mounted) {
+                _showMaintenanceOverlay(maintenanceModel);
+              }
+            });
           }
         }
 
         return widget.child;
       },
       loading: () {
-        // Don't show overlay while loading
         if (_maintenanceOverlay != null) {
           _maintenanceOverlay?.remove();
           _maintenanceOverlay = null;
@@ -64,7 +64,6 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
       error: (error, stackTrace) {
         AppLogger.e('MAINTENANCE',
             '[MAINTENANCE_ERROR] Error in maintenance checker: $error');
-        // Don't show overlay on error
         if (_maintenanceOverlay != null) {
           _maintenanceOverlay?.remove();
           _maintenanceOverlay = null;
@@ -72,6 +71,17 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
         return widget.child;
       },
     );
+  }
+
+  bool _isDifferentMaintenance(MaintenanceModel maintenanceModel) {
+    if (_dismissedMaintenanceModel == null) {
+      return true;
+    }
+
+    final dismissed = _dismissedMaintenanceModel!;
+    return dismissed.message != maintenanceModel.message ||
+        dismissed.isUnderMaintenance != maintenanceModel.isUnderMaintenance ||
+        dismissed.minimumBuildNumber != maintenanceModel.minimumBuildNumber;
   }
 
   void _showMaintenanceOverlay(MaintenanceModel maintenanceModel) {
@@ -91,12 +101,13 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
 
     _maintenanceOverlay = OverlayEntry(
       builder: (context) => PopScope(
-        canPop: false, // Prevent back button from dismissing
+        canPop: false,
         child: Material(
           color: Colors.black,
           child: MaintenanceView(
             maintenanceModel: maintenanceModel,
             onClose: () {
+              _dismissedMaintenanceModel = maintenanceModel;
               _maintenanceOverlay?.remove();
               _maintenanceOverlay = null;
             },
