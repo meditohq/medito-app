@@ -390,6 +390,7 @@
   "analyticsDisabledMessage": "El seguimiento de análisis ha sido deshabilitado",
   "analyticsEnabledMessage": "El seguimiento de análisis ha sido habilitado",
   "iosTrackingDialogTitle": "Recolección de Datos",
+  "androidTrackingDialogContent": "Esto deshabilitará el seguimiento de análisis en la aplicación. Podemos recopilar identificadores limitados (por ejemplo, ID de usuario y, cuando esté permitido, ID de dispositivo/publicidad) para medir el uso y mejorar las funciones.",
   "iosTrackingDialogContent": "Esto deshabilitará el seguimiento de análisis en la aplicación. Ten en cuenta que también puedes controlar los permisos de seguimiento a nivel del sistema en tu Configuración de iOS bajo Privacidad y Seguridad > Seguimiento.",
   "iosTrackingDialogCancel": "Cancelar",
   "iosTrackingDialogDisable": "Deshabilitar Seguimiento",

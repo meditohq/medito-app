@@ -9,6 +9,7 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/services/home_widget_service.dart';
 
 part 'stats_provider.g.dart';
 
@@ -143,6 +144,15 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     _lastRefresh = DateTime.now();
     state = await AsyncValue.guard(() => _fetchStatsWithRetry());
     dev.log('StatsNotifier: Refresh completed');
+
+    // Update home widget if stats are available
+    if (state.hasValue && state.value != null) {
+      try {
+        await HomeWidgetService.updateWidgetFromStats(state.value!);
+      } catch (e) {
+        // Silently fail - widget updates are not critical
+      }
+    }
   }
 
   Future<void> refreshFromLocal() async {
@@ -154,6 +164,13 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       var localStats = await statsManager.localAllStats;
       state = AsyncValue.data(localStats);
       dev.log('StatsNotifier: Refresh from local completed');
+
+      // Update home widget
+      try {
+        await HomeWidgetService.updateWidgetFromStats(localStats);
+      } catch (e) {
+        // Silently fail - widget updates are not critical
+      }
     } catch (error) {
       dev.log('StatsNotifier: Error during refresh from local', error: error);
 

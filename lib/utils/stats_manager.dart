@@ -9,6 +9,7 @@ import 'package:medito/services/stats_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/utils/audio_completion_tracker.dart';
+import 'package:medito/services/home_widget_service.dart';
 
 // Key Rules for a Normal Streak (Without Streak Freezes)
 // 1.	Meditating every day increases the streak by 1. Each consecutive day of meditation adds to the streak.
@@ -185,6 +186,13 @@ class StatsManager {
       _lastSyncedAt = _getCurrentDate();
       await _saveLastSyncedAt();
       _dirty = false;
+
+      // Update home widget
+      try {
+        await HomeWidgetService.updateWidgetFromStats(_allStats!);
+      } catch (e) {
+        // Silently fail - widget updates are not critical
+      }
     } else {
       throw Exception("Stats are null");
     }
@@ -545,6 +553,13 @@ class StatsManager {
       _lastSyncedAt = _getCurrentDate();
       await _saveLastSyncedAt();
       _dirty = false;
+
+      // Update home widget
+      try {
+        await HomeWidgetService.updateWidgetFromStats(_allStats!);
+      } catch (e) {
+        // Silently fail - widget updates are not critical
+      }
     }
   }
 
@@ -766,8 +781,8 @@ class StatsManager {
     // Don't apply freezes if there's no recent activity (no streak to preserve)
     var hasRecentActivity = audioDates.any((date) =>
             !date.isBefore(today.subtract(const Duration(days: 7)))) ||
-        existingFreezeDates.any((date) =>
-            !date.isBefore(today.subtract(const Duration(days: 7))));
+        existingFreezeDates.any(
+            (date) => !date.isBefore(today.subtract(const Duration(days: 7))));
 
     if (!hasRecentActivity) {
       // No recent activity, so no streak to preserve
@@ -841,6 +856,13 @@ class StatsManager {
     _lastSyncedAt = _getCurrentDate();
     await _saveLastSyncedAt();
     _dirty = false;
+
+    // Update home widget
+    try {
+      await HomeWidgetService.updateWidgetFromStats(_allStats!);
+    } catch (e) {
+      // Silently fail - widget updates are not critical
+    }
 
     return true;
   }

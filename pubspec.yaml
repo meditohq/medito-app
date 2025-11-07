@@ -79,6 +79,7 @@ dependencies:
   uuid: ^4.5.0
   xml: ^6.5.0
   xml2json: ^6.2.7
+  home_widget: ^0.8.1
 
 dependency_overrides:
   superwallkit_flutter: ^2.4.2

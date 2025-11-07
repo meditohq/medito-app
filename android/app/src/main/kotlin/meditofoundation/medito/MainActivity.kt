@@ -11,6 +11,7 @@ import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugins.GeneratedPluginRegistrant
+import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,6 +40,23 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
         checkAndSendCompletionData()
+        
+        // Set up platform channel for widget updates
+        val widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "medito.app/widget")
+        widgetChannel.setMethodCallHandler { call, result ->
+            if (call.method == "updateWidget") {
+                try {
+                    val intent = Intent("es.antonborri.home_widget.UPDATE_WIDGET")
+                    intent.setPackage(packageName)
+                    sendBroadcast(intent)
+                    result.success(null)
+                } catch (e: Exception) {
+                    result.error("UPDATE_FAILED", "Failed to send widget update broadcast", e.message)
+                }
+            } else {
+                result.notImplemented()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

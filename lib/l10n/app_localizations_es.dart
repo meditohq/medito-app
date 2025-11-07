@@ -1235,7 +1235,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get androidTrackingDialogContent =>
-      'This will disable analytics tracking in the app. We may collect limited identifiers (e.g. user ID and, where permitted, device/advertising IDs) to measure usage and improve features.';
+      'Esto deshabilitará el seguimiento de análisis en la aplicación. Podemos recopilar identificadores limitados (por ejemplo, ID de usuario y, cuando esté permitido, ID de dispositivo/publicidad) para medir el uso y mejorar las funciones.';
 
   @override
   String get iosTrackingDialogCancel => 'Cancelar';

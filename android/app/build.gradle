@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
     id 'kotlin-android'
+    id 'org.jetbrains.kotlin.plugin.compose'
     id 'dev.flutter.flutter-gradle-plugin'
 }
 
@@ -32,6 +33,33 @@ def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+def facebookAppId = System.getenv('FACEBOOK_APP_ID') ?: ''
+def facebookClientToken = System.getenv('FACEBOOK_CLIENT_TOKEN') ?: ''
+
+def envJsonFile = rootProject.file("../.prod.json")
+if (!envJsonFile.exists()) {
+    envJsonFile = rootProject.file("../.staging.json")
+}
+if (envJsonFile.exists() && (!facebookAppId || !facebookClientToken)) {
+    try {
+        def jsonText = envJsonFile.text
+        if (!facebookAppId) {
+            def appIdMatch = jsonText =~ /"FACEBOOK_APP_ID"\s*:\s*"([^"]+)"/
+            if (appIdMatch) {
+                facebookAppId = appIdMatch[0][1]
+            }
+        }
+        if (!facebookClientToken) {
+            def tokenMatch = jsonText =~ /"FACEBOOK_CLIENT_TOKEN"\s*:\s*"([^"]+)"/
+            if (tokenMatch) {
+                facebookClientToken = tokenMatch[0][1]
+            }
+        }
+    } catch (Exception e) {
+        println "Warning: Could not parse environment JSON file: ${e.message}"
+    }
+}
+
 android {
     namespace "meditofoundation.medito"
     compileSdkVersion 36
@@ -46,6 +74,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -81,6 +110,13 @@ android {
             hostName: "medito.app",
             scheme: "https"
         ]
+        
+        resValue "string", "facebook_app_id", facebookAppId
+        resValue "string", "facebook_client_token", facebookClientToken
+    }
+
+    buildFeatures {
+        compose true
     }
 
     packagingOptions {
@@ -183,6 +219,11 @@ dependencies {
     implementation "androidx.core:core-ktx:1.12.0"
     implementation "androidx.appcompat:appcompat:1.6.1"
     implementation "com.google.android.material:material:1.11.0"
+
+    // Glance App Widget
+    implementation "androidx.glance:glance-appwidget:1.0.0"
+    implementation "androidx.glance:glance:1.0.0"
+    implementation "androidx.glance:glance-material:1.0.0"
 }
 
 

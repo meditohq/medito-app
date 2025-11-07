@@ -17,6 +17,7 @@ import 'health_kit_manager.dart';
 import 'stats_manager.dart';
 import '../models/local_audio_completed.dart';
 import 'logger.dart';
+import '../services/home_widget_service.dart';
 
 // Export the key for backward compatibility if needed
 const String completedTracksKey = CompletedTracksStorage.completedTracksKey;
@@ -81,6 +82,16 @@ Future<bool> handleStats(
         // Don't fail the whole operation if provider refresh fails
         AppLogger.e('STATS', 'Failed to refresh stats provider', refreshError);
       }
+    }
+
+    // Update home widget with latest stats
+    try {
+      final updatedStats = await statsManager.localAllStats;
+      await HomeWidgetService.updateWidgetFromStats(updatedStats);
+      AppLogger.d('STATS', 'Home widget updated');
+    } catch (widgetError) {
+      // Don't fail the whole operation if widget update fails
+      AppLogger.e('STATS', 'Failed to update home widget', widgetError);
     }
 
     // Schedule or reschedule Smart Reminders based on latest session time
