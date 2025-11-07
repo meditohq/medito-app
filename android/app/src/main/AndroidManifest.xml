@@ -183,5 +183,17 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/home_widget_provider" />
         </receiver>
+
+        <receiver
+            android:name=".widget.ConsistencyWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="es.antonborri.home_widget.UPDATE_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/consistency_widget_provider" />
+        </receiver>
     </application>
 </manifest>

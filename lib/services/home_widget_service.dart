@@ -9,6 +9,7 @@ import '../utils/logger.dart';
 
 class HomeWidgetService {
   static const String _widgetName = 'MeditationWidgetReceiver';
+  static const String _consistencyWidgetName = 'ConsistencyWidgetReceiver';
   static const String _streakCurrentKey = 'streak_current';
   static const String _meditationDatesKey = 'meditation_dates';
   static const String _freezeDatesKey = 'freeze_dates';
@@ -16,6 +17,7 @@ class HomeWidgetService {
   static const String _daysLabelKey = 'days_label';
   static const String _lastUpdatedKey = 'last_updated';
   static const String _totalTracksCompletedKey = 'total_tracks_completed';
+  static const String _consistencyScoreKey = 'consistency_score';
 
   /// Updates the home widget with the latest stats data
   static Future<void> updateWidget({
@@ -86,21 +88,18 @@ class HomeWidgetService {
         stats.totalTracksCompleted,
       );
 
-      AppLogger.d('WIDGET', 'Saved widget data - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}');
+      // Save consistency score as integer percentage (0-100) to avoid type conversion issues
+      final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
+      await HomeWidget.saveWidgetData<int>(
+        _consistencyScoreKey,
+        consistencyPercentage,
+      );
 
-      // Update the widget - try home_widget package first, fallback to manual broadcast
-      AppLogger.d('WIDGET', 'Calling HomeWidget.updateWidget() with name: $_widgetName');
-      try {
-        await HomeWidget.updateWidget(
-          name: _widgetName,
-          androidName: _widgetName,
-        );
-        AppLogger.d('WIDGET', 'HomeWidget.updateWidget() completed');
-      } catch (e) {
-        AppLogger.w('WIDGET', 'HomeWidget.updateWidget() failed, sending manual broadcast: $e');
-        // Manually send broadcast for Glance widget
-        await _sendWidgetUpdateBroadcast();
-      }
+      AppLogger.d('WIDGET', 'Saved widget data - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}, consistency: ${stats.consistencyScore} (${consistencyPercentage}%)');
+
+      // Update both widgets - try home_widget package first, fallback to manual broadcast
+      await _updateWidget(_widgetName);
+      await _updateWidget(_consistencyWidgetName);
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to update widget', e);
     }
@@ -162,23 +161,36 @@ class HomeWidgetService {
         stats.totalTracksCompleted,
       );
 
-      AppLogger.d('WIDGET', 'Saved widget data (fromStats) - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}');
+      // Save consistency score as integer percentage (0-100) to avoid type conversion issues
+      final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
+      await HomeWidget.saveWidgetData<int>(
+        _consistencyScoreKey,
+        consistencyPercentage,
+      );
 
-      // Update the widget - try home_widget package first, fallback to manual broadcast
-      AppLogger.d('WIDGET', 'Calling HomeWidget.updateWidget() (fromStats) with name: $_widgetName');
-      try {
-        await HomeWidget.updateWidget(
-          name: _widgetName,
-          androidName: _widgetName,
-        );
-        AppLogger.d('WIDGET', 'HomeWidget.updateWidget() (fromStats) completed');
-      } catch (e) {
-        AppLogger.w('WIDGET', 'HomeWidget.updateWidget() (fromStats) failed, sending manual broadcast: $e');
-        // Manually send broadcast for Glance widget
-        await _sendWidgetUpdateBroadcast();
-      }
+      AppLogger.d('WIDGET', 'Saved widget data (fromStats) - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}, consistency: ${stats.consistencyScore} (${consistencyPercentage}%)');
+
+      // Update both widgets - try home_widget package first, fallback to manual broadcast
+      await _updateWidget(_widgetName);
+      await _updateWidget(_consistencyWidgetName);
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to update widget (fromStats)', e);
+    }
+  }
+
+  /// Updates a widget by name - tries home_widget package first, falls back to manual broadcast
+  static Future<void> _updateWidget(String widgetName) async {
+    AppLogger.d('WIDGET', 'Calling HomeWidget.updateWidget() with name: $widgetName');
+    try {
+      await HomeWidget.updateWidget(
+        name: widgetName,
+        androidName: widgetName,
+      );
+      AppLogger.d('WIDGET', 'HomeWidget.updateWidget() completed for $widgetName');
+    } catch (e) {
+      AppLogger.w('WIDGET', 'HomeWidget.updateWidget() failed for $widgetName, sending manual broadcast: $e');
+      // Manually send broadcast for Glance widget
+      await _sendWidgetUpdateBroadcast();
     }
   }
 
