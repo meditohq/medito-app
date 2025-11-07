@@ -221,9 +221,9 @@ dependencies {
     implementation "com.google.android.material:material:1.11.0"
 
     // Glance App Widget
-    implementation "androidx.glance:glance-appwidget:1.0.0"
-    implementation "androidx.glance:glance:1.0.0"
-    implementation "androidx.glance:glance-material:1.0.0"
+    implementation "androidx.glance:glance-appwidget:1.1.0"
+    implementation "androidx.glance:glance:1.1.0"
+    implementation "androidx.glance:glance-material:1.1.0"
 }
 
 
