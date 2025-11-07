@@ -193,8 +193,6 @@ class ProductsService {
             currentProducts[i] = product.copyWith(firstSeenDate: firstSeenDate);
             newCacheData[productId] =
                 cachedDateString; // Keep existing date in new cache
-            dev.log(
-                'ProductsService: Product $productId already seen on $cachedDateString');
           } catch (e) {
             // Handle potential parse error, treat as new
             dev.log(
@@ -236,11 +234,6 @@ class ProductsService {
         cachedData[productId] = DateTime(1970).toIso8601String();
         final updatedCacheJson = json.encode(cachedData);
         await prefs.setString(_cachedProductDataKey, updatedCacheJson);
-        dev.log(
-            'ProductsService: Marked product $productId as seen (set date to epoch).');
-      } else {
-        dev.log(
-            'ProductsService: Product $productId not found in cache to mark as seen.');
       }
     } catch (e) {
       dev.log('ProductsService: Error marking product as seen: $e', error: e);

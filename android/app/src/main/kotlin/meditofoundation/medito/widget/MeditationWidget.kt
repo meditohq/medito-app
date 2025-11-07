@@ -89,7 +89,6 @@ class MeditationWidget : GlanceAppWidget() {
         val calendarDays = allCalendarDays.take(daysToShow).reversed() // Show newest days, oldest on left
 
         val hasActivityToday = allActivityDates.contains(today.timeInMillis)
-        val showFlame = hasActivityToday && streakCurrent > 0
 
         // Medito colors
         val backgroundColor = Color(0xFFF8F9FA) // lightBackground
@@ -98,6 +97,8 @@ class MeditationWidget : GlanceAppWidget() {
         val secondaryTextColor = Color(0xFF000000) // black
         val inactiveCircleColor = Color(0xFFE5E7EB) // lightGrey
         val checkmarkColor = Color(0xFF917DF0) // lightPurple
+
+        val fireIconColor = if (hasActivityToday) checkmarkColor else inactiveCircleColor
 
         Box(
             modifier = GlanceModifier
@@ -117,13 +118,14 @@ class MeditationWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.Vertical.CenterVertically,
                     horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                 ) {
-                    if (showFlame) {
-                        Text(
-                            text = "🔥",
-                            style = TextStyle(fontSize = 28.sp),
-                            modifier = GlanceModifier.padding(end = 8.dp)
-                        )
-                    }
+                    Text(
+                        text = "🔥",
+                        style = TextStyle(
+                            fontSize = 28.sp,
+                            color = ColorProvider(fireIconColor)
+                        ),
+                        modifier = GlanceModifier.padding(end = 8.dp)
+                    )
                     Text(
                         text = streakCurrent.toString(),
                         style = TextStyle(
