@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -14,6 +13,8 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;
@@ -199,7 +200,8 @@ class ExploreContentWidget extends ConsumerWidget {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurface
-                                      .withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
+                                      .withAlpha(((0.7).clamp(0.0, 1.0) * 255)
+                                          .round()),
                                 ),
                             textAlign: TextAlign.center,
                           ),
@@ -452,9 +454,16 @@ class SearchBox extends StatelessWidget {
       focusNode: focusNode,
       decoration: InputDecoration(
         hintText: AppLocalizations.of(context)!.searchMeditations,
-        prefixIcon: Icon(
-          HugeIcons.solidStandardSearch02,
-          color: Theme.of(context).colorScheme.onSurface,
+        prefixIcon: SizedBox(
+          width: 24,
+          height: 24,
+          child: Center(
+            child: MeditoIcon(
+              assetName: MeditoIcons.search,
+              size: 24,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
         ),
         suffixIcon: IconButton(
           icon: Icon(
@@ -464,9 +473,15 @@ class SearchBox extends StatelessWidget {
           onPressed: onClear,
         ),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceTint.withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
+        fillColor: Theme.of(context)
+            .colorScheme
+            .surfaceTint
+            .withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
         hintStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withAlpha(((0.6).clamp(0.0, 1.0) * 255).round()),
+          color: Theme.of(context)
+              .colorScheme
+              .onSurface
+              .withAlpha(((0.6).clamp(0.0, 1.0) * 255).round()),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

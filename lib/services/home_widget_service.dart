@@ -89,13 +89,15 @@ class HomeWidgetService {
       );
 
       // Save consistency score as integer percentage (0-100) to avoid type conversion issues
-      final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
+      final consistencyPercentage =
+          (stats.consistencyScore * 100).round().clamp(0, 100);
       await HomeWidget.saveWidgetData<int>(
         _consistencyScoreKey,
         consistencyPercentage,
       );
 
-      AppLogger.d('WIDGET', 'Saved widget data - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}, consistency: ${stats.consistencyScore} (${consistencyPercentage}%)');
+      AppLogger.d('WIDGET',
+          'Saved widget data - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}, consistency: ${stats.consistencyScore} (${consistencyPercentage}%)');
 
       // Update both widgets - try home_widget package first, fallback to manual broadcast
       await _updateWidget(_widgetName);
@@ -162,13 +164,15 @@ class HomeWidgetService {
       );
 
       // Save consistency score as integer percentage (0-100) to avoid type conversion issues
-      final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
+      final consistencyPercentage =
+          (stats.consistencyScore * 100).round().clamp(0, 100);
       await HomeWidget.saveWidgetData<int>(
         _consistencyScoreKey,
         consistencyPercentage,
       );
 
-      AppLogger.d('WIDGET', 'Saved widget data (fromStats) - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}, consistency: ${stats.consistencyScore} (${consistencyPercentage}%)');
+      AppLogger.d('WIDGET',
+          'Saved widget data (fromStats) - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}, consistency: ${stats.consistencyScore} (${consistencyPercentage}%)');
 
       // Update both widgets - try home_widget package first, fallback to manual broadcast
       await _updateWidget(_widgetName);
@@ -180,15 +184,18 @@ class HomeWidgetService {
 
   /// Updates a widget by name - tries home_widget package first, falls back to manual broadcast
   static Future<void> _updateWidget(String widgetName) async {
-    AppLogger.d('WIDGET', 'Calling HomeWidget.updateWidget() with name: $widgetName');
+    AppLogger.d(
+        'WIDGET', 'Calling HomeWidget.updateWidget() with name: $widgetName');
     try {
       await HomeWidget.updateWidget(
         name: widgetName,
         androidName: widgetName,
       );
-      AppLogger.d('WIDGET', 'HomeWidget.updateWidget() completed for $widgetName');
+      AppLogger.d(
+          'WIDGET', 'HomeWidget.updateWidget() completed for $widgetName');
     } catch (e) {
-      AppLogger.w('WIDGET', 'HomeWidget.updateWidget() failed for $widgetName, sending manual broadcast: $e');
+      AppLogger.w('WIDGET',
+          'HomeWidget.updateWidget() failed for $widgetName, sending manual broadcast: $e');
       // Manually send broadcast for Glance widget
       await _sendWidgetUpdateBroadcast();
     }
@@ -205,4 +212,3 @@ class HomeWidgetService {
     }
   }
 }
-

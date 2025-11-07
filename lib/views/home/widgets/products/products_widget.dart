@@ -11,7 +11,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:medito/services/products_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class ProductsWidget extends StatelessWidget {
   final List<ProductGroupModel>? productGroups;
@@ -61,8 +62,8 @@ class ProductsWidget extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(width: 8),
-                  Icon(
-                    HugeIcons.solidSharpArrowRight02,
+                  MeditoIcon(
+                    assetName: MeditoIcons.arrowRight,
                     color: Theme.of(context).colorScheme.onSurface,
                     size: 16,
                   ),

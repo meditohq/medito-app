@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 import '../../../../constants/colors/color_constants.dart';
 import 'streak_circle_constants.dart';
 
@@ -197,11 +198,16 @@ class StreakCircleState extends ConsumerState<StreakCircle>
           ? BoxDecoration(
               gradient: SweepGradient(
                 colors: [
-                  ColorConstants.lightPurple.withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
-                  ColorConstants.lightPurple.withAlpha(((0.35).clamp(0.0, 1.0) * 255).round()),
-                  ColorConstants.lightPurple.withAlpha(((1).clamp(0.0, 1.0) * 255).round()),
-                  ColorConstants.lightPurple.withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
-                  ColorConstants.lightPurple.withAlpha(((0.25).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple
+                      .withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple
+                      .withAlpha(((0.35).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple
+                      .withAlpha(((1).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple
+                      .withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple
+                      .withAlpha(((0.25).clamp(0.0, 1.0) * 255).round()),
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
                 transform: GradientRotation(
@@ -255,13 +261,13 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                         alignment: Alignment.center,
                         children: [
                           if (isStreakDoneToday)
-                            HugeIcon(
-                              icon: HugeIcons.solidRoundedFire,
+                            MeditoIcon(
+                              assetName: MeditoIcons.fire,
                               size: StreakCircleConstants.iconSize,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
-                          HugeIcon(
-                            icon: HugeIcons.solidRoundedFire,
+                          MeditoIcon(
+                            assetName: MeditoIcons.fire,
                             color: isStreakDoneToday
                                 ? ColorConstants.lightPurple
                                 : Theme.of(context).colorScheme.onSurface,
@@ -328,8 +334,8 @@ class StreakCircleState extends ConsumerState<StreakCircle>
         padding: StreakCircleConstants.padding,
         child: GestureDetector(
           onTap: () => ref.refresh(statsProvider),
-          child: HugeIcon(
-            icon: HugeIcons.strokeRoundedHelpCircle,
+          child: MeditoIcon(
+            assetName: MeditoIcons.help,
             color: ColorConstants.white,
           ),
         ),

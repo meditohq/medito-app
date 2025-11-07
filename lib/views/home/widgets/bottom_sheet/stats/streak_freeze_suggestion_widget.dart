@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class StreakFreezeSuggestionWidget extends ConsumerStatefulWidget {
   final LocalAllStats stats;
@@ -143,8 +144,8 @@ class StreakFreezeSuggestionWidgetState
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorConstants.lightPurple,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor:
-                        theme.colorScheme.onSurface.withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
+                    disabledBackgroundColor: theme.colorScheme.onSurface
+                        .withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -165,14 +166,18 @@ class StreakFreezeSuggestionWidgetState
   Widget _buildAnimatedIcon(int index, int availableCount, ThemeData theme) {
     // If this is not an available freeze or not the animating one
     if (index >= availableCount || index != _animatingIconIndex) {
-      return Icon(
-        index < availableCount
-            ? HugeIcons.solidRoundedSnow
-            : HugeIcons.solidSharpCircle,
-        size: 50,
-        color: index < availableCount
-            ? ColorConstants.lightPurple
-            : theme.colorScheme.onSurface.withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
+      if (index < availableCount) {
+        return const MeditoIcon(
+          assetName: MeditoIcons.snow,
+          size: 50,
+          color: ColorConstants.lightPurple,
+        );
+      }
+
+      return _buildCircleIcon(
+        50,
+        theme.colorScheme.onSurface
+            .withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
       );
     }
 
@@ -220,7 +225,8 @@ class StreakFreezeSuggestionWidgetState
         // Color transition
         final colorAnimation = ColorTween(
           begin: ColorConstants.lightPurple,
-          end: theme.colorScheme.onSurface.withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
+          end: theme.colorScheme.onSurface
+              .withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
         ).animate(iconTransition);
 
         return Transform.scale(
@@ -233,8 +239,8 @@ class StreakFreezeSuggestionWidgetState
                 // Fading out snow icon
                 Opacity(
                   opacity: 1 - iconTransition.value,
-                  child: Icon(
-                    HugeIcons.solidRoundedSnow,
+                  child: MeditoIcon(
+                    assetName: MeditoIcons.snow,
                     size: 50,
                     color: colorAnimation.value,
                   ),
@@ -242,17 +248,25 @@ class StreakFreezeSuggestionWidgetState
                 // Fading in circle icon
                 Opacity(
                   opacity: iconTransition.value,
-                  child: Icon(
-                    HugeIcons.solidSharpCircle,
-                    size: 50,
-                    color: colorAnimation.value,
-                  ),
+                  child: _buildCircleIcon(
+                      50, colorAnimation.value ?? theme.colorScheme.onSurface),
                 ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildCircleIcon(double size, Color colour) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colour,
+      ),
     );
   }
 }

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_freeze_suggestion_provider.dart';
@@ -14,6 +14,7 @@ import 'package:medito/views/path/path_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
   const BottomNavigationBarView({super.key});
@@ -109,8 +110,8 @@ class _BottomNavigationBarViewState
 
   BottomActionBarItem _buildHomeNavigationItem() {
     return BottomActionBarItem(
-      child: HugeIcon(
-        icon: HugeIcons.solidRoundedHome01,
+      child: MeditoIcon(
+        assetName: MeditoIcons.home,
         color: _currentPageIndex == 0
             ? ColorConstants.lightPurple
             : Theme.of(context).colorScheme.onSurface,
@@ -132,8 +133,8 @@ class _BottomNavigationBarViewState
             });
           }
         },
-        child: HugeIcon(
-          icon: HugeIcons.solidRoundedLibraries,
+        child: MeditoIcon(
+          assetName: MeditoIcons.book,
           color: _currentPageIndex == 1
               ? ColorConstants.lightPurple
               : Theme.of(context).colorScheme.onSurface,
@@ -145,8 +146,8 @@ class _BottomNavigationBarViewState
 
   BottomActionBarItem _buildJourneyNavigationItem() {
     return BottomActionBarItem(
-      child: HugeIcon(
-        icon: HugeIcons.solidRoundedRoad02,
+      child: MeditoIcon(
+        assetName: MeditoIcons.road,
         color: _currentPageIndex == 2
             ? ColorConstants.lightPurple
             : Theme.of(context).colorScheme.onSurface,
@@ -157,8 +158,8 @@ class _BottomNavigationBarViewState
 
   BottomActionBarItem _buildSettingsNavigationItem() {
     return BottomActionBarItem(
-      child: HugeIcon(
-        icon: HugeIcons.solidRoundedSettings01,
+      child: MeditoIcon(
+        assetName: MeditoIcons.settings,
         color: _currentPageIndex == 3
             ? ColorConstants.lightPurple
             : Theme.of(context).colorScheme.onSurface,

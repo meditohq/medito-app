@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -11,6 +11,7 @@ import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class AccountSectionWidget extends ConsumerWidget {
   const AccountSectionWidget({super.key});
@@ -54,8 +55,8 @@ class AccountSectionWidget extends ConsumerWidget {
           ),
           height16,
           RowItemWidget(
-            icon: HugeIcon(
-              icon: HugeIcons.solidRoundedLogout01,
+            icon: MeditoIcon(
+              assetName: MeditoIcons.logout,
               color: Theme.of(context).colorScheme.onSurface,
               size: 24,
             ),
@@ -101,8 +102,8 @@ class AccountSectionWidget extends ConsumerWidget {
           ),
           height8,
           RowItemWidget(
-            icon: HugeIcon(
-              icon: HugeIcons.solidRoundedDelete02,
+            icon: MeditoIcon(
+              assetName: MeditoIcons.xmark,
               color: Theme.of(context).colorScheme.onSurface,
               size: 24,
             ),
@@ -127,7 +128,8 @@ class AccountSectionWidget extends ConsumerWidget {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withAlpha(((0.7).clamp(0.0, 1.0) * 255).round())),
+                                .withAlpha(
+                                    ((0.7).clamp(0.0, 1.0) * 255).round())),
                       ),
                       actions: [
                         TextButton(
@@ -199,8 +201,8 @@ class AccountSectionWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RowItemWidget(
-          icon: HugeIcon(
-            icon: HugeIcons.solidRoundedLogin01,
+          icon: MeditoIcon(
+            assetName: MeditoIcons.profile,
             color: Theme.of(context).colorScheme.onSurface,
             size: 24,
           ),

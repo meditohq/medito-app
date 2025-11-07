@@ -3,13 +3,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 // removed unused snackbar import
 
 class ExpandableSectionWidget extends ConsumerStatefulWidget {
@@ -113,8 +114,8 @@ class _ExpandableSectionWidgetState
                       ),
                       child: Row(
                         children: [
-                          HugeIcon(
-                            icon: HugeIcons.solidRoundedShield01,
+                          MeditoIcon(
+                            assetName: MeditoIcons.snow,
                             color: Theme.of(context).colorScheme.onSurface,
                             size: 24.0,
                           ),
@@ -190,7 +191,7 @@ class _ExpandableSectionWidgetState
                         child: Row(
                           children: [
                             Icon(
-                              Icons.bug_report,
+                              Icons.bug_report_outlined,
                               color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
@@ -218,7 +219,6 @@ class _ExpandableSectionWidgetState
                       ),
                     ),
                   ),
-                  // Data Collection switch removed
                   // Onboarding Item (only in debug mode)
                   if (kDebugMode)
                     InkWell(
@@ -283,8 +283,8 @@ class _ExpandableSectionWidgetState
                         ),
                         child: Row(
                           children: [
-                            HugeIcon(
-                              icon: HugeIcons.solidRoundedDocumentAttachment,
+                            MeditoIcon(
+                              assetName: MeditoIcons.document,
                               color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),
@@ -329,8 +329,8 @@ class _ExpandableSectionWidgetState
                         ),
                         child: Row(
                           children: [
-                            HugeIcon(
-                              icon: HugeIcons.solidRoundedShield01,
+                            MeditoIcon(
+                              assetName: MeditoIcons.privacy,
                               color: Theme.of(context).colorScheme.onSurface,
                               size: 24.0,
                             ),

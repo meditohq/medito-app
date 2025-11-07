@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
@@ -12,6 +12,7 @@ import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/player/player_view.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class TrackItemWidget extends ConsumerStatefulWidget {
   final PackItemsModel item;
@@ -142,8 +143,8 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
                       ? const EdgeInsets.only(left: 0)
                       : const EdgeInsets.only(left: 8),
                   child: locked
-                      ? HugeIcon(
-                          icon: HugeIcons.strokeRoundedSquareLock02,
+                      ? MeditoIcon(
+                          assetName: MeditoIcons.privacy,
                           color: Theme.of(context).colorScheme.onSurface,
                           size: 24,
                         )
@@ -163,8 +164,8 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
               if (isCompleted)
                 Padding(
                   padding: EdgeInsets.only(right: 8),
-                  child: HugeIcon(
-                    icon: HugeIcons.strokeStandardTick02,
+                  child: MeditoIcon(
+                    assetName: MeditoIcons.check,
                     color: Theme.of(context).colorScheme.onSurface,
                     size: 24,
                   ),

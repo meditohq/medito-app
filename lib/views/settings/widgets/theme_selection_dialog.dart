@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/theme_provider.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class ThemeSelectionDialog extends ConsumerWidget {
   const ThemeSelectionDialog({super.key});
@@ -21,7 +22,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
             ref,
             ThemeMode.system,
             AppLocalizations.of(context)!.systemTheme,
-            HugeIcons.solidRoundedSettings01,
+            MeditoIcons.settings,
             currentTheme,
           ),
           const SizedBox(height: 8),
@@ -30,7 +31,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
             ref,
             ThemeMode.light,
             AppLocalizations.of(context)!.lightTheme,
-            HugeIcons.solidRoundedSun01,
+            MeditoIcons.sun,
             currentTheme,
           ),
           const SizedBox(height: 8),
@@ -39,7 +40,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
             ref,
             ThemeMode.dark,
             AppLocalizations.of(context)!.darkTheme,
-            HugeIcons.solidRoundedMoon,
+            MeditoIcons.moon,
             currentTheme,
           ),
         ],
@@ -52,7 +53,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
     WidgetRef ref,
     ThemeMode themeMode,
     String title,
-    IconData icon,
+    String iconAsset,
     ThemeMode currentTheme,
   ) {
     final isSelected = currentTheme == themeMode;
@@ -73,8 +74,8 @@ class ThemeSelectionDialog extends ConsumerWidget {
         ),
         child: Row(
           children: [
-            HugeIcon(
-              icon: icon,
+            MeditoIcon(
+              assetName: iconAsset,
               size: 20,
               color: isSelected
                   ? Theme.of(context).colorScheme.primary

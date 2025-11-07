@@ -2,7 +2,6 @@
 
 import 'dart:async';
 
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -17,6 +16,9 @@ import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 import '../../utils/permission_handler.dart';
 import '../bottom_navigation/bottom_navigation_bar_view.dart';
@@ -142,8 +144,10 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Spacer(),
-              HugeIcon(
-                  icon: HugeIcons.solidSharpDelete02, color: Colors.redAccent),
+              const MeditoIcon(
+                assetName: MeditoIcons.xmark,
+                color: Colors.redAccent,
+              ),
             ],
           ),
         ),

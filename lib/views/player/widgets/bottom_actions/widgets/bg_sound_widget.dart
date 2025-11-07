@@ -1,7 +1,8 @@
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 import '../../../../../models/track/track_model.dart';
 import '../../../../background_sound/background_sound_view.dart';
@@ -76,8 +77,8 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
         },
         icon: widget.isBackgroundSoundSelected
             ? _spinningIcon()
-            : Icon(
-                HugeIcons.strokeRoundedMusicNote01,
+            : MeditoIcon(
+                assetName: MeditoIcons.musicNote,
                 color: Colors.white,
                 size: 23,
               ),
@@ -91,8 +92,8 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
       builder: (context, child) {
         return Transform.rotate(
           angle: _animationController.value * 2 * 3.1415926535897932,
-          child: Icon(
-            HugeIcons.solidRoundedVynil01,
+          child: MeditoIcon(
+            assetName: MeditoIcons.compactDiscSolid,
             color: ColorConstants.white,
           ),
         );

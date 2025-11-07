@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
@@ -114,8 +114,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  HugeIcon(
-                                    icon: HugeIcons.solidRoundedFire,
+                                  MeditoIcon(
+                                    assetName: MeditoIcons.fire,
                                     size: 20,
                                     color: Theme.of(
                                       context,
@@ -220,8 +220,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                           child: GestureDetector(
                             onTap: () =>
                                 ref.read(statsProvider.notifier).refresh(),
-                            child: HugeIcon(
-                              icon: HugeIcons.strokeRoundedHelpCircle,
+                            child: MeditoIcon(
+                              assetName: MeditoIcons.help,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
@@ -298,8 +298,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
     final maxFreezes = stats.maxStreakFreezes ?? 0;
 
     return RowItemWidget(
-      icon: HugeIcon(
-        icon: HugeIcons.solidStandardSnow,
+      icon: MeditoIcon(
+        assetName: MeditoIcons.snow,
         color: Theme.of(context).colorScheme.onSurface,
         size: 20,
       ),
@@ -394,8 +394,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             child: ElevatedButton.icon(
               onPressed: () =>
                   Share.share(AppLocalizations.of(context)!.shareStatsText),
-              icon: HugeIcon(
-                icon: HugeIcons.solidRoundedShare08,
+              icon: MeditoIcon(
+                assetName: MeditoIcons.shareAndroid,
                 size: 20,
                 color: Theme.of(context).colorScheme.onPrimary,
               ),

@@ -43,9 +43,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
 
   Future<void> setTheme(ThemeMode themeMode) async {
     // Ensure prefs are initialized
-    if (_prefs == null) {
-      _prefs = await SharedPreferences.getInstance();
-    }
+    _prefs ??= await SharedPreferences.getInstance();
 
     String themeString;
     switch (themeMode) {

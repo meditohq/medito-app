@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 import '../constants/colors/color_constants.dart';
 import '../models/track/track_model.dart';
@@ -20,8 +21,8 @@ class ReportButtonWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       onPressed: () => _showReportDialog(context, ref),
-      icon: Icon(
-        HugeIcons.strokeRoundedAlert01,
+      icon: MeditoIcon(
+        assetName: MeditoIcons.alert,
         color: ColorConstants.white.withValues(alpha: 0.5),
         size: 24,
       ),

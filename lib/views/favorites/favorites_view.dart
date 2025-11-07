@@ -187,8 +187,8 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
                   if (index < favorites.length - 1)
                     Divider(
                       color: Theme.of(context).colorScheme.outline,
-                      thickness: 2,
-                      height: 2,
+                      thickness: 0.5,
+                      height: 1,
                     ),
                 ],
               ),

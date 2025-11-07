@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class QuoteWidget extends ConsumerStatefulWidget {
   const QuoteWidget({super.key, required this.data});
@@ -69,10 +70,10 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     onPressed: _shareQuote,
-                    icon: HugeIcon(
-                      icon: Platform.isIOS
-                          ? HugeIcons.solidRoundedShare03
-                          : HugeIcons.solidRoundedShare08,
+                    icon: MeditoIcon(
+                      assetName: Platform.isIOS
+                          ? MeditoIcons.shareIos
+                          : MeditoIcons.shareAndroid,
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface

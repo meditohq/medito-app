@@ -1,16 +1,17 @@
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' show Platform;
 import 'package:share_plus/share_plus.dart';
 
+import 'package:medito/constants/icons/medito_icons.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../models/favorites/favorite_item.dart';
 import '../../../../models/track/track_model.dart';
 import '../../../../providers/favorites/favorites_provider.dart';
 import '../../../../providers/meditation/track_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
+import '../../../../widgets/medito_huge_icon.dart';
 import 'bottom_action_bar.dart';
 
 class TrackViewBottomBar extends ConsumerWidget {
@@ -46,7 +47,7 @@ class TrackViewBottomBar extends ConsumerWidget {
             if (Platform.isIOS)
               _buildBottomSheetTile(
                 context,
-                icon: HugeIcons.solidRoundedSiri,
+                iconAsset: MeditoIcons.siri,
                 title: AppLocalizations.of(context)!.addToSiri,
                 onTap: () {
                   addToSiri(
@@ -59,9 +60,9 @@ class TrackViewBottomBar extends ConsumerWidget {
               ),
             _buildBottomSheetTile(
               context,
-              icon: Platform.isIOS
-                  ? HugeIcons.strokeRoundedShare05
-                  : HugeIcons.strokeRoundedShare08,
+              iconAsset: Platform.isIOS
+                  ? MeditoIcons.shareIos
+                  : MeditoIcons.shareAndroid,
               title: AppLocalizations.of(context)!.share,
               onTap: () {
                 _shareTrack(context);
@@ -77,13 +78,13 @@ class TrackViewBottomBar extends ConsumerWidget {
 
   ListTile _buildBottomSheetTile(
     BuildContext context, {
-    required IconData icon,
+    required String iconAsset,
     required String title,
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: HugeIcon(
-        icon: icon,
+      leading: MeditoIcon(
+        assetName: iconAsset,
         color: Theme.of(context).colorScheme.onSurface,
         size: 20,
       ),
@@ -148,24 +149,24 @@ class TrackViewBottomBar extends ConsumerWidget {
     bool isFavorite,
     bool isDailyMeditation,
   ) {
-    var colour = isFavorite ? ColorConstants.lightPurple : Theme.of(context).colorScheme.onSurface;
-    var icon =
-        isFavorite ? HugeIcons.solidRoundedStar : HugeIcons.strokeRoundedStar;
+    var colour = isFavorite
+        ? ColorConstants.lightPurple
+        : Theme.of(context).colorScheme.onSurface;
+    var icon = isFavorite ? MeditoIcons.starSolid : MeditoIcons.star;
 
     return BottomActionBar(
       layout: BottomActionBarLayout.compactRight,
       leftItem: BottomActionBarItem(
-        child: HugeIcon(
-          icon: HugeIcons.solidSharpArrowLeft02,
+        child: MeditoIcon(
+          assetName: MeditoIcons.arrowLeft,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: onBackPressed,
       ),
       rightCenterItem: BottomActionBarItem(
-        child: HugeIcon(
-          icon: Platform.isIOS
-              ? HugeIcons.strokeRoundedShare05
-              : HugeIcons.strokeRoundedShare08,
+        child: MeditoIcon(
+          assetName:
+              Platform.isIOS ? MeditoIcons.shareIos : MeditoIcons.shareAndroid,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: Platform.isIOS
@@ -175,8 +176,8 @@ class TrackViewBottomBar extends ConsumerWidget {
       rightItem: isDailyMeditation
           ? null
           : BottomActionBarItem(
-              child: HugeIcon(
-                icon: icon,
+              child: MeditoIcon(
+                assetName: icon,
                 color: colour,
               ),
               onTap: () {

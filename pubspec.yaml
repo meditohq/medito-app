@@ -55,9 +55,6 @@ dependencies:
   tiktok_events_sdk: ^1.0.9
   health: ^13.2.1
   http: ^1.4.0
-  hugeicons:
-    hosted: https://onepub.dev/api/kdpxxpsdav
-    version: ^0.0.12
   image: ^4.1.4
   in_app_review: ^2.0.10
   intl: ^0.20.2

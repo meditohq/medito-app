@@ -1,5 +1,9 @@
-import 'package:hugeicons/hugeicons.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:haptic_feedback/haptic_feedback.dart';
+
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
@@ -7,12 +11,10 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:haptic_feedback/haptic_feedback.dart';
-import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
+import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/root/root_page_view.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 import 'widgets/donation_widget.dart';
 
@@ -81,8 +83,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
     return Scaffold(
       bottomNavigationBar: BottomActionBar(
         leftItem: BottomActionBarItem(
-          child: HugeIcon(
-            icon: HugeIcons.solidSharpMultiplicationSign,
+          child: MeditoIcon(
+            assetName: MeditoIcons.xmark,
             color: Theme.of(context).colorScheme.onSurface,
           ),
           onTap: () => Navigator.pop(context),
@@ -96,8 +98,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
           onTap: null,
         ),
         rightItem: BottomActionBarItem(
-          child: HugeIcon(
-            icon: HugeIcons.solidSharpHome01,
+          child: MeditoIcon(
+            assetName: MeditoIcons.home,
             color: Theme.of(context).colorScheme.onSurface,
           ),
           onTap: _navigateToHome,
@@ -325,32 +327,44 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
                 alignment: Alignment.center,
                 children: [
                   if (isConsecutive)
-                    HugeIcon(
-                      size: 36,
-                      icon: HugeIcons.solidSharpCircle,
-                      color: Theme.of(context).colorScheme.onSurface,
+                    _buildCircle(
+                      36,
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.12),
                     ),
                   if (isFreeze)
-                    HugeIcon(
-                        size: 32,
-                        icon: HugeIcons.solidRoundedSnow,
-                        color: ColorConstants.graphite)
+                    MeditoIcon(
+                      assetName: MeditoIcons.snow,
+                      size: 32,
+                      color: ColorConstants.graphite,
+                    )
                   else if (isMeditated)
-                    HugeIcon(
-                        size: 32,
-                        icon: HugeIcons.solidSharpCheckmarkCircle02,
-                        color: ColorConstants.lightPurple)
+                    MeditoIcon(
+                      assetName: MeditoIcons.checkCircleSolid,
+                      size: 32,
+                      color: ColorConstants.lightPurple,
+                    )
                   else
-                    HugeIcon(
-                        size: 32,
-                        icon: HugeIcons.solidSharpCircle,
-                        color: ColorConstants.moon),
+                    _buildCircle(32, ColorConstants.moon),
                 ],
               ),
             ],
           ),
         );
       }),
+    );
+  }
+
+  Widget _buildCircle(double size, Color colour) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: colour,
+      ),
     );
   }
 }

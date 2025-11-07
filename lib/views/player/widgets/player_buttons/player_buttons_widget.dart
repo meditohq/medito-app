@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
+
+import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 import '../../../../providers/player/repeat_state_provider.dart';
 import '../../../../src/audio_pigeon.g.dart';
@@ -73,8 +75,8 @@ class PlayerButtonsWidget extends ConsumerWidget {
   IconButton _rewindButton() {
     return IconButton(
       onPressed: onSkip10SecondsBackward,
-      icon: Icon(
-        HugeIcons.strokeStandardGoBackward10Sec,
+      icon: const MeditoIcon(
+        assetName: MeditoIcons.backward15,
         size: 40,
         color: Colors.white,
       ),
@@ -84,8 +86,8 @@ class PlayerButtonsWidget extends ConsumerWidget {
   IconButton _forwardButton() {
     return IconButton(
       onPressed: onSkip10SecondsForward,
-      icon: Icon(
-        HugeIcons.strokeStandardGoForward10Sec,
+      icon: const MeditoIcon(
+        assetName: MeditoIcons.forward15,
         size: 40,
         color: Colors.white,
       ),
@@ -93,24 +95,23 @@ class PlayerButtonsWidget extends ConsumerWidget {
   }
 
   IconButton _repeatButton(RepeatMode repeatMode) {
-    IconData iconData;
+    var iconAsset = MeditoIcons.repeat;
     Color? iconColor;
 
     switch (repeatMode) {
       case RepeatMode.none:
-        iconData = HugeIcons.solidSharpRepeat;
         iconColor = Colors.white;
         break;
       case RepeatMode.infinite:
-        iconData = HugeIcons.solidStandardRepeatOne01;
+        iconAsset = MeditoIcons.repeatOnce;
         iconColor = Colors.white;
         break;
     }
 
     return IconButton(
       onPressed: onRepeat,
-      icon: Icon(
-        iconData,
+      icon: MeditoIcon(
+        assetName: iconAsset,
         size: 32,
         color: iconColor,
       ),

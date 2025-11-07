@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class CustomiseHomeLayoutScreen extends ConsumerStatefulWidget {
   const CustomiseHomeLayoutScreen({super.key});
@@ -56,8 +57,8 @@ class CustomiseHomeLayoutScreenState
 
                     return ListTile(
                       key: ValueKey(widgetType.name),
-                      leading: HugeIcon(
-                        icon: HugeIcons.solidSharpMenu01,
+                      leading: MeditoIcon(
+                        assetName: MeditoIcons.dragHandle,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                       title: Text(_getTitleForType(widgetType)),

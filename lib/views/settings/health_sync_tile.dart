@@ -2,11 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:health/health.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 
 import '../../widgets/snackbar_widget.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/widgets/bottom_sheet/row_item_widget.dart';
+import '../../widgets/medito_huge_icon.dart';
 
 class HealthSyncTile extends StatelessWidget {
   const HealthSyncTile({super.key});
@@ -23,8 +24,8 @@ class HealthSyncTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RowItemWidget(
-      icon: HugeIcon(
-        icon: HugeIcons.solidRoundedHealth,
+      icon: MeditoIcon(
+        assetName: MeditoIcons.health,
         color: Theme.of(context).colorScheme.onSurface,
       ),
       title: AppLocalizations.of(context)!.syncWithHealth,

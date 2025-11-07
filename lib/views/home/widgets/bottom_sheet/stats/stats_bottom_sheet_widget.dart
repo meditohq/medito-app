@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
@@ -99,7 +99,8 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                             color: Theme.of(context)
                                 .colorScheme
                                 .surface
-                                .withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
+                                .withAlpha(
+                                    ((0.1).clamp(0.0, 1.0) * 255).round()),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: Theme.of(context).colorScheme.onSurface,
@@ -115,8 +116,8 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  HugeIcon(
-                                    icon: HugeIcons.solidRoundedFire,
+                                  MeditoIcon(
+                                    assetName: MeditoIcons.fire,
                                     size: 20,
                                     color:
                                         Theme.of(context).colorScheme.onSurface,
@@ -210,9 +211,10 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                     return Center(
                       child: GestureDetector(
                         onTap: () => ref.read(statsProvider.notifier).refresh(),
-                        child: HugeIcon(
-                            icon: HugeIcons.strokeRoundedHelpCircle,
-                            color: Theme.of(context).colorScheme.onSurface),
+                        child: MeditoIcon(
+                          assetName: MeditoIcons.help,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                     );
                   }
@@ -277,8 +279,8 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
     final maxFreezes = stats.maxStreakFreezes ?? 0;
 
     return RowItemWidget(
-      icon: HugeIcon(
-        icon: HugeIcons.solidStandardSnow,
+      icon: MeditoIcon(
+        assetName: MeditoIcons.snow,
         color: Theme.of(context).colorScheme.onSurface,
         size: 20,
       ),
@@ -361,8 +363,8 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
             child: ElevatedButton.icon(
               onPressed: () =>
                   Share.share(AppLocalizations.of(context)!.shareStatsText),
-              icon: HugeIcon(
-                icon: HugeIcons.solidRoundedShare08,
+              icon: MeditoIcon(
+                assetName: MeditoIcons.shareAndroid,
                 size: 20,
                 color: Theme.of(context).colorScheme.onPrimary,
               ),

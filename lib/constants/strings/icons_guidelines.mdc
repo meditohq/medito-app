@@ -1,0 +1,21 @@
+# Icon Usage Guidelines
+
+## Overview
+Icons in Medito are now asset-driven. Use the `MeditoIcon` widget and the `MeditoIcons` constants to ensure consistency and reuse.
+
+## Key Principles
+- **Always render icons with `MeditoIcon`** and a constant from `MeditoIcons`.
+- **Add new assets centrally** by extending `AssetConstants` and `MeditoIcons` before using them in widgets.
+- **Do not use** Flutter's built-in `Icons.*` or the deprecated HugeIcons package in production code.
+
+## Usage Pattern
+```dart
+MeditoIcon(
+  assetName: MeditoIcons.play,
+  size: 32,
+  color: Theme.of(context).colorScheme.onSurface,
+)
+```
+
+## Migration Notes
+Legacy `HugeIcons.*` references should point to the appropriate asset constant in `MeditoIcons`. Remove any imports of `package:hugeicons/hugeicons.dart` during cleanup.

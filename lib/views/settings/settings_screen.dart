@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -23,6 +23,7 @@ import 'package:medito/views/settings/widgets/theme_selection_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
 
@@ -115,35 +116,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         section: AppLocalizations.of(context)!.helpLegalSection,
         type: TypeConstants.url,
         title: AppLocalizations.of(context)!.helpTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedHelpCircle,
-            color: Theme.of(context).colorScheme.onSurface),
+        icon: MeditoIcon(
+          assetName: MeditoIcons.help,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         path: 'https://medito.support.site/',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,
         type: TypeConstants.route,
         title: AppLocalizations.of(context)!.donateTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidSharpFavourite,
-            color: Theme.of(context).colorScheme.onSurface),
+        icon: MeditoIcon(
+          assetName: MeditoIcons.heart,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         path: RouteConstants.donation,
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,
         type: TypeConstants.url,
         title: AppLocalizations.of(context)!.shopTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedShoppingBag01,
-            color: Theme.of(context).colorScheme.onSurface),
+        icon: MeditoIcon(
+          assetName: MeditoIcons.shop,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         path: 'https://shop.medito.app',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.helpLegalSection,
         type: TypeConstants.url,
         title: AppLocalizations.of(context)!.editStatsTitle,
-        icon: HugeIcon(
-          icon: HugeIcons.solidRoundedQuestion,
+        icon: MeditoIcon(
+          assetName: MeditoIcons.graphUp,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         path: ref.watch(editStatsUrlProvider).when(
@@ -156,26 +160,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         section: AppLocalizations.of(context)!.supportCommunitySection,
         type: TypeConstants.url,
         title: AppLocalizations.of(context)!.telegramTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidRoundedTelegram,
-            color: Theme.of(context).colorScheme.onSurface),
+        icon: MeditoIcon(
+          assetName: MeditoIcons.telegram,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         path: 'https://t.me/meditoapp',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,
         type: TypeConstants.url,
         title: AppLocalizations.of(context)!.whatsappTitle,
-        icon: HugeIcon(
-            icon: HugeIcons.solidStandardWhatsapp,
-            color: Theme.of(context).colorScheme.onSurface),
+        icon: MeditoIcon(
+          assetName: MeditoIcons.whatsapp,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         path: 'https://whatsapp.com/channel/0029Vaov2lZ5kg77zmTZfd2X',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.customizationSection,
         type: TypeConstants.theme,
         title: AppLocalizations.of(context)!.themeTitle,
-        icon: HugeIcon(
-          icon: HugeIcons.solidRoundedSettings01,
+        icon: MeditoIcon(
+          assetName: MeditoIcons.settings,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         path: TypeConstants.theme,
@@ -184,8 +190,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         section: AppLocalizations.of(context)!.customizationSection,
         type: TypeConstants.route,
         title: AppLocalizations.of(context)!.customiseHomeLayout,
-        icon: HugeIcon(
-          icon: HugeIcons.solidSharpEdit02,
+        icon: MeditoIcon(
+          assetName: MeditoIcons.pencil,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         path: TypeConstants.customiseHomeLayout,
@@ -194,8 +200,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         section: AppLocalizations.of(context)!.customizationSection,
         type: TypeConstants.toggle,
         title: AppLocalizations.of(context)!.enableDndDuringMeditation,
-        icon: HugeIcon(
-          icon: HugeIcons.solidRoundedMoon,
+        icon: MeditoIcon(
+          assetName: MeditoIcons.moon,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         path: TypeConstants.toggleDnd,
@@ -241,8 +247,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
       color: Theme.of(context).cardColor,
       child: RowItemWidget(
-        icon: HugeIcon(
-          icon: HugeIcons.solidRoundedNotification03,
+        icon: MeditoIcon(
+          assetName: MeditoIcons.bell,
           size: 24,
           color: Theme.of(context).colorScheme.onSurface,
         ),

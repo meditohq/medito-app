@@ -1,7 +1,9 @@
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class PlayPauseButtonWidget extends ConsumerWidget {
   const PlayPauseButtonWidget({
@@ -18,16 +20,16 @@ class PlayPauseButtonWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
-      onTap: onPlayPause, 
+      onTap: onPlayPause,
       borderRadius: BorderRadius.circular(iconSize / 2),
       child: AnimatedCrossFade(
-        firstChild: Icon(
-         HugeIcons.solidSharpPlayCircle,
+        firstChild: MeditoIcon(
+          assetName: MeditoIcons.playSolid,
           size: iconSize,
           color: ColorConstants.white,
         ),
-        secondChild: Icon(
-          HugeIcons.strokeSharpPauseCircle,
+        secondChild: MeditoIcon(
+          assetName: MeditoIcons.pause,
           size: iconSize,
           color: ColorConstants.white,
         ),

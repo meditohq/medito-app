@@ -1,13 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:hugeicons/hugeicons.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 class AudioDownloadWidget extends ConsumerWidget {
   const AudioDownloadWidget({
@@ -76,8 +77,8 @@ class AudioDownloadWidget extends ConsumerWidget {
       return IconButton(
         onPressed: () =>
             _handleRemoveDownload(downloadAudioProvider, ref, context),
-        icon: const Icon(
-          HugeIcons.solidStandardDownloadCircle02,
+        icon: const MeditoIcon(
+          assetName: MeditoIcons.downloadCircleSolid,
           color: ColorConstants.white,
         ),
       );
@@ -87,8 +88,8 @@ class AudioDownloadWidget extends ConsumerWidget {
     } else {
       return IconButton(
         onPressed: () => _handleDownload(downloadAudioProvider, context),
-        icon: const HugeIcon(
-          icon: HugeIcons.twotoneRoundedDownloadCircle01,
+        icon: const MeditoIcon(
+          assetName: MeditoIcons.downloadCircle,
           color: ColorConstants.white,
         ),
       );
