@@ -146,8 +146,7 @@ Future<void> _handleDonationNavigation(
 
   final isUSStorefront = ref.read(isUSStorefrontProvider);
 
-  if (!Platform.isIOS || (isUSStorefront && false)) {
-    // Temporarily disable iOS Superwall
+  if (!Platform.isIOS || isUSStorefront) {
     await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
   } else {
     final uri = Uri.parse('https://meditofoundation.org/donate');
