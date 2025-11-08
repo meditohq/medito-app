@@ -8,6 +8,7 @@ import 'package:medito/views/home/widgets/bottom_sheet/stats/streak_freeze_sugge
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
 
 // Test implementation of FeatureFlagsNotifier
 class TestFeatureFlagsNotifier extends FeatureFlagsNotifier {
@@ -82,8 +83,9 @@ void main() {
       expect(find.textContaining('2 streak freezes available'), findsOneWidget);
       expect(find.text('Use Streak Freeze'), findsOneWidget);
 
-      // Verify that freeze icons are displayed
-      expect(find.byType(Icon), findsAtLeast(2)); // Should have 2 freeze icons
+      // Verify that freeze icons are displayed (MeditoIcon for available freezes)
+      expect(find.byType(MeditoIcon),
+          findsAtLeast(2)); // Should have 2 freeze icons
 
       // Test tapping the "Use Streak Freeze" button
       await tester.tap(find.text('Use Streak Freeze'));
@@ -199,8 +201,11 @@ void main() {
       // Verify the correct freeze count is displayed
       expect(find.textContaining('1 streak freezes available'), findsOneWidget);
 
-      // Verify correct number of icons (3 total, 1 available, 2 used)
-      expect(find.byType(Icon), findsAtLeast(3));
+      // Verify correct number of icons (3 total, 1 available MeditoIcon, 2 used Container circles)
+      expect(find.byType(MeditoIcon),
+          findsAtLeast(1)); // At least 1 available freeze icon
+      expect(find.byType(Container),
+          findsAtLeast(2)); // At least 2 used freeze circles
     });
 
     testWidgets(
