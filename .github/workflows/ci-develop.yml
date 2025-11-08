@@ -101,13 +101,7 @@ jobs:
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Run Unit Tests
-        run: flutter test --coverage --dart-define-from-file=.prod.json
-
-      - name: Upload Test Coverage
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage/lcov.info
-          fail_ci_if_error: true
+        run: flutter test --dart-define-from-file=.prod.json
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
