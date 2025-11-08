@@ -21,14 +21,6 @@ jobs:
     
     - uses: actions/checkout@v4
     
-    - name: Setup OnePub
-      env:
-        ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
-      run: |
-        dart pub global activate onepub
-        onepub import
-        onepub pub add hugeicons
-    
     - name: Create .prod.env file
       run: echo "${{ secrets.PROD_ENV }}" > .prod.env
     

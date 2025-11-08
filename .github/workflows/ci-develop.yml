@@ -46,24 +46,6 @@ jobs:
           max_attempts: 2
           command: flutter upgrade
 
-      - name: Setup OnePub
-        env:
-          ONEPUB_TOKEN: ${{ secrets.ONEPUB_TOKEN }}
-        run: |
-          echo "Setting up OnePub..."
-          mkdir -p $PUB_CACHE/credentials
-          dart pub global activate onepub
-          dart pub global run onepub import
-          echo "Verifying OnePub setup..."
-          ls -la $PUB_CACHE/credentials/ || echo "Failed to list credentials directory"
-          cat $PUB_CACHE/credentials/credentials.json || echo "Failed to read credentials file"
-          # Add pub credentials directly
-          echo '{
-            "https://onepub.dev/api/kdpxxpsdav/": {
-              "token": "${{ secrets.ONEPUB_TOKEN }}"
-            }
-          }' > $PUB_CACHE/credentials/credentials.json
-
       - name: Flutter Pub Get
         uses: nick-invision/retry@v2
         with:
