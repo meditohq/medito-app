@@ -33,6 +33,12 @@ abstract class MeditoAndroidAudioServiceManager {
 }
 
 @HostApi()
+abstract class MeditoWidgetManager {
+  @async
+  bool pinWidget(String widgetType);
+}
+
+@HostApi()
 abstract class MeditoAudioServiceApi {
   bool playAudio(AudioData audioData);
 

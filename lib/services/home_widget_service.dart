@@ -28,7 +28,7 @@ class HomeWidgetService {
         themePreference,
       );
       AppLogger.d('WIDGET', 'Saved theme preference: $themePreference');
-      
+
       // Update both widgets when theme changes
       await _updateWidget(_widgetName);
       await _updateWidget(_consistencyWidgetName);
@@ -114,9 +114,6 @@ class HomeWidgetService {
         consistencyPercentage,
       );
 
-      AppLogger.d('WIDGET',
-          'Saved widget data - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}, consistency: ${stats.consistencyScore} (${consistencyPercentage}%)');
-
       // Update both widgets - try home_widget package first, fallback to manual broadcast
       await _updateWidget(_widgetName);
       await _updateWidget(_consistencyWidgetName);
@@ -188,10 +185,6 @@ class HomeWidgetService {
         _consistencyScoreKey,
         consistencyPercentage,
       );
-
-      AppLogger.d('WIDGET',
-          'Saved widget data (fromStats) - streak: ${stats.streakCurrent}, sessions: ${stats.totalTracksCompleted}, consistency: ${stats.consistencyScore} (${consistencyPercentage}%)');
-
       // Update both widgets - try home_widget package first, fallback to manual broadcast
       await _updateWidget(_widgetName);
       await _updateWidget(_consistencyWidgetName);
@@ -227,6 +220,23 @@ class HomeWidgetService {
       AppLogger.d('WIDGET', 'Manual widget update broadcast sent');
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to send manual widget update broadcast', e);
+    }
+  }
+
+  /// Requests to pin a widget to the home screen (Android only)
+  /// widgetType: "meditation" or "consistency"
+  static Future<bool> pinWidget({String widgetType = 'consistency'}) async {
+    try {
+      const platform = MethodChannel('medito.app/widget');
+      final result = await platform.invokeMethod<bool>(
+        'pinWidget',
+        {'widgetType': widgetType},
+      );
+      AppLogger.d('WIDGET', 'Widget pin request sent for type: $widgetType');
+      return result ?? false;
+    } catch (e) {
+      AppLogger.e('WIDGET', 'Failed to pin widget', e);
+      return false;
     }
   }
 }

@@ -1360,6 +1360,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get customizationSection => 'Personalización';
 
   @override
+  String get addHomeScreenWidget => 'Add Home Screen Widget';
+
+  @override
   String get themeTitle => 'Tema';
 
   @override

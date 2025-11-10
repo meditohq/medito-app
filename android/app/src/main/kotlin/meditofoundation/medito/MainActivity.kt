@@ -21,9 +21,16 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import android.os.Handler
 import android.os.Looper
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.DpSize
+import meditofoundation.medito.widget.MeditationWidget
+import meditofoundation.medito.widget.MeditationWidgetReceiver
+import meditofoundation.medito.widget.ConsistencyWidget
+import meditofoundation.medito.widget.ConsistencyWidgetReceiver
 
 @UnstableApi
-class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager {
+class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager, MeditoWidgetManager {
 
     private var meditoAudioApi: MeditoAudioServiceCallbackApi? = null
     private val activityJob = SupervisorJob()
@@ -37,6 +44,7 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         GeneratedPluginRegistrant.registerWith(flutterEngine)
         
         MeditoAndroidAudioServiceManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
+        MeditoWidgetManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
         checkAndSendCompletionData()
@@ -244,6 +252,32 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
             
             println("❌ [Native] Error binding to service: ${e.message}")
             callback(Result.success(false))
+        }
+    }
+
+    override fun pinWidget(widgetType: String, callback: (Result<Boolean>) -> Unit) {
+        activityScope.launch(Dispatchers.Main) {
+            try {
+                val manager = GlanceAppWidgetManager(this@MainActivity)
+                val receiver = when (widgetType) {
+                    "consistency" -> ConsistencyWidgetReceiver::class.java
+                    else -> MeditationWidgetReceiver::class.java
+                }
+                val widget = when (widgetType) {
+                    "consistency" -> ConsistencyWidget()
+                    else -> MeditationWidget()
+                }
+                
+                val success = manager.requestPinGlanceAppWidget(
+                    receiver = receiver,
+                    preview = widget,
+                    previewSize = DpSize(245.dp, 115.dp)
+                )
+                callback(Result.success(success))
+            } catch (e: Exception) {
+                println("Error pinning widget: ${e.message}")
+                callback(Result.failure(e))
+            }
         }
     }
 

@@ -515,6 +515,10 @@
   "@customizationSection": {
     "description": "Section title for customization settings"
   },
+  "addHomeScreenWidget": "Add Home Screen Widget",
+  "@addHomeScreenWidget": {
+    "description": "Title for adding home screen widget option in customization section"
+  },
   "themeTitle": "Theme",
   "@themeTitle": {
     "description": "Title for theme selection setting in customization section"

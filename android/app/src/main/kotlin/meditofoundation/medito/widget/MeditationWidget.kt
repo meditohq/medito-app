@@ -7,13 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
-import androidx.glance.LocalSize
 import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.state.GlanceStateDefinition
@@ -27,6 +28,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.text.FontWeight
@@ -47,7 +49,7 @@ class MeditationWidget : GlanceAppWidget() {
         get() = HomeWidgetGlanceStateDefinition()
 
     override val sizeMode: SizeMode
-        get() = SizeMode.Responsive
+        get() = SizeMode.Single
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
@@ -57,9 +59,6 @@ class MeditationWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetContent(context: Context) {
-        val size = LocalSize.current
-        val isCompact = size.height < 150.dp
-        
         val prefs = currentState<HomeWidgetGlanceState>().preferences
         val streakCurrent = prefs.getInt("streak_current", 0)
         val totalTracksCompleted = prefs.getInt("total_tracks_completed", 0)
@@ -133,22 +132,11 @@ class MeditationWidget : GlanceAppWidget() {
 
         val fireIconColor = if (hasActivityToday) checkmarkColor else inactiveCircleColor
 
-        // Adjust sizes based on compact mode
-        val padding = if (isCompact) 12.dp else 20.dp
-        val iconSize = if (isCompact) 28.dp else 36.dp
-        val streakFontSize = if (isCompact) 28.sp else 36.sp
-        val labelFontSize = if (isCompact) 16.sp else 20.sp
-        val dayAbbrevFontSize = if (isCompact) 9.sp else 11.sp
-        val circleSize = if (isCompact) 22.dp else 28.dp
-        val checkmarkSize = if (isCompact) 12.dp else 16.dp
-        val spacingBetweenSections = if (isCompact) 8.dp else 16.dp
-        val spacingInCalendar = if (isCompact) 4.dp else 6.dp
-
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(backgroundColor)
-                .padding(padding)
+                .padding(8.dp)
                 .clickable(onClick = actionStartActivity<MainActivity>(context))
         ) {
             Column(
@@ -168,29 +156,29 @@ class MeditationWidget : GlanceAppWidget() {
                         ),
                         contentDescription = "Fire icon",
                         modifier = GlanceModifier
-                            .width(iconSize)
-                            .height(iconSize)
-                            .padding(top = if (isCompact) 2.dp else 4.dp, end = if (isCompact) 6.dp else 8.dp)
+                            .width(24.dp)
+                            .height(24.dp)
+                            .padding(top = 2.dp, end = 4.dp)
                     )
                     Text(
                         text = streakCurrent.toString(),
                         style = TextStyle(
-                            fontSize = streakFontSize,
+                            fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = ColorProvider(textColor)
                         )
                     )
-                    Spacer(modifier = GlanceModifier.width(if (isCompact) 2.dp else 4.dp))
+                    Spacer(modifier = GlanceModifier.width(2.dp))
                     Text(
                         text = label,
                         style = TextStyle(
-                            fontSize = labelFontSize,
+                            fontSize = 14.sp,
                             color = ColorProvider(textColor)
                         )
                     )
                 }
 
-                Spacer(modifier = GlanceModifier.height(spacingBetweenSections))
+                Spacer(modifier = GlanceModifier.height(4.dp))
 
                 // Calendar section - Duolingo style with circular indicators
                 Row(
@@ -206,15 +194,15 @@ class MeditationWidget : GlanceAppWidget() {
                             Text(
                                 text = day.abbreviation,
                                 style = TextStyle(
-                                    fontSize = dayAbbrevFontSize,
+                                    fontSize = 9.sp,
                                     color = ColorProvider(secondaryTextColor)
                                 )
                             )
-                            Spacer(modifier = GlanceModifier.height(spacingInCalendar))
+                            Spacer(modifier = GlanceModifier.height(2.dp))
                             Box(
                                 modifier = GlanceModifier
-                                    .width(circleSize)
-                                    .height(circleSize)
+                                    .width(20.dp)
+                                    .height(20.dp)
                                     .background(
                                         if (day.hasActivity) checkmarkColor else inactiveCircleColor
                                     ),
@@ -225,16 +213,16 @@ class MeditationWidget : GlanceAppWidget() {
                                         provider = ImageProvider(R.drawable.ic_checkmark_white),
                                         contentDescription = "Checkmark",
                                         modifier = GlanceModifier
-                                            .width(checkmarkSize)
-                                            .height(checkmarkSize)
+                                            .width(12.dp)
+                                            .height(12.dp)
                                     )
                                 } else {
                                     Image(
                                         provider = ImageProvider(R.drawable.ic_square_grey),
                                         contentDescription = "Empty day",
                                         modifier = GlanceModifier
-                                            .width(checkmarkSize)
-                                            .height(checkmarkSize)
+                                            .width(12.dp)
+                                            .height(12.dp)
                                     )
                                 }
                             }
@@ -292,5 +280,19 @@ class MeditationWidget : GlanceAppWidget() {
     private fun isDarkMode(context: Context): Boolean {
         val nightModeFlags = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    @Composable
+    fun GlanceModifier.appWidgetInnerCornerRadius(widgetPadding: Dp): GlanceModifier {
+        if (Build.VERSION.SDK_INT < 31) {
+            return this
+        }
+        val resources = LocalContext.current.resources
+        val px = resources.getDimension(android.R.dimen.system_app_widget_background_radius)
+        val widgetBackgroundRadiusDpValue = px / resources.displayMetrics.density
+        if (widgetBackgroundRadiusDpValue < widgetPadding.value.toFloat()) {
+            return this
+        }
+        return this.cornerRadius(Dp(widgetBackgroundRadiusDpValue - widgetPadding.value))
     }
 }

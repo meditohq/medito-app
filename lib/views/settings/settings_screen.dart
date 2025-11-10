@@ -24,6 +24,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/src/audio_pigeon.g.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
 
@@ -59,6 +60,25 @@ class ReminderEnabledNotifier extends Notifier<bool> {
 
 final reminderEnabledProvider = NotifierProvider<ReminderEnabledNotifier, bool>(
     () => ReminderEnabledNotifier());
+
+class WidgetOptionSeenNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    return prefs.getBool(SharedPreferenceConstants.hasSeenWidgetOption) ??
+        false;
+  }
+
+  Future<void> markAsSeen() async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setBool(SharedPreferenceConstants.hasSeenWidgetOption, true);
+    state = true;
+  }
+}
+
+final widgetOptionSeenProvider =
+    NotifierProvider<WidgetOptionSeenNotifier, bool>(
+        () => WidgetOptionSeenNotifier());
 
 // Analytics user providers moved to a dedicated module
 
@@ -206,6 +226,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         path: TypeConstants.toggleDnd,
       ),
+      if (Platform.isAndroid)
+        SettingsItem(
+          section: AppLocalizations.of(context)!.customizationSection,
+          type: TypeConstants.route,
+          title: AppLocalizations.of(context)!.addHomeScreenWidget,
+          icon: MeditoIcon(
+            assetName: MeditoIcons.home,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          path: TypeConstants.addWidget,
+        ),
     ];
 
     return Scaffold(
@@ -228,6 +259,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     BuildContext context,
     SettingsItem item,
   ) async {
+    if (item.path == TypeConstants.addWidget) {
+      await ref.read(widgetOptionSeenProvider.notifier).markAsSeen();
+      try {
+        final widgetManager = MeditoWidgetManager();
+        await widgetManager.pinWidget('consistency');
+      } catch (e) {
+        // Silently fail - Android system dialog handles user interaction
+      }
+      return;
+    }
+
     await handleNavigation(
       item.type,
       [item.path.toString().getIdFromPath(), item.path],
@@ -304,6 +346,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
     final isThemeItem = item.type == TypeConstants.theme;
+    final isWidgetItem = item.path == TypeConstants.addWidget;
 
     if (isAccountItem) {
       return const SizedBox.shrink();
@@ -341,6 +384,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       );
     }
 
+    if (isWidgetItem) {
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          RowItemWidget(
+            icon: item.icon,
+            title: item.title,
+            hasUnderline: true,
+            onTap: () => handleItemPress(context, item),
+          ),
+          Positioned(
+            left: 12,
+            top: 12,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return RowItemWidget(
       icon: item.icon,
       title: item.title,
@@ -373,10 +442,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isEffectivelySignedIn =
         user != null && user.email != null && user.email!.isNotEmpty;
 
-    final customizationItems = _getItemsBySection(
+    final allCustomizationItems = _getItemsBySection(
             settingsItems, AppLocalizations.of(context)!.customizationSection)
         .where((item) =>
             !item.path.contains(TypeConstants.toggleDnd) || _isDndSupported)
+        .toList();
+
+    final widgetItem = allCustomizationItems
+        .where((item) => item.path == TypeConstants.addWidget)
+        .firstOrNull;
+    final otherCustomizationItems = allCustomizationItems
+        .where((item) => item.path != TypeConstants.addWidget)
         .toList();
 
     var children = <Widget>[
@@ -392,7 +468,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               AppLocalizations.of(context)!.supportCommunitySection)
           .map((item) => _buildMenuItemTile(context, ref, item)),
       _buildSectionTitle(context, AppLocalizations.of(context)!.customization),
-      ...customizationItems
+      if (widgetItem != null) _buildMenuItemTile(context, ref, widgetItem),
+      ...otherCustomizationItems
           .map((item) => _buildMenuItemTile(context, ref, item)),
       _buildSectionTitle(context, AppLocalizations.of(context)!.helpLegal),
       ..._getItemsBySection(

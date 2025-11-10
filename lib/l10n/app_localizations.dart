@@ -2552,6 +2552,12 @@ abstract class AppLocalizations {
   /// **'Customisation'**
   String get customizationSection;
 
+  /// Title for adding home screen widget option in customization section
+  ///
+  /// In en, this message translates to:
+  /// **'Add Home Screen Widget'**
+  String get addHomeScreenWidget;
+
   /// Title for theme selection setting in customization section
   ///
   /// In en, this message translates to:
