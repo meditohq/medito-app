@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -143,17 +142,7 @@ Future<void> _handleDonationNavigation(
 ) async {
   if (ref == null) return;
 
-  if (Platform.isIOS) {
-    await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
-  } else {
-    final uri = Uri.parse('https://meditofoundation.org/donate');
-    if (await canLaunchUrl(uri)) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => _URLLauncherScreen(url: uri)),
-      );
-    }
-  }
+  await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
 }
 
 Future<void> launchEmailSubmission(String email, {String? body}) async {

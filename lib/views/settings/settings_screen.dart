@@ -262,6 +262,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (item.path == TypeConstants.addWidget) {
       await ref.read(widgetOptionSeenProvider.notifier).markAsSeen();
       if (mounted) {
+        
         setState(() {});
       }
       try {
