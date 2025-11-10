@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/providers/storefront_provider.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
@@ -144,9 +143,7 @@ Future<void> _handleDonationNavigation(
 ) async {
   if (ref == null) return;
 
-  final isUSStorefront = ref.read(isUSStorefrontProvider);
-
-  if (!Platform.isIOS || isUSStorefront) {
+  if (Platform.isIOS) {
     await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
   } else {
     final uri = Uri.parse('https://meditofoundation.org/donate');
