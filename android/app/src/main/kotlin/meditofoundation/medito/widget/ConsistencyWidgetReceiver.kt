@@ -40,9 +40,14 @@ class ConsistencyWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ConsistencyWidg
         val action = intent.action
         Log.d(TAG, "📨 onReceive called with action: $action")
         
-        // Only handle home_widget specific updates - let the base class handle standard updates
+        // Handle home_widget specific updates
         if (action == "es.antonborri.home_widget.UPDATE_WIDGET") {
             Log.d(TAG, "✅ Received home_widget UPDATE_WIDGET broadcast, triggering update")
+            updateWidget(context)
+        }
+        // Handle standard widget updates
+        else if (action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
+            Log.d(TAG, "✅ Received APPWIDGET_UPDATE broadcast, updating widget")
             updateWidget(context)
         } else {
             Log.d(TAG, "ℹ️ Ignoring action: $action")

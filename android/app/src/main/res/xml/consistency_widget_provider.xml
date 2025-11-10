@@ -3,7 +3,7 @@
     android:minWidth="110dp"
     android:minHeight="110dp"
     android:resizeMode="horizontal"
-    android:updatePeriodMillis="1800000"
+    android:updatePeriodMillis="300000"
     android:targetCellWidth="2"
     android:targetCellHeight="1"
     android:previewImage="@drawable/ic_launcher_foreground"

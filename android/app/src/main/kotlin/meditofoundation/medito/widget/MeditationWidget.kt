@@ -1,6 +1,8 @@
 package meditofoundation.medito.widget
 
 import android.content.Context
+import android.content.res.Configuration
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -25,10 +27,13 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import meditofoundation.medito.R
 import es.antonborri.home_widget.actionStartActivity
 import HomeWidgetGlanceState
 import HomeWidgetGlanceStateDefinition
@@ -90,13 +95,38 @@ class MeditationWidget : GlanceAppWidget() {
 
         val hasActivityToday = allActivityDates.contains(today.timeInMillis)
 
-        // Medito colors
-        val backgroundColor = Color(0xFFF8F9FA) // lightBackground
-        val accentColor = Color(0xffef5e55) // amber
-        val textColor = Color(0xFF000000) // black
-        val secondaryTextColor = Color(0xFF000000) // black
-        val inactiveCircleColor = Color(0xFFE5E7EB) // lightGrey
-        val checkmarkColor = Color(0xFF917DF0) // lightPurple
+        // Get theme-aware colors based on app theme preference
+        val themePreference = prefs.getString("theme_preference", "system") ?: "system"
+        val isDarkMode = when (themePreference) {
+            "light" -> false
+            "dark" -> true
+            "system" -> isDarkMode(context)
+            else -> isDarkMode(context)
+        }
+        
+        val colors = if (isDarkMode) {
+            ThemeColors(
+                backgroundColor = Color(0xFF121212), // dark background
+                textColor = Color(0xFFFFFFFF), // white text
+                secondaryTextColor = Color(0xFFB3B3B3), // light grey text
+                inactiveCircleColor = Color(0xFF2C2C2C), // dark grey
+                checkmarkColor = Color(0xFF917DF0) // lightPurple
+            )
+        } else {
+            ThemeColors(
+                backgroundColor = Color(0xFFF8F9FA), // lightBackground
+                textColor = Color(0xFF000000), // black
+                secondaryTextColor = Color(0xFF000000), // black
+                inactiveCircleColor = Color(0xFFE5E7EB), // lightGrey
+                checkmarkColor = Color(0xFF917DF0) // lightPurple
+            )
+        }
+        
+        val backgroundColor = colors.backgroundColor
+        val textColor = colors.textColor
+        val secondaryTextColor = colors.secondaryTextColor
+        val inactiveCircleColor = colors.inactiveCircleColor
+        val checkmarkColor = colors.checkmarkColor
 
         val fireIconColor = if (hasActivityToday) checkmarkColor else inactiveCircleColor
 
@@ -118,13 +148,15 @@ class MeditationWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.Vertical.CenterVertically,
                     horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                 ) {
-                    Text(
-                        text = "🔥",
-                        style = TextStyle(
-                            fontSize = 28.sp,
-                            color = ColorProvider(fireIconColor)
+                    Image(
+                        provider = ImageProvider(
+                            if (hasActivityToday) R.drawable.ic_fire_purple else R.drawable.ic_fire_grey
                         ),
-                        modifier = GlanceModifier.padding(end = 8.dp)
+                        contentDescription = "Fire icon",
+                        modifier = GlanceModifier
+                            .width(36.dp)
+                            .height(36.dp)
+                            .padding(top = 4.dp, end = 8.dp)
                     )
                     Text(
                         text = streakCurrent.toString(),
@@ -134,7 +166,7 @@ class MeditationWidget : GlanceAppWidget() {
                             color = ColorProvider(textColor)
                         )
                     )
-                    Spacer(modifier = GlanceModifier.width(6.dp))
+                    Spacer(modifier = GlanceModifier.width(4.dp))
                     Text(
                         text = label,
                         style = TextStyle(
@@ -165,7 +197,6 @@ class MeditationWidget : GlanceAppWidget() {
                                 )
                             )
                             Spacer(modifier = GlanceModifier.height(6.dp))
-                            // Circular indicator (Duolingo style - using square as Glance doesn't support rounded corners)
                             Box(
                                 modifier = GlanceModifier
                                     .width(28.dp)
@@ -176,13 +207,20 @@ class MeditationWidget : GlanceAppWidget() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (day.hasActivity) {
-                                    Text(
-                                        text = "✓",
-                                        style = TextStyle(
-                                            fontSize = 16.sp,
-                                            color = ColorProvider(Color.White),
-                                            fontWeight = FontWeight.Bold
-                                        )
+                                    Image(
+                                        provider = ImageProvider(R.drawable.ic_checkmark_white),
+                                        contentDescription = "Checkmark",
+                                        modifier = GlanceModifier
+                                            .width(16.dp)
+                                            .height(16.dp)
+                                    )
+                                } else {
+                                    Image(
+                                        provider = ImageProvider(R.drawable.ic_square_grey),
+                                        contentDescription = "Empty day",
+                                        modifier = GlanceModifier
+                                            .width(16.dp)
+                                            .height(16.dp)
                                     )
                                 }
                             }
@@ -190,16 +228,6 @@ class MeditationWidget : GlanceAppWidget() {
                     }
                 }
 
-                Spacer(modifier = GlanceModifier.height(8.dp))
-
-                // Total sessions count in tiny text
-                Text(
-                    text = "$totalTracksCompleted sessions",
-                    style = TextStyle(
-                        fontSize = 9.sp,
-                        color = ColorProvider(secondaryTextColor)
-                    )
-                )
             }
         }
     }
@@ -238,4 +266,17 @@ class MeditationWidget : GlanceAppWidget() {
     }
 
     private data class CalendarDay(val abbreviation: String, val hasActivity: Boolean)
+
+    private data class ThemeColors(
+        val backgroundColor: Color,
+        val textColor: Color,
+        val secondaryTextColor: Color,
+        val inactiveCircleColor: Color,
+        val checkmarkColor: Color
+    )
+
+    private fun isDarkMode(context: Context): Boolean {
+        val nightModeFlags = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
+    }
 }

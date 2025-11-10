@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/strings/shared_preference_constants.dart';
 import '../l10n/app_localizations.dart';
+import '../services/home_widget_service.dart';
 
 final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
   return ThemeNotifier();
@@ -39,6 +40,11 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
         state = ThemeMode.dark;
         break;
     }
+    
+    // Save theme preference to widget when loading
+    if (savedTheme != null) {
+      HomeWidgetService.saveThemePreference(savedTheme);
+    }
   }
 
   Future<void> setTheme(ThemeMode themeMode) async {
@@ -61,6 +67,9 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
     await _prefs!
         .setString(SharedPreferenceConstants.themePreference, themeString);
     state = themeMode;
+    
+    // Save theme preference to widget
+    await HomeWidgetService.saveThemePreference(themeString);
   }
 
   String getCurrentThemeString() {

@@ -18,6 +18,24 @@ class HomeWidgetService {
   static const String _lastUpdatedKey = 'last_updated';
   static const String _totalTracksCompletedKey = 'total_tracks_completed';
   static const String _consistencyScoreKey = 'consistency_score';
+  static const String _themePreferenceKey = 'theme_preference';
+
+  /// Saves the theme preference to the widget
+  static Future<void> saveThemePreference(String themePreference) async {
+    try {
+      await HomeWidget.saveWidgetData<String>(
+        _themePreferenceKey,
+        themePreference,
+      );
+      AppLogger.d('WIDGET', 'Saved theme preference: $themePreference');
+      
+      // Update both widgets when theme changes
+      await _updateWidget(_widgetName);
+      await _updateWidget(_consistencyWidgetName);
+    } catch (e) {
+      AppLogger.e('WIDGET', 'Failed to save theme preference', e);
+    }
+  }
 
   /// Updates the home widget with the latest stats data
   static Future<void> updateWidget({
