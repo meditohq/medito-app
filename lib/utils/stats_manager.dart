@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/utils/audio_completion_tracker.dart';
 import 'package:medito/services/home_widget_service.dart';
+import 'package:medito/utils/stats_updater.dart';
 
 // Key Rules for a Normal Streak (Without Streak Freezes)
 // 1.	Meditating every day increases the streak by 1. Each consecutive day of meditation adds to the streak.
@@ -176,10 +177,12 @@ class StatsManager {
         );
       }
 
+      final newConsistencyScore = calculateConsistencyScore(_allStats!);
       _allStats = _allStats!.copyWith(
-        consistencyScore: calculateConsistencyScore(_allStats!),
+        consistencyScore: newConsistencyScore,
       );
 
+      await saveConsistencyScoreHistory(newConsistencyScore);
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
       // Mark as synced and clear dirty flag after successful POST
@@ -544,9 +547,14 @@ class StatsManager {
       duration: duration,
     );
 
-    // Calculate streak and save stats
+    // Calculate streak and consistency score, then save stats
     if (_allStats != null) {
       _allStats = calculateStreak(_allStats!);
+      final newConsistencyScore = calculateConsistencyScore(_allStats!);
+      _allStats = _allStats!.copyWith(
+        consistencyScore: newConsistencyScore,
+      );
+      await saveConsistencyScoreHistory(newConsistencyScore);
       await _saveLocalAllStatsToSharedPrefs();
       await _statsService.postStats(_allStats!);
       // Mark as synced and clear dirty flag after successful POST
@@ -849,6 +857,11 @@ class StatsManager {
 
     // Calculate the new streak with freezes applied
     _allStats = calculateStreak(_allStats!);
+    final newConsistencyScore = calculateConsistencyScore(_allStats!);
+    _allStats = _allStats!.copyWith(
+      consistencyScore: newConsistencyScore,
+    );
+    await saveConsistencyScoreHistory(newConsistencyScore);
 
     await _saveLocalAllStatsToSharedPrefs();
     await _statsService.postStats(_allStats!);

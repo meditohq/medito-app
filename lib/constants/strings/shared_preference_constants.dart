@@ -44,4 +44,7 @@ class SharedPreferenceConstants {
   static const String analyticsFirebaseEnabled = 'analytics_firebase_enabled';
   static const String analyticsMetaEnabled = 'analytics_meta_enabled';
   static const String analyticsTiktokEnabled = 'analytics_tiktok_enabled';
+
+  // Historical consistency score data
+  static const String consistencyScoreHistory = 'consistency_score_history';
 }
