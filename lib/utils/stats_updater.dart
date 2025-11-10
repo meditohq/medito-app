@@ -351,9 +351,8 @@ Future<void> saveConsistencyScoreHistory(
     List<Map<String, dynamic>> historyList = [];
     if (historyJson != null && historyJson.isNotEmpty) {
       final decoded = jsonDecode(historyJson) as List<dynamic>;
-      historyList = decoded
-          .map((item) => item as Map<String, dynamic>)
-          .toList();
+      historyList =
+          decoded.map((item) => item as Map<String, dynamic>).toList();
     }
 
     final entry = {
