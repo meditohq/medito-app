@@ -157,6 +157,7 @@ class _BottomNavigationBarViewState
   }
 
   BottomActionBarItem _buildSettingsNavigationItem() {
+    final hasSeenWidget = ref.watch(widgetOptionSeenProvider);
     final icon = MeditoIcon(
       assetName: MeditoIcons.settings,
       color: _currentPageIndex == 3
@@ -165,12 +166,14 @@ class _BottomNavigationBarViewState
     );
 
     return BottomActionBarItem(
-      child: Badge(
-        backgroundColor: Colors.red,
-        smallSize: 8,
-        alignment: Alignment.topRight,
-        child: icon,
-      ),
+      child: hasSeenWidget
+          ? icon
+          : Badge(
+              backgroundColor: Colors.red,
+              smallSize: 8,
+              alignment: Alignment.topRight,
+              child: icon,
+            ),
       onTap: () => _onDestinationSelected(3),
     );
   }

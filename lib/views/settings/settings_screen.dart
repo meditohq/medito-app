@@ -261,6 +261,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   ) async {
     if (item.path == TypeConstants.addWidget) {
       await ref.read(widgetOptionSeenProvider.notifier).markAsSeen();
+      if (mounted) {
+        setState(() {});
+      }
       try {
         final widgetManager = MeditoWidgetManager();
         await widgetManager.pinWidget('consistency');
@@ -385,6 +388,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     if (isWidgetItem) {
+      final hasSeenWidget = ref.watch(widgetOptionSeenProvider);
+
       return Stack(
         clipBehavior: Clip.none,
         children: [
@@ -394,18 +399,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             hasUnderline: true,
             onTap: () => handleItemPress(context, item),
           ),
-          Positioned(
-            left: 12,
-            top: 12,
-            child: Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
+          if (!hasSeenWidget)
+            Positioned(
+              left: 12,
+              top: 12,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
         ],
       );
     }
