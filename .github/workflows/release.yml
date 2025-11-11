@@ -3,8 +3,8 @@ name: Release
 on:
   push:
     tags:
-      - '*.*.*+*'
-      - 'v*.*.*+*'
+      - '*.*.*'
+      - 'v*.*.*'
 
 jobs:
   android-release:
