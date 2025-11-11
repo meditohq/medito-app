@@ -21,6 +21,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import android.os.Handler
 import android.os.Looper
+import android.os.Build
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.DpSize
@@ -301,6 +302,7 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
             }
         }
     }
+
 
     companion object {
         const val ENGINE_ID = "medito_flutter_engine"
