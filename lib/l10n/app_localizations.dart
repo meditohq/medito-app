@@ -1598,6 +1598,18 @@ abstract class AppLocalizations {
   /// **'Start Meditating'**
   String get startMeditating;
 
+  /// No description provided for @trackingPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help Us Improve'**
+  String get trackingPermissionTitle;
+
+  /// No description provided for @trackingPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We don\'t collect any personal data, we just want to know if our ads are working.'**
+  String get trackingPermissionBody;
+
   /// No description provided for @splashHeadline.
   ///
   /// In en, this message translates to:

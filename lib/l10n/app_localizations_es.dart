@@ -821,6 +821,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get startMeditating => 'Comenzar a Meditar';
 
   @override
+  String get trackingPermissionTitle => 'Help Us Improve';
+
+  @override
+  String get trackingPermissionBody =>
+      'We don\'t collect any personal data, we just want to know if our ads are working.';
+
+  @override
   String get splashHeadline => 'Meditación Hecha Simple';
 
   @override

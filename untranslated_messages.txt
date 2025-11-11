@@ -1,5 +1,7 @@
 {
   "es": [
+    "trackingPermissionTitle",
+    "trackingPermissionBody",
     "addHomeScreenWidget"
   ]
 }

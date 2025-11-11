@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/all_set_screen.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
+import 'package:medito/views/onboarding/tracking_permission_screen.dart';
 import 'package:medito/widgets/onboarding/progress_indicator_widget.dart';
 
 class OnboardingPagerScreen extends StatefulWidget {
@@ -44,6 +47,15 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
           );
         },
       ),
+      if (Platform.isIOS)
+        TrackingPermissionScreen(
+          onNext: () {
+            _controller.nextPage(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeIn,
+            );
+          },
+        ),
       AllSetScreen(
         onComplete: () => Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -78,8 +90,12 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
                     );
                   },
                   child: Image.asset(
-                    _images[_currentPage],
-                    key: ValueKey<String>(_images[_currentPage]),
+                    _images[_currentPage < _images.length
+                        ? _currentPage
+                        : _images.length - 1],
+                    key: ValueKey<String>(_images[_currentPage < _images.length
+                        ? _currentPage
+                        : _images.length - 1]),
                     width: MediaQuery.of(context).size.width,
                     fit: BoxFit.fitWidth,
                   ),
