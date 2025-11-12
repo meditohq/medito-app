@@ -12,6 +12,8 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/paywall_manager_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -291,7 +293,7 @@ class _SuperwallDonationScreenState
           builder: (context, setState) {
             if (!hasRequestedInitialFocus && !keepKeyboardClosed) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (!keepKeyboardClosed && !focusNode.hasFocus) {
+                if (!keepKeyboardClosed) {
                   focusNode.requestFocus();
                 }
               });
@@ -309,32 +311,58 @@ class _SuperwallDonationScreenState
                     Text(AppLocalizations.of(context)!
                         .emailForReceiptDescription),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: emailController,
-                      focusNode: focusNode,
-                      keyboardType: TextInputType.emailAddress,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.email,
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).brightness ==
-                                  Brightness.light
-                              ? const Color(0xFF6B7280)
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                    AutofillGroup(
+                      child: TextField(
+                        controller: emailController,
+                        focusNode: focusNode,
+                        keyboardType: TextInputType.emailAddress,
+                        autofocus: true,
+                        autofillHints: const [AutofillHints.email],
+                        textInputAction: TextInputAction.next,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
-                        floatingLabelStyle: TextStyle(
-                          color: Theme.of(context).brightness ==
-                                  Brightness.light
-                              ? const Color(0xFF6B7280)
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.email,
+                          labelStyle: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? const Color(0xFF6B7280)
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                          ),
+                          floatingLabelStyle: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? const Color(0xFF6B7280)
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                          ),
+                          border: const OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Theme.of(context).colorScheme.surface,
+                          suffixIcon: emailController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: MeditoIcon(
+                                    assetName: MeditoIcons.xmark,
+                                    size: 20,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.6),
+                                  ),
+                                  onPressed: () {
+                                    emailController.clear();
+                                    focusNode.requestFocus();
+                                    setState(() {});
+                                  },
+                                )
+                              : null,
                         ),
-                        border: const OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.surface,
+                        onChanged: (_) => setState(() {}),
                       ),
-                      onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 12),
                     Wrap(
@@ -353,7 +381,7 @@ class _SuperwallDonationScreenState
                         return OutlinedButton(
                           onPressed: () {
                             keepKeyboardClosed = true;
-                            FocusScope.of(context).unfocus();
+                            focusNode.unfocus();
 
                             final currentText = emailController.text.trim();
                             String newText;
