@@ -145,13 +145,13 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     state = await AsyncValue.guard(() => _fetchStatsWithRetry());
     dev.log('StatsNotifier: Refresh completed');
 
-    // Update home widget if stats are available
+    // Update home widget if stats are available (fire-and-forget to avoid blocking)
     if (state.hasValue && state.value != null) {
-      try {
-        await HomeWidgetService.updateWidgetFromStats(state.value!);
-      } catch (e) {
+      // Don't await widget updates to prevent blocking the UI thread
+      // Widget updates are non-critical and should not cause ANRs
+      HomeWidgetService.updateWidgetFromStats(state.value!).catchError((e) {
         // Silently fail - widget updates are not critical
-      }
+      });
     }
   }
 
@@ -165,12 +165,10 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       state = AsyncValue.data(localStats);
       dev.log('StatsNotifier: Refresh from local completed');
 
-      // Update home widget
-      try {
-        await HomeWidgetService.updateWidgetFromStats(localStats);
-      } catch (e) {
+      // Update home widget (fire-and-forget to avoid blocking)
+      HomeWidgetService.updateWidgetFromStats(localStats).catchError((e) {
         // Silently fail - widget updates are not critical
-      }
+      });
     } catch (error) {
       dev.log('StatsNotifier: Error during refresh from local', error: error);
 

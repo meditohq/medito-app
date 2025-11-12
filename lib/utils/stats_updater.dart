@@ -84,14 +84,16 @@ Future<bool> handleStats(
       }
     }
 
-    // Update home widget with latest stats
+    // Update home widget with latest stats (fire-and-forget to avoid blocking)
     try {
       final updatedStats = await statsManager.localAllStats;
-      await HomeWidgetService.updateWidgetFromStats(updatedStats);
-      AppLogger.d('STATS', 'Home widget updated');
+      HomeWidgetService.updateWidgetFromStats(updatedStats).catchError((e) {
+        AppLogger.e('STATS', 'Failed to update home widget', e);
+      });
+      AppLogger.d('STATS', 'Home widget update initiated');
     } catch (widgetError) {
       // Don't fail the whole operation if widget update fails
-      AppLogger.e('STATS', 'Failed to update home widget', widgetError);
+      AppLogger.e('STATS', 'Failed to get stats for widget update', widgetError);
     }
 
     // Schedule or reschedule Smart Reminders based on latest session time

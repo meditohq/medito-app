@@ -190,12 +190,10 @@ class StatsManager {
       await _saveLastSyncedAt();
       _dirty = false;
 
-      // Update home widget
-      try {
-        await HomeWidgetService.updateWidgetFromStats(_allStats!);
-      } catch (e) {
+      // Update home widget (fire-and-forget to avoid blocking)
+      HomeWidgetService.updateWidgetFromStats(_allStats!).catchError((e) {
         // Silently fail - widget updates are not critical
-      }
+      });
     } else {
       throw Exception("Stats are null");
     }
@@ -562,12 +560,10 @@ class StatsManager {
       await _saveLastSyncedAt();
       _dirty = false;
 
-      // Update home widget
-      try {
-        await HomeWidgetService.updateWidgetFromStats(_allStats!);
-      } catch (e) {
+      // Update home widget (fire-and-forget to avoid blocking)
+      HomeWidgetService.updateWidgetFromStats(_allStats!).catchError((e) {
         // Silently fail - widget updates are not critical
-      }
+      });
     }
   }
 

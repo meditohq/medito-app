@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:home_widget/home_widget.dart';
@@ -142,49 +143,88 @@ class HomeWidgetService {
       // Extract freeze usage dates
       final freezeDates = stats.freezeUsageDates.toList();
 
-      // Save data to widget (using default labels)
-      await HomeWidget.saveWidgetData<int>(
-        _streakCurrentKey,
-        stats.streakCurrent,
-      );
+      // Save data to widget (using default labels) with timeout to prevent ANR
+      try {
+        await HomeWidget.saveWidgetData<int>(
+          _streakCurrentKey,
+          stats.streakCurrent,
+        ).timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.w(
+            'WIDGET', 'saveWidgetData timeout/error for streak_current: $e');
+      }
 
-      await HomeWidget.saveWidgetData<String>(
-        _meditationDatesKey,
-        jsonEncode(uniqueMeditationDates),
-      );
+      try {
+        await HomeWidget.saveWidgetData<String>(
+          _meditationDatesKey,
+          jsonEncode(uniqueMeditationDates),
+        ).timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.w(
+            'WIDGET', 'saveWidgetData timeout/error for meditation_dates: $e');
+      }
 
-      await HomeWidget.saveWidgetData<String>(
-        _freezeDatesKey,
-        jsonEncode(freezeDates),
-      );
+      try {
+        await HomeWidget.saveWidgetData<String>(
+          _freezeDatesKey,
+          jsonEncode(freezeDates),
+        ).timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.w(
+            'WIDGET', 'saveWidgetData timeout/error for freeze_dates: $e');
+      }
 
-      await HomeWidget.saveWidgetData<String>(
-        _dayLabelKey,
-        'day',
-      );
+      try {
+        await HomeWidget.saveWidgetData<String>(
+          _dayLabelKey,
+          'day',
+        ).timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.w('WIDGET', 'saveWidgetData timeout/error for day_label: $e');
+      }
 
-      await HomeWidget.saveWidgetData<String>(
-        _daysLabelKey,
-        'days',
-      );
+      try {
+        await HomeWidget.saveWidgetData<String>(
+          _daysLabelKey,
+          'days',
+        ).timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.w(
+            'WIDGET', 'saveWidgetData timeout/error for days_label: $e');
+      }
 
-      await HomeWidget.saveWidgetData<int>(
-        _lastUpdatedKey,
-        DateTime.now().millisecondsSinceEpoch,
-      );
+      try {
+        await HomeWidget.saveWidgetData<int>(
+          _lastUpdatedKey,
+          DateTime.now().millisecondsSinceEpoch,
+        ).timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.w(
+            'WIDGET', 'saveWidgetData timeout/error for last_updated: $e');
+      }
 
-      await HomeWidget.saveWidgetData<int>(
-        _totalTracksCompletedKey,
-        stats.totalTracksCompleted,
-      );
+      try {
+        await HomeWidget.saveWidgetData<int>(
+          _totalTracksCompletedKey,
+          stats.totalTracksCompleted,
+        ).timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.w('WIDGET',
+            'saveWidgetData timeout/error for total_tracks_completed: $e');
+      }
 
       // Save consistency score as integer percentage (0-100) to avoid type conversion issues
       final consistencyPercentage =
           (stats.consistencyScore * 100).round().clamp(0, 100);
-      await HomeWidget.saveWidgetData<int>(
-        _consistencyScoreKey,
-        consistencyPercentage,
-      );
+      try {
+        await HomeWidget.saveWidgetData<int>(
+          _consistencyScoreKey,
+          consistencyPercentage,
+        ).timeout(const Duration(seconds: 2));
+      } catch (e) {
+        AppLogger.w(
+            'WIDGET', 'saveWidgetData timeout/error for consistency_score: $e');
+      }
       // Update both widgets - try home_widget package first, fallback to manual broadcast
       await _updateWidget(_widgetName);
       await _updateWidget(_consistencyWidgetName);
@@ -201,7 +241,12 @@ class HomeWidgetService {
       await HomeWidget.updateWidget(
         name: widgetName,
         androidName: widgetName,
-      );
+      ).timeout(const Duration(seconds: 3), onTimeout: () {
+        AppLogger.w(
+            'WIDGET', 'HomeWidget.updateWidget() timeout for $widgetName');
+        throw TimeoutException(
+            'Widget update timeout', const Duration(seconds: 3));
+      });
       AppLogger.d(
           'WIDGET', 'HomeWidget.updateWidget() completed for $widgetName');
     } catch (e) {
@@ -216,8 +261,12 @@ class HomeWidgetService {
   static Future<void> _sendWidgetUpdateBroadcast() async {
     try {
       const platform = MethodChannel('medito.app/widget');
-      await platform.invokeMethod('updateWidget');
+      await platform.invokeMethod('updateWidget').timeout(
+            const Duration(seconds: 2),
+          );
       AppLogger.d('WIDGET', 'Manual widget update broadcast sent');
+    } on TimeoutException {
+      AppLogger.w('WIDGET', 'Widget update broadcast timeout');
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to send manual widget update broadcast', e);
     }

@@ -54,14 +54,28 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         val widgetChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "medito.app/widget")
         widgetChannel.setMethodCallHandler { call, result ->
             if (call.method == "updateWidget") {
-                try {
-                    val intent = Intent("es.antonborri.home_widget.UPDATE_WIDGET")
-                    intent.setPackage(packageName)
-                    sendBroadcast(intent)
-                    result.success(null)
-                } catch (e: Exception) {
-                    result.error("UPDATE_FAILED", "Failed to send widget update broadcast", e.message)
+                // Run widget update asynchronously to avoid blocking the main thread
+                // Note: sendBroadcast should not block, but running on IO thread as defensive measure
+                activityScope.launch(Dispatchers.IO) {
+                    try {
+                        println("🔔 [Widget] Sending widget update broadcast on thread: ${Thread.currentThread().name}")
+                        val intent = Intent("es.antonborri.home_widget.UPDATE_WIDGET")
+                        intent.setPackage(packageName)
+                        sendBroadcast(intent)
+                        println("🔔 [Widget] Broadcast sent successfully")
+                        withContext(Dispatchers.Main) {
+                            result.success(null)
+                        }
+                    } catch (e: Exception) {
+                        println("❌ [Widget] Error sending broadcast: ${e.message}")
+                        withContext(Dispatchers.Main) {
+                            result.error("UPDATE_FAILED", "Failed to send widget update broadcast", e.message)
+                        }
+                    }
                 }
+            } else if (call.method == "pinWidget") {
+                // pinWidget is already handled by the MeditoWidgetManager interface
+                result.notImplemented()
             } else {
                 result.notImplemented()
             }
