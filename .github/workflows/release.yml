@@ -40,6 +40,18 @@ jobs:
         run: |
           printf "%s" "$PROD_ENV" > .prod.json
 
+      - name: Write keystore.properties from secret
+        env:
+          KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
+        run: |
+          printf "%s" "$KEYSTORE_PROPERTIES" > android/keystore.properties
+
+      - name: Write keystore file from secret
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+        run: |
+          echo "$KEYSTORE_FILE" | base64 -d > android/meditokey.jks
+
       - name: Build APK (prod, live paywall)
         run: |
           flutter build apk --flavor prod --release \

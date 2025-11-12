@@ -31,7 +31,11 @@ if (flutterVersionName == null) {
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} else {
+    throw new FileNotFoundException("keystore.properties file not found. Please create it from keystore.properties.example")
+}
 
 def facebookAppId = System.getenv('FACEBOOK_APP_ID') ?: ''
 def facebookClientToken = System.getenv('FACEBOOK_CLIENT_TOKEN') ?: ''
