@@ -199,33 +199,15 @@ class MeditationWidget : GlanceAppWidget() {
                                 )
                             )
                             Spacer(modifier = GlanceModifier.height(2.dp))
-                            Box(
+                            Image(
+                                provider = ImageProvider(
+                                    if (day.hasActivity) R.drawable.streak_day_checked_purple else R.drawable.streak_day_unchecked
+                                ),
+                                contentDescription = if (day.hasActivity) "Completed day" else "Empty day",
                                 modifier = GlanceModifier
                                     .width(20.dp)
                                     .height(20.dp)
-                                    .background(
-                                        if (day.hasActivity) checkmarkColor else inactiveCircleColor
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (day.hasActivity) {
-                                    Image(
-                                        provider = ImageProvider(R.drawable.ic_checkmark_white),
-                                        contentDescription = "Checkmark",
-                                        modifier = GlanceModifier
-                                            .width(12.dp)
-                                            .height(12.dp)
-                                    )
-                                } else {
-                                    Image(
-                                        provider = ImageProvider(R.drawable.ic_square_grey),
-                                        contentDescription = "Empty day",
-                                        modifier = GlanceModifier
-                                            .width(12.dp)
-                                            .height(12.dp)
-                                    )
-                                }
-                            }
+                            )
                         }
                     }
                 }
