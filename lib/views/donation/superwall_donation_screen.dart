@@ -278,6 +278,8 @@ class _SuperwallDonationScreenState
   Future<String?> _collectEmailForPayment(BuildContext context) async {
     final emailController = TextEditingController();
     final focusNode = FocusNode();
+    bool keepKeyboardClosed = false;
+    bool hasRequestedInitialFocus = false;
     String? email;
 
     await showDialog<String>(
@@ -287,11 +289,14 @@ class _SuperwallDonationScreenState
         // Use StatefulBuilder to request focus after build
         return StatefulBuilder(
           builder: (context, setState) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!focusNode.hasFocus) {
-                focusNode.requestFocus();
-              }
-            });
+            if (!hasRequestedInitialFocus && !keepKeyboardClosed) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!keepKeyboardClosed && !focusNode.hasFocus) {
+                  focusNode.requestFocus();
+                }
+              });
+              hasRequestedInitialFocus = true;
+            }
 
             return PopScope(
               canPop: false, // Prevent back button from dismissing dialog
@@ -308,11 +313,91 @@ class _SuperwallDonationScreenState
                       controller: emailController,
                       focusNode: focusNode,
                       keyboardType: TextInputType.emailAddress,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.email,
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).brightness ==
+                                  Brightness.light
+                              ? const Color(0xFF6B7280)
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        floatingLabelStyle: TextStyle(
+                          color: Theme.of(context).brightness ==
+                                  Brightness.light
+                              ? const Color(0xFF6B7280)
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                         border: const OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Theme.of(context).colorScheme.surface,
                       ),
-                      autofocus: true,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        '@gmail.com',
+                        '@icloud.com',
+                        '@me.com',
+                        '@outlook.com',
+                        '@yahoo.com',
+                        '@pm.me',
+                        '@hotmail.com',
+                        '@live.com',
+                      ].map((domain) {
+                        return OutlinedButton(
+                          onPressed: () {
+                            keepKeyboardClosed = true;
+                            FocusScope.of(context).unfocus();
+
+                            final currentText = emailController.text.trim();
+                            String newText;
+
+                            if (currentText.isEmpty) {
+                              newText = domain;
+                            } else if (currentText.contains('@')) {
+                              final localPart = currentText.split('@').first;
+                              newText = '$localPart$domain';
+                            } else {
+                              newText = '$currentText$domain';
+                            }
+
+                            emailController.text = newText;
+                            emailController.selection =
+                                TextSelection.fromPosition(
+                              TextPosition(offset: newText.length),
+                            );
+                            setState(() {});
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.surface,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onSurface,
+                            side: BorderSide(
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            domain,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(fontSize: 12),
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
