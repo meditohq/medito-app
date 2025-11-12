@@ -821,11 +821,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get startMeditating => 'Comenzar a Meditar';
 
   @override
-  String get trackingPermissionTitle => 'Help Us Improve';
+  String get trackingPermissionTitle => 'Help Us Improve Medito';
 
   @override
   String get trackingPermissionBody =>
-      'We don\'t collect any personal data, we just want to know if our ads are working.';
+      'Your privacy matters. We use anonymous data to understand how people use Medito, so we can make it better for everyone. We never collect personal information or sell your data.';
+
+  @override
+  String get trackingPermissionPrivacyNote =>
+      'Your data stays anonymous and is never shared with third parties.';
+
+  @override
+  String get trackingPermissionAllow => 'Continue';
 
   @override
   String get splashHeadline => 'Meditación Hecha Simple';

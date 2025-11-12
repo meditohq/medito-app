@@ -105,7 +105,8 @@ class _SuperwallDonationScreenState
           if (mounted && !_isProcessingPayment) {
             AppLogger.d(
                 'SUPERWALL_DONATION_SCREEN', 'User cancelled - closing screen');
-            Navigator.of(context).pop();
+            // Return false to indicate no donation was made
+            Navigator.of(context).pop(false);
           } else if (_isProcessingPayment) {
             AppLogger.d('SUPERWALL_DONATION_SCREEN',
                 'Payment in progress - keeping screen open for completion');
@@ -180,7 +181,8 @@ class _SuperwallDonationScreenState
         userEmail = await _collectEmailForPayment(context);
         if (userEmail == null) {
           if (mounted) {
-            Navigator.of(context).pop();
+            // Return false to indicate no donation was made
+            Navigator.of(context).pop(false);
           }
           return;
         }
@@ -256,7 +258,8 @@ class _SuperwallDonationScreenState
       if (mounted) {
         AppLogger.d('SUPERWALL_DONATION_SCREEN',
             'Closing donation screen after successful payment');
-        Navigator.of(context).pop();
+        // Return true to indicate donation was made
+        Navigator.of(context).pop(true);
       }
     } catch (error) {
       AppLogger.e('SUPERWALL_DONATION_SCREEN',
@@ -269,7 +272,8 @@ class _SuperwallDonationScreenState
         );
 
         // Close the screen immediately - the global snackbar will show regardless
-        Navigator.of(context).pop();
+        // Return false to indicate no donation was made
+        Navigator.of(context).pop(false);
       }
     } finally {
       _isProcessingPayment = false;
@@ -492,7 +496,8 @@ class _SuperwallDonationScreenState
       }
     } finally {
       if (mounted) {
-        Navigator.of(context).pop();
+        // Return false to indicate no donation was made
+        Navigator.of(context).pop(false);
       }
     }
   }

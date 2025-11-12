@@ -1601,14 +1601,26 @@ abstract class AppLocalizations {
   /// No description provided for @trackingPermissionTitle.
   ///
   /// In en, this message translates to:
-  /// **'Help Us Improve'**
+  /// **'Help Us Improve Medito'**
   String get trackingPermissionTitle;
 
   /// No description provided for @trackingPermissionBody.
   ///
   /// In en, this message translates to:
-  /// **'We don\'t collect any personal data, we just want to know if our ads are working.'**
+  /// **'Your privacy matters. We use anonymous data to understand how people use Medito, so we can make it better for everyone. We never collect personal information or sell your data.'**
   String get trackingPermissionBody;
+
+  /// No description provided for @trackingPermissionPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data stays anonymous and is never shared with third parties.'**
+  String get trackingPermissionPrivacyNote;
+
+  /// No description provided for @trackingPermissionAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get trackingPermissionAllow;
 
   /// No description provided for @splashHeadline.
   ///

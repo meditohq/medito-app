@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/views/donation/superwall_donation_screen.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
   const OnboardingDonationScreen({super.key, this.onNext});
@@ -47,13 +47,19 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
 
     _didAttemptDonation = true;
 
-    handleNavigation(
-      TypeConstants.route,
-      [RouteConstants.donation],
-      context,
-      ref: ref,
-      sourceRouteName: FirebaseAnalyticsService.paywallSourceOnboarding,
+    // Push SuperwallDonationScreen directly to await the result
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => SuperwallDonationScreen(
+          source: FirebaseAnalyticsService.paywallSourceOnboarding,
+        ),
+      ),
     );
+
+    // If dismissed without donation (result is false or null), advance to next page
+    if (result != true && mounted) {
+      widget.onNext?.call();
+    }
   }
 
   @override

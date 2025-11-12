@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 
 class TrackingPermissionScreen extends StatelessWidget {
   const TrackingPermissionScreen({super.key, this.onNext});
@@ -37,6 +39,8 @@ class TrackingPermissionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -45,38 +49,75 @@ class TrackingPermissionScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.trackingPermissionTitle,
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                    textAlign: TextAlign.center,
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      MeditoIcon(
+                        assetName: MeditoIcons.shield,
+                        size: 48,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        l10n.trackingPermissionTitle,
+                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.trackingPermissionBody,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontSize: 16,
+                              height: 1.5,
+                              color: Colors.white.withAlpha(
+                                  ((0.9).clamp(0.0, 1.0) * 255).round()),
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildPrivacyNote(context, l10n),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    AppLocalizations.of(context)!.trackingPermissionBody,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 16,
-                          height: 1.5,
-                          color: Colors.white.withAlpha(
-                              ((0.9).clamp(0.0, 1.0) * 255).round()),
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                ),
               ),
               _buildActionButton(
-                text: AppLocalizations.of(context)!.continueText,
+                text: l10n.trackingPermissionAllow,
                 onPressed: () async => await _handleContinue(context),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPrivacyNote(BuildContext context, AppLocalizations l10n) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MeditoIcon(
+          assetName: MeditoIcons.checkCircle,
+          size: 16,
+          color: Colors.white.withAlpha(((0.9).clamp(0.0, 1.0) * 255).round()),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            l10n.trackingPermissionPrivacyNote,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontSize: 13,
+                  height: 1.3,
+                  color: Colors.white.withAlpha(
+                      ((0.85).clamp(0.0, 1.0) * 255).round()),
+                ),
+          ),
+        ),
+      ],
     );
   }
 

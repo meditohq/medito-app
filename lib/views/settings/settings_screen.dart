@@ -64,6 +64,12 @@ final reminderEnabledProvider = NotifierProvider<ReminderEnabledNotifier, bool>(
 class WidgetOptionSeenNotifier extends Notifier<bool> {
   @override
   bool build() {
+    // Widget option is only available on Android, so on iOS we always return true
+    // to indicate the badge shouldn't be shown
+    if (!Platform.isAndroid) {
+      return true;
+    }
+
     final prefs = ref.read(sharedPreferencesProvider);
     return prefs.getBool(SharedPreferenceConstants.hasSeenWidgetOption) ??
         false;
@@ -262,7 +268,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (item.path == TypeConstants.addWidget) {
       await ref.read(widgetOptionSeenProvider.notifier).markAsSeen();
       if (mounted) {
-        
         setState(() {});
       }
       try {
