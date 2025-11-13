@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:home_widget/home_widget.dart';
 import 'package:medito/models/local_all_stats.dart';
@@ -30,9 +31,11 @@ class HomeWidgetService {
       );
       AppLogger.d('WIDGET', 'Saved theme preference: $themePreference');
 
-      // Update both widgets when theme changes
-      await _updateWidget(_widgetName);
-      await _updateWidget(_consistencyWidgetName);
+      // Update both widgets when theme changes (Android only)
+      if (Platform.isAndroid) {
+        await _updateWidget(_widgetName);
+        await _updateWidget(_consistencyWidgetName);
+      }
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to save theme preference', e);
     }
@@ -115,9 +118,11 @@ class HomeWidgetService {
         consistencyPercentage,
       );
 
-      // Update both widgets - try home_widget package first, fallback to manual broadcast
-      await _updateWidget(_widgetName);
-      await _updateWidget(_consistencyWidgetName);
+      // Update both widgets - try home_widget package first, fallback to manual broadcast (Android only)
+      if (Platform.isAndroid) {
+        await _updateWidget(_widgetName);
+        await _updateWidget(_consistencyWidgetName);
+      }
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to update widget', e);
     }
@@ -225,16 +230,23 @@ class HomeWidgetService {
         AppLogger.w(
             'WIDGET', 'saveWidgetData timeout/error for consistency_score: $e');
       }
-      // Update both widgets - try home_widget package first, fallback to manual broadcast
-      await _updateWidget(_widgetName);
-      await _updateWidget(_consistencyWidgetName);
+      // Update both widgets - try home_widget package first, fallback to manual broadcast (Android only)
+      if (Platform.isAndroid) {
+        await _updateWidget(_widgetName);
+        await _updateWidget(_consistencyWidgetName);
+      }
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to update widget (fromStats)', e);
     }
   }
 
   /// Updates a widget by name - tries home_widget package first, falls back to manual broadcast
+  /// Android only - iOS widgets update automatically via App Groups
   static Future<void> _updateWidget(String widgetName) async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+
     AppLogger.d(
         'WIDGET', 'Calling HomeWidget.updateWidget() with name: $widgetName');
     try {
@@ -258,7 +270,12 @@ class HomeWidgetService {
   }
 
   /// Manually sends a broadcast to trigger widget update for Glance widgets
+  /// Android only
   static Future<void> _sendWidgetUpdateBroadcast() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+
     try {
       const platform = MethodChannel('medito.app/widget');
       await platform.invokeMethod('updateWidget').timeout(
@@ -275,6 +292,10 @@ class HomeWidgetService {
   /// Requests to pin a widget to the home screen (Android only)
   /// widgetType: "meditation" or "consistency"
   static Future<bool> pinWidget({String widgetType = 'consistency'}) async {
+    if (!Platform.isAndroid) {
+      return false;
+    }
+
     try {
       const platform = MethodChannel('medito.app/widget');
       final result = await platform.invokeMethod<bool>(
