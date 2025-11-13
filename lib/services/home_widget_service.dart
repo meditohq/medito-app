@@ -240,33 +240,14 @@ class HomeWidgetService {
     }
   }
 
-  /// Updates a widget by name - tries home_widget package first, falls back to manual broadcast
+  /// Updates widgets using manual broadcast
   /// Android only - iOS widgets update automatically via App Groups
   static Future<void> _updateWidget(String widgetName) async {
     if (!Platform.isAndroid) {
       return;
     }
 
-    AppLogger.d(
-        'WIDGET', 'Calling HomeWidget.updateWidget() with name: $widgetName');
-    try {
-      await HomeWidget.updateWidget(
-        name: widgetName,
-        androidName: widgetName,
-      ).timeout(const Duration(seconds: 3), onTimeout: () {
-        AppLogger.w(
-            'WIDGET', 'HomeWidget.updateWidget() timeout for $widgetName');
-        throw TimeoutException(
-            'Widget update timeout', const Duration(seconds: 3));
-      });
-      AppLogger.d(
-          'WIDGET', 'HomeWidget.updateWidget() completed for $widgetName');
-    } catch (e) {
-      AppLogger.w('WIDGET',
-          'HomeWidget.updateWidget() failed for $widgetName, sending manual broadcast: $e');
-      // Manually send broadcast for Glance widget
-      await _sendWidgetUpdateBroadcast();
-    }
+    await _sendWidgetUpdateBroadcast();
   }
 
   /// Manually sends a broadcast to trigger widget update for Glance widgets
