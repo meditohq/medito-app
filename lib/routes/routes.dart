@@ -70,6 +70,8 @@ Future<void> handleNavigation(
     }
   } else if (type.contains('settings')) {
     await _pushRoute(SettingsScreen(), ref);
+  } else if (type == 'donation') {
+    await _handleDonationNavigation(context, ref, sourceRouteName);
   } else if (type == TypeConstants.email) {
     await _handleEmailNavigation(ids, ref);
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
@@ -140,7 +142,12 @@ Future<void> _handleDonationNavigation(
   WidgetRef? ref,
   String? sourceRouteName,
 ) async {
-  if (ref == null) return;
+  if (ref == null) {
+    AppLogger.w('ROUTES', 'Cannot open donation screen: ref is null');
+    return;
+  } else {
+    AppLogger.d('ROUTES', 'Opening donation screen from $sourceRouteName');
+  }
 
   await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
 }

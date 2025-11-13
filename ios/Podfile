@@ -39,21 +39,18 @@ target 'Runner' do
 end
 
 post_install do |installer|
-  # Add this line to ensure installer.pods_project exists
-  installer.generated_projects.each do |project|
-    project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      end
-    end
-  end
-  
   installer.pods_project.targets.each do |target|
+    # Set deployment target for all configs first to ensure consistency
     target.build_configurations.each do |config|
-      # Apply Flutter specific settings first
-      flutter_additional_ios_build_settings(target)
-
-      # Then apply general settings
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
+    
+    # Apply Flutter specific settings (called per target, not per config)
+    flutter_additional_ios_build_settings(target)
+    
+    # Then apply per-config settings
+    target.build_configurations.each do |config|
+      # Ensure deployment target is still 15.0 after Flutter settings
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
         '$(inherited)',
@@ -74,6 +71,12 @@ post_install do |installer|
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
         config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
       end
+      
+      # Exclude TikTok SDK from simulator builds (doesn't support simulator architectures)
+      if target.name.include?('TikTok') || target.name.include?('tiktok')
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64 x86_64'
+        config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+      end
 
       # Finally, force Automatic signing for Pods targets AFTER other settings
       config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
@@ -82,5 +85,11 @@ post_install do |installer|
       config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ''
       config.build_settings['PROVISIONING_PROFILE'] = ''
     end 
+  end
+  
+  # Run script to remove TikTok SDK frameworks from Debug builds (simulator only)
+  fix_script = File.join(File.dirname(__FILE__), 'fix_tiktok_simulator.rb')
+  if File.exist?(fix_script)
+    system("ruby #{fix_script}")
   end
 end

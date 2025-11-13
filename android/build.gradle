@@ -1,4 +1,4 @@
-ext.kotlin_version = '2.0.21'
+ext.kotlin_version = '2.1.0'
 
 rootProject.buildDir = '../build'
 subprojects {

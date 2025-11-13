@@ -101,6 +101,7 @@
                 <data android:pathPrefix="/tracks/" />
                 <data android:pathPrefix="/packs/" />
                 <data android:pathPrefix="/otp/" />
+                <data android:pathPrefix="/donation" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -113,6 +114,7 @@
                 <data android:pathPrefix="/tracks/" />
                 <data android:pathPrefix="/packs/" />
                 <data android:pathPrefix="/otp/" />
+                <data android:pathPrefix="/donation" />
             </intent-filter>
 
         </activity>

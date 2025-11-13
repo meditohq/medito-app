@@ -215,7 +215,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       var pathSegments = <String>[];
 
       if (uri.scheme == 'org.meditofoundation') {
-        pathSegments = [uri.host, ...uri.pathSegments];
+        // For custom scheme, if host is "medito", use pathSegments directly
+        // Otherwise, treat host as first path segment (e.g., org.meditofoundation://tracks/123)
+        if (uri.host == 'medito') {
+          pathSegments = uri.pathSegments;
+        } else {
+          pathSegments = [uri.host, ...uri.pathSegments];
+        }
       } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
         pathSegments = uri.pathSegments;
       } else {
@@ -230,7 +236,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
       // Handle OTP links
       if (pathSegments[0] == 'otp' ||
-          pathSegments[1] == 'otp' && pathSegments.length > 1) {
+          (pathSegments.length > 1 && pathSegments[1] == 'otp')) {
         return;
       }
 
@@ -241,7 +247,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
 
       Future.delayed(const Duration(seconds: 2), () {
-        handleNavigation(path, [id], context);
+        handleNavigation(path, [id], context, ref: ref);
       });
     } catch (e) {
       AppLogger.e('DEEPLINK', 'Error handling deep link', e);

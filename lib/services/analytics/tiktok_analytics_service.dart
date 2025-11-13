@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tiktok_events_sdk/tiktok_events_sdk.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/utils/logger.dart';
@@ -19,6 +20,28 @@ class TikTokAnalyticsService {
 
   Future<void> initialize({bool requestAttPermissionImmediately = true}) async {
     if (_initialized) return;
+
+    // Skip TikTok SDK initialization on iOS simulator (SDK doesn't support simulator)
+    if (Platform.isIOS) {
+      try {
+        final deviceInfo = await DeviceInfoPlugin().iosInfo;
+        if (deviceInfo.isPhysicalDevice == false) {
+          if (kDebugMode) {
+            AppLogger.d(
+                'TIKTOK', 'Skipping TikTok SDK initialization on simulator');
+          }
+          _initialized = true;
+          return;
+        }
+      } catch (e) {
+        // If we can't determine device type, continue with initialization
+        if (kDebugMode) {
+          AppLogger.d('TIKTOK',
+              'Could not determine device type, attempting initialization');
+        }
+      }
+    }
+
     try {
       if (Platform.isIOS && requestAttPermissionImmediately) {
         await _requestIOSTrackingAuthorization();
@@ -122,4 +145,3 @@ class TikTokAnalyticsService {
     await logEvent(name: freqEvent, parameters: props);
   }
 }
-
