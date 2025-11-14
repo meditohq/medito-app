@@ -47,7 +47,7 @@ class StatsManager {
 
   Future<bool> _acquireLock() async {
     var prefs = await SharedPreferences.getInstance();
-    var lastLockTime = await prefs.getInt(_syncLockKey) ?? 0;
+    var lastLockTime = prefs.getInt(_syncLockKey) ?? 0;
     var now = _getCurrentDate().millisecondsSinceEpoch;
 
     if (now - lastLockTime > _syncLockTimeout.inMilliseconds) {
