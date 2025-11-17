@@ -22,7 +22,7 @@ class AudioData {
   Track track;
 }
 
-enum RepeatMode { none, infinite }
+enum RepeatMode { none, once, infinite }
 
 @HostApi()
 abstract class MeditoAndroidAudioServiceManager {

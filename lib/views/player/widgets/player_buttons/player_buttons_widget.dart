@@ -100,10 +100,13 @@ class PlayerButtonsWidget extends ConsumerWidget {
 
     switch (repeatMode) {
       case RepeatMode.none:
+        iconColor = Colors.white.withOpacity(0.5);
+        break;
+      case RepeatMode.once:
+        iconAsset = MeditoIcons.repeatOnce;
         iconColor = Colors.white;
         break;
       case RepeatMode.infinite:
-        iconAsset = MeditoIcons.repeatOnce;
         iconColor = Colors.white;
         break;
     }

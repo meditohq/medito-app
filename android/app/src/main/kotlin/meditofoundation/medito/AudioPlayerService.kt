@@ -553,14 +553,21 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 )
                 .build()
 
-            primaryPlayer.setMediaItem(primaryMediaItem)
-
             // Apply current repeat mode
             when (currentRepeatMode) {
                 RepeatMode.NONE -> {
+                    primaryPlayer.setMediaItem(primaryMediaItem)
                     primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
                 }
+                RepeatMode.ONCE -> {
+                    // Add item twice for repeat once behavior
+                    primaryPlayer.addMediaItem(primaryMediaItem)
+                    primaryPlayer.addMediaItem(primaryMediaItem)
+                    primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
+                    Log.d(TAG, "🔊 Added media item twice for repeat once mode")
+                }
                 RepeatMode.INFINITE -> {
+                    primaryPlayer.setMediaItem(primaryMediaItem)
                     primaryPlayer.repeatMode = Player.REPEAT_MODE_ONE
                 }
             }
@@ -789,15 +796,47 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         currentRepeatMode = mode
         
         if (::primaryPlayer.isInitialized) {
+            val currentMediaItem = primaryPlayer.currentMediaItem
+            if (currentMediaItem == null) {
+                Log.d(TAG, "🔊 No media item currently loaded, repeat mode will be applied when media is loaded")
+                return
+            }
+
+            // Get current position to restore after rebuilding playlist
+            val currentPosition = primaryPlayer.currentPosition
+            val wasPlaying = primaryPlayer.isPlaying
+
+            // Rebuild playlist based on repeat mode
+            primaryPlayer.stop()
+            primaryPlayer.clearMediaItems()
+
             when (mode) {
                 RepeatMode.NONE -> {
+                    primaryPlayer.setMediaItem(currentMediaItem)
                     primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
                     Log.d(TAG, "🔊 Repeat mode set to OFF")
                 }
-                RepeatMode.INFINITE -> {
-                    primaryPlayer.repeatMode = Player.REPEAT_MODE_ONE
-                    Log.d(TAG, "🔊 Repeat mode set to ONE")
+                RepeatMode.ONCE -> {
+                    // Add item twice for repeat once behavior
+                    primaryPlayer.addMediaItem(currentMediaItem)
+                    primaryPlayer.addMediaItem(currentMediaItem)
+                    primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
+                    Log.d(TAG, "🔊 Repeat mode set to ONCE (added item twice)")
                 }
+                RepeatMode.INFINITE -> {
+                    primaryPlayer.setMediaItem(currentMediaItem)
+                    primaryPlayer.repeatMode = Player.REPEAT_MODE_ONE
+                    Log.d(TAG, "🔊 Repeat mode set to INFINITE (repeat forever)")
+                }
+            }
+
+            // Restore playback state
+            primaryPlayer.prepare()
+            if (wasPlaying) {
+                primaryPlayer.seekTo(currentPosition)
+                primaryPlayer.play()
+            } else {
+                primaryPlayer.seekTo(currentPosition)
             }
         }
     }

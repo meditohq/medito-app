@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../src/audio_pigeon.g.dart';
+import '../../utils/logger.dart';
 
 part 'repeat_state_provider.g.dart';
 
@@ -11,14 +12,15 @@ class RepeatState extends _$RepeatState {
   }
 
   RepeatMode toggleRepeat() {
-    switch (state) {
-      case RepeatMode.none:
-        state = RepeatMode.infinite;
-        return RepeatMode.infinite;
-      case RepeatMode.infinite:
-        state = RepeatMode.none;
-        return RepeatMode.none;
-    }
+    AppLogger.d('REPEAT', 'Current state before toggle: $state');
+    final newMode = switch (state) {
+      RepeatMode.none => RepeatMode.once,
+      RepeatMode.once => RepeatMode.infinite,
+      RepeatMode.infinite => RepeatMode.none,
+    };
+    state = newMode;
+    AppLogger.d('REPEAT', 'New state after toggle: $newMode');
+    return newMode;
   }
 
   void setRepeatMode(RepeatMode mode) {
@@ -27,4 +29,5 @@ class RepeatState extends _$RepeatState {
 
   bool get isRepeating => state != RepeatMode.none;
   bool get isRepeatingInfinite => state == RepeatMode.infinite;
+  bool get isRepeatingOnce => state == RepeatMode.once;
 }

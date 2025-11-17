@@ -83,7 +83,8 @@ class FlutterError (
 
 enum class RepeatMode(val raw: Int) {
   NONE(0),
-  INFINITE(1);
+  ONCE(1),
+  INFINITE(2);
 
   companion object {
     fun ofRaw(raw: Int): RepeatMode? {
