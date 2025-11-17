@@ -16,8 +16,9 @@ import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/utils/black_friday_utils.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/colors/color_constants.dart';
 
-class ProductsWidget extends ConsumerWidget {
+class ProductsWidget extends ConsumerStatefulWidget {
   final List<ProductGroupModel>? productGroups;
 
   const ProductsWidget({
@@ -26,8 +27,78 @@ class ProductsWidget extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (productGroups == null || productGroups!.isEmpty) {
+  ConsumerState<ProductsWidget> createState() => _ProductsWidgetState();
+}
+
+class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollIndicator = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkScrollIndicator();
+    });
+  }
+
+  void _checkScrollIndicator() {
+    if (!_scrollController.hasClients) return;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final shouldShow = maxScroll > 0;
+    if (shouldShow != _showScrollIndicator) {
+      setState(() {
+        _showScrollIndicator = shouldShow;
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(ProductsWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.productGroups != widget.productGroups) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkScrollIndicator();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final shouldShow = currentScroll < maxScroll - 10;
+
+    if (shouldShow != _showScrollIndicator) {
+      setState(() {
+        _showScrollIndicator = shouldShow;
+      });
+    }
+  }
+
+  void _scrollRight() {
+    if (!_scrollController.hasClients) return;
+    final currentPosition = _scrollController.position.pixels;
+    final scrollAmount = 180.0;
+    _scrollController.animateTo(
+      currentPosition + scrollAmount,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.productGroups == null || widget.productGroups!.isEmpty) {
       AppLogger.d('ProductsWidget', 'No product groups to display');
       return const SizedBox.shrink();
     }
@@ -38,7 +109,7 @@ class ProductsWidget extends ConsumerWidget {
     final showBlackFridayStyle = isBlackFriday && !isDismissed;
 
     // Sort product groups - new products first
-    final sortedGroups = List<ProductGroupModel>.from(productGroups!)
+    final sortedGroups = List<ProductGroupModel>.from(widget.productGroups!)
       ..sort((a, b) {
         // Check if any variant in the group is new
         final aHasNew = a.variants.any((v) => v.isNew);
@@ -125,15 +196,59 @@ class ProductsWidget extends ConsumerWidget {
           const SizedBox(height: 12),
           SizedBox(
             height: 200,
-            child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(left: 16),
-              itemCount: sortedGroups.length,
-              itemBuilder: (context, index) {
-                final productGroup = sortedGroups[index];
-                return ProductGroupCard(productGroup: productGroup);
-              },
+            child: Stack(
+              children: [
+                ListView.builder(
+                  controller: _scrollController,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.only(left: 16),
+                  itemCount: sortedGroups.length,
+                  itemBuilder: (context, index) {
+                    final productGroup = sortedGroups[index];
+                    return ProductGroupCard(productGroup: productGroup);
+                  },
+                ),
+                if (_showScrollIndicator)
+                  Positioned(
+                    right: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: _scrollRight,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? ColorConstants.greyIsTheNewGrey
+                                        .withValues(alpha: 0.9)
+                                    : ColorConstants.lightCard
+                                        .withValues(alpha: 0.95),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.black.withValues(alpha: 0.3)
+                                    : Colors.black.withValues(alpha: 0.15),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
           if (showBlackFridayStyle)
