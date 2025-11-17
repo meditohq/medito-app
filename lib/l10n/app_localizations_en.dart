@@ -39,6 +39,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get meditationProducts => 'Shop to Support';
 
   @override
+  String get blackFridayTitle => 'Black Friday - Support Mindful Living';
+
+  @override
+  String get blackFridaySubtitle =>
+      'Support free meditation for everyone. Your purchase helps keep Medito free and accessible to millions worldwide';
+
+  @override
+  String get blackFridaySeeAllButton => 'Visit store';
+
+  @override
   String get fromPrefix => 'From ';
 
   @override

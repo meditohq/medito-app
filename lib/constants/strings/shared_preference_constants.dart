@@ -50,4 +50,7 @@ class SharedPreferenceConstants {
 
   // Widget pinning
   static const String hasSeenWidgetOption = 'has_seen_widget_option';
+
+  // Black Friday positioning
+  static const String blackFridayDismissed = 'black_friday_dismissed';
 }

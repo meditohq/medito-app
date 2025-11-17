@@ -13,8 +13,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/utils/black_friday_utils.dart';
+import 'package:medito/providers/home/widget_order_provider.dart';
+import 'package:medito/constants/constants.dart';
 
-class ProductsWidget extends StatelessWidget {
+class ProductsWidget extends ConsumerWidget {
   final List<ProductGroupModel>? productGroups;
 
   const ProductsWidget({
@@ -23,11 +26,16 @@ class ProductsWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (productGroups == null || productGroups!.isEmpty) {
       AppLogger.d('ProductsWidget', 'No product groups to display');
       return const SizedBox.shrink();
     }
+
+    final isBlackFriday = BlackFridayUtils.isBlackFridayWeek(DateTime.now());
+    final prefs = ref.read(sharedPreferencesProvider);
+    final isDismissed = BlackFridayUtils.isBlackFridayDismissedSync(prefs);
+    final showBlackFridayStyle = isBlackFriday && !isDismissed;
 
     // Sort product groups - new products first
     final sortedGroups = List<ProductGroupModel>.from(productGroups!)
@@ -46,31 +54,74 @@ class ProductsWidget extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: GestureDetector(
-              onTap: () => _openShopUrl(),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.meditationProducts,
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontFamily: 'teachers',
-                          fontSize: 20,
-                          fontWeight: FontWeight.w400,
-                          height: 28 / 24,
-                          color: Theme.of(context).colorScheme.onSurface,
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _openShopUrl(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          showBlackFridayStyle
+                              ? AppLocalizations.of(context)!.blackFridayTitle
+                              : AppLocalizations.of(context)!
+                                  .meditationProducts,
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(
+                                fontFamily: 'teachers',
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                                height: 28 / 24,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
+                        if (!showBlackFridayStyle) ...[
+                          const SizedBox(width: 8),
+                          MeditoIcon(
+                            assetName: MeditoIcons.arrowRight,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            size: 16,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  MeditoIcon(
-                    assetName: MeditoIcons.arrowRight,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    size: 16,
+                ),
+                if (showBlackFridayStyle)
+                  GestureDetector(
+                    onTap: () => _dismissBlackFriday(context, ref),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Icons.close,
+                        size: 20,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6),
+                      ),
+                    ),
                   ),
-                ],
-              ),
+              ],
             ),
           ),
+          if (showBlackFridayStyle)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: Text(
+                AppLocalizations.of(context)!.blackFridaySubtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontSize: 13,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
+                    ),
+              ),
+            ),
           const SizedBox(height: 12),
           SizedBox(
             height: 200,
@@ -85,9 +136,40 @@ class ProductsWidget extends StatelessWidget {
               },
             ),
           ),
+          if (showBlackFridayStyle)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => _openShopUrl(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.blackFridaySeeAllButton,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
+  }
+
+  Future<void> _dismissBlackFriday(BuildContext context, WidgetRef ref) async {
+    await BlackFridayUtils.dismissBlackFriday();
+    ref.read(homeWidgetOrderProvider.notifier).refreshOrder();
   }
 
   Future<void> _openShopUrl() async {

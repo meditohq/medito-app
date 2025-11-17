@@ -54,7 +54,7 @@ class StatsManager {
       var success = await prefs.setInt(_syncLockKey, now);
       if (!success) return false;
 
-      var checkLock = await prefs.getInt(_syncLockKey);
+      var checkLock = prefs.getInt(_syncLockKey);
       return checkLock == now;
     }
     return false;
@@ -254,7 +254,7 @@ class StatsManager {
     if (localAllStats == null) {
       var prefs = await SharedPreferences.getInstance();
       var localAllStatsJson =
-          await prefs.getString(SharedPreferenceConstants.localAllStatsKey);
+         prefs.getString(SharedPreferenceConstants.localAllStatsKey);
 
       if (localAllStatsJson != null && localAllStatsJson != 'null') {
         localAllStats = LocalAllStats.fromJson(
@@ -503,7 +503,7 @@ class StatsManager {
     try {
       var prefs = await SharedPreferences.getInstance();
       var json =
-          await prefs.getString(SharedPreferenceConstants.localAllStatsKey);
+           prefs.getString(SharedPreferenceConstants.localAllStatsKey);
       if (json != null) {
         var decodedJson = jsonDecode(json);
         if (decodedJson is Map<String, dynamic>) {
