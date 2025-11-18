@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:medito/utils/logger.dart';
 
 final reminderProvider = Provider<ReminderProvider>((ref) {
   return ReminderProvider();
@@ -71,8 +72,8 @@ class ReminderProvider {
       );
     } catch (e, s) {
       if (kDebugMode) {
-        print('Error scheduling notification: $e');
-        print('Stack trace: $s');
+        AppLogger.d('REMINDER', 'Error scheduling notification: $e');
+        AppLogger.d('REMINDER', 'Stack trace: $s');
       }
     }
   }

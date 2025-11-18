@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/utils/logger.dart';
 
 class MetaSdkService {
@@ -41,6 +43,19 @@ class MetaSdkService {
 
   Future<void> logEvent(String name, Map<String, Object?> params) async {
     try {
+      // Check if Meta Analytics is enabled by user preference
+      final prefs = await SharedPreferences.getInstance();
+      final isEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsMetaEnabled) ?? true;
+
+      if (!isEnabled) {
+        if (kDebugMode) {
+          AppLogger.d('META',
+              'Analytics disabled by user preference, skipping event: $name');
+        }
+        return;
+      }
+
       await _events.logEvent(name: name, parameters: params);
       if (kDebugMode) {
         AppLogger.d('META', 'Logged FB event: $name');
@@ -58,7 +73,7 @@ class MetaSdkService {
       const key = 'meta_app_first_open_logged';
       if (prefs.getBool(key) == true) return;
 
-      await logEvent('app_first_open', {});
+      await logEvent(AnalyticsEventConstants.appFirstOpen, {});
       await prefs.setBool(key, true);
     } catch (e, stack) {
       AppLogger.e('META', 'Failed to log app_first_open', e, stack);
@@ -71,15 +86,19 @@ class MetaSdkService {
     required String frequency,
   }) async {
     final props = {
-      'revenue': revenueCents,
-      'currency': currency,
+      AnalyticsEventConstants.paramRevenue: revenueCents,
+      AnalyticsEventConstants.paramCurrency: currency,
     };
 
-    await logEvent('paywall_donation', props);
+    await logEvent(AnalyticsEventConstants.paywallDonation, props);
 
-    var freqEvent = 'lifetime_donation';
-    if (frequency == 'monthly') freqEvent = 'monthly_donation';
-    if (frequency == 'yearly') freqEvent = 'yearly_donation';
+    var freqEvent = AnalyticsEventConstants.lifetimeDonation;
+    if (frequency == 'monthly') {
+      freqEvent = AnalyticsEventConstants.monthlyDonation;
+    }
+    if (frequency == 'yearly') {
+      freqEvent = AnalyticsEventConstants.yearlyDonation;
+    }
 
     await logEvent(freqEvent, props);
   }

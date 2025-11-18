@@ -39,12 +39,13 @@ if (keystorePropertiesFile.exists()) {
 
 def facebookAppId = System.getenv('FACEBOOK_APP_ID') ?: ''
 def facebookClientToken = System.getenv('FACEBOOK_CLIENT_TOKEN') ?: ''
+def tiktokAndroidAppId = System.getenv('TIKTOK_ANDROID_APP_ID') ?: ''
 
 def envJsonFile = rootProject.file("../.prod.json")
 if (!envJsonFile.exists()) {
     envJsonFile = rootProject.file("../.staging.json")
 }
-if (envJsonFile.exists() && (!facebookAppId || !facebookClientToken)) {
+if (envJsonFile.exists()) {
     try {
         def jsonText = envJsonFile.text
         if (!facebookAppId) {
@@ -57,6 +58,12 @@ if (envJsonFile.exists() && (!facebookAppId || !facebookClientToken)) {
             def tokenMatch = jsonText =~ /"FACEBOOK_CLIENT_TOKEN"\s*:\s*"([^"]+)"/
             if (tokenMatch) {
                 facebookClientToken = tokenMatch[0][1]
+            }
+        }
+        if (!tiktokAndroidAppId) {
+            def tiktokIdMatch = jsonText =~ /"TIKTOK_ANDROID_APP_ID"\s*:\s*"([^"]+)"/
+            if (tiktokIdMatch) {
+                tiktokAndroidAppId = tiktokIdMatch[0][1]
             }
         }
     } catch (Exception e) {
@@ -117,6 +124,7 @@ android {
         
         resValue "string", "facebook_app_id", facebookAppId
         resValue "string", "facebook_client_token", facebookClientToken
+        resValue "string", "tiktok_app_id", tiktokAndroidAppId
     }
 
     buildFeatures {
@@ -189,7 +197,8 @@ android {
     productFlavors {
         dev {
             dimension "default"
-            applicationIdSuffix ".dev"
+            // Temporarily disabled for TikTok testing - package name must match TikTok Events Manager
+            // applicationIdSuffix ".dev"
             versionNameSuffix "-dev"
         }
         prod {
@@ -206,7 +215,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation platform('com.google.firebase:firebase-bom:33.2.0')
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.android.billingclient:billing:7.1.0'
+    implementation 'com.android.billingclient:billing:6.0.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 
     // Google Pay dependencies

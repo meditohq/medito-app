@@ -7,6 +7,8 @@ import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/utils/logger.dart';
 
 class TikTokAnalyticsService {
@@ -43,6 +45,11 @@ class TikTokAnalyticsService {
     }
 
     try {
+      if (kDebugMode) {
+        AppLogger.d('TIKTOK',
+            'Initializing with App ID: $tiktokAndroidAppId (Android) / $tiktokIosAppId (iOS)');
+      }
+
       if (Platform.isIOS && requestAttPermissionImmediately) {
         await _requestIOSTrackingAuthorization();
       }
@@ -53,7 +60,7 @@ class TikTokAnalyticsService {
         iosAppId: tiktokIosAppId,
         tiktokIosId: tiktokIosAppId,
         isDebugMode: kDebugMode,
-        logLevel: kDebugMode ? TikTokLogLevel.debug : TikTokLogLevel.none,
+        logLevel: kDebugMode ? TikTokLogLevel.debug : TikTokLogLevel.info,
         androidOptions: TikTokAndroidOptions(
           disableAutoStart: false,
           enableAutoIapTrack: false,
@@ -66,10 +73,22 @@ class TikTokAnalyticsService {
         ),
       );
 
+      // Add delay to allow SDK to initialize and fetch config
+      if (kDebugMode) {
+        await Future.delayed(const Duration(seconds: 2));
+      }
+
       _initialized = true;
 
       if (kDebugMode) {
-        AppLogger.d('TIKTOK', 'TikTok SDK initialized');
+        AppLogger.d('TIKTOK',
+            'TikTok SDK initialized with test events enabled (debug mode)');
+        AppLogger.d('TIKTOK',
+            'Note: Config fetch warnings are expected - SDK will retry automatically');
+        AppLogger.d('TIKTOK',
+            'Events are queued and will flush once config fetch succeeds (may take a few seconds)');
+        AppLogger.d('TIKTOK',
+            'To see events in Test Events tab: ensure debug mode is enabled and wait for config fetch to complete');
       }
     } catch (e, stack) {
       AppLogger.e('TIKTOK', 'Error initializing TikTok SDK', e, stack);
@@ -93,6 +112,20 @@ class TikTokAnalyticsService {
     Map<String, Object>? parameters,
   }) async {
     try {
+      // Check if TikTok Analytics is enabled by user preference
+      final prefs = await SharedPreferences.getInstance();
+      final isEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsTiktokEnabled) ??
+              true;
+
+      if (!isEnabled) {
+        if (kDebugMode) {
+          AppLogger.d('TIKTOK',
+              'Analytics disabled by user preference, skipping event: $name');
+        }
+        return;
+      }
+
       if (!_initialized) await initialize();
 
       await TikTokEventsSdk.logEvent(
@@ -107,6 +140,8 @@ class TikTokAnalyticsService {
 
       if (kDebugMode) {
         AppLogger.d('TIKTOK', 'Logged event $name | $parameters');
+        AppLogger.d('TIKTOK',
+            'Note: Events may be queued until config fetch completes. Check Test Events tab in TikTok Events Manager.');
       }
     } catch (e, stack) {
       AppLogger.e('TIKTOK', 'Failed to log event $name', e, stack);
@@ -119,7 +154,7 @@ class TikTokAnalyticsService {
       const key = 'tiktok_app_first_open_logged';
       if (prefs.getBool(key) == true) return;
 
-      await logEvent(name: 'app_first_open');
+      await logEvent(name: AnalyticsEventConstants.appFirstOpen);
       await prefs.setBool(key, true);
     } catch (e, stack) {
       AppLogger.e('TIKTOK', 'Failed to log app_first_open', e, stack);
@@ -132,15 +167,18 @@ class TikTokAnalyticsService {
     required String frequency,
   }) async {
     final props = {
-      'revenue': revenueCents,
-      'currency': currency,
+      AnalyticsEventConstants.paramRevenue: revenueCents,
+      AnalyticsEventConstants.paramCurrency: currency,
     };
 
-    await logEvent(name: 'paywall_donation', parameters: props);
+    await logEvent(
+        name: AnalyticsEventConstants.paywallDonation, parameters: props);
 
-    var freqEvent = 'lifetime_donation';
-    if (frequency == 'monthly') freqEvent = 'monthly_donation';
-    if (frequency == 'yearly') freqEvent = 'yearly_donation';
+    var freqEvent = AnalyticsEventConstants.lifetimeDonation;
+    if (frequency == 'monthly')
+      freqEvent = AnalyticsEventConstants.monthlyDonation;
+    if (frequency == 'yearly')
+      freqEvent = AnalyticsEventConstants.yearlyDonation;
 
     await logEvent(name: freqEvent, parameters: props);
   }

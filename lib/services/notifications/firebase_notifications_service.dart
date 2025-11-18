@@ -52,7 +52,7 @@ class FirebaseMessagingHandler {
       );
 
       if (kDebugMode) {
-        print(
+        AppLogger.d('FIREBASE_NOTIFICATIONS',
             "Firebase Messaging initialized with foreground presentation enabled (badges disabled)");
       }
 
@@ -65,7 +65,7 @@ class FirebaseMessagingHandler {
       );
 
       if (kDebugMode) {
-        print(
+        AppLogger.d('FIREBASE_NOTIFICATIONS',
             "Firebase Messaging permission status: ${settings.authorizationStatus}");
       }
 
@@ -74,7 +74,7 @@ class FirebaseMessagingHandler {
       }
     } catch (e) {
       if (kDebugMode) {
-        print("Error initializing Firebase Messaging: $e");
+        AppLogger.d('FIREBASE_NOTIFICATIONS', "Error initializing Firebase Messaging: $e");
       }
     }
   }
@@ -147,7 +147,7 @@ class FirebaseMessagingHandler {
             _navigate(context, ref, data);
           } catch (e) {
             if (kDebugMode) {
-              print("Error decoding notification payload: $e");
+              AppLogger.d('FIREBASE_NOTIFICATIONS', "Error decoding notification payload: $e");
             }
           }
         }
@@ -155,7 +155,7 @@ class FirebaseMessagingHandler {
     );
 
     if (kDebugMode) {
-      print("Local notifications initialized");
+      AppLogger.d('FIREBASE_NOTIFICATIONS', "Local notifications initialized");
     }
   }
 
@@ -166,7 +166,7 @@ class FirebaseMessagingHandler {
   ) async {
     // Debug log
     if (kDebugMode) {
-      print(
+      AppLogger.d('FIREBASE_NOTIFICATIONS',
           "Received foreground message: ${message.notification?.title} / ${message.notification?.body}");
     }
 
@@ -285,7 +285,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   } catch (e) {
     // Firebase might already be initialized
     if (kDebugMode) {
-      print('Error initializing Firebase in background handler: $e');
+      AppLogger.d('FIREBASE_NOTIFICATIONS', 'Error initializing Firebase in background handler: $e');
     }
   }
 

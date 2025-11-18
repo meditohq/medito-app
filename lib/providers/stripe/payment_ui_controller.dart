@@ -10,6 +10,7 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/tiktok_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../me/me_provider.dart';
 
@@ -168,14 +169,21 @@ class PaymentUIController extends _$PaymentUIController {
     result.when(
       success: (paymentIntentId, amount, currency) {
         // Track successful donation
+        final donationEventName = frequency == 'monthly'
+            ? AnalyticsEventConstants.donationMonthly
+            : frequency == 'yearly'
+                ? AnalyticsEventConstants.donationYearly
+                : AnalyticsEventConstants.donationOnetime;
+
         FirebaseAnalyticsService().logEvent(
-          name: 'donation_$frequency',
+          name: donationEventName,
           parameters: {
-            'amount': amount.toDouble(),
-            'donation_currency': currency,
-            'paywall_id': paywallId ?? 'unknown',
-            'medito_user_id': userId ?? 'unknown',
-            'paywall_source': paywallSource ?? 'unknown',
+            AnalyticsEventConstants.paramAmount: amount.toDouble(),
+            AnalyticsEventConstants.paramDonationCurrency: currency,
+            AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
+            AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
+            AnalyticsEventConstants.paramPaywallSource:
+                paywallSource ?? 'unknown',
           },
         );
 
@@ -207,6 +215,34 @@ class PaymentUIController extends _$PaymentUIController {
       failure: (errorMessage, paymentIntentId) {
         AppLogger.e('PAYMENT_UI',
             '❌ Showing error message: $errorMessage (Intent: $paymentIntentId)');
+
+        final eventParams = {
+          AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
+          AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
+          AnalyticsEventConstants.paramPaywallSource:
+              paywallSource ?? 'unknown',
+          AnalyticsEventConstants.paramPaymentIntentId:
+              paymentIntentId ?? 'unknown',
+        };
+
+        // Firebase Analytics
+        FirebaseAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.paymentFailed,
+          parameters: eventParams,
+        );
+
+        // TikTok Analytics
+        TikTokAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.paymentFailed,
+          parameters: eventParams,
+        );
+
+        // Meta Analytics
+        MetaSdkService.instance.logEvent(
+          AnalyticsEventConstants.paymentFailed,
+          eventParams,
+        );
+
         _showErrorSnackbar(
             context,
             PaymentError(
@@ -218,6 +254,51 @@ class PaymentUIController extends _$PaymentUIController {
       },
       cancelled: () {
         AppLogger.d('PAYMENT_UI', 'ℹ️ Showing cancellation message');
+
+        final eventParams = {
+          AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
+          AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
+          AnalyticsEventConstants.paramPaywallSource:
+              paywallSource ?? 'unknown',
+        };
+
+        // Firebase Analytics
+        FirebaseAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.paymentCancelled,
+          parameters: eventParams,
+        );
+
+        // TikTok Analytics
+        TikTokAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.paymentCancelled,
+          parameters: eventParams,
+        );
+
+        // Meta Analytics
+        MetaSdkService.instance.logEvent(
+          AnalyticsEventConstants.paymentCancelled,
+          eventParams,
+        );
+
+        // Also track as paywall dismissed without payment
+        // Firebase Analytics
+        FirebaseAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.paywallDismissedNoPayment,
+          parameters: eventParams,
+        );
+
+        // TikTok Analytics
+        TikTokAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.paywallDismissedNoPayment,
+          parameters: eventParams,
+        );
+
+        // Meta Analytics
+        MetaSdkService.instance.logEvent(
+          AnalyticsEventConstants.paywallDismissedNoPayment,
+          eventParams,
+        );
+
         _showInfoSnackbar(
             context, AppLocalizations.of(context)!.paymentCancelledMessage);
       },

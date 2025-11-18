@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
 
 // Lightweight stand-in so unit tests don't depend on firebase_core.
 class _NoopAnalytics {
@@ -38,64 +41,75 @@ class FirebaseAnalyticsService {
   // Keys and constants
   static const String analyticsEnabledKey = 'analytics_enabled';
 
-  // Analytics event names
+  // Analytics event names - These reference shared constants for consistency across all analytics platforms
+  // For new code, prefer using AnalyticsEventConstants directly
   static const String eventUnexpectedLogoutRefreshTokenMissing =
-      'unexpected_logout_refresh_token_missing';
+      AnalyticsEventConstants.unexpectedLogoutRefreshTokenMissing;
   static const String eventSecureStoragePersistentFailure =
-      'secure_storage_persistent_failure';
+      AnalyticsEventConstants.secureStoragePersistentFailure;
   static const String eventTokenBackupStorageAttempt =
-      'token_backup_storage_attempt';
+      AnalyticsEventConstants.tokenBackupStorageAttempt;
   static const String eventTokenBackupStorageResult =
-      'token_backup_storage_result';
+      AnalyticsEventConstants.tokenBackupStorageResult;
   static const String eventTokenRetrievedFromBackup =
-      'token_retrieved_from_backup';
+      AnalyticsEventConstants.tokenRetrievedFromBackup;
   static const String eventTokenBackupAfterErrorAttempt =
-      'token_backup_after_error_attempt';
+      AnalyticsEventConstants.tokenBackupAfterErrorAttempt;
   static const String eventTokenBackupAfterErrorResult =
-      'token_backup_after_error_result';
+      AnalyticsEventConstants.tokenBackupAfterErrorResult;
   static const String eventRefreshTokenRetrievalFailed =
-      'refresh_token_retrieval_failed';
+      AnalyticsEventConstants.refreshTokenRetrievalFailed;
   static const String eventRefreshTokenReadErrorSharedPreferences =
-      'refresh_token_read_error_shared_preferences';
+      AnalyticsEventConstants.refreshTokenReadErrorSharedPreferences;
   static const String eventRefreshTokenReadErrorSecureStorage =
-      'refresh_token_read_error_secure_storage';
-  static const String eventEmailAddressSaveFailed = 'email_address_save_failed';
+      AnalyticsEventConstants.refreshTokenReadErrorSecureStorage;
+  static const String eventEmailAddressSaveFailed =
+      AnalyticsEventConstants.emailAddressSaveFailed;
   static const String eventEmailAddressSaveFailed2 =
-      'email_address_save_failed2';
-  static const String eventAuthTokenStorageFailed = 'auth_token_storage_failed';
-  static const String eventPostMeditationFeedback = 'post_meditation_feedback';
+      AnalyticsEventConstants.emailAddressSaveFailed2;
+  static const String eventAuthTokenStorageFailed =
+      AnalyticsEventConstants.authTokenStorageFailed;
+  static const String eventPostMeditationFeedback =
+      AnalyticsEventConstants.postMeditationFeedback;
   static const String eventOnboardingNotificationsPermissionGranted =
-      'onboarding_notifications_permission_granted';
+      AnalyticsEventConstants.onboardingNotificationsPermissionGranted;
   static const String eventOnboardingNotificationsPermissionDenied =
-      'onboarding_notifications_permission_denied';
+      AnalyticsEventConstants.onboardingNotificationsPermissionDenied;
   static const String eventOnboardingSplashscreenSignupTap =
-      'onboarding_splashscreen_signup_tap';
+      AnalyticsEventConstants.onboardingSplashscreenSignupTap;
   static const String eventOnboardingSplashscreenContinueTap =
-      'onboarding_splashscreen_continue_tap';
+      AnalyticsEventConstants.onboardingSplashscreenContinueTap;
   static const String eventOnboardingSignupCompleted =
-      'onboarding_signup_completed';
+      AnalyticsEventConstants.onboardingSignupCompleted;
   static const String eventOnboardingReminderSetTap =
-      'onboarding_reminder_set_tap';
+      AnalyticsEventConstants.onboardingReminderSetTap;
   static const String eventOnboardingReminderSkipTap =
-      'onboarding_reminder_skip_tap';
+      AnalyticsEventConstants.onboardingReminderSkipTap;
   static const String eventOnboardingReminderConfirmTap =
-      'onboarding_reminder_confirm_tap';
+      AnalyticsEventConstants.onboardingReminderConfirmTap;
   static const String eventOnboardingReminderCancelTap =
-      'onboarding_reminder_cancel_tap';
-  static const String eventOnboardingDonateNowTap = 'onboarding_donate_now_tap';
-  static const String eventOnboardingCompleted = 'onboarding_completed';
+      AnalyticsEventConstants.onboardingReminderCancelTap;
+  static const String eventOnboardingDonateNowTap =
+      AnalyticsEventConstants.onboardingDonateNowTap;
+  static const String eventOnboardingCompleted =
+      AnalyticsEventConstants.onboardingCompleted;
   static const String eventOnboardingTrackingPermissionGranted =
-      'onboarding_tracking_permission_granted';
+      AnalyticsEventConstants.onboardingTrackingPermissionGranted;
   static const String eventOnboardingTrackingPermissionDenied =
-      'onboarding_tracking_permission_denied';
+      AnalyticsEventConstants.onboardingTrackingPermissionDenied;
   static const String eventPaywallDismissedNoPayment =
-      'paywall_dismissed_no_payment';
+      AnalyticsEventConstants.paywallDismissedNoPayment;
 
-  // Paywall source constants
-  static const String paywallSourceOnboarding = 'onboarding';
-  static const String paywallSourceSettings = 'settings';
-  static const String paywallSourceEndScreen = 'end_screen';
-  static const String paywallSourceAnnouncement = 'announcement';
+  // Paywall source constants - These reference shared constants for consistency across all analytics platforms
+  // For new code, prefer using AnalyticsEventConstants directly
+  static const String paywallSourceOnboarding =
+      AnalyticsEventConstants.paywallSourceOnboarding;
+  static const String paywallSourceSettings =
+      AnalyticsEventConstants.paywallSourceSettings;
+  static const String paywallSourceEndScreen =
+      AnalyticsEventConstants.paywallSourceEndScreen;
+  static const String paywallSourceAnnouncement =
+      AnalyticsEventConstants.paywallSourceAnnouncement;
 
   // Don't pollute Firebase from unit/widget tests executed via `flutter test`.
   static bool get _runningInTest =>
@@ -137,13 +151,15 @@ class FirebaseAnalyticsService {
       );
 
       if (kDebugMode) {
-        print('Firebase Analytics initialized with consent: $consentGranted');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Firebase Analytics initialized with consent: $consentGranted');
       }
 
       _initialized = true;
     } catch (e) {
       if (kDebugMode) {
-        print('Error initializing Firebase Analytics: $e');
+        AppLogger.d(
+            'FIREBASE_ANALYTICS', 'Error initializing Firebase Analytics: $e');
       }
     }
   }
@@ -172,7 +188,8 @@ class FirebaseAnalyticsService {
       final newStatus =
           await AppTrackingTransparency.trackingAuthorizationStatus;
       if (kDebugMode) {
-        print('iOS App Tracking Transparency status: $newStatus');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'iOS App Tracking Transparency status: $newStatus');
       }
 
       // If the user denied tracking, also disable Firebase Analytics
@@ -183,7 +200,8 @@ class FirebaseAnalyticsService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error requesting iOS tracking authorization: $e');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error requesting iOS tracking authorization: $e');
       }
     }
   }
@@ -222,11 +240,13 @@ class FirebaseAnalyticsService {
       await prefs.setBool(analyticsEnabledKey, true);
 
       if (kDebugMode) {
-        print('Firebase Analytics consent set to granted for all types');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Firebase Analytics consent set to granted for all types');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error setting Firebase Analytics consent: $e');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error setting Firebase Analytics consent: $e');
       }
     }
   }
@@ -261,23 +281,29 @@ class FirebaseAnalyticsService {
       }
 
       if (kDebugMode) {
-        print('Firebase Analytics consent updated:');
+        AppLogger.d(
+            'FIREBASE_ANALYTICS', 'Firebase Analytics consent updated:');
         if (analyticsStorageConsentGranted != null) {
-          print('Analytics storage: $analyticsStorageConsentGranted');
+          AppLogger.d('FIREBASE_ANALYTICS',
+              'Analytics storage: $analyticsStorageConsentGranted');
         }
         if (adStorageConsentGranted != null) {
-          print('Ad storage: $adStorageConsentGranted');
+          AppLogger.d(
+              'FIREBASE_ANALYTICS', 'Ad storage: $adStorageConsentGranted');
         }
         if (adUserDataConsentGranted != null) {
-          print('Ad user data: $adUserDataConsentGranted');
+          AppLogger.d(
+              'FIREBASE_ANALYTICS', 'Ad user data: $adUserDataConsentGranted');
         }
         if (adPersonalizationSignalsConsentGranted != null) {
-          print('Ad personalization: $adPersonalizationSignalsConsentGranted');
+          AppLogger.d('FIREBASE_ANALYTICS',
+              'Ad personalization: $adPersonalizationSignalsConsentGranted');
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error setting Firebase Analytics consent: $e');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error setting Firebase Analytics consent: $e');
       }
     }
   }
@@ -293,17 +319,24 @@ class FirebaseAnalyticsService {
     try {
       // Only log events if analytics consent is granted and _analytics is initialized
       final prefs = await SharedPreferences.getInstance();
-      bool analyticsEnabled = prefs.getBool(analyticsEnabledKey) ?? true;
+
+      final analyticsEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+              true;
 
       if (analyticsEnabled && _analytics != null) {
         await _analytics.logEvent(
           name: name,
           parameters: parameters,
         );
+      } else if (kDebugMode && !analyticsEnabled) {
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Firebase Analytics disabled by user preference, skipping event: $name');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error logging event to Firebase Analytics: $e');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error logging event to Firebase Analytics: $e');
       }
     }
   }
@@ -314,16 +347,19 @@ class FirebaseAnalyticsService {
     if (!_initialized) await initialize();
 
     try {
-      // Only set user ID if analytics consent is granted
+      // Only set user ID if Firebase Analytics is enabled
       final prefs = await SharedPreferences.getInstance();
-      bool analyticsEnabled = prefs.getBool(analyticsEnabledKey) ?? true;
+      final analyticsEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+              true;
 
       if (analyticsEnabled && _analytics != null) {
         await _analytics.setUserId(id: userId);
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error setting user ID in Firebase Analytics: $e');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error setting user ID in Firebase Analytics: $e');
       }
     }
   }
@@ -344,11 +380,12 @@ class FirebaseAnalyticsService {
       }
 
       if (kDebugMode) {
-        print('Firebase Analytics data reset');
+        AppLogger.d('FIREBASE_ANALYTICS', 'Firebase Analytics data reset');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error resetting Firebase Analytics data: $e');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error resetting Firebase Analytics data: $e');
       }
     }
   }
@@ -363,9 +400,11 @@ class FirebaseAnalyticsService {
     if (!_initialized) await initialize();
 
     try {
-      // Only log screen view if analytics consent is granted and _analytics is initialized
+      // Only log screen view if Firebase Analytics is enabled
       final prefs = await SharedPreferences.getInstance();
-      bool analyticsEnabled = prefs.getBool(analyticsEnabledKey) ?? true;
+      final analyticsEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+              true;
 
       if (analyticsEnabled && _analytics != null) {
         await _analytics.logScreenView(
@@ -386,13 +425,14 @@ class FirebaseAnalyticsService {
         }
 
         if (kDebugMode) {
-          print(
+          AppLogger.d('FIREBASE_ANALYTICS',
               'Screen view logged: $screenName${parameters != null ? ' with parameters' : ''}');
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error logging screen view in Firebase Analytics: $e');
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error logging screen view in Firebase Analytics: $e');
       }
     }
   }

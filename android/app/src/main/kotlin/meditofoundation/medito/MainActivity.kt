@@ -42,7 +42,6 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
             .getInstance()
             .put(ENGINE_ID, flutterEngine)
         super.configureFlutterEngine(flutterEngine)
-        GeneratedPluginRegistrant.registerWith(flutterEngine)
         
         MeditoAndroidAudioServiceManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
         MeditoWidgetManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)

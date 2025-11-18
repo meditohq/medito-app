@@ -10,7 +10,6 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/paywall_manager_service.dart';
-import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
@@ -33,7 +32,6 @@ class _SuperwallDonationScreenState
   bool _isLoading = true;
   bool _isProcessingPayment = false;
   String? _currentPaywallId;
-  String? _completedPaywallId;
 
   @override
   void initState() {
@@ -84,21 +82,6 @@ class _SuperwallDonationScreenState
         },
         onPaywallDismissed: (String paywallId) {
           AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Paywall dismissed');
-
-          // Only track as "no payment" if we didn't complete a donation
-          if (_completedPaywallId != paywallId) {
-            final userId =
-                ref.read(authRepositorySyncProvider).currentUser?.id ??
-                    'unknown';
-
-            FirebaseAnalyticsService().logEvent(
-              name: FirebaseAnalyticsService.eventPaywallDismissedNoPayment,
-              parameters: {
-                'paywall_id': paywallId,
-                'medito_user_id': userId,
-              },
-            );
-          }
 
           // Only close the screen if we're NOT processing a payment
           // If payment is being processed, let the payment flow handle screen closure
@@ -231,9 +214,7 @@ class _SuperwallDonationScreenState
           userId: userId,
           userEmail: userEmail,
           paywallSource: widget.source,
-          onSuccess: () {
-            _completedPaywallId = paywallId;
-          },
+          onSuccess: () {},
         );
       } else {
         await uiController.initiateOneTimePayment(
@@ -245,9 +226,7 @@ class _SuperwallDonationScreenState
           userId: userId,
           userEmail: userEmail,
           paywallSource: widget.source,
-          onSuccess: () {
-            _completedPaywallId = paywallId;
-          },
+          onSuccess: () {},
         );
       }
 
