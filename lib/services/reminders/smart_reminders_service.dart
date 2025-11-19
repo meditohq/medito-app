@@ -27,7 +27,15 @@ class SmartRemindersService {
     var saved = getSavedTime();
     final time = saved ?? _computeDefaultTimeFromNow();
 
-    await reminders.scheduleDailyNotification(time);
+    final now = DateTime.now();
+    var anchor = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    if (anchor.isBefore(now)) {
+      anchor = anchor.add(const Duration(days: 1));
+    }
+
+    final scheduler =
+        SmartRemindersScheduler(prefs: prefs, reminders: reminders);
+    await scheduler.scheduleSeriesFromAnchor(anchor);
 
     if (saved == null) {
       await _saveTime(time);
@@ -39,6 +47,7 @@ class SmartRemindersService {
   Future<void> disable() async {
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, false);
     await reminders.cancelDailyNotification();
+    await reminders.cancelSmartReminderSeries();
   }
 
   TimeOfDay _computeDefaultTimeFromNow() {
@@ -74,6 +83,7 @@ class SmartRemindersScheduler {
     }
 
     await reminders.cancelSmartReminderSeries();
+    await reminders.cancelDailyNotification();
     await reminders.scheduleSmartReminderSeries(items
         .map((e) => ScheduledReminder(
               id: e.id,
@@ -97,7 +107,7 @@ class SmartRemindersScheduler {
     final start = end.subtract(Duration(milliseconds: durationMs));
     final anchor = start
         .add(const Duration(days: 1))
-        .subtract(const Duration(minutes: 15));
+        .subtract(const Duration(minutes: 10));
     await scheduleSeriesFromAnchor(anchor, l10n: l10n);
   }
 

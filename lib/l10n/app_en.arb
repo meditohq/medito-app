@@ -746,7 +746,7 @@
   "@smartReminderDay4Title": {
     "description": "Smart reminder day 4 title"
   },
-  "smartReminderDay4Body": "It has been 4 days. Restart your practice with a short session.",
+  "smartReminderDay4Body": "It has been 4 days since you meditated. Resume your practice with a short session.",
   "@smartReminderDay4Body": {
     "description": "Smart reminder day 4 body"
   },
@@ -770,7 +770,7 @@
   "@smartReminderDay7Title": {
     "description": "Smart reminder day 7 title"
   },
-  "smartReminderDay7Body": "It has been a week. Ready to come back?",
+  "smartReminderDay7Body": "It has been a week since you meditated. Take a moment for yourself today.",
   "@smartReminderDay7Body": {
     "description": "Smart reminder day 7 body"
   },
@@ -794,7 +794,7 @@
   "@smartReminderDay10Title": {
     "description": "Smart reminder day 10 title"
   },
-  "smartReminderDay10Body": "It has been 10 days. Pick up where you left off.",
+  "smartReminderDay10Body": "It has been 10 days since you meditated. Pick up where you left off.",
   "@smartReminderDay10Body": {
     "description": "Smart reminder day 10 body"
   },
@@ -826,15 +826,15 @@
   "@smartReminderDay14Title": {
     "description": "Smart reminder day 14 title"
   },
-  "smartReminderDay14Body": "It has been 14 days. Start again today, gently.",
+  "smartReminderDay14Body": "It has been 14 days since you meditated. Resume your practice today, gently.",
   "@smartReminderDay14Body": {
     "description": "Smart reminder day 14 body"
   },
-  "smartReminderDay15Title": "We will pause reminders 🌿",
+  "smartReminderDay15Title": "Pausing reminders 🌿",
   "@smartReminderDay15Title": {
     "description": "Smart reminder day 15 title"
   },
-  "smartReminderDay15Body": "These reminders do not seem to be working, so we will stop for now.",
+  "smartReminderDay15Body": "We will pause reminders for now. We are here whenever you are ready.",
   "@smartReminderDay15Body": {
     "description": "Smart reminder day 15 body"
   }

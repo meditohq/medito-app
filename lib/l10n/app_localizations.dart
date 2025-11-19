@@ -2867,7 +2867,7 @@ abstract class AppLocalizations {
   /// Smart reminder day 4 body
   ///
   /// In en, this message translates to:
-  /// **'It has been 4 days. Restart your practice with a short session.'**
+  /// **'It has been 4 days. Resume your practice with a short session.'**
   String get smartReminderDay4Body;
 
   /// Smart reminder day 5 title
@@ -2903,7 +2903,7 @@ abstract class AppLocalizations {
   /// Smart reminder day 7 body
   ///
   /// In en, this message translates to:
-  /// **'It has been a week. Ready to come back?'**
+  /// **'It has been a week. Take a moment for yourself today.'**
   String get smartReminderDay7Body;
 
   /// Smart reminder day 8 title
@@ -2987,19 +2987,19 @@ abstract class AppLocalizations {
   /// Smart reminder day 14 body
   ///
   /// In en, this message translates to:
-  /// **'It has been 14 days. Start again today, gently.'**
+  /// **'It has been 14 days. Resume your practice today, gently.'**
   String get smartReminderDay14Body;
 
   /// Smart reminder day 15 title
   ///
   /// In en, this message translates to:
-  /// **'We will pause reminders 🌿'**
+  /// **'Pausing reminders 🌿'**
   String get smartReminderDay15Title;
 
   /// Smart reminder day 15 body
   ///
   /// In en, this message translates to:
-  /// **'These reminders do not seem to be working, so we will stop for now.'**
+  /// **'We will pause reminders for now. We are here whenever you are ready.'**
   String get smartReminderDay15Body;
 }
 

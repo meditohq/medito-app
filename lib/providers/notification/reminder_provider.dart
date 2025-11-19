@@ -14,9 +14,10 @@ final reminderProvider = Provider<ReminderProvider>((ref) {
 class ReminderProvider {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+  late final Future<void> _initFuture;
 
   ReminderProvider() {
-    _initializeNotifications();
+    _initFuture = _initializeNotifications();
   }
 
   Future<void> _initializeNotifications() async {
@@ -35,6 +36,7 @@ class ReminderProvider {
   }
 
   Future<void> scheduleDailyNotification(TimeOfDay pickedTime) async {
+    await _initFuture;
     try {
       final now = DateTime.now();
 
@@ -79,6 +81,7 @@ class ReminderProvider {
   }
 
   Future<void> clearBadge() async {
+    await _initFuture;
     if (Platform.isIOS) {
       const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
           badgeNumber: 0,
@@ -95,12 +98,14 @@ class ReminderProvider {
   }
 
   Future<void> cancelDailyNotification() async {
+    await _initFuture;
     await _flutterLocalNotificationsPlugin.cancel(dailyNotificationId);
     await clearBadge();
   }
 
   Future<void> scheduleSmartReminderSeries(
       List<ScheduledReminder> items) async {
+    await _initFuture;
     try {
       for (final item in items) {
         await _flutterLocalNotificationsPlugin.zonedSchedule(
@@ -125,6 +130,7 @@ class ReminderProvider {
   }
 
   Future<void> cancelSmartReminderSeries() async {
+    await _initFuture;
     for (var i = 0; i < smartSeriesCount; i++) {
       await _flutterLocalNotificationsPlugin.cancel(smartBaseId + i);
     }
