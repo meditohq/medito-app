@@ -73,48 +73,70 @@ class _HomeViewState extends ConsumerState<HomeView>
         final widgetOrder = ref.watch(homeWidgetOrderProvider);
 
         return Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 56.0,
-            title: HeaderWidget(
-              greeting:
-                  homeData.greeting ?? AppLocalizations.of(context)!.welcome,
-              onStatsButtonTap: () => _onStatsButtonTapped(context),
-            ),
-            elevation: 0.0,
-          ),
           body: RefreshIndicator(
             onRefresh: _onRefresh,
-            child: SingleChildScrollView(
+            edgeOffset: 150,
+            child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              child: Column(
-                spacing: 20,
-                children: [
-                  _getAnnouncementBanner(),
-                  ...widgetOrder.map((type) {
-                    switch (type) {
-                      case HomeWidgetType.shortcuts:
-                        return ShortcutsItemsWidget(
-                          key: ValueKey(type.name),
-                          data: homeData.shortcuts,
-                        );
-                      case HomeWidgetType.carousel:
-                        return CarouselWidget(
-                          key: ValueKey(type.name),
-                          carouselItems: homeData.carousel,
-                        );
-                      case HomeWidgetType.quote:
-                        return QuoteWidget(
-                          key: ValueKey(type.name),
-                          data: homeData.todayQuote,
-                        );
-                      case HomeWidgetType.products:
-                        return _getProductsWidget();
-                    }
-                  }),
-                ],
-              ),
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  floating: true,
+                  pinned: true,
+                  elevation: 0.0,
+                  toolbarHeight: 56.0,
+                  title: HeaderWidget(
+                    greeting: homeData.greeting ??
+                        AppLocalizations.of(context)!.welcome,
+                    onStatsButtonTap: () => _onStatsButtonTapped(context),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: _getAnnouncementBanner(),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      var type = widgetOrder[index];
+                      Widget child;
+                      switch (type) {
+                        case HomeWidgetType.shortcuts:
+                          child = ShortcutsItemsWidget(
+                            key: ValueKey(type.name),
+                            data: homeData.shortcuts,
+                          );
+                          break;
+                        case HomeWidgetType.carousel:
+                          child = CarouselWidget(
+                            key: ValueKey(type.name),
+                            carouselItems: homeData.carousel,
+                          );
+                          break;
+                        case HomeWidgetType.quote:
+                          child = QuoteWidget(
+                            key: ValueKey(type.name),
+                            data: homeData.todayQuote,
+                          );
+                          break;
+                        case HomeWidgetType.products:
+                          child = _getProductsWidget();
+                          break;
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: child,
+                      );
+                    },
+                    childCount: widgetOrder.length,
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 20)),
+              ],
             ),
           ),
         );

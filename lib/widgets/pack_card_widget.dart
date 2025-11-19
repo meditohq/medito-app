@@ -5,7 +5,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/widgets/network_image_widget.dart';
 import 'package:flutter/material.dart';
 
-class PackCardWidget extends StatelessWidget {
+class PackCardWidget extends StatefulWidget {
   const PackCardWidget({
     super.key,
     required this.title,
@@ -20,11 +20,32 @@ class PackCardWidget extends StatelessWidget {
   final void Function()? onTap;
 
   @override
+  State<PackCardWidget> createState() => _PackCardWidgetState();
+}
+
+class _PackCardWidgetState extends State<PackCardWidget> {
+  Future<ColorScheme?>? _colorSchemeFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _colorSchemeFuture = _generateColorScheme(context);
+  }
+
+  @override
+  void didUpdateWidget(covariant PackCardWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.coverUrlPath != widget.coverUrlPath) {
+      _colorSchemeFuture = _generateColorScheme(context);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
     return FutureBuilder<ColorScheme?>(
-      future: _generateColorScheme(context),
+      future: _colorSchemeFuture,
       builder: (context, snapshot) {
         var colorScheme = snapshot.data;
         var backgroundColor =
@@ -38,22 +59,23 @@ class PackCardWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
           ),
           child: InkWell(
-            onTap: onTap,
+            onTap: widget.onTap,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (coverUrlPath != null && coverUrlPath!.isNotEmpty)
+                if (widget.coverUrlPath != null &&
+                    widget.coverUrlPath!.isNotEmpty)
                   _getCoverUrl(),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _title(textTheme, title: title, color: titleColor),
-                      if (subTitle != null) const SizedBox(height: 4),
+                      _title(textTheme, title: widget.title, color: titleColor),
+                      if (widget.subTitle != null) const SizedBox(height: 4),
                       _description(
                         textTheme,
-                        subtitle: subTitle,
+                        subtitle: widget.subTitle,
                         color: subtitleColor,
                       ),
                     ],
@@ -68,14 +90,14 @@ class PackCardWidget extends StatelessWidget {
   }
 
   Future<ColorScheme?> _generateColorScheme(BuildContext context) async {
-    if (coverUrlPath != null && coverUrlPath!.isNotEmpty) {
+    if (widget.coverUrlPath != null && widget.coverUrlPath!.isNotEmpty) {
       // Skip processing images from dead domains
-      if (HTTPConstants.isDeadDomain(coverUrlPath!)) {
+      if (HTTPConstants.isDeadDomain(widget.coverUrlPath!)) {
         return null;
       }
 
       try {
-        var image = CachedNetworkImageProvider(coverUrlPath!);
+        var image = CachedNetworkImageProvider(widget.coverUrlPath!);
 
         return await ColorScheme.fromImageProvider(
           provider: image,
@@ -139,7 +161,7 @@ class PackCardWidget extends StatelessWidget {
       child: AspectRatio(
         aspectRatio: 4 / 3,
         child: NetworkImageWidget(
-          url: coverUrlPath ?? '',
+          url: widget.coverUrlPath ?? '',
           shouldCache: true,
         ),
       ),

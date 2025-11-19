@@ -246,17 +246,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        toolbarHeight: 56.0,
-        title: Column(
-          children: [
-            HomeHeaderWidget(greeting: AppLocalizations.of(context)!.settings),
-          ],
-        ),
-        elevation: 0.0,
-      ),
       body: SafeArea(child: _buildMain(context, ref, settingsItems)),
     );
   }
@@ -339,7 +328,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Widget _buildMain(
       BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
-    return _buildSettingsList(context, ref, settingsItems);
+    return CustomScrollView(
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        SliverAppBar(
+          centerTitle: false,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          toolbarHeight: 56.0,
+          pinned: true,
+          floating: true,
+          elevation: 0.0,
+          title: HomeHeaderWidget(
+              greeting: AppLocalizations.of(context)!.settings),
+        ),
+        _buildSettingsListSlivers(context, ref, settingsItems),
+      ],
+    );
   }
 
   Widget _buildMenuItemTile(
@@ -444,7 +448,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Widget _buildSettingsList(
+  Widget _buildSettingsListSlivers(
     BuildContext context,
     WidgetRef ref,
     List<SettingsItem> settingsItems,
@@ -495,14 +499,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       const ExpandableSectionWidget(),
     ];
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.only(top: padding16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: children,
-        ),
+    return SliverPadding(
+      padding: const EdgeInsets.only(top: padding16),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate(children),
       ),
     );
   }
