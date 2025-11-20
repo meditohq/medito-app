@@ -70,13 +70,16 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
+    private val backgroundScope = CoroutineScope(Dispatchers.Default + serviceJob)
     private var positionUpdateJob: Job? = null
     private val fadeOutDurationMillis = 10000
     private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
+    @Volatile
+    private var isUpdatingPlaybackState = false
 
     private fun startPositionUpdates() {
         positionUpdateJob?.cancel()
-        positionUpdateJob = serviceScope.launch {
+        positionUpdateJob = backgroundScope.launch {
             while (isActive) {
                 updatePlaybackState()
                 delay(1000) // 1 second interval
@@ -88,43 +91,67 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         positionUpdateJob?.cancel()
     }
 
-    private fun updatePlaybackState() {
+    private suspend fun updatePlaybackState() {
         if (!::primaryPlayer.isInitialized) return
+        
+        // Skip if previous update is still in progress to prevent accumulation
+        if (isUpdatingPlaybackState) {
+            return
+        }
 
         try {
-            val state = PlaybackState(
-                isPlaying = primaryPlayer.isPlaying,
-                position = primaryPlayer.currentPosition,
-                volume = primaryPlayer.volume.toLong(),
-                speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
-                isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                duration = primaryPlayer.duration,
-                isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
-                track = primaryPlayer.currentMediaItem?.let { mediaItem ->
-                    Track(
-                        id = mediaItem.mediaId,
-                        title = mediaItem.mediaMetadata.title?.toString() ?: "",
-                        fileId = mediaItem.mediaMetadata.extras?.getString(KEY_FILE_ID) ?: "",
-                        description = mediaItem.mediaMetadata.description?.toString()
-                            ?: "",
-                        imageUrl = mediaItem.mediaMetadata.artworkUri?.toString() ?: "",
-                        artist = mediaItem.mediaMetadata.artist?.toString() ?: "",
-                        artistUrl = mediaItem.mediaMetadata.extras?.getString(KEY_ARTIST_URL),
-                    )
-                } ?: Track(id = "", title = "", fileId = "", description = "", imageUrl = "", artist = null, artistUrl = null)
-            )
+            isUpdatingPlaybackState = true
+            
+            // ExoPlayer methods should be called on main thread for thread safety
+            val state = withContext(Dispatchers.Main) {
+                if (!::primaryPlayer.isInitialized) return@withContext null
+                
+                PlaybackState(
+                    isPlaying = primaryPlayer.isPlaying,
+                    position = primaryPlayer.currentPosition,
+                    volume = primaryPlayer.volume.toLong(),
+                    speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
+                    isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                    duration = primaryPlayer.duration,
+                    isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                    isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
+                    track = primaryPlayer.currentMediaItem?.let { mediaItem ->
+                        Track(
+                            id = mediaItem.mediaId,
+                            title = mediaItem.mediaMetadata.title?.toString() ?: "",
+                            fileId = mediaItem.mediaMetadata.extras?.getString(KEY_FILE_ID) ?: "",
+                            description = mediaItem.mediaMetadata.description?.toString()
+                                ?: "",
+                            imageUrl = mediaItem.mediaMetadata.artworkUri?.toString() ?: "",
+                            artist = mediaItem.mediaMetadata.artist?.toString() ?: "",
+                            artistUrl = mediaItem.mediaMetadata.extras?.getString(KEY_ARTIST_URL),
+                        )
+                    } ?: Track(id = "", title = "", fileId = "", description = "", imageUrl = "", artist = null, artistUrl = null)
+                )
+            } ?: return
 
-            applyBackgroundSoundVolume(state.duration, state.position)
+            // Apply background sound volume on main thread (touches ExoPlayer)
+            withContext(Dispatchers.Main) {
+                applyBackgroundSoundVolume(state.duration, state.position)
+            }
 
-            meditoAudioApi?.updatePlaybackState(state) {
-                if (state.isCompleted && !isCompletionHandled) {
-                    isCompletionHandled = true
-                    handleTrackCompletion(state)
+            // Pigeon channel communication - already async/non-blocking
+            // Post to main thread handler to ensure thread safety for callback
+            val api = meditoAudioApi
+            if (api != null) {
+                handler.post {
+                    api.updatePlaybackState(state) {
+                        if (state.isCompleted && !isCompletionHandled) {
+                            isCompletionHandled = true
+                            handleTrackCompletion(state)
+                        }
+                    }
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error updating playback state: ${e.message}")
+        } finally {
+            isUpdatingPlaybackState = false
         }
     }
 
