@@ -49,6 +49,38 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _precacheCurrentTrackImage();
+  }
+
+  void _precacheCurrentTrackImage() {
+    final currentlyPlayingTrack = ref.read(playerProvider);
+    if (currentlyPlayingTrack != null) {
+      _precacheImage(currentlyPlayingTrack.coverUrl);
+    }
+  }
+
+  void _precacheImage(String imageUrl) {
+    if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasScheme == true) {
+      if (!HTTPConstants.isDeadDomain(imageUrl)) {
+        try {
+          final networkImage = NetworkImage(imageUrl);
+          unawaited(
+            precacheImage(networkImage, context).catchError((error) {
+              AppLogger.d('PlayerView',
+                  'Failed to precache image: \$imageUrl, error: \$error');
+            }),
+          );
+        } catch (e) {
+          AppLogger.d('PlayerView',
+              'Failed to create or precache image: \$imageUrl, error: \$e');
+        }
+      }
+    }
+  }
+
   Future<void> _logScreenView() async {
     final currentlyPlayingTrack = ref.read(playerProvider);
     final parameters = currentlyPlayingTrack != null
@@ -96,6 +128,13 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     }
 
     final currentlyPlayingTrack = ref.watch(playerProvider);
+
+    ref.listen(playerProvider.select((p) => p?.coverUrl), (_, next) {
+      if (next != null) {
+        _precacheImage(next);
+      }
+    });
+
     if (currentlyPlayingTrack == null) {
       return MeditoErrorWidget(
         error: const UnknownError(),
@@ -107,29 +146,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final track = ref.watch(audioStateProvider.select((s) => s.track));
     final isPlaying = ref.watch(audioStateProvider.select((s) => s.isPlaying));
     final imageUrl = track.imageUrl;
-
-    if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasScheme == true) {
-      // Skip precaching images from dead domains
-      if (HTTPConstants.isDeadDomain(imageUrl)) {
-        // Skip precaching for dead domain
-      } else {
-        try {
-          final networkImage = NetworkImage(imageUrl);
-          // Use unawaited to avoid blocking the build method
-          unawaited(
-            precacheImage(networkImage, context).catchError((error) {
-              // Silently handle precaching errors - they're not critical
-              AppLogger.d('PlayerView',
-                  'Failed to precache image: $imageUrl, error: $error');
-            }),
-          );
-        } catch (e) {
-          // Silently handle any synchronous errors from NetworkImage constructor or precaching
-          AppLogger.d('PlayerView',
-              'Failed to create or precache image: $imageUrl, error: $e');
-        }
-      }
-    }
 
     return PopScope<void>(
       onPopInvokedWithResult: (didPop, result) {
@@ -146,37 +162,55 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
             return Stack(
               fit: StackFit.expand,
               children: [
-                if (imageUrl.isNotEmpty)
-                  _FadingNetworkImage(
-                    imageUrl: imageUrl,
-                  ),
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    color: ColorConstants.black
-                        .withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
-                  ),
-                ),
-                SafeArea(
+                RepaintBoundary(
                   child: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      Center(
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 32.0),
-                            child: orientation == Orientation.portrait
-                                ? _buildPortraitLayout(track, isPlaying)
-                                : _buildLandscapeLayout(track, isPlaying),
-                          ),
+                      if (imageUrl.isNotEmpty)
+                        _FadingNetworkImage(
+                          imageUrl: imageUrl,
+                        ),
+                      BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          color: ColorConstants.black
+                              .withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
                         ),
                       ),
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: ReportButtonWidget(track: currentlyPlayingTrack),
-                      ),
                     ],
+                  ),
+                ),
+                RepaintBoundary(
+                  child: SafeArea(
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 32.0),
+                              child: orientation == Orientation.portrait
+                                  ? _PortraitPlayerLayout(
+                                      track: track,
+                                      isPlaying: isPlaying,
+                                      onPlayPause: onPlayPausePressed,
+                                    )
+                                  : _LandscapePlayerLayout(
+                                      track: track,
+                                      isPlaying: isPlaying,
+                                      onPlayPause: onPlayPausePressed,
+                                    ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 16,
+                          right: 16,
+                          child:
+                              ReportButtonWidget(track: currentlyPlayingTrack),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -196,76 +230,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     );
   }
 
-  Widget _buildPortraitLayout(Track track, bool isPlaying) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ArtistTitleWidget(
-          trackTitle: track.title.isNotEmpty == true ? track.title : '',
-          artistName: track.artist?.isNotEmpty == true ? track.artist : '',
-          artistUrlPath: track.artistUrl,
-          isPlayerScreen: true,
-        ),
-        const SizedBox(height: 32),
-        DurationIndicatorWidget(
-          onSeekEnd: (value) {
-            ref.read(playerProvider.notifier).seekToPosition(value);
-          },
-        ),
-        const SizedBox(height: 24),
-        PlayerButtonsWidget(
-          isPlaying: isPlaying,
-          onPlayPause: onPlayPausePressed,
-          onSkip10SecondsBackward: () =>
-              ref.read(playerProvider.notifier).skip10SecondsBackward(),
-          onSkip10SecondsForward: () =>
-              ref.read(playerProvider.notifier).skip10SecondsForward(),
-          onRepeat: () {
-            final newMode =
-                ref.read(repeatStateProvider.notifier).toggleRepeat();
-            ref.read(playerProvider.notifier).setRepeatMode(newMode);
-          },
-          isPortrait: true,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLandscapeLayout(Track track, bool isPlaying) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ArtistTitleWidget(
-          trackTitle: track.title.isNotEmpty == true ? track.title : '',
-          artistName: track.artist?.isNotEmpty == true ? track.artist : '',
-          artistUrlPath: track.artistUrl,
-          isPlayerScreen: true,
-        ),
-        DurationIndicatorWidget(
-          onSeekEnd: (value) {
-            ref.read(playerProvider.notifier).seekToPosition(value);
-          },
-        ),
-        PlayerButtonsWidget(
-          isPlaying: isPlaying,
-          onPlayPause: onPlayPausePressed,
-          onSkip10SecondsBackward: () =>
-              ref.read(playerProvider.notifier).skip10SecondsBackward(),
-          onSkip10SecondsForward: () =>
-              ref.read(playerProvider.notifier).skip10SecondsForward(),
-          onRepeat: () {
-            final newMode =
-                ref.read(repeatStateProvider.notifier).toggleRepeat();
-            ref.read(playerProvider.notifier).setRepeatMode(newMode);
-          },
-          isPortrait: false,
-        ),
-      ],
-    );
-  }
-
   void onPlayPausePressed() {
     final isPlaying = ref.read(audioStateProvider).isPlaying;
 
@@ -282,9 +246,11 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 
   bool _isBackgroundSoundSelected() {
-    final bgSoundNotifier = ref.read(backgroundSoundsNotifierProvider);
+    final bgSoundNotifier = ref.watch(backgroundSoundsNotifierProvider);
+    final isPlaying = ref.watch(audioStateProvider.select((s) => s.isPlaying));
 
-    return bgSoundNotifier.selectedBgSound != null &&
+    return isPlaying &&
+        bgSoundNotifier.selectedBgSound != null &&
         bgSoundNotifier.selectedBgSound?.title !=
             AppLocalizations.of(context)!.none;
   }
@@ -347,6 +313,102 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         }
       }
     });
+  }
+}
+
+class _PortraitPlayerLayout extends ConsumerWidget {
+  const _PortraitPlayerLayout({
+    required this.track,
+    required this.isPlaying,
+    required this.onPlayPause,
+  });
+
+  final Track track;
+  final bool isPlaying;
+  final VoidCallback onPlayPause;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ArtistTitleWidget(
+          trackTitle: track.title.isNotEmpty == true ? track.title : '',
+          artistName: track.artist?.isNotEmpty == true ? track.artist : '',
+          artistUrlPath: track.artistUrl,
+          isPlayerScreen: true,
+        ),
+        const SizedBox(height: 32),
+        DurationIndicatorWidget(
+          onSeekEnd: (value) {
+            ref.read(playerProvider.notifier).seekToPosition(value);
+          },
+        ),
+        const SizedBox(height: 24),
+        PlayerButtonsWidget(
+          isPlaying: isPlaying,
+          onPlayPause: onPlayPause,
+          onSkip10SecondsBackward: () =>
+              ref.read(playerProvider.notifier).skip10SecondsBackward(),
+          onSkip10SecondsForward: () =>
+              ref.read(playerProvider.notifier).skip10SecondsForward(),
+          onRepeat: () {
+            final newMode =
+                ref.read(repeatStateProvider.notifier).toggleRepeat();
+            ref.read(playerProvider.notifier).setRepeatMode(newMode);
+          },
+          isPortrait: true,
+        ),
+      ],
+    );
+  }
+}
+
+class _LandscapePlayerLayout extends ConsumerWidget {
+  const _LandscapePlayerLayout({
+    required this.track,
+    required this.isPlaying,
+    required this.onPlayPause,
+  });
+
+  final Track track;
+  final bool isPlaying;
+  final VoidCallback onPlayPause;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ArtistTitleWidget(
+          trackTitle: track.title.isNotEmpty == true ? track.title : '',
+          artistName: track.artist?.isNotEmpty == true ? track.artist : '',
+          artistUrlPath: track.artistUrl,
+          isPlayerScreen: true,
+        ),
+        DurationIndicatorWidget(
+          onSeekEnd: (value) {
+            ref.read(playerProvider.notifier).seekToPosition(value);
+          },
+        ),
+        PlayerButtonsWidget(
+          isPlaying: isPlaying,
+          onPlayPause: onPlayPause,
+          onSkip10SecondsBackward: () =>
+              ref.read(playerProvider.notifier).skip10SecondsBackward(),
+          onSkip10SecondsForward: () =>
+              ref.read(playerProvider.notifier).skip10SecondsForward(),
+          onRepeat: () {
+            final newMode =
+                ref.read(repeatStateProvider.notifier).toggleRepeat();
+            ref.read(playerProvider.notifier).setRepeatMode(newMode);
+          },
+          isPortrait: false,
+        ),
+      ],
+    );
   }
 }
 

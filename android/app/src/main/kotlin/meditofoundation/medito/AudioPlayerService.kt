@@ -165,6 +165,13 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {
         try {
+            // Only apply fade if background sound is set, initialized, and volume is set
+            if (backgroundSoundUri == null || 
+                !::backgroundMusicPlayer.isInitialized || 
+                backgroundMusicVolume <= 0.0F) {
+                return
+            }
+
             if (trackDuration != C.TIME_UNSET &&
                 trackDuration - currentPosition <= fadeOutDurationMillis &&
                 trackDuration > fadeOutDurationMillis
@@ -179,7 +186,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         } catch (e: Exception) {
             e.printStackTrace()
             // Default to the set volume if there's an error
-            backgroundMusicPlayer.volume = backgroundMusicVolume
+            if (::backgroundMusicPlayer.isInitialized) {
+                backgroundMusicPlayer.volume = backgroundMusicVolume
+            }
         }
     }
 
@@ -669,6 +678,11 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             backgroundMusicPlayer.repeatMode = Player.REPEAT_MODE_ONE
             backgroundMusicPlayer.setMediaItem(backgroundMediaItem)
             backgroundMusicPlayer.prepare()
+
+            // Ensure volume is set before playing
+            if (backgroundMusicVolume > 0.0F) {
+                backgroundMusicPlayer.volume = backgroundMusicVolume
+            }
 
             // Start playing once prepared
             backgroundMusicPlayer.play()

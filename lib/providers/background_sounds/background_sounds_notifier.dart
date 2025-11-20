@@ -51,8 +51,15 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   double volume = 50;
   BackgroundSoundsModel? selectedBgSound;
   BackgroundSoundsModel? downloadingBgSound;
+  StreamSubscription<Duration>? _fadeSubscription;
 
   BackgroundSoundsNotifier(this.ref);
+
+  @override
+  void dispose() {
+    _fadeSubscription?.cancel();
+    super.dispose();
+  }
 
   void handleOnChangeVolume(double vol) {
     AppLogger.d('BG_SOUND', 'Changing volume to $vol');
@@ -155,6 +162,9 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
         // Play the background sound
         AppLogger.d('BG_SOUND', 'Starting background playback');
         await _api.playBackgroundSound();
+        
+        // Ensure volume is set after playback starts
+        _api.setBackgroundSoundVolume(scaledVolume(volume));
       } catch (e, s) {
         AppLogger.e('BG_SOUND', 'Error playing Android background sound', e, s);
       }
@@ -169,6 +179,7 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
           await iosBackgroundPlayer.setFilePath(uri);
         }
         AppLogger.d('BG_SOUND', 'Playing iOS background sound');
+        iosBackgroundPlayer.setVolume(scaledVolume(volume));
         unawaited(iosBackgroundPlayer.play());
         _handleFadeAtEndForIos();
       } catch (e, s) {
@@ -203,6 +214,8 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
 
   void stopBackgroundSound() {
     AppLogger.d('BG_SOUND', 'Stopping background sound');
+    _fadeSubscription?.cancel();
+    _fadeSubscription = null;
     if (Platform.isAndroid) {
       _api.setBackgroundSound(null);
       _api.stopBackgroundSound();
@@ -233,14 +246,22 @@ class BackgroundSoundsNotifier extends ChangeNotifier {
   }
 
   void _handleFadeAtEndForIos() {
+    _fadeSubscription?.cancel();
+    _fadeSubscription = null;
+
     var durationFromEnd = const Duration(seconds: 10).inMilliseconds;
 
-    iosAudioHandler.positionStream.listen(
+    _fadeSubscription = iosAudioHandler.positionStream.listen(
       (currentPosition) {
         var duration = iosAudioHandler.duration?.inMilliseconds ?? 0;
+        if (duration == 0) {
+          iosBackgroundPlayer.setVolume(scaledVolume(volume));
+          return;
+        }
+
         var remainingTime = duration - currentPosition.inMilliseconds;
 
-        if (remainingTime <= durationFromEnd) {
+        if (remainingTime <= durationFromEnd && remainingTime > 0) {
           var newVolume = volume * remainingTime / durationFromEnd;
           iosBackgroundPlayer.setVolume(scaledVolume(newVolume));
         } else {
