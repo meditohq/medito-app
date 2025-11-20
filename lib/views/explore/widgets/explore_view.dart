@@ -70,7 +70,6 @@ class ExploreViewState extends ConsumerState<ExploreView> {
       var asciiQuery = value.replaceAll(RegExp(r'[^\x00-\x7F]'), '');
       setState(() {
         _searchQuery = asciiQuery;
-        if (_searchQuery.isEmpty) ref.invalidate(explorePacksProvider);
       });
     });
   }

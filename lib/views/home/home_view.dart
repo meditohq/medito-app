@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/utils/logger.dart';
 
 import '../../providers/home/home_provider.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/exceptions/app_error.dart';
-import 'package:medito/models/home/announcement/announcement_model.dart';
-import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/home/products_provider.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/constants/constants.dart';
-import 'widgets/announcement/announcement_widget.dart';
+import 'widgets/announcement/home_announcement_section.dart';
 import 'widgets/editorial/carousel_widget.dart';
 import 'widgets/header_widget.dart';
-import 'widgets/products/products_widget.dart';
+import 'widgets/products/home_products_section.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
 
@@ -93,10 +90,10 @@ class _HomeViewState extends ConsumerState<HomeView>
                     onStatsButtonTap: () => _onStatsButtonTapped(context),
                   ),
                 ),
-                SliverToBoxAdapter(
+                const SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: _getAnnouncementBanner(),
+                    padding: EdgeInsets.only(top: 20),
+                    child: HomeAnnouncementSection(),
                   ),
                 ),
                 SliverList(
@@ -124,7 +121,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                           );
                           break;
                         case HomeWidgetType.products:
-                          child = _getProductsWidget();
+                          child = const HomeProductsSection();
                           break;
                       }
                       return Padding(
@@ -139,55 +136,6 @@ class _HomeViewState extends ConsumerState<HomeView>
               ],
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _getProductsWidget() {
-    final products = ref.watch(productsProvider);
-
-    return products.when(
-      loading: () {
-        AppLogger.d('HomeView', 'Products are loading');
-        return const SizedBox(height: 230);
-      },
-      error: (err, stack) {
-        return const SizedBox.shrink();
-      },
-      data: (List<ProductGroupModel> productGroups) {
-        // Shuffle the order of product groups
-        var shuffledProducts = List<ProductGroupModel>.from(productGroups)
-          ..shuffle();
-
-        return ProductsWidget(
-          key: ValueKey(HomeWidgetType.products.name),
-          productGroups: shuffledProducts,
-        );
-      },
-    );
-  }
-
-  Widget _getAnnouncementBanner() {
-    final data = ref.watch(fetchLatestAnnouncementProvider);
-
-    return data.when(
-      loading: () => Container(),
-      error: (err, stack) => Container(),
-      data: (AnnouncementModel? announcement) {
-        if (announcement == null ||
-            announcement.text == null ||
-            announcement.text == '') {
-          return Container();
-        }
-
-        return AnnouncementWidget(
-          announcement: announcement,
-          onPressedDismiss: () {
-            ref
-                .read(dismissedAnnouncementProvider.notifier)
-                .dismissAnnouncement(announcement.id!);
-          },
         );
       },
     );

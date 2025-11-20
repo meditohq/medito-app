@@ -86,7 +86,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = ref.watch(audioStateProvider.select((s) => s.isCompleted));
+    final isCompleted =
+        ref.watch(audioStateProvider.select((s) => s.isCompleted));
     if (isCompleted) {
       final position = ref.read(audioStateProvider).position;
       if (position > 5000) {
@@ -152,7 +153,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
-                    color: ColorConstants.black.withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
+                    color: ColorConstants.black
+                        .withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
                   ),
                 ),
                 SafeArea(
@@ -200,12 +202,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: track.title.isNotEmpty == true
-              ? track.title
-              : '',
-          artistName: track.artist?.isNotEmpty == true
-              ? track.artist
-              : '',
+          trackTitle: track.title.isNotEmpty == true ? track.title : '',
+          artistName: track.artist?.isNotEmpty == true ? track.artist : '',
           artistUrlPath: track.artistUrl,
           isPlayerScreen: true,
         ),
@@ -240,12 +238,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: track.title.isNotEmpty == true
-              ? track.title
-              : '',
-          artistName: track.artist?.isNotEmpty == true
-              ? track.artist
-              : '',
+          trackTitle: track.title.isNotEmpty == true ? track.title : '',
+          artistName: track.artist?.isNotEmpty == true ? track.artist : '',
           artistUrlPath: track.artistUrl,
           isPlayerScreen: true,
         ),

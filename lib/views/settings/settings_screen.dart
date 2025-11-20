@@ -6,23 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/providers/notification/reminder_provider.dart';
-import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
+import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
 import 'package:medito/views/settings/widgets/expandable_section_widget.dart';
+import 'package:medito/views/settings/widgets/smart_reminder_tile.dart';
 import 'package:medito/views/settings/widgets/theme_selection_dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/views/settings/widgets/widget_option_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/services/reminders/smart_reminders_service.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 
@@ -34,68 +33,6 @@ final bearerTokenProvider = FutureProvider<String>((ref) async {
 
   return bearerToken;
 });
-
-final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-
-  return _getReminderTimeFromPrefs(prefs);
-});
-
-class ReminderEnabledNotifier extends Notifier<bool> {
-  @override
-  bool build() {
-    final prefs = ref.read(sharedPreferencesProvider);
-    final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
-    final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
-    return prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
-        (savedHour != null && savedMinute != null);
-  }
-
-  Future<void> setEnabled(bool value) async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, value);
-    state = value;
-  }
-}
-
-final reminderEnabledProvider = NotifierProvider<ReminderEnabledNotifier, bool>(
-    () => ReminderEnabledNotifier());
-
-class WidgetOptionSeenNotifier extends Notifier<bool> {
-  @override
-  bool build() {
-    // Widget option is only available on Android, so on iOS we always return true
-    // to indicate the badge shouldn't be shown
-    if (!Platform.isAndroid) {
-      return true;
-    }
-
-    final prefs = ref.read(sharedPreferencesProvider);
-    return prefs.getBool(SharedPreferenceConstants.hasSeenWidgetOption) ??
-        false;
-  }
-
-  Future<void> markAsSeen() async {
-    final prefs = ref.read(sharedPreferencesProvider);
-    await prefs.setBool(SharedPreferenceConstants.hasSeenWidgetOption, true);
-    state = true;
-  }
-}
-
-final widgetOptionSeenProvider =
-    NotifierProvider<WidgetOptionSeenNotifier, bool>(
-        () => WidgetOptionSeenNotifier());
-
-// Analytics user providers moved to a dedicated module
-
-TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
-  final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
-  final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
-
-  return (savedHour != null && savedMinute != null)
-      ? TimeOfDay(hour: savedHour, minute: savedMinute)
-      : null;
-}
 
 class SettingsItem {
   final String section;
@@ -279,53 +216,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Widget _buildDailyNotificationTile(BuildContext context, WidgetRef ref) {
-    final isEnabled = ref.watch(reminderEnabledProvider);
-
-    return Card(
-      borderOnForeground: true,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      color: Theme.of(context).cardColor,
-      child: RowItemWidget(
-        icon: MeditoIcon(
-          assetName: MeditoIcons.bell,
-          size: 24,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-        title: AppLocalizations.of(context)!.smartReminders,
-        subTitle: null,
-        hasUnderline: false,
-        isSwitch: true,
-        switchValue: isEnabled,
-        onSwitchChanged: (value) async {
-          if (value) {
-            var accepted =
-                await PermissionHandler.requestAlarmPermission(context);
-            if (!accepted) return;
-
-            final prefs = ref.read(sharedPreferencesProvider);
-            final service = SmartRemindersService(
-              prefs: prefs,
-              reminders: ref.read(reminderProvider),
-            );
-
-            final time = await service.enable();
-            await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
-            ref.read(reminderTimeProvider.notifier).state = time;
-          } else {
-            final prefs = ref.read(sharedPreferencesProvider);
-            final service = SmartRemindersService(
-              prefs: prefs,
-              reminders: ref.read(reminderProvider),
-            );
-            await ref.read(reminderEnabledProvider.notifier).setEnabled(false);
-            await service.disable();
-          }
-        },
-      ),
-    );
-  }
-
   Widget _buildMain(
       BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
     return CustomScrollView(
@@ -366,17 +256,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     if (isDndToggle) {
-      final isDndEnabled = ref.watch(dndProvider);
-
-      return RowItemWidget(
+      return DndSettingTile(
         icon: item.icon,
         title: item.title,
-        hasUnderline: true,
-        isSwitch: true,
-        switchValue: isDndEnabled,
-        onSwitchChanged: (value) {
-          ref.read(dndProvider.notifier).toggleDnd(value);
-        },
       );
     }
 
@@ -398,31 +280,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     if (isWidgetItem) {
-      final hasSeenWidget = ref.watch(widgetOptionSeenProvider);
-
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          RowItemWidget(
-            icon: item.icon,
-            title: item.title,
-            hasUnderline: true,
-            onTap: () => handleItemPress(context, item),
-          ),
-          if (!hasSeenWidget)
-            Positioned(
-              left: 12,
-              top: 12,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-        ],
+      return WidgetOptionTile(
+        icon: item.icon,
+        title: item.title,
+        onTap: () => handleItemPress(context, item),
       );
     }
 
@@ -472,7 +333,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         .toList();
 
     var children = <Widget>[
-      _buildDailyNotificationTile(context, ref),
+      const SmartReminderTile(),
       if (_isHealthSyncAvailable) const HealthSyncTile(),
       if (!isEffectivelySignedIn) ...[
         _buildSectionTitle(context, AppLocalizations.of(context)!.account),
