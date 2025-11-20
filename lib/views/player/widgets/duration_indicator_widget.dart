@@ -2,17 +2,14 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/utils/duration_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/providers.dart';
 
 class DurationIndicatorWidget extends ConsumerStatefulWidget {
   const DurationIndicatorWidget({
     super.key,
-    required this.totalDuration,
-    required this.currentPosition,
     required this.onSeekEnd,
   });
 
-  final int totalDuration;
-  final int currentPosition;
   final void Function(int) onSeekEnd;
 
   @override
@@ -27,12 +24,21 @@ class _DurationIndicatorWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final totalDuration = ref.watch(audioStateProvider.select((s) => s.duration));
+    final currentPosition = ref.watch(audioStateProvider.select((s) => s.position));
+
+    // clamp values to avoid negative slider values
+    final safeTotal = totalDuration < 0 ? 0 : totalDuration;
+    final safePosition = currentPosition < 0 ? 0 : currentPosition;
+
     return _durationBar(
       context,
       // 99 is to avoid rounding errors which would result in the current
       // position being larger that the total duration
-      widget.totalDuration / 99,
-      widget.currentPosition / 100,
+      safeTotal / 99,
+      safePosition / 100,
+      safeTotal,
+      safePosition,
     );
   }
 
@@ -40,6 +46,8 @@ class _DurationIndicatorWidgetState
     BuildContext context,
     double totalDuration,
     double currentDuration,
+    int rawTotalDuration,
+    int rawCurrentPosition,
   ) {
     return Padding(
       padding: const EdgeInsets.only(left: 32, right: 32, top: 0, bottom: 0),
@@ -59,7 +67,7 @@ class _DurationIndicatorWidgetState
               activeColor: ColorConstants.white,
               inactiveColor: ColorConstants.onyx,
               value:
-                  _isSeekbarBeingDragged ? _dragSeekbarValue : currentDuration,
+                  _isSeekbarBeingDragged ? _dragSeekbarValue : currentDuration.clamp(0.0, (totalDuration > 0.0 ? totalDuration : 1.0)),
               onChanged: (val) {
                 if (!_isSeekbarBeingDragged) {
                   _isSeekbarBeingDragged = true;
@@ -75,6 +83,8 @@ class _DurationIndicatorWidgetState
             offset: const Offset(0, -14),
             child: _durationLabels(
               context,
+              rawTotalDuration,
+              rawCurrentPosition,
             ),
           ),
         ],
@@ -87,18 +97,22 @@ class _DurationIndicatorWidgetState
     widget.onSeekEnd((val * 100).toInt());
   }
 
-  Row _durationLabels(BuildContext context) {
+  Row _durationLabels(
+    BuildContext context,
+    int totalDuration,
+    int currentPosition,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _durationLabel(
           context,
-          Duration(milliseconds: widget.currentPosition.round())
+          Duration(milliseconds: currentPosition.round())
               .toMinutesSeconds(),
         ),
         _durationLabel(
           context,
-          Duration(milliseconds: widget.totalDuration.round())
+          Duration(milliseconds: totalDuration.round())
               .toMinutesSeconds(),
         ),
       ],

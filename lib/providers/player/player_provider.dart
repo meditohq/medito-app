@@ -76,6 +76,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
     var trackData = Track(
       id: track.id,
       title: track.title,
+      fileId: file.id,
       artist: track.audio.first.guideName ?? '',
       artistUrl: track.artist?.path,
       description: track.description,

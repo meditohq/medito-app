@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import android.os.HandlerThread
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.AudioAttributes
@@ -27,6 +26,9 @@ import androidx.media3.session.MediaStyleNotificationHelper
 import io.flutter.embedding.engine.FlutterEngineCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.SupervisorJob
@@ -68,142 +70,116 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     private val serviceJob = SupervisorJob()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
+    private var positionUpdateJob: Job? = null
     private val fadeOutDurationMillis = 10000
     private val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
-    private val backgroundHandler =
-        Handler(HandlerThread("AudioServiceBackground").apply { start() }.looper)
-    private val updateIntervalMs = 1000L
 
-    private val positionUpdateRunnable = object : Runnable {
-        override fun run() {
-            if (!::primaryPlayer.isInitialized) {
-                Log.e(TAG, "❌ Position update runnable: primaryPlayer not initialized")
-                return
-            }
-
-            try {
-                val runnable = this
-                handler.post {
-                    try {
-                        // Cache player state to minimize main thread work
-                        val state = PlaybackState(
-                            isPlaying = primaryPlayer.isPlaying,
-                            position = primaryPlayer.currentPosition,
-                            volume = primaryPlayer.volume.toLong(),
-                            speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
-                            isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                            duration = primaryPlayer.duration,
-                            isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                            isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
-                            track = primaryPlayer.currentMediaItem?.let { mediaItem ->
-                                Track(
-                                    id = mediaItem.mediaId,
-                                    title = mediaItem.mediaMetadata.title?.toString() ?: "",
-                                    description = mediaItem.mediaMetadata.description?.toString()
-                                        ?: "",
-                                    imageUrl = mediaItem.mediaMetadata.artworkUri?.toString() ?: "",
-                                    artist = mediaItem.mediaMetadata.artist?.toString() ?: "",
-                                    artistUrl = mediaItem.mediaMetadata.extras?.getString(KEY_ARTIST_URL)
-                                )
-                            } ?: Track(id = "", title = "", description = "", imageUrl = "", artist = null, artistUrl = null)
-                        )
-
-                        // Apply background sound volume on main thread
-                        applyBackgroundSoundVolume(state.duration, state.position)
-
-                        // Launch coroutine for state update
-                        CoroutineScope(Dispatchers.Main).launch {
-                            try {
-                                Log.d(
-                                    TAG,
-                                    "🔊 Updating playback state: isPlaying=${state.isPlaying}, position=${state.position}ms, playbackState=${primaryPlayer.playbackState}"
-                                )
-                                meditoAudioApi?.updatePlaybackState(state) {
-                                    if (state.isCompleted && !isCompletionHandled) {
-                                        isCompletionHandled = true
-                                        handleTrackCompletion(state)
-                                    } else if (!isCompletionHandled) {
-                                        backgroundHandler.postDelayed(runnable, updateIntervalMs)
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                Log.e(TAG, "❌ Error updating playback state: ${e.message}")
-                                e.printStackTrace()
-                                if (!isCompletionHandled) {
-                                    backgroundHandler.postDelayed(runnable, updateIntervalMs)
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "❌ Error in position update runnable: ${e.message}")
-                        e.printStackTrace()
-                        if (!isCompletionHandled) {
-                            backgroundHandler.postDelayed(runnable, updateIntervalMs)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "❌ Exception in position update outer block: ${e.message}")
-                e.printStackTrace()
-                if (!isCompletionHandled) {
-                    backgroundHandler.postDelayed(this, updateIntervalMs)
-                }
+    private fun startPositionUpdates() {
+        positionUpdateJob?.cancel()
+        positionUpdateJob = serviceScope.launch {
+            while (isActive) {
+                updatePlaybackState()
+                delay(1000) // 1 second interval
             }
         }
+    }
 
-        private fun handleTrackCompletion(state: PlaybackState) {
-            val completionData = createCompletionData(state)
-            saveAndSendCompletionData(completionData)
-        }
+    private fun stopPositionUpdates() {
+        positionUpdateJob?.cancel()
+    }
 
-        private fun createCompletionData(state: PlaybackState): CompletionData {
-            return CompletionData(
-                trackId = state.track.id,
-                duration = state.duration,
-                fileId = state.track.title,
-                guideId = state.track.artist,
-                timestamp = System.currentTimeMillis()
+    private fun updatePlaybackState() {
+        if (!::primaryPlayer.isInitialized) return
+
+        try {
+            val state = PlaybackState(
+                isPlaying = primaryPlayer.isPlaying,
+                position = primaryPlayer.currentPosition,
+                volume = primaryPlayer.volume.toLong(),
+                speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
+                isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                duration = primaryPlayer.duration,
+                isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
+                isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
+                track = primaryPlayer.currentMediaItem?.let { mediaItem ->
+                    Track(
+                        id = mediaItem.mediaId,
+                        title = mediaItem.mediaMetadata.title?.toString() ?: "",
+                        fileId = mediaItem.mediaMetadata.extras?.getString(KEY_FILE_ID) ?: "",
+                        description = mediaItem.mediaMetadata.description?.toString()
+                            ?: "",
+                        imageUrl = mediaItem.mediaMetadata.artworkUri?.toString() ?: "",
+                        artist = mediaItem.mediaMetadata.artist?.toString() ?: "",
+                        artistUrl = mediaItem.mediaMetadata.extras?.getString(KEY_ARTIST_URL),
+                    )
+                } ?: Track(id = "", title = "", fileId = "", description = "", imageUrl = "", artist = null, artistUrl = null)
             )
-        }
 
-        private fun saveAndSendCompletionData(completionData: CompletionData) {
-            SharedPreferencesManager.saveCompletionData(this@AudioPlayerService, completionData)
+            applyBackgroundSoundVolume(state.duration, state.position)
 
-            CoroutineScope(Dispatchers.Main).launch {
-                meditoAudioApi?.let { api ->
-                    api.handleCompletedTrack(completionData) { result ->
-                        if (result.isSuccess) {
-                            SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
-                        }
-                        finishPlayback()
-                    }
-                } ?: finishPlayback()
-            }
-        }
-
-        private fun finishPlayback() {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
-        }
-
-        private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {
-            try {
-                if (trackDuration != C.TIME_UNSET &&
-                    trackDuration - currentPosition <= fadeOutDurationMillis &&
-                    trackDuration > fadeOutDurationMillis
-                ) {
-                    val volumeFraction =
-                        (trackDuration - currentPosition).toFloat() / fadeOutDurationMillis
-                    backgroundMusicPlayer.volume =
-                        backgroundMusicVolume * volumeFraction
-                } else {
-                    backgroundMusicPlayer.volume = backgroundMusicVolume
+            meditoAudioApi?.updatePlaybackState(state) {
+                if (state.isCompleted && !isCompletionHandled) {
+                    isCompletionHandled = true
+                    handleTrackCompletion(state)
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                // Default to the set volume if there's an error
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error updating playback state: ${e.message}")
+        }
+    }
+
+    private fun handleTrackCompletion(state: PlaybackState) {
+        val completionData = createCompletionData(state)
+        saveAndSendCompletionData(completionData)
+    }
+
+    private fun createCompletionData(state: PlaybackState): CompletionData {
+        return CompletionData(
+            trackId = state.track.id,
+            duration = state.duration,
+            fileId = state.track.fileId,
+            guideId = state.track.artist,
+            timestamp = System.currentTimeMillis()
+        )
+    }
+
+    private fun saveAndSendCompletionData(completionData: CompletionData) {
+        SharedPreferencesManager.saveCompletionData(this@AudioPlayerService, completionData)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            meditoAudioApi?.let { api ->
+                api.handleCompletedTrack(completionData) { result ->
+                    if (result.isSuccess) {
+                        SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
+                    }
+                    finishPlayback()
+                }
+            } ?: finishPlayback()
+        }
+    }
+
+    private fun finishPlayback() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
+    private fun applyBackgroundSoundVolume(trackDuration: Long, currentPosition: Long) {
+        try {
+            if (trackDuration != C.TIME_UNSET &&
+                trackDuration - currentPosition <= fadeOutDurationMillis &&
+                trackDuration > fadeOutDurationMillis
+            ) {
+                val volumeFraction =
+                    (trackDuration - currentPosition).toFloat() / fadeOutDurationMillis
+                backgroundMusicPlayer.volume =
+                    backgroundMusicVolume * volumeFraction
+            } else {
                 backgroundMusicPlayer.volume = backgroundMusicVolume
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Default to the set volume if there's an error
+            backgroundMusicPlayer.volume = backgroundMusicVolume
         }
     }
 
@@ -347,13 +323,13 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
         // Cancel any pending coroutines
         serviceJob.cancel()
+        stopPositionUpdates()
 
         // Clean up on the main thread to avoid threading issues
         handler.post {
             try {
                 Log.d(TAG, "🔊 Removing callbacks and stopping players")
-                backgroundHandler.removeCallbacks(positionUpdateRunnable)
-
+                
                 if (::primaryPlayer.isInitialized) {
                     primaryPlayer.stop()
                     primaryPlayer.removeListener(this@AudioPlayerService)
@@ -413,7 +389,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         // Only stop service if not playing
         if (!primaryPlayer.isPlaying) {
             serviceScope.launch {
-                backgroundHandler.removeCallbacks(positionUpdateRunnable)
+                stopPositionUpdates()
                 clearNotification()
                 primaryPlayer.stop()
                 backgroundMusicPlayer.stop()
@@ -487,8 +463,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 // Start position updates
                 withContext(Dispatchers.Main) {
                     Log.d(TAG, "🔊 Starting position updates")
-                    backgroundHandler.removeCallbacks(positionUpdateRunnable)
-                    backgroundHandler.post(positionUpdateRunnable)
+                    startPositionUpdates()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "❌ Error setting up service: ${e.message}")
@@ -548,6 +523,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                         .setArtworkUri(audioData.track.imageUrl?.let { Uri.parse(it) })
                         .setExtras(android.os.Bundle().apply {
                             putString(KEY_ARTIST_URL, audioData.track.artistUrl)
+                            putString(KEY_FILE_ID, audioData.track.fileId)
                         })
                         .build()
                 )
@@ -585,8 +561,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             updateNotification()
 
             // Start position updates
-            backgroundHandler.removeCallbacks(positionUpdateRunnable)
-            backgroundHandler.post(positionUpdateRunnable)
+            startPositionUpdates()
 
             // Restart background sound if it was playing before
             if (wasBackgroundPlaying && backgroundSoundUri != null && !backgroundMusicPlayer.isPlaying) {
@@ -846,6 +821,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         primaryPlayer.stop()
         backgroundMusicPlayer.stop()
         clearNotification()
+        stopPositionUpdates()
     }
 
     override fun playPauseAudio() {
@@ -1034,5 +1010,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         private const val TAG = "MeditoAudioService"
         const val ACTION_BIND_SERVICE = "meditofoundation.medito.BIND_SERVICE"
         private const val KEY_ARTIST_URL = "artistUrl"
+        private const val KEY_FILE_ID = "fileId"
     }
 }

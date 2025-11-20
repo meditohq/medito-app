@@ -112,6 +112,7 @@ class Speed {
 class Track {
   String id;
   String title;
+  String fileId;
   String description;
   String imageUrl;
   String? artist;
@@ -120,6 +121,7 @@ class Track {
   Track({
     required this.id,
     required this.title,
+    required this.fileId,
     required this.description,
     required this.imageUrl,
     this.artist,

@@ -242,6 +242,7 @@ data class Speed (
 data class Track (
   val id: String,
   val title: String,
+  val fileId: String,
   val description: String,
   val imageUrl: String,
   val artist: String? = null,
@@ -252,17 +253,19 @@ data class Track (
     fun fromList(pigeonVar_list: List<Any?>): Track {
       val id = pigeonVar_list[0] as String
       val title = pigeonVar_list[1] as String
-      val description = pigeonVar_list[2] as String
-      val imageUrl = pigeonVar_list[3] as String
-      val artist = pigeonVar_list[4] as String?
-      val artistUrl = pigeonVar_list[5] as String?
-      return Track(id, title, description, imageUrl, artist, artistUrl)
+      val fileId = pigeonVar_list[2] as String
+      val description = pigeonVar_list[3] as String
+      val imageUrl = pigeonVar_list[4] as String
+      val artist = pigeonVar_list[5] as String?
+      val artistUrl = pigeonVar_list[6] as String?
+      return Track(id, title, fileId, description, imageUrl, artist, artistUrl)
     }
   }
   fun toList(): List<Any?> {
     return listOf(
       id,
       title,
+      fileId,
       description,
       imageUrl,
       artist,

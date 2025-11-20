@@ -86,9 +86,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    final playbackState = ref.watch(audioStateProvider);
-    if (playbackState.isCompleted && playbackState.position > 5000) {
-      _openEndScreen();
+    final isCompleted = ref.watch(audioStateProvider.select((s) => s.isCompleted));
+    if (isCompleted) {
+      final position = ref.read(audioStateProvider).position;
+      if (position > 5000) {
+        _openEndScreen();
+      }
     }
 
     final currentlyPlayingTrack = ref.watch(playerProvider);
@@ -100,7 +103,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     }
 
     final file = currentlyPlayingTrack.audio.first.files.first;
-    final imageUrl = playbackState.track.imageUrl;
+    final track = ref.watch(audioStateProvider.select((s) => s.track));
+    final isPlaying = ref.watch(audioStateProvider.select((s) => s.isPlaying));
+    final imageUrl = track.imageUrl;
 
     if (imageUrl.isNotEmpty && Uri.tryParse(imageUrl)?.hasScheme == true) {
       // Skip precaching images from dead domains
@@ -159,8 +164,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 32.0),
                             child: orientation == Orientation.portrait
-                                ? _buildPortraitLayout(playbackState)
-                                : _buildLandscapeLayout(playbackState),
+                                ? _buildPortraitLayout(track, isPlaying)
+                                : _buildLandscapeLayout(track, isPlaying),
                           ),
                         ),
                       ),
@@ -189,32 +194,30 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     );
   }
 
-  Widget _buildPortraitLayout(PlaybackState playbackState) {
+  Widget _buildPortraitLayout(Track track, bool isPlaying) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: playbackState.track.title.isNotEmpty == true
-              ? playbackState.track.title
+          trackTitle: track.title.isNotEmpty == true
+              ? track.title
               : '',
-          artistName: playbackState.track.artist?.isNotEmpty == true
-              ? playbackState.track.artist
+          artistName: track.artist?.isNotEmpty == true
+              ? track.artist
               : '',
-          artistUrlPath: playbackState.track.artistUrl,
+          artistUrlPath: track.artistUrl,
           isPlayerScreen: true,
         ),
         const SizedBox(height: 32),
         DurationIndicatorWidget(
-          totalDuration: playbackState.duration,
-          currentPosition: playbackState.position,
           onSeekEnd: (value) {
             ref.read(playerProvider.notifier).seekToPosition(value);
           },
         ),
         const SizedBox(height: 24),
         PlayerButtonsWidget(
-          isPlaying: playbackState.isPlaying,
+          isPlaying: isPlaying,
           onPlayPause: onPlayPausePressed,
           onSkip10SecondsBackward: () =>
               ref.read(playerProvider.notifier).skip10SecondsBackward(),
@@ -231,30 +234,28 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     );
   }
 
-  Widget _buildLandscapeLayout(PlaybackState playbackState) {
+  Widget _buildLandscapeLayout(Track track, bool isPlaying) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: playbackState.track.title.isNotEmpty == true
-              ? playbackState.track.title
+          trackTitle: track.title.isNotEmpty == true
+              ? track.title
               : '',
-          artistName: playbackState.track.artist?.isNotEmpty == true
-              ? playbackState.track.artist
+          artistName: track.artist?.isNotEmpty == true
+              ? track.artist
               : '',
-          artistUrlPath: playbackState.track.artistUrl,
+          artistUrlPath: track.artistUrl,
           isPlayerScreen: true,
         ),
         DurationIndicatorWidget(
-          totalDuration: playbackState.duration,
-          currentPosition: playbackState.position,
           onSeekEnd: (value) {
             ref.read(playerProvider.notifier).seekToPosition(value);
           },
         ),
         PlayerButtonsWidget(
-          isPlaying: playbackState.isPlaying,
+          isPlaying: isPlaying,
           onPlayPause: onPlayPausePressed,
           onSkip10SecondsBackward: () =>
               ref.read(playerProvider.notifier).skip10SecondsBackward(),

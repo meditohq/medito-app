@@ -232,7 +232,7 @@ class IosAudioHandler extends BaseAudioHandler {
     return {
       TypeConstants.trackIdKey: trackState.id,
       TypeConstants.durationIdKey: duration?.inMilliseconds ?? 0,
-      TypeConstants.fileIdKey: mediaItem.value?.title ?? '',
+      TypeConstants.fileIdKey: trackState.fileId,
       TypeConstants.guideIdKey: trackState.artist ?? '',
       TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
       UpdateStatsConstants.userTokenKey: userToken,
