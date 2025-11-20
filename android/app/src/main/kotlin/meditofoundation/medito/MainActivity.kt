@@ -22,6 +22,9 @@ import kotlinx.coroutines.cancel
 import android.os.Handler
 import android.os.Looper
 import android.os.Build
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.DpSize
@@ -82,7 +85,16 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
         super.onCreate(savedInstanceState)
+        
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController?.let { controller ->
+            controller.isAppearanceLightStatusBars = false
+            controller.isAppearanceLightNavigationBars = false
+        }
+        
         createNotificationChannels()
     }
 
