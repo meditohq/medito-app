@@ -277,6 +277,9 @@ class ApplePayService implements PaymentMethodService {
       AppLogger.d('PAYMENT',
           'Presenting Apple Pay sheet for ${paymentIntent.id}, amount: ${(paymentIntent.amount / 100).toStringAsFixed(2)} ${paymentIntent.currency}');
 
+      final amountString = (paymentIntent.amount / 100).toStringAsFixed(2);
+      final paymentLabel = _getPaymentLabel(paymentIntent);
+
       await Stripe.instance.confirmPlatformPayPaymentIntent(
         clientSecret: paymentIntent.clientSecret,
         confirmParams: PlatformPayConfirmParams.applePay(
@@ -286,8 +289,12 @@ class ApplePayService implements PaymentMethodService {
             currencyCode: paymentIntent.currency,
             cartItems: [
               ApplePayCartSummaryItem.immediate(
-                label: _getPaymentLabel(paymentIntent),
-                amount: (paymentIntent.amount / 100).toStringAsFixed(2),
+                label: paymentLabel,
+                amount: amountString,
+              ),
+              ApplePayCartSummaryItem.immediate(
+                label: 'Medito Foundation',
+                amount: amountString,
               ),
             ],
           ),
