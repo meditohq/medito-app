@@ -34,7 +34,7 @@ class AnalyticsEventConstants {
   static const String paywallDonation = 'paywall_donation';
 
   /// Event logged for lifetime/one-time donations (used by TikTok and Meta)
-  static const String lifetimeDonation = 'lifetime_donation';
+  static const String oneTimeDonation = 'onetime_donation';
 
   /// Event logged for monthly subscription donations (used by TikTok and Meta)
   static const String monthlyDonation = 'monthly_donation';
@@ -43,7 +43,8 @@ class AnalyticsEventConstants {
   static const String yearlyDonation = 'yearly_donation';
 
   /// Event logged when paywall is dismissed without completing a payment
-  static const String paywallDismissedNoPayment = 'paywall_dismissed_no_payment';
+  static const String paywallDismissedNoPayment =
+      'paywall_dismissed_no_payment';
 
   /// Event logged when a payment fails
   static const String paymentFailed = 'payment_failed';
@@ -67,7 +68,8 @@ class AnalyticsEventConstants {
   static const String onboardingReminderSetTap = 'onboarding_reminder_set_tap';
 
   /// Event logged when user skips reminder setup during onboarding
-  static const String onboardingReminderSkipTap = 'onboarding_reminder_skip_tap';
+  static const String onboardingReminderSkipTap =
+      'onboarding_reminder_skip_tap';
 
   /// Event logged when user confirms reminder setup during onboarding
   static const String onboardingReminderConfirmTap =
@@ -113,7 +115,8 @@ class AnalyticsEventConstants {
       'secure_storage_persistent_failure';
 
   /// Event logged when token backup storage is attempted
-  static const String tokenBackupStorageAttempt = 'token_backup_storage_attempt';
+  static const String tokenBackupStorageAttempt =
+      'token_backup_storage_attempt';
 
   /// Event logged with result of token backup storage attempt
   static const String tokenBackupStorageResult = 'token_backup_storage_result';

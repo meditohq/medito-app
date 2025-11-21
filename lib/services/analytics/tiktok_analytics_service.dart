@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tiktok_events_sdk/tiktok_events_sdk.dart';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/services/app_tracking_transparency_service.dart';
 import 'package:medito/utils/logger.dart';
 
 class TikTokAnalyticsService {
@@ -51,7 +51,8 @@ class TikTokAnalyticsService {
       }
 
       if (Platform.isIOS && requestAttPermissionImmediately) {
-        await _requestIOSTrackingAuthorization();
+        await AppTrackingTransparencyService.instance
+            .requestTrackingPermission();
       }
 
       await TikTokEventsSdk.initSdk(
@@ -95,17 +96,6 @@ class TikTokAnalyticsService {
     }
   }
 
-  Future<void> _requestIOSTrackingAuthorization() async {
-    try {
-      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-      if (status == TrackingStatus.notDetermined) {
-        await Future.delayed(const Duration(milliseconds: 200));
-        await AppTrackingTransparency.requestTrackingAuthorization();
-      }
-    } catch (e, stack) {
-      AppLogger.e('TIKTOK', 'ATT request failed', e, stack);
-    }
-  }
 
   Future<void> logEvent({
     required String name,
@@ -174,7 +164,7 @@ class TikTokAnalyticsService {
     await logEvent(
         name: AnalyticsEventConstants.paywallDonation, parameters: props);
 
-    var freqEvent = AnalyticsEventConstants.lifetimeDonation;
+    var freqEvent = AnalyticsEventConstants.oneTimeDonation;
     if (frequency == 'monthly') {
       freqEvent = AnalyticsEventConstants.monthlyDonation;
     }

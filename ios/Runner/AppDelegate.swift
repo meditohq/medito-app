@@ -5,6 +5,7 @@ import app_links
 import Intents
 import IntentsUI
 import AppTrackingTransparency
+import FBSDKCoreKit
 
 @main
 class AppDelegate: FlutterAppDelegate {
@@ -17,6 +18,8 @@ class AppDelegate: FlutterAppDelegate {
         FirebaseApp.configure()
         
         let controller = window?.rootViewController as! FlutterViewController
+        
+        // Siri channel
         let siriChannel = FlutterMethodChannel(
             name: "com.medito.app/siri",
             binaryMessenger: controller.binaryMessenger
@@ -38,6 +41,25 @@ class AppDelegate: FlutterAppDelegate {
             
             self?.presentAddVoiceShortcutUI(title: title, id: id, url: url)
             result(true)
+        }
+        
+        // Facebook SDK channel for iOS 14+ advertiser tracking
+        let facebookChannel = FlutterMethodChannel(
+            name: "com.medito.app/facebook",
+            binaryMessenger: controller.binaryMessenger
+        )
+        
+        facebookChannel.setMethodCallHandler { call, result in
+            if call.method == "setAdvertiserTrackingEnabled" {
+                if let enabled = call.arguments as? Bool {
+                    Settings.shared.isAdvertiserTrackingEnabled = enabled
+                    result(true)
+                } else {
+                    result(FlutterError(code: "INVALID_ARGUMENT", message: "Expected Bool argument", details: nil))
+                }
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
         }
         
         // Register Flutter plugins

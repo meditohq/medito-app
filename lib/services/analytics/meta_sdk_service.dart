@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -12,6 +16,8 @@ class MetaSdkService {
   static final MetaSdkService instance = MetaSdkService._();
   bool _initialised = false;
   final FacebookAppEvents _events = FacebookAppEvents();
+  static const MethodChannel _channel =
+      MethodChannel('com.medito.app/facebook');
 
   Future<void> init() async {
     if (_initialised) {
@@ -24,6 +30,33 @@ class MetaSdkService {
     // If consent gating is required, handle it before enabling tracking.
 
     _initialised = true;
+  }
+
+  /// Update Facebook SDK advertiser tracking enabled flag based on ATT status
+  /// This is required for iOS 14+ SKAdNetwork attribution
+  /// Call this after ATT permission has been requested
+  Future<void> updateTrackingStatus() async {
+    if (!Platform.isIOS) {
+      return;
+    }
+
+    try {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      final isAuthorized = status == TrackingStatus.authorized;
+
+      // Set advertiser tracking enabled via platform channel
+      // This tells Facebook SDK whether it can use IDFA for attribution
+      await _channel.invokeMethod('setAdvertiserTrackingEnabled', isAuthorized);
+
+      if (kDebugMode) {
+        AppLogger.d('META',
+            'Set advertiser tracking enabled: $isAuthorized (ATT status: $status)');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.w('META', 'Failed to set advertiser tracking enabled: $e');
+      }
+    }
   }
 
   Future<void> setUserId(String? userId) async {
@@ -92,7 +125,7 @@ class MetaSdkService {
 
     await logEvent(AnalyticsEventConstants.paywallDonation, props);
 
-    var freqEvent = AnalyticsEventConstants.lifetimeDonation;
+    var freqEvent = AnalyticsEventConstants.oneTimeDonation;
     if (frequency == 'monthly') {
       freqEvent = AnalyticsEventConstants.monthlyDonation;
     }

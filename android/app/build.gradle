@@ -71,6 +71,13 @@ if (envJsonFile.exists()) {
     }
 }
 
+def isDebugBuild = project.gradle.startParameter.taskNames.any { it.toLowerCase().contains('debug') }
+if (isDebugBuild) {
+    println "Facebook App ID: ${facebookAppId ?: 'NOT SET'}"
+    println "Facebook Client Token: ${facebookClientToken ?: 'NOT SET'}"
+    println "TikTok Android App ID: ${tiktokAndroidAppId ?: 'NOT SET'}"
+}
+
 android {
     namespace "meditofoundation.medito"
     compileSdkVersion 36

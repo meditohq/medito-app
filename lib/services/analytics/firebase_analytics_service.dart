@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:medito/services/app_tracking_transparency_service.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 
@@ -136,7 +137,13 @@ class FirebaseAnalyticsService {
 
       // For iOS, request App Tracking Transparency authorization if requested
       if (Platform.isIOS && requestAttPermissionImmediately) {
-        await _requestIOSTrackingAuthorization();
+        final status = await AppTrackingTransparencyService.instance
+            .requestTrackingPermission();
+        // If the user denied tracking, also disable Firebase Analytics
+        if (status != TrackingStatus.authorized) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(analyticsEnabledKey, false);
+        }
       }
 
       // Check if user has previously set a preference
@@ -165,36 +172,23 @@ class FirebaseAnalyticsService {
   }
 
   /// Request App Tracking Transparency permission (for iOS)
+  /// Uses the shared ATT service and updates Firebase Analytics based on result
   Future<void> requestIOSTrackingPermission() async {
-    if (Platform.isIOS) {
-      await _requestIOSTrackingAuthorization();
+    if (!Platform.isIOS) {
+      return;
     }
-  }
 
-  /// Request tracking authorization on iOS using the App Tracking Transparency framework
-  Future<void> _requestIOSTrackingAuthorization() async {
     try {
-      // Check the current status
-      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      final status = await AppTrackingTransparencyService.instance
+          .requestTrackingPermission();
 
-      // If not determined, request authorization
-      if (status == TrackingStatus.notDetermined) {
-        // Wait for dialog to display completely before continuing
-        await Future.delayed(const Duration(milliseconds: 200));
-        await AppTrackingTransparency.requestTrackingAuthorization();
-      }
-
-      // Log the result
-      final newStatus =
-          await AppTrackingTransparency.trackingAuthorizationStatus;
       if (kDebugMode) {
         AppLogger.d('FIREBASE_ANALYTICS',
-            'iOS App Tracking Transparency status: $newStatus');
+            'iOS App Tracking Transparency status: $status');
       }
 
       // If the user denied tracking, also disable Firebase Analytics
-      if (newStatus != TrackingStatus.authorized) {
-        // Save preference
+      if (status != TrackingStatus.authorized) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(analyticsEnabledKey, false);
       }

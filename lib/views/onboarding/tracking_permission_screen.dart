@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/services/app_tracking_transparency_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 
@@ -15,14 +18,27 @@ class TrackingPermissionScreen extends StatelessWidget {
   Future<void> _handleContinue(BuildContext context) async {
     if (Platform.isIOS) {
       try {
-        await FirebaseAnalyticsService().requestIOSTrackingPermission();
+        // Request ATT permission using the shared service
+        final status = await AppTrackingTransparencyService.instance
+            .requestTrackingPermission();
 
-        final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+        // Update Firebase Analytics based on ATT result (handles disabling if denied)
+        final prefs = await SharedPreferences.getInstance();
+        if (status != TrackingStatus.authorized) {
+          await prefs.setBool(
+              FirebaseAnalyticsService.analyticsEnabledKey, false);
+        }
 
+        // Update Facebook SDK with ATT status for iOS 14+ SKAdNetwork support
+        await MetaSdkService.instance.updateTrackingStatus();
+
+        // Log analytics event
         await FirebaseAnalyticsService().logEvent(
           name: status == TrackingStatus.authorized
-              ? FirebaseAnalyticsService.eventOnboardingTrackingPermissionGranted
-              : FirebaseAnalyticsService.eventOnboardingTrackingPermissionDenied,
+              ? FirebaseAnalyticsService
+                  .eventOnboardingTrackingPermissionGranted
+              : FirebaseAnalyticsService
+                  .eventOnboardingTrackingPermissionDenied,
         );
       } catch (e) {
         if (context.mounted) {
@@ -61,11 +77,12 @@ class TrackingPermissionScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       Text(
                         l10n.trackingPermissionTitle,
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.displayLarge?.copyWith(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
@@ -112,8 +129,8 @@ class TrackingPermissionScreen extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontSize: 13,
                   height: 1.3,
-                  color: Colors.white.withAlpha(
-                      ((0.85).clamp(0.0, 1.0) * 255).round()),
+                  color: Colors.white
+                      .withAlpha(((0.85).clamp(0.0, 1.0) * 255).round()),
                 ),
           ),
         ),
@@ -135,4 +152,3 @@ class TrackingPermissionScreen extends StatelessWidget {
     );
   }
 }
-
