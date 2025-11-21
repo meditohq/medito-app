@@ -193,6 +193,14 @@ if [ "$BUILD_IOS" = true ]; then
       -archivePath "$ARCHIVE_PATH" \
       archive
 
+    # Upload dSYMs to Firebase Crashlytics
+    if [ -f "ios/upload_dsyms.sh" ]; then
+        print_colored $BLUE "📤 Uploading dSYMs to Firebase Crashlytics..."
+        ios/upload_dsyms.sh "$ARCHIVE_PATH"
+    else
+        print_colored $YELLOW "⚠️  upload_dsyms.sh not found. Skipping dSYM upload."
+    fi
+
     # Export the .ipa
     xcodebuild -exportArchive \
       -archivePath "$ARCHIVE_PATH" \

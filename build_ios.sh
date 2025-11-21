@@ -24,6 +24,14 @@ xcodebuild -workspace ios/Runner.xcworkspace \
   -archivePath "$ARCHIVE_PATH" \
   archive
 
+# Upload dSYMs to Firebase Crashlytics
+if [ -f "ios/upload_dsyms.sh" ]; then
+  echo "\n[2.5/3] Uploading dSYMs to Firebase Crashlytics..."
+  ios/upload_dsyms.sh "$ARCHIVE_PATH"
+else
+  echo "\n[Warning] upload_dsyms.sh not found. Skipping dSYM upload."
+fi
+
 # Export the .ipa
 xcodebuild -exportArchive \
   -archivePath "$ARCHIVE_PATH" \
