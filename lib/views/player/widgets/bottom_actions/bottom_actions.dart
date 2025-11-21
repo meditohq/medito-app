@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medito/utils/utils.dart';
 
 class BottomActions extends StatelessWidget {
   final String title;
@@ -17,7 +18,7 @@ class BottomActions extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black.withAlpha(((0.8).clamp(0.0, 1.0) * 255).round()),
+        color: Colors.black.withOpacityValue(0.8),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: Row(

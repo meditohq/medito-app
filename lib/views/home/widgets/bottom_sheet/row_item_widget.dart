@@ -1,6 +1,7 @@
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/utils/utils.dart';
 
 class RowItemWidget extends StatelessWidget {
   const RowItemWidget({
@@ -42,7 +43,7 @@ class RowItemWidget extends StatelessWidget {
       bottom: hasUnderline
           ? BorderSide(
               width: 0.7,
-              color: Theme.of(context).colorScheme.onSurface.withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
+              color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.2),
             )
           : BorderSide.none,
     );

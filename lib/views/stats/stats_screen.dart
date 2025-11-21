@@ -13,6 +13,7 @@ import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:medito/utils/utils.dart';
 
 class StatsScreen extends ConsumerStatefulWidget {
   const StatsScreen({super.key});
@@ -98,7 +99,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                           decoration: BoxDecoration(
                             color: Theme.of(
                               context,
-                            ).colorScheme.surface.withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
+                            ).colorScheme.surface.withOpacityValue(0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: Theme.of(context).colorScheme.onSurface,
@@ -351,7 +352,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface.withAlpha(((0.08).clamp(0.0, 1.0) * 255).round()),
+              color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.08),
               width: 1,
             ),
           ),
@@ -471,7 +472,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                           side: BorderSide(
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withAlpha(((0.6).clamp(0.0, 1.0) * 255).round()),
+                            ).colorScheme.onSurface.withOpacityValue(0.6),
                             width: 1.5,
                           ),
                           shape: RoundedRectangleBorder(

@@ -2,6 +2,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:medito/utils/utils.dart';
 
 class MarkdownWidget extends StatelessWidget {
   const MarkdownWidget({
@@ -27,7 +28,7 @@ class MarkdownWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var titleMedium = Theme.of(context).textTheme.titleMedium;
-    var walterWhite = ColorConstants.white.withAlpha(((0.9).clamp(0.0, 1.0) * 255).round());
+    var walterWhite = ColorConstants.white.withOpacityValue(0.9);
 
     return Markdown(
       data: body,

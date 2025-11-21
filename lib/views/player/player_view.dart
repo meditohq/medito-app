@@ -8,6 +8,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/utils.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -173,8 +174,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                       BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
-                          color: ColorConstants.black
-                              .withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
+                          color: ColorConstants.black.withOpacityValue(0.3),
                         ),
                       ),
                     ],

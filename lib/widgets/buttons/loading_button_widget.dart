@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/utils/utils.dart';
 
 class LoadingButtonWidget extends StatelessWidget {
   const LoadingButtonWidget({
@@ -32,7 +33,7 @@ class LoadingButtonWidget extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: bgColor,
         foregroundColor: textColor,
-        disabledBackgroundColor: bgColor.withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
+        disabledBackgroundColor: bgColor.withOpacityValue(0.7),
         elevation: elevation,
         padding: const EdgeInsets.symmetric(vertical: 8),
         shape: RoundedRectangleBorder(

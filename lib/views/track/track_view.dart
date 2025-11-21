@@ -256,14 +256,14 @@ class _TrackViewState extends ConsumerState<TrackView>
   Widget _buildLoadingCover() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Container(color: ColorConstants.black.withAlpha(((0.6).clamp(0.0, 1.0) * 255).round())),
+      child: Container(color: ColorConstants.black.withOpacityValue(0.6)),
     );
   }
 
   Widget _buildErrorCover() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Container(color: ColorConstants.black.withAlpha(((0.6).clamp(0.0, 1.0) * 255).round())),
+      child: Container(color: ColorConstants.black.withOpacityValue(0.6)),
     );
   }
 

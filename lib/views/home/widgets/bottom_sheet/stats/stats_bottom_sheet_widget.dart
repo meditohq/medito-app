@@ -13,6 +13,7 @@ import 'package:medito/widgets/widgets.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../row_item_widget.dart';
+import 'package:medito/utils/utils.dart';
 
 class StatsBottomSheetWidget extends ConsumerStatefulWidget {
   const StatsBottomSheetWidget({super.key});
@@ -434,7 +435,7 @@ class _StatsBottomSheetWidgetState extends ConsumerState<StatsBottomSheetWidget>
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withAlpha(((0.6).clamp(0.0, 1.0) * 255).round()),
+                            .withOpacityValue(0.6),
                         width: 1.5,
                       ),
                       shape: RoundedRectangleBorder(

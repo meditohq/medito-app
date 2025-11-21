@@ -18,6 +18,7 @@ import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
+import 'package:medito/utils/utils.dart';
 import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
@@ -174,7 +175,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                           .textTheme
                           .bodyMedium
                           ?.color
-                          ?.withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
+                          ?.withOpacityValue(0.7),
                     ),
               ),
               actions: [
@@ -524,7 +525,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                           .textTheme
                           .bodySmall
                           ?.color
-                          ?.withAlpha(((0.38).clamp(0.0, 1.0) * 255).round())
+                          ?.withOpacityValue(0.38)
                       : ColorConstants.brightSky,
                   fontSize: 14,
                 ),
@@ -551,7 +552,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withAlpha(((0.6).clamp(0.0, 1.0) * 255).round())),
+                        .withOpacityValue(0.6)),
                 onPressed: () {
                   _emailController.clear();
                   _validateEmail();
@@ -594,7 +595,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                       .textTheme
                       .bodySmall
                       ?.color
-                      ?.withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
+                      ?.withOpacityValue(0.7),
                   fontSize: 12,
                 ),
             children: [
@@ -640,7 +641,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
       backgroundColor: ColorConstants.lightPurple,
       disabledForegroundColor: Colors.white60,
-      disabledBackgroundColor: ColorConstants.lightPurple.withAlpha(((0.5).clamp(0.0, 1.0) * 255).round()),
+      disabledBackgroundColor: ColorConstants.lightPurple.withOpacityValue(0.5),
       minimumSize: const Size(double.infinity, 48),
     );
   }
@@ -652,7 +653,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withAlpha(((0.6).clamp(0.0, 1.0) * 255).round())),
+          color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6)),
       filled: true,
       fillColor: Theme.of(context).colorScheme.surface,
       enabledBorder: const OutlineInputBorder(

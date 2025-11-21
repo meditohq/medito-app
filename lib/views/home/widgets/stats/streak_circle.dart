@@ -9,6 +9,7 @@ import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import '../../../../constants/colors/color_constants.dart';
 import 'streak_circle_constants.dart';
+import 'package:medito/utils/utils.dart';
 
 class StreakCircle extends ConsumerStatefulWidget {
   final VoidCallback onTap;
@@ -198,16 +199,11 @@ class StreakCircleState extends ConsumerState<StreakCircle>
           ? BoxDecoration(
               gradient: SweepGradient(
                 colors: [
-                  ColorConstants.lightPurple
-                      .withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
-                  ColorConstants.lightPurple
-                      .withAlpha(((0.35).clamp(0.0, 1.0) * 255).round()),
-                  ColorConstants.lightPurple
-                      .withAlpha(((1).clamp(0.0, 1.0) * 255).round()),
-                  ColorConstants.lightPurple
-                      .withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
-                  ColorConstants.lightPurple
-                      .withAlpha(((0.25).clamp(0.0, 1.0) * 255).round()),
+                  ColorConstants.lightPurple.withOpacityValue(0.2),
+                  ColorConstants.lightPurple.withOpacityValue(0.35),
+                  ColorConstants.lightPurple.withOpacityValue(1),
+                  ColorConstants.lightPurple.withOpacityValue(0.3),
+                  ColorConstants.lightPurple.withOpacityValue(0.25),
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
                 transform: GradientRotation(
@@ -246,7 +242,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                           backgroundColor: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
+                              .withOpacityValue(0.2),
                           valueColor: AlwaysStoppedAnimation<Color>(
                             isStreakDoneToday
                                 ? ColorConstants.lightPurple

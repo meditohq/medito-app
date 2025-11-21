@@ -125,3 +125,9 @@ extension GetIdFromPath on String {
     return split('/').last;
   }
 }
+
+extension ColorExtensions on Color {
+  Color withOpacityValue(double opacity) {
+    return withAlpha((opacity.clamp(0.0, 1.0) * 255).round());
+  }
+}

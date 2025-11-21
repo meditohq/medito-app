@@ -39,8 +39,7 @@ class AppTrackingTransparencyService {
           await AppTrackingTransparency.trackingAuthorizationStatus;
 
       if (kDebugMode) {
-        AppLogger.d('ATT',
-            'Tracking authorization status: $finalStatus');
+        AppLogger.d('ATT', 'Tracking authorization status: $finalStatus');
       }
 
       return finalStatus;
@@ -74,4 +73,3 @@ class AppTrackingTransparencyService {
     return status == TrackingStatus.authorized;
   }
 }
-

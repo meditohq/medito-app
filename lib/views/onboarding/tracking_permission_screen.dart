@@ -9,6 +9,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/utils/utils.dart';
 
 class TrackingPermissionScreen extends StatelessWidget {
   const TrackingPermissionScreen({super.key, this.onNext});
@@ -91,8 +92,7 @@ class TrackingPermissionScreen extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontSize: 16,
                               height: 1.5,
-                              color: Colors.white.withAlpha(
-                                  ((0.9).clamp(0.0, 1.0) * 255).round()),
+                              color: Colors.white.withOpacityValue(0.9),
                             ),
                         textAlign: TextAlign.center,
                       ),
@@ -120,7 +120,7 @@ class TrackingPermissionScreen extends StatelessWidget {
         MeditoIcon(
           assetName: MeditoIcons.checkCircle,
           size: 16,
-          color: Colors.white.withAlpha(((0.9).clamp(0.0, 1.0) * 255).round()),
+          color: Colors.white.withOpacityValue(0.9),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -129,8 +129,7 @@ class TrackingPermissionScreen extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontSize: 13,
                   height: 1.3,
-                  color: Colors.white
-                      .withAlpha(((0.85).clamp(0.0, 1.0) * 255).round()),
+                  color: Colors.white.withOpacityValue(0.85),
                 ),
           ),
         ),

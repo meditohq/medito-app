@@ -17,6 +17,7 @@ import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:medito/widgets/pack_card_widget.dart';
+import 'package:medito/utils/utils.dart';
 
 // Create a filtered provider to handle search logic efficiently
 final filteredPacksProvider =
@@ -212,7 +213,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
+                              .withOpacityValue(0.7),
                         ),
                     textAlign: TextAlign.center,
                   ),
@@ -456,12 +457,12 @@ class SearchBox extends StatelessWidget {
         fillColor: Theme.of(context)
             .colorScheme
             .surfaceTint
-            .withAlpha(((0.1).clamp(0.0, 1.0) * 255).round()),
+            .withOpacityValue(0.1),
         hintStyle: TextStyle(
           color: Theme.of(context)
               .colorScheme
               .onSurface
-              .withAlpha(((0.6).clamp(0.0, 1.0) * 255).round()),
+              .withOpacityValue(0.6),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

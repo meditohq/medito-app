@@ -4,6 +4,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/donation/superwall_donation_screen.dart';
+import 'package:medito/utils/utils.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
   const OnboardingDonationScreen({super.key, this.onNext});
@@ -90,7 +91,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withAlpha(((0.7).clamp(0.0, 1.0) * 255).round()),
+                          .withOpacityValue(0.7),
                       fontSize: 16,
                       height: 1.5,
                     ),

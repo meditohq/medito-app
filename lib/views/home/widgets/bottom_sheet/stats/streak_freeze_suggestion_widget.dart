@@ -6,6 +6,7 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/utils/utils.dart';
 
 class StreakFreezeSuggestionWidget extends ConsumerStatefulWidget {
   final LocalAllStats stats;
@@ -145,7 +146,7 @@ class StreakFreezeSuggestionWidgetState
                     backgroundColor: ColorConstants.lightPurple,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: theme.colorScheme.onSurface
-                        .withAlpha(((0.2).clamp(0.0, 1.0) * 255).round()),
+                        .withOpacityValue(0.2),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -177,7 +178,7 @@ class StreakFreezeSuggestionWidgetState
       return _buildCircleIcon(
         50,
         theme.colorScheme.onSurface
-            .withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
+            .withOpacityValue(0.4),
       );
     }
 
@@ -226,7 +227,7 @@ class StreakFreezeSuggestionWidgetState
         final colorAnimation = ColorTween(
           begin: ColorConstants.lightPurple,
           end: theme.colorScheme.onSurface
-              .withAlpha(((0.4).clamp(0.0, 1.0) * 255).round()),
+              .withOpacityValue(0.4),
         ).animate(iconTransition);
 
         return Transform.scale(

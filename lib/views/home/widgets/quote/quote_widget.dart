@@ -8,6 +8,7 @@ import 'package:medito/models/home/home_model.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/utils/utils.dart';
 
 class QuoteWidget extends ConsumerStatefulWidget {
   const QuoteWidget({super.key, required this.data});
@@ -30,7 +31,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
         );
 
     final authorStyle = quoteStyle?.copyWith(
-      color: quoteStyle.color?.withAlpha(((0.8).clamp(0.0, 1.0) * 255).round()),
+      color: quoteStyle.color?.withOpacityValue(0.8),
       fontSize: 16,
     );
 
@@ -77,7 +78,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withAlpha(((0.8).clamp(0.0, 1.0) * 255).round()),
+                          .withOpacityValue(0.8),
                       size: 16,
                     ),
                   ),

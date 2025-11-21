@@ -1,6 +1,7 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/utils/utils.dart';
 
 class MeditoAppBarLarge extends StatefulWidget {
   const MeditoAppBarLarge({
@@ -83,8 +84,8 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
             begin: Alignment.topLeft,
             end: Alignment.bottomLeft,
             colors: [
-              ColorConstants.black.withAlpha(((0).clamp(0.0, 1.0) * 255).round()),
-              ColorConstants.black.withAlpha(((0.3).clamp(0.0, 1.0) * 255).round()),
+              ColorConstants.black.withOpacityValue(0),
+              ColorConstants.black.withOpacityValue(0.3),
             ],
           ),
           url: coverUrl,

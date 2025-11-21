@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 
 import '../../views/downloads/downloads_view.dart';
+import 'package:medito/utils/utils.dart';
 
 class MeditoErrorWidget extends ConsumerWidget {
   const MeditoErrorWidget({
@@ -239,7 +240,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                   AppLocalizations.of(context)!.reportError,
                   style: TextStyle(
                     color: isCoolingDown
-                        ? ColorConstants.lightPurple.withAlpha(((0.5).clamp(0.0, 1.0) * 255).round())
+                        ? ColorConstants.lightPurple.withOpacityValue(0.5)
                         : ColorConstants.lightPurple,
                   ),
                 ),

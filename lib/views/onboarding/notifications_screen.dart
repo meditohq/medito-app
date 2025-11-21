@@ -12,6 +12,7 @@ import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/utils/utils.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key, this.onNext});
@@ -156,7 +157,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: 16,
                           height: 1.5,
-                          color: Colors.white.withAlpha(((0.9).clamp(0.0, 1.0) * 255).round()),
+                          color: Colors.white.withOpacityValue(0.9),
                         ),
                     textAlign: TextAlign.center,
                   ),
