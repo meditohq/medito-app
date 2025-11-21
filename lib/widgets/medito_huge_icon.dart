@@ -87,7 +87,7 @@ class MeditoHugeIcon extends StatelessWidget {
     'solidRoundedSun01': MeditoIcons.sun,
     'solidRoundedDownloadSquare02': MeditoIcons.downloadCircleNew,
     'solidRoundedTime01': MeditoIcons.timerOutline,
-    'solidRoundedSleeping': MeditoIcons.sleep,
+    'solidRoundedSleeping': MeditoIcons.moon,
     'solidRoundedMedal06': MeditoIcons.medalOutline,
     'solidRoundedHealtcare': MeditoIcons.health,
     'solidRoundedStar': MeditoIcons.star,

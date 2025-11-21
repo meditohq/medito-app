@@ -175,10 +175,12 @@ class TikTokAnalyticsService {
         name: AnalyticsEventConstants.paywallDonation, parameters: props);
 
     var freqEvent = AnalyticsEventConstants.lifetimeDonation;
-    if (frequency == 'monthly')
+    if (frequency == 'monthly') {
       freqEvent = AnalyticsEventConstants.monthlyDonation;
-    if (frequency == 'yearly')
+    }
+    if (frequency == 'yearly') {
       freqEvent = AnalyticsEventConstants.yearlyDonation;
+    }
 
     await logEvent(name: freqEvent, parameters: props);
   }
