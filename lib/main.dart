@@ -225,12 +225,18 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
         pathSegments = uri.pathSegments;
       } else {
-        showSnackBar(context, AppLocalizations.of(context)!.invalidDeepLink);
+        final localizations = AppLocalizations.of(context);
+        if (localizations != null) {
+          showSnackBar(context, localizations.invalidDeepLink);
+        }
         return;
       }
 
       if (pathSegments.isEmpty) {
-        showSnackBar(context, AppLocalizations.of(context)!.invalidDeepLink);
+        final localizations = AppLocalizations.of(context);
+        if (localizations != null) {
+          showSnackBar(context, localizations.invalidDeepLink);
+        }
         return;
       }
 
@@ -247,11 +253,16 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
 
       Future.delayed(const Duration(seconds: 2), () {
-        handleNavigation(path, [id], context, ref: ref);
+        if (mounted) {
+          handleNavigation(path, [id], context, ref: ref);
+        }
       });
     } catch (e) {
       AppLogger.e('DEEPLINK', 'Error handling deep link', e);
-      showSnackBar(context, AppLocalizations.of(context)!.deepLinkError);
+      final localizations = AppLocalizations.of(context);
+      if (localizations != null) {
+        showSnackBar(context, localizations.deepLinkError);
+      }
     }
   }
 
