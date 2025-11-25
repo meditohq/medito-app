@@ -185,8 +185,11 @@ class HttpApiService {
 
       _retryCount = 0;
       return content.isEmpty ? {} : _parseResponseContent(content);
-    } on NetworkConnectionError catch (e, stackTrace) {
+    } on SocketException catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Network Error (SocketException)', e, stackTrace);
+      throw NetworkConnectionError(originalException: e);
+    } on NetworkConnectionError catch (e, stackTrace) {
+      AppLogger.e('HTTP', 'Network Error (NetworkConnectionError)', e, stackTrace);
       throw NetworkConnectionError(originalException: e);
     } on TimeoutException catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Request Timeout', e, stackTrace);

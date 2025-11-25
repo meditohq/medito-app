@@ -46,6 +46,11 @@ class CrashlyticsService {
     // Set up Flutter error handling
     final originalOnError = FlutterError.onError;
     FlutterError.onError = (errorDetails) {
+      // Don't report network connection errors to Crashlytics
+      if (errorDetails.exception is NetworkConnectionError) {
+        return;
+      }
+
       if (_shouldIgnoreImageLoadingError(
         stack: errorDetails.stack?.toString(),
         exception: errorDetails.exception,
@@ -185,6 +190,11 @@ class CrashlyticsService {
     String? reason,
     Iterable<Object>? information,
   }) {
+    // Don't report network connection errors to Crashlytics
+    if (exception is NetworkConnectionError) {
+      return;
+    }
+
     FirebaseCrashlytics.instance.recordError(
       exception,
       stack,
