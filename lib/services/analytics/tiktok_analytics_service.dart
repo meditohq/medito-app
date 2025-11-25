@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tiktok_events_sdk/tiktok_events_sdk.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:medito/src/tiktok_pigeon.g.dart'; // Import generated Pigeon code
 
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -23,6 +25,59 @@ class TikTokAnalyticsService {
   Future<void> initialize({bool requestAttPermissionImmediately = true}) async {
     if (_initialized) return;
 
+    // ---------------------------------------------------------
+    // ANDROID: Use Native Pigeon Implementation
+    // ---------------------------------------------------------
+    if (Platform.isAndroid) {
+      try {
+        if (kDebugMode) {
+          AppLogger.d('TIKTOK', 'Initializing Native Android SDK via Pigeon');
+          AppLogger.d('TIKTOK',
+              'App ID value: "$tiktokAndroidAppId" (length: ${tiktokAndroidAppId.length})');
+        }
+
+        final api = TikTokAndroidApi();
+        // Use test event code from config (only set in staging/debug builds)
+        final testEventCode = tiktokTestEventCode?.isNotEmpty == true
+            ? tiktokTestEventCode
+            : null;
+        await api.initialize(
+            tiktokAndroidAppId,
+            tiktokAndroidAppId, // Pass same ID for ttAppId
+            kDebugMode,
+            testEventCode);
+
+        _initialized = true;
+
+        if (kDebugMode) {
+          AppLogger.d('TIKTOK',
+              'SDK initialization call completed. Config fetch happens asynchronously.');
+          AppLogger.d('TIKTOK',
+              'If network is unavailable, config fetch may fail but SDK will retry automatically.');
+          AppLogger.d('TIKTOK',
+              'Events will be queued and flushed once config fetch succeeds.');
+        }
+      } catch (e, stack) {
+        // If initialization fails due to Pigeon channel error but SDK might still be initialized
+        // (e.g., double initialization guard on native side), mark as initialized to prevent retries
+        final errorString = e.toString();
+        if (errorString.contains('channel-error') ||
+            errorString.contains('Unable to establish connection') ||
+            (e is PlatformException && e.code == 'channel-error')) {
+          AppLogger.w('TIKTOK',
+              'Pigeon channel error during initialization - SDK may already be initialized. Marking as initialized.');
+          _initialized = true;
+        } else {
+          AppLogger.e(
+              'TIKTOK', 'Error initializing Android TikTok SDK', e, stack);
+        }
+      }
+      return;
+    }
+
+    // ---------------------------------------------------------
+    // iOS: Keep existing Plugin Implementation
+    // ---------------------------------------------------------
     // Skip TikTok SDK initialization on iOS simulator (SDK doesn't support simulator)
     if (Platform.isIOS) {
       try {
@@ -46,8 +101,8 @@ class TikTokAnalyticsService {
 
     try {
       if (kDebugMode) {
-        AppLogger.d('TIKTOK',
-            'Initializing with App ID: $tiktokAndroidAppId (Android) / $tiktokIosAppId (iOS)');
+        AppLogger.d(
+            'TIKTOK', 'Initializing iOS Plugin with App ID: $tiktokIosAppId');
       }
 
       if (Platform.isIOS && requestAttPermissionImmediately) {
@@ -55,18 +110,15 @@ class TikTokAnalyticsService {
             .requestTrackingPermission();
       }
 
+      // Only initialize plugin for iOS (Android uses native Pigeon implementation)
       await TikTokEventsSdk.initSdk(
-        androidAppId: tiktokAndroidAppId,
+        androidAppId:
+            tiktokAndroidAppId, // Plugin ignores this if we don't call it on Android
         tikTokAndroidId: tiktokAndroidAppId,
         iosAppId: tiktokIosAppId,
         tiktokIosId: tiktokIosAppId,
         isDebugMode: kDebugMode,
         logLevel: kDebugMode ? TikTokLogLevel.debug : TikTokLogLevel.info,
-        androidOptions: TikTokAndroidOptions(
-          disableAutoStart: false,
-          enableAutoIapTrack: false,
-          disableAdvertiserIDCollection: false,
-        ),
         iosOptions: TikTokIosOptions(
           disableTracking: false,
           disableAutomaticTracking: false,
@@ -96,7 +148,6 @@ class TikTokAnalyticsService {
     }
   }
 
-
   Future<void> logEvent({
     required String name,
     Map<String, Object>? parameters,
@@ -118,6 +169,19 @@ class TikTokAnalyticsService {
 
       if (!_initialized) await initialize();
 
+      // ---------------------------------------------------------
+      // ANDROID: Use Native Pigeon Implementation
+      // ---------------------------------------------------------
+      if (Platform.isAndroid) {
+        await TikTokAndroidApi().logEvent(name, parameters);
+        if (kDebugMode)
+          AppLogger.d('TIKTOK', 'Logged Native Android event $name');
+        return;
+      }
+
+      // ---------------------------------------------------------
+      // iOS: Use Plugin Implementation
+      // ---------------------------------------------------------
       await TikTokEventsSdk.logEvent(
         event: TikTokEvent(
           eventName: name,

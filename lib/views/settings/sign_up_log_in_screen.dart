@@ -289,10 +289,12 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           if (userId != null && userId.isNotEmpty) {
             await FirebaseAnalyticsService().setUserId(userId);
             await MetaSdkService.instance.setUserId(userId);
-            dev.log('[SIGN_UP] User ID set for analytics: $userId', level: 1000);
+            dev.log('[SIGN_UP] User ID set for analytics: $userId',
+                level: 1000);
           }
         } catch (e) {
-          dev.log('[SIGN_UP] Error setting user ID for analytics: $e', level: 1000);
+          dev.log('[SIGN_UP] Error setting user ID for analytics: $e',
+              level: 1000);
         }
 
         // Log analytics event for completed signup

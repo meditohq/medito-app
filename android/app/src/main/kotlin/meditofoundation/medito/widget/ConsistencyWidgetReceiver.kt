@@ -44,11 +44,6 @@ class ConsistencyWidgetReceiver : HomeWidgetGlanceWidgetReceiver<ConsistencyWidg
         if (action == "es.antonborri.home_widget.UPDATE_WIDGET") {
             Log.d(TAG, "✅ Received home_widget UPDATE_WIDGET broadcast, triggering update")
             updateWidget(context)
-        }
-        // Handle standard widget updates
-        else if (action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
-            Log.d(TAG, "✅ Received APPWIDGET_UPDATE broadcast, updating widget")
-            updateWidget(context)
         } else {
             Log.d(TAG, "ℹ️ Ignoring action: $action")
         }

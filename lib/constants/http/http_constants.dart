@@ -13,6 +13,7 @@ class EnvConfig {
   final String paywallEnvironment;
   final String tiktokAndroidAppId;
   final String tiktokIosAppId;
+  final String? tiktokTestEventCode;
   final String facebookAppId;
   final String facebookClientToken;
 
@@ -29,6 +30,7 @@ class EnvConfig {
     required this.paywallEnvironment,
     required this.tiktokAndroidAppId,
     required this.tiktokIosAppId,
+    this.tiktokTestEventCode,
     required this.facebookAppId,
     required this.facebookClientToken,
   });
@@ -48,6 +50,7 @@ class ProdEnv extends EnvConfig {
     required super.paywallEnvironment,
     required super.tiktokAndroidAppId,
     required super.tiktokIosAppId,
+    super.tiktokTestEventCode,
     required super.facebookAppId,
     required super.facebookClientToken,
   });
@@ -67,6 +70,7 @@ class StagingEnv extends EnvConfig {
     required super.paywallEnvironment,
     required super.tiktokAndroidAppId,
     required super.tiktokIosAppId,
+    super.tiktokTestEventCode,
     required super.facebookAppId,
     required super.facebookClientToken,
   });
@@ -86,6 +90,7 @@ const _prodEnv = ProdEnv(
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
   tiktokAndroidAppId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
   tiktokIosAppId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
+  tiktokTestEventCode: String.fromEnvironment('TIKTOK_TEST_EVENT_CODE'),
   facebookAppId: String.fromEnvironment('FACEBOOK_APP_ID'),
   facebookClientToken: String.fromEnvironment('FACEBOOK_CLIENT_TOKEN'),
 );
@@ -104,6 +109,7 @@ const _stagingEnv = StagingEnv(
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
   tiktokAndroidAppId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
   tiktokIosAppId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
+  tiktokTestEventCode: String.fromEnvironment('TIKTOK_TEST_EVENT_CODE'),
   facebookAppId: String.fromEnvironment('FACEBOOK_APP_ID'),
   facebookClientToken: String.fromEnvironment('FACEBOOK_CLIENT_TOKEN'),
 );
@@ -122,6 +128,7 @@ String get superwallApiKey => _currentEnv.superwallApiKey;
 String get paywallEnvironment => _currentEnv.paywallEnvironment;
 String get tiktokAndroidAppId => _currentEnv.tiktokAndroidAppId;
 String get tiktokIosAppId => _currentEnv.tiktokIosAppId;
+String? get tiktokTestEventCode => _currentEnv.tiktokTestEventCode;
 String get facebookAppId => _currentEnv.facebookAppId;
 String get facebookClientToken => _currentEnv.facebookClientToken;
 
@@ -159,7 +166,7 @@ class HTTPConstants {
 
   // DEAD DOMAINS - domains that no longer exist and should be avoided
   static const List<String> _deadDomains = [
-    'images.medito.space',  
+    'images.medito.space',
   ];
 
   /// Checks if a URL is from a dead/unavailable domain
