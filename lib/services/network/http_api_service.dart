@@ -189,7 +189,8 @@ class HttpApiService {
       AppLogger.e('HTTP', 'Network Error (SocketException)', e, stackTrace);
       throw NetworkConnectionError(originalException: e);
     } on NetworkConnectionError catch (e, stackTrace) {
-      AppLogger.e('HTTP', 'Network Error (NetworkConnectionError)', e, stackTrace);
+      AppLogger.e(
+          'HTTP', 'Network Error (NetworkConnectionError)', e, stackTrace);
       throw NetworkConnectionError(originalException: e);
     } on TimeoutException catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Request Timeout', e, stackTrace);

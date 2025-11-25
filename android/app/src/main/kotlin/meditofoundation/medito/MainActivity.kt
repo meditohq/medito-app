@@ -22,6 +22,7 @@ import kotlinx.coroutines.cancel
 import android.os.Handler
 import android.os.Looper
 import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsCompat
@@ -180,15 +181,19 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         createAudioServiceNotificationChannel()
         val intent = Intent(this, AudioPlayerService::class.java)
         
-        // Use the appropriate method based on Android version
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
+        try {
+            // Use the appropriate method based on Android version
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                ContextCompat.startForegroundService(this, intent)
+            } else {
+                startService(intent)
+            }
+            // Log successful service start attempt
+            println("🔊 Service start requested")
+        } catch (e: Exception) {
+            println("❌ Error starting service: ${e.message}")
+            e.printStackTrace()
         }
-
-        // Log successful service start attempt
-        println("🔊 Service start requested")
     }
 
     override fun isServiceReady(callback: (Result<Boolean>) -> Unit) {

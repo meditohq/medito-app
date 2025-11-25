@@ -39,6 +39,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.app.ForegroundServiceStartNotAllowedException
 import meditofoundation.medito.pigeon.*
 
 @UnstableApi
@@ -455,17 +456,33 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "🔊 Service onStartCommand called")
+        
         // Create and show notification immediately
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(
-                NOTIFICATION_ID,
-                createInitialNotification(),
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
-            )
-        } else {
-            startForeground(NOTIFICATION_ID, createInitialNotification())
+        try {
+            val notification = createInitialNotification()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
+                )
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
+            Log.d(TAG, "🔊 Started foreground service with initial notification")
+        } catch (e: ForegroundServiceStartNotAllowedException) {
+            // This exception only occurs on Android 12+ (API 31+) when trying to start
+            // a foreground service from the background
+            Log.e(TAG, "❌ ForegroundServiceStartNotAllowedException: ${e.message}")
+            Log.w(TAG, "⚠️ Cannot start foreground service from background, stopping service")
+            // Stop the service since we can't run as foreground
+            stopSelf()
+            return START_NOT_STICKY
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error starting foreground service: ${e.message}")
+            e.printStackTrace()
+            // Try to continue anyway if it's not a critical error
         }
-        Log.d(TAG, "🔊 Started foreground service with initial notification")
 
         // Call super after starting foreground
         super.onStartCommand(intent, flags, startId)
