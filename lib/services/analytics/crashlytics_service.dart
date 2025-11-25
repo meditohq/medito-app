@@ -17,7 +17,10 @@ class CrashlyticsService {
   static const _imageRelatedKeywords = [
     'Image',
     'CachedNetworkImage',
-    'NetworkImage'
+    'NetworkImage',
+    'precacheImage',
+    'ImageStreamCompleter',
+    'MultiFrameImageStreamCompleter',
   ];
 
   static const _networkErrorPatterns = [
@@ -76,7 +79,9 @@ class CrashlyticsService {
   bool _isImageLoadingError(String? stackTrace) {
     if (stackTrace == null) return false;
 
-    return _imageRelatedKeywords.any((keyword) => stackTrace.contains(keyword));
+    final lowerStack = stackTrace.toLowerCase();
+    return _imageRelatedKeywords
+        .any((keyword) => lowerStack.contains(keyword.toLowerCase()));
   }
 
   bool _hasNetworkError(dynamic exception) {
@@ -120,20 +125,44 @@ class CrashlyticsService {
       }
     }
 
-    // Special case for SocketException from image URLs (DNS failures, host lookup failures, etc.)
+    // Special case for SocketException from image URLs (DNS failures, host lookup failures, connection timeouts, etc.)
     if (exception is SocketException) {
       final exceptionString = exception.toString();
-      // Check if it's related to cdn.medito.app or contains DNS error patterns
-      if (exceptionString.contains('cdn.medito.app') ||
-          exceptionString.contains('Failed host lookup') ||
-          exceptionString.contains('No address associated with hostname')) {
-        // If it's an image loading error, ignore it
+      final lowerExceptionString = exceptionString.toLowerCase();
+      final isCdnMeditoError = lowerExceptionString.contains('cdn.medito.app');
+      final isConnectionTimeout =
+          lowerExceptionString.contains('connection timed out');
+      final isNetworkError =
+          lowerExceptionString.contains('failed host lookup') ||
+              lowerExceptionString
+                  .contains('no address associated with hostname') ||
+              isConnectionTimeout ||
+              lowerExceptionString.contains('connection refused');
+
+      // If it's related to cdn.medito.app or is a network error, check if we should ignore it
+      if (isCdnMeditoError || isNetworkError) {
+        // If it's an image loading error (precacheImage, ImageStreamCompleter, etc.), ignore it
         if (_isImageLoadingError(stack)) {
           return true;
         }
         // Also check if the stack trace contains URLs from dead domains
         if (stack != null && HTTPConstants.isDeadDomain(stack)) {
           return true;
+        }
+        // If it's a connection timeout from cdn.medito.app, always ignore (likely image loading)
+        // Connection timeouts during image loading are not fatal errors
+        if (isCdnMeditoError && isConnectionTimeout) {
+          return true;
+        }
+        // Also ignore any connection timeout if stack trace suggests image loading
+        if (isConnectionTimeout && stack != null) {
+          final lowerStack = stack.toLowerCase();
+          if (lowerStack.contains('image') ||
+              lowerStack.contains('precache') ||
+              lowerStack.contains('networkimage') ||
+              lowerStack.contains('cachednetworkimage')) {
+            return true;
+          }
         }
       }
     }
