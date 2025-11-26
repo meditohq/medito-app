@@ -602,25 +602,77 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             }
 
             // Request audio focus before preparing (but don't stop background sound)
-            requestAudioFocus()
-
-            // Prepare and start playback
-            primaryPlayer.prepare()
-            primaryPlayer.play()
-
-            Log.d(TAG, "🔊 Started primary audio playback")
-
-            // Update notification
-            updateNotification()
-
-            // Start position updates
-            startPositionUpdates()
-
-            // Restart background sound if it was playing before
-            if (wasBackgroundPlaying && backgroundSoundUri != null && !backgroundMusicPlayer.isPlaying) {
-                Log.d(TAG, "🔊 Restarting background sound that was playing before")
-                playBackgroundSound()
+            val audioFocusGranted = requestAudioFocus()
+            
+            // On Android 16+, continue even if audio focus is denied initially
+            // The system may grant it later, and we want to attempt playback
+            if (!audioFocusGranted) {
+                Log.w(TAG, "⚠️ Audio focus not granted initially, but continuing with playback attempt")
             }
+
+            // Ensure MediaSession is ready (important for Android 16+)
+            if (primaryMediaSession == null) {
+                Log.w(TAG, "⚠️ MediaSession is null, recreating it")
+                primaryMediaSession = MediaSession.Builder(this, primaryPlayer)
+                    .setId("MeditoAudioSession_${System.currentTimeMillis()}")
+                    .build()
+            }
+            
+            // Prepare the player
+            primaryPlayer.prepare()
+            
+            // Helper function to start playback once ready
+            val startPlayback = {
+                // Ensure we still have audio focus or request it again
+                if (!hasAudioFocus) {
+                    requestAudioFocus()
+                }
+                
+                // Start playback
+                primaryPlayer.play()
+                
+                // Update notification
+                updateNotification()
+                
+                // Start position updates
+                startPositionUpdates()
+                
+                // Restart background sound if it was playing before
+                if (wasBackgroundPlaying && backgroundSoundUri != null && !backgroundMusicPlayer.isPlaying) {
+                    Log.d(TAG, "🔊 Restarting background sound that was playing before")
+                    playBackgroundSound()
+                }
+            }
+            
+            // Check if player is already ready
+            if (primaryPlayer.playbackState == Player.STATE_READY) {
+                Log.d(TAG, "🔊 Player already ready, starting playback immediately")
+                startPlayback()
+            } else {
+                // Wait for player to be ready before playing (important for Android 16+)
+                // Use a listener to start playback once ready
+                val playbackListener = object : Player.Listener {
+                    private var isHandled = false
+                    
+                    override fun onPlaybackStateChanged(state: Int) {
+                        if (state == Player.STATE_READY && !isHandled) {
+                            isHandled = true
+                            Log.d(TAG, "🔊 Player is ready, starting playback")
+                            primaryPlayer.removeListener(this)
+                            startPlayback()
+                        } else if (state == Player.STATE_IDLE || state == Player.STATE_ENDED) {
+                            if (!isHandled) {
+                                isHandled = true
+                                primaryPlayer.removeListener(this)
+                            }
+                        }
+                    }
+                }
+                
+                primaryPlayer.addListener(playbackListener)
+            }
+
+            Log.d(TAG, "🔊 Started primary audio playback preparation")
 
             return true
         } catch (e: Exception) {
@@ -886,6 +938,13 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         Log.d(TAG, "🔊 playPauseAudio called")
         try {
             isCompletionHandled = false
+            
+            // Check if player is initialized and in a valid state
+            if (!::primaryPlayer.isInitialized) {
+                Log.e(TAG, "❌ Primary player not initialized")
+                return
+            }
+            
             if (primaryPlayer.isPlaying) {
                 Log.d(TAG, "🔊 Pausing primary player")
                 primaryPlayer.pause()
@@ -896,20 +955,50 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 }
             } else {
                 Log.d(TAG, "🔊 Playing primary player")
+                
+                // Check player state before attempting to play
+                val playbackState = primaryPlayer.playbackState
+                if (playbackState == Player.STATE_IDLE || playbackState == Player.STATE_ENDED) {
+                    Log.w(TAG, "⚠️ Player is in $playbackState state, cannot play. Need to prepare first.")
+                    return
+                }
 
                 // Request audio focus before playing
                 requestAudioFocus()
 
-                // Play regardless of audio focus state
-                primaryPlayer.play()
+                // Only play if player is in a ready state
+                if (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING) {
+                    primaryPlayer.play()
+                    
+                    // If background sound was previously playing, resume it
+                    if (backgroundSoundUri != null) {
+                        Log.d(TAG, "🔊 Resuming background sound if available")
+                        playBackgroundSound()
+                    }
 
-                // If background sound was previously playing, resume it
-                if (backgroundSoundUri != null) {
-                    Log.d(TAG, "🔊 Resuming background sound if available")
-                    playBackgroundSound()
+                    Log.d(TAG, "🔊 Primary player playback started")
+                } else {
+                    Log.w(TAG, "⚠️ Player not ready (state: $playbackState), waiting for STATE_READY")
+                    // Add listener to play when ready
+                    val playListener = object : Player.Listener {
+                        private var isHandled = false
+                        
+                        override fun onPlaybackStateChanged(state: Int) {
+                            if (state == Player.STATE_READY && !isHandled) {
+                                isHandled = true
+                                primaryPlayer.removeListener(this)
+                                primaryPlayer.play()
+                                
+                                if (backgroundSoundUri != null) {
+                                    playBackgroundSound()
+                                }
+                                
+                                Log.d(TAG, "🔊 Primary player playback started after becoming ready")
+                            }
+                        }
+                    }
+                    primaryPlayer.addListener(playListener)
                 }
-
-                Log.d(TAG, "🔊 Primary player playback started")
             }
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error in playPauseAudio: ${e.message}")
@@ -917,11 +1006,11 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         }
     }
 
-    private fun requestAudioFocus() {
+    private fun requestAudioFocus(): Boolean {
         try {
             if (hasAudioFocus) {
                 Log.d(TAG, "🔊 Already have audio focus, not requesting again")
-                return
+                return true
             }
 
             Log.d(TAG, "🔊 Requesting audio focus")
@@ -992,9 +1081,12 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 TAG,
                 "🔊 Audio focus request result: $result (${if (hasAudioFocus) "GRANTED" else "DENIED"})"
             )
+            
+            return hasAudioFocus
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error requesting audio focus: ${e.message}")
             e.printStackTrace()
+            return false
         }
     }
 
