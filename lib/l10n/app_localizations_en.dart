@@ -256,6 +256,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stats => 'Stats';
 
   @override
+  String get history => 'History';
+
+  @override
   String get reminderNotificationCleared => 'Reminder cancelled';
 
   @override

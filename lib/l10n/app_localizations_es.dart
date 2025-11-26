@@ -258,6 +258,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get stats => 'Estadísticas';
 
   @override
+  String get history => 'Historial';
+
+  @override
   String get reminderNotificationCleared => 'Recordatorio cancelado';
 
   @override

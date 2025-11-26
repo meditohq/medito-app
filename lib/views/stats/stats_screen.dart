@@ -14,6 +14,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/views/home/widgets/bottom_sheet/stats/meditation_calendar_widget.dart';
 
 class StatsScreen extends ConsumerStatefulWidget {
   const StatsScreen({super.key});
@@ -23,14 +24,16 @@ class StatsScreen extends ConsumerStatefulWidget {
 }
 
 class _StatsScreenState extends ConsumerState<StatsScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   bool _isCardVisible = true;
   late AnimationController _animationController;
   late Animation<double> _animation;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -43,6 +46,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
 
   @override
   void dispose() {
+    _tabController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -61,200 +65,266 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
 
   @override
   Widget build(BuildContext context) {
-    var statsAsync = ref.watch(statsProvider);
-    var hasSeenStreakCircle = ref.watch(streakCircleProvider);
-
     return Scaffold(
       appBar: MeditoAppBarSmall(
-        title: AppLocalizations.of(context)!.stats,
         hasBackButton: false,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.stats),
+            Tab(text: AppLocalizations.of(context)!.history),
+          ],
+          labelColor: Theme.of(context).colorScheme.onSurface,
+          unselectedLabelColor:
+              Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
+          indicatorColor: ColorConstants.lightPurple,
+          labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontFamily: dmSans,
+                fontWeight: FontWeight.w600,
+              ),
+          unselectedLabelStyle:
+              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontFamily: dmSans,
+                  ),
+        ),
       ),
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_isCardVisible)
-                  hasSeenStreakCircle.when(
-                    loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
-                    data: (seen) {
-                      if (seen) return const SizedBox.shrink();
-                      return AnimatedOpacity(
-                        opacity: _animation.value,
-                        duration: const Duration(milliseconds: 300),
-                        child: Container(
-                          padding: const EdgeInsets.only(
-                            top: 16,
-                            left: 16,
-                            right: 16,
-                            bottom: 12,
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildStatsTab(),
+          _buildHistoryTab(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsTab() {
+    var statsAsync = ref.watch(statsProvider);
+    var hasSeenStreakCircle = ref.watch(streakCircleProvider);
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              if (_isCardVisible)
+                hasSeenStreakCircle.when(
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                  data: (seen) {
+                    if (seen) return const SizedBox.shrink();
+                    return AnimatedOpacity(
+                      opacity: _animation.value,
+                      duration: const Duration(milliseconds: 300),
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                          top: 16,
+                          left: 16,
+                          right: 16,
+                          bottom: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surface.withOpacityValue(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            width: 1,
+                            style: BorderStyle.solid,
                           ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.surface.withOpacityValue(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              width: 1,
-                              style: BorderStyle.solid,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                MeditoIcon(
+                                  assetName: MeditoIcons.fire,
+                                  size: 20,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!
+                                        .statsWelcomeTitle,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium
+                                        ?.copyWith(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: dmSans,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  MeditoIcon(
-                                    assetName: MeditoIcons.fire,
-                                    size: 20,
+                            const SizedBox(height: 8),
+                            Text(
+                              AppLocalizations.of(
+                                context,
+                              )!
+                                  .statsWelcomeMessage,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontSize: 14,
+                                    height: 1.4,
+                                    fontFamily: dmSans,
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurface,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      AppLocalizations.of(
-                                        context,
-                                      )!
-                                          .statsWelcomeTitle,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineMedium
-                                          ?.copyWith(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: dmSans,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!
-                                    .statsWelcomeMessage,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      fontSize: 14,
-                                      height: 1.4,
-                                      fontFamily: dmSans,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                              ),
-                              const SizedBox(height: 16),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: ElevatedButton(
-                                  onPressed: _fadeAndHideCard,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.surface,
-                                    foregroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.gotIt,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                          fontSize: 14,
-                                        ),
+                            ),
+                            const SizedBox(height: 16),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton(
+                                onPressed: _fadeAndHideCard,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.surface,
+                                  foregroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
                                   ),
                                 ),
+                                child: Text(
+                                  AppLocalizations.of(context)!.gotIt,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                        fontSize: 14,
+                                      ),
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                statsAsync.when(
-                  loading: () => const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(32.0),
-                      child: SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                  ),
-                  error: (error, stack) {
-                    if (statsAsync.hasValue) {
-                      final stats = statsAsync.value!;
-                      return _statsList(context, stats, ref);
-                    } else {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(32.0),
-                          child: GestureDetector(
-                            onTap: () =>
-                                ref.read(statsProvider.notifier).refresh(),
-                            child: MeditoIcon(
-                              assetName: MeditoIcons.help,
-                              color: Theme.of(context).colorScheme.onSurface,
                             ),
-                          ),
+                          ],
                         ),
-                      );
-                    }
-                  },
-                  data: (stats) {
-                    final isPossiblyStillLoading = stats.updated == 0;
-
-                    if (isPossiblyStillLoading) {
-                      Future.microtask(
-                        () => ref.read(statsProvider.notifier).refresh(),
-                      );
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32.0),
-                          child: SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
-                      );
-                    }
-
-                    return _statsList(context, stats, ref);
+                      ),
+                    );
                   },
                 ),
-                const SizedBox(height: 16),
-              ],
-            ),
+              statsAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
+                error: (error, stack) {
+                  if (statsAsync.hasValue) {
+                    final stats = statsAsync.value!;
+                    return _statsList(context, stats, ref);
+                  } else {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: GestureDetector(
+                          onTap: () =>
+                              ref.read(statsProvider.notifier).refresh(),
+                          child: MeditoIcon(
+                            assetName: MeditoIcons.help,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                },
+                data: (stats) {
+                  final isPossiblyStillLoading = stats.updated == 0;
+
+                  if (isPossiblyStillLoading) {
+                    Future.microtask(
+                      () => ref.read(statsProvider.notifier).refresh(),
+                    );
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32.0),
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return _statsList(context, stats, ref);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHistoryTab() {
+    var statsAsync = ref.watch(statsProvider);
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              statsAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
+                error: (_, __) => const SizedBox.shrink(),
+                data: (stats) {
+                  if (stats.updated == 0) return const SizedBox.shrink();
+                  return MeditationCalendarWidget(stats: stats);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
       ),
@@ -352,7 +422,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.08),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withOpacityValue(0.08),
               width: 1,
             ),
           ),

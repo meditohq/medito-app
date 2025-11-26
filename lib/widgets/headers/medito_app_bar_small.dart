@@ -11,6 +11,7 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
     this.hasCloseButton = false,
     this.actions,
     this.closePressed,
+    this.bottom,
   }) : super(key: key);
 
   final void Function()? closePressed;
@@ -20,9 +21,12 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
   final bool hasBackButton;
   final List<Widget>? actions;
   final String? title;
+  final PreferredSizeWidget? bottom;
 
   @override
   Widget build(BuildContext context) {
+    final hasBottom = bottom != null;
+    final hasActions = actions != null && actions!.isNotEmpty;
     return AppBar(
       leading: null,
       automaticallyImplyLeading: false,
@@ -32,7 +36,9 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: isTransparent
           ? ColorConstants.transparent
           : Theme.of(context).colorScheme.surface,
-      title: getTitleWidget(context),
+      title: hasBottom ? null : getTitleWidget(context),
+      toolbarHeight: hasBottom && !hasActions ? 0 : null,
+      bottom: bottom,
     );
   }
 
@@ -43,5 +49,10 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(56.0);
+  Size get preferredSize {
+    if (bottom != null) {
+      return Size.fromHeight(bottom!.preferredSize.height);
+    }
+    return const Size.fromHeight(56.0);
+  }
 }

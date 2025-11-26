@@ -566,6 +566,12 @@ abstract class AppLocalizations {
   /// **'Stats'**
   String get stats;
 
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
   /// No description provided for @reminderNotificationCleared.
   ///
   /// In en, this message translates to:
