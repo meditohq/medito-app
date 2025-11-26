@@ -22,6 +22,7 @@ import kotlinx.coroutines.cancel
 import android.os.Handler
 import android.os.Looper
 import android.os.Build
+import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -90,8 +91,7 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
