@@ -334,7 +334,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     var children = <Widget>[
       const SmartReminderTile(),
-      if (_isHealthSyncAvailable) const HealthSyncTile(),
       if (!isEffectivelySignedIn) ...[
         _buildSectionTitle(context, AppLocalizations.of(context)!.account),
         const AccountSectionWidget(),
@@ -348,6 +347,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (widgetItem != null) _buildMenuItemTile(context, ref, widgetItem),
       ...otherCustomizationItems
           .map((item) => _buildMenuItemTile(context, ref, item)),
+      if (_isHealthSyncAvailable) const HealthSyncTile(),
       _buildSectionTitle(context, AppLocalizations.of(context)!.helpLegal),
       ..._getItemsBySection(
               settingsItems, AppLocalizations.of(context)!.helpLegalSection)
