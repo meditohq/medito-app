@@ -66,19 +66,24 @@ class _PackCardWidgetState extends State<PackCardWidget> {
                 if (widget.coverUrlPath != null &&
                     widget.coverUrlPath!.isNotEmpty)
                   _getCoverUrl(),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _title(textTheme, title: widget.title, color: titleColor),
-                      if (widget.subTitle != null) const SizedBox(height: 4),
-                      _description(
-                        textTheme,
-                        subtitle: widget.subTitle,
-                        color: subtitleColor,
-                      ),
-                    ],
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _title(textTheme,
+                            title: widget.title, color: titleColor),
+                        if (widget.subTitle != null) const SizedBox(height: 4),
+                        Expanded(
+                          child: _description(
+                            textTheme,
+                            subtitle: widget.subTitle,
+                            color: subtitleColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -122,6 +127,8 @@ class _PackCardWidgetState extends State<PackCardWidget> {
   }) {
     return Text(
       title,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
       style: textTheme.displayLarge?.copyWith(
         fontFamily: dmSans,
         height: 1.2,
@@ -138,7 +145,7 @@ class _PackCardWidgetState extends State<PackCardWidget> {
     if (subtitle != null) {
       return Text(
         subtitle,
-        maxLines: 4,
+        maxLines: 3,
         overflow: TextOverflow.ellipsis,
         style: textTheme.titleMedium?.copyWith(
           letterSpacing: 0,
@@ -159,7 +166,7 @@ class _PackCardWidgetState extends State<PackCardWidget> {
         topRight: Radius.circular(14),
       ),
       child: AspectRatio(
-        aspectRatio: 4 / 3,
+        aspectRatio: 16 / 9,
         child: NetworkImageWidget(
           url: widget.coverUrlPath ?? '',
           shouldCache: true,

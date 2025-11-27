@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -22,19 +21,19 @@ import 'package:medito/utils/utils.dart';
 // Create a filtered provider to handle search logic efficiently
 final filteredPacksProvider =
     Provider.autoDispose.family<List<PackItem>, String>((ref, query) {
-  final packsAsync = ref.watch(explorePacksProvider);
-  return packsAsync.maybeWhen(
-    data: (packs) {
-      if (query.isEmpty) return packs;
-      final lowerQuery = query.toLowerCase();
-      return packs
-          .where((p) =>
-              p.title.toLowerCase().contains(lowerQuery) ||
-              p.subtitle.toLowerCase().contains(lowerQuery))
-          .toList();
-    },
-    orElse: () => [],
+  final packs = ref.watch(
+    explorePacksProvider.select((asyncValue) => asyncValue.valueOrNull ?? []),
   );
+  if (query.isEmpty) return packs;
+  final lowerQuery = query.toLowerCase();
+  final filtered = packs
+      .where((p) =>
+          p.title.toLowerCase().contains(lowerQuery) ||
+          p.subtitle.toLowerCase().contains(lowerQuery))
+      .toList();
+  // Return the same list reference if the filtered results are the same
+  // This prevents unnecessary rebuilds of the pack grid
+  return filtered;
 });
 
 class ExploreView extends ConsumerStatefulWidget {
@@ -113,14 +112,16 @@ class ExploreViewState extends ConsumerState<ExploreView> {
           edgeOffset: 150,
           onRefresh: _refreshExploreList,
           child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverAppBar(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 expandedHeight: 134.0,
-                collapsedHeight: 0,
+                collapsedHeight: _searchQuery.isEmpty ? 0 : 134.0,
                 toolbarHeight: 0,
-                floating: true,
+                floating: _searchQuery.isEmpty,
                 pinned: true,
+                snap: false,
                 flexibleSpace: FlexibleSpaceBar(
                   background: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: padding16),
@@ -191,16 +192,8 @@ class ExploreViewState extends ConsumerState<ExploreView> {
       final searchTracksAsync = ref.watch(searchTracksProvider(_searchQuery));
       final packs = ref.watch(filteredPacksProvider(_searchQuery));
 
-      // We still need to handle loading state of packs if they are being fetched for the first time
-      final explorePacksAsync = ref.watch(explorePacksProvider);
-
       return searchTracksAsync.when(
         data: (tracks) {
-          // Check if packs are still loading
-          if (explorePacksAsync.isLoading) {
-            return [const SliverToBoxAdapter(child: LoadingWidget())];
-          }
-
           if (packs.isEmpty && tracks.isEmpty) {
             return [
               SliverToBoxAdapter(
@@ -271,6 +264,8 @@ class ExploreViewState extends ConsumerState<ExploreView> {
             slivers.addAll(_buildTrackList(context, ref, tracks));
           }
 
+          slivers.add(const SliverToBoxAdapter(child: SizedBox(height: 32)));
+
           return slivers;
         },
         error: (err, stack) {
@@ -321,6 +316,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
               (context, index) {
                 var item = tracks[index];
                 return TrackCardWidget(
+                  key: ValueKey('track_${item.id}'),
                   title: item.title,
                   subTitle: item.subtitle,
                   coverUrlPath: item.coverUrl,
@@ -350,6 +346,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
             (context, index) {
               var item = tracks[index];
               return Padding(
+                key: ValueKey('track_${item.id}'),
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: TrackCardWidget(
                   title: item.title,
@@ -377,7 +374,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   List<Widget> _buildPackList(
       BuildContext context, WidgetRef ref, List<PackItem> packItems) {
     final width = MediaQuery.of(context).size.width;
-    var crossAxisCount = width > 600 ? 3 : 2;
+    final crossAxisCount = width > 600 ? 3 : 2;
 
     return [
       SliverPadding(
@@ -386,28 +383,37 @@ class ExploreViewState extends ConsumerState<ExploreView> {
           right: padding16,
           top: padding16,
         ),
-        sliver: SliverMasonryGrid.count(
-          crossAxisCount: crossAxisCount,
-          mainAxisSpacing: padding16,
-          crossAxisSpacing: padding16,
-          childCount: packItems.length,
-          itemBuilder: (context, index) {
-            var item = packItems[index];
-            return PackCardWidget(
-              title: item.title,
-              subTitle: item.subtitle,
-              coverUrlPath: item.coverUrl,
-              onTap: () {
-                unfocusSearch();
-                handleNavigation(
-                  TypeConstants.pack,
-                  [item.id, item.path],
-                  context,
-                  ref: ref,
-                );
-              },
-            );
-          },
+        sliver: SliverGrid(
+          key: ValueKey('pack_grid_${packItems.map((p) => p.id).join(',')}'),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: padding16,
+            crossAxisSpacing: padding16,
+            childAspectRatio: 0.7,
+          ),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final item = packItems[index];
+              return RepaintBoundary(
+                key: ValueKey('pack_${item.id}'),
+                child: PackCardWidget(
+                  title: item.title,
+                  subTitle: item.subtitle,
+                  coverUrlPath: item.coverUrl,
+                  onTap: () {
+                    unfocusSearch();
+                    handleNavigation(
+                      TypeConstants.pack,
+                      [item.id, item.path],
+                      context,
+                      ref: ref,
+                    );
+                  },
+                ),
+              );
+            },
+            childCount: packItems.length,
+          ),
         ),
       ),
     ];
@@ -454,15 +460,10 @@ class SearchBox extends StatelessWidget {
           onPressed: onClear,
         ),
         filled: true,
-        fillColor: Theme.of(context)
-            .colorScheme
-            .surfaceTint
-            .withOpacityValue(0.1),
+        fillColor:
+            Theme.of(context).colorScheme.surfaceTint.withOpacityValue(0.1),
         hintStyle: TextStyle(
-          color: Theme.of(context)
-              .colorScheme
-              .onSurface
-              .withOpacityValue(0.6),
+          color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.69),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
