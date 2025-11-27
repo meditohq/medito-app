@@ -6,6 +6,7 @@ import '../../constants/constants.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/app_localizations_en.dart';
 import '../../providers/notification/reminder_provider.dart';
+import '../../utils/logger.dart';
 
 class SmartRemindersService {
   final SharedPreferences prefs;
@@ -24,22 +25,15 @@ class SmartRemindersService {
   Future<TimeOfDay> enable() async {
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
 
-    var saved = getSavedTime();
-    final time = saved ?? _computeDefaultTimeFromNow();
-
     final now = DateTime.now();
-    var anchor = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    if (anchor.isBefore(now)) {
-      anchor = anchor.add(const Duration(days: 1));
-    }
+    final time = _computeDefaultTimeFromNow();
+    final anchor = now.add(const Duration(days: 1));
 
     final scheduler =
         SmartRemindersScheduler(prefs: prefs, reminders: reminders);
     await scheduler.scheduleSeriesFromAnchor(anchor);
 
-    if (saved == null) {
-      await _saveTime(time);
-    }
+    await _saveTime(time);
 
     return time;
   }
@@ -82,8 +76,23 @@ class SmartRemindersScheduler {
           id: smartBaseId + i, when: tzWhen, title: copy.$1, body: copy.$2));
     }
 
-    await reminders.cancelSmartReminderSeries();
-    await reminders.cancelDailyNotification();
+    AppLogger.d('REMINDER',
+        'Scheduling smart reminder series from anchor: $anchorLocal');
+
+    try {
+      await reminders.cancelSmartReminderSeries();
+    } catch (e, s) {
+      AppLogger.e('REMINDER',
+          'Error cancelling smart reminder series before rescheduling: $e', s);
+    }
+
+    try {
+      await reminders.cancelDailyNotification();
+    } catch (e, s) {
+      AppLogger.e('REMINDER',
+          'Error cancelling daily notification before rescheduling: $e', s);
+    }
+
     await reminders.scheduleSmartReminderSeries(items
         .map((e) => ScheduledReminder(
               id: e.id,
@@ -92,6 +101,9 @@ class SmartRemindersScheduler {
               body: e.body,
             ))
         .toList());
+
+    AppLogger.d(
+        'REMINDER', 'Successfully scheduled ${items.length} smart reminders');
 
     final first = TimeOfDay(hour: anchorLocal.hour, minute: anchorLocal.minute);
     await prefs.setInt(SharedPreferenceConstants.savedHours, first.hour);

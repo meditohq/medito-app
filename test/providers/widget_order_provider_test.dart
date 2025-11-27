@@ -27,7 +27,9 @@ void main() {
     });
 
     group('Default order', () {
-      test('returns default order when no custom order saved', () {
+      test('returns default order when no custom order saved', () async {
+        await prefs.setBool(
+            SharedPreferenceConstants.blackFridayDismissed, true);
         final order = container.read(homeWidgetOrderProvider);
         expect(order, [
           HomeWidgetType.shortcuts,
@@ -66,6 +68,8 @@ void main() {
           SharedPreferenceConstants.homeWidgetOrder,
           customOrder.map((e) => e.name).toList(),
         );
+        await prefs.setBool(
+            SharedPreferenceConstants.blackFridayDismissed, true);
 
         final order = container.read(homeWidgetOrderProvider);
         // When not Black Friday (current date), should return custom order as-is
@@ -158,6 +162,8 @@ void main() {
           SharedPreferenceConstants.homeWidgetOrder,
           customOrder.map((e) => e.name).toList(),
         );
+        await prefs.setBool(
+            SharedPreferenceConstants.blackFridayDismissed, true);
 
         final notifier = container.read(homeWidgetOrderProvider.notifier);
         notifier.refreshOrder();
