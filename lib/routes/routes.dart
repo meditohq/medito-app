@@ -1,12 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/utils.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/path/journal_entry_view.dart';
@@ -149,6 +151,20 @@ Future<void> _handleDonationNavigation(
     AppLogger.d('ROUTES', 'Opening donation screen from $sourceRouteName');
   }
 
+  // If iOS and outside US, show donation website in webview
+  if (Platform.isIOS && !isInUS()) {
+    final uri = Uri.parse('https://meditofoundation.org/donate');
+    if (await canLaunchUrl(uri)) {
+      await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => _DonationWebViewScreen(url: uri),
+        ),
+      );
+    }
+    return;
+  }
+
   await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
 }
 
@@ -200,5 +216,40 @@ class _URLLauncherScreenState extends State<_URLLauncherScreen>
   @override
   Widget build(BuildContext context) {
     return const Scaffold(backgroundColor: Colors.transparent);
+  }
+}
+
+class _DonationWebViewScreen extends StatefulWidget {
+  final Uri url;
+
+  const _DonationWebViewScreen({required this.url});
+
+  @override
+  State<_DonationWebViewScreen> createState() => _DonationWebViewScreenState();
+}
+
+class _DonationWebViewScreenState extends State<_DonationWebViewScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _launchUrl();
+  }
+
+  Future<void> _launchUrl() async {
+    await launchUrl(widget.url, mode: LaunchMode.inAppWebView);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: const Text('Donate'),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+      ),
+      body: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }

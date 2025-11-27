@@ -19,8 +19,11 @@ class BlackFridayUtils {
     final endDate =
         DateTime(blackFridayEnd.year, blackFridayEnd.month, blackFridayEnd.day);
 
-    return today.isAfter(startDate.subtract(const Duration(days: 1))) &&
-        today.isBefore(endDate.add(const Duration(days: 1)));
+    final effectiveStartDate = startDate.subtract(const Duration(days: 1));
+    final effectiveEndDate = endDate.add(const Duration(days: 1));
+
+    return !today.isBefore(effectiveStartDate) &&
+        today.isBefore(effectiveEndDate);
   }
 
   static bool isBlackFridayDismissedSync(SharedPreferences prefs) {

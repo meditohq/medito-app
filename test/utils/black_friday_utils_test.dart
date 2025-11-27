@@ -7,8 +7,13 @@ void main() {
   group('BlackFridayUtils', () {
     group('isBlackFridayWeek', () {
       test('returns false before Black Friday week', () {
-        final date = DateTime(2024, 11, 27); // Nov 27, day before
+        final date = DateTime(2024, 11, 26); // Nov 26, day before
         expect(BlackFridayUtils.isBlackFridayWeek(date), false);
+      });
+
+      test('returns true on day before Black Friday', () {
+        final date = DateTime(2024, 11, 27); // Nov 27, day before Black Friday
+        expect(BlackFridayUtils.isBlackFridayWeek(date), true);
       });
 
       test('returns true on Black Friday start day', () {

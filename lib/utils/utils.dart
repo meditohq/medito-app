@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
@@ -130,4 +131,10 @@ extension ColorExtensions on Color {
   Color withOpacityValue(double opacity) {
     return withAlpha((opacity.clamp(0.0, 1.0) * 255).round());
   }
+}
+
+/// Check if the device is currently set to a US locale
+bool isInUS() {
+  final countryCode = PlatformDispatcher.instance.locale.countryCode;
+  return countryCode != null && countryCode.toUpperCase() == 'US';
 }
