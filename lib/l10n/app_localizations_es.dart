@@ -40,11 +40,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get meditationProducts => 'Tienda para Apoyar';
 
   @override
-  String get blackFridayTitle => 'Black Friday - Apoya una Vida Consciente';
+  String get blackFridayTitle => 'Apoya Meditación Gratuita';
 
   @override
   String get blackFridaySubtitle =>
-      'Apoya la meditación gratuita para todos. Tu compra ayuda a mantener Medito gratis y accesible para millones en todo el mundo';
+      'Este Black Friday, apoya la meditación gratuita para todos. Tu compra ayuda a mantener Medito gratis y accesible para millones en todo el mundo';
 
   @override
   String get blackFridaySeeAllButton => 'Visitar tienda';

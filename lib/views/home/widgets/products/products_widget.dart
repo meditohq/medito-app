@@ -131,23 +131,26 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                   child: GestureDetector(
                     onTap: () => _openShopUrl(),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          showBlackFridayStyle
-                              ? AppLocalizations.of(context)!.blackFridayTitle
-                              : AppLocalizations.of(context)!
-                                  .meditationProducts,
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelLarge
-                              ?.copyWith(
-                                fontFamily: 'teachers',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w400,
-                                height: 28 / 24,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                        Flexible(
+                          child: Text(
+                            showBlackFridayStyle
+                                ? AppLocalizations.of(context)!.blackFridayTitle
+                                : AppLocalizations.of(context)!
+                                    .meditationProducts,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  fontFamily: 'teachers',
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w400,
+                                  height: 28 / 24,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
                         ),
                         if (!showBlackFridayStyle) ...[
                           const SizedBox(width: 8),
@@ -161,7 +164,8 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                     ),
                   ),
                 ),
-                if (showBlackFridayStyle)
+                if (showBlackFridayStyle) ...[
+                  const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () => _dismissBlackFriday(context, ref),
                     child: Container(
@@ -176,6 +180,7 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                       ),
                     ),
                   ),
+                ],
               ],
             ),
           ),

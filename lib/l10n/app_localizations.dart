@@ -161,13 +161,13 @@ abstract class AppLocalizations {
   /// No description provided for @blackFridayTitle.
   ///
   /// In en, this message translates to:
-  /// **'Black Friday - Support Mindful Living'**
+  /// **'Support Free Meditation'**
   String get blackFridayTitle;
 
   /// No description provided for @blackFridaySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Support free meditation for everyone. Your purchase helps keep Medito free and accessible to millions worldwide'**
+  /// **'This Black Friday, support free meditation for everyone. Your purchase helps keep Medito free and accessible to millions worldwide'**
   String get blackFridaySubtitle;
 
   /// No description provided for @blackFridaySeeAllButton.
