@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -72,7 +71,7 @@ Future<void> handleNavigation(
     }
   } else if (type.contains('settings')) {
     await _pushRoute(SettingsScreen(), ref);
-  } else if (type == 'donation') {
+  } else if (_isDonationRoute(type, ids)) {
     await _handleDonationNavigation(context, ref, sourceRouteName);
   } else if (type == TypeConstants.email) {
     await _handleEmailNavigation(ids, ref);
@@ -98,9 +97,6 @@ Future<void> handleNavigation(
       ids.contains(TypeConstants.customiseHomeLayout)) {
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
-      ids.contains(RouteConstants.donation)) {
-    await _handleDonationNavigation(context, ref, sourceRouteName);
-  } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.stats)) {
     await _pushRoute(const StatsScreen(), ref);
   } else if (type == TypeConstants.route &&
@@ -115,6 +111,12 @@ Future<bool?> _pushRoute(Widget route, WidgetRef? ref) async {
   return await navigatorKey.currentState?.push<bool>(
     MaterialPageRoute(builder: (context) => route),
   );
+}
+
+/// Check if the navigation type/ids represent a donation route
+bool _isDonationRoute(String? type, List<String?> ids) {
+  return type == 'donation' ||
+      (type == TypeConstants.route && ids.contains(RouteConstants.donation));
 }
 
 Future<void> _handleTrackNavigation(List<String?> ids, WidgetRef? ref) async {
@@ -139,33 +141,50 @@ Future<void> _handleEmailNavigation(List<String?> ids, WidgetRef? ref) async {
   }
 }
 
+Future<bool?> handleDonationNavigation(
+  BuildContext context,
+  WidgetRef? ref,
+  String? sourceRouteName, {
+  NavigatorState? navigator,
+}) async {
+  if (ref == null) {
+    AppLogger.w('ROUTES', 'Cannot open donation screen: ref is null');
+    return false;
+  } else {
+    AppLogger.d('ROUTES', 'Opening donation screen from $sourceRouteName');
+  }
+
+  // Check if we should use Superwall or web donation
+  final useSuperwall = await shouldUseSuperwallForDonation();
+
+  if (!useSuperwall) {
+    // Use web donation - open directly without navigating to a screen
+    final uri = Uri.parse('https://meditofoundation.org/donate');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      // Return false to indicate no donation was made (user can donate on website)
+      return false;
+    }
+    return false;
+  }
+
+  // Use Superwall donation screen
+  final nav = navigator ?? navigatorKey.currentState;
+  if (nav == null) return false;
+
+  return await nav.push<bool>(
+    MaterialPageRoute(
+      builder: (context) => SuperwallDonationScreen(source: sourceRouteName),
+    ),
+  );
+}
+
 Future<void> _handleDonationNavigation(
   BuildContext context,
   WidgetRef? ref,
   String? sourceRouteName,
 ) async {
-  if (ref == null) {
-    AppLogger.w('ROUTES', 'Cannot open donation screen: ref is null');
-    return;
-  } else {
-    AppLogger.d('ROUTES', 'Opening donation screen from $sourceRouteName');
-  }
-
-  // If iOS and outside US, show donation website in webview
-  if (Platform.isIOS && !isInUS()) {
-    final uri = Uri.parse('https://meditofoundation.org/donate');
-    if (await canLaunchUrl(uri)) {
-      await Navigator.push<bool>(
-        context,
-        MaterialPageRoute(
-          builder: (context) => _DonationWebViewScreen(url: uri),
-        ),
-      );
-    }
-    return;
-  }
-
-  await _pushRoute(SuperwallDonationScreen(source: sourceRouteName), ref);
+  await handleDonationNavigation(context, ref, sourceRouteName);
 }
 
 Future<void> launchEmailSubmission(String email, {String? body}) async {
@@ -216,40 +235,5 @@ class _URLLauncherScreenState extends State<_URLLauncherScreen>
   @override
   Widget build(BuildContext context) {
     return const Scaffold(backgroundColor: Colors.transparent);
-  }
-}
-
-class _DonationWebViewScreen extends StatefulWidget {
-  final Uri url;
-
-  const _DonationWebViewScreen({required this.url});
-
-  @override
-  State<_DonationWebViewScreen> createState() => _DonationWebViewScreenState();
-}
-
-class _DonationWebViewScreenState extends State<_DonationWebViewScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _launchUrl();
-  }
-
-  Future<void> _launchUrl() async {
-    await launchUrl(widget.url, mode: LaunchMode.inAppWebView);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Donate'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-      ),
-      body: const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
   }
 }

@@ -24,6 +24,10 @@ class HomeWidgetService {
 
   /// Saves the theme preference to the widget
   static Future<void> saveThemePreference(String themePreference) async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+
     try {
       await HomeWidget.saveWidgetData<String>(
         _themePreferenceKey,
@@ -32,10 +36,8 @@ class HomeWidgetService {
       AppLogger.d('WIDGET', 'Saved theme preference: $themePreference');
 
       // Update both widgets when theme changes (Android only)
-      if (Platform.isAndroid) {
-        await _updateWidget(_widgetName);
-        await _updateWidget(_consistencyWidgetName);
-      }
+      await _updateWidget(_widgetName);
+      await _updateWidget(_consistencyWidgetName);
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to save theme preference', e);
     }
@@ -46,6 +48,10 @@ class HomeWidgetService {
     required LocalAllStats stats,
     BuildContext? context,
   }) async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+
     try {
       // Extract meditation dates from audioCompleted
       final meditationDates = <int>[];
@@ -119,10 +125,8 @@ class HomeWidgetService {
       );
 
       // Update both widgets - try home_widget package first, fallback to manual broadcast (Android only)
-      if (Platform.isAndroid) {
-        await _updateWidget(_widgetName);
-        await _updateWidget(_consistencyWidgetName);
-      }
+      await _updateWidget(_widgetName);
+      await _updateWidget(_consistencyWidgetName);
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to update widget', e);
     }
@@ -131,6 +135,10 @@ class HomeWidgetService {
   /// Updates the widget using stats from a provider/notifier
   /// This version doesn't require a BuildContext for localization
   static Future<void> updateWidgetFromStats(LocalAllStats stats) async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+
     try {
       // Extract meditation dates from audioCompleted
       final meditationDates = <int>[];
@@ -231,10 +239,8 @@ class HomeWidgetService {
             'WIDGET', 'saveWidgetData timeout/error for consistency_score: $e');
       }
       // Update both widgets - try home_widget package first, fallback to manual broadcast (Android only)
-      if (Platform.isAndroid) {
-        await _updateWidget(_widgetName);
-        await _updateWidget(_consistencyWidgetName);
-      }
+      await _updateWidget(_widgetName);
+      await _updateWidget(_consistencyWidgetName);
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to update widget (fromStats)', e);
     }
