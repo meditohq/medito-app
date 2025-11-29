@@ -243,6 +243,15 @@ class SplashViewState extends ConsumerState<SplashView>
             'SPLASH', 'Error setting user ID for analytics', e, stackTrace);
       }
 
+      // Apply stored UTM parameters from deep links (e.g., Apple Ads)
+      // This should be done after user initialization to ensure proper attribution
+      try {
+        await FirebaseAnalyticsService.applyStoredUtmParameters();
+      } catch (e, stackTrace) {
+        AppLogger.e(
+            'SPLASH', 'Error applying stored UTM parameters', e, stackTrace);
+      }
+
       final currentUser = auth.currentUser;
       final isLoggedIn = await auth.isLoggedIn();
       AppLogger.i('SPLASH',
@@ -330,11 +339,15 @@ class SplashViewState extends ConsumerState<SplashView>
         if (userId != null && userId.isNotEmpty) {
           await FirebaseAnalyticsService().setUserId(userId);
           await MetaSdkService.instance.setUserId(userId);
-          AppLogger.i('SPLASH', 'User ID set for analytics after anonymous sign in: $userId');
+          AppLogger.i('SPLASH',
+              'User ID set for analytics after anonymous sign in: $userId');
         }
       } catch (e, stackTrace) {
         AppLogger.e(
-            'SPLASH', 'Error setting user ID for analytics after anonymous sign in', e, stackTrace);
+            'SPLASH',
+            'Error setting user ID for analytics after anonymous sign in',
+            e,
+            stackTrace);
       }
 
       await _initializeServices();
