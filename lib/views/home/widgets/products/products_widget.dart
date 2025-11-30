@@ -334,12 +334,22 @@ class ProductGroupCard extends ConsumerWidget {
       },
       child: SizedBox(
         width: cardWidth,
-        child: Card(
+        child: Container(
           margin: const EdgeInsets.only(right: 12),
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Color.lerp(
+                    Theme.of(context).cardColor,
+                    Colors.white,
+                    0.3,
+                  ) ??
+                  Theme.of(context).cardColor,
+              width: 0.5,
+            ),
           ),
+          clipBehavior: Clip.antiAlias,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,

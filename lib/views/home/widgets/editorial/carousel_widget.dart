@@ -132,12 +132,20 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                 ref: ref,
               );
             },
-            child: Card(
-              shape: RoundedRectangleBorder(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(_kCardBorderRadius),
+                border: Border.all(
+                  color: Color.lerp(
+                        Theme.of(context).cardColor,
+                        Colors.white,
+                        0.3,
+                      ) ??
+                      Theme.of(context).cardColor,
+                  width: 0.5,
+                ),
               ),
-              margin: EdgeInsets.zero,
-              color: Theme.of(context).cardColor,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 child: Column(
