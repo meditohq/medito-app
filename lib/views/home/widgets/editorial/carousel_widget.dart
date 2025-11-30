@@ -14,7 +14,7 @@ import 'package:medito/widgets/network_image_widget.dart';
 const _kAutoScrollDelay = Duration(seconds: 10);
 const _kScrollAnimationDuration = Duration(milliseconds: 500);
 const _kCardBorderRadius = 24.0;
-const _kCardAspectRatio = 16 / 9;
+const _kCardAspectRatio = 2 / 1;
 const _kButtonHeight = 48.0;
 const _kBannerFontSize = 14.0;
 const _kSmallSpacing = 8.0;
@@ -68,7 +68,6 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        height16,
         Padding(
           padding: const EdgeInsets.only(left: padding16),
           child: Text(

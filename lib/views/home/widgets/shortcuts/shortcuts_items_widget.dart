@@ -94,20 +94,9 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
   }
 
   void _onReorder(int oldIndex, int newIndex) {
-    AppLogger.d('ShortcutsItemsWidget',
-        '_onReorder called: oldIndex=$oldIndex, newIndex=$newIndex');
-    AppLogger.d(
-        'ShortcutsItemsWidget', 'Before reorder - data length: ${data.length}');
-    AppLogger.d('ShortcutsItemsWidget',
-        'Before reorder - IDs: ${data.map((e) => e.id).toList()}');
-
     setState(() {
       final element = data.removeAt(oldIndex);
-      AppLogger.d('ShortcutsItemsWidget',
-          'Removed element at $oldIndex: id=${element.id}, title=${element.title}');
       data.insert(newIndex, element);
-      AppLogger.d('ShortcutsItemsWidget',
-          'After reorder - IDs: ${data.map((e) => e.id).toList()}');
       _handleShortcutItemPlacementInPreference(oldIndex, newIndex);
     });
   }
@@ -117,8 +106,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     int newIndex,
   ) async {
     _isReordering = true;
-    AppLogger.d('ShortcutsItemsWidget',
-        '_handleShortcutItemPlacementInPreference: oldIndex=$oldIndex, newIndex=$newIndex');
 
     var ids = data.map((e) {
       if (e.id != null) {
@@ -127,16 +114,9 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
       return '${e.type}_${e.path}';
     }).toList();
 
-    AppLogger.d('ShortcutsItemsWidget', 'Saving IDs to preference: $ids');
-    AppLogger.d('ShortcutsItemsWidget',
-        'Items with null IDs: ${data.where((e) => e.id == null).map((e) => '${e.type}_${e.path}').toList()}');
-
     try {
       await ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids).future);
-      AppLogger.d('ShortcutsItemsWidget',
-          'Successfully updated shortcuts in preference');
       await ref.read(refreshHomeAPIsProvider.future);
-      AppLogger.d('ShortcutsItemsWidget', 'Successfully refreshed home APIs');
     } catch (e, stackTrace) {
       AppLogger.e('ShortcutsItemsWidget', 'Error updating shortcuts preference',
           e, stackTrace);
@@ -147,8 +127,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.d('ShortcutsItemsWidget',
-        'build: data length=${data.length}, widget.data length=${widget.data.length}');
     var size = MediaQuery.of(context).size;
     var isWideScreen = size.width > 600;
     final columns = isWideScreen ? 8 : 4;
@@ -165,7 +143,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     return ReorderableWrap(
       spacing: spacing,
       runSpacing: runSpacing,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
       maxMainAxisCount: columns,
       minMainAxisCount: columns,
       onReorder: _onReorder,
