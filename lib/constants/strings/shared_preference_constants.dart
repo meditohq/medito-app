@@ -48,9 +48,6 @@ class SharedPreferenceConstants {
   // Historical consistency score data
   static const String consistencyScoreHistory = 'consistency_score_history';
 
-  // Widget pinning
-  static const String hasSeenWidgetOption = 'has_seen_widget_option';
-
   // Black Friday positioning
   static const String blackFridayDismissed = 'black_friday_dismissed';
 

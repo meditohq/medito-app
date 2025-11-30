@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -192,10 +191,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     SettingsItem item,
   ) async {
     if (item.path == TypeConstants.addWidget) {
-      await ref.read(widgetOptionSeenProvider.notifier).markAsSeen();
-      if (mounted) {
-        setState(() {});
-      }
       try {
         final widgetManager = MeditoWidgetManager();
         await widgetManager.pinWidget('consistency');

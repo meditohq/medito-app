@@ -14,7 +14,6 @@ import 'package:medito/views/path/path_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
-import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
@@ -158,23 +157,13 @@ class _BottomNavigationBarViewState
   }
 
   BottomActionBarItem _buildSettingsNavigationItem() {
-    final hasSeenWidget = ref.watch(widgetOptionSeenProvider);
-    final icon = MeditoIcon(
-      assetName: MeditoIcons.settings,
-      color: _currentPageIndex == 3
-          ? ColorConstants.lightPurple
-          : Theme.of(context).colorScheme.onSurface,
-    );
-
     return BottomActionBarItem(
-      child: hasSeenWidget
-          ? icon
-          : Badge(
-              backgroundColor: Colors.red,
-              smallSize: 8,
-              alignment: Alignment.topRight,
-              child: icon,
-            ),
+      child: MeditoIcon(
+        assetName: MeditoIcons.settings,
+        color: _currentPageIndex == 3
+            ? ColorConstants.lightPurple
+            : Theme.of(context).colorScheme.onSurface,
+      ),
       onTap: () => _onDestinationSelected(3),
     );
   }
