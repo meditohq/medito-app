@@ -31,7 +31,6 @@ class AllSetScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.displayLarge?.copyWith(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
                     ),
                 textAlign: TextAlign.center,
               ),
