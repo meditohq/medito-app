@@ -466,6 +466,38 @@ class FirebaseAnalyticsService {
     }
   }
 
+  /// Get stored UTM parameters from SharedPreferences as a map
+  /// This returns UTM parameters without removing them, useful for including in events
+  static Future<Map<String, String>> getStoredUtmParameters() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final utmParams = <String, String>{};
+
+      final utmParamMap = {
+        SharedPreferenceConstants.utmSource: 'utm_source',
+        SharedPreferenceConstants.utmMedium: 'utm_medium',
+        SharedPreferenceConstants.utmCampaign: 'utm_campaign',
+        SharedPreferenceConstants.utmTerm: 'utm_term',
+        SharedPreferenceConstants.utmContent: 'utm_content',
+      };
+
+      for (final entry in utmParamMap.entries) {
+        final value = prefs.getString(entry.key);
+        if (value != null && value.isNotEmpty) {
+          utmParams[entry.value] = value;
+        }
+      }
+
+      return utmParams;
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.e(
+            'FIREBASE_ANALYTICS', 'Error getting stored UTM parameters', e);
+      }
+      return {};
+    }
+  }
+
   /// Apply stored UTM parameters from SharedPreferences to Firebase Analytics user properties
   /// This should be called after user initialization to ensure UTM parameters from
   /// deep links (e.g., from Apple Ads) are properly attributed to the user

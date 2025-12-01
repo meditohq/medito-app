@@ -4,7 +4,7 @@ This guide explains how to use UTM parameters in deep links for tracking user ac
 
 ## Overview
 
-The Medito app supports UTM parameters in deep links, which are automatically stored and attributed to users in Firebase Analytics. This allows you to track which marketing campaigns, sources, and channels are driving app installs and user engagement.
+The Medito app supports UTM parameters in deep links, which are automatically stored and attributed to users in Firebase Analytics. This allows you to track which marketing campaigns, sources, and channels are driving app installs and user engagement. 
 
 ## Supported UTM Parameters
 
@@ -18,52 +18,70 @@ The following standard UTM parameters are supported:
 
 ## URL Format
 
-### Custom URL Scheme
+### Custom URL Scheme (iOS only)
 
-For iOS custom URL scheme deep links, use one of these formats:
-
-**Recommended format (with path separator):**
-```
-org.meditofoundation:///?utm_source=campaign1&utm_campaign=summer2024
-```
-
-**Alternative format (with host):**
-```
-org.meditofoundation://medito?utm_source=campaign1&utm_campaign=summer2024
-```
+**iOS:** Use either format:
+- `org.meditofoundation:///?utm_source=campaign1&utm_campaign=summer2024` (with path separator)
+- `org.meditofoundation://medito?utm_source=campaign1&utm_campaign=summer2024` (with host)
 
 ### Universal Links (HTTPS)
 
-For universal links that work on both iOS and Android:
+**Recommended for both iOS and Android:**
 
 ```
 https://medito.app/?utm_source=campaign1&utm_campaign=summer2024
 ```
 
+**Android:** Use universal links (`https://medito.app`) for UTM tracking.
+
 ## Usage Examples
 
 ### Apple Ads Campaign
 
+**iOS (custom scheme):**
 ```
 org.meditofoundation:///?utm_source=apple_ads&utm_medium=cpc&utm_campaign=summer_meditation&utm_content=ad_variant_1
 ```
 
+**Universal link (both platforms):**
+```
+https://medito.app/?utm_source=apple_ads&utm_medium=cpc&utm_campaign=summer_meditation&utm_content=ad_variant_1
+```
+
 ### Social Media Campaign
 
+**iOS (custom scheme):**
 ```
 org.meditofoundation:///?utm_source=facebook&utm_medium=social&utm_campaign=mindfulness_week
 ```
 
+**Universal link (both platforms):**
+```
+https://medito.app/?utm_source=facebook&utm_medium=social&utm_campaign=mindfulness_week
+```
+
 ### Email Campaign
 
+**iOS (custom scheme):**
 ```
 org.meditofoundation:///?utm_source=email&utm_medium=newsletter&utm_campaign=monthly_digest&utm_content=cta_button
 ```
 
+**Universal link (both platforms):**
+```
+https://medito.app/?utm_source=email&utm_medium=newsletter&utm_campaign=monthly_digest&utm_content=cta_button
+```
+
 ### Custom Store Page
 
+**iOS (custom scheme):**
 ```
 org.meditofoundation:///?utm_source=website&utm_medium=web&utm_campaign=landing_page_v2
+```
+
+**Universal link (both platforms):**
+```
+https://medito.app/?utm_source=website&utm_medium=web&utm_campaign=landing_page_v2
 ```
 
 ## How It Works
@@ -79,31 +97,6 @@ org.meditofoundation:///?utm_source=website&utm_medium=web&utm_campaign=landing_
 - **One-time storage**: UTM parameters are stored once and applied after user initialization, then removed from storage
 - **No navigation required**: UTM-only links (with no path) will simply open the app without navigating to a specific screen
 - **Case sensitive**: UTM parameter names are case-sensitive - use lowercase (e.g., `utm_source`, not `UTM_SOURCE`)
-
-## Testing
-
-### iOS Simulator/Device
-
-1. Open Safari on your iOS device/simulator
-2. Enter the deep link URL in the address bar:
-   ```
-   org.meditofoundation:///?utm_source=test&utm_campaign=testing
-   ```
-3. Press Go - the app should open
-4. Check the debug logs for confirmation:
-   - Look for `[DEEPLINK]` log entries showing stored UTM parameters
-   - After user initialization, look for `[FIREBASE_ANALYTICS]` entries showing applied UTM parameters
-
-### Android Device
-
-1. Use ADB to test:
-   ```bash
-   adb shell am start -W -a android.intent.action.VIEW -d "org.meditofoundation:///?utm_source=test&utm_campaign=testing"
-   ```
-2. Or use a browser/QR code scanner to open the universal link:
-   ```
-   https://medito.app/?utm_source=test&utm_campaign=testing
-   ```
 
 ## Best Practices
 
@@ -126,25 +119,3 @@ Example:
 ```
 org.meditofoundation:///?utm_source=email&utm_campaign=summer%202024
 ```
-
-## Troubleshooting
-
-### UTM Parameters Not Appearing in Analytics
-
-1. **Check the URL format**: Ensure you're using the correct format with `:///?` or `://host?`
-2. **Verify user initialization**: UTM parameters are only applied after user initialization - check logs for user ID
-3. **Check Firebase Analytics**: Verify Firebase Analytics is initialized and enabled
-4. **Review debug logs**: Look for `[DEEPLINK]` and `[FIREBASE_ANALYTICS]` log entries
-
-### App Not Opening from Deep Link
-
-1. **Verify URL scheme**: Ensure `org.meditofoundation` is registered in the app's Info.plist (iOS) or AndroidManifest.xml (Android)
-2. **Check URL format**: Use the recommended format `org.meditofoundation:///?...`
-3. **Test in Safari/Chrome**: Try opening the link in a browser first to verify it's valid
-
-## Support
-
-For technical questions or issues, contact the development team.
-
-For marketing campaign questions, refer to your campaign manager.
-
