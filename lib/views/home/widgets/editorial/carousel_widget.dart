@@ -15,9 +15,12 @@ const _kAutoScrollDelay = Duration(seconds: 10);
 const _kScrollAnimationDuration = Duration(milliseconds: 500);
 const _kCardBorderRadius = 24.0;
 const _kCardAspectRatio = 2 / 1;
+const _kSmallPhoneAspectRatio = 2.2 / 1;
 const _kButtonHeight = 48.0;
 const _kBannerFontSize = 14.0;
 const _kSmallSpacing = 8.0;
+const _kSmallPhoneThreshold = 400.0;
+const _kSmallPhoneWidthMultiplier = 0.85;
 
 class CarouselWidget extends ConsumerStatefulWidget {
   final List<HomeCarouselModel> carouselItems;
@@ -50,9 +53,13 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         var screenSize = MediaQuery.of(context).size;
         var isHorizontal = screenSize.width > screenSize.height;
         var isTablet = screenSize.shortestSide >= 600;
-        var cardWidth = isHorizontal || isTablet
+        var isSmallPhone = screenSize.shortestSide < _kSmallPhoneThreshold;
+        var baseCardWidth = isHorizontal || isTablet
             ? (screenSize.width / 2) - (3 * padding16)
             : screenSize.width - (3 * padding16);
+        var cardWidth = isSmallPhone
+            ? baseCardWidth * _kSmallPhoneWidthMultiplier
+            : baseCardWidth;
 
         _scrollController.animateTo(
           cardWidth + padding16,
@@ -106,10 +113,19 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     final screenSize = MediaQuery.of(context).size;
     final isHorizontal = screenSize.width > screenSize.height;
     final isTablet = screenSize.shortestSide >= 600;
+    final isSmallPhone = screenSize.shortestSide < _kSmallPhoneThreshold;
 
-    var cardWidth = isHorizontal || isTablet
+    var baseCardWidth = isHorizontal || isTablet
         ? (screenSize.longestSide / 2) - (3 * padding16)
         : screenSize.width - (3 * padding16);
+    
+    var cardWidth = isSmallPhone
+        ? baseCardWidth * _kSmallPhoneWidthMultiplier
+        : baseCardWidth;
+    
+    var aspectRatio = isSmallPhone
+        ? _kSmallPhoneAspectRatio
+        : _kCardAspectRatio;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -152,7 +168,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     AspectRatio(
-                      aspectRatio: _kCardAspectRatio,
+                      aspectRatio: aspectRatio,
                       child: NetworkImageWidget(
                           url: item.coverUrl, shouldCache: true),
                     ),
