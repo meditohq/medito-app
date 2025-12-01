@@ -64,6 +64,14 @@ final class EmailExistsError extends AppError {
   });
 }
 
+/// Error indicating that the client ID is already associated with a different email address.
+final class EmailMismatchError extends AppError {
+  const EmailMismatchError({
+    super.message =
+        'This account is already linked to a different email address. Please use the original email.',
+  });
+}
+
 /// Error indicating an issue reading from local storage (SharedPreferences or SecureStorage).
 class StorageReadError extends AppError {
   const StorageReadError(
