@@ -43,12 +43,12 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
                       Semantics(
                         button: true,
                         label:
-                            AppLocalizations.of(context)!.thanksForSharingHappy,
+                            AppLocalizations.of(context)!.thanksForSharingSad,
                         child: _buildEmotionButton(
                           context,
-                          '😊',
+                          '☹️',
                           AppLocalizations.of(context)!.thanksForSharing,
-                          _handlePositiveFeedback,
+                          _handleNegativeFeedback,
                         ),
                       ),
                       Semantics(
@@ -65,12 +65,12 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
                       Semantics(
                         button: true,
                         label:
-                            AppLocalizations.of(context)!.thanksForSharingSad,
+                            AppLocalizations.of(context)!.thanksForSharingHappy,
                         child: _buildEmotionButton(
                           context,
-                          '☹️',
+                          '😊',
                           AppLocalizations.of(context)!.thanksForSharing,
-                          _handleNegativeFeedback,
+                          _handlePositiveFeedback,
                         ),
                       ),
                     ],
@@ -129,7 +129,7 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventPostMeditationFeedback,
       parameters: {
-        'type': 'thumbs_down',
+        'feedback_type': 'thumbs_down',
       },
     );
   }
