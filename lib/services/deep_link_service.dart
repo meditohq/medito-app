@@ -39,15 +39,15 @@ class DeepLinkService {
     _linkSubscription?.cancel();
   }
 
-  void handleDeepLink(Uri uri) {
+  Future<void> handleDeepLink(Uri uri) async {
     AppLogger.d('DEEPLINK', 'Handling deep link: ${uri.toString()}');
     AppLogger.d('DEEPLINK', 'Scheme: ${uri.scheme}');
     AppLogger.d('DEEPLINK', 'Host: ${uri.host}');
     AppLogger.d('DEEPLINK', 'Path: ${uri.path}');
 
     try {
-      // Extract and store UTM parameters (async, won't block navigation)
-      _storeUtmParameters(uri);
+      // Extract and store UTM parameters before navigation
+      await _storeUtmParameters(uri);
 
       var pathSegments = <String>[];
 
