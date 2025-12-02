@@ -108,7 +108,7 @@ class MetaSdkService {
 
       // Get stored UTM parameters to include in first open event
       final utmParams = await _getStoredUtmParameters();
-      
+
       await logEvent(AnalyticsEventConstants.appFirstOpen, utmParams);
       await prefs.setBool(key, true);
     } catch (e, stack) {

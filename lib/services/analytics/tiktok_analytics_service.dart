@@ -210,7 +210,7 @@ class TikTokAnalyticsService {
 
       // Get stored UTM parameters to include in first open event
       final utmParams = await _getStoredUtmParameters();
-      
+
       await logEvent(
         name: AnalyticsEventConstants.appFirstOpen,
         parameters: utmParams.isNotEmpty ? utmParams : null,
