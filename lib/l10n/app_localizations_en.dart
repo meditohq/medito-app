@@ -1321,7 +1321,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storageReadError => 'Failed to read data from local storage';
 
   @override
-  String get accountInactiveError => 'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.';
+  String get accountInactiveError =>
+      'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.';
 
   @override
   String get rateLimitError => 'Something went wrong';

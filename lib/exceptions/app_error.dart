@@ -80,5 +80,7 @@ class StorageReadError extends AppError {
 
 /// Error indicating that the email provided is associated with an inactive account.
 class InactiveEmailError extends AppError {
-  const InactiveEmailError({super.message = 'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.'});
+  const InactiveEmailError(
+      {super.message =
+          'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.'});
 }

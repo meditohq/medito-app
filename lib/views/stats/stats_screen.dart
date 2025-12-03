@@ -265,24 +265,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                   }
                 },
                 data: (stats) {
-                  final isPossiblyStillLoading = stats.updated == 0;
-
-                  if (isPossiblyStillLoading) {
-                    Future.microtask(
-                      () => ref.read(statsProvider.notifier).refresh(),
-                    );
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32.0),
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                    );
-                  }
-
                   return _statsList(context, stats, ref);
                 },
               ),

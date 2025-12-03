@@ -106,14 +106,6 @@ class StreakCircleState extends ConsumerState<StreakCircle>
             }
           },
           data: (stats) {
-            final isPossiblyStillLoading = stats.updated == 0;
-
-            if (isPossiblyStillLoading) {
-              Future.microtask(
-                  () => ref.read(statsProvider.notifier).refresh());
-              return _buildShimmer();
-            }
-
             final isStreakDoneToday =
                 _controller.isStreakDoneToday(stats.audioCompleted);
 
