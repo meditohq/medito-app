@@ -178,6 +178,8 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     final borderColor =
         Color.lerp(backgroundColor, Colors.white, 0.3) ?? backgroundColor;
 
+    final iconSize = (width * 0.5).clamp(24.0, 32.0);
+
     final squareButton = Container(
       width: width,
       height: width,
@@ -206,7 +208,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
           child: Center(
             child: MeditoHugeIcon(
               icon: e.icon ?? '',
-              size: 32,
+              size: iconSize,
               color: iconColor,
             ),
           ),
@@ -222,16 +224,19 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
         children: [
           squareButton,
           const SizedBox(height: 8),
-          Text(
-            e.title ?? '',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontFamily: teachers,
-                  fontSize: 12,
-                  color: textColor,
-                ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              e.title ?? '',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontFamily: teachers,
+                    fontSize: 12,
+                    color: textColor,
+                  ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),
