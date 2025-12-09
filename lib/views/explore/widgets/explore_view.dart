@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -59,7 +60,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   String _searchQuery = '';
   Timer? _debounce;
   bool _hasLoadedData = false;
-  ExploreFilter _currentFilter = ExploreFilter.all;
+  ExploreFilter _currentFilter = ExploreFilter.packs;
   final _analytics = FirebaseAnalyticsService();
 
   @override
@@ -110,7 +111,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
       setState(() {
         _searchQuery = asciiQuery;
         if (asciiQuery.isEmpty) {
-          _currentFilter = ExploreFilter.all;
+          _currentFilter = ExploreFilter.packs;
         }
       });
     });
@@ -128,7 +129,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               _buildHeader(),
-              if (_searchQuery.isNotEmpty) _buildFilterChips(),
+              if (_searchQuery.isNotEmpty) _buildFilterChips(ref),
               ..._buildContentSlivers(ref),
             ],
           ),
@@ -160,7 +161,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
               onClear: () {
                 setState(() {
                   _searchQuery = '';
-                  _currentFilter = ExploreFilter.all;
+                  _currentFilter = ExploreFilter.packs;
                   _searchController.clear();
                 });
               },
@@ -171,7 +172,25 @@ class ExploreViewState extends ConsumerState<ExploreView> {
     );
   }
 
-  Widget _buildFilterChips() {
+  Widget _buildFilterChips(WidgetRef ref) {
+    final packs = ref.watch(filteredPacksProvider(_searchQuery));
+    final searchTracksAsync = ref.watch(searchTracksProvider(_searchQuery));
+
+    final packsCount = packs.length;
+    final tracksCount = searchTracksAsync.valueOrNull?.length ?? 0;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_currentFilter == ExploreFilter.packs &&
+          packsCount == 0 &&
+          tracksCount > 0) {
+        setState(() => _currentFilter = ExploreFilter.tracks);
+      } else if (_currentFilter == ExploreFilter.tracks &&
+          tracksCount == 0 &&
+          packsCount > 0) {
+        setState(() => _currentFilter = ExploreFilter.packs);
+      }
+    });
+
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: padding16),
@@ -181,8 +200,12 @@ class ExploreViewState extends ConsumerState<ExploreView> {
               child: Wrap(
                 spacing: 8,
                 children: ExploreFilter.values
-                    .map((filter) => _buildFilterChip(filter))
-                    .toList(),
+                    .where((filter) => filter != ExploreFilter.all)
+                    .map((filter) {
+                  final count =
+                      filter == ExploreFilter.packs ? packsCount : tracksCount;
+                  return _buildFilterChip(filter, count);
+                }).toList(),
               ),
             ),
           ],
@@ -191,12 +214,12 @@ class ExploreViewState extends ConsumerState<ExploreView> {
     );
   }
 
-  Widget _buildFilterChip(ExploreFilter filter) {
+  Widget _buildFilterChip(ExploreFilter filter, int count) {
     final isSelected = _currentFilter == filter;
 
     return ChoiceChip(
       label: Text(
-        filter.label(context),
+        '${filter.label(context)} ($count)',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: isSelected
                   ? Theme.of(context).colorScheme.onPrimary
@@ -397,36 +420,31 @@ class ExploreViewState extends ConsumerState<ExploreView> {
           padding16,
           0,
         ),
-        sliver: SliverGrid(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            mainAxisSpacing: padding16,
-            crossAxisSpacing: padding16,
-            childAspectRatio: 0.75,
-          ),
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final item = packItems[index];
-              return RepaintBoundary(
-                key: ValueKey('pack_${item.id}'),
-                child: PackCardWidget(
-                  title: item.title,
-                  subTitle: item.subtitle,
-                  coverUrlPath: item.coverUrl,
-                  onTap: () {
-                    unfocusSearch();
-                    handleNavigation(
-                      TypeConstants.pack,
-                      [item.id, item.path],
-                      context,
-                      ref: ref,
-                    );
-                  },
-                ),
-              );
-            },
-            childCount: packItems.length,
-          ),
+        sliver: SliverMasonryGrid.count(
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: padding16,
+          crossAxisSpacing: padding16,
+          itemBuilder: (context, index) {
+            final item = packItems[index];
+            return RepaintBoundary(
+              key: ValueKey('pack_${item.id}'),
+              child: PackCardWidget(
+                title: item.title,
+                subTitle: item.subtitle,
+                coverUrlPath: item.coverUrl,
+                onTap: () {
+                  unfocusSearch();
+                  handleNavigation(
+                    TypeConstants.pack,
+                    [item.id, item.path],
+                    context,
+                    ref: ref,
+                  );
+                },
+              ),
+            );
+          },
+          childCount: packItems.length,
         ),
       ),
     ];

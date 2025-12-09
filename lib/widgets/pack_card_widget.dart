@@ -62,28 +62,26 @@ class _PackCardWidgetState extends State<PackCardWidget> {
             onTap: widget.onTap,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 if (widget.coverUrlPath != null &&
                     widget.coverUrlPath!.isNotEmpty)
                   _getCoverUrl(),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _title(textTheme,
-                            title: widget.title, color: titleColor),
-                        if (widget.subTitle != null) const SizedBox(height: 4),
-                        Expanded(
-                          child: _description(
-                            textTheme,
-                            subtitle: widget.subTitle,
-                            color: subtitleColor,
-                          ),
-                        ),
-                      ],
-                    ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _title(textTheme,
+                          title: widget.title, color: titleColor),
+                      if (widget.subTitle != null) const SizedBox(height: 4),
+                      _description(
+                        textTheme,
+                        subtitle: widget.subTitle,
+                        color: subtitleColor,
+                      ),
+                    ],
                   ),
                 ),
               ],
