@@ -18,7 +18,6 @@ import 'package:medito/widgets/widgets.dart';
 import 'package:medito/widgets/pack_card_widget.dart';
 import 'package:medito/utils/utils.dart';
 
-// Create a filtered provider to handle search logic efficiently
 final filteredPacksProvider =
     Provider.autoDispose.family<List<PackItem>, String>((ref, query) {
   final packs = ref.watch(
@@ -26,15 +25,24 @@ final filteredPacksProvider =
   );
   if (query.isEmpty) return packs;
   final lowerQuery = query.toLowerCase();
-  final filtered = packs
+  return packs
       .where((p) =>
           p.title.toLowerCase().contains(lowerQuery) ||
           p.subtitle.toLowerCase().contains(lowerQuery))
       .toList();
-  // Return the same list reference if the filtered results are the same
-  // This prevents unnecessary rebuilds of the pack grid
-  return filtered;
 });
+
+enum ExploreFilter {
+  all,
+  packs,
+  tracks;
+
+  String label(BuildContext context) => switch (this) {
+        ExploreFilter.all => AppLocalizations.of(context)!.all,
+        ExploreFilter.packs => AppLocalizations.of(context)!.packs,
+        ExploreFilter.tracks => AppLocalizations.of(context)!.tracks,
+      };
+}
 
 class ExploreView extends ConsumerStatefulWidget {
   final FocusNode searchFocusNode;
@@ -45,40 +53,32 @@ class ExploreView extends ConsumerStatefulWidget {
   ConsumerState<ExploreView> createState() => ExploreViewState();
 }
 
-// Make the state class public so it can be referenced by GlobalKey
 class ExploreViewState extends ConsumerState<ExploreView> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
   Timer? _debounce;
   bool _hasLoadedData = false;
+  ExploreFilter _currentFilter = ExploreFilter.all;
   final _analytics = FirebaseAnalyticsService();
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _debounce?.cancel();
-    super.dispose();
-  }
-
-  void unfocusSearch() {
-    widget.searchFocusNode.unfocus();
-  }
-
-  void _onSearchChanged(String value) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      var asciiQuery = value.replaceAll(RegExp(r'[^\x00-\x7F]'), '');
-      setState(() {
-        _searchQuery = asciiQuery;
-      });
-    });
-  }
 
   @override
   void initState() {
     super.initState();
     _logScreenView();
     AppLogger.d('ExploreView', 'initState');
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _scrollController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void unfocusSearch() {
+    widget.searchFocusNode.unfocus();
   }
 
   Future<void> _logScreenView() async {
@@ -103,57 +103,128 @@ class ExploreViewState extends ConsumerState<ExploreView> {
     }
   }
 
+  void _onSearchChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      final asciiQuery = value.replaceAll(RegExp(r'[^\x00-\x7F]'), '');
+      setState(() {
+        _searchQuery = asciiQuery;
+        if (asciiQuery.isEmpty) {
+          _currentFilter = ExploreFilter.all;
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     AppLogger.d('ExploreView', 'build started');
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
-          edgeOffset: 150,
           onRefresh: _refreshExploreList,
           child: CustomScrollView(
+            controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              SliverAppBar(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                expandedHeight: 134.0,
-                collapsedHeight: _searchQuery.isEmpty ? 0 : 134.0,
-                toolbarHeight: 0,
-                floating: _searchQuery.isEmpty,
-                pinned: true,
-                snap: false,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: padding16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HomeHeaderWidget(
-                            greeting: AppLocalizations.of(context)!.explore),
-                        const SizedBox(height: 18.0),
-                        SearchBox(
-                          controller: _searchController,
-                          focusNode: widget.searchFocusNode,
-                          onChanged: _onSearchChanged,
-                          onClear: () {
-                            setState(() {
-                              _searchQuery = '';
-                              _searchController.clear();
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 18.0),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              _buildHeader(),
+              if (_searchQuery.isNotEmpty) _buildFilterChips(),
               ..._buildContentSlivers(ref),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          padding16,
+          padding16,
+          padding16,
+          18,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            HomeHeaderWidget(
+              greeting: AppLocalizations.of(context)!.explore,
+            ),
+            const SizedBox(height: 18),
+            SearchBox(
+              controller: _searchController,
+              focusNode: widget.searchFocusNode,
+              onChanged: _onSearchChanged,
+              onClear: () {
+                setState(() {
+                  _searchQuery = '';
+                  _currentFilter = ExploreFilter.all;
+                  _searchController.clear();
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChips() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: padding16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Wrap(
+                spacing: 8,
+                children: ExploreFilter.values
+                    .map((filter) => _buildFilterChip(filter))
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(ExploreFilter filter) {
+    final isSelected = _currentFilter == filter;
+
+    return ChoiceChip(
+      label: Text(
+        filter.label(context),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+      ),
+      selected: isSelected,
+      selectedColor: Theme.of(context).colorScheme.primary,
+      onSelected: (selected) {
+        if (selected) {
+          setState(() => _currentFilter = filter);
+        }
+      },
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      iconTheme: IconThemeData(
+        color: isSelected
+            ? Theme.of(context).colorScheme.onPrimary
+            : Theme.of(context).colorScheme.onSurface,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 
@@ -165,8 +236,13 @@ class ExploreViewState extends ConsumerState<ExploreView> {
         data: (packs) {
           if (packs.isEmpty) {
             return [
-              const SliverToBoxAdapter(
-                child: Center(child: Text('No packs available')),
+              SliverFillRemaining(
+                child: Center(
+                  child: Text(
+                    'No packs available',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
               ),
             ];
           }
@@ -175,31 +251,43 @@ class ExploreViewState extends ConsumerState<ExploreView> {
         error: (err, stack) {
           final error = err is AppError ? err : const UnknownError();
           return [
-            SliverToBoxAdapter(
+            SliverFillRemaining(
               child: MeditoErrorWidget(
                 error: error,
                 isScaffold: false,
                 onTap: () => ref.invalidate(explorePacksProvider),
               ),
-            )
+            ),
           ];
         },
         loading: () => [
-          const SliverToBoxAdapter(child: LoadingWidget()),
+          const SliverFillRemaining(
+            child: Center(child: CircularProgressIndicator()),
+          ),
         ],
       );
     } else {
-      final searchTracksAsync = ref.watch(searchTracksProvider(_searchQuery));
-      final packs = ref.watch(filteredPacksProvider(_searchQuery));
+      return _buildSearchResults(ref);
+    }
+  }
 
-      return searchTracksAsync.when(
-        data: (tracks) {
-          if (packs.isEmpty && tracks.isEmpty) {
-            return [
-              SliverToBoxAdapter(
+  List<Widget> _buildSearchResults(WidgetRef ref) {
+    final searchTracksAsync = ref.watch(searchTracksProvider(_searchQuery));
+    final packs = ref.watch(filteredPacksProvider(_searchQuery));
+
+    return searchTracksAsync.when(
+      data: (tracks) {
+        final filteredPacks =
+            _currentFilter == ExploreFilter.tracks ? <PackItem>[] : packs;
+        final filteredTracks =
+            _currentFilter == ExploreFilter.packs ? <TrackItem>[] : tracks;
+
+        if (filteredPacks.isEmpty && filteredTracks.isEmpty) {
+          return [
+            SliverFillRemaining(
+              child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: padding16, vertical: padding16),
+                  padding: const EdgeInsets.all(padding16),
                   child: Text(
                     AppLocalizations.of(context)!.noResultsFound,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -212,142 +300,64 @@ class ExploreViewState extends ConsumerState<ExploreView> {
                   ),
                 ),
               ),
-            ];
-          }
-
-          List<Widget> slivers = [];
-
-          if (packs.isNotEmpty) {
-            slivers.add(
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: padding16, right: padding16, bottom: padding16),
-                  child: Text(
-                    AppLocalizations.of(context)!.packsSectionHeader,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                        ),
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-              ),
-            );
-            slivers.addAll(_buildPackList(context, ref, packs));
-            slivers.add(const SliverToBoxAdapter(child: SizedBox(height: 8)));
-          }
-
-          if (tracks.isNotEmpty) {
-            slivers.add(
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: padding16,
-                    top: padding8,
-                    left: padding16,
-                    right: padding16,
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.tracksSectionHeader,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                        ),
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-              ),
-            );
-            slivers.addAll(_buildTrackList(context, ref, tracks));
-          }
-
-          slivers.add(const SliverToBoxAdapter(child: SizedBox(height: 32)));
-
-          return slivers;
-        },
-        error: (err, stack) {
-          var errorMsg = err.toString();
-          return [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Track search error:',
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    Text(errorMsg,
-                        style: Theme.of(context).textTheme.bodyMedium),
-                  ],
-                ),
-              ),
             ),
           ];
-        },
-        loading: () => [
-          const SliverToBoxAdapter(child: LoadingWidget()),
-        ],
-      );
-    }
+        }
+
+        final slivers = <Widget>[];
+
+        if (filteredPacks.isNotEmpty) {
+          slivers.addAll(_buildPackList(context, ref, filteredPacks));
+        }
+
+        if (filteredTracks.isNotEmpty) {
+          slivers.addAll(_buildTrackList(context, ref, filteredTracks));
+        }
+
+        slivers.add(const SliverToBoxAdapter(child: SizedBox(height: 32)));
+
+        return slivers;
+      },
+      error: (err, stack) {
+        final error = err is AppError ? err : const UnknownError();
+        return [
+          SliverFillRemaining(
+            child: MeditoErrorWidget(
+              error: error,
+              isScaffold: false,
+              onTap: () => ref.invalidate(searchTracksProvider(_searchQuery)),
+            ),
+          ),
+        ];
+      },
+      loading: () => [
+        const SliverFillRemaining(
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ],
+    );
   }
 
   List<Widget> _buildTrackList(
-      BuildContext context, WidgetRef ref, List<TrackItem> tracks) {
-    final isWideScreen = MediaQuery.of(context).size.shortestSide >= 600;
-
-    if (isWideScreen) {
-      return [
-        SliverPadding(
-          padding: const EdgeInsets.only(
-              top: padding16, left: padding16, right: padding16),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: padding16,
-              crossAxisSpacing: padding16,
-              childAspectRatio: 1.0, // Adjust as needed
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                var item = tracks[index];
-                return TrackCardWidget(
-                  key: ValueKey('track_${item.id}'),
-                  title: item.title,
-                  subTitle: item.subtitle,
-                  coverUrlPath: item.coverUrl,
-                  onTap: () {
-                    unfocusSearch();
-                    handleNavigation(
-                      TypeConstants.track,
-                      [item.id, item.path],
-                      context,
-                      ref: ref,
-                    );
-                  },
-                );
-              },
-              childCount: tracks.length,
-            ),
-          ),
-        ),
-      ];
-    }
-
+    BuildContext context,
+    WidgetRef ref,
+    List<TrackItem> tracks,
+  ) {
     return [
       SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: padding16),
+        padding: const EdgeInsets.fromLTRB(
+          padding16,
+          padding16,
+          padding16,
+          0,
+        ),
         sliver: SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              var item = tracks[index];
+              final item = tracks[index];
               return Padding(
                 key: ValueKey('track_${item.id}'),
-                padding: const EdgeInsets.only(bottom: 16.0),
+                padding: const EdgeInsets.only(bottom: padding16),
                 child: TrackCardWidget(
                   title: item.title,
                   subTitle: item.subtitle,
@@ -372,24 +382,27 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   }
 
   List<Widget> _buildPackList(
-      BuildContext context, WidgetRef ref, List<PackItem> packItems) {
-    final width = MediaQuery.of(context).size.width;
-    final crossAxisCount = width > 600 ? 3 : 2;
+    BuildContext context,
+    WidgetRef ref,
+    List<PackItem> packItems,
+  ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisCount = screenWidth > 600 ? 3 : 2;
 
     return [
       SliverPadding(
-        padding: const EdgeInsets.only(
-          left: padding16,
-          right: padding16,
-          top: padding16,
+        padding: const EdgeInsets.fromLTRB(
+          padding16,
+          padding16,
+          padding16,
+          0,
         ),
         sliver: SliverGrid(
-          key: ValueKey('pack_grid_${packItems.map((p) => p.id).join(',')}'),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             mainAxisSpacing: padding16,
             crossAxisSpacing: padding16,
-            childAspectRatio: 0.7,
+            childAspectRatio: 0.75,
           ),
           delegate: SliverChildBuilderDelegate(
             (context, index) {
@@ -492,24 +505,6 @@ class SearchBox extends StatelessWidget {
       ),
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       onChanged: onChanged,
-    );
-  }
-}
-
-class LoadingWidget extends StatelessWidget {
-  const LoadingWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(
-            Theme.of(context).colorScheme.primary,
-          ),
-        ),
-      ),
     );
   }
 }

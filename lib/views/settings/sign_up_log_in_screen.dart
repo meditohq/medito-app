@@ -303,6 +303,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         );
 
         await StatsManager().clearAllStats();
+        // Force sync after clearing stats to ensure we fetch from server
+        var statsManager = StatsManager();
+        await statsManager.initialize();
+        await statsManager.sync(force: true);
         ref.read(statsProvider.notifier).refresh();
         ref.invalidate(packProvider);
 

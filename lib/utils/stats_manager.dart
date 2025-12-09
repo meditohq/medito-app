@@ -622,6 +622,9 @@ class StatsManager {
     var prefs = await SharedPreferences.getInstance();
     await prefs.remove(SharedPreferenceConstants.localAllStatsKey);
     _allStats = LocalAllStats.empty();
+    // Reset sync timestamp so that sync will run after clearing
+    _lastSyncedAt = null;
+    await _saveLastSyncedAt();
   }
 
   /// Awards a streak freeze to the user
