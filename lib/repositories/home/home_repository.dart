@@ -60,19 +60,28 @@ class HomeRepositoryImpl extends HomeRepository {
     var savedIds = getLocalShortcutIds();
     if (savedIds.isEmpty) return shortcuts;
 
-    var sortedShortcuts = List<ShortcutsModel>.from(shortcuts);
-    sortedShortcuts.sort((a, b) {
-      var keyA = a.id ?? '${a.type}_${a.path}';
-      var keyB = b.id ?? '${b.type}_${b.path}';
-      var indexA = savedIds.indexOf(keyA);
-      var indexB = savedIds.indexOf(keyB);
-      if (indexA == -1) return 1;
-      if (indexB == -1) return -1;
+    final savedIdsSet = savedIds.toSet();
+    final orderedShortcuts = <ShortcutsModel>[];
+    final unorderedShortcuts = <ShortcutsModel>[];
 
+    for (var shortcut in shortcuts) {
+      final key = shortcut.id ?? '${shortcut.type}_${shortcut.path}';
+      if (savedIdsSet.contains(key)) {
+        orderedShortcuts.add(shortcut);
+      } else {
+        unorderedShortcuts.add(shortcut);
+      }
+    }
+
+    orderedShortcuts.sort((a, b) {
+      final keyA = a.id ?? '${a.type}_${a.path}';
+      final keyB = b.id ?? '${b.type}_${b.path}';
+      final indexA = savedIds.indexOf(keyA);
+      final indexB = savedIds.indexOf(keyB);
       return indexA.compareTo(indexB);
     });
 
-    return sortedShortcuts;
+    return [...orderedShortcuts, ...unorderedShortcuts];
   }
 }
 
