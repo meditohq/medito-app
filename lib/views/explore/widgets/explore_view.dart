@@ -62,6 +62,9 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   bool _hasLoadedData = false;
   ExploreFilter _currentFilter = ExploreFilter.packs;
   final _analytics = FirebaseAnalyticsService();
+  int? _previousPacksCount;
+  int? _previousTracksCount;
+  bool _isFilterSwitchCallbackScheduled = false;
 
   @override
   void initState() {
@@ -179,17 +182,28 @@ class ExploreViewState extends ConsumerState<ExploreView> {
     final packsCount = packs.length;
     final tracksCount = searchTracksAsync.valueOrNull?.length ?? 0;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_currentFilter == ExploreFilter.packs &&
-          packsCount == 0 &&
-          tracksCount > 0) {
-        setState(() => _currentFilter = ExploreFilter.tracks);
-      } else if (_currentFilter == ExploreFilter.tracks &&
-          tracksCount == 0 &&
-          packsCount > 0) {
-        setState(() => _currentFilter = ExploreFilter.packs);
-      }
-    });
+    if ((_previousPacksCount != packsCount ||
+            _previousTracksCount != tracksCount) &&
+        !_isFilterSwitchCallbackScheduled) {
+      _previousPacksCount = packsCount;
+      _previousTracksCount = tracksCount;
+      _isFilterSwitchCallbackScheduled = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _isFilterSwitchCallbackScheduled = false;
+        if (!mounted) return;
+
+        if (_currentFilter == ExploreFilter.packs &&
+            packsCount == 0 &&
+            tracksCount > 0) {
+          setState(() => _currentFilter = ExploreFilter.tracks);
+        } else if (_currentFilter == ExploreFilter.tracks &&
+            tracksCount == 0 &&
+            packsCount > 0) {
+          setState(() => _currentFilter = ExploreFilter.packs);
+        }
+      });
+    }
 
     return SliverToBoxAdapter(
       child: Padding(
