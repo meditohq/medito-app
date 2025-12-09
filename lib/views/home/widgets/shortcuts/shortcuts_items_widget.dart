@@ -24,59 +24,30 @@ class ShortcutsItemsWidget extends ConsumerStatefulWidget {
 }
 
 class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
-  late List<ShortcutsModel> data;
-  bool _isReordering = false;
+  late List<ShortcutsModel> _localData;
 
   String _getItemKey(ShortcutsModel e) => e.id ?? '${e.type}_${e.path}';
-
-  List<String> _getItemKeys(List<ShortcutsModel> items) =>
-      items.map(_getItemKey).toList();
-
-  bool _areOrdersEqual(List<ShortcutsModel> a, List<ShortcutsModel> b) {
-    if (a.length != b.length) return false;
-    final keysA = _getItemKeys(a);
-    final keysB = _getItemKeys(b);
-    for (var i = 0; i < keysA.length; i++) {
-      if (keysA[i] != keysB[i]) return false;
-    }
-    return true;
-  }
 
   @override
   void initState() {
     super.initState();
-    data = widget.data.toList();
-    AppLogger.d('ShortcutsItemsWidget', 'initState: ${data.length} items');
-    AppLogger.d(
-        'ShortcutsItemsWidget', 'Item IDs: ${data.map((e) => e.id).toList()}');
+    _localData = List.from(widget.data);
   }
 
   @override
   void didUpdateWidget(covariant ShortcutsItemsWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (_isReordering) {
-      AppLogger.d('ShortcutsItemsWidget',
-          'didUpdateWidget: Skipping update - reorder in progress');
-      return;
-    }
-
-    final ordersEqual = _areOrdersEqual(widget.data, data);
-    AppLogger.d('ShortcutsItemsWidget',
-        'didUpdateWidget: ordersEqual=$ordersEqual, widget.data.length=${widget.data.length}, data.length=${data.length}');
-
-    if (!ordersEqual && widget.data.length == data.length) {
-      AppLogger.d('ShortcutsItemsWidget',
-          'Updating data - order changed or items changed');
-      AppLogger.d('ShortcutsItemsWidget', 'Old order: ${_getItemKeys(data)}');
-      AppLogger.d(
-          'ShortcutsItemsWidget', 'New order: ${_getItemKeys(widget.data)}');
-
-      data = widget.data.toList();
-      AppLogger.d('ShortcutsItemsWidget', 'Updated local data order');
-    } else if (widget.data.length != data.length) {
-      AppLogger.d('ShortcutsItemsWidget', 'Item count changed, updating data');
-      data = widget.data.toList();
+    if (widget.data.length != _localData.length) {
+      _localData = List.from(widget.data);
+    } else {
+      final currentKeys = _localData.map(_getItemKey).toList();
+      final newKeys = widget.data.map(_getItemKey).toList();
+      final currentKeysSet = currentKeys.toSet();
+      final newKeysSet = newKeys.toSet();
+      if (currentKeysSet.length != newKeysSet.length ||
+          !currentKeysSet.containsAll(newKeysSet)) {
+        _localData = List.from(widget.data);
+      }
     }
   }
 
@@ -93,26 +64,15 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     );
   }
 
-  void _onReorder(int oldIndex, int newIndex) {
+  Future<void> _onReorder(int oldIndex, int newIndex) async {
+    if (oldIndex == newIndex) return;
+
     setState(() {
-      final element = data.removeAt(oldIndex);
-      data.insert(newIndex, element);
-      _handleShortcutItemPlacementInPreference(oldIndex, newIndex);
+      final element = _localData.removeAt(oldIndex);
+      _localData.insert(newIndex, element);
     });
-  }
 
-  Future<void> _handleShortcutItemPlacementInPreference(
-    int oldIndex,
-    int newIndex,
-  ) async {
-    _isReordering = true;
-
-    var ids = data.map((e) {
-      if (e.id != null) {
-        return e.id!;
-      }
-      return '${e.type}_${e.path}';
-    }).toList();
+    final ids = _localData.map((e) => _getItemKey(e)).toList();
 
     try {
       await ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids).future);
@@ -120,8 +80,9 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     } catch (e, stackTrace) {
       AppLogger.e('ShortcutsItemsWidget', 'Error updating shortcuts preference',
           e, stackTrace);
-    } finally {
-      _isReordering = false;
+      setState(() {
+        _localData = List.from(widget.data);
+      });
     }
   }
 
@@ -137,9 +98,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     final totalPadding = horizontalPadding * 2;
     final containerSize = (size.width - totalPadding - totalSpacing) / columns;
 
-    AppLogger.d('ShortcutsItemsWidget',
-        'Building ReorderableWrap with ${data.length} children, columns=$columns');
-
     return ReorderableWrap(
       spacing: spacing,
       runSpacing: runSpacing,
@@ -147,7 +105,7 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
       maxMainAxisCount: columns,
       minMainAxisCount: columns,
       onReorder: _onReorder,
-      children: data
+      children: _localData
           .map((e) => _buildShortcutItem(e, containerSize, containerSize))
           .toList(),
     );
@@ -172,8 +130,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     final textColor = Theme.of(context).colorScheme.onSurface;
 
     final uniqueKey = _getItemKey(e);
-    AppLogger.d('ShortcutsItemsWidget',
-        'Building item with key: $uniqueKey (id: ${e.id}, type: ${e.type}, path: ${e.path})');
 
     final borderColor =
         Color.lerp(backgroundColor, Colors.white, 0.3) ?? backgroundColor;
