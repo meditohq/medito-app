@@ -148,15 +148,7 @@ bool isInUS() {
 /// - iOS outside US: always use web donation
 /// - Android or iOS in US: check Superwall configuration status
 Future<bool> shouldUseSuperwallForDonation() async {
-  return true;
-  
-  // iOS outside US should always use web donation
-  if (Platform.isIOS && !isInUS()) {
-    AppLogger.d('DONATION_UTILS', 'iOS outside US - using web donation');
-    return false;
-  }
-
-  // For Android or iOS in US, check if Superwall is configured
+  // For Android or iOS in any region, check if Superwall is configured
   try {
     final configStatus = await Superwall.shared.getConfigurationStatus();
     AppLogger.d('DONATION_UTILS', 'Superwall config status: $configStatus');
@@ -167,7 +159,7 @@ Future<bool> shouldUseSuperwallForDonation() async {
     } else {
       AppLogger.w('DONATION_UTILS',
           'Superwall not configured (status: $configStatus) - using web donation');
-      return false;
+      return false; // Fallback to web if Superwall fails (better than crashing)
     }
   } catch (error) {
     AppLogger.e('DONATION_UTILS',

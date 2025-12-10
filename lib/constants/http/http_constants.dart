@@ -87,7 +87,7 @@ const _prodEnv = ProdEnv(
   donationToken: String.fromEnvironment('DONATION_TOKEN'),
   superwallApiKey: String.fromEnvironment('SUPERWALL_API_KEY'),
   paywallEnvironment:
-      String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
+      String.fromEnvironment('PAYWALL_ENV', defaultValue: 'live'),
   tiktokAndroidAppId: String.fromEnvironment('TIKTOK_ANDROID_APP_ID'),
   tiktokIosAppId: String.fromEnvironment('TIKTOK_IOS_APP_ID'),
   tiktokTestEventCode: String.fromEnvironment('TIKTOK_TEST_EVENT_CODE'),

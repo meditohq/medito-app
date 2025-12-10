@@ -77,4 +77,22 @@ platform :android do
       release_status: "draft",
     )
   end
+
+  desc "Upload APK to Play Store with custom path and track"
+  lane :upload_apk do |options|
+    apk_path = options[:apk_path] || '../build/app/outputs/apk/prod/release/app-prod-release.apk'
+    track = options[:track] || 'internal'
+    json_key_path = options[:json_key] || '../../play-store-credentials.json'
+    
+    upload_to_play_store(
+      track: track,
+      apk: apk_path,
+      json_key: json_key_path,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false,
+      release_status: "draft",
+    )
+  end
 end
