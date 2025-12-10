@@ -11,21 +11,7 @@ Future<HomeModel> fetchHome(Ref ref) async {
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
-  var homeModel = await homeRepository.fetchHome();
-  var sortedShortcuts =
-      await homeRepository.getSortedShortcuts(homeModel.shortcuts);
-
-  return homeModel.copyWith(shortcuts: sortedShortcuts);
-}
-
-@riverpod
-Future<void> updateShortcutsIdsInPreference(
-  Ref ref, {
-  required List<String> ids,
-}) {
-  final homeRepository = ref.watch(homeRepositoryProvider);
-
-  return homeRepository.setShortcutIdsInPreference(ids);
+  return await homeRepository.fetchHome();
 }
 
 @riverpod

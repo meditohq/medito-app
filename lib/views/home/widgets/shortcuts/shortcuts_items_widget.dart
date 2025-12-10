@@ -4,52 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:reorderables/reorderables.dart';
 
-import '../../../../providers/home/home_provider.dart';
-import '../../../../utils/logger.dart';
 import '../../../../widgets/medito_huge_icon.dart';
 
-class ShortcutsItemsWidget extends ConsumerStatefulWidget {
+class ShortcutsItemsWidget extends ConsumerWidget {
   const ShortcutsItemsWidget({super.key, required this.data});
 
   final List<ShortcutsModel> data;
-
-  @override
-  ConsumerState<ShortcutsItemsWidget> createState() =>
-      _ShortcutsItemsWidgetState();
-}
-
-class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
-  late List<ShortcutsModel> _localData;
-
-  String _getItemKey(ShortcutsModel e) => e.id ?? '${e.type}_${e.path}';
-
-  @override
-  void initState() {
-    super.initState();
-    _localData = List.from(widget.data);
-  }
-
-  @override
-  void didUpdateWidget(covariant ShortcutsItemsWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.data.length != _localData.length) {
-      _localData = List.from(widget.data);
-    } else {
-      final currentKeys = _localData.map(_getItemKey).toList();
-      final newKeys = widget.data.map(_getItemKey).toList();
-      final currentKeysSet = currentKeys.toSet();
-      final newKeysSet = newKeys.toSet();
-      if (currentKeysSet.length != newKeysSet.length ||
-          !currentKeysSet.containsAll(newKeysSet)) {
-        _localData = List.from(widget.data);
-      }
-    }
-  }
 
   void _handleChipPress(
     BuildContext context,
@@ -64,30 +27,8 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     );
   }
 
-  Future<void> _onReorder(int oldIndex, int newIndex) async {
-    if (oldIndex == newIndex) return;
-
-    setState(() {
-      final element = _localData.removeAt(oldIndex);
-      _localData.insert(newIndex, element);
-    });
-
-    final ids = _localData.map((e) => _getItemKey(e)).toList();
-
-    try {
-      await ref.read(updateShortcutsIdsInPreferenceProvider(ids: ids).future);
-      await ref.read(refreshHomeAPIsProvider.future);
-    } catch (e, stackTrace) {
-      AppLogger.e('ShortcutsItemsWidget', 'Error updating shortcuts preference',
-          e, stackTrace);
-      setState(() {
-        _localData = List.from(widget.data);
-      });
-    }
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     var isWideScreen = size.width > 600;
     final columns = isWideScreen ? 8 : 4;
@@ -98,16 +39,17 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     final totalPadding = horizontalPadding * 2;
     final containerSize = (size.width - totalPadding - totalSpacing) / columns;
 
-    return ReorderableWrap(
-      spacing: spacing,
-      runSpacing: runSpacing,
+    return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-      maxMainAxisCount: columns,
-      minMainAxisCount: columns,
-      onReorder: _onReorder,
-      children: _localData
-          .map((e) => _buildShortcutItem(e, containerSize, containerSize))
-          .toList(),
+      child: Wrap(
+        spacing: spacing,
+        runSpacing: runSpacing,
+        alignment: WrapAlignment.start,
+        children: data
+            .map((e) => _buildShortcutItem(
+                context, ref, e, containerSize, containerSize))
+            .toList(),
+      ),
     );
   }
 
@@ -115,7 +57,13 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     return title?.toLowerCase() == 'courses';
   }
 
-  Widget _buildShortcutItem(ShortcutsModel e, double width, double height) {
+  Widget _buildShortcutItem(
+    BuildContext context,
+    WidgetRef ref,
+    ShortcutsModel e,
+    double width,
+    double height,
+  ) {
     final isCourses = _isCourses(e.title);
     final backgroundColor = isCourses
         ? ColorConstants.lightPurple
@@ -128,8 +76,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
             ? ColorConstants.onyx
             : Theme.of(context).colorScheme.onSurface);
     final textColor = Theme.of(context).colorScheme.onSurface;
-
-    final uniqueKey = _getItemKey(e);
 
     final borderColor =
         Color.lerp(backgroundColor, Colors.white, 0.3) ?? backgroundColor;
@@ -146,15 +92,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
           color: borderColor,
           width: 0.5,
         ),
-        boxShadow: isCourses
-            ? [
-                BoxShadow(
-                  color: ColorConstants.lightPurple.withOpacity(0.5),
-                  blurRadius: 12,
-                  spreadRadius: 2,
-                ),
-              ]
-            : null,
       ),
       child: Material(
         color: Colors.transparent,
@@ -173,7 +110,6 @@ class _ShortcutsItemsWidgetState extends ConsumerState<ShortcutsItemsWidget> {
     );
 
     return SizedBox(
-      key: ValueKey(uniqueKey),
       width: width,
       child: Column(
         mainAxisSize: MainAxisSize.min,

@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/providers.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -11,13 +10,7 @@ part 'home_repository.g.dart';
 abstract class HomeRepository {
   Future<HomeModel> fetchHome();
 
-  List<String> getLocalShortcutIds();
-
   Future<AnnouncementModel?> fetchLatestAnnouncement();
-
-  Future<void> setShortcutIdsInPreference(
-    List<String> ids,
-  );
 }
 
 class HomeRepositoryImpl extends HomeRepository {
@@ -25,21 +18,6 @@ class HomeRepositoryImpl extends HomeRepository {
   final Ref ref;
 
   HomeRepositoryImpl({required this.ref, required this.client});
-
-  @override
-  List<String> getLocalShortcutIds() {
-    return ref
-            .read(sharedPreferencesProvider)
-            .getStringList(SharedPreferenceConstants.shortcuts) ??
-        [];
-  }
-
-  @override
-  Future<void> setShortcutIdsInPreference(List<String> ids) async {
-    await ref
-        .read(sharedPreferencesProvider)
-        .setStringList(SharedPreferenceConstants.shortcuts, ids);
-  }
 
   @override
   Future<HomeModel> fetchHome() async {
@@ -53,35 +31,6 @@ class HomeRepositoryImpl extends HomeRepository {
     var response = await client.getRequest(HTTPConstants.latestAnnouncement);
 
     return AnnouncementModel.fromJson(response);
-  }
-
-  Future<List<ShortcutsModel>> getSortedShortcuts(
-      List<ShortcutsModel> shortcuts) async {
-    var savedIds = getLocalShortcutIds();
-    if (savedIds.isEmpty) return shortcuts;
-
-    final savedIdsSet = savedIds.toSet();
-    final orderedShortcuts = <ShortcutsModel>[];
-    final unorderedShortcuts = <ShortcutsModel>[];
-
-    for (var shortcut in shortcuts) {
-      final key = shortcut.id ?? '${shortcut.type}_${shortcut.path}';
-      if (savedIdsSet.contains(key)) {
-        orderedShortcuts.add(shortcut);
-      } else {
-        unorderedShortcuts.add(shortcut);
-      }
-    }
-
-    orderedShortcuts.sort((a, b) {
-      final keyA = a.id ?? '${a.type}_${a.path}';
-      final keyB = b.id ?? '${b.type}_${b.path}';
-      final indexA = savedIds.indexOf(keyA);
-      final indexB = savedIds.indexOf(keyB);
-      return indexA.compareTo(indexB);
-    });
-
-    return [...orderedShortcuts, ...unorderedShortcuts];
   }
 }
 
