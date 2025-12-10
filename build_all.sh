@@ -245,10 +245,16 @@ if [ "$BUILD_ANDROID" = true ]; then
             # Change to android directory to run Fastlane
             cd android
             
-            # Check if bundle is available, otherwise try fastlane directly
+            # Check if bundle is available
             if command -v bundle &> /dev/null; then
+                # Check if Gemfile exists and install dependencies if needed
+                if [ -f "Gemfile" ]; then
+                    print_colored $BLUE "📦 Installing Fastlane dependencies..."
+                    bundle install
+                fi
                 bundle exec fastlane android upload_apk apk_path:"$ABS_APK_PATH" track:"$PLAY_STORE_TRACK" json_key:"$ABS_CREDENTIALS_PATH"
             else
+                print_colored $YELLOW "⚠️  bundle not found, trying fastlane directly..."
                 fastlane android upload_apk apk_path:"$ABS_APK_PATH" track:"$PLAY_STORE_TRACK" json_key:"$ABS_CREDENTIALS_PATH"
             fi
             

@@ -47,6 +47,14 @@ Promote beta track to prod
 
 Submit a new production build to Google Play
 
+### android upload_apk
+
+```sh
+[bundle exec] fastlane android upload_apk
+```
+
+Upload APK to Play Store with custom path and track
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
