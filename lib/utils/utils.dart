@@ -148,6 +148,8 @@ bool isInUS() {
 /// - iOS outside US: always use web donation
 /// - Android or iOS in US: check Superwall configuration status
 Future<bool> shouldUseSuperwallForDonation() async {
+  return true;
+  
   // iOS outside US should always use web donation
   if (Platform.isIOS && !isInUS()) {
     AppLogger.d('DONATION_UTILS', 'iOS outside US - using web donation');
