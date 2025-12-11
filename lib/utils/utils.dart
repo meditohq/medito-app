@@ -145,10 +145,18 @@ bool isInUS() {
 /// Returns true if Superwall should be used, false if web donation should be used
 ///
 /// Logic:
-/// - iOS outside US: always use web donation
-/// - Android or iOS in US: check Superwall configuration status
+/// - iOS: always use web donation (external browser) to comply with Apple guidelines
+/// - Android: check Superwall configuration status
 Future<bool> shouldUseSuperwallForDonation() async {
-  // For Android or iOS in any region, check if Superwall is configured
+  // For iOS, always use web donation to comply with Apple's IAP guidelines
+  // Apple requires donations to use IAP or link to external browser
+  if (Platform.isIOS) {
+    AppLogger.d('DONATION_UTILS',
+        'iOS detected - using web donation to comply with Apple guidelines');
+    return false;
+  }
+
+  // For Android, check if Superwall is configured
   try {
     final configStatus = await Superwall.shared.getConfigurationStatus();
     AppLogger.d('DONATION_UTILS', 'Superwall config status: $configStatus');
