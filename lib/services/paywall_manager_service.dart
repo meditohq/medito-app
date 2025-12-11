@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/superwall_service.dart';
@@ -14,10 +15,10 @@ class PaywallManagerService {
       : _superwallService = ref.read(superwallServiceProvider);
 
   String getDonationPlacementId() {
-    if (paywallEnvironment == 'live') {
-      return 'donation_flow';
-    } else {
+    if (kDebugMode) {
       return 'dev_donation_flow';
+    } else {
+      return 'donation_flow';
     }
   }
 

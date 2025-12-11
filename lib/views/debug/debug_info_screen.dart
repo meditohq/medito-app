@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/services/paywall_manager_service.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
@@ -35,7 +36,7 @@ class DebugInfoScreen extends ConsumerWidget {
 
   Widget _buildBody(BuildContext context, WidgetRef ref) {
     return ref.watch(deviceAppAndUserInfoProvider).when(
-          data: (infoString) => _buildInfoView(context, infoString),
+          data: (infoString) => _buildInfoView(context, ref, infoString),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stackTrace) => Center(
             child: Text(AppLocalizations.of(context)!.anErrorOccurred),
@@ -43,11 +44,16 @@ class DebugInfoScreen extends ConsumerWidget {
         );
   }
 
-  Widget _buildInfoView(BuildContext context, String infoString) {
+  Widget _buildInfoView(
+      BuildContext context, WidgetRef ref, String infoString) {
+    final paywallManager = ref.read(paywallManagerServiceProvider);
+    final donationPlacementId = paywallManager.getDonationPlacementId();
+    final fullInfo = '$infoString\nDPI: $donationPlacementId';
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: SelectableText(
-        infoString,
+        fullInfo,
         style: Theme.of(context).textTheme.bodyMedium,
       ),
     );
@@ -55,7 +61,11 @@ class DebugInfoScreen extends ConsumerWidget {
 
   void _copyDebugInfo(BuildContext context, WidgetRef ref) async {
     final infoString = await ref.read(deviceAppAndUserInfoProvider.future);
-    await Clipboard.setData(ClipboardData(text: infoString));
+    final paywallManager = ref.read(paywallManagerServiceProvider);
+    final donationPlacementId = paywallManager.getDonationPlacementId();
+    final fullInfo =
+        '$infoString\n\nDonation Placement ID: $donationPlacementId';
+    await Clipboard.setData(ClipboardData(text: fullInfo));
     if (context.mounted) {
       showSnackBar(context, AppLocalizations.of(context)!.debugInfoCopied);
     }
