@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/providers/stats_provider.dart';
 
 import '../../providers/home/home_provider.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
@@ -142,6 +143,8 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> _onRefresh() async {
+    ref.invalidate(statsProvider);
+    await ref.read(statsProvider.future);
     ref.invalidate(fetchLatestAnnouncementProvider);
     await ref.read(fetchLatestAnnouncementProvider.future);
     ref.invalidate(refreshHomeAPIsProvider);
