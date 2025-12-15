@@ -4,9 +4,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/routes/routes.dart';
-import 'package:medito/utils/utils.dart';
-import 'package:medito/utils/logger.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
   const OnboardingDonationScreen({super.key, this.onNext});
@@ -50,38 +47,16 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
 
     _didAttemptDonation = true;
 
-    // Check if we should use Superwall or web donation
-    final useSuperwall = await shouldUseSuperwallForDonation();
+    // Use shared donation navigation logic from routes.dart
+    await handleDonationNavigation(
+      context,
+      ref,
+      FirebaseAnalyticsService.paywallSourceOnboarding,
+      navigator: Navigator.of(context),
+    );
 
-    // If not using Superwall, open web donation directly
-    if (!useSuperwall) {
-      final uri = Uri.parse('https://meditofoundation.org/donate');
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-        // Advance to next page after opening web donation
-        if (mounted) {
-          widget.onNext?.call();
-        }
-        return;
-      } else {
-        AppLogger.w('ONBOARDING_DONATION', 'Unable to launch web donation URL');
-        // Advance to next page anyway
-        if (mounted) {
-          widget.onNext?.call();
-        }
-        return;
-      }
-    } else {
-      // Use shared donation navigation logic from routes.dart
-      final result = await handleDonationNavigation(
-        context,
-        ref,
-        FirebaseAnalyticsService.paywallSourceOnboarding,
-        navigator: Navigator.of(context),
-      );
-      if (result != true && mounted) {
-        widget.onNext?.call();
-      }
+    if (mounted) {
+      widget.onNext?.call();
     }
   }
 
@@ -113,7 +88,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacityValue(0.7),
+                          .withValues(alpha: 0.7),
                       fontSize: 16,
                       height: 1.5,
                     ),
