@@ -112,25 +112,23 @@ class DeepLinkService {
         return;
       }
 
-      // Standard UTM parameter names and their SharedPreferences keys
-      final utmParamMap = {
-        'utm_source': SharedPreferenceConstants.utmSource,
-        'utm_medium': SharedPreferenceConstants.utmMedium,
-        'utm_campaign': SharedPreferenceConstants.utmCampaign,
-        'utm_term': SharedPreferenceConstants.utmTerm,
-        'utm_content': SharedPreferenceConstants.utmContent,
-      };
-
       final prefs = await SharedPreferences.getInstance();
       var storedCount = 0;
 
-      for (final entry in utmParamMap.entries) {
-        final value = queryParameters[entry.key];
+      final utmParams = [
+        SharedPreferenceConstants.utmSource,
+        SharedPreferenceConstants.utmMedium,
+        SharedPreferenceConstants.utmCampaign,
+        SharedPreferenceConstants.utmTerm,
+        SharedPreferenceConstants.utmContent,
+      ];
+
+      for (final paramKey in utmParams) {
+        final value = queryParameters[paramKey];
         if (value != null && value.isNotEmpty) {
-          await prefs.setString(entry.value, value);
+          await prefs.setString(paramKey, value);
           storedCount++;
-          AppLogger.d(
-              'DEEPLINK', 'Stored UTM parameter: ${entry.key} = $value');
+          AppLogger.d('DEEPLINK', 'Stored UTM parameter: $paramKey = $value');
         }
       }
 

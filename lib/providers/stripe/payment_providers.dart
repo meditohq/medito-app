@@ -5,8 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -367,9 +369,11 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     try {
       state = const AsyncValue.loading();
 
+      final utmParams = await _getStoredUtmParameters();
       final metadata = <String, dynamic>{
         if (userId != null) 'user_id': userId,
         if (userEmail != null) 'email': userEmail,
+        ...utmParams,
       };
 
       final request = PaymentIntentRequest(
@@ -430,9 +434,11 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     try {
       state = const AsyncValue.loading();
 
+      final utmParams = await _getStoredUtmParameters();
       final metadata = <String, dynamic>{
         if (userId != null) 'user_id': userId,
         if (userEmail != null) 'email': userEmail,
+        ...utmParams,
       };
 
       final request = PaymentIntentRequest(
@@ -494,9 +500,11 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     try {
       state = const AsyncValue.loading();
 
+      final utmParams = await _getStoredUtmParameters();
       final metadata = <String, dynamic>{
         if (userId != null) 'user_id': userId,
         if (userEmail != null) 'email': userEmail,
+        ...utmParams,
       };
 
       final request = PaymentIntentRequest(
@@ -547,6 +555,34 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
 @riverpod
 IDonationApiService donationService(Ref ref) {
   return DonationApiService();
+}
+
+// Helper function to get stored UTM parameters from SharedPreferences
+Future<Map<String, String>> _getStoredUtmParameters() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final utmParams = <String, String>{};
+
+    final utmParamKeys = [
+      SharedPreferenceConstants.utmSource,
+      SharedPreferenceConstants.utmMedium,
+      SharedPreferenceConstants.utmCampaign,
+      SharedPreferenceConstants.utmTerm,
+      SharedPreferenceConstants.utmContent,
+    ];
+
+    for (final paramKey in utmParamKeys) {
+      final value = prefs.getString(paramKey);
+      if (value != null && value.isNotEmpty) {
+        utmParams[paramKey] = value;
+      }
+    }
+
+    return utmParams;
+  } catch (e) {
+    AppLogger.e('PAYMENT', 'Error getting stored UTM parameters', e);
+    return {};
+  }
 }
 
 // Helper function to convert PaymentMethodType to string

@@ -121,18 +121,18 @@ class MetaSdkService {
       final prefs = await SharedPreferences.getInstance();
       final utmParams = <String, Object?>{};
 
-      final utmParamMap = {
-        SharedPreferenceConstants.utmSource: 'utm_source',
-        SharedPreferenceConstants.utmMedium: 'utm_medium',
-        SharedPreferenceConstants.utmCampaign: 'utm_campaign',
-        SharedPreferenceConstants.utmTerm: 'utm_term',
-        SharedPreferenceConstants.utmContent: 'utm_content',
-      };
+      final utmParamKeys = [
+        SharedPreferenceConstants.utmSource,
+        SharedPreferenceConstants.utmMedium,
+        SharedPreferenceConstants.utmCampaign,
+        SharedPreferenceConstants.utmTerm,
+        SharedPreferenceConstants.utmContent,
+      ];
 
-      for (final entry in utmParamMap.entries) {
-        final value = prefs.getString(entry.key);
+      for (final paramKey in utmParamKeys) {
+        final value = prefs.getString(paramKey);
         if (value != null && value.isNotEmpty) {
-          utmParams[entry.value] = value;
+          utmParams[paramKey] = value;
         }
       }
 
