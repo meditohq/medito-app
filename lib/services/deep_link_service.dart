@@ -24,6 +24,8 @@ class DeepLinkService {
   void initialize() {
     AppLogger.d('DEEPLINK', 'Setting up deep link handlers');
 
+    _checkInitialLink();
+
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (uri) {
         AppLogger.d('DEEPLINK', 'Got deep link: $uri');
@@ -33,6 +35,18 @@ class DeepLinkService {
         AppLogger.e('DEEPLINK', 'Error from link stream', err);
       },
     );
+  }
+
+  Future<void> _checkInitialLink() async {
+    try {
+      final initialUri = await _appLinks.getInitialLink();
+      if (initialUri != null) {
+        AppLogger.d('DEEPLINK', 'Got initial deep link: $initialUri');
+        handleDeepLink(initialUri);
+      }
+    } catch (e) {
+      AppLogger.e('DEEPLINK', 'Error checking initial link', e);
+    }
   }
 
   void dispose() {
