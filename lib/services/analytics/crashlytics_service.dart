@@ -32,8 +32,10 @@ class CrashlyticsService {
     'Invalid statusCode: 500',
     'Connection refused',
     'Connection timed out',
+    'Connection closed',
     'Failed host lookup',
     'No address associated with hostname',
+    'ClientException',
   ];
 
   Future<void> initialize() async {
@@ -166,6 +168,45 @@ class CrashlyticsService {
               lowerStack.contains('precache') ||
               lowerStack.contains('networkimage') ||
               lowerStack.contains('cachednetworkimage')) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Special case for ClientException (connection closed during data transfer)
+    // This commonly occurs during image loading when the connection is interrupted
+    final exceptionString = exception.toString();
+    final lowerExceptionString = exceptionString.toLowerCase();
+    if (lowerExceptionString.contains('clientexception')) {
+      final isCdnMeditoError = lowerExceptionString.contains('cdn.medito.app');
+      final isConnectionClosed =
+          lowerExceptionString.contains('connection closed');
+
+      // If it's related to cdn.medito.app or involves connection closed, check if we should ignore it
+      if (isCdnMeditoError || isConnectionClosed) {
+        // If it's an image loading error, always ignore it
+        if (_isImageLoadingError(stack)) {
+          return true;
+        }
+        // Also check if the stack trace contains URLs from dead domains
+        if (stack != null && HTTPConstants.isDeadDomain(stack)) {
+          return true;
+        }
+        // If it's from cdn.medito.app and involves connection closed, likely image loading
+        if (isCdnMeditoError && isConnectionClosed) {
+          return true;
+        }
+        // Also ignore if stack trace suggests image loading
+        if (stack != null) {
+          final lowerStack = stack.toLowerCase();
+          if (lowerStack.contains('image') ||
+              lowerStack.contains('precache') ||
+              lowerStack.contains('networkimage') ||
+              lowerStack.contains('cachednetworkimage') ||
+              lowerStack.contains('png/') ||
+              lowerStack.contains('jpg/') ||
+              lowerStack.contains('webp/')) {
             return true;
           }
         }
