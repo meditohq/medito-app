@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/superwall_service.dart';
-import 'package:medito/constants/http/http_constants.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 /// Service to manage paywall presentation and lifecycle

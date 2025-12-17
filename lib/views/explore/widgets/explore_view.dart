@@ -268,8 +268,8 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   List<Widget> _buildContentSlivers(WidgetRef ref) {
     AppLogger.d('ExploreView', '_buildContentSlivers query: $_searchQuery');
     if (_searchQuery.isEmpty) {
-      final explorePacks = ref.watch(explorePacksProvider);
-      return explorePacks.when(
+      final explorePacksAsync = ref.watch(explorePacksProvider);
+      return explorePacksAsync.when(
         data: (packs) {
           if (packs.isEmpty) {
             return [
