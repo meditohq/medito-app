@@ -34,7 +34,6 @@ import meditofoundation.medito.widget.MeditationWidget
 import meditofoundation.medito.widget.MeditationWidgetReceiver
 import meditofoundation.medito.widget.ConsistencyWidget
 import meditofoundation.medito.widget.ConsistencyWidgetReceiver
-import meditofoundation.medito.pigeon.TikTokPigeonImpl
 
 @UnstableApi
 class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager, MeditoWidgetManager {
@@ -51,9 +50,6 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         
         MeditoAndroidAudioServiceManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
         MeditoWidgetManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
-
-        // Add this line to register the new TikTok API
-        TikTokAndroidApi.setUp(flutterEngine.dartExecutor.binaryMessenger, TikTokPigeonImpl(this))
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
         checkAndSendCompletionData()

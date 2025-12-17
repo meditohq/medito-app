@@ -14,7 +14,6 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/services/analytics/tiktok_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
@@ -173,24 +172,6 @@ class SplashViewState extends ConsumerState<SplashView>
       );
       AppLogger.i(
           'SPLASH', 'Firebase Analytics initialized with consent mode v2');
-
-      // Initialize TikTok Analytics and log first open once
-      await TikTokAnalyticsService()
-          .initialize(requestAttPermissionImmediately: false)
-          .timeout(
-        const Duration(seconds: 3),
-        onTimeout: () {
-          AppLogger.w('SPLASH', 'TikTok Analytics initialization timed out');
-          throw Exception('TikTok Analytics initialization timeout');
-        },
-      );
-      await TikTokAnalyticsService().logAppFirstOpenOnce().timeout(
-        const Duration(seconds: 2),
-        onTimeout: () {
-          AppLogger.w('SPLASH', 'TikTok logAppFirstOpenOnce timed out');
-          // Don't throw here as this is not critical
-        },
-      );
 
       // Initialize Meta SDK and log first open once
       await MetaSdkService.instance.init().timeout(
