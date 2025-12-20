@@ -2525,7 +2525,7 @@ abstract class AppLocalizations {
   /// Error message when account is inactive
   ///
   /// In en, this message translates to:
-  /// **'Account is inactive'**
+  /// **'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.'**
   String get accountInactiveError;
 
   /// Error message for rate limit errors

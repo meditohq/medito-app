@@ -312,84 +312,110 @@ class ProductGroupCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final hasNewVariant = productGroup.variants.any((v) => v.isNew);
+    final backgroundColor = Theme.of(context).cardColor;
+    final borderColor =
+        Color.lerp(backgroundColor, Colors.white, 0.3) ?? backgroundColor;
+    final textColor = Theme.of(context).colorScheme.onSurface;
 
-    return GestureDetector(
-      onTap: () async {
-        // Log analytics event
-        var analytics = ref.read(analyticsServiceProvider);
+    return Container(
+      width: cardWidth,
+      margin: const EdgeInsets.only(right: 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: cardWidth,
+            height: cardWidth,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: borderColor,
+                width: 0.5,
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () async {
+                  // Log analytics event
+                  var analytics = ref.read(analyticsServiceProvider);
 
-        analytics.logEvent(
-          name: AnalyticsEventConstants.productClicked,
-          parameters: {
-            'group_id': productGroup.groupId,
-            'name': productGroup.name,
-            'url': productGroup.url ?? '',
-          },
-        );
+                  analytics.logEvent(
+                    name: AnalyticsEventConstants.productClicked,
+                    parameters: {
+                      'group_id': productGroup.groupId,
+                      'name': productGroup.name,
+                      'url': productGroup.url ?? '',
+                    },
+                  );
 
-        _openProductUrl(productGroup.url);
-        for (final variant in productGroup.variants) {
-          ProductsService().markProductAsSeen(variant.id);
-        }
-      },
-      child: SizedBox(
-        width: cardWidth,
-        child: Card(
-          margin: const EdgeInsets.only(right: 12),
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                children: [
-                  if (productGroup.allImageUrls.isNotEmpty)
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(14)),
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ProductImageCarousel(
-                            productGroup: productGroup,
-                            cardWidth: cardWidth,
+                  _openProductUrl(productGroup.url);
+                  for (final variant in productGroup.variants) {
+                    ProductsService().markProductAsSeen(variant.id);
+                  }
+                },
+                borderRadius: BorderRadius.circular(24),
+                child: Stack(
+                  children: [
+                      if (productGroup.allImageUrls.isNotEmpty)
+                        AspectRatio(
+                          aspectRatio: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ProductImageCarousel(
+                              productGroup: productGroup,
+                              cardWidth: cardWidth,
+                            ),
                           ),
-                        ),
-                      ),
-                    )
-                  else if (productGroup.imageUrl != null)
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(14)),
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: CachedNetworkImage(
-                            imageUrl: productGroup.imageUrl!,
-                            fit: BoxFit.contain,
-                            width: cardWidth,
-                            key: ValueKey(
-                                'product_image_${productGroup.groupId}'),
-                            placeholder: (context, url) => Container(
-                              color: Theme.of(context).colorScheme.surface,
-                              child: Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
+                        )
+                      else if (productGroup.imageUrl != null)
+                        AspectRatio(
+                          aspectRatio: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CachedNetworkImage(
+                              imageUrl: productGroup.imageUrl!,
+                              fit: BoxFit.contain,
+                              width: cardWidth,
+                              key: ValueKey(
+                                  'product_image_${productGroup.groupId}'),
+                              placeholder: (context, url) => Container(
+                                color: Theme.of(context).colorScheme.surface,
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Theme.of(context).colorScheme.surface,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.image_not_supported_outlined,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
                                   ),
                                 ),
                               ),
                             ),
-                            errorWidget: (context, url, error) => Container(
+                          ),
+                        )
+                      else
+                        AspectRatio(
+                          aspectRatio: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
                               color: Theme.of(context).colorScheme.surface,
                               child: Center(
                                 child: Icon(
@@ -401,79 +427,59 @@ class ProductGroupCard extends ConsumerWidget {
                             ),
                           ),
                         ),
-                      ),
-                    )
-                  else
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(14)),
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                      if (hasNewVariant)
+                        Positioned(
+                          top: 8,
+                          right: 8,
                           child: Container(
-                            color: Theme.of(context).colorScheme.surface,
-                            child: Center(
-                              child: Icon(
-                                Icons.image_not_supported_outlined,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              AppLocalizations.of(context)!.newProductLabel,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
+                                  ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  if (hasNewVariant)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.newProductLabel,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                child: Text(
-                  productGroup.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        height: 1.4,
-                      ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: 8),
+          Text(
+            productGroup.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontFamily: teachers,
+                  fontSize: 12,
+                  color: textColor,
+                ),
+          ),
+        ],
       ),
     );
   }
@@ -683,7 +689,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
         key: ValueKey(
             'product_image_${widget.productGroup.groupId}_$_currentImageIndex'),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(16.0),
           color: Theme.of(context).colorScheme.surface,
         ),
         clipBehavior: Clip.antiAlias,
@@ -692,7 +698,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
           fit: BoxFit.contain,
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.0),
+              borderRadius: BorderRadius.circular(16.0),
               image: DecorationImage(
                 image: imageProvider,
                 fit: BoxFit.contain,

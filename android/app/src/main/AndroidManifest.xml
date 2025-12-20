@@ -92,9 +92,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Existing intent filter for https links -->
-
-            <!-- New intent filter for custom scheme -->
+            <!-- Intent filter for custom scheme (supports paths and UTM-only links) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -103,11 +101,9 @@
 
                 <data android:scheme="org.meditofoundation" />
                 <data android:host="medito" />
-                <data android:pathPrefix="/tracks/" />
-                <data android:pathPrefix="/packs/" />
-                <data android:pathPrefix="/otp/" />
-                <data android:pathPrefix="/donation" />
             </intent-filter>
+
+            <!-- Intent filter for HTTPS links with paths -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -120,6 +116,17 @@
                 <data android:pathPrefix="/packs/" />
                 <data android:pathPrefix="/otp/" />
                 <data android:pathPrefix="/donation" />
+            </intent-filter>
+
+            <!-- Intent filter for HTTPS links without path (for UTM-only links) -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="medito.app" />
             </intent-filter>
 
         </activity>

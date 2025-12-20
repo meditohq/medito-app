@@ -22,72 +22,35 @@ class QuoteWidget extends ConsumerStatefulWidget {
 class QuoteWidgetState extends ConsumerState<QuoteWidget> {
   @override
   Widget build(BuildContext context) {
-    final quoteStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontFamily: sourceSerif,
-          fontWeight: FontWeight.w300,
-          fontSize: 18,
-          height: 1.4,
-          color: Theme.of(context).colorScheme.onSurface,
-        );
-
-    final authorStyle = quoteStyle?.copyWith(
-      color: quoteStyle.color?.withOpacityValue(0.8),
-      fontSize: 16,
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        height16,
-        Padding(
-          padding: const EdgeInsets.only(left: padding16, right: padding16),
-          child: Row(
-            children: [
-              Text(
-                AppLocalizations.of(context)!.dailyQuote,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontFamily: teachers,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      height: 28 / 24,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: padding16),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: padding24, horizontal: padding20),
+            child: _buildQuoteContent(),
           ),
-        ),
-        height8,
-        Card(
-          margin: const EdgeInsets.symmetric(horizontal: padding16),
-          child: Padding(
-            padding: const EdgeInsets.all(padding16),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                _buildQuoteContent(quoteStyle, authorStyle),
-                Positioned(
-                  right: -12,
-                  bottom: -12,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: _shareQuote,
-                    icon: MeditoIcon(
-                      assetName: Platform.isIOS
-                          ? MeditoIcons.shareIos
-                          : MeditoIcons.shareAndroid,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacityValue(0.8),
-                      size: 16,
-                    ),
-                  ),
-                ),
-              ],
+          Positioned(
+            right: -12,
+            bottom: -12,
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              onPressed: _shareQuote,
+              icon: MeditoIcon(
+                assetName: Platform.isIOS
+                    ? MeditoIcons.shareIos
+                    : MeditoIcons.shareAndroid,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withOpacityValue(0.8),
+                size: 16,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -99,25 +62,36 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
     Share.share(shareText);
   }
 
-  Widget _buildQuoteContent(TextStyle? quoteStyle, TextStyle? authorStyle) {
+  Widget _buildQuoteContent() {
     return SelectionArea(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           if (widget.data?.quote != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 60.0),
-              child: Text(
-                widget.data!.quote,
-                style: quoteStyle,
+            Text(
+              widget.data!.quote,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: sourceSerif,
+                fontWeight: FontWeight.w300,
+                fontSize: 18,
+                height: 1.4,
+                color: Theme.of(context).colorScheme.onSurface,
+                fontStyle: FontStyle.italic,
               ),
             ),
           if (widget.data?.author != null) ...[
-            height4,
+            height12,
             Text(
-              widget.data!.author,
-              style: authorStyle,
+              '— ${widget.data!.author}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: dmSans,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ],

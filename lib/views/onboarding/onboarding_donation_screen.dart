@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/views/donation/superwall_donation_screen.dart';
+import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/utils/logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
   const OnboardingDonationScreen({super.key, this.onNext});
@@ -48,18 +50,38 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
 
     _didAttemptDonation = true;
 
-    // Push SuperwallDonationScreen directly to await the result
-    final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => SuperwallDonationScreen(
-          source: FirebaseAnalyticsService.paywallSourceOnboarding,
-        ),
-      ),
-    );
+    // Check if we should use Superwall or web donation
+    final useSuperwall = await shouldUseSuperwallForDonation();
 
-    // If dismissed without donation (result is false or null), advance to next page
-    if (result != true && mounted) {
-      widget.onNext?.call();
+    // If not using Superwall, open web donation directly
+    if (!useSuperwall) {
+      final uri = Uri.parse('https://meditofoundation.org/donate');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        // Advance to next page after opening web donation
+        if (mounted) {
+          widget.onNext?.call();
+        }
+        return;
+      } else {
+        AppLogger.w('ONBOARDING_DONATION', 'Unable to launch web donation URL');
+        // Advance to next page anyway
+        if (mounted) {
+          widget.onNext?.call();
+        }
+        return;
+      }
+    } else {
+      // Use shared donation navigation logic from routes.dart
+      final result = await handleDonationNavigation(
+        context,
+        ref,
+        FirebaseAnalyticsService.paywallSourceOnboarding,
+        navigator: Navigator.of(context),
+      );
+      if (result != true && mounted) {
+        widget.onNext?.call();
+      }
     }
   }
 

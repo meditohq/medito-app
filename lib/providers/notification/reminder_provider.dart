@@ -1,11 +1,10 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:medito/utils/logger.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 
 final reminderProvider = Provider<ReminderProvider>((ref) {
   return ReminderProvider();
@@ -35,51 +34,6 @@ class ReminderProvider {
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
-  Future<void> scheduleDailyNotification(TimeOfDay pickedTime) async {
-    await _initFuture;
-    try {
-      final now = DateTime.now();
-
-      var scheduledDate = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        pickedTime.hour,
-        pickedTime.minute,
-      );
-
-      if (scheduledDate.isBefore(now)) {
-        scheduledDate = scheduledDate.add(const Duration(days: 1));
-      }
-
-      final scheduledDateTz = tz.TZDateTime.from(scheduledDate, tz.local);
-
-      await _flutterLocalNotificationsPlugin.zonedSchedule(
-        dailyNotificationId,
-        'Daily Meditation Reminder', // This will be localized in the UI layer
-        'It\'s time for your daily meditation. Take a moment to relax and focus.', // This will be localized in the UI layer
-        scheduledDateTz,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            androidNotificationChannelId,
-            androidNotificationChannelName,
-            icon: androidNotificationIcon,
-            channelDescription: androidNotificationChannelDescription,
-            importance: Importance.max,
-            priority: Priority.high,
-          ),
-        ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
-      );
-    } catch (e, s) {
-      if (kDebugMode) {
-        AppLogger.d('REMINDER', 'Error scheduling notification: $e');
-        AppLogger.d('REMINDER', 'Stack trace: $s');
-      }
-    }
-  }
-
   Future<void> clearBadge() async {
     await _initFuture;
     if (Platform.isIOS) {
@@ -99,8 +53,24 @@ class ReminderProvider {
 
   Future<void> cancelDailyNotification() async {
     await _initFuture;
-    await _flutterLocalNotificationsPlugin.cancel(dailyNotificationId);
-    await clearBadge();
+    try {
+      await _flutterLocalNotificationsPlugin.cancel(dailyNotificationId);
+      AppLogger.d('REMINDER',
+          'Cancelled daily notification (id: $dailyNotificationId)');
+    } catch (e, s) {
+      AppLogger.e('REMINDER', 'Error cancelling daily notification: $e', s);
+      CrashlyticsService().recordError(
+        e,
+        s,
+        reason: 'Failed to cancel daily notification',
+      );
+    }
+    try {
+      await clearBadge();
+    } catch (e, s) {
+      AppLogger.e('REMINDER',
+          'Error clearing badge after cancelling daily notification: $e', s);
+    }
   }
 
   Future<void> scheduleSmartReminderSeries(
@@ -108,33 +78,83 @@ class ReminderProvider {
     await _initFuture;
     try {
       for (final item in items) {
-        await _flutterLocalNotificationsPlugin.zonedSchedule(
-          item.id,
-          item.title,
-          item.body,
-          item.scheduledDate,
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              androidNotificationChannelId,
-              androidNotificationChannelName,
-              icon: androidNotificationIcon,
-              channelDescription: androidNotificationChannelDescription,
-              importance: Importance.max,
-              priority: Priority.high,
+        try {
+          await _flutterLocalNotificationsPlugin.zonedSchedule(
+            item.id,
+            item.title,
+            item.body,
+            item.scheduledDate,
+            const NotificationDetails(
+              android: AndroidNotificationDetails(
+                androidNotificationChannelId,
+                androidNotificationChannelName,
+                icon: androidNotificationIcon,
+                channelDescription: androidNotificationChannelDescription,
+                importance: Importance.max,
+                priority: Priority.high,
+              ),
             ),
-          ),
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        );
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          );
+        } catch (e, s) {
+          AppLogger.e(
+              'REMINDER',
+              'Error scheduling reminder ${item.id} at ${item.scheduledDate}: $e',
+              s);
+          CrashlyticsService().recordError(
+            e,
+            s,
+            reason:
+                'Failed to schedule smart reminder ${item.id} at ${item.scheduledDate}',
+          );
+        }
       }
-    } catch (_) {}
+    } catch (e, s) {
+      AppLogger.e('REMINDER', 'Error scheduling smart reminder series: $e', s);
+      CrashlyticsService().recordError(
+        e,
+        s,
+        reason:
+            'Failed to schedule smart reminder series (${items.length} items)',
+      );
+      rethrow;
+    }
   }
 
   Future<void> cancelSmartReminderSeries() async {
     await _initFuture;
-    for (var i = 0; i < smartSeriesCount; i++) {
-      await _flutterLocalNotificationsPlugin.cancel(smartBaseId + i);
+    try {
+      var cancelledCount = 0;
+      for (var i = 0; i < smartSeriesCount; i++) {
+        try {
+          await _flutterLocalNotificationsPlugin.cancel(smartBaseId + i);
+          cancelledCount++;
+        } catch (e, s) {
+          AppLogger.e('REMINDER',
+              'Error cancelling smart reminder ${smartBaseId + i}: $e', s);
+          CrashlyticsService().recordError(
+            e,
+            s,
+            reason: 'Failed to cancel smart reminder ${smartBaseId + i}',
+          );
+        }
+      }
+      AppLogger.d('REMINDER',
+          'Cancelled $cancelledCount/$smartSeriesCount smart reminders');
+    } catch (e, s) {
+      AppLogger.e('REMINDER', 'Error cancelling smart reminder series: $e', s);
+      CrashlyticsService().recordError(
+        e,
+        s,
+        reason: 'Failed to cancel smart reminder series',
+      );
     }
-    await clearBadge();
+    try {
+      await clearBadge();
+    } catch (e, s) {
+      AppLogger.e('REMINDER',
+          'Error clearing badge after cancelling smart reminders: $e', s);
+    }
   }
 }
 

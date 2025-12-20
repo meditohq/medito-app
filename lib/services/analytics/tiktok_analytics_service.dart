@@ -208,10 +208,45 @@ class TikTokAnalyticsService {
       const key = 'tiktok_app_first_open_logged';
       if (prefs.getBool(key) == true) return;
 
-      await logEvent(name: AnalyticsEventConstants.appFirstOpen);
+      // Get stored UTM parameters to include in first open event
+      final utmParams = await _getStoredUtmParameters();
+
+      await logEvent(
+        name: AnalyticsEventConstants.appFirstOpen,
+        parameters: utmParams.isNotEmpty ? utmParams : null,
+      );
       await prefs.setBool(key, true);
     } catch (e, stack) {
       AppLogger.e('TIKTOK', 'Failed to log app_first_open', e, stack);
+    }
+  }
+
+  Future<Map<String, Object>> _getStoredUtmParameters() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final utmParams = <String, Object>{};
+
+      final utmParamMap = {
+        SharedPreferenceConstants.utmSource: 'utm_source',
+        SharedPreferenceConstants.utmMedium: 'utm_medium',
+        SharedPreferenceConstants.utmCampaign: 'utm_campaign',
+        SharedPreferenceConstants.utmTerm: 'utm_term',
+        SharedPreferenceConstants.utmContent: 'utm_content',
+      };
+
+      for (final entry in utmParamMap.entries) {
+        final value = prefs.getString(entry.key);
+        if (value != null && value.isNotEmpty) {
+          utmParams[entry.value] = value;
+        }
+      }
+
+      return utmParams;
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.w('TIKTOK', 'Error getting stored UTM parameters: $e');
+      }
+      return {};
     }
   }
 

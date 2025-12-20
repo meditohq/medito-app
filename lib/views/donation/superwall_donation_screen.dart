@@ -454,30 +454,28 @@ class _SuperwallDonationScreenState
     try {
       AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Opening web donation fallback');
       final uri = Uri.parse('https://meditofoundation.org/donate');
+
+      // Close the screen first
+      if (mounted) {
+        Navigator.of(context).pop(false);
+      }
+
+      // Wait a moment for the screen to close, then open the web URL
+      await Future.delayed(const Duration(milliseconds: 300));
+
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
+        AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Web donation opened');
       } else {
-        if (mounted) {
-          showSnackBar(
-            context,
-            AppLocalizations.of(context)!.unableToLoadDonationOptionsAtThisTime,
-          );
-        }
+        // If we can't open the URL, show snackbar on the previous screen
+        // Note: context might not be available after pop, so we'll skip the snackbar
+        AppLogger.w(
+            'SUPERWALL_DONATION_SCREEN', 'Unable to launch web donation URL');
       }
     } catch (error) {
       AppLogger.e(
           'SUPERWALL_DONATION_SCREEN', 'Failed to open web donation', error);
-      if (mounted) {
-        showSnackBar(
-          context,
-          AppLocalizations.of(context)!.unableToLoadDonationOptionsAtThisTime,
-        );
-      }
-    } finally {
-      if (mounted) {
-        // Return false to indicate no donation was made
-        Navigator.of(context).pop(false);
-      }
+      // Screen is already closed, so we can't show snackbar here
     }
   }
 

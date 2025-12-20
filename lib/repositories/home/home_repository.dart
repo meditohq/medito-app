@@ -62,8 +62,10 @@ class HomeRepositoryImpl extends HomeRepository {
 
     var sortedShortcuts = List<ShortcutsModel>.from(shortcuts);
     sortedShortcuts.sort((a, b) {
-      var indexA = savedIds.indexOf(a.id ?? '');
-      var indexB = savedIds.indexOf(b.id ?? '');
+      var keyA = a.id ?? '${a.type}_${a.path}';
+      var keyB = b.id ?? '${b.type}_${b.path}';
+      var indexA = savedIds.indexOf(keyA);
+      var indexB = savedIds.indexOf(keyB);
       if (indexA == -1) return 1;
       if (indexB == -1) return -1;
 

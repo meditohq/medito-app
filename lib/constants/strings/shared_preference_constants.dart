@@ -48,9 +48,13 @@ class SharedPreferenceConstants {
   // Historical consistency score data
   static const String consistencyScoreHistory = 'consistency_score_history';
 
-  // Widget pinning
-  static const String hasSeenWidgetOption = 'has_seen_widget_option';
-
   // Black Friday positioning
   static const String blackFridayDismissed = 'black_friday_dismissed';
+
+  // UTM parameters (stored from deep links, applied after user initialization)
+  static const String utmSource = 'utm_source';
+  static const String utmMedium = 'utm_medium';
+  static const String utmCampaign = 'utm_campaign';
+  static const String utmTerm = 'utm_term';
+  static const String utmContent = 'utm_content';
 }

@@ -73,7 +73,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
         opacity: _fadeAnimation,
         child: Padding(
           padding: const EdgeInsets.only(
-              top: padding8, left: padding16, right: padding16),
+              top: padding8, left: padding16, right: padding16, bottom: padding16),
           child: Container(
             decoration: BoxDecoration(
               color: bgColor,

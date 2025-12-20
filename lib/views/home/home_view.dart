@@ -125,7 +125,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                           break;
                       }
                       return Padding(
-                        padding: const EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.only(top: 8),
                         child: child,
                       );
                     },

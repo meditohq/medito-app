@@ -485,6 +485,16 @@ class AuthRepositoryImpl extends AuthRepository {
       var clientId = _preferences.getString(SharedPreferenceConstants.userId) ??
           _generateClientId();
       await _authService.requestOtp(email, clientId);
+    } on EmailMismatchError {
+      // Client ID exists but is associated with different email
+      // Generate a new client ID and retry once
+      dev.log(
+          '[AUTH_REPO] EMAIL_MISMATCH detected, generating new client ID and retrying',
+          level: 500);
+      final newClientId = _generateClientId();
+      await _preferences.setString(
+          SharedPreferenceConstants.userId, newClientId);
+      await _authService.requestOtp(email, newClientId);
     } on RateLimitError catch (e) {
       _crashlyticsService.recordError(
         e,

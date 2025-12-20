@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:app_links/app_links.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +30,8 @@ import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
-import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/services/deep_link_service.dart';
 // ignore: depend_on_referenced_packages
 import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
@@ -146,15 +145,13 @@ class ParentWidget extends ConsumerStatefulWidget {
 
 class _ParentWidgetState extends ConsumerState<ParentWidget>
     with WidgetsBindingObserver {
-  late AppLinks _appLinks;
-  StreamSubscription<Uri>? _linkSubscription;
+  DeepLinkService? _deepLinkService;
 
   @override
   void initState() {
     super.initState();
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
-    _initDeepLinks();
   }
 
   void _setUpSystemUi() {
@@ -189,86 +186,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     );
   }
 
-  Future<void> _initDeepLinks() async {
-    _appLinks = AppLinks();
-    AppLogger.d('DEEPLINK', 'Setting up deep link handlers');
-
-    // Handle links
-    _linkSubscription = _appLinks.uriLinkStream.listen(
-      (uri) {
-        AppLogger.d('DEEPLINK', 'Got deep link: $uri');
-        _handleDeepLink(uri);
-      },
-      onError: (err) {
-        AppLogger.e('DEEPLINK', 'Error from link stream', err);
-      },
-    );
-  }
-
-  void _handleDeepLink(Uri uri) {
-    AppLogger.d('DEEPLINK', 'Handling deep link: ${uri.toString()}');
-    AppLogger.d('DEEPLINK', 'Scheme: ${uri.scheme}');
-    AppLogger.d('DEEPLINK', 'Host: ${uri.host}');
-    AppLogger.d('DEEPLINK', 'Path: ${uri.path}');
-
-    try {
-      var pathSegments = <String>[];
-
-      if (uri.scheme == 'org.meditofoundation') {
-        // For custom scheme, if host is "medito", use pathSegments directly
-        // Otherwise, treat host as first path segment (e.g., org.meditofoundation://tracks/123)
-        if (uri.host == 'medito') {
-          pathSegments = uri.pathSegments;
-        } else {
-          pathSegments = [uri.host, ...uri.pathSegments];
-        }
-      } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
-        pathSegments = uri.pathSegments;
-      } else {
-        final localizations = AppLocalizations.of(context);
-        if (localizations != null) {
-          showSnackBar(context, localizations.invalidDeepLink);
-        }
-        return;
-      }
-
-      if (pathSegments.isEmpty) {
-        final localizations = AppLocalizations.of(context);
-        if (localizations != null) {
-          showSnackBar(context, localizations.invalidDeepLink);
-        }
-        return;
-      }
-
-      // Handle OTP links
-      if (pathSegments[0] == 'otp' ||
-          (pathSegments.length > 1 && pathSegments[1] == 'otp')) {
-        return;
-      }
-
-      // Handle other navigation links
-      var path = pathSegments[0];
-      var id = pathSegments.length > 1 ? pathSegments[1] : '';
-
-      AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
-
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          handleNavigation(path, [id], context, ref: ref);
-        }
-      });
-    } catch (e) {
-      AppLogger.e('DEEPLINK', 'Error handling deep link', e);
-      final localizations = AppLocalizations.of(context);
-      if (localizations != null) {
-        showSnackBar(context, localizations.deepLinkError);
-      }
-    }
-  }
-
   @override
   void dispose() {
-    _linkSubscription?.cancel();
+    _deepLinkService?.dispose();
     WidgetsBinding.instance.removeObserver(this);
     // Close auth state stream controller to prevent memory leaks
     disposeAuthStateController();
@@ -289,6 +209,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         ),
       ),
       data: (_) {
+        // Initialize deep link service once we have context
+        _deepLinkService ??= DeepLinkService(ref: ref, context: context);
+        _deepLinkService?.initialize();
+
         // Initialize auth state listener to handle navigation on force logout
         ref.watch(authStateListenerProvider);
 

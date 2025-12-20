@@ -26,6 +26,8 @@ class _NoopAnalytics {
 
   Future<void> setUserId({String? id}) async {}
 
+  Future<void> setUserProperty({required String name, String? value}) async {}
+
   Future<void> resetAnalyticsData() async {}
 }
 
@@ -363,6 +365,39 @@ class FirebaseAnalyticsService {
     await setUserId(null);
   }
 
+  /// Set a user property for Firebase Analytics
+  Future<void> setUserProperty({
+    required String name,
+    String? value,
+  }) async {
+    if (_runningInTest) return;
+    if (!_initialized) await initialize();
+
+    try {
+      // Only set user property if Firebase Analytics is enabled
+      final prefs = await SharedPreferences.getInstance();
+      final analyticsEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+              true;
+
+      if (analyticsEnabled && _analytics != null) {
+        await _analytics.setUserProperty(name: name, value: value);
+        if (kDebugMode) {
+          AppLogger.d(
+              'FIREBASE_ANALYTICS', 'Set user property: $name = $value');
+        }
+      } else if (kDebugMode && !analyticsEnabled) {
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Firebase Analytics disabled by user preference, skipping user property: $name');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error setting user property in Firebase Analytics: $e');
+      }
+    }
+  }
+
   /// Reset all analytics data for this app instance
   Future<void> resetAnalyticsData() async {
     if (_runningInTest) return;
@@ -427,6 +462,95 @@ class FirebaseAnalyticsService {
       if (kDebugMode) {
         AppLogger.d('FIREBASE_ANALYTICS',
             'Error logging screen view in Firebase Analytics: $e');
+      }
+    }
+  }
+
+  /// Get stored UTM parameters from SharedPreferences as a map
+  /// This returns UTM parameters without removing them, useful for including in events
+  static Future<Map<String, String>> getStoredUtmParameters() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final utmParams = <String, String>{};
+
+      final utmParamMap = {
+        SharedPreferenceConstants.utmSource: 'utm_source',
+        SharedPreferenceConstants.utmMedium: 'utm_medium',
+        SharedPreferenceConstants.utmCampaign: 'utm_campaign',
+        SharedPreferenceConstants.utmTerm: 'utm_term',
+        SharedPreferenceConstants.utmContent: 'utm_content',
+      };
+
+      for (final entry in utmParamMap.entries) {
+        final value = prefs.getString(entry.key);
+        if (value != null && value.isNotEmpty) {
+          utmParams[entry.value] = value;
+        }
+      }
+
+      return utmParams;
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.e(
+            'FIREBASE_ANALYTICS', 'Error getting stored UTM parameters', e);
+      }
+      return {};
+    }
+  }
+
+  /// Apply stored UTM parameters from SharedPreferences to Firebase Analytics user properties
+  /// This should be called after user initialization to ensure UTM parameters from
+  /// deep links (e.g., from Apple Ads) are properly attributed to the user
+  static Future<void> applyStoredUtmParameters() async {
+    try {
+      if (_runningInTest) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final analyticsService = FirebaseAnalyticsService();
+
+      // Ensure Firebase Analytics is initialized
+      await analyticsService.initialize();
+
+      // Map of SharedPreferences keys to UTM parameter names
+      final utmParamMap = {
+        SharedPreferenceConstants.utmSource: 'utm_source',
+        SharedPreferenceConstants.utmMedium: 'utm_medium',
+        SharedPreferenceConstants.utmCampaign: 'utm_campaign',
+        SharedPreferenceConstants.utmTerm: 'utm_term',
+        SharedPreferenceConstants.utmContent: 'utm_content',
+      };
+
+      var appliedCount = 0;
+
+      for (final entry in utmParamMap.entries) {
+        final value = prefs.getString(entry.key);
+        if (value != null && value.isNotEmpty) {
+          await analyticsService.setUserProperty(
+            name: entry.value,
+            value: value,
+          );
+          appliedCount++;
+
+          if (kDebugMode) {
+            AppLogger.d('FIREBASE_ANALYTICS',
+                'Applied stored UTM parameter: ${entry.value} = $value');
+          }
+
+          // Remove from storage after applying (one-time use)
+          await prefs.remove(entry.key);
+        }
+      }
+
+      if (appliedCount > 0) {
+        if (kDebugMode) {
+          AppLogger.d('FIREBASE_ANALYTICS',
+              'Applied $appliedCount stored UTM parameter(s)');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.e(
+            'FIREBASE_ANALYTICS', 'Error applying stored UTM parameters', e);
       }
     }
   }

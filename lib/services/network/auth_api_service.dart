@@ -350,6 +350,15 @@ class AuthApiService {
           );
         }
 
+        // Handle Email Mismatch - client ID exists but is associated with different email
+        if (errorCode == 'EMAIL_MISMATCH' &&
+            statusCode == HttpStatus.forbidden) {
+          throw EmailMismatchError(
+            message: errorMessage ??
+                'This account is already linked to a different email address. Please use the original email.',
+          );
+        }
+
         if (errorMessage != null) {
           if (errorMessage.contains('Invalid refresh token') ||
               errorMessage.contains('Expired refresh token') ||
@@ -365,6 +374,7 @@ class AuthApiService {
       } catch (e) {
         if (e is RateLimitError ||
             e is EmailExistsError ||
+            e is EmailMismatchError ||
             e is RefreshTokenError ||
             e is InactiveEmailError) {
           rethrow; // Rethrow specific exceptions

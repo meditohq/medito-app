@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 Color parseColor(String? color) {
   if (color == null || color.isEmpty) return ColorConstants.ebony;
@@ -137,4 +139,37 @@ extension ColorExtensions on Color {
 bool isInUS() {
   final countryCode = PlatformDispatcher.instance.locale.countryCode;
   return countryCode != null && countryCode.toUpperCase() == 'US';
+}
+
+/// Check if Superwall should be used for donation flow
+/// Returns true if Superwall should be used, false if web donation should be used
+///
+/// Logic:
+/// - iOS outside US: always use web donation
+/// - Android or iOS in US: check Superwall configuration status
+Future<bool> shouldUseSuperwallForDonation() async {
+  // iOS outside US should always use web donation
+  if (Platform.isIOS && !isInUS()) {
+    AppLogger.d('DONATION_UTILS', 'iOS outside US - using web donation');
+    return false;
+  }
+
+  // For Android or iOS in US, check if Superwall is configured
+  try {
+    final configStatus = await Superwall.shared.getConfigurationStatus();
+    AppLogger.d('DONATION_UTILS', 'Superwall config status: $configStatus');
+
+    if (configStatus == ConfigurationStatus.configured) {
+      AppLogger.d('DONATION_UTILS', 'Superwall configured - using Superwall');
+      return true;
+    } else {
+      AppLogger.w('DONATION_UTILS',
+          'Superwall not configured (status: $configStatus) - using web donation');
+      return false;
+    }
+  } catch (error) {
+    AppLogger.e('DONATION_UTILS',
+        'Error checking Superwall status - using web donation', error);
+    return false;
+  }
 }
