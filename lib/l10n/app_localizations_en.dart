@@ -1451,11 +1451,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'We rely on donors like you to continue providing mindfulness to everyone.';
 
   @override
-  String get smartReminderDay1TitleVar1 => 'See you tomorrow 🌱';
+  String get smartReminderDay1TitleVar1 => 'Keep your streak going 🌱';
 
   @override
   String smartReminderDay1BodyVar1(String streak) {
-    return 'You are on a $streak day streak. See you tomorrow?';
+    return 'You are on a $streak day streak. Keep it going?';
   }
 
   @override
@@ -1471,7 +1471,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get smartReminderDay1BodyVar3 =>
-      'A few minutes tomorrow keeps your momentum alive.';
+      'A few minutes now keeps your momentum alive.';
+
+  @override
+  String get smartReminderDay1TitleVar4 => 'Your practice awaits 🌸';
+
+  @override
+  String get smartReminderDay1BodyVar4 =>
+      'Take a moment to reconnect with yourself.';
+
+  @override
+  String get smartReminderDay1TitleVar5 => 'One breath at a time 🫧';
+
+  @override
+  String get smartReminderDay1BodyVar5 =>
+      'Every session counts, no matter how short.';
 
   @override
   String get smartReminderDay2TitleVar1 => 'Keep the flow 🔁';
@@ -1494,6 +1508,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Return to your breath, one moment at a time.';
 
   @override
+  String get smartReminderDay2TitleVar4 => 'Small steps forward 🚶';
+
+  @override
+  String get smartReminderDay2BodyVar4 =>
+      'Consistency builds strength. Start with just a few minutes.';
+
+  @override
+  String get smartReminderDay2TitleVar5 => 'Gentle return 💚';
+
+  @override
+  String get smartReminderDay2BodyVar5 =>
+      'Your mindful practice is here whenever you are ready.';
+
+  @override
   String get smartReminderDay3TitleVar1 => 'Build the habit 📆';
 
   @override
@@ -1513,6 +1541,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get smartReminderDay3BodyVar3 => 'Two mindful minutes is enough.';
 
   @override
+  String get smartReminderDay3TitleVar4 => 'Growing stronger 🌿';
+
+  @override
+  String get smartReminderDay3BodyVar4 =>
+      'Each day you practice, you build something meaningful.';
+
+  @override
+  String get smartReminderDay3TitleVar5 => 'Find your calm 🕊️';
+
+  @override
+  String get smartReminderDay3BodyVar5 =>
+      'A brief pause can reset your entire day.';
+
+  @override
   String get smartReminderDay4Title => 'Small steps 🪴';
 
   @override
@@ -1520,31 +1562,32 @@ class AppLocalizationsEn extends AppLocalizations {
       'It has been 4 days since you meditated. Resume your practice with a short session.';
 
   @override
-  String get smartReminderDay5Title => 'You are doing great 💪';
+  String get smartReminderDay5Title => 'Time to reconnect 💪';
 
   @override
-  String get smartReminderDay5Body => 'A calm pause today keeps you on track.';
+  String get smartReminderDay5Body =>
+      'It has been 5 days. A calm pause now can help you get back on track.';
 
   @override
-  String get smartReminderDay6Title => 'Nearly a week 📈';
+  String get smartReminderDay6Title => 'Almost a week ⏰';
 
   @override
   String get smartReminderDay6Body =>
-      'Close the loop. Make today a mindful moment.';
+      'It has been almost a week since you meditated. Close the loop with a mindful moment.';
 
   @override
-  String get smartReminderDay7Title => 'One week check in 🎉';
+  String get smartReminderDay7Title => 'One week check in 📅';
 
   @override
   String get smartReminderDay7Body =>
-      'It has been a week since you meditated. Take a moment for yourself today.';
+      'It has been a week since you meditated. Take a moment for yourself now.';
 
   @override
   String get smartReminderDay8Title => 'Fresh start 🌤️';
 
   @override
   String get smartReminderDay8Body =>
-      'New week energy. Just a few mindful minutes.';
+      'It has been over a week. A fresh start with just a few mindful minutes.';
 
   @override
   String get smartReminderDay9Title => 'Find your centre 🎯';
@@ -1573,18 +1616,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get smartReminderDay12Body => 'A calm moment is waiting for you.';
 
   @override
-  String get smartReminderDay13Title => 'Almost there ✨';
+  String get smartReminderDay13Title => 'Approaching two weeks ⏳';
 
   @override
   String get smartReminderDay13Body =>
-      'Two weeks is near. Try a two minute restart.';
+      'It has been almost two weeks since you meditated. Try a two minute restart.';
 
   @override
   String get smartReminderDay14Title => 'Two week check in 🔔';
 
   @override
   String get smartReminderDay14Body =>
-      'It has been 14 days since you meditated. Resume your practice today, gently.';
+      'It has been 14 days since you meditated. Resume your practice now, gently.';
 
   @override
   String get smartReminderDay15Title => 'Pausing reminders 🌿';
@@ -1592,4 +1635,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get smartReminderDay15Body =>
       'We will pause reminders for now. We are here whenever you are ready.';
+
+  @override
+  String get smartReminderDay30Title => 'It\'s been a month 📅';
+
+  @override
+  String get smartReminderDay30Body =>
+      'It\'s been a month since you meditated. Try Medito again, just do 2 mins, you\'ll feel better.';
 }

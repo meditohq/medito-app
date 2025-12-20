@@ -79,6 +79,9 @@ class ReminderProvider {
     try {
       for (final item in items) {
         try {
+          final payload = item.scheduledDate.toIso8601String();
+          AppLogger.d('REMINDER',
+              'Scheduling reminder ${item.id} with payload: $payload');
           await _flutterLocalNotificationsPlugin.zonedSchedule(
             item.id,
             item.title,
@@ -95,6 +98,7 @@ class ReminderProvider {
               ),
             ),
             androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            payload: payload,
           );
         } catch (e, s) {
           AppLogger.e(
@@ -139,8 +143,15 @@ class ReminderProvider {
           );
         }
       }
+      try {
+        await _flutterLocalNotificationsPlugin.cancel(smartBaseId + 15);
+        cancelledCount++;
+      } catch (e, s) {
+        AppLogger.e('REMINDER',
+            'Error cancelling day 30 reminder ${smartBaseId + 15}: $e', s);
+      }
       AppLogger.d('REMINDER',
-          'Cancelled $cancelledCount/$smartSeriesCount smart reminders');
+          'Cancelled $cancelledCount smart reminders (including day 30)');
     } catch (e, s) {
       AppLogger.e('REMINDER', 'Error cancelling smart reminder series: $e', s);
       CrashlyticsService().recordError(
@@ -154,6 +165,30 @@ class ReminderProvider {
     } catch (e, s) {
       AppLogger.e('REMINDER',
           'Error clearing badge after cancelling smart reminders: $e', s);
+    }
+  }
+
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    await _initFuture;
+    AppLogger.d('REMINDER', 'Getting pending notifications...');
+    try {
+      final pendingNotifications =
+          await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
+      AppLogger.d('REMINDER',
+          'Found ${pendingNotifications.length} pending notification(s)');
+      for (final notification in pendingNotifications) {
+        AppLogger.d('REMINDER',
+            'Notification ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}, Payload: ${notification.payload}');
+      }
+      return pendingNotifications;
+    } catch (e, s) {
+      AppLogger.e('REMINDER', 'Error getting pending notifications: $e', s);
+      CrashlyticsService().recordError(
+        e,
+        s,
+        reason: 'Failed to get pending notifications',
+      );
+      return [];
     }
   }
 }

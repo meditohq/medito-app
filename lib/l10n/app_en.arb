@@ -659,11 +659,11 @@
   "@smartRemindersOn": {
     "description": "Status text when smart reminders are enabled"
   },
-  "smartReminderDay1TitleVar1": "See you tomorrow 🌱",
+  "smartReminderDay1TitleVar1": "Keep your streak going 🌱",
   "@smartReminderDay1TitleVar1": {
     "description": "Smart reminder day 1 title variant 1"
   },
-  "smartReminderDay1BodyVar1": "You are on a {streak} day streak. See you tomorrow?",
+  "smartReminderDay1BodyVar1": "You are on a {streak} day streak. Keep it going?",
   "@smartReminderDay1BodyVar1": {
     "description": "Smart reminder day 1 body variant 1",
     "placeholders": {
@@ -691,9 +691,25 @@
   "@smartReminderDay1TitleVar3": {
     "description": "Smart reminder day 1 title variant 3"
   },
-  "smartReminderDay1BodyVar3": "A few minutes tomorrow keeps your momentum alive.",
+  "smartReminderDay1BodyVar3": "A few minutes now keeps your momentum alive.",
   "@smartReminderDay1BodyVar3": {
     "description": "Smart reminder day 1 body variant 3"
+  },
+  "smartReminderDay1TitleVar4": "Your practice awaits 🌸",
+  "@smartReminderDay1TitleVar4": {
+    "description": "Smart reminder day 1 title variant 4"
+  },
+  "smartReminderDay1BodyVar4": "Take a moment to reconnect with yourself.",
+  "@smartReminderDay1BodyVar4": {
+    "description": "Smart reminder day 1 body variant 4"
+  },
+  "smartReminderDay1TitleVar5": "One breath at a time 🫧",
+  "@smartReminderDay1TitleVar5": {
+    "description": "Smart reminder day 1 title variant 5"
+  },
+  "smartReminderDay1BodyVar5": "Every session counts, no matter how short.",
+  "@smartReminderDay1BodyVar5": {
+    "description": "Smart reminder day 1 body variant 5"
   },
   "smartReminderDay2TitleVar1": "Keep the flow 🔁",
   "@smartReminderDay2TitleVar1": {
@@ -719,6 +735,22 @@
   "@smartReminderDay2BodyVar3": {
     "description": "Smart reminder day 2 body variant 3"
   },
+  "smartReminderDay2TitleVar4": "Small steps forward 🚶",
+  "@smartReminderDay2TitleVar4": {
+    "description": "Smart reminder day 2 title variant 4"
+  },
+  "smartReminderDay2BodyVar4": "Consistency builds strength. Start with just a few minutes.",
+  "@smartReminderDay2BodyVar4": {
+    "description": "Smart reminder day 2 body variant 4"
+  },
+  "smartReminderDay2TitleVar5": "Gentle return 💚",
+  "@smartReminderDay2TitleVar5": {
+    "description": "Smart reminder day 2 title variant 5"
+  },
+  "smartReminderDay2BodyVar5": "Your mindful practice is here whenever you are ready.",
+  "@smartReminderDay2BodyVar5": {
+    "description": "Smart reminder day 2 body variant 5"
+  },
   "smartReminderDay3TitleVar1": "Build the habit 📆",
   "@smartReminderDay3TitleVar1": {
     "description": "Smart reminder day 3 title variant 1"
@@ -743,6 +775,22 @@
   "@smartReminderDay3BodyVar3": {
     "description": "Smart reminder day 3 body variant 3"
   },
+  "smartReminderDay3TitleVar4": "Growing stronger 🌿",
+  "@smartReminderDay3TitleVar4": {
+    "description": "Smart reminder day 3 title variant 4"
+  },
+  "smartReminderDay3BodyVar4": "Each day you practice, you build something meaningful.",
+  "@smartReminderDay3BodyVar4": {
+    "description": "Smart reminder day 3 body variant 4"
+  },
+  "smartReminderDay3TitleVar5": "Find your calm 🕊️",
+  "@smartReminderDay3TitleVar5": {
+    "description": "Smart reminder day 3 title variant 5"
+  },
+  "smartReminderDay3BodyVar5": "A brief pause can reset your entire day.",
+  "@smartReminderDay3BodyVar5": {
+    "description": "Smart reminder day 3 body variant 5"
+  },
   "smartReminderDay4Title": "Small steps 🪴",
   "@smartReminderDay4Title": {
     "description": "Smart reminder day 4 title"
@@ -751,27 +799,27 @@
   "@smartReminderDay4Body": {
     "description": "Smart reminder day 4 body"
   },
-  "smartReminderDay5Title": "You are doing great 💪",
+  "smartReminderDay5Title": "Time to reconnect 💪",
   "@smartReminderDay5Title": {
     "description": "Smart reminder day 5 title"
   },
-  "smartReminderDay5Body": "A calm pause today keeps you on track.",
+  "smartReminderDay5Body": "It has been 5 days. A calm pause now can help you get back on track.",
   "@smartReminderDay5Body": {
     "description": "Smart reminder day 5 body"
   },
-  "smartReminderDay6Title": "Nearly a week 📈",
+  "smartReminderDay6Title": "Almost a week ⏰",
   "@smartReminderDay6Title": {
     "description": "Smart reminder day 6 title"
   },
-  "smartReminderDay6Body": "Close the loop. Make today a mindful moment.",
+  "smartReminderDay6Body": "It has been almost a week since you meditated. Close the loop with a mindful moment.",
   "@smartReminderDay6Body": {
     "description": "Smart reminder day 6 body"
   },
-  "smartReminderDay7Title": "One week check in 🎉",
+  "smartReminderDay7Title": "One week check in 📅",
   "@smartReminderDay7Title": {
     "description": "Smart reminder day 7 title"
   },
-  "smartReminderDay7Body": "It has been a week since you meditated. Take a moment for yourself today.",
+  "smartReminderDay7Body": "It has been a week since you meditated. Take a moment for yourself now.",
   "@smartReminderDay7Body": {
     "description": "Smart reminder day 7 body"
   },
@@ -779,7 +827,7 @@
   "@smartReminderDay8Title": {
     "description": "Smart reminder day 8 title"
   },
-  "smartReminderDay8Body": "New week energy. Just a few mindful minutes.",
+  "smartReminderDay8Body": "It has been over a week. A fresh start with just a few mindful minutes.",
   "@smartReminderDay8Body": {
     "description": "Smart reminder day 8 body"
   },
@@ -815,11 +863,11 @@
   "@smartReminderDay12Body": {
     "description": "Smart reminder day 12 body"
   },
-  "smartReminderDay13Title": "Almost there ✨",
+  "smartReminderDay13Title": "Approaching two weeks ⏳",
   "@smartReminderDay13Title": {
     "description": "Smart reminder day 13 title"
   },
-  "smartReminderDay13Body": "Two weeks is near. Try a two minute restart.",
+  "smartReminderDay13Body": "It has been almost two weeks since you meditated. Try a two minute restart.",
   "@smartReminderDay13Body": {
     "description": "Smart reminder day 13 body"
   },
@@ -827,7 +875,7 @@
   "@smartReminderDay14Title": {
     "description": "Smart reminder day 14 title"
   },
-  "smartReminderDay14Body": "It has been 14 days since you meditated. Resume your practice today, gently.",
+  "smartReminderDay14Body": "It has been 14 days since you meditated. Resume your practice now, gently.",
   "@smartReminderDay14Body": {
     "description": "Smart reminder day 14 body"
   },
@@ -838,5 +886,13 @@
   "smartReminderDay15Body": "We will pause reminders for now. We are here whenever you are ready.",
   "@smartReminderDay15Body": {
     "description": "Smart reminder day 15 body"
+  },
+  "smartReminderDay30Title": "It's been a month 📅",
+  "@smartReminderDay30Title": {
+    "description": "Smart reminder day 30 title"
+  },
+  "smartReminderDay30Body": "It's been a month since you meditated. Try Medito again, just do 2 mins, you'll feel better.",
+  "@smartReminderDay30Body": {
+    "description": "Smart reminder day 30 body"
   }
 }
