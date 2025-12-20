@@ -857,15 +857,15 @@
   "@smartReminderDay15Title": {
     "description": "Smart reminder day 15 title"
   },
-  "smartReminderDay15Body": "Estos recordatorios no parecen estar funcionando, así que los pausaremos por ahora.",
+  "smartReminderDay15Body": "Estamos pausando los recordatorios por ahora. Estamos aquí cuando estés listo.",
   "@smartReminderDay15Body": {
     "description": "Smart reminder day 15 body"
   },
-  "smartReminderDay30Title": "Ha pasado un mes 📅",
+  "smartReminderDay30Title": "Un suave empujón 🤗",
   "@smartReminderDay30Title": {
     "description": "Smart reminder day 30 title"
   },
-  "smartReminderDay30Body": "Ha pasado un mes desde que meditaste. Prueba Medito de nuevo, solo 2 minutos, te sentirás mejor.",
+  "smartReminderDay30Body": "Ha pasado un mes desde que meditaste. Solo 2 minutos pueden ayudarte a sentirte mejor. Estamos aquí cuando estés listo.",
   "@smartReminderDay30Body": {
     "description": "Smart reminder day 30 body"
   }

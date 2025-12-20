@@ -883,15 +883,15 @@
   "@smartReminderDay15Title": {
     "description": "Smart reminder day 15 title"
   },
-  "smartReminderDay15Body": "We will pause reminders for now. We are here whenever you are ready.",
+  "smartReminderDay15Body": "We're pausing reminders for now. We are here whenever you are ready.",
   "@smartReminderDay15Body": {
     "description": "Smart reminder day 15 body"
   },
-  "smartReminderDay30Title": "It's been a month 📅",
+  "smartReminderDay30Title": "A gentle nudge 🤗",
   "@smartReminderDay30Title": {
     "description": "Smart reminder day 30 title"
   },
-  "smartReminderDay30Body": "It's been a month since you meditated. Try Medito again, just do 2 mins, you'll feel better.",
+  "smartReminderDay30Body": "It's been a month since you meditated. Just 2 minutes can help you feel better. We're here when you're ready.",
   "@smartReminderDay30Body": {
     "description": "Smart reminder day 30 body"
   }
