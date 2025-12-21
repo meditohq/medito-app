@@ -8,13 +8,19 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/review_service_provider.dart';
+import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 
 import 'widgets/donation_widget.dart';
 
@@ -111,6 +117,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
           child: Column(
             children: [
               _buildStatsArea(),
+              _buildReminderPrompt(),
               _buildCard(),
               // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
             ],
@@ -366,5 +373,141 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         color: colour,
       ),
     );
+  }
+
+  Future<void> _dismissReminderPromptForever() async {
+    await ref.read(reminderPromptDismissedProvider.notifier).dismissForever();
+    if (mounted) {
+      showSnackBar(
+        context,
+        AppLocalizations.of(context)!.reminderPromptDismissedMessage,
+      );
+    }
+  }
+
+  Widget _buildReminderPrompt() {
+    final shouldShow = ref.watch(shouldShowReminderPromptProvider);
+    final isReminderEnabled = ref.watch(reminderEnabledProvider);
+
+    if (!shouldShow) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: padding16,
+        right: padding16,
+        bottom: 16,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Theme.of(context).cardColor,
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 15,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                MeditoIcon(
+                  assetName: MeditoIcons.bell,
+                  size: 24,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    AppLocalizations.of(context)!.smartReminders,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontFamily: teachers,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+                IconButton(
+                  icon: MeditoIcon(
+                    assetName: MeditoIcons.xmark,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  onPressed: _dismissReminderPromptForever,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+            if (!isReminderEnabled) ...[
+              const SizedBox(height: 8),
+              Text(
+                AppLocalizations.of(context)!.enableNotificationsBody,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isReminderEnabled ? null : () => _enableReminders(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isReminderEnabled
+                      ? Theme.of(context).colorScheme.surface
+                      : Theme.of(context).colorScheme.primary,
+                  foregroundColor: isReminderEnabled
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6)
+                      : Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+                child: Text(
+                  isReminderEnabled
+                      ? AppLocalizations.of(context)!.smartRemindersOn
+                      : AppLocalizations.of(context)!.turnOnSmartReminders,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _enableReminders() async {
+    try {
+      final accepted = await PermissionHandler.requestAlarmPermission(context);
+      if (!accepted || !mounted) {
+        return;
+      }
+
+      final prefs = ref.read(sharedPreferencesProvider);
+      final service = SmartRemindersService(
+        prefs: prefs,
+        reminders: ref.read(reminderProvider),
+      );
+
+      final time = await service.enable();
+      await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
+      ref.read(reminderTimeProvider.notifier).state = time;
+
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      // Error enabling reminders - silently fail
+    }
   }
 }

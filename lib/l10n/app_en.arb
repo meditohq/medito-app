@@ -659,6 +659,10 @@
   "@smartRemindersOn": {
     "description": "Status text when smart reminders are enabled"
   },
+  "reminderPromptDismissedMessage": "You can turn reminders on or off in Settings",
+  "@reminderPromptDismissedMessage": {
+    "description": "Message shown when user dismisses the reminder prompt on the end screen"
+  },
   "smartReminderDay1TitleVar1": "Keep your streak going 🌱",
   "@smartReminderDay1TitleVar1": {
     "description": "Smart reminder day 1 title variant 1"

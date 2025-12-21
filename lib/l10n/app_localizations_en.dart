@@ -1451,6 +1451,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'We rely on donors like you to continue providing mindfulness to everyone.';
 
   @override
+  String get reminderPromptDismissedMessage =>
+      'You can turn reminders on or off in Settings';
+
+  @override
   String get smartReminderDay1TitleVar1 => 'Keep your streak going 🌱';
 
   @override
@@ -1634,12 +1638,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get smartReminderDay15Body =>
-      'We will pause reminders for now. We are here whenever you are ready.';
+      'We\'re pausing reminders for now. We are here whenever you are ready.';
 
   @override
-  String get smartReminderDay30Title => 'It\'s been a month 📅';
+  String get smartReminderDay30Title => 'A gentle nudge 🤗';
 
   @override
   String get smartReminderDay30Body =>
-      'It\'s been a month since you meditated. Try Medito again, just do 2 mins, you\'ll feel better.';
+      'It\'s been a month since you meditated. Just 2 minutes can help you feel better. We\'re here when you\'re ready.';
 }

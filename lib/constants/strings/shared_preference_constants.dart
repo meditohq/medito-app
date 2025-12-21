@@ -39,6 +39,7 @@ class SharedPreferenceConstants {
 
   // Smart Reminders
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
+  static const String reminderPromptDismissedForever = 'reminder_prompt_dismissed_forever';
 
   // Analytics consent flags
   static const String analyticsFirebaseEnabled = 'analytics_firebase_enabled';

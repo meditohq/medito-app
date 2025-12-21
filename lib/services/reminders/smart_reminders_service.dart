@@ -128,7 +128,7 @@ class SmartRemindersScheduler {
     final start = end.subtract(Duration(milliseconds: durationMs));
     final anchor = start
         .add(const Duration(days: 1))
-        .subtract(const Duration(minutes: 10));
+        .subtract(const Duration(minutes: 15));
     await scheduleSeriesFromAnchor(anchor, l10n: l10n);
   }
 

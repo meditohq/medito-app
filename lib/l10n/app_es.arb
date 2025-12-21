@@ -633,6 +633,10 @@
   "@smartRemindersOn": {
     "description": "Status text when smart reminders are enabled"
   },
+  "reminderPromptDismissedMessage": "Puedes activar o desactivar los recordatorios en Configuración",
+  "@reminderPromptDismissedMessage": {
+    "description": "Message shown when user dismisses the reminder prompt on the end screen"
+  },
   "smartReminderDay1TitleVar1": "Mantén tu racha 🌱",
   "@smartReminderDay1TitleVar1": {
     "description": "Smart reminder day 1 title variant 1"

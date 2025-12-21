@@ -2756,6 +2756,12 @@ abstract class AppLocalizations {
   /// **'We rely on donors like you to continue providing mindfulness to everyone.'**
   String get donorSupportMessage;
 
+  /// Message shown when user dismisses the reminder prompt on the end screen
+  ///
+  /// In en, this message translates to:
+  /// **'You can turn reminders on or off in Settings'**
+  String get reminderPromptDismissedMessage;
+
   /// Smart reminder day 1 title variant 1
   ///
   /// In en, this message translates to:
@@ -3077,19 +3083,19 @@ abstract class AppLocalizations {
   /// Smart reminder day 15 body
   ///
   /// In en, this message translates to:
-  /// **'We will pause reminders for now. We are here whenever you are ready.'**
+  /// **'We\'re pausing reminders for now. We are here whenever you are ready.'**
   String get smartReminderDay15Body;
 
   /// Smart reminder day 30 title
   ///
   /// In en, this message translates to:
-  /// **'It\'s been a month 📅'**
+  /// **'A gentle nudge 🤗'**
   String get smartReminderDay30Title;
 
   /// Smart reminder day 30 body
   ///
   /// In en, this message translates to:
-  /// **'It\'s been a month since you meditated. Try Medito again, just do 2 mins, you\'ll feel better.'**
+  /// **'It\'s been a month since you meditated. Just 2 minutes can help you feel better. We\'re here when you\'re ready.'**
   String get smartReminderDay30Body;
 }
 
