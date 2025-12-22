@@ -240,7 +240,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       _api.skip10SecondsForward();
     } else {
       iosAudioHandler.seek(
-        iosAudioHandler.position + const Duration(seconds: 10),
+        iosAudioHandler.position + const Duration(seconds: 15),
       );
     }
   }
@@ -250,7 +250,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       _api.skip10SecondsBackward();
     } else {
       iosAudioHandler.seek(
-        iosAudioHandler.position - const Duration(seconds: 10),
+        iosAudioHandler.position - const Duration(seconds: 15),
       );
     }
   }

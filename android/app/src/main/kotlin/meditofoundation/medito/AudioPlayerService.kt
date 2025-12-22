@@ -859,21 +859,21 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             return
         }
 
-        if (currentPosition + 10000 > duration) {
+        if (currentPosition + 15000 > duration) {
             primaryPlayer.seekTo(duration)
             return
         }
-        primaryPlayer.seekTo(currentPosition + 10000)
+        primaryPlayer.seekTo(currentPosition + 15000)
     }
 
     override fun skip10SecondsBackward() {
         val currentPosition = primaryPlayer.currentPosition
 
-        if (currentPosition < 10000) {
+        if (currentPosition < 15000) {
             primaryPlayer.seekTo(0)
             return
         }
-        primaryPlayer.seekTo(currentPosition - 10000)
+        primaryPlayer.seekTo(currentPosition - 15000)
     }
 
     override fun setRepeatMode(mode: RepeatMode) {
