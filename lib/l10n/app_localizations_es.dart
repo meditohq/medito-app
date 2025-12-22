@@ -1669,4 +1669,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get smartReminderDay30Body =>
       'Ha pasado un mes desde que meditaste. Solo 2 minutos pueden ayudarte a sentirte mejor. Estamos aquí cuando estés listo.';
+
+  @override
+  String get repeatModeNormal => 'Normal';
+
+  @override
+  String get repeatModeOnce => 'Repetir una vez';
+
+  @override
+  String get repeatModeForever => 'Repetir siempre';
 }

@@ -3097,6 +3097,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'It\'s been a month since you meditated. Just 2 minutes can help you feel better. We\'re here when you\'re ready.'**
   String get smartReminderDay30Body;
+
+  /// Tooltip text for repeat mode when set to normal (no repeat)
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get repeatModeNormal;
+
+  /// Tooltip text for repeat mode when set to repeat once
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Once'**
+  String get repeatModeOnce;
+
+  /// Tooltip text for repeat mode when set to repeat forever
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Forever'**
+  String get repeatModeForever;
 }
 
 class _AppLocalizationsDelegate

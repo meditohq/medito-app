@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 
 import '../../../../providers/player/repeat_state_provider.dart';
@@ -45,7 +49,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
             children: [
               _rewindButton(),
               const SizedBox(width: 32),
-              _repeatButton(repeatMode),
+              _repeatButton(context, repeatMode),
               const SizedBox(width: 32),
               _forwardButton(),
             ],
@@ -66,7 +70,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
           const SizedBox(width: 32),
           _forwardButton(),
           const SizedBox(width: 32),
-          _repeatButton(repeatMode),
+          _repeatButton(context, repeatMode),
         ],
       );
     }
@@ -94,7 +98,82 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  IconButton _repeatButton(RepeatMode repeatMode) {
+  Widget _repeatButton(BuildContext context, RepeatMode repeatMode) {
+    return _RepeatButtonWithLabel(
+      repeatMode: repeatMode,
+      onRepeat: onRepeat,
+    );
+  }
+}
+
+class _RepeatButtonWithLabel extends ConsumerStatefulWidget {
+  const _RepeatButtonWithLabel({
+    required this.repeatMode,
+    required this.onRepeat,
+  });
+
+  final RepeatMode repeatMode;
+  final VoidCallback onRepeat;
+
+  @override
+  ConsumerState<_RepeatButtonWithLabel> createState() =>
+      _RepeatButtonWithLabelState();
+}
+
+class _RepeatButtonWithLabelState
+    extends ConsumerState<_RepeatButtonWithLabel> {
+  Timer? _timer;
+  bool _showLabel = false;
+  String _currentLabel = '';
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    final localizations = AppLocalizations.of(context)!;
+
+    final nextMode = switch (widget.repeatMode) {
+      RepeatMode.none => RepeatMode.once,
+      RepeatMode.once => RepeatMode.infinite,
+      RepeatMode.infinite => RepeatMode.none,
+    };
+
+    String labelText;
+    switch (nextMode) {
+      case RepeatMode.none:
+        labelText = localizations.repeatModeNormal;
+        break;
+      case RepeatMode.once:
+        labelText = localizations.repeatModeOnce;
+        break;
+      case RepeatMode.infinite:
+        labelText = localizations.repeatModeForever;
+        break;
+    }
+
+    widget.onRepeat();
+
+    _timer?.cancel();
+    setState(() {
+      _currentLabel = labelText;
+      _showLabel = true;
+    });
+
+    _timer = Timer(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _showLabel = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final repeatMode = ref.watch(repeatStateProvider);
     var iconAsset = MeditoIcons.repeat;
     Color? iconColor;
 
@@ -111,13 +190,44 @@ class PlayerButtonsWidget extends ConsumerWidget {
         break;
     }
 
-    return IconButton(
-      onPressed: onRepeat,
-      icon: MeditoIcon(
-        assetName: iconAsset,
-        size: 32,
-        color: iconColor,
-      ),
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        IconButton(
+          onPressed: _handleTap,
+          icon: MeditoIcon(
+            assetName: iconAsset,
+            size: 32,
+            color: iconColor,
+          ),
+        ),
+        if (_showLabel)
+          Positioned(
+            bottom: -40,
+            child: AnimatedOpacity(
+              opacity: _showLabel ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacityValue(0.7),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _currentLabel,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -872,5 +872,17 @@
   "smartReminderDay30Body": "Ha pasado un mes desde que meditaste. Solo 2 minutos pueden ayudarte a sentirte mejor. Estamos aquí cuando estés listo.",
   "@smartReminderDay30Body": {
     "description": "Smart reminder day 30 body"
+  },
+  "repeatModeNormal": "Normal",
+  "@repeatModeNormal": {
+    "description": "Tooltip text for repeat mode when set to normal (no repeat)"
+  },
+  "repeatModeOnce": "Repetir una vez",
+  "@repeatModeOnce": {
+    "description": "Tooltip text for repeat mode when set to repeat once"
+  },
+  "repeatModeForever": "Repetir siempre",
+  "@repeatModeForever": {
+    "description": "Tooltip text for repeat mode when set to repeat forever"
   }
 }
