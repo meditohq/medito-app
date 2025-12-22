@@ -7,6 +7,7 @@ import '../../l10n/app_localizations.dart';
 import '../../l10n/app_localizations_en.dart';
 import '../../providers/notification/reminder_provider.dart';
 import '../../utils/logger.dart';
+import '../../utils/stats_manager.dart';
 
 class SmartRemindersService {
   final SharedPreferences prefs;
@@ -68,17 +69,37 @@ class SmartRemindersScheduler {
     final localizations = l10n ?? _getFallbackLocalizations();
     final items = <_SeriesItem>[];
 
+    var streakCount = '1';
+    var consistencyPercentage = '0';
+
+    try {
+      final statsManager = StatsManager();
+      await statsManager.initialize();
+      final stats = await statsManager.localAllStats;
+      streakCount = '${stats.streakCurrent}';
+      consistencyPercentage = '${(stats.consistencyScore * 100).round()}';
+    } catch (e) {
+      AppLogger.w('REMINDER',
+          'Failed to fetch stats for smart reminders, using defaults: $e');
+    }
+
     for (var i = 0; i < 15; i++) {
       final when = anchorLocal.add(Duration(days: i));
       final tzWhen = tz.TZDateTime.from(when, tz.local);
-      final copy = _copyForDay(i + 1, l10n: localizations);
+      final copy = _copyForDay(i + 1,
+          l10n: localizations,
+          streakCount: streakCount,
+          consistencyPercentage: consistencyPercentage);
       items.add(_SeriesItem(
           id: smartBaseId + i, when: tzWhen, title: copy.$1, body: copy.$2));
     }
 
     final day30When = anchorLocal.add(Duration(days: 29));
     final day30TzWhen = tz.TZDateTime.from(day30When, tz.local);
-    final day30Copy = _copyForDay(30, l10n: localizations);
+    final day30Copy = _copyForDay(30,
+        l10n: localizations,
+        streakCount: streakCount,
+        consistencyPercentage: consistencyPercentage);
     items.add(_SeriesItem(
         id: smartBaseId + 15,
         when: day30TzWhen,
@@ -132,12 +153,23 @@ class SmartRemindersScheduler {
     await scheduleSeriesFromAnchor(anchor, l10n: l10n);
   }
 
-  (String, String) _copyForDay(int day, {required AppLocalizations l10n}) {
+  (String, String) _copyForDay(
+    int day, {
+    required AppLocalizations l10n,
+    String streakCount = '1',
+    String consistencyPercentage = '0',
+  }) {
     switch (day) {
       case 1:
         final variants = <(String, String)>[
-          (l10n.smartReminderDay1TitleVar1, l10n.smartReminderDay1BodyVar1('')),
-          (l10n.smartReminderDay1TitleVar2, l10n.smartReminderDay1BodyVar2('')),
+          (
+            l10n.smartReminderDay1TitleVar1,
+            l10n.smartReminderDay1BodyVar1(streakCount)
+          ),
+          (
+            l10n.smartReminderDay1TitleVar2,
+            l10n.smartReminderDay1BodyVar2(consistencyPercentage)
+          ),
           (l10n.smartReminderDay1TitleVar3, l10n.smartReminderDay1BodyVar3),
           (l10n.smartReminderDay1TitleVar4, l10n.smartReminderDay1BodyVar4),
           (l10n.smartReminderDay1TitleVar5, l10n.smartReminderDay1BodyVar5),
