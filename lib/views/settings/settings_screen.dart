@@ -174,7 +174,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         type: TypeConstants.toggle,
         title: AppLocalizations.of(context)!.zenMode,
         icon: MeditoIcon(
-          assetName: MeditoIcons.moon,
+          assetName: MeditoIcons.sun,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         path: TypeConstants.toggleZenMode,
