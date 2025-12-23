@@ -11,7 +11,6 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/review_service_provider.dart';
-import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';

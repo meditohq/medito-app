@@ -376,7 +376,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                 padding: StreakCircleConstants.padding,
                 child: MeditoIcon(
                   assetName:
-                      isStreakDoneToday ? MeditoIcons.fire : MeditoIcons.moon,
+                      isStreakDoneToday ? MeditoIcons.fire : MeditoIcons.sun,
                   size: StreakCircleConstants.iconSize,
                   color: isStreakDoneToday
                       ? ColorConstants.lightPurple
