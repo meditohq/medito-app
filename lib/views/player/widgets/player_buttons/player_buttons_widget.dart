@@ -179,7 +179,7 @@ class _RepeatButtonWithLabelState
 
     switch (repeatMode) {
       case RepeatMode.none:
-        iconColor = Colors.white.withOpacity(0.5);
+        iconColor = Colors.white.withValues(alpha: 0.5);
         break;
       case RepeatMode.once:
         iconAsset = MeditoIcons.repeatOnce;

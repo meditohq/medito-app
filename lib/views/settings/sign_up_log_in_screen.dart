@@ -163,7 +163,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       final proceed = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              backgroundColor: Theme.of(context).dialogBackgroundColor,
+              backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
               title: Text(
                 AppLocalizations.of(context)!.accountTransitionWarningTitle,
                 style: Theme.of(context).textTheme.headlineSmall,

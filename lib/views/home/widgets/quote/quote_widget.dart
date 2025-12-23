@@ -59,7 +59,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
 
     final shareText =
         '${widget.data?.quote}\n- ${widget.data?.author}\n\n${AppLocalizations.of(context)!.shareStatsText}';
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
   }
 
   Widget _buildQuoteContent() {

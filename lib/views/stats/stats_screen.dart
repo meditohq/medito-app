@@ -449,7 +449,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () =>
-                  Share.share(AppLocalizations.of(context)!.shareStatsText),
+                  SharePlus.instance.share(ShareParams(text: AppLocalizations.of(context)!.shareStatsText)),
               icon: MeditoIcon(
                 assetName: MeditoIcons.shareAndroid,
                 size: 20,

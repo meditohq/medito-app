@@ -16,7 +16,6 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
-import 'package:medito/widgets/pack_card_widget.dart';
 import 'package:medito/utils/utils.dart';
 
 final filteredPacksProvider =

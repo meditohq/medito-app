@@ -31,7 +31,7 @@ class PackViewBottomBar extends ConsumerWidget {
     final deepLink = 'https://medito.app/packs/$packId';
     final shareText =
         AppLocalizations.of(context)!.sharePackText(packName, deepLink);
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
   }
 
   void _showBottomSheet(BuildContext context) {

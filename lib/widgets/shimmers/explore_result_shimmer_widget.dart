@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 
 class ExploreResultShimmerWidget extends StatelessWidget {
-  const ExploreResultShimmerWidget({Key? key}) : super(key: key);
+  const ExploreResultShimmerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -288,7 +288,7 @@ Future<void> _checkAndAwardStreakFreeze({
           await _markFreezeAwardedToday();
 
           AppLogger.d('STREAK_FREEZE',
-              'Awarded streak freeze for reaching ${currentStreak}-day milestone');
+              'Awarded streak freeze for reaching $currentStreak-day milestone');
 
           // Show snackbar notification
           final context = navigatorKey.currentContext;

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
-import 'package:medito/constants/config_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/utils/logger.dart';
@@ -16,7 +14,6 @@ import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/utils/black_friday_utils.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/constants/colors/color_constants.dart';
 
 class ProductsWidget extends ConsumerStatefulWidget {
   final List<ProductGroupModel>? productGroups;

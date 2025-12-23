@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
   const MeditoAppBarSmall({
-    Key? key,
+    super.key,
     this.title,
     this.titleWidget,
     this.isTransparent = false,
@@ -12,7 +12,7 @@ class MeditoAppBarSmall extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.closePressed,
     this.bottom,
-  }) : super(key: key);
+  });
 
   final void Function()? closePressed;
   final Widget? titleWidget;
