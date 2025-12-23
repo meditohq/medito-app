@@ -23,6 +23,7 @@ import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
 import 'widgets/donation_widget.dart';
+import 'widgets/zen_mode_animation.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
   final TrackModel trackModel;
@@ -36,16 +37,115 @@ class EndScreenView extends ConsumerStatefulWidget {
   ConsumerState<EndScreenView> createState() => _EndScreenViewState();
 }
 
-class _EndScreenViewState extends ConsumerState<EndScreenView> {
+class _EndScreenViewState extends ConsumerState<EndScreenView>
+    with TickerProviderStateMixin {
   final _animatedSwitcherKey = GlobalKey();
   bool _hasFiredHapticFeedback = false;
   final _analytics = FirebaseAnalyticsService();
+
+  late AnimationController _statsAnimationController;
+  late AnimationController _reminderAnimationController;
+  late AnimationController _cardAnimationController;
+
+  late Animation<Offset> _statsSlideAnimation;
+  late Animation<double> _statsFadeAnimation;
+  late Animation<Offset> _reminderSlideAnimation;
+  late Animation<double> _reminderFadeAnimation;
+  late Animation<Offset> _cardSlideAnimation;
+  late Animation<double> _cardFadeAnimation;
 
   @override
   void initState() {
     super.initState();
     _loadStats();
     _logScreenView();
+
+    _statsAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _reminderAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _cardAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _statsSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _statsAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _statsFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _statsAnimationController,
+      curve: Curves.easeOut,
+    ));
+
+    _reminderSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _reminderAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _reminderFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _reminderAnimationController,
+      curve: Curves.easeOut,
+    ));
+
+    _cardSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _cardAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _cardFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _cardAnimationController,
+      curve: Curves.easeOut,
+    ));
+
+    _startAnimations();
+  }
+
+  void _startAnimations() {
+    _statsAnimationController.forward();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        _reminderAnimationController.forward();
+      }
+    });
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        _cardAnimationController.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _statsAnimationController.dispose();
+    _reminderAnimationController.dispose();
+    _cardAnimationController.dispose();
+    super.dispose();
   }
 
   Future<void> _logScreenView() async {
@@ -116,9 +216,29 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: SafeArea(
           child: Column(
             children: [
-              _buildStatsArea(),
-              _buildReminderPrompt(),
-              _buildCard(),
+              SlideTransition(
+                position: _statsSlideAnimation,
+                child: FadeTransition(
+                  opacity: _statsFadeAnimation,
+                  child: ref.watch(zenModeProvider)
+                      ? const ZenModeAnimation()
+                      : _buildStatsArea(),
+                ),
+              ),
+              SlideTransition(
+                position: _reminderSlideAnimation,
+                child: FadeTransition(
+                  opacity: _reminderFadeAnimation,
+                  child: _buildReminderPrompt(),
+                ),
+              ),
+              SlideTransition(
+                position: _cardSlideAnimation,
+                child: FadeTransition(
+                  opacity: _cardFadeAnimation,
+                  child: _buildCard(),
+                ),
+              ),
               // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
             ],
           ),

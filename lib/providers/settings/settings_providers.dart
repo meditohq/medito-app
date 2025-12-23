@@ -30,6 +30,23 @@ class ReminderEnabledNotifier extends Notifier<bool> {
 final reminderEnabledProvider = NotifierProvider<ReminderEnabledNotifier, bool>(
     () => ReminderEnabledNotifier());
 
+class ZenModeNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    return prefs.getBool(SharedPreferenceConstants.zenModeEnabled) ?? false;
+  }
+
+  Future<void> setEnabled(bool value) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setBool(SharedPreferenceConstants.zenModeEnabled, value);
+    state = value;
+  }
+}
+
+final zenModeProvider = NotifierProvider<ZenModeNotifier, bool>(
+    () => ZenModeNotifier());
+
 TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
   final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
   final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/providers/settings/settings_providers.dart';
 
 class ReminderPromptNotifier extends Notifier<bool> {
   @override

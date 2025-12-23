@@ -2072,6 +2072,18 @@ abstract class AppLocalizations {
   /// **'Silence phone during meditation'**
   String get enableDndDuringMeditation;
 
+  /// Title for zen mode setting in customization section
+  ///
+  /// In en, this message translates to:
+  /// **'Zen Mode'**
+  String get zenMode;
+
+  /// Message shown in zen mode after completing meditation
+  ///
+  /// In en, this message translates to:
+  /// **'Mind Clear'**
+  String get mindClear;
+
   /// No description provided for @donateToMedito.
   ///
   /// In en, this message translates to:

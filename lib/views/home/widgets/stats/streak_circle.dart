@@ -5,6 +5,7 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
+import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import '../../../../constants/colors/color_constants.dart';
@@ -46,6 +47,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
         final statsAsync = ref.watch(statsProvider);
         final hasSeenStreakCircle = ref.watch(streakCircleProvider);
         final displayTypeAsync = ref.watch(streakCircleDisplayProvider);
+        final isZenModeEnabled = ref.watch(zenModeProvider);
 
         return statsAsync.when(
           loading: () => _buildShimmer(),
@@ -54,6 +56,18 @@ class StreakCircleState extends ConsumerState<StreakCircle>
               final stats = statsAsync.value!;
               final isStreakDoneToday =
                   _controller.isStreakDoneToday(stats.audioCompleted);
+
+              if (isZenModeEnabled) {
+                _controller.updateAnimation(isStreakDoneToday);
+                return _buildWithBadge(
+                  hasSeenStreakCircle,
+                  AnimatedBuilder(
+                    animation: _controller.animationController,
+                    builder: (context, child) =>
+                        _buildZenModeCircle(isStreakDoneToday),
+                  ),
+                );
+              }
 
               return displayTypeAsync.when(
                 loading: () => _buildShimmer(),
@@ -108,6 +122,18 @@ class StreakCircleState extends ConsumerState<StreakCircle>
           data: (stats) {
             final isStreakDoneToday =
                 _controller.isStreakDoneToday(stats.audioCompleted);
+
+            if (isZenModeEnabled) {
+              _controller.updateAnimation(isStreakDoneToday);
+              return _buildWithBadge(
+                hasSeenStreakCircle,
+                AnimatedBuilder(
+                  animation: _controller.animationController,
+                  builder: (context, child) =>
+                      _buildZenModeCircle(isStreakDoneToday),
+                ),
+              );
+            }
 
             return displayTypeAsync.when(
               loading: () => _buildShimmer(),
@@ -304,6 +330,58 @@ class StreakCircleState extends ConsumerState<StreakCircle>
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 color: ColorConstants.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildZenModeCircle(bool isStreakDoneToday) {
+    return Container(
+      decoration: isStreakDoneToday
+          ? BoxDecoration(
+              gradient: SweepGradient(
+                colors: [
+                  ColorConstants.lightPurple.withOpacityValue(0.2),
+                  ColorConstants.lightPurple.withOpacityValue(0.35),
+                  ColorConstants.lightPurple.withOpacityValue(1),
+                  ColorConstants.lightPurple.withOpacityValue(0.3),
+                  ColorConstants.lightPurple.withOpacityValue(0.25),
+                ],
+                stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
+                transform: GradientRotation(
+                    _controller.animationController.value * 2 * 3.14159),
+              ),
+              borderRadius: BorderRadius.circular(
+                  StreakCircleConstants.borderRadius + 1.5),
+            )
+          : null,
+      child: Padding(
+        padding: isStreakDoneToday ? const EdgeInsets.all(2) : EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onTap,
+            borderRadius:
+                BorderRadius.circular(StreakCircleConstants.borderRadius),
+            child: Ink(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius:
+                    BorderRadius.circular(StreakCircleConstants.borderRadius),
+              ),
+              child: Padding(
+                padding: StreakCircleConstants.padding,
+                child: MeditoIcon(
+                  assetName:
+                      isStreakDoneToday ? MeditoIcons.fire : MeditoIcons.moon,
+                  size: StreakCircleConstants.iconSize,
+                  color: isStreakDoneToday
+                      ? ColorConstants.lightPurple
+                      : Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
           ),

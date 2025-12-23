@@ -17,6 +17,7 @@ class TypeConstants {
   static const String toggle = 'toggle';
   static const String toggleDnd = 'toggle_dnd';
   static const String toggleStreakFreeze = 'toggle_streak_freeze';
+  static const String toggleZenMode = 'toggle_zen_mode';
   static const String theme = 'theme';
   static const String addWidget = 'add_widget';
 

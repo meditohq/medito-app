@@ -328,6 +328,14 @@
   "errorUnknownMessage": "Algo salió mal, por favor inténtalo de nuevo",
   "inactiveEmailError": "Esta dirección de correo electrónico actualmente no puede recibir mensajes debido a restricciones del proveedor de correo electrónico o problemas de entrega. Por favor intenta usar una dirección de correo electrónico diferente.",
   "enableDndDuringMeditation": "Silenciar teléfono durante la meditación",
+  "zenMode": "Modo Zen",
+  "@zenMode": {
+    "description": "Title for zen mode setting in customization section"
+  },
+  "mindClear": "Mente Clara",
+  "@mindClear": {
+    "description": "Message shown in zen mode after completing meditation"
+  },
   "donateToMedito": "Donar Ahora",
   "currency": "Moneda",
   "custom": "Cantidad Personalizada",

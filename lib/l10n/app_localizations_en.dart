@@ -1075,6 +1075,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableDndDuringMeditation => 'Silence phone during meditation';
 
   @override
+  String get zenMode => 'Zen Mode';
+
+  @override
+  String get mindClear => 'Mind Clear';
+
+  @override
   String get donateToMedito => 'Donate Now';
 
   @override

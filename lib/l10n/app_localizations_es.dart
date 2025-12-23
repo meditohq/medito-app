@@ -1093,6 +1093,12 @@ class AppLocalizationsEs extends AppLocalizations {
       'Silenciar teléfono durante la meditación';
 
   @override
+  String get zenMode => 'Modo Zen';
+
+  @override
+  String get mindClear => 'Mente Clara';
+
+  @override
   String get donateToMedito => 'Donar Ahora';
 
   @override

@@ -41,6 +41,9 @@ class SharedPreferenceConstants {
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
   static const String reminderPromptDismissedForever = 'reminder_prompt_dismissed_forever';
 
+  // Zen Mode
+  static const String zenModeEnabled = 'zen_mode_enabled';
+
   // Analytics consent flags
   static const String analyticsFirebaseEnabled = 'analytics_firebase_enabled';
   static const String analyticsMetaEnabled = 'analytics_meta_enabled';

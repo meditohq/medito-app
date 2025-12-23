@@ -332,6 +332,14 @@
   "errorUnknownMessage": "Something went wrong, please try again",
   "inactiveEmailError": "This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.",
   "enableDndDuringMeditation": "Silence phone during meditation",
+  "zenMode": "Zen Mode",
+  "@zenMode": {
+    "description": "Title for zen mode setting in customization section"
+  },
+  "mindClear": "Mind Clear",
+  "@mindClear": {
+    "description": "Message shown in zen mode after completing meditation"
+  },
   "donateToMedito": "Donate Now",
   "currency": "Currency",
   "custom": "Custom Amount",
