@@ -72,8 +72,6 @@ class _PackCardWidgetState extends State<PackCardWidget> {
   }) {
     return Text(
       title,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
       style: textTheme.displayLarge?.copyWith(
         fontFamily: dmSans,
         height: 1.2,
@@ -90,8 +88,6 @@ class _PackCardWidgetState extends State<PackCardWidget> {
     if (subtitle != null) {
       return Text(
         subtitle,
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
         style: textTheme.titleMedium?.copyWith(
           letterSpacing: 0,
           color: color,
