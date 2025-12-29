@@ -151,7 +151,7 @@ class _MeditationCalendarWidgetState
 
   Future<void> _showAddSessionDialog(BuildContext context) async {
     final selectedDate = _selectedDayForSessions ?? _selectedDay;
-    
+
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => ManualSessionDialog(selectedDate: selectedDate),
@@ -170,7 +170,7 @@ class _MeditationCalendarWidgetState
       if (success && mounted) {
         // Refresh stats to update the calendar
         await ref.read(statsProvider.notifier).refreshFromLocal();
-        
+
         // Select the day that was added
         final dayStart = DateTime(dateTime.year, dateTime.month, dateTime.day);
         setState(() {
@@ -469,14 +469,19 @@ class _MeditationCalendarWidgetState
                           ),
                           label: Text(
                             AppLocalizations.of(context)!.addSession,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
                                   fontFamily: dmSans,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.transparent,
-                            foregroundColor: Theme.of(context).colorScheme.onSurface,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onSurface,
                             side: BorderSide(
                               color: Theme.of(context)
                                   .colorScheme
@@ -513,9 +518,8 @@ class _SessionItemWidget extends ConsumerWidget {
     final date = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
     final timeFormat = DateFormat('HH:mm');
     final isManual = isManualSession(session);
-    final trackAsync = isManual
-        ? null
-        : ref.watch(tracksProvider(trackId: session.id));
+    final trackAsync =
+        isManual ? null : ref.watch(tracksProvider(trackId: session.id));
 
     final content = Container(
       padding: const EdgeInsets.all(12),
@@ -523,8 +527,7 @@ class _SessionItemWidget extends ConsumerWidget {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color:
-              Theme.of(context).colorScheme.onSurface.withOpacityValue(0.08),
+          color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.08),
           width: 1,
         ),
       ),
@@ -547,7 +550,8 @@ class _SessionItemWidget extends ConsumerWidget {
               children: [
                 isManual
                     ? Text(
-                        getManualSessionTitle(session.id, AppLocalizations.of(context)!),
+                        getManualSessionTitle(
+                            session.id, AppLocalizations.of(context)!),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontFamily: dmSans,
                               fontWeight: FontWeight.w600,
@@ -603,10 +607,8 @@ class _SessionItemWidget extends ConsumerWidget {
           if (!isManual)
             Icon(
               Icons.chevron_right_rounded,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withOpacityValue(0.6),
+              color:
+                  Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
               size: 20,
             ),
         ],

@@ -97,8 +97,13 @@ Future<void> handleNavigation(
       ids.contains(TypeConstants.customiseHomeLayout)) {
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
-      ids.contains(RouteConstants.stats)) {
-    await _pushRoute(const StatsScreen(), ref);
+      ids.any((id) => id?.contains(RouteConstants.stats) ?? false)) {
+    final statsPath = ids.firstWhere(
+      (id) => id?.contains(RouteConstants.stats) ?? false,
+      orElse: () => RouteConstants.stats,
+    );
+    final initialTabIndex = statsPath?.contains(':history') == true ? 1 : 0;
+    await _pushRoute(StatsScreen(initialTabIndex: initialTabIndex), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.analytics)) {
     await _pushRoute(const AnalyticsSettingsScreen(), ref);

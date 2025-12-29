@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
@@ -107,17 +106,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.helpLegalSection,
-        type: TypeConstants.url,
+        type: TypeConstants.route,
         title: AppLocalizations.of(context)!.editStatsTitle,
         icon: MeditoIcon(
           assetName: MeditoIcons.graphUp,
           color: Theme.of(context).colorScheme.onSurface,
         ),
-        path: ref.watch(editStatsUrlProvider).when(
-              data: (url) => url,
-              loading: () => '$editStatsUrl?clientid=',
-              error: (_, __) => '$editStatsUrl?clientid=',
-            ),
+        path: '${RouteConstants.stats}:history',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,

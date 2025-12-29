@@ -17,7 +17,9 @@ import 'package:medito/utils/utils.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/stats/meditation_calendar_widget.dart';
 
 class StatsScreen extends ConsumerStatefulWidget {
-  const StatsScreen({super.key});
+  final int initialTabIndex;
+
+  const StatsScreen({super.key, this.initialTabIndex = 0});
 
   @override
   ConsumerState<StatsScreen> createState() => _StatsScreenState();
@@ -33,7 +35,11 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
