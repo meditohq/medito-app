@@ -372,7 +372,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hourFull => 'hour';
 
   @override
-  String get minutes => 'minutes';
+  String get minutes => 'Minutes';
 
   @override
   String get minute => 'minute';
@@ -1661,4 +1661,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get repeatModeForever => 'Repeat Forever';
+
+  @override
+  String get addSession => 'Add Session';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get selectDate => 'Select date';
+
+  @override
+  String get selectTime => 'Select time';
+
+  @override
+  String get durationInMinutes => 'Duration (minutes)';
+
+  @override
+  String get optional => 'Optional';
+
+  @override
+  String get morningMeditation => 'Morning meditation';
+
+  @override
+  String get afternoonMeditation => 'Afternoon meditation';
+
+  @override
+  String get eveningMeditation => 'Evening meditation';
+
+  @override
+  String get nightMeditation => 'Night meditation';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get addedManually => 'Added manually';
+
+  @override
+  String get manuallyAddedSession => 'Manually added session';
+
+  @override
+  String get addSessionExplanation =>
+      'If you\'ve done a meditation session outside the app, you can add it here to track it in your stats.';
+
+  @override
+  String get cannotAddFutureSession => 'Cannot add sessions in the future';
 }

@@ -396,3 +396,129 @@ Future<List<Map<String, dynamic>>> getConsistencyScoreHistory() async {
     return [];
   }
 }
+
+/// Checks if a session was manually added (not from a track)
+bool isManualSession(LocalAudioCompleted session) {
+  return session.id == TypeConstants.manual1 ||
+      session.id == TypeConstants.manual2 ||
+      session.id == TypeConstants.manual3 ||
+      session.id == TypeConstants.manual4;
+}
+
+/// Gets the display title for a manual session based on its ID
+String getManualSessionTitle(String id, AppLocalizations l10n) {
+  switch (id) {
+    case TypeConstants.manual1:
+      return l10n.morningMeditation;
+    case TypeConstants.manual2:
+      return l10n.afternoonMeditation;
+    case TypeConstants.manual3:
+      return l10n.eveningMeditation;
+    case TypeConstants.manual4:
+      return l10n.nightMeditation;
+    default:
+      return l10n.manuallyAddedSession;
+  }
+}
+
+/// Gets the manual session ID based on the time of day
+String _getManualSessionId(DateTime dateTime) {
+  final hour = dateTime.hour;
+  if (hour >= 5 && hour < 12) {
+    return TypeConstants.manual1; // Morning
+  } else if (hour >= 12 && hour < 18) {
+    return TypeConstants.manual2; // Afternoon
+  } else if (hour >= 18 && hour < 23) {
+    return TypeConstants.manual3; // Evening
+  } else {
+    return TypeConstants.manual4; // Night
+  }
+}
+
+/// Skips HealthKit sync as manual sessions shouldn't sync to HealthKit
+Future<bool> addManualSession({
+  required DateTime dateTime,
+  required int durationMinutes,
+  WidgetRef? ref,
+  StatsManager? statsManager,
+}) async {
+  try {
+    // Validate inputs
+    if (dateTime.isAfter(DateTime.now())) {
+      AppLogger.e('STATS', 'Cannot add session in the future');
+      return false;
+    }
+
+    // Allow 0 duration (empty field defaults to 0)
+    // Convert duration from minutes to milliseconds
+    final durationMs = durationMinutes * 60 * 1000;
+    final timestamp = dateTime.millisecondsSinceEpoch;
+
+    // Get the appropriate manual session ID based on time of day
+    final manualId = _getManualSessionId(dateTime);
+
+    // Create manual session entry
+    final manualSession = LocalAudioCompleted(
+      id: manualId,
+      timestamp: timestamp,
+    );
+
+    // Initialize stats manager if not provided
+    statsManager ??= StatsManager()..initialize();
+
+    // Get stats before update for comparison
+    final statsBefore = await statsManager.localAllStats;
+    final previousStreak = statsBefore.streakCurrent;
+
+    // Add the manual session (this will update streaks, consistency score, etc.)
+    await statsManager.addAudioCompleted(manualSession, durationMs);
+    AppLogger.d('STATS',
+        'Manual session added successfully for ${dateTime.toString()}');
+
+    // Check if user earned a new streak freeze
+    bool isStreakFreezeEnabled;
+    if (ref != null) {
+      final featureFlags = ref.read(featureFlagsProvider);
+      isStreakFreezeEnabled = featureFlags.isStreakFreezeEnabled;
+    } else {
+      // Fallback: read directly from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      isStreakFreezeEnabled = prefs.getBool('streak_freeze_enabled') ?? false;
+    }
+
+    await _checkAndAwardStreakFreeze(
+      statsManager: statsManager,
+      previousStreak: previousStreak,
+      isStreakFreezeEnabled: isStreakFreezeEnabled,
+    );
+
+    // Refresh the stats provider from local stats without syncing
+    // This ensures the UI shows updated stats immediately
+    if (ref != null) {
+      try {
+        await ref.read(statsProvider.notifier).refreshFromLocal();
+        AppLogger.d('STATS', 'Stats provider refreshed from local');
+      } catch (refreshError) {
+        // Don't fail the whole operation if provider refresh fails
+        AppLogger.e('STATS', 'Failed to refresh stats provider', refreshError);
+      }
+    }
+
+    // Update home widget with latest stats (fire-and-forget to avoid blocking)
+    try {
+      final updatedStats = await statsManager.localAllStats;
+      HomeWidgetService.updateWidgetFromStats(updatedStats).catchError((e) {
+        AppLogger.e('STATS', 'Failed to update home widget', e);
+      });
+      AppLogger.d('STATS', 'Home widget update initiated');
+    } catch (widgetError) {
+      // Don't fail the whole operation if widget update fails
+      AppLogger.e('STATS', 'Failed to get stats for widget update', widgetError);
+    }
+
+    return true;
+  } catch (e) {
+    AppLogger.e('STATS', 'Failed to add manual session', e);
+    return false;
+  }
+}

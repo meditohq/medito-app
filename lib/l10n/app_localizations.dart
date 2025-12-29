@@ -788,10 +788,10 @@ abstract class AppLocalizations {
   /// **'hour'**
   String get hourFull;
 
-  /// No description provided for @minutes.
+  /// Short placeholder text for duration input
   ///
   /// In en, this message translates to:
-  /// **'minutes'**
+  /// **'Minutes'**
   String get minutes;
 
   /// No description provided for @minute.
@@ -3127,6 +3127,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Repeat Forever'**
   String get repeatModeForever;
+
+  /// Title for adding a manual meditation session
+  ///
+  /// In en, this message translates to:
+  /// **'Add Session'**
+  String get addSession;
+
+  /// Label for date selection
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// Label for time selection
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// Placeholder text for date selection
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectDate;
+
+  /// Placeholder text for time selection
+  ///
+  /// In en, this message translates to:
+  /// **'Select time'**
+  String get selectTime;
+
+  /// Placeholder text for duration input in minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Duration (minutes)'**
+  String get durationInMinutes;
+
+  /// Text to indicate an optional field
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
+  /// Title for morning meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Morning meditation'**
+  String get morningMeditation;
+
+  /// Title for afternoon meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon meditation'**
+  String get afternoonMeditation;
+
+  /// Title for evening meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Evening meditation'**
+  String get eveningMeditation;
+
+  /// Title for night meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Night meditation'**
+  String get nightMeditation;
+
+  /// Button text to add a session
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// Text shown for manually added meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Added manually'**
+  String get addedManually;
+
+  /// Placeholder text shown for manually added sessions when no custom title is provided
+  ///
+  /// In en, this message translates to:
+  /// **'Manually added session'**
+  String get manuallyAddedSession;
+
+  /// Explanation text for the add session dialog
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'ve done a meditation session outside the app, you can add it here to track it in your stats.'**
+  String get addSessionExplanation;
+
+  /// Error message shown when trying to add a session with a future date/time
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot add sessions in the future'**
+  String get cannotAddFutureSession;
 }
 
 class _AppLocalizationsDelegate

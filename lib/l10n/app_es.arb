@@ -892,5 +892,73 @@
   "repeatModeForever": "Repetir siempre",
   "@repeatModeForever": {
     "description": "Tooltip text for repeat mode when set to repeat forever"
+  },
+  "addSession": "Agregar sesión",
+  "@addSession": {
+    "description": "Title for adding a manual meditation session"
+  },
+  "date": "Fecha",
+  "@date": {
+    "description": "Label for date selection"
+  },
+  "time": "Hora",
+  "@time": {
+    "description": "Label for time selection"
+  },
+  "selectDate": "Seleccionar fecha",
+  "@selectDate": {
+    "description": "Placeholder text for date selection"
+  },
+  "selectTime": "Seleccionar hora",
+  "@selectTime": {
+    "description": "Placeholder text for time selection"
+  },
+  "durationInMinutes": "Duración (minutos)",
+  "@durationInMinutes": {
+    "description": "Placeholder text for duration input in minutes"
+  },
+  "minutes": "Minutos",
+  "@minutes": {
+    "description": "Short placeholder text for duration input"
+  },
+  "optional": "Opcional",
+  "@optional": {
+    "description": "Text to indicate an optional field"
+  },
+  "morningMeditation": "Meditación matutina",
+  "@morningMeditation": {
+    "description": "Title for morning meditation sessions"
+  },
+  "afternoonMeditation": "Meditación vespertina",
+  "@afternoonMeditation": {
+    "description": "Title for afternoon meditation sessions"
+  },
+  "eveningMeditation": "Meditación nocturna",
+  "@eveningMeditation": {
+    "description": "Title for evening meditation sessions"
+  },
+  "nightMeditation": "Meditación nocturna",
+  "@nightMeditation": {
+    "description": "Title for night meditation sessions"
+  },
+  "add": "Agregar",
+  "@add": {
+    "description": "Button text to add a session"
+  },
+  "addedManually": "Agregado manualmente",
+  "@addedManually": {
+    "description": "Text shown for manually added meditation sessions"
+  },
+  "manuallyAddedSession": "Sesión agregada manualmente",
+  "@manuallyAddedSession": {
+    "description": "Placeholder text shown for manually added sessions when no custom title is provided"
+  },
+  "addSessionExplanation": "Si has hecho una sesión de meditación fuera de la aplicación, puedes agregarla aquí para registrarla en tus estadísticas.",
+  "@addSessionExplanation": {
+    "description": "Texto explicativo para el diálogo de agregar sesión"
+  },
+  "cannotAddFutureSession": "No se pueden agregar sesiones en el futuro",
+  "@cannotAddFutureSession": {
+    "description": "Mensaje de error que se muestra al intentar agregar una sesión con una fecha/hora futura"
   }
 }

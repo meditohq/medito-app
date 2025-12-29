@@ -918,5 +918,73 @@
   "repeatModeForever": "Repeat Forever",
   "@repeatModeForever": {
     "description": "Tooltip text for repeat mode when set to repeat forever"
+  },
+  "addSession": "Add Session",
+  "@addSession": {
+    "description": "Title for adding a manual meditation session"
+  },
+  "date": "Date",
+  "@date": {
+    "description": "Label for date selection"
+  },
+  "time": "Time",
+  "@time": {
+    "description": "Label for time selection"
+  },
+  "selectDate": "Select date",
+  "@selectDate": {
+    "description": "Placeholder text for date selection"
+  },
+  "selectTime": "Select time",
+  "@selectTime": {
+    "description": "Placeholder text for time selection"
+  },
+  "durationInMinutes": "Duration (minutes)",
+  "@durationInMinutes": {
+    "description": "Placeholder text for duration input in minutes"
+  },
+  "minutes": "Minutes",
+  "@minutes": {
+    "description": "Short placeholder text for duration input"
+  },
+  "optional": "Optional",
+  "@optional": {
+    "description": "Text to indicate an optional field"
+  },
+  "morningMeditation": "Morning meditation",
+  "@morningMeditation": {
+    "description": "Title for morning meditation sessions"
+  },
+  "afternoonMeditation": "Afternoon meditation",
+  "@afternoonMeditation": {
+    "description": "Title for afternoon meditation sessions"
+  },
+  "eveningMeditation": "Evening meditation",
+  "@eveningMeditation": {
+    "description": "Title for evening meditation sessions"
+  },
+  "nightMeditation": "Night meditation",
+  "@nightMeditation": {
+    "description": "Title for night meditation sessions"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Button text to add a session"
+  },
+  "addedManually": "Added manually",
+  "@addedManually": {
+    "description": "Text shown for manually added meditation sessions"
+  },
+  "manuallyAddedSession": "Manually added session",
+  "@manuallyAddedSession": {
+    "description": "Placeholder text shown for manually added sessions when no custom title is provided"
+  },
+  "addSessionExplanation": "If you've done a meditation session outside the app, you can add it here to track it in your stats.",
+  "@addSessionExplanation": {
+    "description": "Explanation text for the add session dialog"
+  },
+  "cannotAddFutureSession": "Cannot add sessions in the future",
+  "@cannotAddFutureSession": {
+    "description": "Error message shown when trying to add a session with a future date/time"
   }
 }
