@@ -933,7 +933,7 @@
   "@afternoonMeditation": {
     "description": "Title for afternoon meditation sessions"
   },
-  "eveningMeditation": "Meditación nocturna",
+  "eveningMeditation": "Meditación de la tarde",
   "@eveningMeditation": {
     "description": "Title for evening meditation sessions"
   },

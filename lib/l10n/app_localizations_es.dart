@@ -1713,7 +1713,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get afternoonMeditation => 'Meditación vespertina';
 
   @override
-  String get eveningMeditation => 'Meditación nocturna';
+  String get eveningMeditation => 'Meditación de la tarde';
 
   @override
   String get nightMeditation => 'Meditación nocturna';
