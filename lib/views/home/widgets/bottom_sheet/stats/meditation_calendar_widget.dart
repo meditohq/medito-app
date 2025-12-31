@@ -36,6 +36,7 @@ class _MeditationCalendarWidgetState
   DateTime? _selectedDayForSessions;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  bool _isAddingSession = false;
 
   @override
   void initState() {
@@ -161,6 +162,15 @@ class _MeditationCalendarWidgetState
       final dateTime = result['dateTime'] as DateTime;
       final duration = result['duration'] as int;
 
+      setState(() {
+        _isAddingSession = true;
+        final dayStart = DateTime(dateTime.year, dateTime.month, dateTime.day);
+        _selectedDayForSessions = dayStart;
+        _selectedDay = dayStart;
+        _focusedDay = dayStart;
+      });
+      _animationController.forward();
+
       final success = await addManualSession(
         dateTime: dateTime,
         durationMinutes: duration,
@@ -170,15 +180,12 @@ class _MeditationCalendarWidgetState
       if (success && mounted) {
         // Refresh stats to update the calendar
         await ref.read(statsProvider.notifier).refreshFromLocal();
+      }
 
-        // Select the day that was added
-        final dayStart = DateTime(dateTime.year, dateTime.month, dateTime.day);
+      if (mounted) {
         setState(() {
-          _selectedDayForSessions = dayStart;
-          _selectedDay = dayStart;
-          _focusedDay = dayStart;
+          _isAddingSession = false;
         });
-        _animationController.forward();
       }
     }
   }
@@ -443,7 +450,16 @@ class _MeditationCalendarWidgetState
                             ),
                       ),
                       const SizedBox(height: 16),
-                      if (sessions.isNotEmpty)
+                      if (_isAddingSession)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: ColorConstants.lightPurple,
+                            ),
+                          ),
+                        )
+                      else if (sessions.isNotEmpty)
                         ...sessions.asMap().entries.map((entry) {
                           final index = entry.key;
                           final session = entry.value;
