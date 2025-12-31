@@ -234,8 +234,27 @@ class DebugInfoScreen extends ConsumerWidget {
     final infoString = await ref.read(deviceAppAndUserInfoProvider.future);
     final paywallManager = ref.read(paywallManagerServiceProvider);
     final donationPlacementId = paywallManager.getDonationPlacementId();
-    final fullInfo =
+    var fullInfo =
         '$infoString\n\nDonation Placement ID: $donationPlacementId';
+
+    if (kReleaseMode) {
+      final reminders = await _getPendingRemindersWithDates(ref);
+      if (reminders.isNotEmpty) {
+        final dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+        final buffer = StringBuffer();
+        buffer.writeln('\nScheduled Events:');
+        for (final reminderWithDate in reminders) {
+          final reminder = reminderWithDate.reminder;
+          final scheduledDate = reminderWithDate.scheduledDate;
+          buffer.writeln('Event ${reminder.id}');
+          if (scheduledDate != null) {
+            buffer.writeln('  Time: ${dateFormat.format(scheduledDate)}');
+          }
+        }
+        fullInfo = '$fullInfo$buffer';
+      }
+    }
+
     await Clipboard.setData(ClipboardData(text: fullInfo));
     if (context.mounted) {
       showSnackBar(context, AppLocalizations.of(context)!.debugInfoCopied);

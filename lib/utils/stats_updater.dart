@@ -93,7 +93,8 @@ Future<bool> handleStats(
       AppLogger.d('STATS', 'Home widget update initiated');
     } catch (widgetError) {
       // Don't fail the whole operation if widget update fails
-      AppLogger.e('STATS', 'Failed to get stats for widget update', widgetError);
+      AppLogger.e(
+          'STATS', 'Failed to get stats for widget update', widgetError);
     }
 
     // Schedule or reschedule Smart Reminders based on latest session time
@@ -513,7 +514,8 @@ Future<bool> addManualSession({
       AppLogger.d('STATS', 'Home widget update initiated');
     } catch (widgetError) {
       // Don't fail the whole operation if widget update fails
-      AppLogger.e('STATS', 'Failed to get stats for widget update', widgetError);
+      AppLogger.e(
+          'STATS', 'Failed to get stats for widget update', widgetError);
     }
 
     return true;
