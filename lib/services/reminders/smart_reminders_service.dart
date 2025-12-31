@@ -24,24 +24,17 @@ class SmartRemindersService {
   }
 
   Future<TimeOfDay> enable() async {
-    AppLogger.d('XXXX', 'SmartRemindersService.enable() called');
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
 
     final now = DateTime.now();
     final time = _computeDefaultTimeFromNow();
     final anchor = now.add(const Duration(days: 1));
 
-    AppLogger.d('XXXX',
-        'Enabling reminders: now=$now, computed time=$time, anchor=$anchor');
-
     final scheduler =
         SmartRemindersScheduler(prefs: prefs, reminders: reminders);
     await scheduler.scheduleSeriesFromAnchor(anchor);
 
     await _saveTime(time);
-
-    AppLogger.d('XXXX',
-        'Reminders enabled: saved hour=${time.hour}, saved minute=${time.minute}');
 
     return time;
   }
@@ -90,9 +83,6 @@ class SmartRemindersScheduler {
           'Failed to fetch stats for smart reminders, using defaults: $e');
     }
 
-    AppLogger.d('XXXX',
-        'scheduleSeriesFromAnchor called with anchor: $anchorLocal');
-
     for (var i = 0; i < 15; i++) {
       final when = anchorLocal.add(Duration(days: i));
       final tzWhen = tz.TZDateTime.from(when, tz.local);
@@ -102,8 +92,6 @@ class SmartRemindersScheduler {
           consistencyPercentage: consistencyPercentage);
       items.add(_SeriesItem(
           id: smartBaseId + i, when: tzWhen, title: copy.$1, body: copy.$2));
-      AppLogger.d('XXXX',
-          'Scheduled reminder ${smartBaseId + i}: ID=${smartBaseId + i}, when=$when, tzWhen=$tzWhen');
     }
 
     final day30When = anchorLocal.add(Duration(days: 29));
@@ -118,13 +106,8 @@ class SmartRemindersScheduler {
         title: day30Copy.$1,
         body: day30Copy.$2));
 
-    AppLogger.d('XXXX',
-        'Scheduled reminder ${smartBaseId + 15}: ID=${smartBaseId + 15}, when=$day30When, tzWhen=$day30TzWhen');
-
     AppLogger.d('REMINDER',
         'Scheduling smart reminder series from anchor: $anchorLocal');
-    AppLogger.d('XXXX',
-        'Total ${items.length} reminders prepared for scheduling');
 
     try {
       await reminders.cancelSmartReminderSeries();
@@ -149,19 +132,10 @@ class SmartRemindersScheduler {
             ))
         .toList();
 
-    AppLogger.d('XXXX',
-        'Calling scheduleSmartReminderSeries with ${scheduledReminders.length} reminders');
-    for (final reminder in scheduledReminders) {
-      AppLogger.d('XXXX',
-          'Reminder to schedule: ID=${reminder.id}, scheduledDate=${reminder.scheduledDate}, title=${reminder.title}');
-    }
-
     await reminders.scheduleSmartReminderSeries(scheduledReminders);
 
     AppLogger.d(
         'REMINDER', 'Successfully scheduled ${items.length} smart reminders');
-    AppLogger.d('XXXX',
-        'Successfully scheduled ${items.length} smart reminders');
 
     final first = TimeOfDay(hour: anchorLocal.hour, minute: anchorLocal.minute);
     await prefs.setInt(SharedPreferenceConstants.savedHours, first.hour);
@@ -177,7 +151,7 @@ class SmartRemindersScheduler {
     final start = end.subtract(Duration(milliseconds: durationMs));
     final anchor = start
         .add(const Duration(days: 1))
-        .subtract(const Duration(minutes: 15));
+        .subtract(const Duration(minutes: 10));
     await scheduleSeriesFromAnchor(anchor, l10n: l10n);
   }
 

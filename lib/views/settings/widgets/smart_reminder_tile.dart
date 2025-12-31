@@ -16,6 +16,32 @@ class SmartReminderTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isEnabled = ref.watch(reminderEnabledProvider);
 
+    Future<void> handleToggle(bool value) async {
+      if (value) {
+        var accepted =
+            await PermissionHandler.requestAlarmPermission(context);
+        if (!accepted) return;
+
+        final prefs = ref.read(sharedPreferencesProvider);
+        final service = SmartRemindersService(
+          prefs: prefs,
+          reminders: ref.read(reminderProvider),
+        );
+
+        final time = await service.enable();
+        await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
+        ref.read(reminderTimeProvider.notifier).state = time;
+      } else {
+        final prefs = ref.read(sharedPreferencesProvider);
+        final service = SmartRemindersService(
+          prefs: prefs,
+          reminders: ref.read(reminderProvider),
+        );
+        await ref.read(reminderEnabledProvider.notifier).setEnabled(false);
+        await service.disable();
+      }
+    }
+
     return Card(
       borderOnForeground: true,
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -31,31 +57,8 @@ class SmartReminderTile extends ConsumerWidget {
         hasUnderline: false,
         isSwitch: true,
         switchValue: isEnabled,
-        onSwitchChanged: (value) async {
-          if (value) {
-            var accepted =
-                await PermissionHandler.requestAlarmPermission(context);
-            if (!accepted) return;
-
-            final prefs = ref.read(sharedPreferencesProvider);
-            final service = SmartRemindersService(
-              prefs: prefs,
-              reminders: ref.read(reminderProvider),
-            );
-
-            final time = await service.enable();
-            await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
-            ref.read(reminderTimeProvider.notifier).state = time;
-          } else {
-            final prefs = ref.read(sharedPreferencesProvider);
-            final service = SmartRemindersService(
-              prefs: prefs,
-              reminders: ref.read(reminderProvider),
-            );
-            await ref.read(reminderEnabledProvider.notifier).setEnabled(false);
-            await service.disable();
-          }
-        },
+        onTap: () => handleToggle(!isEnabled),
+        onSwitchChanged: handleToggle,
       ),
     );
   }
