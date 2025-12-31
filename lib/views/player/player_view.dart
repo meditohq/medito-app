@@ -310,6 +310,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_endScreenOpened && mounted) {
         _resetState();
+        _stopAudio();
         final currentlyPlayingTrack = ref.read(playerProvider);
         if (currentlyPlayingTrack != null) {
           Future.delayed(const Duration(milliseconds: 500), () {

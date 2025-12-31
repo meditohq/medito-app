@@ -7,7 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
-import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/providers/notification/reminder_provider.dart'
+    show reminderProvider, smartBaseId;
 import 'package:medito/services/paywall_manager_service.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
@@ -16,13 +17,32 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
 
 class _ReminderWithDate {
-  final PendingNotificationRequest reminder;
+  final PendingNotificationRequest? reminder;
+  final int id;
+  final String? title;
+  final String? body;
+  final String? payload;
   final DateTime? scheduledDate;
 
-  _ReminderWithDate({
-    required this.reminder,
-    this.scheduledDate,
-  });
+  _ReminderWithDate.fromReminder({
+    required PendingNotificationRequest reminder,
+    DateTime? scheduledDate,
+  })  : reminder = reminder,
+        id = reminder.id,
+        title = reminder.title,
+        body = reminder.body,
+        payload = reminder.payload,
+        scheduledDate = scheduledDate;
+
+  _ReminderWithDate.calculated({
+    required int id,
+    required DateTime scheduledDate,
+  })  : reminder = null,
+        id = id,
+        title = null,
+        body = null,
+        payload = scheduledDate.toIso8601String(),
+        scheduledDate = scheduledDate;
 }
 
 class DebugInfoScreen extends ConsumerWidget {
@@ -158,21 +178,22 @@ class DebugInfoScreen extends ConsumerWidget {
         buffer.writeln();
 
         for (final reminderWithDate in reminders) {
-          final reminder = reminderWithDate.reminder;
           final scheduledDate = reminderWithDate.scheduledDate;
 
           AppLogger.d('DEBUG_INFO_SCREEN',
-              'Reminder ID: ${reminder.id}, Title: ${reminder.title}, Payload: ${reminder.payload}, ScheduledDate: $scheduledDate');
+              'Reminder ID: ${reminderWithDate.id}, Title: ${reminderWithDate.title}, Payload: ${reminderWithDate.payload}, ScheduledDate: $scheduledDate');
 
-          buffer.writeln('ID: ${reminder.id}');
+          buffer.writeln('ID: ${reminderWithDate.id}');
           if (scheduledDate != null) {
             buffer.writeln('Scheduled: ${dateFormat.format(scheduledDate)}');
           }
-          if (reminder.title != null && reminder.title!.isNotEmpty) {
-            buffer.writeln('Title: ${reminder.title}');
+          if (reminderWithDate.title != null &&
+              reminderWithDate.title!.isNotEmpty) {
+            buffer.writeln('Title: ${reminderWithDate.title}');
           }
-          if (reminder.body != null && reminder.body!.isNotEmpty) {
-            buffer.writeln('Body: ${reminder.body}');
+          if (reminderWithDate.body != null &&
+              reminderWithDate.body!.isNotEmpty) {
+            buffer.writeln('Body: ${reminderWithDate.body}');
           }
           buffer.writeln();
         }
@@ -187,13 +208,27 @@ class DebugInfoScreen extends ConsumerWidget {
 
   Future<List<_ReminderWithDate>> _getPendingRemindersWithDates(
       WidgetRef ref) async {
+    AppLogger.d('XXXX', '_getPendingRemindersWithDates called');
     final reminders =
         await ref.read(reminderProvider).getPendingNotifications();
+    AppLogger.d(
+        'XXXX', 'Got ${reminders.length} pending notifications from system');
     final prefs = await SharedPreferences.getInstance();
     final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
     final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
+    final isReminderEnabled =
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
+            (savedHour != null && savedMinute != null);
 
-    return reminders.map((reminder) {
+    AppLogger.d('XXXX',
+        'Reminder state: enabled=$isReminderEnabled, savedHour=$savedHour, savedMinute=$savedMinute');
+
+    for (final reminder in reminders) {
+      AppLogger.d('XXXX',
+          'Pending reminder: ID=${reminder.id}, payload=${reminder.payload}, title=${reminder.title}');
+    }
+
+    final result = reminders.map((reminder) {
       DateTime? scheduledDate;
 
       if (reminder.payload != null && reminder.payload!.isNotEmpty) {
@@ -212,22 +247,73 @@ class DebugInfoScreen extends ConsumerWidget {
           reminder.id <= smartBaseId + 15 &&
           savedHour != null &&
           savedMinute != null) {
-        final dayOffset = reminder.id - smartBaseId;
-        final now = DateTime.now();
-        var anchor =
-            DateTime(now.year, now.month, now.day, savedHour, savedMinute);
-        if (anchor.isBefore(now)) {
-          anchor = anchor.add(const Duration(days: 1));
-        }
-        final daysToAdd = dayOffset == 15 ? 29 : dayOffset;
-        scheduledDate = anchor.add(Duration(days: daysToAdd));
-        AppLogger.d('DEBUG_INFO_SCREEN',
-            'Calculated scheduled date from ID ${reminder.id} (day offset: $dayOffset, days to add: $daysToAdd): $scheduledDate');
+        scheduledDate =
+            _calculateScheduledDate(reminder.id, savedHour, savedMinute);
       }
 
-      return _ReminderWithDate(
+      return _ReminderWithDate.fromReminder(
           reminder: reminder, scheduledDate: scheduledDate);
     }).toList();
+
+    if (kDebugMode &&
+        result.isEmpty &&
+        isReminderEnabled &&
+        savedHour != null &&
+        savedMinute != null) {
+      AppLogger.d('XXXX',
+          'Debug mode: No pending notifications but reminders enabled, adding calculated dates for UI');
+      final calculatedDates = await _getCalculatedScheduledDates();
+      for (final entry in calculatedDates) {
+        result.add(_ReminderWithDate.calculated(
+            id: entry.key, scheduledDate: entry.value));
+      }
+    }
+
+    return result;
+  }
+
+  Future<List<MapEntry<int, DateTime>>> _getCalculatedScheduledDates() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
+    final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
+    final isReminderEnabled =
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
+            (savedHour != null && savedMinute != null);
+
+    AppLogger.d('DEBUG_INFO_SCREEN',
+        'Calculated dates check: isReminderEnabled=$isReminderEnabled, savedHour=$savedHour, savedMinute=$savedMinute');
+
+    if (!isReminderEnabled || savedHour == null || savedMinute == null) {
+      AppLogger.d('DEBUG_INFO_SCREEN',
+          'Skipping calculated dates: reminders not enabled or time not saved');
+      return [];
+    }
+
+    final result = <MapEntry<int, DateTime>>[];
+    for (var i = 0; i <= 15; i++) {
+      final reminderId = smartBaseId + i;
+      final scheduledDate =
+          _calculateScheduledDate(reminderId, savedHour, savedMinute);
+      result.add(MapEntry(reminderId, scheduledDate));
+    }
+    AppLogger.d(
+        'DEBUG_INFO_SCREEN', 'Calculated ${result.length} scheduled dates');
+    return result;
+  }
+
+  DateTime _calculateScheduledDate(
+      int reminderId, int savedHour, int savedMinute) {
+    final dayOffset = reminderId - smartBaseId;
+    final now = DateTime.now();
+    var anchor = DateTime(now.year, now.month, now.day, savedHour, savedMinute);
+    if (anchor.isBefore(now)) {
+      anchor = anchor.add(const Duration(days: 1));
+    }
+    final daysToAdd = dayOffset == 15 ? 29 : dayOffset;
+    final scheduledDate = anchor.add(Duration(days: daysToAdd));
+    AppLogger.d('DEBUG_INFO_SCREEN',
+        'Calculated scheduled date from ID $reminderId (day offset: $dayOffset, days to add: $daysToAdd): $scheduledDate');
+    return scheduledDate;
   }
 
   void _copyDebugInfo(BuildContext context, WidgetRef ref) async {
@@ -237,19 +323,44 @@ class DebugInfoScreen extends ConsumerWidget {
     var fullInfo = '$infoString\n\nDonation Placement ID: $donationPlacementId';
 
     final reminders = await _getPendingRemindersWithDates(ref);
+    final calculatedDates = await _getCalculatedScheduledDates();
+
+    AppLogger.d('DEBUG_INFO_SCREEN',
+        'Copy debug info: ${reminders.length} pending reminders, ${calculatedDates.length} calculated dates');
+
+    final dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    final buffer = StringBuffer();
+    final addedIds = <int>{};
+
     if (reminders.isNotEmpty) {
-      final dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-      final buffer = StringBuffer();
       buffer.writeln('\nScheduled Events:');
       for (final reminderWithDate in reminders) {
-        final reminder = reminderWithDate.reminder;
         final scheduledDate = reminderWithDate.scheduledDate;
-        buffer.writeln('Event ${reminder.id}');
         if (scheduledDate != null) {
+          buffer.writeln('Event ${reminderWithDate.id}');
           buffer.writeln('  Time: ${dateFormat.format(scheduledDate)}');
+          addedIds.add(reminderWithDate.id);
         }
       }
+    }
+
+    if (calculatedDates.isNotEmpty) {
+      if (buffer.isEmpty) {
+        buffer.writeln('\nScheduled Events:');
+      }
+      for (final entry in calculatedDates) {
+        if (!addedIds.contains(entry.key)) {
+          buffer.writeln('Event ${entry.key}');
+          buffer.writeln('  Time: ${dateFormat.format(entry.value)}');
+        }
+      }
+    }
+
+    if (buffer.isNotEmpty) {
       fullInfo = '$fullInfo$buffer';
+      AppLogger.d('DEBUG_INFO_SCREEN', 'Added scheduled events to copy text');
+    } else {
+      AppLogger.d('DEBUG_INFO_SCREEN', 'No scheduled events to add');
     }
 
     await Clipboard.setData(ClipboardData(text: fullInfo));

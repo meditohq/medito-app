@@ -76,12 +76,16 @@ class ReminderProvider {
   Future<void> scheduleSmartReminderSeries(
       List<ScheduledReminder> items) async {
     await _initFuture;
+    AppLogger.d('XXXX',
+        'scheduleSmartReminderSeries called with ${items.length} items');
     try {
       for (final item in items) {
         try {
           final payload = item.scheduledDate.toIso8601String();
           AppLogger.d('REMINDER',
               'Scheduling reminder ${item.id} with payload: $payload');
+          AppLogger.d('XXXX',
+              'Scheduling reminder ID=${item.id}, scheduledDate=${item.scheduledDate}, payload=$payload, title=${item.title}');
           await _flutterLocalNotificationsPlugin.zonedSchedule(
             item.id,
             item.title,
@@ -100,11 +104,15 @@ class ReminderProvider {
             androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
             payload: payload,
           );
+          AppLogger.d('XXXX',
+              'Successfully scheduled reminder ID=${item.id} at ${item.scheduledDate}');
         } catch (e, s) {
           AppLogger.e(
               'REMINDER',
               'Error scheduling reminder ${item.id} at ${item.scheduledDate}: $e',
               s);
+          AppLogger.e('XXXX',
+              'Error scheduling reminder ID=${item.id} at ${item.scheduledDate}: $e');
           CrashlyticsService().recordError(
             e,
             s,
@@ -113,8 +121,18 @@ class ReminderProvider {
           );
         }
       }
+      AppLogger.d('XXXX',
+          'Finished scheduling ${items.length} reminders, checking pending notifications...');
+      final pending = await getPendingNotifications();
+      AppLogger.d('XXXX',
+          'Pending notifications after scheduling: ${pending.length} found');
+      for (final notification in pending) {
+        AppLogger.d('XXXX',
+            'Pending notification: ID=${notification.id}, payload=${notification.payload}');
+      }
     } catch (e, s) {
       AppLogger.e('REMINDER', 'Error scheduling smart reminder series: $e', s);
+      AppLogger.e('XXXX', 'Error scheduling smart reminder series: $e');
       CrashlyticsService().recordError(
         e,
         s,
