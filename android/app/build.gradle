@@ -212,7 +212,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation platform('com.google.firebase:firebase-bom:33.2.0')
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.android.billingclient:billing:6.0.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 
     // Google Pay dependencies
@@ -242,6 +241,5 @@ dependencies {
         resolutionStrategy {
             force "androidx.work:work-runtime:2.8.1"
             force "androidx.work:work-runtime-ktx:2.8.1"
-            force "com.android.billingclient:billing:6.0.1"
         }
     }
