@@ -960,5 +960,9 @@
   "cannotAddFutureSession": "No se pueden agregar sesiones en el futuro",
   "@cannotAddFutureSession": {
     "description": "Mensaje de error que se muestra al intentar agregar una sesión con una fecha/hora futura"
+  },
+  "completedAt": "Completado a las",
+  "@completedAt": {
+    "description": "Etiqueta de prefijo para la hora de finalización de la meditación"
   }
 }

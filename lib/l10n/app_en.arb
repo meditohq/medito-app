@@ -986,5 +986,9 @@
   "cannotAddFutureSession": "Cannot add sessions in the future",
   "@cannotAddFutureSession": {
     "description": "Error message shown when trying to add a session with a future date/time"
+  },
+  "completedAt": "Completed at",
+  "@completedAt": {
+    "description": "Label prefix for meditation completion time"
   }
 }

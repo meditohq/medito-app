@@ -611,7 +611,7 @@ class _SessionItemWidget extends ConsumerWidget {
                       ),
                 const SizedBox(height: 4),
                 Text(
-                  timeFormat.format(date),
+                  '${AppLocalizations.of(context)!.completedAt} ${timeFormat.format(date)}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontFamily: dmSans,
                         color: Theme.of(context).colorScheme.onSurface,
