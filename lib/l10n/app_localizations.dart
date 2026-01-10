@@ -2078,6 +2078,12 @@ abstract class AppLocalizations {
   /// **'Zen Mode'**
   String get zenMode;
 
+  /// Message shown when zen mode is enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Stats will be hidden throughout the app'**
+  String get zenModeEnabledMessage;
+
   /// Message shown in zen mode after completing meditation
   ///
   /// In en, this message translates to:
@@ -3223,6 +3229,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cannot add sessions in the future'**
   String get cannotAddFutureSession;
+
+  /// Label prefix for meditation completion time
+  ///
+  /// In en, this message translates to:
+  /// **'Completed at'**
+  String get completedAt;
 }
 
 class _AppLocalizationsDelegate

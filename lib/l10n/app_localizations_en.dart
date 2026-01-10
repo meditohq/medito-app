@@ -1078,6 +1078,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zenMode => 'Zen Mode';
 
   @override
+  String get zenModeEnabledMessage => 'Stats will be hidden throughout the app';
+
+  @override
   String get mindClear => 'Mind Clear';
 
   @override
@@ -1710,4 +1713,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cannotAddFutureSession => 'Cannot add sessions in the future';
+
+  @override
+  String get completedAt => 'Completed at';
 }

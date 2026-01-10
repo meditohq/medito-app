@@ -1096,6 +1096,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get zenMode => 'Modo Zen';
 
   @override
+  String get zenModeEnabledMessage =>
+      'Las estadísticas se ocultarán en toda la aplicación';
+
+  @override
   String get mindClear => 'Mente Clara';
 
   @override
@@ -1734,4 +1738,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get cannotAddFutureSession =>
       'No se pueden agregar sesiones en el futuro';
+
+  @override
+  String get completedAt => 'Completado a las';
 }

@@ -336,6 +336,10 @@
   "@zenMode": {
     "description": "Title for zen mode setting in customization section"
   },
+  "zenModeEnabledMessage": "Stats will be hidden throughout the app",
+  "@zenModeEnabledMessage": {
+    "description": "Message shown when zen mode is enabled"
+  },
   "mindClear": "Mind Clear",
   "@mindClear": {
     "description": "Message shown in zen mode after completing meditation"
