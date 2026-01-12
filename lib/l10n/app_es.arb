@@ -633,6 +633,26 @@
   "@donorSupportMessage": {
     "description": "Message shown to existing donors explaining their importance"
   },
+  "donateAgain": "Donar Nuevamente",
+  "@donateAgain": {
+    "description": "Texto del botón para donar nuevamente después de una donación previa"
+  },
+  "donationInfoTitle": "Por Qué Puedes Ver Esto",
+  "@donationInfoTitle": {
+    "description": "Título del diálogo de información sobre donaciones que explica por qué los usuarios pueden ver la solicitud de donación"
+  },
+  "donationInfoMessage": "A veces no sabemos cuándo alguien ha donado. Estamos buscando formas de mejorar esto. Puedes ocultar este mensaje por un tiempo si ya has donado.",
+  "@donationInfoMessage": {
+    "description": "Mensaje que explica por qué los usuarios pueden ver la solicitud de donación incluso si ya han donado"
+  },
+  "hideForNow": "Ya He Donado",
+  "@hideForNow": {
+    "description": "Texto del botón para ocultar temporalmente la solicitud de donación"
+  },
+  "donationAskHiddenMessage": "Solicitud de donación oculta por 30 días",
+  "@donationAskHiddenMessage": {
+    "description": "Mensaje mostrado después de ocultar la solicitud de donación"
+  },
   "smartReminders": "Recordatorios Inteligentes",
   "@smartReminders": {
     "description": "Label for the smart reminders feature toggle"

@@ -12,6 +12,7 @@ import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../me/me_provider.dart';
+import '../donation/donation_snooze_provider.dart';
 
 part 'payment_ui_controller.g.dart';
 
@@ -51,7 +52,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      _handlePaymentResult(context, result, paywallId, 'onetime', userId,
+      await _handlePaymentResult(context, result, paywallId, 'onetime', userId,
           paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
@@ -83,7 +84,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      _handlePaymentResult(context, result, paywallId, 'monthly', userId,
+      await _handlePaymentResult(context, result, paywallId, 'monthly', userId,
           paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
@@ -115,7 +116,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      _handlePaymentResult(context, result, paywallId, 'yearly', userId,
+      await _handlePaymentResult(context, result, paywallId, 'yearly', userId,
           paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
@@ -156,7 +157,7 @@ class PaymentUIController extends _$PaymentUIController {
   }
 
   /// Handles payment results and shows appropriate success/error messages
-  void _handlePaymentResult(
+  Future<void> _handlePaymentResult(
     BuildContext context,
     PaymentResult result,
     String? paywallId,
@@ -164,7 +165,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userId,
     String? paywallSource,
     VoidCallback? onSuccess,
-  ) {
+  ) async {
     result.when(
       success: (paymentIntentId, amount, currency) {
         // Track successful donation
@@ -192,6 +193,15 @@ class PaymentUIController extends _$PaymentUIController {
           currency: currency,
           frequency: frequency,
         );
+
+        // Record donation success for snooze tracking (fire-and-forget)
+        ref
+            .read(donationSnoozeProvider.notifier)
+            .recordDonationSuccess(frequency)
+            .catchError((e) {
+          AppLogger.e(
+              'PAYMENT_UI', 'Failed to record donation success for snooze', e);
+        });
 
         onSuccess?.call(); // Notify screen
 

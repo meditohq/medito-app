@@ -2774,6 +2774,36 @@ abstract class AppLocalizations {
   /// **'We rely on donors like you to continue providing mindfulness to everyone.'**
   String get donorSupportMessage;
 
+  /// Button text for donating again after a previous donation
+  ///
+  /// In en, this message translates to:
+  /// **'Donate Again'**
+  String get donateAgain;
+
+  /// Title for the donation info dialog explaining why users might see the donation ask
+  ///
+  /// In en, this message translates to:
+  /// **'Why You Might See This'**
+  String get donationInfoTitle;
+
+  /// Message explaining why users might see the donation ask even if they've donated
+  ///
+  /// In en, this message translates to:
+  /// **'Sometimes we don\'t know when someone has donated. We are looking at how to improve this. You can hide this message for a while if you\'ve already donated.'**
+  String get donationInfoMessage;
+
+  /// Button text to temporarily hide the donation ask
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve Already Donated'**
+  String get hideForNow;
+
+  /// Message shown after hiding the donation ask
+  ///
+  /// In en, this message translates to:
+  /// **'Donation ask hidden for 30 days'**
+  String get donationAskHiddenMessage;
+
   /// Message shown when user dismisses the reminder prompt on the end screen
   ///
   /// In en, this message translates to:

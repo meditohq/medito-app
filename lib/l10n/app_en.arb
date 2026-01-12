@@ -659,6 +659,26 @@
   "@donorSupportMessage": {
     "description": "Message shown to existing donors explaining their importance"
   },
+  "donateAgain": "Donate Again",
+  "@donateAgain": {
+    "description": "Button text for donating again after a previous donation"
+  },
+  "donationInfoTitle": "Why You Might See This",
+  "@donationInfoTitle": {
+    "description": "Title for the donation info dialog explaining why users might see the donation ask"
+  },
+  "donationInfoMessage": "Sometimes we don't know when someone has donated. We are looking at how to improve this. You can hide this message for a while if you've already donated.",
+  "@donationInfoMessage": {
+    "description": "Message explaining why users might see the donation ask even if they've donated"
+  },
+  "hideForNow": "I've Already Donated",
+  "@hideForNow": {
+    "description": "Button text to temporarily hide the donation ask"
+  },
+  "donationAskHiddenMessage": "Donation ask hidden for 30 days",
+  "@donationAskHiddenMessage": {
+    "description": "Message shown after hiding the donation ask"
+  },
   "smartReminders": "Smart Reminders",
   "@smartReminders": {
     "description": "Label for the smart reminders feature toggle"

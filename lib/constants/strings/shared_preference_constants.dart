@@ -60,4 +60,9 @@ class SharedPreferenceConstants {
   static const String utmCampaign = 'utm_campaign';
   static const String utmTerm = 'utm_term';
   static const String utmContent = 'utm_content';
+
+  // Donation snooze tracking
+  static const String donationAskSnoozedUntilMs = 'donation_ask_snoozed_until_ms';
+  static const String lastSuccessfulDonationAtMs = 'last_successful_donation_at_ms';
+  static const String lastSuccessfulDonationFrequency = 'last_successful_donation_frequency';
 }

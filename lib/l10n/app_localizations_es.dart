@@ -1484,6 +1484,23 @@ class AppLocalizationsEs extends AppLocalizations {
       'Dependemos de donantes como tú para seguir proporcionando mindfulness a todos.';
 
   @override
+  String get donateAgain => 'Donar Nuevamente';
+
+  @override
+  String get donationInfoTitle => 'Por Qué Puedes Ver Esto';
+
+  @override
+  String get donationInfoMessage =>
+      'A veces no sabemos cuándo alguien ha donado. Estamos buscando formas de mejorar esto. Puedes ocultar este mensaje por un tiempo si ya has donado.';
+
+  @override
+  String get hideForNow => 'Ya He Donado';
+
+  @override
+  String get donationAskHiddenMessage =>
+      'Solicitud de donación oculta por 30 días';
+
+  @override
   String get reminderPromptDismissedMessage =>
       'Puedes activar o desactivar los recordatorios en Configuración';
 
