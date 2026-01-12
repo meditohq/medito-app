@@ -143,8 +143,7 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> _onRefresh() async {
-    ref.invalidate(statsProvider);
-    await ref.read(statsProvider.future);
+    await ref.read(statsProvider.notifier).refresh();
     ref.invalidate(fetchLatestAnnouncementProvider);
     await ref.read(fetchLatestAnnouncementProvider.future);
     ref.invalidate(refreshHomeAPIsProvider);
