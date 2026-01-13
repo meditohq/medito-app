@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';

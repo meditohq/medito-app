@@ -4,11 +4,34 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final reminderTimeProvider = StateProvider<TimeOfDay?>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
+class ReminderTimeNotifier extends Notifier<TimeOfDay?> {
+  @override
+  TimeOfDay? build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return _getReminderTimeFromPrefs(prefs);
+  }
 
-  return _getReminderTimeFromPrefs(prefs);
-});
+  Future<void> setTime(TimeOfDay? time) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (time != null) {
+      await prefs.setInt(SharedPreferenceConstants.savedHours, time.hour);
+      await prefs.setInt(SharedPreferenceConstants.savedMinutes, time.minute);
+    } else {
+      await prefs.remove(SharedPreferenceConstants.savedHours);
+      await prefs.remove(SharedPreferenceConstants.savedMinutes);
+    }
+    state = time;
+  }
+
+  void refreshFromPrefs() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    state = _getReminderTimeFromPrefs(prefs);
+  }
+}
+
+final reminderTimeProvider = NotifierProvider<ReminderTimeNotifier, TimeOfDay?>(
+  () => ReminderTimeNotifier(),
+);
 
 class ReminderEnabledNotifier extends Notifier<bool> {
   @override

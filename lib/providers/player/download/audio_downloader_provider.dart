@@ -2,21 +2,38 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+class AudioDownloaderState {
+  final Map<String, double> downloadingProgress;
+  final Map<String, AudioDownloadState> audioDownloadState;
+
+  const AudioDownloaderState({
+    this.downloadingProgress = const {},
+    this.audioDownloadState = const {},
+  });
+
+  AudioDownloaderState copyWith({
+    Map<String, double>? downloadingProgress,
+    Map<String, AudioDownloadState>? audioDownloadState,
+  }) {
+    return AudioDownloaderState(
+      downloadingProgress: downloadingProgress ?? this.downloadingProgress,
+      audioDownloadState: audioDownloadState ?? this.audioDownloadState,
+    );
+  }
+}
+
 final audioDownloaderProvider =
-    ChangeNotifierProvider<AudioDownloaderProvider>((ref) {
-  return AudioDownloaderProvider(ref);
+    NotifierProvider<AudioDownloaderProvider, AudioDownloaderState>(() {
+  return AudioDownloaderProvider();
 });
 
-class AudioDownloaderProvider extends ChangeNotifier {
-  Ref<AudioDownloaderProvider> ref;
-
-  AudioDownloaderProvider(this.ref);
-
-  Map<String, double> downloadingProgress = {};
-  Map<String, AudioDownloadState> audioDownloadState = {};
+class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
+  @override
+  AudioDownloaderState build() {
+    return const AudioDownloaderState();
+  }
 
   Future<void> downloadTrackAudio(
     TrackModel trackModel,
@@ -26,30 +43,49 @@ class AudioDownloaderProvider extends ChangeNotifier {
         '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
-      audioDownloadState[fileName] = AudioDownloadState.downloading;
+      var newDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+      newDownloadState[fileName] = AudioDownloadState.downloading;
+      state = state.copyWith(audioDownloadState: newDownloadState);
+      
       await downloadAudio.downloadFile(
         file.path,
         fileName: fileName,
         onReceiveProgress: (received, total) {
-          if (total != -1) {
-            downloadingProgress[fileName] = (received / total * 100);
-            notifyListeners();
+          if (total != -1 && ref.mounted) {
+            var newProgress = Map<String, double>.from(state.downloadingProgress);
+            newProgress[fileName] = (received / total * 100);
+            state = state.copyWith(downloadingProgress: newProgress);
           }
         },
       );
-      downloadingProgress.remove(fileName);
-      audioDownloadState[fileName] = AudioDownloadState.downloaded;
+      
+      if (!ref.mounted) return;
+      
+      var finalProgress = Map<String, double>.from(state.downloadingProgress);
+      finalProgress.remove(fileName);
+      var finalDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+      finalDownloadState[fileName] = AudioDownloadState.downloaded;
+      state = state.copyWith(
+        downloadingProgress: finalProgress,
+        audioDownloadState: finalDownloadState,
+      );
+      
       await ref.read(deleteTrackFromPreferenceProvider(
         file: file,
       ).future);
+      
+      if (!ref.mounted) return;
+      
       await ref.read(addSingleTrackInPreferenceProvider(
         trackModel: trackModel,
         file: file,
       ).future);
-      notifyListeners();
     } catch (e) {
-      audioDownloadState[fileName] = AudioDownloadState.download;
-      notifyListeners();
+      if (ref.mounted) {
+        var errorDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+        errorDownloadState[fileName] = AudioDownloadState.download;
+        state = state.copyWith(audioDownloadState: errorDownloadState);
+      }
       rethrow;
     }
   }
@@ -57,17 +93,25 @@ class AudioDownloaderProvider extends ChangeNotifier {
   Future<void> deleteTrackAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     await downloadAudio.deleteDownloadedFile(fileName);
-    audioDownloadState[fileName] = AudioDownloadState.download;
-    notifyListeners();
+    
+    if (!ref.mounted) return;
+    
+    var newDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+    newDownloadState[fileName] = AudioDownloadState.download;
+    state = state.copyWith(audioDownloadState: newDownloadState);
   }
 
   Future<String?> getTrackPath(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     var audioPath = await downloadAudio.getDownloadedFile(fileName);
-    audioDownloadState[fileName] = audioPath != null
+    
+    if (!ref.mounted) return audioPath;
+    
+    var newDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+    newDownloadState[fileName] = audioPath != null
         ? AudioDownloadState.downloaded
         : AudioDownloadState.download;
-    notifyListeners();
+    state = state.copyWith(audioDownloadState: newDownloadState);
 
     return audioPath;
   }

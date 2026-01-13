@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/maintenance/maintenance_model.dart';
 import 'package:medito/services/network/maintenance_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

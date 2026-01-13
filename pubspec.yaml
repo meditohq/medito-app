@@ -42,7 +42,7 @@ dependencies:
   firebase_messaging: ^16.0.3
   flutter_local_notifications: ^19.2.1
   flutter_markdown: ^0.7.4+1
-  flutter_riverpod: ^2.6.1
+  flutter_riverpod: ^3.1.0
   flutter_secure_storage: ^9.2.4
   flutter_staggered_grid_view: ^0.7.0
   flutter_stripe: 12.1.1
@@ -61,7 +61,7 @@ dependencies:
   path_provider: ^2.1.2
   permission_handler: ^12.0.1
   reorderables: ^0.6.0
-  riverpod_annotation: ^2.6.1
+  riverpod_annotation: ^4.0.0
   rxdart: ^0.28.0
   share_plus: ^12.0.1
   shared_preferences: ^2.2.2
@@ -90,7 +90,7 @@ dev_dependencies:
   mocktail: ^1.0.2
   mockito: ^5.4.6
   pigeon: ^25.4.0
-  riverpod_generator: ^2.6.1
+  riverpod_generator: ^4.0.0+1
   integration_test:
     sdk: flutter
 

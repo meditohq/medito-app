@@ -1,43 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/strings/shared_preference_constants.dart';
 import '../l10n/app_localizations.dart';
 import '../services/home_widget_service.dart';
+import 'shared_preference/shared_preference_provider.dart';
 
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(() {
   return ThemeNotifier();
 });
 
-class ThemeNotifier extends StateNotifier<ThemeMode> {
-  SharedPreferences? _prefs;
+class ThemeNotifier extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final savedTheme = prefs.getString(SharedPreferenceConstants.themePreference);
 
-  ThemeNotifier() : super(ThemeMode.dark) {
-    _initPrefs();
-  }
-
-  Future<void> _initPrefs() async {
-    _prefs = await SharedPreferences.getInstance();
-    _loadTheme();
-  }
-
-  void _loadTheme() {
-    final savedTheme =
-        _prefs?.getString(SharedPreferenceConstants.themePreference);
-
+    ThemeMode themeMode;
     switch (savedTheme) {
       case 'light':
-        state = ThemeMode.light;
+        themeMode = ThemeMode.light;
         break;
       case 'dark':
-        state = ThemeMode.dark;
+        themeMode = ThemeMode.dark;
         break;
       case 'system':
-        state = ThemeMode.system;
+        themeMode = ThemeMode.system;
         break;
       default:
         // Default to dark theme for new users
-        state = ThemeMode.dark;
+        themeMode = ThemeMode.dark;
         break;
     }
     
@@ -45,11 +36,12 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
     if (savedTheme != null) {
       HomeWidgetService.saveThemePreference(savedTheme);
     }
+
+    return themeMode;
   }
 
   Future<void> setTheme(ThemeMode themeMode) async {
-    // Ensure prefs are initialized
-    _prefs ??= await SharedPreferences.getInstance();
+    final prefs = ref.read(sharedPreferencesProvider);
 
     String themeString;
     switch (themeMode) {
@@ -64,8 +56,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
         break;
     }
 
-    await _prefs!
-        .setString(SharedPreferenceConstants.themePreference, themeString);
+    await prefs.setString(SharedPreferenceConstants.themePreference, themeString);
     state = themeMode;
     
     // Save theme preference to widget
@@ -84,7 +75,6 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
   }
 
   String getThemeDisplayName(BuildContext context) {
-    // Import AppLocalizations at the top of the file
     final l10n = AppLocalizations.of(context)!;
 
     switch (state) {

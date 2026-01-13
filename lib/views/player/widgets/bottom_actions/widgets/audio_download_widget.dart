@@ -22,7 +22,7 @@ class AudioDownloadWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final downloadAudioProvider = ref.watch(audioDownloaderProvider);
+    final downloadAudioState = ref.watch(audioDownloaderProvider);
     var downloadFileKey =
         '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
 
@@ -33,7 +33,7 @@ class AudioDownloadWidget extends ConsumerWidget {
         child: _buildDownloadWidget(
           context,
           ref,
-          downloadAudioProvider,
+          downloadAudioState,
           downloadFileKey,
         ),
       ),
@@ -43,14 +43,14 @@ class AudioDownloadWidget extends ConsumerWidget {
   Widget _buildDownloadWidget(
     BuildContext context,
     WidgetRef ref,
-    AudioDownloaderProvider downloadAudioProvider,
+    AudioDownloaderState downloadAudioState,
     String downloadFileKey,
   ) {
     var isDownloaded =
-        downloadAudioProvider.audioDownloadState[downloadFileKey] ==
+        downloadAudioState.audioDownloadState[downloadFileKey] ==
             AudioDownloadState.downloaded;
     var isDownloading =
-        downloadAudioProvider.audioDownloadState[downloadFileKey] ==
+        downloadAudioState.audioDownloadState[downloadFileKey] ==
             AudioDownloadState.downloading;
 
     return Container(
@@ -60,13 +60,13 @@ class AudioDownloadWidget extends ConsumerWidget {
               borderRadius: BorderRadius.circular(6),
             )
           : null,
-      child: _buildDownloadContent(downloadAudioProvider, downloadFileKey,
+      child: _buildDownloadContent(downloadAudioState, downloadFileKey,
           isDownloaded, isDownloading, context, ref),
     );
   }
 
   Widget _buildDownloadContent(
-    AudioDownloaderProvider downloadAudioProvider,
+    AudioDownloaderState downloadAudioState,
     String downloadFileKey,
     bool isDownloaded,
     bool isDownloading,
@@ -76,7 +76,7 @@ class AudioDownloadWidget extends ConsumerWidget {
     if (isDownloaded) {
       return IconButton(
         onPressed: () =>
-            _handleRemoveDownload(downloadAudioProvider, ref, context),
+            _handleRemoveDownload(ref, context),
         icon: const MeditoIcon(
           assetName: MeditoIcons.downloadCircleSolid,
           color: ColorConstants.white,
@@ -84,10 +84,10 @@ class AudioDownloadWidget extends ConsumerWidget {
       );
     } else if (isDownloading) {
       return showDownloadProgress(
-          downloadAudioProvider, downloadFileKey, context);
+          downloadAudioState, downloadFileKey, context);
     } else {
       return IconButton(
-        onPressed: () => _handleDownload(downloadAudioProvider, context),
+        onPressed: () => _handleDownload(ref, context),
         icon: const MeditoIcon(
           assetName: MeditoIcons.downloadCircle,
           color: ColorConstants.white,
@@ -97,11 +97,11 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Widget showDownloadProgress(
-    AudioDownloaderProvider downloadAudioProvider,
+    AudioDownloaderState downloadAudioState,
     String downloadFileKey,
     BuildContext context,
   ) {
-    var progress = _getDownloadProgress(downloadAudioProvider, downloadFileKey);
+    var progress = _getDownloadProgress(downloadAudioState, downloadFileKey);
 
     return Stack(
       alignment: Alignment.center,
@@ -141,22 +141,22 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   double _getDownloadProgress(
-    AudioDownloaderProvider downloadAudioProvider,
+    AudioDownloaderState downloadAudioState,
     String downloadFileKey,
   ) {
-    if (downloadAudioProvider.downloadingProgress[downloadFileKey] != null) {
-      return downloadAudioProvider.downloadingProgress[downloadFileKey]! / 100;
+    if (downloadAudioState.downloadingProgress[downloadFileKey] != null) {
+      return downloadAudioState.downloadingProgress[downloadFileKey]! / 100;
     }
 
     return 0;
   }
 
   Future<void> _handleDownload(
-    AudioDownloaderProvider downloadAudioProvider,
+    WidgetRef ref,
     BuildContext context,
   ) async {
     try {
-      await downloadAudioProvider.downloadTrackAudio(
+      await ref.read(audioDownloaderProvider.notifier).downloadTrackAudio(
         trackModel,
         file,
       );
@@ -166,7 +166,6 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Future<void> _handleRemoveDownload(
-    AudioDownloaderProvider downloadAudioProvider,
     WidgetRef ref,
     BuildContext context,
   ) async {
@@ -201,7 +200,7 @@ class AudioDownloadWidget extends ConsumerWidget {
 
     if (confirmDelete == true) {
       try {
-        await downloadAudioProvider.deleteTrackAudio(
+        await ref.read(audioDownloaderProvider.notifier).deleteTrackAudio(
           '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}',
         );
         ref.read(deleteTrackFromPreferenceProvider(

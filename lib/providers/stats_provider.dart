@@ -6,6 +6,7 @@ import 'package:medito/providers/device_and_app_info/device_and_app_info_provide
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -14,10 +15,6 @@ import 'package:medito/services/home_widget_service.dart';
 part 'stats_provider.g.dart';
 
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
-
-final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
-  return StatsNotifier();
-});
 
 /// Provides the best-available user ID (auth first, then SharedPreferences)
 final userIdProvider = FutureProvider<String?>((ref) async {
@@ -41,8 +38,8 @@ final editStatsUrlProvider = FutureProvider<String>((ref) async {
     dev.log('Using fallback clientId from SharedPreferences: $clientId');
   }
 
-  final stats = ref.watch(statsProvider).valueOrNull;
-  final deviceInfo = ref.watch(deviceAndAppInfoProvider).valueOrNull;
+  final stats = ref.watch(statsProvider).value;
+  final deviceInfo = ref.watch(deviceAndAppInfoProvider).value;
 
   if (deviceInfo == null || stats == null) {
     return '$editStatsUrl?clientid=$clientId';

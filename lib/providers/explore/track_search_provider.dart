@@ -3,7 +3,6 @@ import 'package:medito/models/explore/explore_list_item.dart';
 import 'package:medito/repositories/explore/track_search_repository.dart';
 import 'package:medito/repositories/pack/packs_repository.dart';
 import 'package:medito/services/network/http_api_service.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 final trackSearchRepositoryProvider = Provider<TrackSearchRepository>((ref) {
   return TrackSearchRepository(HttpApiService());

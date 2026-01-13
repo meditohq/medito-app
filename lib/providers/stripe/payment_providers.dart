@@ -10,8 +10,6 @@ import 'package:medito/utils/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../constants/stripe/stripe_constants.dart';
 import '../../models/stripe/payment_error_model.dart';
 import '../../models/stripe/payment_intent_model.dart';

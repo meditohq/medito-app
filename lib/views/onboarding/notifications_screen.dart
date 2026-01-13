@@ -131,10 +131,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
 
     if (mounted) {
-      ref.read(reminderTimeProvider.notifier).state = TimeOfDay(
+      await ref.read(reminderTimeProvider.notifier).setTime(TimeOfDay(
         hour: anchorLocal.hour,
         minute: anchorLocal.minute,
-      );
+      ));
       setState(() => _isProcessing = false);
       _navigateNext();
     }

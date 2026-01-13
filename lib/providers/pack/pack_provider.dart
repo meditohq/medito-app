@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/stats_provider.dart';

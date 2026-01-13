@@ -7,7 +7,6 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/network/http_api_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:medito/models/background_sounds/background_sounds_model.dart';
 

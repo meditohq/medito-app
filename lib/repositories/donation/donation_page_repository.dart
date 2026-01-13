@@ -1,5 +1,4 @@
 import 'package:medito/models/events/donation/donation_page_model.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

@@ -37,28 +37,28 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   }
 }
 
-class AudioStateNotifier extends StateNotifier<PlaybackState> {
-  AudioStateNotifier()
-      : super(
-          PlaybackState(
-            position: 0,
-            isPlaying: false,
-            isBuffering: false,
-            isSeeking: false,
-            isCompleted: false,
-            duration: 0,
-            speed: Speed(speed: 1),
-            volume: 100,
-            track: Track(
-              id: '',
-              title: '',
-              fileId: '',
-              description: '',
-              imageUrl: '',
-              artist: '',
-            ),
-          ),
-        ) {
+class AudioStateNotifier extends Notifier<PlaybackState> {
+  @override
+  PlaybackState build() {
+    final initialState = PlaybackState(
+      position: 0,
+      isPlaying: false,
+      isBuffering: false,
+      isSeeking: false,
+      isCompleted: false,
+      duration: 0,
+      speed: Speed(speed: 1),
+      volume: 100,
+      track: Track(
+        id: '',
+        title: '',
+        fileId: '',
+        description: '',
+        imageUrl: '',
+        artist: '',
+      ),
+    );
+
     iosAudioHandler.iosStateStream.listen(
       (event) {
         var playerState = event.playerState;
@@ -74,6 +74,8 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
         );
       },
     );
+
+    return initialState;
   }
 
   void updatePlaybackState(PlaybackState newState) {
@@ -103,7 +105,7 @@ class AudioStateNotifier extends StateNotifier<PlaybackState> {
 }
 
 final audioStateProvider =
-    StateNotifierProvider<AudioStateNotifier, PlaybackState>((ref) {
+    NotifierProvider<AudioStateNotifier, PlaybackState>(() {
   return audioStateNotifier;
 });
 

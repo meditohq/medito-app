@@ -21,7 +21,7 @@ import 'package:medito/utils/utils.dart';
 final filteredPacksProvider =
     Provider.autoDispose.family<List<PackItem>, String>((ref, query) {
   final packs = ref.watch(
-    explorePacksProvider.select((asyncValue) => asyncValue.valueOrNull ?? []),
+    explorePacksProvider.select((asyncValue) => asyncValue.value ?? []),
   );
   if (query.isEmpty) return packs;
   final lowerQuery = query.toLowerCase();
@@ -179,7 +179,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
     final searchTracksAsync = ref.watch(searchTracksProvider(_searchQuery));
 
     final packsCount = packs.length;
-    final tracksCount = searchTracksAsync.valueOrNull?.length ?? 0;
+    final tracksCount = searchTracksAsync.value?.length ?? 0;
 
     if ((_previousPacksCount != packsCount ||
             _previousTracksCount != tracksCount) &&

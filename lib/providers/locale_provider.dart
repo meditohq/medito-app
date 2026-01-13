@@ -1,52 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/strings/shared_preference_constants.dart';
 import '../constants/types/type_constants.dart';
+import 'shared_preference/shared_preference_provider.dart';
 
-final localeProvider = StateNotifierProvider<LocaleNotifier, Locale?>((ref) {
+final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(() {
   return LocaleNotifier();
 });
 
-class LocaleNotifier extends StateNotifier<Locale?> {
-  SharedPreferences? _prefs;
-
-  LocaleNotifier() : super(null) {
-    _initPrefs();
-  }
-
-  Future<void> _initPrefs() async {
-    _prefs = await SharedPreferences.getInstance();
-    _loadLocale();
-  }
-
-  void _loadLocale() {
-    if (_prefs == null) return;
-
-    final savedLocale =
-        _prefs!.getString(SharedPreferenceConstants.localePreference);
+class LocaleNotifier extends Notifier<Locale?> {
+  @override
+  Locale? build() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final savedLocale = prefs.getString(SharedPreferenceConstants.localePreference);
 
     if (savedLocale == null || savedLocale == LocaleConstants.system) {
       // Force English until backend is ready for Spanish
-      state = const Locale(LocaleConstants.english);
+      return const Locale(LocaleConstants.english);
     } else {
       // Force English even if Spanish was previously selected
-      state = const Locale(LocaleConstants.english);
+      return const Locale(LocaleConstants.english);
     }
   }
 
   Future<void> setLocale(String localeCode) async {
-
-    await _prefs!
-        .setString(SharedPreferenceConstants.localePreference, localeCode);
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setString(SharedPreferenceConstants.localePreference, localeCode);
 
     // Force English until backend is ready for Spanish
     state = const Locale(LocaleConstants.english);
   }
 
   String getCurrentLocaleSetting() {
-    return _prefs?.getString(SharedPreferenceConstants.localePreference) ??
+    final prefs = ref.read(sharedPreferencesProvider);
+    return prefs.getString(SharedPreferenceConstants.localePreference) ??
         LocaleConstants.system;
   }
 

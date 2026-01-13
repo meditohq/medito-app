@@ -377,7 +377,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       {Key? key}) {
     lastFiveDays = lastFiveDays.reversed.toList();
 
-    var statsData = ref.watch(statsProvider).valueOrNull;
+    var statsData = ref.watch(statsProvider).value;
     var daysWithFreeze =
         statsData != null ? _getDaysWithStreakFreeze(statsData) : <String>[];
 
@@ -620,7 +620,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
       final time = await service.enable();
       await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
-      ref.read(reminderTimeProvider.notifier).state = time;
+      await ref.read(reminderTimeProvider.notifier).setTime(time);
 
       if (mounted) {
         setState(() {});

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/repositories/downloader/downloader_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -28,7 +27,7 @@ Future<void> removeDownloadedTrack(Ref ref, {required TrackModel track}) async {
       await ref.read(downloaderRepositoryProvider).isFileDownloaded(fileName);
 
   if (isDownloaded) {
-    await ref.read(audioDownloaderProvider).deleteTrackAudio(fileName);
+    await ref.read(audioDownloaderProvider.notifier).deleteTrackAudio(fileName);
     await ref.read(deleteTrackFromPreferenceProvider(file: firstItem).future);
   }
 }
@@ -38,6 +37,9 @@ Future<void> deleteTrackFromPreference(Ref ref,
     {required TrackFilesModel file}) async {
   try {
     var downloadedTrackList = await ref.watch(downloadedTracksProvider.future);
+    
+    if (!ref.mounted) return;
+    
     downloadedTrackList.removeWhere((element) =>
         element.audio.first.files.indexWhere((e) => e.id == file.id) != -1);
 
@@ -45,6 +47,8 @@ Future<void> deleteTrackFromPreference(Ref ref,
       addTrackListInPreferenceProvider(tracks: downloadedTrackList).future,
     );
 
+    if (!ref.mounted) return;
+    
     ref.invalidate(downloadedTracksProvider);
   } catch (e) {
     AppLogger.e('DOWNLOAD', 'Error in deleteTrackFromPreference: $e');
@@ -71,9 +75,15 @@ Future<void> addSingleTrackInPreference(Ref ref,
   }).toList();
 
   var downloadedTrackList = await ref.read(downloadedTracksProvider.future);
+  
+  if (!ref.mounted) return;
+  
   downloadedTrackList.add(track);
   await ref.read(
     addTrackListInPreferenceProvider(tracks: downloadedTrackList).future,
   );
-  unawaited(ref.refresh(downloadedTracksProvider.future));
+  
+  if (!ref.mounted) return;
+  
+  ref.invalidate(downloadedTracksProvider);
 }

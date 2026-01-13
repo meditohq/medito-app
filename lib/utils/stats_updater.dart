@@ -9,6 +9,7 @@ import '../providers/notification/reminder_provider.dart';
 import '../services/reminders/smart_reminders_service.dart';
 import '../providers/feature_flags_provider.dart';
 import '../providers/stats_provider.dart';
+import '../providers/settings/settings_providers.dart';
 import '../routes/routes.dart';
 import '../widgets/snackbar_widget.dart';
 import '../l10n/app_localizations.dart';
@@ -123,6 +124,15 @@ Future<bool> handleStats(
               : null,
         );
         AppLogger.d('STATS', 'Smart Reminder series scheduled');
+        
+        // Update the reminder time provider state to reflect the new time saved to SharedPreferences
+        if (ref != null) {
+          try {
+            ref.read(reminderTimeProvider.notifier).refreshFromPrefs();
+          } catch (e) {
+            AppLogger.w('STATS', 'Failed to refresh reminder time provider: $e');
+          }
+        }
       } else {
         AppLogger.d('STATS', 'Smart Reminders disabled; skipping scheduling');
       }

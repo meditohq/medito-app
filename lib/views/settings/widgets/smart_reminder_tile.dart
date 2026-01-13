@@ -30,7 +30,7 @@ class SmartReminderTile extends ConsumerWidget {
 
         final time = await service.enable();
         await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
-        ref.read(reminderTimeProvider.notifier).state = time;
+        await ref.read(reminderTimeProvider.notifier).setTime(time);
       } else {
         final prefs = ref.read(sharedPreferencesProvider);
         final service = SmartRemindersService(

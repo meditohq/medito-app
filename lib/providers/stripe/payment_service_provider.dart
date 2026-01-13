@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -74,7 +73,7 @@ PaymentService paymentService(Ref ref) {
 @Riverpod(keepAlive: true)
 Future<PaymentConfigModel> paymentConfig(Ref ref) {
   final service = ref.watch(paymentServiceProvider);
-  final deviceInfo = ref.watch(deviceAndAppInfoProvider).valueOrNull;
+  final deviceInfo = ref.watch(deviceAndAppInfoProvider).value;
 
   return service.getPaymentConfig(
     currency: deviceInfo?.currency,
