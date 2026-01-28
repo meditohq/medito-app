@@ -18,8 +18,10 @@ import 'widgets/header_widget.dart';
 import 'widgets/products/home_products_section.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
+import 'widgets/up_next/up_next_widget.dart';
 
 import '../../providers/home/announcement_provider.dart';
+import '../../providers/home/up_next_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -124,6 +126,11 @@ class _HomeViewState extends ConsumerState<HomeView>
                         case HomeWidgetType.products:
                           child = const HomeProductsSection();
                           break;
+                        case HomeWidgetType.upNext:
+                          child = UpNextWidget(
+                            key: ValueKey(type.name),
+                          );
+                          break;
                       }
                       return Padding(
                         padding: const EdgeInsets.only(top: 8),
@@ -150,6 +157,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     await ref.read(refreshHomeAPIsProvider.future);
     ref.invalidate(refreshProductsProvider);
     await ref.read(refreshProductsProvider.future);
+    ref.invalidate(upNextProvider);
   }
 
   void _onStatsButtonTapped(BuildContext context) {

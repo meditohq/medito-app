@@ -65,4 +65,7 @@ class SharedPreferenceConstants {
   static const String donationAskSnoozedUntilMs = 'donation_ask_snoozed_until_ms';
   static const String lastSuccessfulDonationAtMs = 'last_successful_donation_at_ms';
   static const String lastSuccessfulDonationFrequency = 'last_successful_donation_frequency';
+
+  // Up Next pack preference
+  static const String upNextPackId = 'up_next_pack_id';
 }

@@ -28,7 +28,7 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
         TypeConstants.fileIdKey: completionData.fileId,
         TypeConstants.guideIdKey: completionData.guideId,
         TypeConstants.timestampIdKey: completionData.timestamp,
-      }, ref: ref);
+      });
 
       return true;
     } on Exception catch (_) {

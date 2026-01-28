@@ -49,6 +49,8 @@ class AssetConstants {
   static const String iconMoon = 'assets/images/moon-sat.svg';
   static const String iconMusicNote = 'assets/images/music-double-note.svg';
   static const String iconPause = 'assets/images/pause.svg';
+  static const String iconPin = 'assets/images/pin.svg';
+  static const String iconPinSolid = 'assets/images/pin-solid.svg';
   static const String iconPlay = 'assets/images/play.svg';
   static const String iconPlaySolid = 'assets/images/play-solid.svg';
   static const String iconPrivacy = 'assets/images/privacy-policy.svg';

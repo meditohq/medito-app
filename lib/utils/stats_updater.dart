@@ -9,6 +9,7 @@ import '../providers/notification/reminder_provider.dart';
 import '../services/reminders/smart_reminders_service.dart';
 import '../providers/feature_flags_provider.dart';
 import '../providers/stats_provider.dart';
+import '../providers/home/up_next_provider.dart';
 import '../providers/settings/settings_providers.dart';
 import '../routes/routes.dart';
 import '../widgets/snackbar_widget.dart';
@@ -26,9 +27,37 @@ const String completedTracksKey = CompletedTracksStorage.completedTracksKey;
 // Static flag to prevent concurrent processing
 bool _isProcessingPendingTracks = false;
 
+/// Refreshes the stats provider and invalidates the upNextProvider
+/// This ensures the UI shows updated stats immediately after a session is completed
+Future<void> _refreshStatsAndUpNext() async {
+  final context = navigatorKey.currentContext;
+  if (context == null) {
+    AppLogger.w('STATS', 'No navigator context available, skipping provider refresh');
+    return;
+  }
+
+  try {
+    final container = ProviderScope.containerOf(context);
+    try {
+      await container.read(statsProvider.notifier).refreshFromLocal();
+      AppLogger.d('STATS', 'Stats provider refreshed from local');
+    } catch (refreshError) {
+      AppLogger.e('STATS', 'Failed to refresh stats provider', refreshError);
+    }
+
+    try {
+      container.invalidate(upNextProvider);
+      AppLogger.d('STATS', 'UpNext provider invalidated');
+    } catch (invalidateError) {
+      AppLogger.e('STATS', 'Failed to invalidate upNext provider', invalidateError);
+    }
+  } catch (_) {
+    AppLogger.w('STATS', 'No ProviderScope available, skipping provider refresh');
+  }
+}
+
 Future<bool> handleStats(
   Map<String, dynamic> payload, {
-  WidgetRef? ref,
   StatsManager? statsManager, // For testing
 }) async {
   try {
@@ -57,10 +86,18 @@ Future<bool> handleStats(
         'Stats updated successfully for track ${newAudioCompleted.id}');
 
     // Check if user earned a new streak freeze
-    bool isStreakFreezeEnabled;
-    if (ref != null) {
-      final featureFlags = ref.read(featureFlagsProvider);
-      isStreakFreezeEnabled = featureFlags.isStreakFreezeEnabled;
+    bool isStreakFreezeEnabled = false;
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      try {
+        final container = ProviderScope.containerOf(context);
+        final featureFlags = container.read(featureFlagsProvider);
+        isStreakFreezeEnabled = featureFlags.isStreakFreezeEnabled;
+      } catch (_) {
+        // Fallback: read directly from SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        isStreakFreezeEnabled = prefs.getBool('streak_freeze_enabled') ?? false;
+      }
     } else {
       // Fallback: read directly from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
@@ -73,17 +110,8 @@ Future<bool> handleStats(
       isStreakFreezeEnabled: isStreakFreezeEnabled,
     );
 
-    // Refresh the stats provider from local stats without syncing
-    // This ensures the UI shows updated stats immediately
-    if (ref != null) {
-      try {
-        await ref.read(statsProvider.notifier).refreshFromLocal();
-        AppLogger.d('STATS', 'Stats provider refreshed from local');
-      } catch (refreshError) {
-        // Don't fail the whole operation if provider refresh fails
-        AppLogger.e('STATS', 'Failed to refresh stats provider', refreshError);
-      }
-    }
+    // Refresh the stats provider and invalidate upNextProvider
+    await _refreshStatsAndUpNext();
 
     // Update home widget with latest stats (fire-and-forget to avoid blocking)
     try {
@@ -116,19 +144,19 @@ Future<bool> handleStats(
           prefs: prefs,
           reminders: ReminderProvider(),
         );
+        final context = navigatorKey.currentContext;
         await scheduler.rescheduleAfterSession(
           endMs: endMs,
           durationMs: durationMs,
-          l10n: ref != null
-              ? AppLocalizations.of(navigatorKey.currentContext!)
-              : null,
+          l10n: context != null ? AppLocalizations.of(context) : null,
         );
         AppLogger.d('STATS', 'Smart Reminder series scheduled');
         
         // Update the reminder time provider state to reflect the new time saved to SharedPreferences
-        if (ref != null) {
+        if (context != null) {
           try {
-            ref.read(reminderTimeProvider.notifier).refreshFromPrefs();
+            final container = ProviderScope.containerOf(context);
+            container.read(reminderTimeProvider.notifier).refreshFromPrefs();
           } catch (e) {
             AppLogger.w('STATS', 'Failed to refresh reminder time provider: $e');
           }
@@ -450,7 +478,6 @@ String _getManualSessionId(DateTime dateTime) {
 Future<bool> addManualSession({
   required DateTime dateTime,
   required int durationMinutes,
-  WidgetRef? ref,
   StatsManager? statsManager,
 }) async {
   try {
@@ -487,10 +514,18 @@ Future<bool> addManualSession({
         'Manual session added successfully for ${dateTime.toString()}');
 
     // Check if user earned a new streak freeze
-    bool isStreakFreezeEnabled;
-    if (ref != null) {
-      final featureFlags = ref.read(featureFlagsProvider);
-      isStreakFreezeEnabled = featureFlags.isStreakFreezeEnabled;
+    bool isStreakFreezeEnabled = false;
+    final context = navigatorKey.currentContext;
+    if (context != null) {
+      try {
+        final container = ProviderScope.containerOf(context);
+        final featureFlags = container.read(featureFlagsProvider);
+        isStreakFreezeEnabled = featureFlags.isStreakFreezeEnabled;
+      } catch (_) {
+        // Fallback: read directly from SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        isStreakFreezeEnabled = prefs.getBool('streak_freeze_enabled') ?? false;
+      }
     } else {
       // Fallback: read directly from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
@@ -503,17 +538,8 @@ Future<bool> addManualSession({
       isStreakFreezeEnabled: isStreakFreezeEnabled,
     );
 
-    // Refresh the stats provider from local stats without syncing
-    // This ensures the UI shows updated stats immediately
-    if (ref != null) {
-      try {
-        await ref.read(statsProvider.notifier).refreshFromLocal();
-        AppLogger.d('STATS', 'Stats provider refreshed from local');
-      } catch (refreshError) {
-        // Don't fail the whole operation if provider refresh fails
-        AppLogger.e('STATS', 'Failed to refresh stats provider', refreshError);
-      }
-    }
+    // Refresh the stats provider and invalidate upNextProvider
+    await _refreshStatsAndUpNext();
 
     // Update home widget with latest stats (fire-and-forget to avoid blocking)
     try {

@@ -20,8 +20,13 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
     if (savedOrder != null) {
       baseOrder =
           savedOrder.map((type) => HomeWidgetType.fromString(type)).toList();
+      // Ensure upNext is always included if not already present
+      if (!baseOrder.contains(HomeWidgetType.upNext)) {
+        baseOrder.insert(0, HomeWidgetType.upNext);
+      }
     } else {
       baseOrder = [
+        HomeWidgetType.upNext,
         HomeWidgetType.shortcuts,
         HomeWidgetType.carousel,
         HomeWidgetType.quote,
@@ -146,8 +151,13 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
     if (savedOrder != null) {
       baseOrder =
           savedOrder.map((type) => HomeWidgetType.fromString(type)).toList();
+      // Ensure upNext is always included if not already present
+      if (!baseOrder.contains(HomeWidgetType.upNext)) {
+        baseOrder.insert(0, HomeWidgetType.upNext);
+      }
     } else {
       baseOrder = [
+        HomeWidgetType.upNext,
         HomeWidgetType.shortcuts,
         HomeWidgetType.carousel,
         HomeWidgetType.quote,

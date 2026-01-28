@@ -4,6 +4,8 @@
     "trackingPermissionBody",
     "trackingPermissionPrivacyNote",
     "trackingPermissionAllow",
-    "addHomeScreenWidget"
+    "addHomeScreenWidget",
+    "upNextTitle",
+    "upNextSessionCount"
   ]
 }

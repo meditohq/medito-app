@@ -800,6 +800,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get skipForNow => 'Omitir por Ahora';
 
   @override
+  String get skip => 'Omitir';
+
+  @override
+  String get packSetAsUpNext =>
+      'Este paquete ahora aparecerá en la sección Próximo en la página de inicio';
+
+  @override
+  String get packUnpinnedFromUpNext =>
+      'Este paquete ha sido eliminado de la sección Próximo';
+
+  @override
   String get smartReminders => 'Recordatorios Inteligentes';
 
   @override
@@ -1758,4 +1769,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get completedAt => 'Completado a las';
+
+  @override
+  String get upNextTitle => 'Up Next';
+
+  @override
+  String upNextSessionCount(int current, int total) {
+    return 'Session $current of $total';
+  }
 }

@@ -786,6 +786,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skipForNow => 'Skip for Now';
 
   @override
+  String get skip => 'Skip';
+
+  @override
+  String get packSetAsUpNext =>
+      'This pack will now appear in the Up Next section on the homepage';
+
+  @override
+  String get packUnpinnedFromUpNext =>
+      'This pack has been removed from the Up Next section';
+
+  @override
   String get smartReminders => 'Smart Reminders';
 
   @override
@@ -1732,4 +1743,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get completedAt => 'Completed at';
+
+  @override
+  String get upNextTitle => 'Up Next';
+
+  @override
+  String upNextSessionCount(int current, int total) {
+    return 'Session $current of $total';
+  }
 }

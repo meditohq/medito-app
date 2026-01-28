@@ -1,4 +1,7 @@
 class ConfigConstants {
+  // Pack IDs
+  static const String basicsPackId = 'j4SVy5TrKAT7ywxp';
+
   // URL constants
   static const String meditoUrl = 'https://meditofoundation.org/';
   static const String donationFormUrl = 'https://meditofoundation.org/donate';

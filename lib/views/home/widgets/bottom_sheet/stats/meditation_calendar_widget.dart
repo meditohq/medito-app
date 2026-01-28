@@ -159,7 +159,6 @@ class _MeditationCalendarWidgetState
       final success = await addManualSession(
         dateTime: dateTime,
         durationMinutes: duration,
-        ref: ref,
       );
 
       if (success && mounted) {

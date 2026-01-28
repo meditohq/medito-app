@@ -1556,6 +1556,24 @@ abstract class AppLocalizations {
   /// **'Skip for Now'**
   String get skipForNow;
 
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @packSetAsUpNext.
+  ///
+  /// In en, this message translates to:
+  /// **'This pack will now appear in the Up Next section on the homepage'**
+  String get packSetAsUpNext;
+
+  /// No description provided for @packUnpinnedFromUpNext.
+  ///
+  /// In en, this message translates to:
+  /// **'This pack has been removed from the Up Next section'**
+  String get packUnpinnedFromUpNext;
+
   /// Label for the smart reminders feature toggle
   ///
   /// In en, this message translates to:
@@ -3265,6 +3283,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Completed at'**
   String get completedAt;
+
+  /// Title for the up next section on the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Up Next'**
+  String get upNextTitle;
+
+  /// Shows the current session number out of total sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Session {current} of {total}'**
+  String upNextSessionCount(int current, int total);
 }
 
 class _AppLocalizationsDelegate
