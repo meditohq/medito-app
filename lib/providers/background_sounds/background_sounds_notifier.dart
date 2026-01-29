@@ -51,16 +51,22 @@ class BackgroundSoundsState {
 
   BackgroundSoundsState copyWith({
     double? volume,
-    BackgroundSoundsModel? selectedBgSound,
-    BackgroundSoundsModel? downloadingBgSound,
+    Object? selectedBgSound = _sentinel,
+    Object? downloadingBgSound = _sentinel,
   }) {
     return BackgroundSoundsState(
       volume: volume ?? this.volume,
-      selectedBgSound: selectedBgSound ?? this.selectedBgSound,
-      downloadingBgSound: downloadingBgSound ?? this.downloadingBgSound,
+      selectedBgSound: selectedBgSound == _sentinel
+          ? this.selectedBgSound
+          : selectedBgSound as BackgroundSoundsModel?,
+      downloadingBgSound: downloadingBgSound == _sentinel
+          ? this.downloadingBgSound
+          : downloadingBgSound as BackgroundSoundsModel?,
     );
   }
 }
+
+const _sentinel = Object();
 
 final backgroundSoundsNotifierProvider =
     NotifierProvider<BackgroundSoundsNotifier, BackgroundSoundsState>(
