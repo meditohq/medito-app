@@ -501,6 +501,8 @@ class FirebaseAnalyticsService {
   /// Apply stored UTM parameters from SharedPreferences to Firebase Analytics user properties
   /// This should be called after user initialization to ensure UTM parameters from
   /// deep links (e.g., from Apple Ads) are properly attributed to the user
+  /// Note: UTM parameters are kept in storage so they can be used by other analytics
+  /// services (e.g., Meta) for attribution on subsequent events like donations
   static Future<void> applyStoredUtmParameters() async {
     try {
       if (_runningInTest) return;
@@ -534,9 +536,6 @@ class FirebaseAnalyticsService {
             AppLogger.d('FIREBASE_ANALYTICS',
                 'Applied stored UTM parameter: $paramKey = $value');
           }
-
-          // Remove from storage after applying (one-time use)
-          await prefs.remove(paramKey);
         }
       }
 

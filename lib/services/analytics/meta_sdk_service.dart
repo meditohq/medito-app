@@ -150,9 +150,13 @@ class MetaSdkService {
     required String currency,
     required String frequency,
   }) async {
+    // Get stored UTM parameters to include in donation events for attribution
+    final utmParams = await _getStoredUtmParameters();
+
     final props = {
       AnalyticsEventConstants.paramRevenue: revenueCents,
       AnalyticsEventConstants.paramCurrency: currency,
+      ...utmParams,
     };
 
     await logEvent(AnalyticsEventConstants.paywallDonation, props);

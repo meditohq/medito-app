@@ -105,6 +105,19 @@ class AnalyticsEventConstants {
   /// Event logged when user submits post-meditation feedback
   static const String postMeditationFeedback = 'post_meditation_feedback';
 
+  // Audio session events
+  /// Event logged when an audio session is completed and stats are updated
+  static const String audioSessionCompleted = 'audio_session_completed';
+
+  /// Parameter name for audio file ID
+  static const String paramAudioFileId = 'audioFileId';
+
+  /// Parameter name for audio file guide/narrator
+  static const String paramAudioFileGuide = 'audioFileGuide';
+
+  /// Parameter name for audio file duration in milliseconds
+  static const String paramAudioFileDuration = 'audioFileDuration';
+
   // Error and token events
   /// Event logged when unexpected logout occurs due to missing refresh token
   static const String unexpectedLogoutRefreshTokenMissing =

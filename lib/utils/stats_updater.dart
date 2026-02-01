@@ -20,6 +20,8 @@ import 'stats_manager.dart';
 import '../models/local_audio_completed.dart';
 import 'logger.dart';
 import '../services/home_widget_service.dart';
+import '../services/analytics/firebase_analytics_service.dart';
+import '../constants/strings/analytics_event_constants.dart';
 
 // Export the key for backward compatibility if needed
 const String completedTracksKey = CompletedTracksStorage.completedTracksKey;
@@ -32,7 +34,8 @@ bool _isProcessingPendingTracks = false;
 Future<void> _refreshStatsAndUpNext() async {
   final context = navigatorKey.currentContext;
   if (context == null) {
-    AppLogger.w('STATS', 'No navigator context available, skipping provider refresh');
+    AppLogger.w(
+        'STATS', 'No navigator context available, skipping provider refresh');
     return;
   }
 
@@ -49,10 +52,12 @@ Future<void> _refreshStatsAndUpNext() async {
       container.invalidate(upNextProvider);
       AppLogger.d('STATS', 'UpNext provider invalidated');
     } catch (invalidateError) {
-      AppLogger.e('STATS', 'Failed to invalidate upNext provider', invalidateError);
+      AppLogger.e(
+          'STATS', 'Failed to invalidate upNext provider', invalidateError);
     }
   } catch (_) {
-    AppLogger.w('STATS', 'No ProviderScope available, skipping provider refresh');
+    AppLogger.w(
+        'STATS', 'No ProviderScope available, skipping provider refresh');
   }
 }
 
@@ -84,6 +89,24 @@ Future<bool> handleStats(
     await statsManager.addAudioCompleted(newAudioCompleted, duration);
     AppLogger.d('STATS',
         'Stats updated successfully for track ${newAudioCompleted.id}');
+
+    // Log Firebase analytics event for audio session completion
+    try {
+      final fileId = payload[TypeConstants.fileIdKey] as String?;
+      final guide = payload[TypeConstants.guideIdKey] as String?;
+
+      await FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.audioSessionCompleted,
+        parameters: {
+          AnalyticsEventConstants.paramAudioFileId: fileId ?? 'unknown',
+          AnalyticsEventConstants.paramAudioFileGuide: guide ?? 'unknown',
+          AnalyticsEventConstants.paramAudioFileDuration: duration,
+        },
+      );
+      AppLogger.d('STATS', 'Logged audio_session_completed event to Firebase');
+    } catch (analyticsError) {
+      AppLogger.e('STATS', 'Failed to log analytics event', analyticsError);
+    }
 
     // Check if user earned a new streak freeze
     bool isStreakFreezeEnabled = false;
@@ -151,14 +174,15 @@ Future<bool> handleStats(
           l10n: context != null ? AppLocalizations.of(context) : null,
         );
         AppLogger.d('STATS', 'Smart Reminder series scheduled');
-        
+
         // Update the reminder time provider state to reflect the new time saved to SharedPreferences
         if (context != null) {
           try {
             final container = ProviderScope.containerOf(context);
             container.read(reminderTimeProvider.notifier).refreshFromPrefs();
           } catch (e) {
-            AppLogger.w('STATS', 'Failed to refresh reminder time provider: $e');
+            AppLogger.w(
+                'STATS', 'Failed to refresh reminder time provider: $e');
           }
         }
       } else {
