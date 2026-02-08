@@ -1067,5 +1067,17 @@
   "defaultsNote": "These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.",
   "@defaultsNote": {
     "description": "Note explaining how defaults work in Up Next"
+  },
+  "streakFreezeUsed": "Streak freeze used",
+  "@streakFreezeUsed": {
+    "description": "Text shown when a streak freeze was used on a particular day"
+  },
+  "session": "session",
+  "@session": {
+    "description": "Singular form of session"
+  },
+  "sessions": "sessions",
+  "@sessions": {
+    "description": "Plural form of sessions"
   }
 }

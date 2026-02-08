@@ -898,40 +898,59 @@ class StatsManager {
     audioDates =
         audioDates.where((date) => !date.isAfter(today)).toSet().toList();
 
+    // Convert freeze dates (year-month-day format)
+    var freezeDates = allStats.freezeUsageDates.map((timestamp) {
+      var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      return DateTime(date.year, date.month, date.day);
+    }).toList();
+
+    // Remove duplicate freeze dates and future dates
+    // Only include freeze dates that don't already have audio activity
+    freezeDates = freezeDates
+        .where((date) => !date.isAfter(today) && !audioDates.contains(date))
+        .toSet()
+        .toList();
+
+    // Combine audio and freeze dates for consistency calculation
+    var allActivityDates = {...audioDates, ...freezeDates}.toList();
+
     // If no valid dates, return 0
-    if (audioDates.isEmpty) {
+    if (allActivityDates.isEmpty) {
       return 0.0;
     }
 
     // Sort dates in ascending order to find first session
-    audioDates.sort();
-    var firstSessionDate = audioDates.first;
+    allActivityDates.sort();
+    var firstSessionDate = allActivityDates.first;
 
     // Calculate days since first session (inclusive)
     var daysSinceFirstSession = today.difference(firstSessionDate).inDays + 1;
 
-    // If first session is today, return 1.0 if meditated today, 0.0 otherwise
+    // If first session is today, return 1.0 if activity today, 0.0 otherwise
     if (daysSinceFirstSession == 1) {
-      return audioDates.any((date) => date.isAtSameMomentAs(today)) ? 1.0 : 0.0;
+      return allActivityDates.any((date) => date.isAtSameMomentAs(today))
+          ? 1.0
+          : 0.0;
     }
 
     // For users with less than 30 days history
     if (daysSinceFirstSession < 30) {
-      var meditatedDays = audioDates.length;
-      return (meditatedDays / daysSinceFirstSession).clamp(0.0, 1.0);
+      var activeDays = allActivityDates.length;
+
+      return (activeDays / daysSinceFirstSession).clamp(0.0, 1.0);
     }
 
     // For users with 30+ days history, only look at last 30 days
     var daysToCheck =
         List.generate(30, (index) => today.subtract(Duration(days: index)));
-    var meditatedDaysInRange = daysToCheck
-        .where((date) => audioDates.any((audioDate) =>
-            audioDate.year == date.year &&
-            audioDate.month == date.month &&
-            audioDate.day == date.day))
+    var activeDaysInRange = daysToCheck
+        .where((date) => allActivityDates.any((activityDate) =>
+            activityDate.year == date.year &&
+            activityDate.month == date.month &&
+            activityDate.day == date.day))
         .length;
 
-    return (meditatedDaysInRange / 30.0);
+    return (activeDaysInRange / 30.0);
   }
 
   // Test helpers

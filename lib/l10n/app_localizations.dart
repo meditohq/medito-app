@@ -3343,6 +3343,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.'**
   String get defaultsNote;
+
+  /// Text shown when a streak freeze was used on a particular day
+  ///
+  /// In en, this message translates to:
+  /// **'Streak freeze used'**
+  String get streakFreezeUsed;
+
+  /// Singular form of session
+  ///
+  /// In en, this message translates to:
+  /// **'session'**
+  String get session;
+
+  /// Plural form of sessions
+  ///
+  /// In en, this message translates to:
+  /// **'sessions'**
+  String get sessions;
 }
 
 class _AppLocalizationsDelegate

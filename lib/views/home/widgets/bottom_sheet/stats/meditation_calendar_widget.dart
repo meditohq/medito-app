@@ -98,6 +98,32 @@ class _MeditationCalendarWidgetState
     return dates;
   }
 
+  Set<DateTime> _getFreezeDates(LocalAllStats stats) {
+    final dates = <DateTime>{};
+    final today = DateTime.now();
+    final todayStart = DateTime(today.year, today.month, today.day);
+    final meditationDates = _getMeditationDates(stats);
+
+    for (final timestamp in stats.freezeUsageDates) {
+      final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      final dayStart = DateTime(date.year, date.month, date.day);
+
+      // Only include freeze dates that don't have meditation activity and aren't in the future
+      if (!dayStart.isAfter(todayStart) && !meditationDates.contains(dayStart)) {
+        dates.add(dayStart);
+      }
+    }
+
+    return dates;
+  }
+
+  bool _isFreezeDay(DateTime day) {
+    final freezeDates = _getFreezeDates(widget.stats);
+    final dayStart = DateTime(day.year, day.month, day.day);
+
+    return freezeDates.contains(dayStart);
+  }
+
   List<LocalAudioCompleted> _getSessionsForDay(DateTime day) {
     final sessions = <LocalAudioCompleted>[];
     final dayStart = DateTime(day.year, day.month, day.day);
@@ -177,7 +203,9 @@ class _MeditationCalendarWidgetState
   @override
   Widget build(BuildContext context) {
     final meditationDates = _getMeditationDates(widget.stats);
+    final freezeDates = _getFreezeDates(widget.stats);
     final sessions = _getSessionsForDay(_selectedDayForSessions);
+    final isSelectedDayFreezeDay = _isFreezeDay(_selectedDayForSessions);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -274,6 +302,7 @@ class _MeditationCalendarWidgetState
               defaultBuilder: (context, date, events) {
                 final dayStart = DateTime(date.year, date.month, date.day);
                 final hasMeditation = meditationDates.contains(dayStart);
+                final hasFreeze = freezeDates.contains(dayStart);
 
                 if (hasMeditation) {
                   return Container(
@@ -295,18 +324,46 @@ class _MeditationCalendarWidgetState
                   );
                 }
 
+                if (hasFreeze) {
+                  return Container(
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: ColorConstants.lightBlue.withOpacityValue(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${date.day}',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontFamily: dmSans,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ),
+                  );
+                }
+
                 return null;
               },
               todayBuilder: (context, date, events) {
                 final dayStart = DateTime(date.year, date.month, date.day);
                 final hasMeditation = meditationDates.contains(dayStart);
+                final hasFreeze = freezeDates.contains(dayStart);
+
+                Color backgroundColor;
+                if (hasMeditation) {
+                  backgroundColor = ColorConstants.lightPurple.withOpacityValue(0.25);
+                } else if (hasFreeze) {
+                  backgroundColor = ColorConstants.lightBlue.withOpacityValue(0.25);
+                } else {
+                  backgroundColor = Theme.of(context).colorScheme.surface;
+                }
 
                 return Container(
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: hasMeditation
-                        ? ColorConstants.lightPurple.withOpacityValue(0.25)
-                        : Theme.of(context).colorScheme.surface,
+                    color: backgroundColor,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: ColorConstants.lightPurple,
@@ -326,10 +383,13 @@ class _MeditationCalendarWidgetState
                 );
               },
               selectedBuilder: (context, date, events) {
+                final dayStart = DateTime(date.year, date.month, date.day);
+                final hasFreeze = freezeDates.contains(dayStart);
+
                 return Container(
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: ColorConstants.lightPurple,
+                    color: hasFreeze ? ColorConstants.lightBlue : ColorConstants.lightPurple,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -422,13 +482,33 @@ class _MeditationCalendarWidgetState
                       ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  '${sessions.length} ${sessions.length == 1 ? 'session' : 'sessions'}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: dmSans,
-                        color: Theme.of(context).colorScheme.onSurface,
+                if (isSelectedDayFreezeDay)
+                  Row(
+                    children: [
+                      MeditoIcon(
+                        assetName: MeditoIcons.snow,
+                        size: 16,
+                        color: ColorConstants.lightBlue,
                       ),
-                ),
+                      const SizedBox(width: 6),
+                      Text(
+                        AppLocalizations.of(context)!.streakFreezeUsed,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontFamily: dmSans,
+                              color: ColorConstants.lightBlue,
+                              fontWeight: FontWeight.w500,
+                            ),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    '${sessions.length} ${sessions.length == 1 ? AppLocalizations.of(context)!.session : AppLocalizations.of(context)!.sessions}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontFamily: dmSans,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                  ),
                 const SizedBox(height: 16),
                 if (_isAddingSession)
                   Padding(
