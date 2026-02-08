@@ -16,7 +16,15 @@ class DurationPreferenceNotifier extends Notifier<int?> {
 
       final sharedPreferences = ref.read(sharedPreferencesProvider);
       sharedPreferences.setInt(_durationPreferenceKey, duration);
+    } else {
+      state = null;
+      final sharedPreferences = ref.read(sharedPreferencesProvider);
+      sharedPreferences.remove(_durationPreferenceKey);
     }
+  }
+
+  void clearDuration() {
+    setDuration(null);
   }
 }
 

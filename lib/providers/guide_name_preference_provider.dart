@@ -21,6 +21,10 @@ class GuideNamePreferenceNotifier extends AsyncNotifier<String?> {
 
     state = AsyncValue.data(guideName);
   }
+
+  Future<void> clearGuideName() async {
+    await setGuideName(null);
+  }
 }
 
 final guideNamePreferenceProvider =

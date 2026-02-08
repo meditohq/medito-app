@@ -3295,6 +3295,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Session {current} of {total}'**
   String upNextSessionCount(int current, int total);
+
+  /// Title for the manage defaults screen
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Defaults'**
+  String get manageDefaults;
+
+  /// Section title for defaults
+  ///
+  /// In en, this message translates to:
+  /// **'Defaults'**
+  String get defaults;
+
+  /// Label for default guide name setting
+  ///
+  /// In en, this message translates to:
+  /// **'Default Guide Name'**
+  String get defaultGuideName;
+
+  /// Label for default duration setting
+  ///
+  /// In en, this message translates to:
+  /// **'Default Duration'**
+  String get defaultDuration;
+
+  /// Message shown when default guide name is cleared
+  ///
+  /// In en, this message translates to:
+  /// **'Default guide name cleared'**
+  String get defaultGuideNameCleared;
+
+  /// Message shown when default duration is cleared
+  ///
+  /// In en, this message translates to:
+  /// **'Default duration cleared'**
+  String get defaultDurationCleared;
+
+  /// Text shown when a default value is not set
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get notSet;
+
+  /// Note explaining how defaults work in Up Next
+  ///
+  /// In en, this message translates to:
+  /// **'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.'**
+  String get defaultsNote;
 }
 
 class _AppLocalizationsDelegate
