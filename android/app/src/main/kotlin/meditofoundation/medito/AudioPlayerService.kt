@@ -40,6 +40,8 @@ import android.os.IBinder
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.app.ForegroundServiceStartNotAllowedException
+import android.app.PendingIntent
+import android.view.KeyEvent
 import meditofoundation.medito.pigeon.*
 
 @UnstableApi
@@ -455,7 +457,26 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(TAG, "🔊 Service onStartCommand called")
+        Log.d(TAG, "🔊 Service onStartCommand called with action: ${intent?.action}")
+        
+        // Handle media button actions from notification
+        when (intent?.action) {
+            ACTION_PLAY_PAUSE -> {
+                Log.d(TAG, "🔊 Handling play/pause action from notification")
+                playPauseAudio()
+                return START_STICKY
+            }
+            ACTION_SKIP_FORWARD -> {
+                Log.d(TAG, "🔊 Handling skip forward action from notification")
+                skip10SecondsForward()
+                return START_STICKY
+            }
+            ACTION_SKIP_BACKWARD -> {
+                Log.d(TAG, "🔊 Handling skip backward action from notification")
+                skip10SecondsBackward()
+                return START_STICKY
+            }
+        }
         
         // Create and show notification immediately
         try {
@@ -735,7 +756,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         artist: String,
         artworkBitmap: Bitmap?
     ): NotificationCompat.Builder {
-        return NotificationCompat.Builder(this@AudioPlayerService, CHANNEL_ID)
+        val isPlaying = if (::primaryPlayer.isInitialized) primaryPlayer.isPlaying else false
+
+        val builder = NotificationCompat.Builder(this@AudioPlayerService, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(artist)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -745,11 +768,68 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setOngoing(true)
-            .apply {
-                primaryMediaSession?.let {
-                    setStyle(MediaStyleNotificationHelper.MediaStyle(it))
-                }
-            }
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+        // Add explicit media control actions for older Android versions
+        // These are required for pre-Android 8 devices to show controls on lock screen
+        val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+        // Skip backward action
+        builder.addAction(
+            NotificationCompat.Action(
+                R.drawable.ic_skip_backward,
+                "Skip Backward",
+                createMediaButtonPendingIntent(KeyEvent.KEYCODE_MEDIA_PREVIOUS, pendingIntentFlags)
+            )
+        )
+
+        // Play/Pause action
+        val playPauseIcon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+        val playPauseTitle = if (isPlaying) "Pause" else "Play"
+        builder.addAction(
+            NotificationCompat.Action(
+                playPauseIcon,
+                playPauseTitle,
+                createMediaButtonPendingIntent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, pendingIntentFlags)
+            )
+        )
+
+        // Skip forward action
+        builder.addAction(
+            NotificationCompat.Action(
+                R.drawable.ic_skip_forward,
+                "Skip Forward",
+                createMediaButtonPendingIntent(KeyEvent.KEYCODE_MEDIA_NEXT, pendingIntentFlags)
+            )
+        )
+
+        // Apply MediaStyle with actions shown in compact view
+        primaryMediaSession?.let { session ->
+            builder.setStyle(
+                MediaStyleNotificationHelper.MediaStyle(session)
+                    .setShowActionsInCompactView(0, 1, 2)  // Show all 3 actions in compact view
+            )
+        }
+
+        return builder
+    }
+
+    private fun createMediaButtonPendingIntent(keyCode: Int, flags: Int): PendingIntent {
+        val action = when (keyCode) {
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> ACTION_PLAY_PAUSE
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> ACTION_SKIP_BACKWARD
+            KeyEvent.KEYCODE_MEDIA_NEXT -> ACTION_SKIP_FORWARD
+            else -> return PendingIntent.getService(this, keyCode, Intent(this, AudioPlayerService::class.java), flags)
+        }
+
+        val intent = Intent(this, AudioPlayerService::class.java).apply {
+            this.action = action
+        }
+        return PendingIntent.getService(this, keyCode, intent, flags)
     }
 
     override fun playBackgroundSound() {
@@ -1159,6 +1239,9 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         const val NOTIFICATION_ID = 101011
         private const val TAG = "MeditoAudioService"
         const val ACTION_BIND_SERVICE = "meditofoundation.medito.BIND_SERVICE"
+        const val ACTION_PLAY_PAUSE = "meditofoundation.medito.ACTION_PLAY_PAUSE"
+        const val ACTION_SKIP_FORWARD = "meditofoundation.medito.ACTION_SKIP_FORWARD"
+        const val ACTION_SKIP_BACKWARD = "meditofoundation.medito.ACTION_SKIP_BACKWARD"
         private const val KEY_ARTIST_URL = "artistUrl"
         private const val KEY_FILE_ID = "fileId"
     }
