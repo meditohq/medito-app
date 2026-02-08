@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -212,7 +213,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     try {
       await ref
           .read(authRepositorySyncProvider)
-          .requestOtp(_emailController.text.trim());
+          .requestOtp(_emailController.text.trim().toLowerCase());
       setState(() {
         _hasRequestedOtp = true;
       });
@@ -263,7 +264,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           level: 1000);
 
       var success = await ref.read(authRepositorySyncProvider).verifyOtp(
-            _emailController.text.trim(),
+            _emailController.text.trim().toLowerCase(),
             _otpController.text.trim(),
           );
 
@@ -569,6 +570,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       onChanged: (_) => setState(() {}),
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       keyboardType: TextInputType.emailAddress,
+      inputFormatters: [
+        TextInputFormatter.withFunction((oldValue, newValue) =>
+            TextEditingValue(
+              text: newValue.text.toLowerCase(),
+              selection: newValue.selection,
+            )),
+      ],
     );
   }
 

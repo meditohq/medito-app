@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
@@ -345,6 +346,13 @@ class _SuperwallDonationScreenState
                               : null,
                         ),
                         onChanged: (_) => setState(() {}),
+                        inputFormatters: [
+                          TextInputFormatter.withFunction((oldValue, newValue) =>
+                              TextEditingValue(
+                                text: newValue.text.toLowerCase(),
+                                selection: newValue.selection,
+                              )),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -378,10 +386,11 @@ class _SuperwallDonationScreenState
                               newText = '$currentText$domain';
                             }
 
-                            emailController.text = newText;
+                            final lowerText = newText.toLowerCase();
+                            emailController.text = lowerText;
                             emailController.selection =
                                 TextSelection.fromPosition(
-                              TextPosition(offset: newText.length),
+                              TextPosition(offset: lowerText.length),
                             );
                             setState(() {});
                           },
@@ -415,7 +424,8 @@ class _SuperwallDonationScreenState
                 actions: [
                   TextButton(
                     onPressed: () {
-                      final enteredEmail = emailController.text.trim();
+                      final enteredEmail =
+                          emailController.text.trim().toLowerCase();
                       if (_isValidEmail(enteredEmail)) {
                         Navigator.of(dialogContext).pop(enteredEmail);
                       } else {
