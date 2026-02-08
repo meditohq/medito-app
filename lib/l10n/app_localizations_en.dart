@@ -1776,4 +1776,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get defaultsNote =>
       'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.';
+
+  @override
+  String get streakFreezeUsed => 'Streak freeze used';
+
+  @override
+  String get session => 'session';
+
+  @override
+  String get sessions => 'sessions';
 }
