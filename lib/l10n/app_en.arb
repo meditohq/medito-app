@@ -1035,5 +1035,37 @@
         "description": "Total number of sessions"
       }
     }
+  },
+  "manageDefaults": "Manage Defaults",
+  "@manageDefaults": {
+    "description": "Title for the manage defaults screen"
+  },
+  "defaults": "Defaults",
+  "@defaults": {
+    "description": "Section title for defaults"
+  },
+  "defaultGuideName": "Default Guide Name",
+  "@defaultGuideName": {
+    "description": "Label for default guide name setting"
+  },
+  "defaultDuration": "Default Duration",
+  "@defaultDuration": {
+    "description": "Label for default duration setting"
+  },
+  "defaultGuideNameCleared": "Default guide name cleared",
+  "@defaultGuideNameCleared": {
+    "description": "Message shown when default guide name is cleared"
+  },
+  "defaultDurationCleared": "Default duration cleared",
+  "@defaultDurationCleared": {
+    "description": "Message shown when default duration is cleared"
+  },
+  "notSet": "Not set",
+  "@notSet": {
+    "description": "Text shown when a default value is not set"
+  },
+  "defaultsNote": "These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.",
+  "@defaultsNote": {
+    "description": "Note explaining how defaults work in Up Next"
   }
 }

@@ -1777,4 +1777,29 @@ class AppLocalizationsEs extends AppLocalizations {
   String upNextSessionCount(int current, int total) {
     return 'Session $current of $total';
   }
+
+  @override
+  String get manageDefaults => 'Manage Defaults';
+
+  @override
+  String get defaults => 'Defaults';
+
+  @override
+  String get defaultGuideName => 'Default Guide Name';
+
+  @override
+  String get defaultDuration => 'Default Duration';
+
+  @override
+  String get defaultGuideNameCleared => 'Default guide name cleared';
+
+  @override
+  String get defaultDurationCleared => 'Default duration cleared';
+
+  @override
+  String get notSet => 'Not set';
+
+  @override
+  String get defaultsNote =>
+      'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.';
 }
