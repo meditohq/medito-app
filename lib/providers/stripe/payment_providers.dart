@@ -49,7 +49,7 @@ enum PaymentStatus {
   cancelled,
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class PaymentState extends _$PaymentState {
   @override
   PaymentStateData build() => const PaymentStateData();
@@ -115,7 +115,7 @@ abstract class PaymentMethodService {
   Future<bool> isAvailable();
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 CardPaymentService cardPaymentService(Ref ref) {
   return CardPaymentService(ref);
 }
@@ -127,7 +127,6 @@ class CardPaymentService implements PaymentMethodService {
 
   @override
   Future<bool> isAvailable() async {
-    // Card payment is always available
     return true;
   }
 
@@ -141,17 +140,22 @@ class CardPaymentService implements PaymentMethodService {
       final donationClient = ref.read(donationServiceProvider);
       final body = _buildPaymentIntentBody(request);
 
+      AppLogger.d('PAYMENT', 'Creating card payment intent: $body');
+
       final response = await donationClient.postRequest(
         HTTPConstants.createPaymentIntent,
         body: body,
       );
+
+      AppLogger.d('PAYMENT', 'Payment intent response: $response');
 
       final paymentIntent =
           PaymentIntentModel.fromJson(response['data'] as Map<String, dynamic>);
       paymentState.setPaymentIntent(paymentIntent);
 
       return paymentIntent;
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.e('PAYMENT', 'Failed to create payment intent: $e\n$st');
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
       rethrow;
@@ -226,7 +230,7 @@ class CardPaymentService implements PaymentMethodService {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 ApplePayService applePayService(Ref ref) {
   return ApplePayService(ref);
 }
@@ -349,7 +353,7 @@ class ApplePayService implements PaymentMethodService {
 // PAYMENT CONTROLLERS
 // =============================================================================
 
-@riverpod
+@Riverpod(keepAlive: true)
 class OneTimePaymentController extends _$OneTimePaymentController {
   @override
   AsyncValue<PaymentIntentModel?> build() => const AsyncValue.data(null);
@@ -414,7 +418,7 @@ class OneTimePaymentController extends _$OneTimePaymentController {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class MonthlySubscriptionController extends _$MonthlySubscriptionController {
   @override
   AsyncValue<PaymentIntentModel?> build() => const AsyncValue.data(null);
@@ -471,7 +475,8 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
 
       final result = await paymentService.processPayment(paymentIntent);
       return result;
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.e('PAYMENT', 'Monthly subscription failed: $e\n$st');
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
       state = AsyncValue.error(error, StackTrace.current);
@@ -480,7 +485,7 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class YearlySubscriptionController extends _$YearlySubscriptionController {
   @override
   AsyncValue<PaymentIntentModel?> build() => const AsyncValue.data(null);
@@ -550,7 +555,7 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
 // UTILITY PROVIDERS
 // =============================================================================
 
-@riverpod
+@Riverpod(keepAlive: true)
 IDonationApiService donationService(Ref ref) {
   return DonationApiService();
 }

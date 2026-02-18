@@ -2,6 +2,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../constants/http/http_constants.dart';
+import '../../utils/logger.dart';
 import '../../models/stripe/payment_config_model.dart';
 import '../../services/network/donation_api_service.dart';
 import '../../exceptions/app_error.dart';
@@ -46,6 +47,8 @@ class PaymentServiceImpl implements PaymentService {
       }
       final config = PaymentConfigModel.fromJson(data as Map<String, dynamic>);
 
+      AppLogger.d('PAYMENT', 'Stripe publishableKey: ${config.publishableKey}');
+
       Stripe.publishableKey = config.publishableKey;
       Stripe.merchantIdentifier = config.merchantIdentifier;
 
@@ -62,7 +65,7 @@ class PaymentServiceImpl implements PaymentService {
 }
 
 // Riverpod providers - paymentService must be defined first
-@riverpod
+@Riverpod(keepAlive: true)
 PaymentService paymentService(Ref ref) {
   return PaymentServiceImpl(
     ref: ref,
