@@ -16,7 +16,7 @@ import '../donation/donation_snooze_provider.dart';
 part 'payment_ui_controller.g.dart';
 
 /// Payment UI Controller - Handles payment presentation logic and user feedback
-@riverpod
+@Riverpod(keepAlive: true)
 class PaymentUIController extends _$PaymentUIController {
   @override
   void build() {
@@ -85,7 +85,8 @@ class PaymentUIController extends _$PaymentUIController {
 
       await _handlePaymentResult(context, result, paywallId, 'monthly', userId,
           paywallSource, onSuccess);
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.e('PAYMENT_UI', 'Error initiating monthly subscription: $e\n$st');
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
     }
   }
