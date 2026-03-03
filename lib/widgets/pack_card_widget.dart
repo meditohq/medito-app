@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/widgets/network_image_widget.dart';
 import 'package:flutter/material.dart';
@@ -24,100 +21,48 @@ class PackCardWidget extends StatefulWidget {
 }
 
 class _PackCardWidgetState extends State<PackCardWidget> {
-  Future<ColorScheme?>? _colorSchemeFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _colorSchemeFuture = _generateColorScheme(context);
-  }
-
-  @override
-  void didUpdateWidget(covariant PackCardWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.coverUrlPath != widget.coverUrlPath) {
-      _colorSchemeFuture = _generateColorScheme(context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
 
-    return FutureBuilder<ColorScheme?>(
-      future: _colorSchemeFuture,
-      builder: (context, snapshot) {
-        var colorScheme = snapshot.data;
-        var backgroundColor =
-            colorScheme?.primaryContainer ?? ColorConstants.onyx;
-        var titleColor = colorScheme?.onPrimaryContainer ?? Colors.white;
-        var subtitleColor = colorScheme?.onPrimaryContainer ?? Colors.white;
+    final backgroundColor = theme.cardColor;
+    final titleColor = theme.colorScheme.onSurface;
+    final subtitleColor = theme.colorScheme.onSurface;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: InkWell(
-            onTap: widget.onTap,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.coverUrlPath != null &&
-                    widget.coverUrlPath!.isNotEmpty)
-                  _getCoverUrl(),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _title(textTheme,
-                            title: widget.title, color: titleColor),
-                        if (widget.subTitle != null) const SizedBox(height: 4),
-                        Expanded(
-                          child: _description(
-                            textTheme,
-                            subtitle: widget.subTitle,
-                            color: subtitleColor,
-                          ),
-                        ),
-                      ],
-                    ),
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: InkWell(
+        onTap: widget.onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.coverUrlPath != null && widget.coverUrlPath!.isNotEmpty)
+              _getCoverUrl(),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _title(textTheme, title: widget.title, color: titleColor),
+                  if (widget.subTitle != null) const SizedBox(height: 4),
+                  _description(
+                    textTheme,
+                    subtitle: widget.subTitle,
+                    color: subtitleColor,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
-  }
-
-  Future<ColorScheme?> _generateColorScheme(BuildContext context) async {
-    if (widget.coverUrlPath != null && widget.coverUrlPath!.isNotEmpty) {
-      // Skip processing images from dead domains
-      if (HTTPConstants.isDeadDomain(widget.coverUrlPath!)) {
-        return null;
-      }
-
-      try {
-        var image = CachedNetworkImageProvider(widget.coverUrlPath!);
-
-        return await ColorScheme.fromImageProvider(
-          provider: image,
-          brightness: Brightness.dark,
-          contrastLevel: 1,
-        ).timeout(const Duration(seconds: 5), onTimeout: () {
-          throw TimeoutException('ColorScheme generation timed out');
-        });
-      } catch (e) {
-        // Silently handle image loading errors for color scheme generation
-        // This prevents crashes when pack cover images are missing or fail to load
-        return null;
-      }
-    }
-    return null;
   }
 
   Text _title(
@@ -127,8 +72,6 @@ class _PackCardWidgetState extends State<PackCardWidget> {
   }) {
     return Text(
       title,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
       style: textTheme.displayLarge?.copyWith(
         fontFamily: dmSans,
         height: 1.2,
@@ -145,8 +88,6 @@ class _PackCardWidgetState extends State<PackCardWidget> {
     if (subtitle != null) {
       return Text(
         subtitle,
-        maxLines: 3,
-        overflow: TextOverflow.ellipsis,
         style: textTheme.titleMedium?.copyWith(
           letterSpacing: 0,
           color: color,

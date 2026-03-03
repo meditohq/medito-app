@@ -24,6 +24,8 @@ class DeepLinkService {
   void initialize() {
     AppLogger.d('DEEPLINK', 'Setting up deep link handlers');
 
+    _checkInitialLink();
+
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (uri) {
         AppLogger.d('DEEPLINK', 'Got deep link: $uri');
@@ -33,6 +35,18 @@ class DeepLinkService {
         AppLogger.e('DEEPLINK', 'Error from link stream', err);
       },
     );
+  }
+
+  Future<void> _checkInitialLink() async {
+    try {
+      final initialUri = await _appLinks.getInitialLink();
+      if (initialUri != null) {
+        AppLogger.d('DEEPLINK', 'Got initial deep link: $initialUri');
+        handleDeepLink(initialUri);
+      }
+    } catch (e) {
+      AppLogger.e('DEEPLINK', 'Error checking initial link', e);
+    }
   }
 
   void dispose() {
@@ -112,25 +126,23 @@ class DeepLinkService {
         return;
       }
 
-      // Standard UTM parameter names and their SharedPreferences keys
-      final utmParamMap = {
-        'utm_source': SharedPreferenceConstants.utmSource,
-        'utm_medium': SharedPreferenceConstants.utmMedium,
-        'utm_campaign': SharedPreferenceConstants.utmCampaign,
-        'utm_term': SharedPreferenceConstants.utmTerm,
-        'utm_content': SharedPreferenceConstants.utmContent,
-      };
-
       final prefs = await SharedPreferences.getInstance();
       var storedCount = 0;
 
-      for (final entry in utmParamMap.entries) {
-        final value = queryParameters[entry.key];
+      final utmParams = [
+        SharedPreferenceConstants.utmSource,
+        SharedPreferenceConstants.utmMedium,
+        SharedPreferenceConstants.utmCampaign,
+        SharedPreferenceConstants.utmTerm,
+        SharedPreferenceConstants.utmContent,
+      ];
+
+      for (final paramKey in utmParams) {
+        final value = queryParameters[paramKey];
         if (value != null && value.isNotEmpty) {
-          await prefs.setString(entry.value, value);
+          await prefs.setString(paramKey, value);
           storedCount++;
-          AppLogger.d(
-              'DEEPLINK', 'Stored UTM parameter: ${entry.key} = $value');
+          AppLogger.d('DEEPLINK', 'Stored UTM parameter: $paramKey = $value');
         }
       }
 

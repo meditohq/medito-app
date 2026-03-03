@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/maintenance/maintenance_model.dart';
@@ -13,4 +12,3 @@ Future<MaintenanceModel> fetchMaintenance(Ref ref) {
 
   return maintenanceRepository.fetchMaintenance();
 }
-

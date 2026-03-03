@@ -14,7 +14,7 @@ void main() {
       // end - duration = 10:15 - 5m = 10:10 AM
       // + 24h = Oct 25, 10:10 AM
       // - 10m = Oct 25, 10:00 AM
-      final expectedAnchor = DateTime(2025, 10, 25, 10, 00);
+      final expectedAnchor = DateTime(2025, 10, 25, 10, 0);
 
       final end = DateTime.fromMillisecondsSinceEpoch(endMs);
       final start = end.subtract(Duration(milliseconds: durationMs));

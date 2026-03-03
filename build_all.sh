@@ -126,6 +126,58 @@ case $paywall_choice in
         ;;
 esac
 
+# Play Console upload selection (before building)
+UPLOAD_TO_PLAY_STORE=false
+PLAY_STORE_TRACK=""
+
+if [ "$BUILD_ANDROID" = true ]; then
+    echo ""
+    print_colored $BLUE "📤 Play Console Upload Selection"
+    print_colored $BLUE "=================================="
+    echo -n "Do you want to upload the APK to Google Play Console after building? (y/N): "
+    read upload_choice
+
+    if [[ "$upload_choice" =~ ^[Yy]$ ]]; then
+        UPLOAD_TO_PLAY_STORE=true
+        
+        # Determine track based on paywall environment
+        if [ "$PAYWALL_ENV" = "dev" ]; then
+            PLAY_STORE_TRACK="internal"
+            print_colored $YELLOW "Will upload to 'internal' track (dev paywalls)"
+        else
+            echo ""
+            print_colored $BLUE "Select Play Console track:"
+            echo "1) internal (for internal testing)"
+            echo "2) beta (for beta testing)"
+            echo "3) production (for production release)"
+            echo ""
+            echo -n "Select track (1-3, default: 1): "
+            read track_choice
+            
+            case $track_choice in
+                2)
+                    PLAY_STORE_TRACK="beta"
+                    ;;
+                3)
+                    PLAY_STORE_TRACK="production"
+                    print_colored $YELLOW "⚠️  Will upload to PRODUCTION track!"
+                    echo -n "Are you sure? (y/N): "
+                    read prod_confirm
+                    if [[ ! "$prod_confirm" =~ ^[Yy]$ ]]; then
+                        print_colored $YELLOW "Upload cancelled."
+                        UPLOAD_TO_PLAY_STORE=false
+                        PLAY_STORE_TRACK=""
+                    fi
+                    ;;
+                *)
+                    PLAY_STORE_TRACK="internal"
+                    ;;
+            esac
+        fi
+    fi
+fi
+
+echo ""
 echo "🧪 Running Flutter tests..."
 flutter test
 
@@ -156,8 +208,72 @@ if [ "$BUILD_ANDROID" = true ]; then
         print_colored $GREEN "✅ This build has LIVE paywalls - safe for production deployment"
     fi
 
+    # Upload to Play Console if requested
+    if [ "$UPLOAD_TO_PLAY_STORE" = true ] && [ -n "$PLAY_STORE_TRACK" ]; then
+        echo ""
+        print_colored $BLUE "📤 Uploading APK to Play Console ($PLAY_STORE_TRACK track)..."
+        
+        # Check if Google Play API key exists (try multiple locations)
+        PLAY_API_KEY=""
+        if [ -f "../play-store-credentials.json" ]; then
+            PLAY_API_KEY="../play-store-credentials.json"
+        elif [ -f "android/fastlane/keys/google-play-api-key.json" ]; then
+            PLAY_API_KEY="android/fastlane/keys/google-play-api-key.json"
+        fi
+        
+        if [ -z "$PLAY_API_KEY" ]; then
+            print_colored $RED "❌ Google Play API key not found"
+            print_colored $YELLOW "Checked locations:"
+            print_colored $YELLOW "  - ../play-store-credentials.json"
+            print_colored $YELLOW "  - android/fastlane/keys/google-play-api-key.json"
+            print_colored $YELLOW "Please ensure the API key file exists before uploading."
+        else
+            print_colored $GREEN "✅ Found Google Play credentials at: $PLAY_API_KEY"
+            
+            # Get absolute paths
+            ABS_APK_PATH="$(pwd)/$SOURCE_APK"
+            
+            # Convert credentials path to absolute
+            if [[ "$PLAY_API_KEY" == /* ]]; then
+                ABS_CREDENTIALS_PATH="$PLAY_API_KEY"
+            elif [[ "$PLAY_API_KEY" == ../* ]]; then
+                ABS_CREDENTIALS_PATH="$(cd .. && pwd)/$(basename "$PLAY_API_KEY")"
+            else
+                ABS_CREDENTIALS_PATH="$(pwd)/$PLAY_API_KEY"
+            fi
+            
+            # Change to android directory to run Fastlane
+            cd android
+            
+            # Check if bundle is available
+            if command -v bundle &> /dev/null; then
+                # Check if Gemfile exists and install dependencies if needed
+                if [ -f "Gemfile" ]; then
+                    print_colored $BLUE "📦 Installing Fastlane dependencies..."
+                    bundle install
+                fi
+                bundle exec fastlane android upload_apk apk_path:"$ABS_APK_PATH" track:"$PLAY_STORE_TRACK" json_key:"$ABS_CREDENTIALS_PATH"
+            else
+                print_colored $YELLOW "⚠️  bundle not found, trying fastlane directly..."
+                fastlane android upload_apk apk_path:"$ABS_APK_PATH" track:"$PLAY_STORE_TRACK" json_key:"$ABS_CREDENTIALS_PATH"
+            fi
+            
+            UPLOAD_RESULT=$?
+            cd ..
+            
+            if [ $UPLOAD_RESULT -eq 0 ]; then
+                print_colored $GREEN "✅ APK uploaded to Play Console successfully!"
+                print_colored $BLUE "Track: $PLAY_STORE_TRACK"
+            else
+                print_colored $RED "❌ Failed to upload APK to Play Console"
+                print_colored $YELLOW "APK is still available at: $DEST_APK"
+            fi
+        fi
+    fi
+
     # Open the dated APKs directory
-    echo "✅ Android build completed! Opening dated APKs directory..."
+    echo ""
+    print_colored $BLUE "✅ Android build completed! Opening dated APKs directory..."
     open "$DATED_APKS_DIR"
 else
     print_colored $YELLOW "⏭️  Skipping Android build (--ios-only flag used)"

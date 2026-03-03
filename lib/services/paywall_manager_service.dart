@@ -1,7 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/superwall_service.dart';
-import 'package:medito/constants/http/http_constants.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 /// Service to manage paywall presentation and lifecycle
@@ -14,10 +14,10 @@ class PaywallManagerService {
       : _superwallService = ref.read(superwallServiceProvider);
 
   String getDonationPlacementId() {
-    if (paywallEnvironment == 'live') {
-      return 'donation_flow';
-    } else {
+    if (kDebugMode) {
       return 'dev_donation_flow';
+    } else {
+      return 'donation_flow';
     }
   }
 

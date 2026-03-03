@@ -85,10 +85,10 @@ class _TrackViewState extends ConsumerState<TrackView>
                 child: trackAsyncValue.when(
                   data: (trackModel) {
                     // Derive active state from providers and model
-                    final activeAudio = (guideNameState.valueOrNull != null)
+                    final activeAudio = (guideNameState.value != null)
                         ? trackModel.audio.firstWhere(
                             (audio) =>
-                                audio.guideName == guideNameState.valueOrNull,
+                                audio.guideName == guideNameState.value,
                             orElse: () => trackModel.audio.first,
                           )
                         : trackModel.audio.first;

@@ -1,6 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -56,10 +56,13 @@ class Pack extends _$Pack {
     required String trackId,
     required bool isComplete,
   }) async {
+    final statsManager = StatsManager();
+    await statsManager.initialize();
+    
     if (isComplete) {
-      await StatsManager().removeTrackChecked(trackId);
+      await statsManager.removeTrackChecked(trackId);
     } else {
-      await StatsManager().addTrackChecked(trackId);
+      await statsManager.addTrackChecked(trackId);
     }
 
     // Refresh stats provider from local to ensure UI shows updated stats
@@ -67,6 +70,13 @@ class Pack extends _$Pack {
       await ref.read(statsProvider.notifier).refreshFromLocal();
     } catch (_) {
       // Silently fail if refresh fails - the local state update is more important
+    }
+
+    // Refresh upNextProvider to update the Up Next widget
+    try {
+      await ref.read(upNextProvider.notifier).refresh();
+    } catch (_) {
+      // Silently fail if refresh fails
     }
 
     state = state.whenData((pack) {

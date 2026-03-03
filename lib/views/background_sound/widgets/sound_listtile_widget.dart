@@ -12,15 +12,15 @@ class SoundListTileWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
-    var selectedSoundId = bgSoundNotifierProvider.selectedBgSound?.id ?? '0';
+    final bgSoundState = ref.watch(backgroundSoundsNotifierProvider);
+    var selectedSoundId = bgSoundState.selectedBgSound?.id ?? '0';
     var isDownloading =
-        bgSoundNotifierProvider.downloadingBgSound?.id == sound.id;
+        bgSoundState.downloadingBgSound?.id == sound.id;
     var isSelected = selectedSoundId == sound.id;
 
     return InkWell(
       onTap: () => _handleItemTap(
-        bgSoundNotifierProvider,
+        ref,
         context,
       ),
       child: Container(
@@ -88,12 +88,13 @@ class SoundListTileWidget extends ConsumerWidget {
   }
 
   void _handleItemTap(
-    BackgroundSoundsNotifier bgSoundNotifierProvider,
+    WidgetRef ref,
     BuildContext context,
   ) {
+    final notifier = ref.read(backgroundSoundsNotifierProvider.notifier);
     if (sound.title == AppLocalizations.of(context)!.none) {
-      bgSoundNotifierProvider.stopBackgroundSound();
+      notifier.stopBackgroundSound();
     }
-    bgSoundNotifierProvider.handleOnChangeSound(sound);
+    notifier.handleOnChangeSound(sound);
   }
 }

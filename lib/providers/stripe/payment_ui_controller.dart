@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
@@ -8,11 +7,11 @@ import 'package:medito/providers/stripe/payment_providers.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/services/analytics/tiktok_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../me/me_provider.dart';
+import '../donation/donation_snooze_provider.dart';
 
 part 'payment_ui_controller.g.dart';
 
@@ -52,7 +51,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      _handlePaymentResult(context, result, paywallId, 'onetime', userId,
+      await _handlePaymentResult(context, result, paywallId, 'onetime', userId,
           paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
@@ -84,7 +83,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      _handlePaymentResult(context, result, paywallId, 'monthly', userId,
+      await _handlePaymentResult(context, result, paywallId, 'monthly', userId,
           paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
@@ -116,7 +115,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      _handlePaymentResult(context, result, paywallId, 'yearly', userId,
+      await _handlePaymentResult(context, result, paywallId, 'yearly', userId,
           paywallSource, onSuccess);
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
@@ -157,7 +156,7 @@ class PaymentUIController extends _$PaymentUIController {
   }
 
   /// Handles payment results and shows appropriate success/error messages
-  void _handlePaymentResult(
+  Future<void> _handlePaymentResult(
     BuildContext context,
     PaymentResult result,
     String? paywallId,
@@ -165,7 +164,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userId,
     String? paywallSource,
     VoidCallback? onSuccess,
-  ) {
+  ) async {
     result.when(
       success: (paymentIntentId, amount, currency) {
         // Track successful donation
@@ -187,19 +186,21 @@ class PaymentUIController extends _$PaymentUIController {
           },
         );
 
-        // TikTok donation events (all revenue in cents)
-        TikTokAnalyticsService().logDonationEvents(
-          revenueCents: amount,
-          currency: currency,
-          frequency: frequency,
-        );
-
         // Meta donation events (all revenue in cents)
         MetaSdkService.instance.logDonationEvents(
           revenueCents: amount,
           currency: currency,
           frequency: frequency,
         );
+
+        // Record donation success for snooze tracking (fire-and-forget)
+        ref
+            .read(donationSnoozeProvider.notifier)
+            .recordDonationSuccess(frequency)
+            .catchError((e) {
+          AppLogger.e(
+              'PAYMENT_UI', 'Failed to record donation success for snooze', e);
+        });
 
         onSuccess?.call(); // Notify screen
 
@@ -227,12 +228,6 @@ class PaymentUIController extends _$PaymentUIController {
 
         // Firebase Analytics
         FirebaseAnalyticsService().logEvent(
-          name: AnalyticsEventConstants.paymentFailed,
-          parameters: eventParams,
-        );
-
-        // TikTok Analytics
-        TikTokAnalyticsService().logEvent(
           name: AnalyticsEventConstants.paymentFailed,
           parameters: eventParams,
         );
@@ -268,12 +263,6 @@ class PaymentUIController extends _$PaymentUIController {
           parameters: eventParams,
         );
 
-        // TikTok Analytics
-        TikTokAnalyticsService().logEvent(
-          name: AnalyticsEventConstants.paymentCancelled,
-          parameters: eventParams,
-        );
-
         // Meta Analytics
         MetaSdkService.instance.logEvent(
           AnalyticsEventConstants.paymentCancelled,
@@ -283,12 +272,6 @@ class PaymentUIController extends _$PaymentUIController {
         // Also track as paywall dismissed without payment
         // Firebase Analytics
         FirebaseAnalyticsService().logEvent(
-          name: AnalyticsEventConstants.paywallDismissedNoPayment,
-          parameters: eventParams,
-        );
-
-        // TikTok Analytics
-        TikTokAnalyticsService().logEvent(
           name: AnalyticsEventConstants.paywallDismissedNoPayment,
           parameters: eventParams,
         );

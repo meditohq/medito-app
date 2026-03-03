@@ -38,7 +38,7 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
   Future<void> _fetchAndMergeFromServer() async {
     try {
       final serverFavorites = await _repository.loadFavoritesFromServer();
-      final currentLocalFavorites = state.valueOrNull ?? [];
+      final currentLocalFavorites = state.value ?? [];
       final mergedFavorites =
           mergeFavoriteLists(currentLocalFavorites, serverFavorites);
 
@@ -80,7 +80,7 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
 
   // Updated Add logic
   void addToFavorites(FavoriteItem item) async {
-    final currentFavorites = List<FavoriteItem>.from(state.valueOrNull ?? []);
+    final currentFavorites = List<FavoriteItem>.from(state.value ?? []);
     // Avoid adding duplicates based on ID
     if (currentFavorites.any((fav) => fav.id == item.id)) return;
 
@@ -101,7 +101,7 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
 
   // Updated Remove logic
   void removeFromFavorites(String id) async {
-    final currentFavorites = state.valueOrNull ?? [];
+    final currentFavorites = state.value ?? [];
     final updatedFavorites =
         currentFavorites.where((item) => item.id != id).toList();
 

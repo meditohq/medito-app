@@ -648,6 +648,47 @@ class AuthRepositoryImpl extends AuthRepository {
       await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
 
       dev.log('[AUTH_REPO] Anonymous sign in successful');
+    } on EmailExistsError {
+      dev.log(
+          '[AUTH_REPO] EMAIL_ASSOCIATED detected, generating new client ID and retrying',
+          level: 500);
+
+      // The existing client_id is associated with an email account
+      // Generate a new client_id and retry anonymous sign-in
+      final newClientId = _generateClientId();
+      await _preferences.setString(
+          SharedPreferenceConstants.userId, newClientId);
+
+      try {
+        _tokens = await _authService.signIn(
+          clientId: newClientId,
+        );
+
+        // Update user info
+        _currentUser = User(
+          id: _tokens!.clientId,
+        );
+
+        // Update HTTP service with the new token
+        _httpApiService.setAuthHeader(_tokens!.accessToken);
+
+        // Save client ID
+        await _preferences.setString(
+            SharedPreferenceConstants.userId, _tokens!.clientId);
+
+        // Mark user as logged in
+        await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
+
+        dev.log('[AUTH_REPO] Anonymous sign in successful with new client ID');
+      } catch (retryError) {
+        _crashlyticsService.recordError(
+          retryError,
+          StackTrace.current,
+          reason:
+              'AuthRepo: Error signing in anonymously after EMAIL_ASSOCIATED retry',
+        );
+        // Don't rethrow, this should not crash the app
+      }
     } catch (e) {
       _crashlyticsService.recordError(
         e,
@@ -687,7 +728,8 @@ class AuthRepositoryImpl extends AuthRepository {
       await MetaSdkService.instance.setUserId(null);
       dev.log('[AUTH_REPO] Firebase Analytics user ID cleared', level: 500);
     } catch (e) {
-      dev.log('[AUTH_REPO] Error clearing Firebase Analytics user ID: $e', level: 800);
+      dev.log('[AUTH_REPO] Error clearing Firebase Analytics user ID: $e',
+          level: 800);
     }
 
     // Reset current user to null

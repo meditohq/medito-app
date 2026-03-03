@@ -17,6 +17,12 @@ class AppDelegate: FlutterAppDelegate {
         // Initialize Firebase
         FirebaseApp.configure()
         
+        // Initialize Facebook SDK
+        ApplicationDelegate.shared.application(
+            application,
+            didFinishLaunchingWithOptions: launchOptions
+        )
+        
         let controller = window?.rootViewController as! FlutterViewController
         
         // Siri channel

@@ -17,6 +17,7 @@ class TypeConstants {
   static const String toggle = 'toggle';
   static const String toggleDnd = 'toggle_dnd';
   static const String toggleStreakFreeze = 'toggle_streak_freeze';
+  static const String toggleZenMode = 'toggle_zen_mode';
   static const String theme = 'theme';
   static const String addWidget = 'add_widget';
 
@@ -25,6 +26,13 @@ class TypeConstants {
   static const String session = 'session';
   static const String journalEntry = 'journal';
   static const String meditationOutsideApp = 'meditation_outside_app';
+  static const String addedManually = 'added_manually';
+  
+  // Manual session IDs based on time of day
+  static const String manual1 = 'manual1'; // Morning (5:00-11:59)
+  static const String manual2 = 'manual2'; // Afternoon (12:00-17:59)
+  static const String manual3 = 'manual3'; // Evening (18:00-22:59)
+  static const String manual4 = 'manual4'; // Night (23:00-4:59)
 }
 
 class RouteConstants {

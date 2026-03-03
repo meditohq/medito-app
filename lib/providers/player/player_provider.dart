@@ -18,13 +18,14 @@ final _androidServiceApi = MeditoAndroidAudioServiceManager();
 final iosAudioHandler = IosAudioHandler();
 
 final playerProvider =
-    StateNotifierProvider<PlayerProvider, TrackModel?>((ref) {
-  return PlayerProvider(ref);
+    NotifierProvider<PlayerProvider, TrackModel?>(() {
+  return PlayerProvider();
 });
 
-class PlayerProvider extends StateNotifier<TrackModel?> {
-  PlayerProvider(this.ref) : super(null);
-  Ref ref;
+class PlayerProvider extends Notifier<TrackModel?> {
+
+  @override
+  TrackModel? build() => null;
 
   Future<void> loadSelectedTrack({
     required TrackModel trackModel,
@@ -63,7 +64,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
   ) async {
     debugPrint(
         '🔊 _playTrack called for track: \\${track.id}, file: \\${file.id}');
-    var downloadPath = await ref.read(audioDownloaderProvider).getTrackPath(
+    var downloadPath = await ref.read(audioDownloaderProvider.notifier).getTrackPath(
           _constructFileName(track, file),
         );
 
@@ -240,7 +241,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       _api.skip10SecondsForward();
     } else {
       iosAudioHandler.seek(
-        iosAudioHandler.position + const Duration(seconds: 10),
+        iosAudioHandler.position + const Duration(seconds: 15),
       );
     }
   }
@@ -250,7 +251,7 @@ class PlayerProvider extends StateNotifier<TrackModel?> {
       _api.skip10SecondsBackward();
     } else {
       iosAudioHandler.seek(
-        iosAudioHandler.position - const Duration(seconds: 10),
+        iosAudioHandler.position - const Duration(seconds: 15),
       );
     }
   }

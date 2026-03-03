@@ -163,7 +163,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       final proceed = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              backgroundColor: Theme.of(context).dialogBackgroundColor,
+              backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
               title: Text(
                 AppLocalizations.of(context)!.accountTransitionWarningTitle,
                 style: Theme.of(context).textTheme.headlineSmall,
@@ -303,6 +303,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         );
 
         await StatsManager().clearAllStats();
+        // Force sync after clearing stats to ensure we fetch from server
+        var statsManager = StatsManager();
+        await statsManager.initialize();
+        await statsManager.sync(force: true);
         ref.read(statsProvider.notifier).refresh();
         ref.invalidate(packProvider);
 

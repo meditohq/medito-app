@@ -83,9 +83,7 @@ void main() async {
         if (importLines.isNotEmpty) {
           final lastImportIndex = updatedContent.lastIndexOf(importLines.last) +
               importLines.last.length;
-          updatedContent = updatedContent.substring(0, lastImportIndex) +
-              '\nimport \'$importPath\';' +
-              updatedContent.substring(lastImportIndex);
+          updatedContent = '${updatedContent.substring(0, lastImportIndex)}\nimport \'$importPath\';${updatedContent.substring(lastImportIndex)}';
         }
       }
 

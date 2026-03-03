@@ -1,7 +1,7 @@
 // cursor_rule.analyticsstrings.mdc
 // Put all analytics event string constants in this file. Add a comment for each event describing the context in which it is used, so that in the future AI and maintainers can accurately translate or update them.
 
-// This file contains all analytics event string constants used for Firebase Analytics, TikTok Analytics, Meta App Events, and other analytics platforms.
+// This file contains all analytics event string constants used for Firebase Analytics, Meta App Events, and other analytics platforms.
 // Add a comment for each event describing the context in which it is used, so future AI and maintainers can accurately translate or update them.
 
 class AnalyticsEventConstants {
@@ -30,16 +30,16 @@ class AnalyticsEventConstants {
   /// Event logged when a yearly subscription donation is successfully completed
   static const String donationYearly = 'donation_yearly';
 
-  /// Event logged when a donation is initiated from the paywall (used by TikTok and Meta)
+  /// Event logged when a donation is initiated from the paywall (used by Meta)
   static const String paywallDonation = 'paywall_donation';
 
-  /// Event logged for lifetime/one-time donations (used by TikTok and Meta)
+  /// Event logged for lifetime/one-time donations (used by Meta)
   static const String oneTimeDonation = 'onetime_donation';
 
-  /// Event logged for monthly subscription donations (used by TikTok and Meta)
+  /// Event logged for monthly subscription donations (used by Meta)
   static const String monthlyDonation = 'monthly_donation';
 
-  /// Event logged for yearly subscription donations (used by TikTok and Meta)
+  /// Event logged for yearly subscription donations (used by Meta)
   static const String yearlyDonation = 'yearly_donation';
 
   /// Event logged when paywall is dismissed without completing a payment
@@ -104,6 +104,19 @@ class AnalyticsEventConstants {
   // Feedback events
   /// Event logged when user submits post-meditation feedback
   static const String postMeditationFeedback = 'post_meditation_feedback';
+
+  // Audio session events
+  /// Event logged when an audio session is completed and stats are updated
+  static const String audioSessionCompleted = 'audio_session_completed';
+
+  /// Parameter name for audio file ID
+  static const String paramAudioFileId = 'audioFileId';
+
+  /// Parameter name for audio file guide/narrator
+  static const String paramAudioFileGuide = 'audioFileGuide';
+
+  /// Parameter name for audio file duration in milliseconds
+  static const String paramAudioFileDuration = 'audioFileDuration';
 
   // Error and token events
   /// Event logged when unexpected logout occurs due to missing refresh token
@@ -185,9 +198,9 @@ class AnalyticsEventConstants {
   /// Parameter name for payment intent identifier
   static const String paramPaymentIntentId = 'payment_intent_id';
 
-  /// Parameter name for revenue (used by TikTok and Meta)
+  /// Parameter name for revenue (used by Meta)
   static const String paramRevenue = 'revenue';
 
-  /// Parameter name for currency (used by TikTok and Meta)
+  /// Parameter name for currency (used by Meta)
   static const String paramCurrency = 'currency';
 }

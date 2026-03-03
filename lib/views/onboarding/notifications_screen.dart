@@ -40,12 +40,17 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
   }
 
-  void _handleNotificationsPermission() async {
+  Future<void> _handleNotificationsPermission() async {
     if (!mounted) return;
 
     setState(() => _isProcessing = true);
     final handler = ref.read(firebaseMessagingProvider);
-    final status = await Permission.notification.request();
+    
+    // Request notification permission if not already granted
+    var status = await Permission.notification.status;
+    if (!status.isGranted) {
+      status = await Permission.notification.request();
+    }
 
     if (!mounted) return;
 
@@ -61,9 +66,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       if (mounted) {
         setState(() {
           _notificationsGranted = true;
-          _isProcessing = false;
         });
       }
+
+      // Automatically set up reminders and advance
+      await _setupRemindersAndAdvance();
     } else {
       // Permission denied - log analytics event for onboarding context
       if (status.isDenied || status.isPermanentlyDenied) {
@@ -83,14 +90,19 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
   }
 
-  Future<void> _handleEnableSmartReminders() async {
+  Future<void> _setupRemindersAndAdvance() async {
+    if (!mounted) return;
+
     // Log analytics event for set reminder tap
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
     );
 
     final accepted = await PermissionHandler.requestAlarmPermission(context);
-    if (!accepted || !mounted) return;
+    if (!accepted || !mounted) {
+      setState(() => _isProcessing = false);
+      return;
+    }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
@@ -118,11 +130,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       l10n: AppLocalizations.of(context),
     );
 
-    ref.read(reminderTimeProvider.notifier).state = TimeOfDay(
-      hour: anchorLocal.hour,
-      minute: anchorLocal.minute,
-    );
-    _navigateNext();
+    if (mounted) {
+      await ref.read(reminderTimeProvider.notifier).setTime(TimeOfDay(
+        hour: anchorLocal.hour,
+        minute: anchorLocal.minute,
+      ));
+      setState(() => _isProcessing = false);
+      _navigateNext();
+    }
   }
 
   void _navigateNext() => widget.onNext?.call();
@@ -164,14 +179,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 children: [
                   if (reminderTime != null)
                     _buildSmartRemindersOnButton()
-                  else if (_notificationsGranted)
-                    _buildActionButton(
-                      text: AppLocalizations.of(context)!.turnOnSmartReminders,
-                      onPressed: _handleEnableSmartReminders,
-                    )
                   else
                     _buildActionButton(
-                      text: AppLocalizations.of(context)!.setReminder,
+                      text: _notificationsGranted
+                          ? AppLocalizations.of(context)!.turnOnSmartReminders
+                          : AppLocalizations.of(context)!.setReminder,
                       onPressed:
                           _isProcessing ? null : _handleNotificationsPermission,
                     ),

@@ -473,18 +473,18 @@ class FirebaseAnalyticsService {
       final prefs = await SharedPreferences.getInstance();
       final utmParams = <String, String>{};
 
-      final utmParamMap = {
-        SharedPreferenceConstants.utmSource: 'utm_source',
-        SharedPreferenceConstants.utmMedium: 'utm_medium',
-        SharedPreferenceConstants.utmCampaign: 'utm_campaign',
-        SharedPreferenceConstants.utmTerm: 'utm_term',
-        SharedPreferenceConstants.utmContent: 'utm_content',
-      };
+      final utmParamKeys = [
+        SharedPreferenceConstants.utmSource,
+        SharedPreferenceConstants.utmMedium,
+        SharedPreferenceConstants.utmCampaign,
+        SharedPreferenceConstants.utmTerm,
+        SharedPreferenceConstants.utmContent,
+      ];
 
-      for (final entry in utmParamMap.entries) {
-        final value = prefs.getString(entry.key);
+      for (final paramKey in utmParamKeys) {
+        final value = prefs.getString(paramKey);
         if (value != null && value.isNotEmpty) {
-          utmParams[entry.value] = value;
+          utmParams[paramKey] = value;
         }
       }
 
@@ -501,6 +501,8 @@ class FirebaseAnalyticsService {
   /// Apply stored UTM parameters from SharedPreferences to Firebase Analytics user properties
   /// This should be called after user initialization to ensure UTM parameters from
   /// deep links (e.g., from Apple Ads) are properly attributed to the user
+  /// Note: UTM parameters are kept in storage so they can be used by other analytics
+  /// services (e.g., Meta) for attribution on subsequent events like donations
   static Future<void> applyStoredUtmParameters() async {
     try {
       if (_runningInTest) return;
@@ -511,33 +513,29 @@ class FirebaseAnalyticsService {
       // Ensure Firebase Analytics is initialized
       await analyticsService.initialize();
 
-      // Map of SharedPreferences keys to UTM parameter names
-      final utmParamMap = {
-        SharedPreferenceConstants.utmSource: 'utm_source',
-        SharedPreferenceConstants.utmMedium: 'utm_medium',
-        SharedPreferenceConstants.utmCampaign: 'utm_campaign',
-        SharedPreferenceConstants.utmTerm: 'utm_term',
-        SharedPreferenceConstants.utmContent: 'utm_content',
-      };
-
       var appliedCount = 0;
 
-      for (final entry in utmParamMap.entries) {
-        final value = prefs.getString(entry.key);
+      final utmParams = [
+        SharedPreferenceConstants.utmSource,
+        SharedPreferenceConstants.utmMedium,
+        SharedPreferenceConstants.utmCampaign,
+        SharedPreferenceConstants.utmTerm,
+        SharedPreferenceConstants.utmContent,
+      ];
+
+      for (final paramKey in utmParams) {
+        final value = prefs.getString(paramKey);
         if (value != null && value.isNotEmpty) {
           await analyticsService.setUserProperty(
-            name: entry.value,
+            name: paramKey,
             value: value,
           );
           appliedCount++;
 
           if (kDebugMode) {
             AppLogger.d('FIREBASE_ANALYTICS',
-                'Applied stored UTM parameter: ${entry.value} = $value');
+                'Applied stored UTM parameter: $paramKey = $value');
           }
-
-          // Remove from storage after applying (one-time use)
-          await prefs.remove(entry.key);
         }
       }
 

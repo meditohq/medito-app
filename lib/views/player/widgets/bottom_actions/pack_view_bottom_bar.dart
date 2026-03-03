@@ -4,7 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' show Platform;
 import 'package:share_plus/share_plus.dart';
 
+import 'package:medito/constants/config_constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/constants/types/type_constants.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/home/up_next_provider.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../models/favorites/favorite_item.dart';
@@ -13,6 +18,7 @@ import '../../../../providers/favorites/favorites_provider.dart';
 import '../../../../providers/pack/pack_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
 import '../../../../widgets/medito_huge_icon.dart';
+import '../../../../widgets/snackbar_widget.dart';
 import 'bottom_action_bar.dart';
 
 class PackViewBottomBar extends ConsumerWidget {
@@ -31,7 +37,7 @@ class PackViewBottomBar extends ConsumerWidget {
     final deepLink = 'https://medito.app/packs/$packId';
     final shareText =
         AppLocalizations.of(context)!.sharePackText(packName, deepLink);
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
   }
 
   void _showBottomSheet(BuildContext context) {
@@ -99,33 +105,50 @@ class PackViewBottomBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final packData = ref.watch(packProvider(packId: packId));
     final favoritesState = ref.watch(favoritesNotifierProvider);
+    final currentUpNextPackId = ref.watch(upNextPackIdProvider);
+    final isDefaultPack = packId == ConfigConstants.basicsPackId;
 
     return packData.when(
       data: (pack) {
+        final containsOnlyTracks = pack.items.every(
+          (item) => item.type == TypeConstants.track,
+        );
         return favoritesState.when(
           data: (favorites) {
             final isFavorite = favorites.any((item) => item.id == packId);
+            final isUpNext = currentUpNextPackId == packId;
             return _buildBottomBar(
               context,
               ref,
               pack,
               isFavorite,
+              isUpNext,
+              containsOnlyTracks,
+              isDefaultPack,
             );
           },
           loading: () {
+            final isUpNext = currentUpNextPackId == packId;
             return _buildBottomBar(
               context,
               ref,
               pack,
               false,
+              isUpNext,
+              containsOnlyTracks,
+              isDefaultPack,
             );
           },
           error: (error, stack) {
+            final isUpNext = currentUpNextPackId == packId;
             return _buildBottomBar(
               context,
               ref,
               pack,
               false,
+              isUpNext,
+              containsOnlyTracks,
+              isDefaultPack,
             );
           },
         );
@@ -140,12 +163,18 @@ class PackViewBottomBar extends ConsumerWidget {
     WidgetRef ref,
     PackModel pack,
     bool isFavorite,
+    bool isUpNext,
+    bool containsOnlyTracks,
+    bool isDefaultPack,
   ) {
-    var colour = isFavorite
+    var favouriteColour = isFavorite
         ? ColorConstants.lightPurple
         : Theme.of(context).colorScheme.onSurface;
-    var icon =
+    var favouriteIcon =
         isFavorite ? MeditoIcons.starSolid : MeditoIcons.star;
+    var pinColour = isUpNext
+        ? ColorConstants.lightPurple
+        : Theme.of(context).colorScheme.onSurface;
 
     return BottomActionBar(
       layout: BottomActionBarLayout.compactRight,
@@ -166,10 +195,19 @@ class PackViewBottomBar extends ConsumerWidget {
             ? () => _showBottomSheet(context)
             : () => _sharePack(context),
       ),
+      leftCenterItem: containsOnlyTracks
+          ? BottomActionBarItem(
+              child: MeditoIcon(
+                assetName: isUpNext ? MeditoIcons.pinSolid : MeditoIcons.pin,
+                color: pinColour,
+              ),
+              onTap: () => _onPinTap(context, ref, isUpNext, isDefaultPack),
+            )
+          : null,
       rightItem: BottomActionBarItem(
         child: MeditoIcon(
-          assetName: icon,
-          color: colour,
+          assetName: favouriteIcon,
+          color: favouriteColour,
         ),
         onTap: () {
           if (isFavorite) {
@@ -191,5 +229,30 @@ class PackViewBottomBar extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  Future<void> _onPinTap(
+    BuildContext context,
+    WidgetRef ref,
+    bool isUpNext,
+    bool isDefaultPack,
+  ) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    if (isUpNext && !isDefaultPack) {
+      // Unpin: set back to default pack
+      await prefs.remove(SharedPreferenceConstants.upNextPackId);
+      ref.invalidate(upNextPackIdProvider);
+      ref.invalidate(upNextProvider);
+      showSnackBar(context, l10n.packUnpinnedFromUpNext);
+    } else if (!isUpNext) {
+      // Pin: set this pack as up next
+      await prefs.setString(SharedPreferenceConstants.upNextPackId, packId);
+      ref.invalidate(upNextPackIdProvider);
+      ref.invalidate(upNextProvider);
+      showSnackBar(context, l10n.packSetAsUpNext);
+    }
+    // If isUpNext && isDefaultPack, do nothing (can't unpin default)
   }
 }

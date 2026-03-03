@@ -39,11 +39,14 @@ class SharedPreferenceConstants {
 
   // Smart Reminders
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
+  static const String reminderPromptDismissedForever = 'reminder_prompt_dismissed_forever';
+
+  // Zen Mode
+  static const String zenModeEnabled = 'zen_mode_enabled';
 
   // Analytics consent flags
   static const String analyticsFirebaseEnabled = 'analytics_firebase_enabled';
   static const String analyticsMetaEnabled = 'analytics_meta_enabled';
-  static const String analyticsTiktokEnabled = 'analytics_tiktok_enabled';
 
   // Historical consistency score data
   static const String consistencyScoreHistory = 'consistency_score_history';
@@ -57,4 +60,12 @@ class SharedPreferenceConstants {
   static const String utmCampaign = 'utm_campaign';
   static const String utmTerm = 'utm_term';
   static const String utmContent = 'utm_content';
+
+  // Donation snooze tracking
+  static const String donationAskSnoozedUntilMs = 'donation_ask_snoozed_until_ms';
+  static const String lastSuccessfulDonationAtMs = 'last_successful_donation_at_ms';
+  static const String lastSuccessfulDonationFrequency = 'last_successful_donation_frequency';
+
+  // Up Next pack preference
+  static const String upNextPackId = 'up_next_pack_id';
 }

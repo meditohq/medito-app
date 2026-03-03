@@ -429,6 +429,7 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
   void willRedeemLink() {
     AppLogger.d('SUPERWALL_DELEGATE', 'Will redeem link');
   }
+  
 }
 
 /// Provider for the Superwall service

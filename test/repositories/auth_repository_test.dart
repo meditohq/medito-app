@@ -104,28 +104,53 @@ void main() {
           SharedPreferenceConstants.isLoggedIn, true)).called(1);
     });
 
-    test('signInAnonymously calls crashlytics on EmailExistsError', () async {
+    test('signInAnonymously retries with new client ID on EmailExistsError', () async {
       // Setup
+      final retryTokens = AuthTokens(
+        accessToken: 'test-access-retry',
+        refreshToken: 'test-refresh-retry',
+        expiresIn: 900,
+        clientId: 'new-client-id-from-server',
+      );
+      
+      var callCount = 0;
+      
       when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
           .thenReturn(clientId);
-      when(() => mockAuthApiService.signIn(clientId: clientId))
-          .thenThrow(const EmailExistsError(email: email));
-      when(() => mockCrashlyticsService.recordError(any(), any()))
-          .thenAnswer((_) {});
+      // First call throws EmailExistsError, subsequent calls succeed
+      when(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
+          .thenAnswer((invocation) {
+        callCount++;
+        final calledClientId = invocation.namedArguments[#clientId] as String;
+        // First call with original client ID throws
+        if (callCount == 1 && calledClientId == clientId) {
+          throw const EmailExistsError(email: email);
+        }
+        // Retry with new client ID succeeds
+        return Future.value(retryTokens);
+      });
+      when(() => mockPreferences.setString(any(), any()))
+          .thenAnswer((_) async => true);
+      when(() => mockPreferences.setBool(any(), any()))
+          .thenAnswer((_) async => true);
+      when(() => mockHttpApiService.setAuthHeader(any()))
+          .thenAnswer((_) async {});
 
       // Action
       await authRepository.signInAnonymously();
 
-      // Assert
-      verify(() => mockAuthApiService.signIn(clientId: clientId)).called(1);
-      verify(() => mockCrashlyticsService.recordError(
-            isA<EmailExistsError>(),
-            any(),
-            reason: any(named: 'reason'),
-          )).called(1);
-      verifyNever(() => mockHttpApiService.setAuthHeader(any()));
-      verifyNever(() =>
-          mockPreferences.setBool(SharedPreferenceConstants.isLoggedIn, any()));
+      // Assert - verify signIn was called twice (first fails, retry succeeds)
+      expect(callCount, equals(2));
+      verify(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
+          .called(2);
+      
+      // Assert - verify successful sign-in setup after retry
+      verify(() => mockHttpApiService.setAuthHeader(retryTokens.accessToken))
+          .called(1);
+      verify(() => mockPreferences.setString(
+          SharedPreferenceConstants.userId, retryTokens.clientId)).called(1);
+      verify(() => mockPreferences.setBool(
+          SharedPreferenceConstants.isLoggedIn, true)).called(1);
     });
 
     test('requestOtp completes successfully when service call succeeds',

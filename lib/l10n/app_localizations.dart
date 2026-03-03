@@ -788,10 +788,10 @@ abstract class AppLocalizations {
   /// **'hour'**
   String get hourFull;
 
-  /// No description provided for @minutes.
+  /// Short placeholder text for duration input
   ///
   /// In en, this message translates to:
-  /// **'minutes'**
+  /// **'Minutes'**
   String get minutes;
 
   /// No description provided for @minute.
@@ -1556,6 +1556,24 @@ abstract class AppLocalizations {
   /// **'Skip for Now'**
   String get skipForNow;
 
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @packSetAsUpNext.
+  ///
+  /// In en, this message translates to:
+  /// **'This pack will now appear in the Up Next section on the homepage'**
+  String get packSetAsUpNext;
+
+  /// No description provided for @packUnpinnedFromUpNext.
+  ///
+  /// In en, this message translates to:
+  /// **'This pack has been removed from the Up Next section'**
+  String get packUnpinnedFromUpNext;
+
   /// Label for the smart reminders feature toggle
   ///
   /// In en, this message translates to:
@@ -2071,6 +2089,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Silence phone during meditation'**
   String get enableDndDuringMeditation;
+
+  /// Title for zen mode setting in customization section
+  ///
+  /// In en, this message translates to:
+  /// **'Zen Mode'**
+  String get zenMode;
+
+  /// Message shown when zen mode is enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Stats will be hidden throughout the app'**
+  String get zenModeEnabledMessage;
+
+  /// Message shown in zen mode after completing meditation
+  ///
+  /// In en, this message translates to:
+  /// **'Mind Clear'**
+  String get mindClear;
 
   /// No description provided for @donateToMedito.
   ///
@@ -2756,16 +2792,52 @@ abstract class AppLocalizations {
   /// **'We rely on donors like you to continue providing mindfulness to everyone.'**
   String get donorSupportMessage;
 
+  /// Button text for donating again after a previous donation
+  ///
+  /// In en, this message translates to:
+  /// **'Donate Again'**
+  String get donateAgain;
+
+  /// Title for the donation info dialog explaining why users might see the donation ask
+  ///
+  /// In en, this message translates to:
+  /// **'Why You Might See This'**
+  String get donationInfoTitle;
+
+  /// Message explaining why users might see the donation ask even if they've donated
+  ///
+  /// In en, this message translates to:
+  /// **'Sometimes we don\'t know when someone has donated. We are looking at how to improve this. You can hide this message for a while if you\'ve already donated.'**
+  String get donationInfoMessage;
+
+  /// Button text to temporarily hide the donation ask
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve Already Donated'**
+  String get hideForNow;
+
+  /// Message shown after hiding the donation ask
+  ///
+  /// In en, this message translates to:
+  /// **'Donation ask hidden for 30 days'**
+  String get donationAskHiddenMessage;
+
+  /// Message shown when user dismisses the reminder prompt on the end screen
+  ///
+  /// In en, this message translates to:
+  /// **'You can turn reminders on or off in Settings'**
+  String get reminderPromptDismissedMessage;
+
   /// Smart reminder day 1 title variant 1
   ///
   /// In en, this message translates to:
-  /// **'See you tomorrow 🌱'**
+  /// **'Keep your streak going 🌱'**
   String get smartReminderDay1TitleVar1;
 
   /// Smart reminder day 1 body variant 1
   ///
   /// In en, this message translates to:
-  /// **'You are on a {streak} day streak. See you tomorrow?'**
+  /// **'You are on a {streak} day streak. Keep it going?'**
   String smartReminderDay1BodyVar1(String streak);
 
   /// Smart reminder day 1 title variant 2
@@ -2789,8 +2861,32 @@ abstract class AppLocalizations {
   /// Smart reminder day 1 body variant 3
   ///
   /// In en, this message translates to:
-  /// **'A few minutes tomorrow keeps your momentum alive.'**
+  /// **'A few minutes now keeps your momentum alive.'**
   String get smartReminderDay1BodyVar3;
+
+  /// Smart reminder day 1 title variant 4
+  ///
+  /// In en, this message translates to:
+  /// **'Your practice awaits 🌸'**
+  String get smartReminderDay1TitleVar4;
+
+  /// Smart reminder day 1 body variant 4
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment to reconnect with yourself.'**
+  String get smartReminderDay1BodyVar4;
+
+  /// Smart reminder day 1 title variant 5
+  ///
+  /// In en, this message translates to:
+  /// **'One breath at a time 🫧'**
+  String get smartReminderDay1TitleVar5;
+
+  /// Smart reminder day 1 body variant 5
+  ///
+  /// In en, this message translates to:
+  /// **'Every session counts, no matter how short.'**
+  String get smartReminderDay1BodyVar5;
 
   /// Smart reminder day 2 title variant 1
   ///
@@ -2828,6 +2924,30 @@ abstract class AppLocalizations {
   /// **'Return to your breath, one moment at a time.'**
   String get smartReminderDay2BodyVar3;
 
+  /// Smart reminder day 2 title variant 4
+  ///
+  /// In en, this message translates to:
+  /// **'Small steps forward 🚶'**
+  String get smartReminderDay2TitleVar4;
+
+  /// Smart reminder day 2 body variant 4
+  ///
+  /// In en, this message translates to:
+  /// **'Consistency builds strength. Start with just a few minutes.'**
+  String get smartReminderDay2BodyVar4;
+
+  /// Smart reminder day 2 title variant 5
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle return 💚'**
+  String get smartReminderDay2TitleVar5;
+
+  /// Smart reminder day 2 body variant 5
+  ///
+  /// In en, this message translates to:
+  /// **'Your mindful practice is here whenever you are ready.'**
+  String get smartReminderDay2BodyVar5;
+
   /// Smart reminder day 3 title variant 1
   ///
   /// In en, this message translates to:
@@ -2864,6 +2984,30 @@ abstract class AppLocalizations {
   /// **'Two mindful minutes is enough.'**
   String get smartReminderDay3BodyVar3;
 
+  /// Smart reminder day 3 title variant 4
+  ///
+  /// In en, this message translates to:
+  /// **'Growing stronger 🌿'**
+  String get smartReminderDay3TitleVar4;
+
+  /// Smart reminder day 3 body variant 4
+  ///
+  /// In en, this message translates to:
+  /// **'Each day you practice, you build something meaningful.'**
+  String get smartReminderDay3BodyVar4;
+
+  /// Smart reminder day 3 title variant 5
+  ///
+  /// In en, this message translates to:
+  /// **'Find your calm 🕊️'**
+  String get smartReminderDay3TitleVar5;
+
+  /// Smart reminder day 3 body variant 5
+  ///
+  /// In en, this message translates to:
+  /// **'A brief pause can reset your entire day.'**
+  String get smartReminderDay3BodyVar5;
+
   /// Smart reminder day 4 title
   ///
   /// In en, this message translates to:
@@ -2879,37 +3023,37 @@ abstract class AppLocalizations {
   /// Smart reminder day 5 title
   ///
   /// In en, this message translates to:
-  /// **'You are doing great 💪'**
+  /// **'Time to reconnect 💪'**
   String get smartReminderDay5Title;
 
   /// Smart reminder day 5 body
   ///
   /// In en, this message translates to:
-  /// **'A calm pause today keeps you on track.'**
+  /// **'It has been 5 days. A calm pause now can help you get back on track.'**
   String get smartReminderDay5Body;
 
   /// Smart reminder day 6 title
   ///
   /// In en, this message translates to:
-  /// **'Nearly a week 📈'**
+  /// **'Almost a week ⏰'**
   String get smartReminderDay6Title;
 
   /// Smart reminder day 6 body
   ///
   /// In en, this message translates to:
-  /// **'Close the loop. Make today a mindful moment.'**
+  /// **'It has been almost a week since you meditated. Close the loop with a mindful moment.'**
   String get smartReminderDay6Body;
 
   /// Smart reminder day 7 title
   ///
   /// In en, this message translates to:
-  /// **'One week check in 🎉'**
+  /// **'One week check in 📅'**
   String get smartReminderDay7Title;
 
   /// Smart reminder day 7 body
   ///
   /// In en, this message translates to:
-  /// **'It has been a week since you meditated. Take a moment for yourself today.'**
+  /// **'It has been a week since you meditated. Take a moment for yourself now.'**
   String get smartReminderDay7Body;
 
   /// Smart reminder day 8 title
@@ -2921,7 +3065,7 @@ abstract class AppLocalizations {
   /// Smart reminder day 8 body
   ///
   /// In en, this message translates to:
-  /// **'New week energy. Just a few mindful minutes.'**
+  /// **'It has been over a week. A fresh start with just a few mindful minutes.'**
   String get smartReminderDay8Body;
 
   /// Smart reminder day 9 title
@@ -2975,13 +3119,13 @@ abstract class AppLocalizations {
   /// Smart reminder day 13 title
   ///
   /// In en, this message translates to:
-  /// **'Almost there ✨'**
+  /// **'Approaching two weeks ⏳'**
   String get smartReminderDay13Title;
 
   /// Smart reminder day 13 body
   ///
   /// In en, this message translates to:
-  /// **'Two weeks is near. Try a two minute restart.'**
+  /// **'It has been almost two weeks since you meditated. Try a two minute restart.'**
   String get smartReminderDay13Body;
 
   /// Smart reminder day 14 title
@@ -2993,7 +3137,7 @@ abstract class AppLocalizations {
   /// Smart reminder day 14 body
   ///
   /// In en, this message translates to:
-  /// **'It has been 14 days since you meditated. Resume your practice today, gently.'**
+  /// **'It has been 14 days since you meditated. Resume your practice now, gently.'**
   String get smartReminderDay14Body;
 
   /// Smart reminder day 15 title
@@ -3005,8 +3149,152 @@ abstract class AppLocalizations {
   /// Smart reminder day 15 body
   ///
   /// In en, this message translates to:
-  /// **'We will pause reminders for now. We are here whenever you are ready.'**
+  /// **'We\'re pausing reminders for now. We are here whenever you are ready.'**
   String get smartReminderDay15Body;
+
+  /// Smart reminder day 30 title
+  ///
+  /// In en, this message translates to:
+  /// **'A gentle nudge 🤗'**
+  String get smartReminderDay30Title;
+
+  /// Smart reminder day 30 body
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s been a month since you meditated. Just 2 minutes can help you feel better. We\'re here when you\'re ready.'**
+  String get smartReminderDay30Body;
+
+  /// Tooltip text for repeat mode when set to normal (no repeat)
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get repeatModeNormal;
+
+  /// Tooltip text for repeat mode when set to repeat once
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Once'**
+  String get repeatModeOnce;
+
+  /// Tooltip text for repeat mode when set to repeat forever
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Forever'**
+  String get repeatModeForever;
+
+  /// Title for adding a manual meditation session
+  ///
+  /// In en, this message translates to:
+  /// **'Add Session'**
+  String get addSession;
+
+  /// Label for date selection
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// Label for time selection
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// Placeholder text for date selection
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectDate;
+
+  /// Placeholder text for time selection
+  ///
+  /// In en, this message translates to:
+  /// **'Select time'**
+  String get selectTime;
+
+  /// Placeholder text for duration input in minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Duration (minutes)'**
+  String get durationInMinutes;
+
+  /// Text to indicate an optional field
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
+  /// Title for morning meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Morning meditation'**
+  String get morningMeditation;
+
+  /// Title for afternoon meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon meditation'**
+  String get afternoonMeditation;
+
+  /// Title for evening meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Evening meditation'**
+  String get eveningMeditation;
+
+  /// Title for night meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Night meditation'**
+  String get nightMeditation;
+
+  /// Button text to add a session
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// Text shown for manually added meditation sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Added manually'**
+  String get addedManually;
+
+  /// Placeholder text shown for manually added sessions when no custom title is provided
+  ///
+  /// In en, this message translates to:
+  /// **'Manually added session'**
+  String get manuallyAddedSession;
+
+  /// Explanation text for the add session dialog
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'ve done a meditation session outside the app, you can add it here to track it in your stats.'**
+  String get addSessionExplanation;
+
+  /// Error message shown when trying to add a session with a future date/time
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot add sessions in the future'**
+  String get cannotAddFutureSession;
+
+  /// Label prefix for meditation completion time
+  ///
+  /// In en, this message translates to:
+  /// **'Completed at'**
+  String get completedAt;
+
+  /// Title for the up next section on the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Up Next'**
+  String get upNextTitle;
+
+  /// Shows the current session number out of total sessions
+  ///
+  /// In en, this message translates to:
+  /// **'Session {current} of {total}'**
+  String upNextSessionCount(int current, int total);
 }
 
 class _AppLocalizationsDelegate

@@ -32,6 +32,7 @@ void main() {
             SharedPreferenceConstants.blackFridayDismissed, true);
         final order = container.read(homeWidgetOrderProvider);
         expect(order, [
+          HomeWidgetType.upNext,
           HomeWidgetType.shortcuts,
           HomeWidgetType.carousel,
           HomeWidgetType.quote,
@@ -54,7 +55,10 @@ void main() {
         );
 
         final order = container.read(homeWidgetOrderProvider);
-        expect(order, customOrder);
+        expect(order, [
+          HomeWidgetType.upNext,
+          ...customOrder,
+        ]);
       });
 
       test('preserves custom order when not Black Friday', () async {
@@ -72,8 +76,11 @@ void main() {
             SharedPreferenceConstants.blackFridayDismissed, true);
 
         final order = container.read(homeWidgetOrderProvider);
-        // When not Black Friday (current date), should return custom order as-is
-        expect(order, customOrder);
+        // When not Black Friday (current date), should return custom order with upNext prepended
+        expect(order, [
+          HomeWidgetType.upNext,
+          ...customOrder,
+        ]);
       });
     });
 
@@ -93,8 +100,11 @@ void main() {
             SharedPreferenceConstants.blackFridayDismissed, true);
 
         final order = container.read(homeWidgetOrderProvider);
-        // Should return custom order when dismissed, even during Black Friday
-        expect(order, customOrder);
+        // Should return custom order when dismissed, even during Black Friday, with upNext prepended
+        expect(order, [
+          HomeWidgetType.upNext,
+          ...customOrder,
+        ]);
       });
 
       test('restores custom order after dismissing and refreshing', () async {
@@ -115,7 +125,10 @@ void main() {
         notifier.refreshOrder();
 
         final order = container.read(homeWidgetOrderProvider);
-        expect(order, customOrder);
+        expect(order, [
+          HomeWidgetType.upNext,
+          ...customOrder,
+        ]);
       });
     });
 
@@ -169,7 +182,10 @@ void main() {
         notifier.refreshOrder();
 
         final order = container.read(homeWidgetOrderProvider);
-        expect(order, customOrder);
+        expect(order, [
+          HomeWidgetType.upNext,
+          ...customOrder,
+        ]);
       });
     });
 
@@ -186,8 +202,11 @@ void main() {
         );
 
         final order = container.read(homeWidgetOrderProvider);
-        // Should return order as-is when shortcuts missing
-        expect(order, customOrder);
+        // Should return order with upNext prepended when shortcuts missing
+        expect(order, [
+          HomeWidgetType.upNext,
+          ...customOrder,
+        ]);
       });
 
       test('handles missing products gracefully', () async {
@@ -202,8 +221,11 @@ void main() {
         );
 
         final order = container.read(homeWidgetOrderProvider);
-        // Should return order as-is when products missing
-        expect(order, customOrder);
+        // Should return order with upNext prepended when products missing
+        expect(order, [
+          HomeWidgetType.upNext,
+          ...customOrder,
+        ]);
       });
 
       test('handles partial custom order', () async {
@@ -217,7 +239,10 @@ void main() {
         );
 
         final order = container.read(homeWidgetOrderProvider);
-        expect(order, customOrder);
+        expect(order, [
+          HomeWidgetType.upNext,
+          ...customOrder,
+        ]);
       });
     });
 

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
@@ -20,6 +19,7 @@ import 'package:medito/views/settings/widgets/expandable_section_widget.dart';
 import 'package:medito/views/settings/widgets/smart_reminder_tile.dart';
 import 'package:medito/views/settings/widgets/theme_selection_dialog.dart';
 import 'package:medito/views/settings/widgets/widget_option_tile.dart';
+import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
@@ -106,17 +106,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.helpLegalSection,
-        type: TypeConstants.url,
+        type: TypeConstants.route,
         title: AppLocalizations.of(context)!.editStatsTitle,
         icon: MeditoIcon(
           assetName: MeditoIcons.graphUp,
           color: Theme.of(context).colorScheme.onSurface,
         ),
-        path: ref.watch(editStatsUrlProvider).when(
-              data: (url) => url,
-              loading: () => '$editStatsUrl?clientid=',
-              error: (_, __) => '$editStatsUrl?clientid=',
-            ),
+        path: '${RouteConstants.stats}:history',
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,
@@ -167,6 +163,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           color: Theme.of(context).colorScheme.onSurface,
         ),
         path: TypeConstants.toggleDnd,
+      ),
+      SettingsItem(
+        section: AppLocalizations.of(context)!.customizationSection,
+        type: TypeConstants.toggle,
+        title: AppLocalizations.of(context)!.zenMode,
+        icon: MeditoIcon(
+          assetName: MeditoIcons.sun,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        path: TypeConstants.toggleZenMode,
       ),
       if (Platform.isAndroid)
         SettingsItem(
@@ -243,6 +249,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
+    final isZenModeToggle = isToggleItem && item.path == TypeConstants.toggleZenMode;
     final isThemeItem = item.type == TypeConstants.theme;
     final isWidgetItem = item.path == TypeConstants.addWidget;
 
@@ -252,6 +259,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     if (isDndToggle) {
       return DndSettingTile(
+        icon: item.icon,
+        title: item.title,
+      );
+    }
+
+    if (isZenModeToggle) {
+      return ZenModeTile(
         icon: item.icon,
         title: item.title,
       );

@@ -72,7 +72,7 @@ Future<void> handleNavigation(
   } else if (type.contains('settings')) {
     await _pushRoute(SettingsScreen(), ref);
   } else if (_isDonationRoute(type, ids)) {
-    await _handleDonationNavigation(context, ref, sourceRouteName);
+    await handleDonationNavigation(context, ref, sourceRouteName);
   } else if (type == TypeConstants.email) {
     await _handleEmailNavigation(ids, ref);
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
@@ -97,8 +97,13 @@ Future<void> handleNavigation(
       ids.contains(TypeConstants.customiseHomeLayout)) {
     await _pushRoute(const CustomiseHomeLayoutScreen(), ref);
   } else if (type == TypeConstants.route &&
-      ids.contains(RouteConstants.stats)) {
-    await _pushRoute(const StatsScreen(), ref);
+      ids.any((id) => id?.contains(RouteConstants.stats) ?? false)) {
+    final statsPath = ids.firstWhere(
+      (id) => id?.contains(RouteConstants.stats) ?? false,
+      orElse: () => RouteConstants.stats,
+    );
+    final initialTabIndex = statsPath?.contains(':history') == true ? 1 : 0;
+    await _pushRoute(StatsScreen(initialTabIndex: initialTabIndex), ref);
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.analytics)) {
     await _pushRoute(const AnalyticsSettingsScreen(), ref);
@@ -162,10 +167,11 @@ Future<bool?> handleDonationNavigation(
     final uri = Uri.parse('https://meditofoundation.org/donate');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-      // Return false to indicate no donation was made (user can donate on website)
+      return false;
+    } else {
+      AppLogger.w('ROUTES', 'Unable to launch web donation URL');
       return false;
     }
-    return false;
   }
 
   // Use Superwall donation screen
@@ -179,13 +185,6 @@ Future<bool?> handleDonationNavigation(
   );
 }
 
-Future<void> _handleDonationNavigation(
-  BuildContext context,
-  WidgetRef? ref,
-  String? sourceRouteName,
-) async {
-  await handleDonationNavigation(context, ref, sourceRouteName);
-}
 
 Future<void> launchEmailSubmission(String email, {String? body}) async {
   final uri = Uri(scheme: 'mailto', path: email, query: 'body=$body');

@@ -100,6 +100,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       ref
           .read(backgroundSoundsNotifierProvider.notifier)
           .playBackgroundSoundFromPref();
+    } else {
+      // Stop background sound if track doesn't allow it
+      ref.read(backgroundSoundsNotifierProvider.notifier).stopBackgroundSound();
     }
 
     var healthKitManager = HealthKitManager();
@@ -133,6 +136,22 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     ref.listen(playerProvider.select((p) => p?.coverUrl), (_, next) {
       if (next != null) {
         _precacheImage(next);
+      }
+    });
+
+    // Listen for track changes and handle background sounds
+    ref.listen(playerProvider.select((p) => p?.hasBackgroundSound),
+        (previous, next) {
+      if (next == false) {
+        // Stop background sound if track doesn't allow it
+        ref
+            .read(backgroundSoundsNotifierProvider.notifier)
+            .stopBackgroundSound();
+      } else if (next == true) {
+        // Start background sound if track allows it
+        ref
+            .read(backgroundSoundsNotifierProvider.notifier)
+            .playBackgroundSoundFromPref();
       }
     });
 
@@ -291,6 +310,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_endScreenOpened && mounted) {
         _resetState();
+        _stopAudio();
         final currentlyPlayingTrack = ref.read(playerProvider);
         if (currentlyPlayingTrack != null) {
           Future.delayed(const Duration(milliseconds: 500), () {

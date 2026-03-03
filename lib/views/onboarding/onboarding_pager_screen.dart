@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/services/superwall_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/all_set_screen.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
@@ -9,14 +12,15 @@ import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/views/onboarding/tracking_permission_screen.dart';
 import 'package:medito/widgets/onboarding/progress_indicator_widget.dart';
 
-class OnboardingPagerScreen extends StatefulWidget {
+class OnboardingPagerScreen extends ConsumerStatefulWidget {
   const OnboardingPagerScreen({super.key});
 
   @override
-  State<OnboardingPagerScreen> createState() => OnboardingPagerScreenState();
+  ConsumerState<OnboardingPagerScreen> createState() =>
+      OnboardingPagerScreenState();
 }
 
-class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
+class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
@@ -64,6 +68,23 @@ class OnboardingPagerScreenState extends State<OnboardingPagerScreen> {
         ),
       ),
     ];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadSuperwallConfig();
+    });
+  }
+
+  void _preloadSuperwallConfig() {
+    unawaited(
+      () async {
+        try {
+          final superwallService = ref.read(superwallServiceProvider);
+          await superwallService.loadPaymentConfig();
+        } catch (error) {
+          // Silently fail - the donation screen will handle errors
+        }
+      }(),
+    );
   }
 
   @override

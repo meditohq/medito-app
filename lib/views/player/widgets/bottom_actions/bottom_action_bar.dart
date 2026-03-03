@@ -48,6 +48,7 @@ class BottomActionBar extends StatelessWidget {
           _buildItem(leftItem),
           const Spacer(),
           if (rightCenterItem != null) _buildItem(rightCenterItem),
+          if (leftCenterItem != null) _buildItem(leftCenterItem),
           if (rightItem != null) _buildItem(rightItem),
         ];
 

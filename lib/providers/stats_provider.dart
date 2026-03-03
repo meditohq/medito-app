@@ -6,6 +6,7 @@ import 'package:medito/providers/device_and_app_info/device_and_app_info_provide
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -14,10 +15,6 @@ import 'package:medito/services/home_widget_service.dart';
 part 'stats_provider.g.dart';
 
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
-
-final statsProvider = AsyncNotifierProvider<StatsNotifier, LocalAllStats>(() {
-  return StatsNotifier();
-});
 
 /// Provides the best-available user ID (auth first, then SharedPreferences)
 final userIdProvider = FutureProvider<String?>((ref) async {
@@ -41,8 +38,8 @@ final editStatsUrlProvider = FutureProvider<String>((ref) async {
     dev.log('Using fallback clientId from SharedPreferences: $clientId');
   }
 
-  final stats = ref.watch(statsProvider).valueOrNull;
-  final deviceInfo = ref.watch(deviceAndAppInfoProvider).valueOrNull;
+  final stats = ref.watch(statsProvider).value;
+  final deviceInfo = ref.watch(deviceAndAppInfoProvider).value;
 
   if (deviceInfo == null || stats == null) {
     return '$editStatsUrl?clientid=$clientId';
@@ -79,10 +76,10 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     return _fetchStatsWithRetry();
   }
 
-  Future<LocalAllStats> _fetchStatsWithRetry() async {
+  Future<LocalAllStats> _fetchStatsWithRetry({bool force = false}) async {
     // Try to fetch valid stats with retries
     for (var attempt = 0; attempt <= _maxRetries; attempt++) {
-      var stats = await _fetchStats();
+      var stats = await _fetchStats(force: force);
 
       // If we have valid stats, return them
       if (stats.totalTracksCompleted > 0 ||
@@ -102,20 +99,19 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     }
 
     // If we still have empty stats after all retries, return them
-    return _fetchStats();
+    return _fetchStats(force: force);
   }
 
-  Future<LocalAllStats> _fetchStats() async {
+  Future<LocalAllStats> _fetchStats({bool force = false}) async {
     var statsManager = ref.read(statsManagerProvider);
 
     try {
       var authRepository = ref.read(authRepositorySyncProvider);
       if (authRepository.currentUser != null) {
-        dev.log('StatsNotifier: Starting fetch');
+        dev.log('StatsNotifier: Starting fetch (force: $force)');
         await statsManager.initialize();
-        // Always sync on startup to ensure we have latest data from server
-        // The sync() method will skip if within TTL and not dirty, which is fine
-        await statsManager.sync(force: false);
+        // Force sync when refreshing to get latest data from server across devices
+        await statsManager.sync(force: force);
       } else {
         dev.log('StatsNotifier: User not signed in, skipping stats sync');
       }
@@ -142,7 +138,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     }
 
     _lastRefresh = DateTime.now();
-    state = await AsyncValue.guard(() => _fetchStatsWithRetry());
+    state = await AsyncValue.guard(() => _fetchStatsWithRetry(force: true));
     dev.log('StatsNotifier: Refresh completed');
 
     // Update home widget if stats are available (fire-and-forget to avoid blocking)

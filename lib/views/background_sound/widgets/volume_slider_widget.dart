@@ -11,8 +11,8 @@ class VolumeSliderWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bgSoundNotifierProvider = ref.watch(backgroundSoundsNotifierProvider);
-    final currentVolume = bgSoundNotifierProvider.volume;
+    final bgSoundState = ref.watch(backgroundSoundsNotifierProvider);
+    final currentVolume = bgSoundState.volume;
 
     return SliderTheme(
       data: SliderThemeData(
@@ -32,7 +32,7 @@ class VolumeSliderWidget extends ConsumerWidget {
         activeColor: ColorConstants.lightPurple,
         inactiveColor: ColorConstants.greyIsTheNewGrey,
         onChanged: (double newValue) {
-          bgSoundNotifierProvider.handleOnChangeVolume(newValue);
+          ref.read(backgroundSoundsNotifierProvider.notifier).handleOnChangeVolume(newValue);
         },
         semanticFormatterCallback: (double newValue) {
           return '${newValue.round()} ';

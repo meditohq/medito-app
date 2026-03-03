@@ -32,7 +32,7 @@ class TrackViewBottomBar extends ConsumerWidget {
     final deepLink = 'https://medito.app/tracks/$trackId';
     final shareText =
         AppLocalizations.of(context)!.shareTrackText(trackTitle, deepLink);
-    Share.share(shareText);
+    SharePlus.instance.share(ShareParams(text: shareText));
   }
 
   void _showBottomSheet(BuildContext context) {

@@ -377,7 +377,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hourFull => 'hora';
 
   @override
-  String get minutes => 'minutos';
+  String get minutes => 'Minutos';
 
   @override
   String get minute => 'minuto';
@@ -800,6 +800,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get skipForNow => 'Omitir por Ahora';
 
   @override
+  String get skip => 'Omitir';
+
+  @override
+  String get packSetAsUpNext =>
+      'Este paquete ahora aparecerá en la sección Próximo en la página de inicio';
+
+  @override
+  String get packUnpinnedFromUpNext =>
+      'Este paquete ha sido eliminado de la sección Próximo';
+
+  @override
   String get smartReminders => 'Recordatorios Inteligentes';
 
   @override
@@ -1091,6 +1102,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get enableDndDuringMeditation =>
       'Silenciar teléfono durante la meditación';
+
+  @override
+  String get zenMode => 'Modo Zen';
+
+  @override
+  String get zenModeEnabledMessage =>
+      'Las estadísticas se ocultarán en toda la aplicación';
+
+  @override
+  String get mindClear => 'Mente Clara';
 
   @override
   String get donateToMedito => 'Donar Ahora';
@@ -1474,11 +1495,32 @@ class AppLocalizationsEs extends AppLocalizations {
       'Dependemos de donantes como tú para seguir proporcionando mindfulness a todos.';
 
   @override
-  String get smartReminderDay1TitleVar1 => 'Hasta mañana 🌱';
+  String get donateAgain => 'Donar Nuevamente';
+
+  @override
+  String get donationInfoTitle => 'Por Qué Puedes Ver Esto';
+
+  @override
+  String get donationInfoMessage =>
+      'A veces no sabemos cuándo alguien ha donado. Estamos buscando formas de mejorar esto. Puedes ocultar este mensaje por un tiempo si ya has donado.';
+
+  @override
+  String get hideForNow => 'Ya He Donado';
+
+  @override
+  String get donationAskHiddenMessage =>
+      'Solicitud de donación oculta por 30 días';
+
+  @override
+  String get reminderPromptDismissedMessage =>
+      'Puedes activar o desactivar los recordatorios en Configuración';
+
+  @override
+  String get smartReminderDay1TitleVar1 => 'Mantén tu racha 🌱';
 
   @override
   String smartReminderDay1BodyVar1(String streak) {
-    return 'Tienes una racha de $streak días. ¿Hasta mañana?';
+    return 'Tienes una racha de $streak días. ¿La mantienes?';
   }
 
   @override
@@ -1494,7 +1536,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get smartReminderDay1BodyVar3 =>
-      'Unos minutos mañana mantienen tu impulso vivo.';
+      'Unos minutos ahora mantienen tu impulso vivo.';
+
+  @override
+  String get smartReminderDay1TitleVar4 => 'Tu práctica te espera 🌸';
+
+  @override
+  String get smartReminderDay1BodyVar4 =>
+      'Tómate un momento para reconectar contigo mismo.';
+
+  @override
+  String get smartReminderDay1TitleVar5 => 'Una respiración a la vez 🫧';
+
+  @override
+  String get smartReminderDay1BodyVar5 =>
+      'Cada sesión cuenta, sin importar cuán corta sea.';
 
   @override
   String get smartReminderDay2TitleVar1 => 'Mantén el flujo 🔁';
@@ -1517,6 +1573,20 @@ class AppLocalizationsEs extends AppLocalizations {
       'Regresa a tu respiración, un momento a la vez.';
 
   @override
+  String get smartReminderDay2TitleVar4 => 'Pequeños pasos adelante 🚶';
+
+  @override
+  String get smartReminderDay2BodyVar4 =>
+      'La consistencia construye fuerza. Empieza con solo unos minutos.';
+
+  @override
+  String get smartReminderDay2TitleVar5 => 'Regreso suave 💚';
+
+  @override
+  String get smartReminderDay2BodyVar5 =>
+      'Tu práctica consciente está aquí cuando estés listo.';
+
+  @override
   String get smartReminderDay3TitleVar1 => 'Construye el hábito 📆';
 
   @override
@@ -1536,6 +1606,20 @@ class AppLocalizationsEs extends AppLocalizations {
       'Dos minutos conscientes son suficientes.';
 
   @override
+  String get smartReminderDay3TitleVar4 => 'Creciendo más fuerte 🌿';
+
+  @override
+  String get smartReminderDay3BodyVar4 =>
+      'Cada día que practicas, construyes algo significativo.';
+
+  @override
+  String get smartReminderDay3TitleVar5 => 'Encuentra tu calma 🕊️';
+
+  @override
+  String get smartReminderDay3BodyVar5 =>
+      'Una breve pausa puede resetear todo tu día.';
+
+  @override
   String get smartReminderDay4Title => 'Pasos pequeños 🪴';
 
   @override
@@ -1543,32 +1627,32 @@ class AppLocalizationsEs extends AppLocalizations {
       'Han pasado 4 días. Reinicia tu práctica con una sesión corta.';
 
   @override
-  String get smartReminderDay5Title => 'Lo estás haciendo genial 💪';
+  String get smartReminderDay5Title => 'Tiempo de reconectar 💪';
 
   @override
   String get smartReminderDay5Body =>
-      'Una pausa calmada hoy te mantiene en el camino.';
+      'Han pasado 5 días. Una pausa calmada ahora puede ayudarte a volver al camino.';
 
   @override
-  String get smartReminderDay6Title => 'Casi una semana 📈';
+  String get smartReminderDay6Title => 'Casi una semana ⏰';
 
   @override
   String get smartReminderDay6Body =>
-      'Cierra el ciclo. Haz de hoy un momento consciente.';
+      'Han pasado casi una semana desde que meditaste. Cierra el ciclo con un momento consciente.';
 
   @override
-  String get smartReminderDay7Title => 'Revisión semanal 🎉';
+  String get smartReminderDay7Title => 'Revisión semanal 📅';
 
   @override
   String get smartReminderDay7Body =>
-      'Ha pasado una semana. ¿Listo para regresar?';
+      'Ha pasado una semana desde que meditaste. ¿Listo para regresar?';
 
   @override
   String get smartReminderDay8Title => 'Nuevo comienzo 🌤️';
 
   @override
   String get smartReminderDay8Body =>
-      'Energía de nueva semana. Solo unos minutos conscientes.';
+      'Han pasado más de una semana. Un nuevo comienzo con solo unos minutos conscientes.';
 
   @override
   String get smartReminderDay9Title => 'Encuentra tu centro 🎯';
@@ -1597,23 +1681,100 @@ class AppLocalizationsEs extends AppLocalizations {
   String get smartReminderDay12Body => 'Un momento calmado te espera.';
 
   @override
-  String get smartReminderDay13Title => 'Casi llegas ✨';
+  String get smartReminderDay13Title => 'Acercándose a dos semanas ⏳';
 
   @override
   String get smartReminderDay13Body =>
-      'Dos semanas están cerca. Intenta un reinicio de dos minutos.';
+      'Han pasado casi dos semanas desde que meditaste. Intenta un reinicio de dos minutos.';
 
   @override
   String get smartReminderDay14Title => 'Revisión de dos semanas 🔔';
 
   @override
   String get smartReminderDay14Body =>
-      'Han pasado 14 días. Comienza de nuevo hoy, gentilmente.';
+      'Han pasado 14 días. Comienza de nuevo ahora, gentilmente.';
 
   @override
   String get smartReminderDay15Title => 'Pausaremos los recordatorios 🌿';
 
   @override
   String get smartReminderDay15Body =>
-      'Estos recordatorios no parecen estar funcionando, así que los pausaremos por ahora.';
+      'Estamos pausando los recordatorios por ahora. Estamos aquí cuando estés listo.';
+
+  @override
+  String get smartReminderDay30Title => 'Un suave empujón 🤗';
+
+  @override
+  String get smartReminderDay30Body =>
+      'Ha pasado un mes desde que meditaste. Solo 2 minutos pueden ayudarte a sentirte mejor. Estamos aquí cuando estés listo.';
+
+  @override
+  String get repeatModeNormal => 'Normal';
+
+  @override
+  String get repeatModeOnce => 'Repetir una vez';
+
+  @override
+  String get repeatModeForever => 'Repetir siempre';
+
+  @override
+  String get addSession => 'Agregar sesión';
+
+  @override
+  String get date => 'Fecha';
+
+  @override
+  String get time => 'Hora';
+
+  @override
+  String get selectDate => 'Seleccionar fecha';
+
+  @override
+  String get selectTime => 'Seleccionar hora';
+
+  @override
+  String get durationInMinutes => 'Duración (minutos)';
+
+  @override
+  String get optional => 'Opcional';
+
+  @override
+  String get morningMeditation => 'Meditación matutina';
+
+  @override
+  String get afternoonMeditation => 'Meditación vespertina';
+
+  @override
+  String get eveningMeditation => 'Meditación de la tarde';
+
+  @override
+  String get nightMeditation => 'Meditación nocturna';
+
+  @override
+  String get add => 'Agregar';
+
+  @override
+  String get addedManually => 'Agregado manualmente';
+
+  @override
+  String get manuallyAddedSession => 'Sesión agregada manualmente';
+
+  @override
+  String get addSessionExplanation =>
+      'Si has hecho una sesión de meditación fuera de la aplicación, puedes agregarla aquí para registrarla en tus estadísticas.';
+
+  @override
+  String get cannotAddFutureSession =>
+      'No se pueden agregar sesiones en el futuro';
+
+  @override
+  String get completedAt => 'Completado a las';
+
+  @override
+  String get upNextTitle => 'Up Next';
+
+  @override
+  String upNextSessionCount(int current, int total) {
+    return 'Session $current of $total';
+  }
 }

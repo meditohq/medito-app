@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
+import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/track/track_view.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'manual_session_dialog.dart';
 
 class MeditationCalendarWidget extends ConsumerStatefulWidget {
   final LocalAllStats stats;
@@ -29,15 +33,19 @@ class _MeditationCalendarWidgetState
     with SingleTickerProviderStateMixin {
   late DateTime _focusedDay;
   late DateTime _selectedDay;
-  DateTime? _selectedDayForSessions;
+  late DateTime _selectedDayForSessions;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  bool _isAddingSession = false;
 
   @override
   void initState() {
     super.initState();
-    _focusedDay = DateTime.now();
-    _selectedDay = DateTime.now();
+    final today = DateTime.now();
+    final todayStart = DateTime(today.year, today.month, today.day);
+    _focusedDay = today;
+    _selectedDay = today;
+    _selectedDayForSessions = todayStart;
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -57,14 +65,11 @@ class _MeditationCalendarWidgetState
 
     final today = DateTime.now();
     final todayStart = DateTime(today.year, today.month, today.day);
-    final sessions = _getSessionsForDay(todayStart);
 
-    if (sessions.isNotEmpty) {
-      setState(() {
-        _selectedDayForSessions = todayStart;
-      });
-      _animationController.forward();
-    }
+    setState(() {
+      _selectedDayForSessions = todayStart;
+    });
+    _animationController.forward();
   }
 
   @override
@@ -109,59 +114,70 @@ class _MeditationCalendarWidgetState
       }));
     }
 
-    sessions.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return sessions;
   }
 
   void _toggleDaySessions(DateTime day) {
-    final sessions = _getSessionsForDay(day);
+    final dayStart = DateTime(day.year, day.month, day.day);
 
-    if (_selectedDayForSessions != null &&
-        isSameDay(_selectedDayForSessions!, day)) {
-      // Hide if same day is tapped again
-      _animationController.reverse().then((_) {
-        if (mounted) {
-          setState(() {
-            _selectedDayForSessions = null;
-          });
-        }
-      });
-    } else if (sessions.isNotEmpty) {
-      // Fade out current, then fade in new
-      if (_selectedDayForSessions != null) {
-        _animationController.reverse().then((_) {
-          if (mounted) {
-            setState(() {
-              _selectedDayForSessions = day;
-            });
-            _animationController.forward();
-          }
-        });
-      } else {
-        // No current selection, just fade in
+    if (isSameDay(_selectedDayForSessions, dayStart)) {
+      return;
+    }
+
+    _animationController.reverse().then((_) {
+      if (mounted) {
         setState(() {
-          _selectedDayForSessions = day;
+          _selectedDayForSessions = dayStart;
         });
         _animationController.forward();
       }
-    } else {
-      // Hide if no sessions
-      _animationController.reverse().then((_) {
-        if (mounted) {
-          setState(() {
-            _selectedDayForSessions = null;
-          });
-        }
+    });
+  }
+
+  Future<void> _showAddSessionDialog(BuildContext context) async {
+    final selectedDate = _selectedDayForSessions;
+
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => ManualSessionDialog(selectedDate: selectedDate),
+    );
+
+    if (result != null && mounted) {
+      final dateTime = result['dateTime'] as DateTime;
+      final duration = result['duration'] as int;
+
+      setState(() {
+        _isAddingSession = true;
+        final dayStart = DateTime(dateTime.year, dateTime.month, dateTime.day);
+        _selectedDayForSessions = dayStart;
+        _selectedDay = dayStart;
+        _focusedDay = dayStart;
       });
+      _animationController.forward();
+
+      final success = await addManualSession(
+        dateTime: dateTime,
+        durationMinutes: duration,
+      );
+
+      if (success && mounted) {
+        // Refresh stats to update the calendar
+        await ref.read(statsProvider.notifier).refreshFromLocal();
+      }
+
+      if (mounted) {
+        setState(() {
+          _isAddingSession = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final meditationDates = _getMeditationDates(widget.stats);
-    final sessions = _selectedDayForSessions != null
-        ? _getSessionsForDay(_selectedDayForSessions!)
-        : <LocalAudioCompleted>[];
+    final sessions = _getSessionsForDay(_selectedDayForSessions);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -377,63 +393,103 @@ class _MeditationCalendarWidgetState
             },
           ),
         ),
-        _selectedDayForSessions != null && sessions.isNotEmpty
-            ? FadeTransition(
-                opacity: _fadeAnimation,
-                child: Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacityValue(0.08),
-                      width: 1,
+        FadeTransition(
+          opacity: _fadeAnimation,
+          child: Container(
+            margin: const EdgeInsets.only(top: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withOpacityValue(0.08),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  DateFormat('EEEE, MMMM d, y').format(_selectedDayForSessions),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontFamily: dmSans,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${sessions.length} ${sessions.length == 1 ? 'session' : 'sessions'}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontFamily: dmSans,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                if (_isAddingSession)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: ColorConstants.lightPurple,
+                      ),
+                    ),
+                  )
+                else if (sessions.isNotEmpty)
+                  ...sessions.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final session = entry.value;
+                    final isLast = index == sessions.length - 1;
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
+                      child: _SessionItemWidget(
+                        key:
+                            ValueKey(session.id + session.timestamp.toString()),
+                        session: session,
+                      ),
+                    );
+                  }),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showAddSessionDialog(context),
+                    icon: Icon(
+                      Icons.add,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    label: Text(
+                      AppLocalizations.of(context)!.addSession,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontFamily: dmSans,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
+                      side: BorderSide(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacityValue(0.2),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        DateFormat('EEEE, MMMM d, y')
-                            .format(_selectedDayForSessions!),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontFamily: dmSans,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${sessions.length} ${sessions.length == 1 ? 'session' : 'sessions'}',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontFamily: dmSans,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      const SizedBox(height: 16),
-                      ...sessions.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final session = entry.value;
-                        final isLast = index == sessions.length - 1;
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
-                          child: _SessionItemWidget(
-                            key: ValueKey(
-                                session.id + session.timestamp.toString()),
-                            session: session,
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
                 ),
-              )
-            : const SizedBox.shrink(),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -450,48 +506,63 @@ class _SessionItemWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final date = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
-    final timeFormat = DateFormat('HH:mm');
-    final trackAsync = ref.watch(tracksProvider(trackId: session.id));
+    final timeFormat = DateFormat('h:mm a');
+    final isManual = isManualSession(session);
+    final trackAsync =
+        isManual ? null : ref.watch(tracksProvider(trackId: session.id));
 
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TrackView(
-              trackId: session.id,
-            ),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color:
-                Theme.of(context).colorScheme.onSurface.withOpacityValue(0.08),
-            width: 1,
-          ),
+    final content = Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.08),
+          width: 1,
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: ColorConstants.lightPurple,
-                shape: BoxShape.circle,
-              ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 60,
+            child: Text(
+              timeFormat.format(date),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontFamily: dmSans,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacityValue(0.7),
+                    fontSize: 12,
+                  ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  trackAsync.when(
+          ),
+          const SizedBox(width: 12),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: isManual
+                  ? ColorConstants.graphite
+                  : ColorConstants.lightPurple,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: isManual
+                ? Text(
+                    getManualSessionTitle(
+                        session.id, AppLocalizations.of(context)!),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontFamily: dmSans,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                  )
+                : trackAsync!.when(
                     data: (track) => Text(
                       track.title,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -517,26 +588,35 @@ class _SessionItemWidget extends ConsumerWidget {
                           ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    timeFormat.format(date),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontFamily: dmSans,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                  ),
-                ],
-              ),
-            ),
+          ),
+          if (!isManual)
             Icon(
               Icons.chevron_right_rounded,
               color:
                   Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
               size: 20,
             ),
-          ],
-        ),
+        ],
       ),
+    );
+
+    if (isManual) {
+      return content;
+    }
+
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TrackView(
+              trackId: session.id,
+            ),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: content,
     );
   }
 }

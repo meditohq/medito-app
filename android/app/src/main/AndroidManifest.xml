@@ -42,11 +42,6 @@
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
 
-        <!-- TikTok SDK App ID -->
-        <meta-data
-            android:name="com.tiktok.tiktok_business_sdk.property.AppId"
-            android:value="@string/tiktok_app_id" />
-
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -74,7 +69,7 @@
 
         <meta-data
             android:name="io.flutter.embedding.android.EnableImpeller"
-            android:value="false" />
+            android:value="true" />
 
         <activity
             android:name=".MainActivity"

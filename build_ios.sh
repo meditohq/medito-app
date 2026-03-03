@@ -2,10 +2,22 @@
 
 set -e
 
+# Accept PAYWALL_ENV as first argument or use environment variable, default to "live"
+PAYWALL_ENV="${1:-${PAYWALL_ENV:-live}}"
+
+# Validate PAYWALL_ENV
+if [ "$PAYWALL_ENV" != "live" ] && [ "$PAYWALL_ENV" != "dev" ]; then
+  echo "\n[ERROR] Invalid PAYWALL_ENV: $PAYWALL_ENV"
+  echo "Usage: $0 [live|dev]"
+  echo "   or: PAYWALL_ENV=dev $0"
+  exit 1
+fi
+
 # Build the iOS app for production
 
 echo "\n[1/3] Building iOS app for production..."
-flutter build ios --dart-define-from-file=../.prod.json --dart-define=ENABLE_DEVICE_PREVIEW=false --release
+echo "🎯 Paywall environment: $PAYWALL_ENV"
+flutter build ios --dart-define-from-file=../.prod.json --dart-define=ENABLE_DEVICE_PREVIEW=false --dart-define=PAYWALL_ENV=$PAYWALL_ENV --release
 
 echo "\n[2/3] Exporting .ipa..."
 
@@ -64,6 +76,11 @@ xcrun altool --upload-app -f "$IPA_PATH" -t ios -u "$APPLE_ID" -p "$APP_PASSWORD
 
 if [ $? -eq 0 ]; then
   echo "\n[Success] .ipa uploaded to TestFlight."
+  if [ "$PAYWALL_ENV" = "dev" ]; then
+    echo "\n⚠️  WARNING: This build has DEV paywalls - do NOT deploy to production!"
+  else
+    echo "\n✅ This build has LIVE paywalls - safe for production deployment"
+  fi
 else
   echo "\n[ERROR] Upload failed."
   exit 1

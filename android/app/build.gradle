@@ -39,7 +39,6 @@ if (keystorePropertiesFile.exists()) {
 
 def facebookAppId = System.getenv('FACEBOOK_APP_ID') ?: ''
 def facebookClientToken = System.getenv('FACEBOOK_CLIENT_TOKEN') ?: ''
-def tiktokAndroidAppId = System.getenv('TIKTOK_ANDROID_APP_ID') ?: ''
 
 def envJsonFile = rootProject.file("../.prod.json")
 if (!envJsonFile.exists()) {
@@ -60,12 +59,6 @@ if (envJsonFile.exists()) {
                 facebookClientToken = tokenMatch[0][1]
             }
         }
-        if (!tiktokAndroidAppId) {
-            def tiktokIdMatch = jsonText =~ /"TIKTOK_ANDROID_APP_ID"\s*:\s*"([^"]+)"/
-            if (tiktokIdMatch) {
-                tiktokAndroidAppId = tiktokIdMatch[0][1]
-            }
-        }
     } catch (Exception e) {
         println "Warning: Could not parse environment JSON file: ${e.message}"
     }
@@ -75,7 +68,6 @@ def isDebugBuild = project.gradle.startParameter.taskNames.any { it.toLowerCase(
 if (isDebugBuild) {
     println "Facebook App ID: ${facebookAppId ?: 'NOT SET'}"
     println "Facebook Client Token: ${facebookClientToken ?: 'NOT SET'}"
-    println "TikTok Android App ID: ${tiktokAndroidAppId ?: 'NOT SET'}"
 }
 
 android {
@@ -131,7 +123,6 @@ android {
         
         resValue "string", "facebook_app_id", facebookAppId
         resValue "string", "facebook_client_token", facebookClientToken
-        resValue "string", "tiktok_app_id", tiktokAndroidAppId
     }
 
     buildFeatures {
@@ -204,8 +195,7 @@ android {
     productFlavors {
         dev {
             dimension "default"
-            // Temporarily disabled for TikTok testing - package name must match TikTok Events Manager
-            // applicationIdSuffix ".dev"
+            applicationIdSuffix ".dev"
             versionNameSuffix "-dev"
         }
         prod {
@@ -222,15 +212,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation platform('com.google.firebase:firebase-bom:33.2.0')
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.android.billingclient:billing:6.0.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 
     // Google Pay dependencies
     implementation 'com.google.android.gms:play-services-wallet:19.3.0'
-
-    // TikTok Business SDK (for native Android integration via Pigeon)
-    // Using the one from JitPack as confirmed by the plugin usage
-    implementation 'com.github.tiktok:tiktok-business-android-sdk:1.5.0'
 
     // Media3 dependencies
     def media3_version = "1.2.1"
@@ -256,6 +241,5 @@ dependencies {
         resolutionStrategy {
             force "androidx.work:work-runtime:2.8.1"
             force "androidx.work:work-runtime-ktx:2.8.1"
-            force "com.android.billingclient:billing:6.0.1"
         }
     }

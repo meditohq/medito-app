@@ -3,7 +3,8 @@ enum HomeWidgetType {
   shortcuts, // For shortcut buttons
   carousel, // For the featured content carousel
   products, // For the shop to support section
-  quote; // For the daily quote
+  quote, // For the daily quote
+  upNext; // For the up next basics pack widget
 
   // Helper method to convert string to enum value
   static HomeWidgetType fromString(String value) {

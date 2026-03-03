@@ -8,15 +8,21 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 
 import 'widgets/donation_widget.dart';
+import 'widgets/zen_mode_animation.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
   final TrackModel trackModel;
@@ -30,16 +36,115 @@ class EndScreenView extends ConsumerStatefulWidget {
   ConsumerState<EndScreenView> createState() => _EndScreenViewState();
 }
 
-class _EndScreenViewState extends ConsumerState<EndScreenView> {
+class _EndScreenViewState extends ConsumerState<EndScreenView>
+    with TickerProviderStateMixin {
   final _animatedSwitcherKey = GlobalKey();
   bool _hasFiredHapticFeedback = false;
   final _analytics = FirebaseAnalyticsService();
+
+  late AnimationController _statsAnimationController;
+  late AnimationController _reminderAnimationController;
+  late AnimationController _cardAnimationController;
+
+  late Animation<Offset> _statsSlideAnimation;
+  late Animation<double> _statsFadeAnimation;
+  late Animation<Offset> _reminderSlideAnimation;
+  late Animation<double> _reminderFadeAnimation;
+  late Animation<Offset> _cardSlideAnimation;
+  late Animation<double> _cardFadeAnimation;
 
   @override
   void initState() {
     super.initState();
     _loadStats();
     _logScreenView();
+
+    _statsAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _reminderAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _cardAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _statsSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _statsAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _statsFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _statsAnimationController,
+      curve: Curves.easeOut,
+    ));
+
+    _reminderSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _reminderAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _reminderFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _reminderAnimationController,
+      curve: Curves.easeOut,
+    ));
+
+    _cardSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _cardAnimationController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _cardFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _cardAnimationController,
+      curve: Curves.easeOut,
+    ));
+
+    _startAnimations();
+  }
+
+  void _startAnimations() {
+    _statsAnimationController.forward();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        _reminderAnimationController.forward();
+      }
+    });
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        _cardAnimationController.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _statsAnimationController.dispose();
+    _reminderAnimationController.dispose();
+    _cardAnimationController.dispose();
+    super.dispose();
   }
 
   Future<void> _logScreenView() async {
@@ -110,8 +215,29 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         child: SafeArea(
           child: Column(
             children: [
-              _buildStatsArea(),
-              _buildCard(),
+              SlideTransition(
+                position: _statsSlideAnimation,
+                child: FadeTransition(
+                  opacity: _statsFadeAnimation,
+                  child: ref.watch(zenModeProvider)
+                      ? const ZenModeAnimation()
+                      : _buildStatsArea(),
+                ),
+              ),
+              SlideTransition(
+                position: _reminderSlideAnimation,
+                child: FadeTransition(
+                  opacity: _reminderFadeAnimation,
+                  child: _buildReminderPrompt(),
+                ),
+              ),
+              SlideTransition(
+                position: _cardSlideAnimation,
+                child: FadeTransition(
+                  opacity: _cardFadeAnimation,
+                  child: _buildCard(),
+                ),
+              ),
               // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
             ],
           ),
@@ -251,7 +377,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
       {Key? key}) {
     lastFiveDays = lastFiveDays.reversed.toList();
 
-    var statsData = ref.watch(statsProvider).valueOrNull;
+    var statsData = ref.watch(statsProvider).value;
     var daysWithFreeze =
         statsData != null ? _getDaysWithStreakFreeze(statsData) : <String>[];
 
@@ -366,5 +492,141 @@ class _EndScreenViewState extends ConsumerState<EndScreenView> {
         color: colour,
       ),
     );
+  }
+
+  Future<void> _dismissReminderPromptForever() async {
+    await ref.read(reminderPromptDismissedProvider.notifier).dismissForever();
+    if (mounted) {
+      showSnackBar(
+        context,
+        AppLocalizations.of(context)!.reminderPromptDismissedMessage,
+      );
+    }
+  }
+
+  Widget _buildReminderPrompt() {
+    final shouldShow = ref.watch(shouldShowReminderPromptProvider);
+    final isReminderEnabled = ref.watch(reminderEnabledProvider);
+
+    if (!shouldShow) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: padding16,
+        right: padding16,
+        bottom: 16,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Theme.of(context).cardColor,
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 15,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                MeditoIcon(
+                  assetName: MeditoIcons.bell,
+                  size: 24,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    AppLocalizations.of(context)!.smartReminders,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontFamily: teachers,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+                IconButton(
+                  icon: MeditoIcon(
+                    assetName: MeditoIcons.xmark,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  onPressed: _dismissReminderPromptForever,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+            if (!isReminderEnabled) ...[
+              const SizedBox(height: 8),
+              Text(
+                AppLocalizations.of(context)!.enableNotificationsBody,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isReminderEnabled ? null : () => _enableReminders(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isReminderEnabled
+                      ? Theme.of(context).colorScheme.surface
+                      : Theme.of(context).colorScheme.primary,
+                  foregroundColor: isReminderEnabled
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6)
+                      : Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+                child: Text(
+                  isReminderEnabled
+                      ? AppLocalizations.of(context)!.smartRemindersOn
+                      : AppLocalizations.of(context)!.turnOnSmartReminders,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _enableReminders() async {
+    try {
+      final accepted = await PermissionHandler.requestAlarmPermission(context);
+      if (!accepted || !mounted) {
+        return;
+      }
+
+      final prefs = ref.read(sharedPreferencesProvider);
+      final service = SmartRemindersService(
+        prefs: prefs,
+        reminders: ref.read(reminderProvider),
+      );
+
+      final time = await service.enable();
+      await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
+      await ref.read(reminderTimeProvider.notifier).setTime(time);
+
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      // Error enabling reminders - silently fail
+    }
   }
 }

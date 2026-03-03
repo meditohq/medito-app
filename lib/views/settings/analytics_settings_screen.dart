@@ -18,12 +18,6 @@ final _metaEnabledProvider = FutureProvider<bool>((ref) async {
   return prefs.getBool(SharedPreferenceConstants.analyticsMetaEnabled) ?? true;
 });
 
-final _tiktokEnabledProvider = FutureProvider<bool>((ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool(SharedPreferenceConstants.analyticsTiktokEnabled) ??
-      true;
-});
-
 class AnalyticsSettingsScreen extends ConsumerWidget {
   const AnalyticsSettingsScreen({super.key});
 
@@ -74,21 +68,6 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
                     value,
                   );
                   ref.invalidate(_metaEnabledProvider);
-                },
-              ),
-              _SwitchTile(
-                label: 'TikTok Analytics',
-                provider: _tiktokEnabledProvider,
-                onConfirmDisableMessage: Platform.isIOS
-                    ? AppLocalizations.of(context)!.iosTrackingDialogContent
-                    : AppLocalizations.of(context)!.analyticsTrackingContent,
-                onChanged: (value) async {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool(
-                    SharedPreferenceConstants.analyticsTiktokEnabled,
-                    value,
-                  );
-                  ref.invalidate(_tiktokEnabledProvider);
                 },
               ),
               if (Platform.isIOS) ...[

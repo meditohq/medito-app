@@ -108,6 +108,8 @@ class CustomiseHomeLayoutScreenState
         return AppLocalizations.of(context)!.quoteTitle;
       case HomeWidgetType.products:
         return AppLocalizations.of(context)!.meditationProducts;
+      case HomeWidgetType.upNext:
+        return AppLocalizations.of(context)!.upNextTitle;
     }
   }
 }
