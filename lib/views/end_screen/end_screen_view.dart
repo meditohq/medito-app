@@ -157,7 +157,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     _hasFiredHapticFeedback = true;
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate) {
-      await Haptics.vibrate(HapticsType.success);
+      await Haptics.vibrate(HapticsType.success, usage: HapticsUsage.media);
     }
   }
 
