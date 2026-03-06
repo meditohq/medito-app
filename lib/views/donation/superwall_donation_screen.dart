@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/models/stripe/payment_intent_model.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
@@ -84,12 +85,9 @@ class _SuperwallDonationScreenState
         onPaywallDismissed: (String paywallId) {
           AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Paywall dismissed');
 
-          // Only close the screen if we're NOT processing a payment
-          // If payment is being processed, let the payment flow handle screen closure
           if (mounted && !_isProcessingPayment) {
             AppLogger.d(
-                'SUPERWALL_DONATION_SCREEN', 'User cancelled - closing screen');
-            // Return false to indicate no donation was made
+                'SUPERWALL_DONATION_SCREEN', 'User dismissed - closing screen');
             Navigator.of(context).pop(false);
           } else if (_isProcessingPayment) {
             AppLogger.d('SUPERWALL_DONATION_SCREEN',
@@ -185,7 +183,7 @@ class _SuperwallDonationScreenState
       }
 
       // Choose the best payment method (prioritize platform pay)
-      payment_models.PaymentMethod selectedMethod = availableMethods.first;
+      var selectedMethod = availableMethods.first;
 
       // Prefer Apple Pay over card payments
       for (final method in availableMethods) {
@@ -205,41 +203,59 @@ class _SuperwallDonationScreenState
       AppLogger.d('SUPERWALL_DONATION_SCREEN',
           'Initiating ${isMonthly ? "monthly subscription" : "one-time payment"} for $amountInCents cents (${(amountInCents / 100).toStringAsFixed(2)} ${paymentConfig.pricing.currency})');
 
-      if (isMonthly) {
-        await uiController.initiateMonthlySubscription(
-          context: context,
-          amount: amountInCents,
-          currency: paymentConfig.pricing.currency,
-          paymentMethod: selectedMethod.type,
-          paywallId: paywallId,
-          userId: userId,
-          userEmail: userEmail,
-          paywallSource: widget.source,
-          onSuccess: () {},
-        );
-      } else {
-        await uiController.initiateOneTimePayment(
-          context: context,
-          amount: amountInCents,
-          currency: paymentConfig.pricing.currency,
-          paymentMethod: selectedMethod.type,
-          paywallId: paywallId,
-          userId: userId,
-          userEmail: userEmail,
-          paywallSource: widget.source,
-          onSuccess: () {},
-        );
-      }
+      final result = isMonthly
+          ? await uiController.initiateMonthlySubscription(
+              context: context,
+              amount: amountInCents,
+              currency: paymentConfig.pricing.currency,
+              paymentMethod: selectedMethod.type,
+              paywallId: paywallId,
+              userId: userId,
+              userEmail: userEmail,
+              paywallSource: widget.source,
+              onSuccess: () {},
+            )
+          : await uiController.initiateOneTimePayment(
+              context: context,
+              amount: amountInCents,
+              currency: paymentConfig.pricing.currency,
+              paymentMethod: selectedMethod.type,
+              paywallId: paywallId,
+              userId: userId,
+              userEmail: userEmail,
+              paywallSource: widget.source,
+              onSuccess: () {},
+            );
 
-      AppLogger.d(
-          'SUPERWALL_DONATION_SCREEN', 'Payment flow completed successfully');
+      switch (result) {
+        case PaymentSuccess():
+          AppLogger.d('SUPERWALL_DONATION_SCREEN',
+              'Payment flow completed successfully');
 
-      // Close the screen immediately - the global snackbar will show regardless
-      if (mounted) {
-        AppLogger.d('SUPERWALL_DONATION_SCREEN',
-            'Closing donation screen after successful payment');
-        // Return true to indicate donation was made
-        Navigator.of(context).pop(true);
+          if (mounted) {
+            AppLogger.d('SUPERWALL_DONATION_SCREEN',
+                'Closing donation screen after successful payment');
+            Navigator.of(context).pop(true);
+          }
+        case PaymentFailure(
+            errorMessage: final errorMessage,
+            paymentIntentId: final paymentIntentId,
+          ):
+          AppLogger.w(
+            'SUPERWALL_DONATION_SCREEN',
+            'Payment failed: $errorMessage (${paymentIntentId ?? 'unknown'})',
+          );
+
+          if (mounted) {
+            Navigator.of(context).pop(false);
+          }
+        case PaymentCancelled():
+          AppLogger.d('SUPERWALL_DONATION_SCREEN',
+              'Payment cancelled - closing donation screen');
+
+          if (mounted) {
+            Navigator.of(context).pop(false);
+          }
       }
     } catch (error) {
       AppLogger.e('SUPERWALL_DONATION_SCREEN',
@@ -347,11 +363,11 @@ class _SuperwallDonationScreenState
                         ),
                         onChanged: (_) => setState(() {}),
                         inputFormatters: [
-                          TextInputFormatter.withFunction((oldValue, newValue) =>
-                              TextEditingValue(
-                                text: newValue.text.toLowerCase(),
-                                selection: newValue.selection,
-                              )),
+                          TextInputFormatter.withFunction(
+                              (oldValue, newValue) => TextEditingValue(
+                                    text: newValue.text.toLowerCase(),
+                                    selection: newValue.selection,
+                                  )),
                         ],
                       ),
                     ),

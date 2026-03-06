@@ -163,15 +163,14 @@ Future<bool?> handleDonationNavigation(
   final useSuperwall = await shouldUseSuperwallForDonation();
 
   if (!useSuperwall) {
-    // Use web donation - open directly without navigating to a screen
     final uri = Uri.parse('https://meditofoundation.org/donate');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-      return false;
     } else {
       AppLogger.w('ROUTES', 'Unable to launch web donation URL');
-      return false;
     }
+
+    return false;
   }
 
   // Use Superwall donation screen
@@ -184,7 +183,6 @@ Future<bool?> handleDonationNavigation(
     ),
   );
 }
-
 
 Future<void> launchEmailSubmission(String email, {String? body}) async {
   final uri = Uri(scheme: 'mailto', path: email, query: 'body=$body');

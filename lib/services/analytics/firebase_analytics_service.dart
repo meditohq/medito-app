@@ -94,6 +94,8 @@ class FirebaseAnalyticsService {
       AnalyticsEventConstants.onboardingReminderCancelTap;
   static const String eventOnboardingDonateNowTap =
       AnalyticsEventConstants.onboardingDonateNowTap;
+  static const String eventOnboardingDonationSkipTap =
+      AnalyticsEventConstants.onboardingDonationSkipTap;
   static const String eventOnboardingCompleted =
       AnalyticsEventConstants.onboardingCompleted;
   static const String eventOnboardingTrackingPermissionGranted =

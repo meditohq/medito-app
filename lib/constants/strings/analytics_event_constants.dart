@@ -82,6 +82,10 @@ class AnalyticsEventConstants {
   /// Event logged when user taps donate now during onboarding
   static const String onboardingDonateNowTap = 'onboarding_donate_now_tap';
 
+  /// Event logged when user skips donation during onboarding
+  static const String onboardingDonationSkipTap =
+      'onboarding_donation_skip_tap';
+
   /// Event logged when user completes onboarding flow
   static const String onboardingCompleted = 'onboarding_completed';
 

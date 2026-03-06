@@ -15,49 +15,38 @@ class OnboardingDonationScreen extends ConsumerStatefulWidget {
       _DonationScreenState();
 }
 
-class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
-    with WidgetsBindingObserver {
-  bool _didAttemptDonation = false;
+class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
+  bool _hasAttemptedDonation = false;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && _didAttemptDonation) {
-      _didAttemptDonation = false;
-      widget.onNext?.call();
-    }
-  }
-
-  void _handleDonationAction(BuildContext context, bool didDonate) async {
-    // Log analytics event for donate now tap
+  void _handleDonationAction(BuildContext context) async {
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
     );
 
-    _didAttemptDonation = true;
-
-    // Use shared donation navigation logic from routes.dart
-    await handleDonationNavigation(
+    final didSucceed = await handleDonationNavigation(
       context,
       ref,
       FirebaseAnalyticsService.paywallSourceOnboarding,
       navigator: Navigator.of(context),
     );
 
-    if (mounted) {
+    if (!mounted) return;
+
+    if (didSucceed == true) {
       widget.onNext?.call();
+
+      return;
     }
+
+    setState(() => _hasAttemptedDonation = true);
+  }
+
+  void _handleSkip() async {
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventOnboardingDonationSkipTap,
+    );
+
+    widget.onNext?.call();
   }
 
   @override
@@ -96,9 +85,25 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen>
                   ),
                 ],
               ),
-              _buildActionButton(
-                text: AppLocalizations.of(context)!.next,
-                onPressed: () => _handleDonationAction(context, false),
+              Column(
+                children: [
+                  _buildActionButton(
+                    text: AppLocalizations.of(context)!.next,
+                    onPressed: () => _handleDonationAction(context),
+                  ),
+                  if (_hasAttemptedDonation) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: _handleSkip,
+                        child: Text(
+                          AppLocalizations.of(context)!.skipForNow,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),

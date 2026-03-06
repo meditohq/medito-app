@@ -27,7 +27,7 @@ class PaymentUIController extends _$PaymentUIController {
   }
 
   /// Initiates a one-time payment with the specified method
-  Future<void> initiateOneTimePayment({
+  Future<PaymentResult> initiateOneTimePayment({
     required BuildContext context,
     required int amount,
     required String currency,
@@ -53,13 +53,20 @@ class PaymentUIController extends _$PaymentUIController {
 
       await _handlePaymentResult(context, result, paywallId, 'onetime', userId,
           paywallSource, onSuccess);
+
+      return result;
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
+
+      return PaymentResult.failure(
+        errorMessage:
+            PaymentErrorHandler.handleStripeError(e).userFriendlyMessage,
+      );
     }
   }
 
   /// Initiates a monthly subscription payment
-  Future<void> initiateMonthlySubscription({
+  Future<PaymentResult> initiateMonthlySubscription({
     required BuildContext context,
     required int amount,
     required String currency,
@@ -85,14 +92,22 @@ class PaymentUIController extends _$PaymentUIController {
 
       await _handlePaymentResult(context, result, paywallId, 'monthly', userId,
           paywallSource, onSuccess);
+
+      return result;
     } catch (e, st) {
-      AppLogger.e('PAYMENT_UI', 'Error initiating monthly subscription: $e\n$st');
+      AppLogger.e(
+          'PAYMENT_UI', 'Error initiating monthly subscription: $e\n$st');
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
+
+      return PaymentResult.failure(
+        errorMessage:
+            PaymentErrorHandler.handleStripeError(e).userFriendlyMessage,
+      );
     }
   }
 
   /// Initiates a yearly subscription payment
-  Future<void> initiateYearlySubscription({
+  Future<PaymentResult> initiateYearlySubscription({
     required BuildContext context,
     required int amount,
     required String currency,
@@ -118,8 +133,15 @@ class PaymentUIController extends _$PaymentUIController {
 
       await _handlePaymentResult(context, result, paywallId, 'yearly', userId,
           paywallSource, onSuccess);
+
+      return result;
     } catch (e) {
       _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
+
+      return PaymentResult.failure(
+        errorMessage:
+            PaymentErrorHandler.handleStripeError(e).userFriendlyMessage,
+      );
     }
   }
 
