@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
@@ -142,21 +143,33 @@ bool isInUS() {
 
 
 Future<bool> shouldUseSuperwallForDonation() async {
+  final isPlatformPaySupported =
+      await Stripe.instance.isPlatformPaySupported();
+  if (!isPlatformPaySupported) {
+    AppLogger.d('DONATION_UTILS',
+        'Apple Pay / Google Pay not supported - using web donation');
+
+    return false;
+  }
+
   try {
     final configStatus = await Superwall.shared.getConfigurationStatus();
     AppLogger.d('DONATION_UTILS', 'Superwall config status: $configStatus');
 
     if (configStatus == ConfigurationStatus.configured) {
       AppLogger.d('DONATION_UTILS', 'Superwall configured - using Superwall');
+
       return true;
     } else {
       AppLogger.w('DONATION_UTILS',
           'Superwall not configured (status: $configStatus) - using web donation');
-      return false; // Fallback to web if Superwall fails (better than crashing)
+
+      return false;
     }
   } catch (error) {
     AppLogger.e('DONATION_UTILS',
         'Error checking Superwall status - using web donation', error);
+
     return false;
   }
 }
