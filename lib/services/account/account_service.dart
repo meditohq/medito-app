@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/http/http_constants.dart' as http_constants;
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:developer' as dev;
+
+final dev = const AppLoggerAdapter('ACCOUNT_SERVICE');
 
 class AccountService {
   final AuthRepository _authRepository;

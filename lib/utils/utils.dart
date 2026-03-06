@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:medito/constants/constants.dart';
-import 'package:flutter/material.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,24 +13,6 @@ Color parseColor(String? color) {
     return Color(int.parse(color.replaceFirst('#', 'FF'), radix: 16));
   } catch (e) {
     return ColorConstants.ebony;
-  }
-}
-
-void createSnackBar(
-  String message,
-  BuildContext context, {
-  Color color = Colors.red,
-}) {
-  final snackBar = SnackBar(
-    content: Text(message),
-    backgroundColor: color,
-    duration: const Duration(seconds: 6),
-  );
-
-  try {
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  } catch (e) {
-    AppLogger.e('SNACKBAR', 'Error showing snackbar', e);
   }
 }
 
@@ -115,12 +96,6 @@ String getAudioFileExtension(String path) {
   }
 
   return '.mp3';
-}
-
-int formatIcon(String icon) {
-  if (icon.isEmpty) return 0;
-
-  return int.parse('0x$icon');
 }
 
 extension GetIdFromPath on String {

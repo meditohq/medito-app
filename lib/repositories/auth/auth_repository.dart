@@ -7,7 +7,6 @@ import 'package:medito/services/secure_storage_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:developer' as dev;
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/repositories/me/me_repository.dart';
@@ -16,6 +15,7 @@ import 'dart:io';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:medito/utils/logger.dart';
 
 class User {
   final String id;
@@ -49,6 +49,8 @@ abstract class AuthRepository {
   Future<void> migrateEmailToStorage();
   Future<bool> isLoggedIn();
 }
+
+final dev = const AppLoggerAdapter('AUTH_REPO');
 
 class AuthRepositoryImpl extends AuthRepository {
   final AuthApiService _authService;

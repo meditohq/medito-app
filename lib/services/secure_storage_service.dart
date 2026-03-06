@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as fs;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -6,8 +5,11 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:medito/utils/logger.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+
+final dev = const AppLoggerAdapter('SECURE_STORAGE');
 
 // Interface for FlutterSecureStorage to make testing easier
 class SecureStorage {

@@ -1,5 +1,7 @@
 // Business logic model for auth tokens
-import 'dart:developer' as dev;
+import 'package:medito/utils/logger.dart';
+
+final dev = const AppLoggerAdapter('AUTH_TOKENS');
 
 class AuthTokens {
   final String accessToken;

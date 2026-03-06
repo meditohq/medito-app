@@ -8,7 +8,11 @@ void showSnackBar(
   String text, {
   VoidCallback? onActionPressed,
   String? actionLabel,
+  Color backgroundColor = ColorConstants.white,
 }) {
+  final foregroundColor = backgroundColor.computeLuminance() > 0.5
+      ? ColorConstants.greyIsTheNewBlack
+      : ColorConstants.white;
   final snackBar = SnackBar(
     content: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -18,7 +22,7 @@ void showSnackBar(
             text,
             style: context != null
                 ? Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: ColorConstants.greyIsTheNewBlack,
+                      color: foregroundColor,
                       fontFamily: dmSans,
                       fontSize: 14,
                     )
@@ -33,7 +37,8 @@ void showSnackBar(
             },
             child: Text(
               actionLabel,
-              style: const TextStyle(
+              style: TextStyle(
+                color: foregroundColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -41,7 +46,7 @@ void showSnackBar(
           ),
       ],
     ),
-    backgroundColor: ColorConstants.white,
+    backgroundColor: backgroundColor,
     behavior: SnackBarBehavior.floating,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
   );

@@ -37,3 +37,24 @@ class AppLogger {
     }
   }
 }
+
+class AppLoggerAdapter {
+  const AppLoggerAdapter(this.tag);
+
+  final String tag;
+
+  void log(
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+    int? level,
+  }) {
+    if (error != null || stackTrace != null) {
+      AppLogger.e(tag, message, error, stackTrace);
+
+      return;
+    }
+
+    AppLogger.d(tag, message);
+  }
+}

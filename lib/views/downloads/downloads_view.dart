@@ -8,7 +8,6 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/utils/duration_extensions.dart';
-import 'package:medito/utils/utils.dart';
 import 'package:medito/views/downloads/widgets/download_list_item.dart';
 import 'package:medito/views/empty_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
@@ -234,10 +233,10 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
       if (mounted) {
         ref.read(removeDownloadedTrackProvider(track: item));
       }
-      createSnackBar(
-        '"${item.title}" ${AppLocalizations.of(context)!.removed.toLowerCase()}',
+      showSnackBar(
         context,
-        color: ColorConstants.white,
+        '"${item.title}" ${AppLocalizations.of(context)!.removed.toLowerCase()}',
+        backgroundColor: ColorConstants.white,
       );
     } else {
       // If the user cancels, refresh the list to ensure all items are visible again.

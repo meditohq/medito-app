@@ -1,10 +1,12 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
 import 'package:http/http.dart' as http;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/home/product/product_model.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml2json/xml2json.dart';
+
+final dev = const AppLoggerAdapter('PRODUCTS_SERVICE');
 
 class ProductsService {
   static const String _productsFeedUrl =

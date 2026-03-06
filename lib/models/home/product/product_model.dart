@@ -1,4 +1,6 @@
-import 'dart:developer' as dev;
+import 'package:medito/utils/logger.dart';
+
+final dev = const AppLoggerAdapter('PRODUCT_MODEL');
 
 class ProductModel {
   final String id;

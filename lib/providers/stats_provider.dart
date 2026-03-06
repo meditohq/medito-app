@@ -1,10 +1,9 @@
-import 'dart:developer' as dev;
-
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/utils/stats_manager.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -35,7 +34,10 @@ final editStatsUrlProvider = FutureProvider<String>((ref) async {
   if (clientId.isEmpty) {
     final prefs = await SharedPreferences.getInstance();
     clientId = prefs.getString(SharedPreferenceConstants.userId) ?? '';
-    dev.log('Using fallback clientId from SharedPreferences: $clientId');
+    AppLogger.d(
+      'STATS_PROVIDER',
+      'Using fallback clientId from SharedPreferences: $clientId',
+    );
   }
 
   final stats = ref.watch(statsProvider).value;
@@ -72,7 +74,8 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
 
   @override
   Future<LocalAllStats> build() async {
-    dev.log('StatsNotifier: Building');
+    AppLogger.d('STATS_PROVIDER', 'StatsNotifier: Building');
+
     return _fetchStatsWithRetry();
   }
 
@@ -84,21 +87,31 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
       // If we have valid stats, return them
       if (stats.totalTracksCompleted > 0 ||
           (stats.audioCompleted?.isNotEmpty ?? false)) {
-        dev.log('StatsNotifier: Got valid stats on attempt ${attempt + 1}');
+        AppLogger.d(
+          'STATS_PROVIDER',
+          'StatsNotifier: Got valid stats on attempt ${attempt + 1}',
+        );
+
         return stats;
       }
 
       // If this isn't the last attempt, wait before retrying
       if (attempt < _maxRetries) {
-        dev.log(
-            'StatsNotifier: Empty stats on attempt ${attempt + 1}, retrying...');
+        AppLogger.d(
+          'STATS_PROVIDER',
+          'StatsNotifier: Empty stats on attempt ${attempt + 1}, retrying...',
+        );
         await Future.delayed(const Duration(milliseconds: 500));
       } else {
-        dev.log('StatsNotifier: Still empty stats after all retries');
+        AppLogger.d(
+          'STATS_PROVIDER',
+          'StatsNotifier: Still empty stats after all retries',
+        );
       }
     }
 
     // If we still have empty stats after all retries, return them
+
     return _fetchStats(force: force);
   }
 
@@ -108,17 +121,23 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
     try {
       var authRepository = ref.read(authRepositorySyncProvider);
       if (authRepository.currentUser != null) {
-        dev.log('StatsNotifier: Starting fetch (force: $force)');
+        AppLogger.d(
+          'STATS_PROVIDER',
+          'StatsNotifier: Starting fetch (force: $force)',
+        );
         await statsManager.initialize();
         // Force sync when refreshing to get latest data from server across devices
         await statsManager.sync(force: force);
       } else {
-        dev.log('StatsNotifier: User not signed in, skipping stats sync');
+        AppLogger.d(
+          'STATS_PROVIDER',
+          'StatsNotifier: User not signed in, skipping stats sync',
+        );
       }
 
       return await statsManager.localAllStats;
     } catch (error) {
-      dev.log('StatsNotifier: Error during fetch', error: error);
+      AppLogger.e('STATS_PROVIDER', 'StatsNotifier: Error during fetch', error);
 
       if (error is AppError) {
         rethrow;
@@ -128,18 +147,22 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   }
 
   Future<void> refresh() async {
-    dev.log('StatsNotifier: Starting refresh');
+    AppLogger.d('STATS_PROVIDER', 'StatsNotifier: Starting refresh');
     if (_lastRefresh != null) {
       var timeSinceLastRefresh = DateTime.now().difference(_lastRefresh!);
       if (timeSinceLastRefresh < _minRefreshInterval) {
-        dev.log('StatsNotifier: Skipping refresh - too soon');
+        AppLogger.d(
+          'STATS_PROVIDER',
+          'StatsNotifier: Skipping refresh - too soon',
+        );
+
         return;
       }
     }
 
     _lastRefresh = DateTime.now();
     state = await AsyncValue.guard(() => _fetchStatsWithRetry(force: true));
-    dev.log('StatsNotifier: Refresh completed');
+    AppLogger.d('STATS_PROVIDER', 'StatsNotifier: Refresh completed');
 
     // Update home widget if stats are available (fire-and-forget to avoid blocking)
     if (state.hasValue && state.value != null) {
@@ -152,21 +175,31 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
   }
 
   Future<void> refreshFromLocal() async {
-    dev.log('StatsNotifier: Starting refresh from local stats');
+    AppLogger.d(
+      'STATS_PROVIDER',
+      'StatsNotifier: Starting refresh from local stats',
+    );
     var statsManager = ref.read(statsManagerProvider);
 
     try {
       await statsManager.initialize();
       var localStats = await statsManager.localAllStats;
       state = AsyncValue.data(localStats);
-      dev.log('StatsNotifier: Refresh from local completed');
+      AppLogger.d(
+        'STATS_PROVIDER',
+        'StatsNotifier: Refresh from local completed',
+      );
 
       // Update home widget (fire-and-forget to avoid blocking)
       HomeWidgetService.updateWidgetFromStats(localStats).catchError((e) {
         // Silently fail - widget updates are not critical
       });
     } catch (error) {
-      dev.log('StatsNotifier: Error during refresh from local', error: error);
+      AppLogger.e(
+        'STATS_PROVIDER',
+        'StatsNotifier: Error during refresh from local',
+        error,
+      );
 
       if (error is AppError) {
         state = AsyncValue.error(error, StackTrace.current);

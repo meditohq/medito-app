@@ -1,19 +1,21 @@
-import 'dart:developer' as dev;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/services/products_service.dart';
+import 'package:medito/utils/logger.dart';
 
 final productsServiceProvider = Provider<ProductsService>((ref) {
   return ProductsService();
 });
 
 final productsProvider = FutureProvider<List<ProductGroupModel>>((ref) async {
-  dev.log('productsProvider: Loading products');
+  AppLogger.d('PRODUCTS_PROVIDER', 'Loading products');
   final service = ref.watch(productsServiceProvider);
   try {
     final response = await service.fetchProducts();
-    dev.log(
-        'productsProvider: Loaded ${response.products.length} raw products');
+    AppLogger.d(
+      'PRODUCTS_PROVIDER',
+      'Loaded ${response.products.length} raw products',
+    );
 
     // --- New Grouping Logic ---
     final Map<String, Map<String, dynamic>> tempGroups = {};
@@ -38,11 +40,11 @@ final productsProvider = FutureProvider<List<ProductGroupModel>>((ref) async {
     }
 
     // Convert the grouped data into ProductGroupModel list
-    final List<ProductGroupModel> groupedProducts = [];
+    final groupedProducts = <ProductGroupModel>[];
     tempGroups.forEach((key, data) {
-      final ProductModel firstProduct = data['firstProduct'];
-      final Set<String> imageSet = data['images'];
-      final List<String> allImages = imageSet.toList();
+      final firstProduct = data['firstProduct'] as ProductModel;
+      final imageSet = data['images'] as Set<String>;
+      final allImages = imageSet.toList();
 
       // Shuffle the collected images for this group
       allImages.shuffle();
@@ -67,27 +69,32 @@ final productsProvider = FutureProvider<List<ProductGroupModel>>((ref) async {
     });
     // --- End New Grouping Logic ---
 
-    dev.log(
-        'productsProvider: Grouped into ${groupedProducts.length} unique display products');
+    AppLogger.d(
+      'PRODUCTS_PROVIDER',
+      'Grouped into ${groupedProducts.length} unique display products',
+    );
 
     return groupedProducts; // Return the correctly grouped and shuffled list
   } catch (e) {
-    dev.log('productsProvider: Error loading products: $e');
+    AppLogger.e('PRODUCTS_PROVIDER', 'Error loading products', e);
     rethrow;
   }
 });
 
 final refreshProductsProvider =
     FutureProvider<List<ProductGroupModel>>((ref) async {
-  dev.log('refreshProductsProvider: Refreshing products');
+  AppLogger.d('PRODUCTS_PROVIDER', 'Refreshing products');
   ref.invalidate(productsProvider);
   try {
     final products = await ref.watch(productsProvider.future);
-    dev.log(
-        'refreshProductsProvider: Refreshed ${products.length} product groups');
+    AppLogger.d(
+      'PRODUCTS_PROVIDER',
+      'Refreshed ${products.length} product groups',
+    );
+
     return products;
   } catch (e) {
-    dev.log('refreshProductsProvider: Error refreshing products: $e');
+    AppLogger.e('PRODUCTS_PROVIDER', 'Error refreshing products', e);
     rethrow;
   }
 });
