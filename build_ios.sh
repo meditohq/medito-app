@@ -13,6 +13,11 @@ if [ "$PAYWALL_ENV" != "live" ] && [ "$PAYWALL_ENV" != "dev" ]; then
   exit 1
 fi
 
+# Load iOS credentials if available
+if [ -f "ios_credentials.sh" ]; then
+  source ios_credentials.sh
+fi
+
 # Build the iOS app for production
 
 echo "\n[1/3] Building iOS app for production..."
