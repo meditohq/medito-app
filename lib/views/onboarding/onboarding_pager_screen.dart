@@ -129,6 +129,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _controller,
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: _pages.length,
                 onPageChanged: (index) {
                   setState(() => _currentPage = index);
