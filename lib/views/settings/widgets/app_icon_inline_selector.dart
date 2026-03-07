@@ -20,11 +20,31 @@ class AppIconInlineSelector extends StatefulWidget {
 
 class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
   String? _currentIconName;
+  late final ScrollController _scrollController;
+  bool _showFade = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
     _loadCurrentIcon();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final atEnd = _scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 8;
+    if (!atEnd != _showFade) {
+      setState(() => _showFade = !atEnd);
+    }
   }
 
   Future<void> _loadCurrentIcon() async {
@@ -110,33 +130,47 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
             const SizedBox(height: 12),
             SizedBox(
               height: 110,
-              child: ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Colors.white,
-                    Colors.white,
-                    Colors.white.withValues(alpha: 0),
-                  ],
-                  stops: const [0.0, 0.75, 1.0],
-                ).createShader(bounds),
-                blendMode: BlendMode.dstIn,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: AppIconOption.values.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    final option = AppIconOption.values[index];
-                    final isSelected = _currentIconName == option.iconName;
+              child: Stack(
+                children: [
+                  ListView.separated(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: AppIconOption.values.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final option = AppIconOption.values[index];
+                      final isSelected = _currentIconName == option.iconName;
 
-                    return _AppIconItem(
-                      option: option,
-                      isSelected: isSelected,
-                      onTap: () => _setIcon(option),
-                    );
-                  },
-                ),
+                      return _AppIconItem(
+                        option: option,
+                        isSelected: isSelected,
+                        onTap: () => _setIcon(option),
+                      );
+                    },
+                  ),
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 300),
+                    opacity: _showFade ? 1.0 : 0.0,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: IgnorePointer(
+                        child: Container(
+                          width: 72,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Theme.of(context).cardColor.withValues(alpha: 0),
+                                Theme.of(context).cardColor,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
