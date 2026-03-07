@@ -335,6 +335,10 @@
   "@zenMode": {
     "description": "Title for zen mode setting in customization section"
   },
+  "zenModeSubtitle": "Ocultar todas las estadísticas, rachas y puntuaciones en toda la app",
+  "@zenModeSubtitle": {
+    "description": "Subtitle for zen mode setting in customization section"
+  },
   "zenModeEnabledMessage": "Las estadísticas se ocultarán en toda la aplicación",
   "@zenModeEnabledMessage": {
     "description": "Message shown when zen mode is enabled"
@@ -991,5 +995,14 @@
   "completedAt": "Completado a las",
   "@completedAt": {
     "description": "Etiqueta de prefijo para la hora de finalización de la meditación"
-  }
+  },
+  "appIconTitle": "Icono de la app",
+  "appIconDefault": "Predeterminado",
+  "appIconNearBlack": "Casi negro",
+  "appIconDusk": "Crepúsculo",
+  "appIconBlush": "Rubor",
+  "appIconOcean": "Océano",
+  "appIconForest": "Bosque",
+  "appIconPink": "Hora dorada",
+  "appIconChanged": "Icono actualizado. Reiniciando…"
 }

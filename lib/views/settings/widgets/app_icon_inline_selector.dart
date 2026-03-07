@@ -1,0 +1,210 @@
+import 'dart:io';
+
+import 'package:dynamic_app_icon_flutter_plus/dynamic_app_icon_flutter_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/utils/logger.dart';
+import 'package:medito/views/settings/widgets/app_icon_selection_dialog.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
+
+class AppIconInlineSelector extends StatefulWidget {
+  const AppIconInlineSelector({super.key});
+
+  @override
+  State<AppIconInlineSelector> createState() => AppIconInlineSelectorState();
+}
+
+class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
+  String? _currentIconName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentIcon();
+  }
+
+  Future<void> _loadCurrentIcon() async {
+    try {
+      String? name;
+      if (Platform.isAndroid) {
+        name = await MeditoAppIconManager().getAlternateIconName();
+      } else {
+        name = await DynamicAppIconFlutterPlus.getAlternateIconName();
+      }
+      if (mounted) {
+        setState(() => _currentIconName = name);
+      }
+    } catch (e, st) {
+      AppLogger.e('AppIcon', 'Failed to load current icon', e, st);
+    }
+  }
+
+  Future<void> _setIcon(AppIconOption option) async {
+    try {
+      if (Platform.isAndroid) {
+        await MeditoAppIconManager().setAlternateIconName(option.iconName);
+        if (mounted) {
+          showSnackBar(context, AppLocalizations.of(context)!.appIconChanged);
+        }
+        await Future.delayed(const Duration(seconds: 1));
+        await SystemNavigator.pop();
+      } else {
+        await DynamicAppIconFlutterPlus.setAlternateIconName(
+          option.iconName,
+          showAlert: false,
+        );
+        if (mounted) {
+          setState(() => _currentIconName = option.iconName);
+        }
+      }
+    } catch (e, st) {
+      AppLogger.e('AppIcon', 'Failed to set icon: ${option.iconName}', e, st);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  padding: const EdgeInsets.all(3),
+                  child: SvgPicture.asset(
+                    AssetConstants.icLogo,
+                    colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.onSurface,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+                width16,
+                Text(
+                  l10n.appIconTitle,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 110,
+              child: ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Colors.white,
+                    Colors.white,
+                    Colors.white.withValues(alpha: 0),
+                  ],
+                  stops: const [0.0, 0.75, 1.0],
+                ).createShader(bounds),
+                blendMode: BlendMode.dstIn,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: AppIconOption.values.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final option = AppIconOption.values[index];
+                    final isSelected = _currentIconName == option.iconName;
+
+                    return _AppIconItem(
+                      option: option,
+                      isSelected: isSelected,
+                      onTap: () => _setIcon(option),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppIconItem extends StatelessWidget {
+  const _AppIconItem({
+    required this.option,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final AppIconOption option;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 72,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.transparent,
+                  width: 2.5,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(11),
+                child: Image.asset(
+                  option.previewAsset,
+                  width: 56,
+                  height: 56,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              option.displayName(context),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

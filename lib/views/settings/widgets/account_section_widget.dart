@@ -15,7 +15,9 @@ import 'package:medito/widgets/medito_huge_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
 class AccountSectionWidget extends ConsumerWidget {
-  const AccountSectionWidget({super.key});
+  const AccountSectionWidget({super.key, this.inCard = false});
+
+  final bool inCard;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,10 +25,8 @@ class AccountSectionWidget extends ConsumerWidget {
     final user = authRepository.currentUser;
 
     if (user != null && user.email != null && user.email!.isNotEmpty) {
-      // User is signed in
       return _buildSignedInUserSection(context, ref, user.email!);
     } else {
-      // User is not signed in
       return _buildSignedOutUserSection(context, ref);
     }
   }
@@ -40,12 +40,12 @@ class AccountSectionWidget extends ConsumerWidget {
     final accountService = ref.watch(accountServiceProvider);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: inCard ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
             child: Text(
               email,
               style: Theme.of(context)
@@ -54,7 +54,6 @@ class AccountSectionWidget extends ConsumerWidget {
                   ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
-          height16,
           RowItemWidget(
             icon: MeditoIcon(
               assetName: MeditoIcons.logout,
@@ -98,7 +97,6 @@ class AccountSectionWidget extends ConsumerWidget {
               }
             },
           ),
-          height8,
           RowItemWidget(
             icon: MeditoIcon(
               assetName: MeditoIcons.xmark,
@@ -109,7 +107,7 @@ class AccountSectionWidget extends ConsumerWidget {
             titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
-            hasUnderline: true,
+            hasUnderline: !inCard,
             onTap: () async {
               final confirmed = await showDialog<bool>(
                     context: context,
@@ -205,7 +203,7 @@ class AccountSectionWidget extends ConsumerWidget {
           titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
               ),
-          hasUnderline: true,
+          hasUnderline: !inCard,
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(

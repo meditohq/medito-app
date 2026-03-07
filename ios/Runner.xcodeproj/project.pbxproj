@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D4562B77FF4244FD7A0BF1F /* blush@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11B39ECC271C6439638C9ACA /* blush@2x.png */; };
+		0E56EAD091A3D2694CF3FA38 /* blush@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F696C23AC21F365306D45A /* blush@3x.png */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		27250C9F2E843752008B6308 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
@@ -16,14 +18,24 @@
 		27250CA62E843752008B6308 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		27250CA72E843752008B6308 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		286F501132BCE08B5ED702C1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
+		2AB55F368BB0C48A3099C502 /* forest@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 101421EE97843C1D2CD49583 /* forest@3x.png */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		34902A6B292214B6EB757F62 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9020A8043DD32631839BE6F /* Pods_RunnerTests.framework */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		75FFF940D93AA63726585B1C /* ocean@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1642F495F0BF67E432218A44 /* ocean@3x.png */; };
+		7F3A591E80D70D658C77967D /* pink@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AC169176E7723242F1D76211 /* pink@2x.png */; };
+		8779BC35DF1AAC24F2EB5EC0 /* forest@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6E4B2292C6E7C1E5F56AFA5 /* forest@2x.png */; };
 		8BD257952AC4B7C80012213D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BD257942AC4B7C80012213D /* GoogleService-Info.plist */; };
+		8EECB3F8D0C2591655DDD85E /* pink@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8EA0F658C4F29C790453417C /* pink@3x.png */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+
+		B94EBB14C84430DEFDEAABA1 /* nearblack@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3695491DE3C75B6C6589CADB /* nearblack@3x.png */; };
+		CC934284185658B1ADA4785C /* nearblack@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD285FFF1378316BD5FCFEC6 /* nearblack@2x.png */; };
+		CC9F9E6509D2EF1445F7D052 /* ocean@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8569F526DAB5AAE67011AF21 /* ocean@2x.png */; };
+
 		F7C33FCECFCB2BD7A48BA96A /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
@@ -38,10 +50,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+
 		0486B7CC9C4218C886196CB6 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		0FFC4805F01806064CC598A5 /* Pods-RunnerTests.release-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release-prod.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release-prod.xcconfig"; sourceTree = "<group>"; };
+		101421EE97843C1D2CD49583 /* forest@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "forest@3x.png"; sourceTree = "<group>"; };
+		11B39ECC271C6439638C9ACA /* blush@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "blush@2x.png"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		1642F495F0BF67E432218A44 /* ocean@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "ocean@3x.png"; sourceTree = "<group>"; };
 		24D0B291C26CB2CCD78E20CC /* Pods-Runner.profile-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-dev.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-dev.xcconfig"; sourceTree = "<group>"; };
 		270582582DE8CCDB00033AF9 /* MeditoWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtension.entitlements; sourceTree = "<group>"; };
 		270582592DE8CCDB00033AF9 /* MeditoWidgetExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtensionRelease.entitlements; sourceTree = "<group>"; };
@@ -52,6 +68,7 @@
 		32E5F811F97EF8E9F497DF92 /* Pods-Runner.debug-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-dev.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-dev.xcconfig"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3695491DE3C75B6C6589CADB /* nearblack@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "nearblack@3x.png"; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		441292DFC0C8784568E7D738 /* Pods-MeditoWidgetExtension.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MeditoWidgetExtension.profile.xcconfig"; path = "Target Support Files/Pods-MeditoWidgetExtension/Pods-MeditoWidgetExtension.profile.xcconfig"; sourceTree = "<group>"; };
 		4DEB2B518C79BF83188E4EAD /* Pods-RunnerTests.profile-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile-prod.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile-prod.xcconfig"; sourceTree = "<group>"; };
@@ -61,9 +78,11 @@
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		8569F526DAB5AAE67011AF21 /* ocean@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "ocean@2x.png"; sourceTree = "<group>"; };
 		8B72EB2FA75CFF73922EBDE7 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		8B7AADD52A559F5C004A5611 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		8BD257942AC4B7C80012213D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8EA0F658C4F29C790453417C /* pink@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "pink@3x.png"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Medito Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Medito Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,8 +91,10 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D823902C8C535090C29E3B7 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6E4B2292C6E7C1E5F56AFA5 /* forest@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "forest@2x.png"; sourceTree = "<group>"; };
 		A7146AD3A13BBF4F494FABD8 /* Pods-Runner.release-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-prod.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-prod.xcconfig"; sourceTree = "<group>"; };
 		A9020A8043DD32631839BE6F /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC169176E7723242F1D76211 /* pink@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "pink@2x.png"; sourceTree = "<group>"; };
 		B0005ABE56C0BD68C1811D4A /* Pods-RunnerTests.profile-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile-dev.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile-dev.xcconfig"; sourceTree = "<group>"; };
 		B87160DAA714472B587ACACB /* Pods-MeditoWidgetExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MeditoWidgetExtension.release.xcconfig"; path = "Target Support Files/Pods-MeditoWidgetExtension/Pods-MeditoWidgetExtension.release.xcconfig"; sourceTree = "<group>"; };
 		BB0B0E732488A1D670FFA76D /* Pods-Runner.debug-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-prod.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-prod.xcconfig"; sourceTree = "<group>"; };
@@ -82,12 +103,14 @@
 		D254B14FB671A44EA78C4DCE /* Pods_MeditoWidgetExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MeditoWidgetExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2B0B14E44D70527A0679E0E /* Pods-RunnerTests.debug-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug-prod.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug-prod.xcconfig"; sourceTree = "<group>"; };
 		D824AF5E86BAF1075761917E /* Pods-RunnerTests.release-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release-dev.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release-dev.xcconfig"; sourceTree = "<group>"; };
+		DD285FFF1378316BD5FCFEC6 /* nearblack@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "nearblack@2x.png"; sourceTree = "<group>"; };
 		DF7C673A0BFFFE28F1BB7522 /* Pods-RunnerTests.debug-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug-dev.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug-dev.xcconfig"; sourceTree = "<group>"; };
 		EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MeditoWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDFD4CFE2C9359BF0066E874 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		EDFD4D002C9359BF0066E874 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		EDFD4D072C9359BF0066E874 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EDFD4D092C9359BF0066E874 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F5F696C23AC21F365306D45A /* blush@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "blush@3x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -224,6 +247,16 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+			DD285FFF1378316BD5FCFEC6 /* nearblack@2x.png */,
+			3695491DE3C75B6C6589CADB /* nearblack@3x.png */,
+			11B39ECC271C6439638C9ACA /* blush@2x.png */,
+				F5F696C23AC21F365306D45A /* blush@3x.png */,
+				8569F526DAB5AAE67011AF21 /* ocean@2x.png */,
+				1642F495F0BF67E432218A44 /* ocean@3x.png */,
+				A6E4B2292C6E7C1E5F56AFA5 /* forest@2x.png */,
+				101421EE97843C1D2CD49583 /* forest@3x.png */,
+				AC169176E7723242F1D76211 /* pink@2x.png */,
+				8EA0F658C4F29C790453417C /* pink@3x.png */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -488,6 +521,16 @@
 				8BD257952AC4B7C80012213D /* GoogleService-Info.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+			CC934284185658B1ADA4785C /* nearblack@2x.png in Resources */,
+			B94EBB14C84430DEFDEAABA1 /* nearblack@3x.png in Resources */,
+			0D4562B77FF4244FD7A0BF1F /* blush@2x.png in Resources */,
+				0E56EAD091A3D2694CF3FA38 /* blush@3x.png in Resources */,
+				CC9F9E6509D2EF1445F7D052 /* ocean@2x.png in Resources */,
+				75FFF940D93AA63726585B1C /* ocean@3x.png in Resources */,
+				8779BC35DF1AAC24F2EB5EC0 /* forest@2x.png in Resources */,
+				2AB55F368BB0C48A3099C502 /* forest@3x.png in Resources */,
+				7F3A591E80D70D658C77967D /* pink@2x.png in Resources */,
+				8EECB3F8D0C2591655DDD85E /* pink@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

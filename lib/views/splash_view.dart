@@ -485,8 +485,8 @@ class SplashViewState extends ConsumerState<SplashView>
             ? Center(
                 child: SvgPicture.asset(
                   AssetConstants.icLogo,
-                  colorFilter: ColorFilter.mode(
-                      ColorConstants.lightPurple, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(
+                      Colors.white, BlendMode.srcIn),
                   width: 168,
                 ),
               )

@@ -1108,6 +1108,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get zenMode => 'Modo Zen';
 
   @override
+  String get zenModeSubtitle =>
+      'Ocultar todas las estadísticas, rachas y puntuaciones en toda la app';
+
+  @override
   String get zenModeEnabledMessage =>
       'Las estadísticas se ocultarán en toda la aplicación';
 
@@ -1413,6 +1417,33 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get themeTitle => 'Tema';
+
+  @override
+  String get appIconTitle => 'Icono de la app';
+
+  @override
+  String get appIconDefault => 'Predeterminado';
+
+  @override
+  String get appIconNearBlack => 'Casi negro';
+
+  @override
+  String get appIconDusk => 'Crepúsculo';
+
+  @override
+  String get appIconBlush => 'Rubor';
+
+  @override
+  String get appIconOcean => 'Océano';
+
+  @override
+  String get appIconForest => 'Bosque';
+
+  @override
+  String get appIconPink => 'Hora dorada';
+
+  @override
+  String get appIconChanged => 'Icono actualizado. Reiniciando…';
 
   @override
   String get systemTheme => 'Sistema';

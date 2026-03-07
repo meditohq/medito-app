@@ -2,6 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="meditofoundation.medito">
 
-    <application android:icon="@mipmap/ic_launcher">
+    <application
+        android:icon="@mipmap/ic_launcher"
+        tools:replace="android:icon">
     </application>
 </manifest>

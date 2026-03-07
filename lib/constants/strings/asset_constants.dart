@@ -1,5 +1,6 @@
 class AssetConstants {
   static const String icLogo = 'assets/images/ic_logo.svg';
+  static const String icSparks = 'assets/images/sparks.svg';
   static const String icLink = 'assets/images/ic_link.svg';
   static const String placeholder = 'assets/images/placeholder.jpg';
   static const String onboardingImage1 = 'assets/images/open_awareness.png';

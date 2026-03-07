@@ -5,12 +5,14 @@ class WidgetOptionTile extends StatelessWidget {
   final Widget icon;
   final String title;
   final VoidCallback onTap;
+  final bool hasUnderline;
 
   const WidgetOptionTile({
     super.key,
     required this.icon,
     required this.title,
     required this.onTap,
+    this.hasUnderline = true,
   });
 
   @override
@@ -18,7 +20,7 @@ class WidgetOptionTile extends StatelessWidget {
     return RowItemWidget(
       icon: icon,
       title: title,
-      hasUnderline: true,
+      hasUnderline: hasUnderline,
       onTap: onTap,
     );
   }

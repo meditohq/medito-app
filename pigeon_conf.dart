@@ -39,6 +39,15 @@ abstract class MeditoWidgetManager {
 }
 
 @HostApi()
+abstract class MeditoAppIconManager {
+  @async
+  String? getAlternateIconName();
+
+  @async
+  void setAlternateIconName(String? iconName);
+}
+
+@HostApi()
 abstract class MeditoAudioServiceApi {
   bool playAudio(AudioData audioData);
 

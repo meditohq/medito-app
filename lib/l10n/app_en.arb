@@ -339,6 +339,10 @@
   "@zenMode": {
     "description": "Title for zen mode setting in customization section"
   },
+  "zenModeSubtitle": "Hide all stats, streak, scores app-wide",
+  "@zenModeSubtitle": {
+    "description": "Subtitle for zen mode setting in customization section"
+  },
   "zenModeEnabledMessage": "Stats will be hidden throughout the app",
   "@zenModeEnabledMessage": {
     "description": "Message shown when zen mode is enabled"
@@ -545,6 +549,42 @@
   "themeTitle": "Theme",
   "@themeTitle": {
     "description": "Title for theme selection setting in customization section"
+  },
+  "appIconTitle": "App Icon",
+  "@appIconTitle": {
+    "description": "Title for app icon selection setting in customization section"
+  },
+  "appIconDefault": "Default",
+  "@appIconDefault": {
+    "description": "Label for the default app icon option"
+  },
+  "appIconNearBlack": "Nearblack",
+  "@appIconNearBlack": {
+    "description": "Label for the near-black app icon option"
+  },
+  "appIconDusk": "Dusk",
+  "@appIconDusk": {
+    "description": "Label for the dusk gradient app icon option (now the default)"
+  },
+  "appIconBlush": "Blush",
+  "@appIconBlush": {
+    "description": "Label for the blush pink gradient app icon option"
+  },
+  "appIconOcean": "Ocean",
+  "@appIconOcean": {
+    "description": "Label for the ocean blue gradient app icon option"
+  },
+  "appIconForest": "Forest",
+  "@appIconForest": {
+    "description": "Label for the forest green gradient app icon option"
+  },
+  "appIconPink": "Golden Hour",
+  "@appIconPink": {
+    "description": "Label for the pink-to-gold sunset gradient app icon option"
+  },
+  "appIconChanged": "Icon updated. Restarting…",
+  "@appIconChanged": {
+    "description": "Snackbar message shown on Android after changing the app icon"
   },
   "systemTheme": "System",
   "@systemTheme": {

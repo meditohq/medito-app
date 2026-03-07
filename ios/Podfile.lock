@@ -12,6 +12,8 @@ PODS:
     - Flutter
   - do_not_disturb (0.0.1):
     - Flutter
+  - dynamic_app_icon_flutter_plus (0.0.1):
+    - Flutter
   - facebook_app_events (0.20.0):
     - FBSDKCoreKit (~> 18.0)
     - Flutter
@@ -274,6 +276,7 @@ DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - do_not_disturb (from `.symlinks/plugins/do_not_disturb/ios`)
+  - dynamic_app_icon_flutter_plus (from `.symlinks/plugins/dynamic_app_icon_flutter_plus/ios`)
   - facebook_app_events (from `.symlinks/plugins/facebook_app_events/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -344,6 +347,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/device_info_plus/ios"
   do_not_disturb:
     :path: ".symlinks/plugins/do_not_disturb/ios"
+  dynamic_app_icon_flutter_plus:
+    :path: ".symlinks/plugins/dynamic_app_icon_flutter_plus/ios"
   facebook_app_events:
     :path: ".symlinks/plugins/facebook_app_events/ios"
   firebase_analytics:
@@ -396,6 +401,7 @@ SPEC CHECKSUMS:
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   do_not_disturb: 7b70fa69b7a8f30b5310bf20ac7a2a6ccff143f4
+  dynamic_app_icon_flutter_plus: 9235d8a780d99c6c53af52930567e33b42875395
   facebook_app_events: cfa07e73912a052992b5f218f79a19a66a99bf1a
   FBAEMKit: 2a6b529993713c185b02bc36f8c91129bf78dfb0
   FBSDKCoreKit: 65d7f7a7d6fcc3aa6eb6e093ec737a4184fc6049

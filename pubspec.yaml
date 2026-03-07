@@ -74,6 +74,7 @@ dependencies:
   xml: ^6.5.0
   xml2json: ^6.2.7
   home_widget: ^0.8.1
+  dynamic_app_icon_flutter_plus: ^0.0.8
 
 dependency_overrides:
   superwallkit_flutter: 2.4.4
@@ -99,6 +100,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/images/app_icons/
   fonts:
     - family: Source Serif
       fonts:

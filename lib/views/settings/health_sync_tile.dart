@@ -10,7 +10,9 @@ import '../home/widgets/bottom_sheet/row_item_widget.dart';
 import '../../widgets/medito_huge_icon.dart';
 
 class HealthSyncTile extends StatelessWidget {
-  const HealthSyncTile({super.key});
+  const HealthSyncTile({super.key, this.hasUnderline = true});
+
+  final bool hasUnderline;
 
   void _handleHealthSync(BuildContext context) async {
     await Health().requestAuthorization(
@@ -29,7 +31,7 @@ class HealthSyncTile extends StatelessWidget {
         color: Theme.of(context).colorScheme.onSurface,
       ),
       title: AppLocalizations.of(context)!.syncWithHealth,
-      hasUnderline: true,
+      hasUnderline: hasUnderline,
       isSwitch: false,
       onTap: () => _handleHealthSync(context),
     );

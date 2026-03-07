@@ -2096,6 +2096,12 @@ abstract class AppLocalizations {
   /// **'Zen Mode'**
   String get zenMode;
 
+  /// Subtitle for zen mode setting in customization section
+  ///
+  /// In en, this message translates to:
+  /// **'Hide all stats, streak, scores app-wide'**
+  String get zenModeSubtitle;
+
   /// Message shown when zen mode is enabled
   ///
   /// In en, this message translates to:
@@ -2647,6 +2653,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Theme'**
   String get themeTitle;
+
+  /// Title for app icon selection setting in customization section
+  ///
+  /// In en, this message translates to:
+  /// **'App Icon'**
+  String get appIconTitle;
+
+  /// Label for the default app icon option
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get appIconDefault;
+
+  /// Label for the near-black app icon option
+  ///
+  /// In en, this message translates to:
+  /// **'Nearblack'**
+  String get appIconNearBlack;
+
+  /// Label for the dusk gradient app icon option (now the default)
+  ///
+  /// In en, this message translates to:
+  /// **'Dusk'**
+  String get appIconDusk;
+
+  /// Label for the blush pink gradient app icon option
+  ///
+  /// In en, this message translates to:
+  /// **'Blush'**
+  String get appIconBlush;
+
+  /// Label for the ocean blue gradient app icon option
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean'**
+  String get appIconOcean;
+
+  /// Label for the forest green gradient app icon option
+  ///
+  /// In en, this message translates to:
+  /// **'Forest'**
+  String get appIconForest;
+
+  /// Label for the pink-to-gold sunset gradient app icon option
+  ///
+  /// In en, this message translates to:
+  /// **'Golden Hour'**
+  String get appIconPink;
+
+  /// Snackbar message shown on Android after changing the app icon
+  ///
+  /// In en, this message translates to:
+  /// **'Icon updated. Restarting…'**
+  String get appIconChanged;
 
   /// System theme option that follows device settings
   ///

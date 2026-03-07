@@ -8,11 +8,13 @@ import 'package:medito/widgets/snackbar_widget.dart';
 class ZenModeTile extends ConsumerWidget {
   final Widget icon;
   final String title;
+  final bool hasUnderline;
 
   const ZenModeTile({
     super.key,
     required this.icon,
     required this.title,
+    this.hasUnderline = true,
   });
 
   @override
@@ -22,7 +24,8 @@ class ZenModeTile extends ConsumerWidget {
     return RowItemWidget(
       icon: icon,
       title: title,
-      hasUnderline: true,
+      subTitle: AppLocalizations.of(context)!.zenModeSubtitle,
+      hasUnderline: hasUnderline,
       isSwitch: true,
       switchValue: isZenModeEnabled,
       onSwitchChanged: (value) {

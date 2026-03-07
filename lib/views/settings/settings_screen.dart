@@ -4,9 +4,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -17,7 +17,8 @@ import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
 import 'package:medito/views/settings/widgets/expandable_section_widget.dart';
 import 'package:medito/views/settings/widgets/smart_reminder_tile.dart';
-import 'package:medito/views/settings/widgets/theme_selection_dialog.dart';
+import 'package:medito/views/settings/widgets/app_icon_inline_selector.dart';
+import 'package:medito/views/settings/widgets/theme_inline_selector.dart';
 import 'package:medito/views/settings/widgets/widget_option_tile.dart';
 import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -146,6 +147,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.customizationSection,
+        type: TypeConstants.appIcon,
+        title: AppLocalizations.of(context)!.appIconTitle,
+        icon: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface,
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          padding: const EdgeInsets.all(3),
+          child: SvgPicture.asset(
+            AssetConstants.icLogo,
+            colorFilter: ColorFilter.mode(
+              Theme.of(context).colorScheme.onSurface,
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
+        path: TypeConstants.appIcon,
+      ),
+      SettingsItem(
+        section: AppLocalizations.of(context)!.customizationSection,
         type: TypeConstants.route,
         title: AppLocalizations.of(context)!.customiseHomeLayout,
         icon: MeditoIcon(
@@ -188,7 +214,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ];
 
     return Scaffold(
-      body: SafeArea(child: _buildMain(context, ref, settingsItems)),
+      body: _buildMain(context, ref, settingsItems),
     );
   }
 
@@ -240,27 +266,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildMenuItemTile(
     BuildContext context,
     WidgetRef ref,
-    SettingsItem item,
-  ) {
-    final authRepository = ref.watch(authRepositorySyncProvider);
-    final user = authRepository.currentUser;
-    final isAccountItem = item.type == TypeConstants.account;
-    final userEmail = user?.email;
-    final hasValidEmail = userEmail != null && userEmail.isNotEmpty;
+    SettingsItem item, {
+    bool isLast = false,
+  }) {
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
     final isZenModeToggle = isToggleItem && item.path == TypeConstants.toggleZenMode;
     final isThemeItem = item.type == TypeConstants.theme;
     final isWidgetItem = item.path == TypeConstants.addWidget;
 
-    if (isAccountItem) {
-      return const SizedBox.shrink();
-    }
-
     if (isDndToggle) {
       return DndSettingTile(
         icon: item.icon,
         title: item.title,
+        hasUnderline: !isLast,
       );
     }
 
@@ -268,30 +287,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       return ZenModeTile(
         icon: item.icon,
         title: item.title,
+        hasUnderline: !isLast,
       );
     }
 
-    if (isThemeItem) {
-      final themeNotifier = ref.read(themeProvider.notifier);
+    if (item.type == TypeConstants.appIcon) {
+      return const AppIconInlineSelector();
+    }
 
-      return RowItemWidget(
-        icon: item.icon,
-        title: item.title,
-        subTitle: themeNotifier.getThemeDisplayName(context),
-        hasUnderline: true,
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => const ThemeSelectionDialog(),
-          );
-        },
-      );
+    if (isThemeItem) {
+      return const ThemeInlineSelector();
     }
 
     if (isWidgetItem) {
       return WidgetOptionTile(
         icon: item.icon,
         title: item.title,
+        hasUnderline: !isLast,
         onTap: () => handleItemPress(context, item),
       );
     }
@@ -299,9 +311,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return RowItemWidget(
       icon: item.icon,
       title: item.title,
-      subTitle: isAccountItem && hasValidEmail ? userEmail : null,
-      hasUnderline: true,
+      hasUnderline: !isLast,
       onTap: () => handleItemPress(context, item),
+    );
+  }
+
+  Widget _buildSectionCard(List<Widget> children) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Column(children: children),
     );
   }
 
@@ -337,42 +355,78 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final widgetItem = allCustomizationItems
         .where((item) => item.path == TypeConstants.addWidget)
         .firstOrNull;
+
+    // Items that render as their own inline cards
+    final inlineCardTypes = {TypeConstants.theme, TypeConstants.appIcon};
+
+    // Items to group in the "other customization" card
     final otherCustomizationItems = allCustomizationItems
-        .where((item) => item.path != TypeConstants.addWidget)
+        .where((item) =>
+            item.path != TypeConstants.addWidget &&
+            !inlineCardTypes.contains(item.type))
         .toList();
 
-    var children = <Widget>[
-      const SmartReminderTile(),
-      if (!isEffectivelySignedIn) ...[
-        _buildSectionTitle(context, AppLocalizations.of(context)!.account),
-        const AccountSectionWidget(),
-      ],
-      _buildSectionTitle(
-          context, AppLocalizations.of(context)!.supportCommunity),
-      ..._getItemsBySection(settingsItems,
-              AppLocalizations.of(context)!.supportCommunitySection)
-          .map((item) => _buildMenuItemTile(context, ref, item)),
-      _buildSectionTitle(context, AppLocalizations.of(context)!.customization),
-      if (widgetItem != null) _buildMenuItemTile(context, ref, widgetItem),
-      ...otherCustomizationItems
-          .map((item) => _buildMenuItemTile(context, ref, item)),
-      if (_isHealthSyncAvailable) const HealthSyncTile(),
-      _buildSectionTitle(context, AppLocalizations.of(context)!.helpLegal),
-      ..._getItemsBySection(
-              settingsItems, AppLocalizations.of(context)!.helpLegalSection)
-          .map((item) => _buildMenuItemTile(context, ref, item)),
-      if (isEffectivelySignedIn) ...[
-        _buildSectionTitle(context, AppLocalizations.of(context)!.account),
-        const AccountSectionWidget(),
-      ],
-      const SizedBox(height: 16.0),
-      const ExpandableSectionWidget(),
+    // Support & Community card
+    final communityItems = _getItemsBySection(
+        settingsItems, AppLocalizations.of(context)!.supportCommunitySection);
+
+    // Help & Legal card
+    final helpItems = _getItemsBySection(
+        settingsItems, AppLocalizations.of(context)!.helpLegalSection);
+
+    // Other customization card children
+    final otherCustomizationChildren = <Widget>[
+      if (widgetItem != null)
+        _buildMenuItemTile(context, ref, widgetItem,
+            isLast: otherCustomizationItems.isEmpty && !_isHealthSyncAvailable),
+      for (var i = 0; i < otherCustomizationItems.length; i++)
+        _buildMenuItemTile(
+          context,
+          ref,
+          otherCustomizationItems[i],
+          isLast: i == otherCustomizationItems.length - 1 && !_isHealthSyncAvailable,
+        ),
+      if (_isHealthSyncAvailable) const HealthSyncTile(hasUnderline: false),
     ];
 
     return SliverPadding(
       padding: const EdgeInsets.only(top: padding16),
       sliver: SliverList(
-        delegate: SliverChildListDelegate(children),
+        delegate: SliverChildListDelegate([
+          const SmartReminderTile(),
+          if (!isEffectivelySignedIn) ...[
+            _buildSectionTitle(context, AppLocalizations.of(context)!.account),
+            _buildSectionCard([const AccountSectionWidget(inCard: true)]),
+          ],
+          _buildSectionTitle(
+              context, AppLocalizations.of(context)!.supportCommunity),
+          _buildSectionCard([
+            for (var i = 0; i < communityItems.length; i++)
+              _buildMenuItemTile(context, ref, communityItems[i],
+                  isLast: i == communityItems.length - 1),
+          ]),
+          _buildSectionTitle(
+              context, AppLocalizations.of(context)!.customization),
+          // Theme and App Icon render as their own cards
+          ...allCustomizationItems
+              .where((item) => inlineCardTypes.contains(item.type))
+              .map((item) => _buildMenuItemTile(context, ref, item)),
+          if (otherCustomizationChildren.isNotEmpty)
+            _buildSectionCard(otherCustomizationChildren),
+          _buildSectionTitle(context, AppLocalizations.of(context)!.helpLegal),
+          _buildSectionCard([
+            for (var i = 0; i < helpItems.length; i++)
+              _buildMenuItemTile(context, ref, helpItems[i],
+                  isLast: i == helpItems.length - 1),
+          ]),
+          if (isEffectivelySignedIn) ...[
+            _buildSectionTitle(
+                context, AppLocalizations.of(context)!.account),
+            _buildSectionCard([const AccountSectionWidget(inCard: true)]),
+          ],
+          const SizedBox(height: 16.0),
+          const ExpandableSectionWidget(),
+        ]),
       ),
     );
   }

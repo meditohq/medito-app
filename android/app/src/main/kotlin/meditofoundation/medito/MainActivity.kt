@@ -50,6 +50,7 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         
         MeditoAndroidAudioServiceManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
         MeditoWidgetManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
+        MeditoAppIconManager.setUp(flutterEngine.dartExecutor.binaryMessenger, AppIconManagerImpl(this))
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
         checkAndSendCompletionData()

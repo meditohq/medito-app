@@ -6,11 +6,13 @@ import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 class DndSettingTile extends ConsumerWidget {
   final Widget icon;
   final String title;
+  final bool hasUnderline;
 
   const DndSettingTile({
     super.key,
     required this.icon,
     required this.title,
+    this.hasUnderline = true,
   });
 
   @override
@@ -20,7 +22,7 @@ class DndSettingTile extends ConsumerWidget {
     return RowItemWidget(
       icon: icon,
       title: title,
-      hasUnderline: true,
+      hasUnderline: hasUnderline,
       isSwitch: true,
       switchValue: isDndEnabled,
       onSwitchChanged: (value) {
