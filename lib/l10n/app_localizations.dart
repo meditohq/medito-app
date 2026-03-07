@@ -1595,19 +1595,19 @@ abstract class AppLocalizations {
   /// No description provided for @donationTitle.
   ///
   /// In en, this message translates to:
-  /// **'Help Keep Medito Free'**
+  /// **'Millions find calm here for free. Help keep it that way.'**
   String get donationTitle;
 
   /// No description provided for @donationBody.
   ///
   /// In en, this message translates to:
-  /// **'We\'re a nonprofit initiative.\nWe rely on donations to remain free and ad-free.\nIf you\'d like to contribute, you can donate any amount. No pressure!'**
+  /// **'Medito is run by a small nonprofit team. No ads, no investors, no paywalls. Just donations from people who use the app.'**
   String get donationBody;
 
   /// No description provided for @donateNow.
   ///
   /// In en, this message translates to:
-  /// **'Donate Now'**
+  /// **'Become a supporter'**
   String get donateNow;
 
   /// No description provided for @noThanks.

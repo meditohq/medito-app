@@ -806,14 +806,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get smartRemindersOn => 'Smart Reminders On';
 
   @override
-  String get donationTitle => 'Help Keep Medito Free';
+  String get donationTitle =>
+      'Millions find calm here for free. Help keep it that way.';
 
   @override
   String get donationBody =>
-      'We\'re a nonprofit initiative.\nWe rely on donations to remain free and ad-free.\nIf you\'d like to contribute, you can donate any amount. No pressure!';
+      'Medito is run by a small nonprofit team. No ads, no investors, no paywalls. Just donations from people who use the app.';
 
   @override
-  String get donateNow => 'Donate Now';
+  String get donateNow => 'Become a supporter';
 
   @override
   String get noThanks => 'No thanks';

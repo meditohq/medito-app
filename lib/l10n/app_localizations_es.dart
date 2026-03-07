@@ -820,14 +820,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get smartRemindersOn => 'Recordatorios Inteligentes Activados';
 
   @override
-  String get donationTitle => 'Ayuda a Mantener Medito Gratis';
+  String get donationTitle =>
+      'Millones encuentran calma aquí gratis. Ayuda a que siga así.';
 
   @override
   String get donationBody =>
-      'Somos una iniciativa sin fines de lucro.\\nDependemos de donaciones para permanecer gratis y sin anuncios.\\nSi te gustaría contribuir, puedes donar cualquier cantidad. ¡Sin presión!';
+      'Medito es gestionado por un pequeño equipo sin fines de lucro. Sin anuncios, sin inversores, sin muros de pago — solo donaciones de personas que usan la app.';
 
   @override
-  String get donateNow => 'Donar Ahora';
+  String get donateNow => 'Conviértete en colaborador';
 
   @override
   String get noThanks => 'No gracias';
