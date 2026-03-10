@@ -1,105 +1,144 @@
-name: Release
+name: Build & Deploy
 
 on:
   push:
     tags:
       - '*.*.*'
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      paywall_env:
+        description: 'Paywall environment'
+        required: true
+        default: 'live'
+        type: choice
+        options:
+          - live
+          - dev
+      play_store_track:
+        description: 'Play Store track (Android)'
+        required: true
+        default: 'internal'
+        type: choice
+        options:
+          - internal
+          - beta
+          - production
+      platforms:
+        description: 'Platforms to build'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - android
+          - ios
 
 jobs:
-  android-release:
-    name: Android Release (APK to GitHub Release)
+  android-deploy:
+    name: Android – Build & Deploy
     runs-on: ubuntu-latest
     environment: prod
+    if: github.event_name != 'workflow_dispatch' || inputs.platforms == 'both' || inputs.platforms == 'android'
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2.12.0
+      - uses: subosito/flutter-action@v2.12.0
         with:
           channel: stable
 
       - name: Flutter pub get
         run: flutter pub get
 
-      - name: Generate code (build_runner)
-        run: flutter packages pub run build_runner build --delete-conflicting-outputs
-
-      - name: Generate Pigeon
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
-
-      - name: Write .prod.json from secret
-        env:
-          PROD_ENV: ${{ secrets.PROD_ENV }}
+      - name: Generate code
         run: |
-          printf "%s" "$PROD_ENV" > .prod.json
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+          flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
-      - name: Write keystore.properties from secret
-        env:
-          KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
-        run: |
-          printf "%s" "$KEYSTORE_PROPERTIES" > android/keystore.properties
+      - name: Write .prod.json
+        run: printf "%s" "${{ secrets.PROD_ENV }}" > .prod.json
 
-      - name: Write keystore file from secret
-        env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
-        run: |
-          echo "$KEYSTORE_FILE" | base64 -d > android/meditokey.jks
+      - name: Write google-services.json
+        run: printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
 
-      - name: Build APK (prod, live paywall)
+      - name: Write keystore.properties
+        run: printf "%s" "${{ secrets.KEYSTORE_PROPERTIES }}" > android/keystore.properties
+
+      - name: Write keystore file
+        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/meditokey.jks
+
+      - name: Run Flutter tests
+        run: flutter test --dart-define-from-file=.prod.json
+
+      - name: Build APK
         run: |
           flutter build apk --flavor prod --release \
             --dart-define-from-file=.prod.json \
-            --dart-define=PAYWALL_ENV=live \
+            --dart-define=PAYWALL_ENV=${{ inputs.paywall_env || 'live' }} \
             --obfuscate --split-debug-info=./symbols
 
-      - name: Upload APK to GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: ruby/setup-ruby@v1
         with:
-          files: build/app/outputs/apk/prod/release/app-prod-release.apk
+          ruby-version: '3.2'
 
-  ios-release:
-    name: iOS Release (TestFlight)
+      - name: Install Android gems
+        working-directory: android
+        run: bundle install
+
+      - name: Upload to Play Store
+        working-directory: android
+        env:
+          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        run: |
+          bundle exec fastlane android upload_apk \
+            apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+            track:"${{ inputs.play_store_track || 'internal' }}"
+
+  ios-deploy:
+    name: iOS – Build & Deploy to TestFlight
     runs-on: macos-latest
     environment: prod
+    if: github.event_name != 'workflow_dispatch' || inputs.platforms == 'both' || inputs.platforms == 'ios'
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Generate code
+        run: |
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+          flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+
+      - name: Write .prod.json
+        run: printf "%s" "${{ secrets.PROD_ENV }}" > .prod.json
+
+      - name: Write GoogleService-Info.plist
+        run: printf "%s" "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
+
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
 
       - name: Install Fastlane
         run: gem install fastlane --no-document
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2.12.0
-        with:
-          channel: stable
-
-      - name: Flutter pub get
-        run: flutter pub get
-
-      - name: Generate code (build_runner)
-        run: flutter packages pub run build_runner build --delete-conflicting-outputs
-
-      - name: Generate Pigeon
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
-      - name: Generate Pigeon
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
-
-      - name: Fastlane Match + Build + TestFlight upload
+      - name: Build & upload to TestFlight
         working-directory: ios
         env:
+          PAYWALL_ENV: ${{ inputs.paywall_env || 'live' }}
           MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
-          MEDITO_APPSTORE_CERTIFICATES_REPO: ${{ secrets.MEDITO_APPSTORE_CERTIFICATES_REPO }}
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
           DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
           APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
@@ -108,6 +147,4 @@ jobs:
           PROVISIONING_PROFILE_SPECIFIER: ${{ secrets.PROVISIONING_PROFILE_SPECIFIER }}
           FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-        run: |
-          fastlane beta
-
+        run: fastlane beta

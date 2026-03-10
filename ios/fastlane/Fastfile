@@ -3,21 +3,31 @@ require 'base64'
 default_platform(:ios)
 
 platform :ios do
-  
+
   before_all do
-    xcode_select "/Applications/Xcode.app" # Set the default path to Xcode
+    xcode_select "/Applications/Xcode.app"
   end
 
-  # For TestFlight (staging)
-  lane :beta do
+  lane :beta do |options|
     setup_keychain()
-    
+
+    paywall_env = options[:paywall_env] || ENV["PAYWALL_ENV"] || "live"
+
     match(
       type: 'appstore',
       readonly: true,
       git_url: "https://github.com/meditohq/fastlane-certificates.git",
       git_basic_authorization: Base64.strict_encode64("x-access-token:#{ENV['MATCH_GIT_TOKEN']}")
     )
+
+    Dir.chdir("..") do
+      sh(
+        "flutter build ios --release " \
+        "--dart-define-from-file=.prod.json " \
+        "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
+        "--dart-define=PAYWALL_ENV=#{paywall_env}"
+      )
+    end
 
     build_app(
       workspace: "Runner.xcworkspace",
@@ -34,17 +44,25 @@ platform :ios do
     upload_to_testflight(skip_submission: true)
     cleanup_keychain()
   end
-  
-  # For App Store (production)
-  lane :release do
+
+  lane :release do |options|
     setup_keychain()
-    
+
     match(
       type: 'appstore',
       readonly: true,
       git_url: "https://github.com/meditohq/fastlane-certificates.git",
       git_basic_authorization: Base64.strict_encode64("x-access-token:#{ENV['MATCH_GIT_TOKEN']}")
     )
+
+    Dir.chdir("..") do
+      sh(
+        "flutter build ios --release " \
+        "--dart-define-from-file=.prod.json " \
+        "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
+        "--dart-define=PAYWALL_ENV=live"
+      )
+    end
 
     build_app(
       workspace: "Runner.xcworkspace",
@@ -63,7 +81,6 @@ platform :ios do
   end
 end
 
-# Helper methods to manage keychain
 def setup_keychain
   create_keychain(
     name: ENV["TEMP_KEYCHAIN_USER"],
