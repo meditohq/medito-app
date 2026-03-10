@@ -32,10 +32,33 @@ jobs:
         command: flutter pub get
         retry_wait_seconds: 10
     
-    - name: Generate code
-      run: |
-        flutter pub run build_runner build --delete-conflicting-outputs
-        flutter pub run pigeon --input pigeon_conf.dart
+    - name: Cache build_runner outputs
+      id: cache-buildrunner
+      uses: actions/cache@v4
+      with:
+        path: |
+          lib/**/*.g.dart
+          lib/**/*.freezed.dart
+        key: ${{ runner.os }}-buildrunner-${{ hashFiles('lib/**/*.dart', 'pubspec.lock') }}
+        restore-keys: ${{ runner.os }}-buildrunner-
+
+    - name: Run build_runner
+      if: steps.cache-buildrunner.outputs.cache-hit != 'true'
+      run: flutter pub run build_runner build --delete-conflicting-outputs
+
+    - name: Cache pigeon outputs
+      id: cache-pigeon
+      uses: actions/cache@v4
+      with:
+        path: |
+          lib/src/audio_pigeon.g.dart
+          android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
+        key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+        restore-keys: ${{ runner.os }}-pigeon-
+
+    - name: Run pigeon
+      if: steps.cache-pigeon.outputs.cache-hit != 'true'
+      run: flutter pub run pigeon --input pigeon_conf.dart
     
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1

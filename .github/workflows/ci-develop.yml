@@ -71,8 +71,10 @@ jobs:
             "DONATION_BASE_URL": "https://example.invalid/",
             "DONATION_TOKEN": "test",
             "SUPERWALL_API_KEY": "test",
-            "TIKTOK_ANDROID_APP_ID": "0",
-            "TIKTOK_IOS_APP_ID": "0"
+            "STRIPE_TEST_PUBLISHABLE_KEY": "test",
+            "STRIPE_LIVE_PUBLISHABLE_KEY": "test",
+            "FACEBOOK_APP_ID": "test",
+            "FACEBOOK_CLIENT_TOKEN": "test"
           }
           JSON
 
@@ -94,10 +96,32 @@ jobs:
           }
           DART
 
+      - name: Cache build_runner outputs
+        id: cache-buildrunner
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib/**/*.g.dart
+            lib/**/*.freezed.dart
+          key: ${{ runner.os }}-buildrunner-${{ hashFiles('lib/**/*.dart', 'pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-buildrunner-
+
       - name: Run Riverpod generator
+        if: steps.cache-buildrunner.outputs.cache-hit != 'true'
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
+      - name: Cache pigeon outputs
+        id: cache-pigeon
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib/src/audio_pigeon.g.dart
+            android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pigeon-
+
       - name: Run Pigeon generator
+        if: steps.cache-pigeon.outputs.cache-hit != 'true'
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Run Unit Tests
