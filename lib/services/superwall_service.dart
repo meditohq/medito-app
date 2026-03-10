@@ -429,7 +429,18 @@ class CustomSuperwallDelegate implements SuperwallDelegate {
   void willRedeemLink() {
     AppLogger.d('SUPERWALL_DELEGATE', 'Will redeem link');
   }
-  
+
+  @override
+  void customerInfoDidChange(CustomerInfo from, CustomerInfo to) {
+    AppLogger.d('SUPERWALL_DELEGATE',
+        'Customer info changed: userId=${to.userId}');
+  }
+
+  @override
+  void userAttributesDidChange(Map<String, Object> newAttributes) {
+    AppLogger.d(
+        'SUPERWALL_DELEGATE', 'User attributes changed: $newAttributes');
+  }
 }
 
 /// Provider for the Superwall service
