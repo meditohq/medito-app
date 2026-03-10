@@ -104,6 +104,9 @@ jobs:
       - name: Write .prod.json
         run: printf "%s" "${{ secrets.PROD_ENV }}" > .prod.json
 
+      - name: Debug .prod.json
+        run: cat .prod.json
+
       - name: Write google-services.json
         run: printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
 
