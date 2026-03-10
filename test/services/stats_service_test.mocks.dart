@@ -23,6 +23,7 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
+// ignore_for_file: invalid_use_of_internal_member
 
 /// A class which mocks [HttpApiService].
 ///
@@ -34,40 +35,28 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
 
   @override
   void addAuthCallback(_i2.AuthStateCallback? callback) => super.noSuchMethod(
-        Invocation.method(
-          #addAuthCallback,
-          [callback],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#addAuthCallback, [callback]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void removeAuthCallback(_i2.AuthStateCallback? callback) =>
       super.noSuchMethod(
-        Invocation.method(
-          #removeAuthCallback,
-          [callback],
-        ),
+        Invocation.method(#removeAuthCallback, [callback]),
         returnValueForMissingStub: null,
       );
 
   @override
   void setAuthHeader(String? accessToken) => super.noSuchMethod(
-        Invocation.method(
-          #setAuthHeader,
-          [accessToken],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#setAuthHeader, [accessToken]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void clearAuthHeader() => super.noSuchMethod(
-        Invocation.method(
-          #clearAuthHeader,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#clearAuthHeader, []),
+    returnValueForMissingStub: null,
+  );
 
   @override
   _i3.Future<Map<String, dynamic>> getRequest(
@@ -75,69 +64,57 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
     Map<String, dynamic>? queryParams,
   }) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #getRequest,
-          [path],
-          {#queryParams: queryParams},
-        ),
-        returnValue:
-            _i3.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i3.Future<Map<String, dynamic>>);
+            Invocation.method(#getRequest, [path], {#queryParams: queryParams}),
+            returnValue: _i3.Future<Map<String, dynamic>>.value(
+              <String, dynamic>{},
+            ),
+          )
+          as _i3.Future<Map<String, dynamic>>);
 
   @override
-  _i3.Future<Map<String, dynamic>> postRequest(
-    String? path, {
-    dynamic body,
-  }) =>
+  _i3.Future<Map<String, dynamic>> postRequest(String? path, {dynamic body}) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #postRequest,
-          [path],
-          {#body: body},
-        ),
-        returnValue:
-            _i3.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i3.Future<Map<String, dynamic>>);
+            Invocation.method(#postRequest, [path], {#body: body}),
+            returnValue: _i3.Future<Map<String, dynamic>>.value(
+              <String, dynamic>{},
+            ),
+          )
+          as _i3.Future<Map<String, dynamic>>);
 
   @override
   _i3.Future<Map<String, dynamic>> deleteRequest(String? path) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteRequest,
-          [path],
-        ),
-        returnValue:
-            _i3.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i3.Future<Map<String, dynamic>>);
+            Invocation.method(#deleteRequest, [path]),
+            returnValue: _i3.Future<Map<String, dynamic>>.value(
+              <String, dynamic>{},
+            ),
+          )
+          as _i3.Future<Map<String, dynamic>>);
 
   @override
-  _i3.Future<void> signOut() => (super.noSuchMethod(
-        Invocation.method(
-          #signOut,
-          [],
-        ),
-        returnValue: _i3.Future<void>.value(),
-        returnValueForMissingStub: _i3.Future<void>.value(),
-      ) as _i3.Future<void>);
+  _i3.Future<void> signOut() =>
+      (super.noSuchMethod(
+            Invocation.method(#signOut, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
 
   @override
   void addDeviceHeaders(Map<String, String>? headers) => super.noSuchMethod(
-        Invocation.method(
-          #addDeviceHeaders,
-          [headers],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#addDeviceHeaders, [headers]),
+    returnValueForMissingStub: null,
+  );
 
   @override
-  _i3.Future<Map<String, dynamic>> diagnoseSecurity() => (super.noSuchMethod(
-        Invocation.method(
-          #diagnoseSecurity,
-          [],
-        ),
-        returnValue:
-            _i3.Future<Map<String, dynamic>>.value(<String, dynamic>{}),
-      ) as _i3.Future<Map<String, dynamic>>);
+  _i3.Future<Map<String, dynamic>> diagnoseSecurity() =>
+      (super.noSuchMethod(
+            Invocation.method(#diagnoseSecurity, []),
+            returnValue: _i3.Future<Map<String, dynamic>>.value(
+              <String, dynamic>{},
+            ),
+          )
+          as _i3.Future<Map<String, dynamic>>);
 }
 
 /// A class which mocks [StatsBackupService].
@@ -150,49 +127,37 @@ class MockStatsBackupService extends _i1.Mock
   }
 
   @override
-  _i3.Future<bool> backupStats(
-    _i5.LocalAllStats? stats,
-    String? userId,
-  ) =>
+  _i3.Future<bool> backupStats(_i5.LocalAllStats? stats, String? userId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #backupStats,
-          [
-            stats,
-            userId,
-          ],
-        ),
-        returnValue: _i3.Future<bool>.value(false),
-      ) as _i3.Future<bool>);
+            Invocation.method(#backupStats, [stats, userId]),
+            returnValue: _i3.Future<bool>.value(false),
+          )
+          as _i3.Future<bool>);
 
   @override
   _i3.Future<_i5.LocalAllStats?> getLatestBackup(String? userId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #getLatestBackup,
-          [userId],
-        ),
-        returnValue: _i3.Future<_i5.LocalAllStats?>.value(),
-      ) as _i3.Future<_i5.LocalAllStats?>);
+            Invocation.method(#getLatestBackup, [userId]),
+            returnValue: _i3.Future<_i5.LocalAllStats?>.value(),
+          )
+          as _i3.Future<_i5.LocalAllStats?>);
 
   @override
   _i3.Future<List<_i4.StatsBackup>> getAllBackups(String? userId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #getAllBackups,
-          [userId],
-        ),
-        returnValue:
-            _i3.Future<List<_i4.StatsBackup>>.value(<_i4.StatsBackup>[]),
-      ) as _i3.Future<List<_i4.StatsBackup>>);
+            Invocation.method(#getAllBackups, [userId]),
+            returnValue: _i3.Future<List<_i4.StatsBackup>>.value(
+              <_i4.StatsBackup>[],
+            ),
+          )
+          as _i3.Future<List<_i4.StatsBackup>>);
 
   @override
-  _i3.Future<void> clearBackups(String? userId) => (super.noSuchMethod(
-        Invocation.method(
-          #clearBackups,
-          [userId],
-        ),
-        returnValue: _i3.Future<void>.value(),
-        returnValueForMissingStub: _i3.Future<void>.value(),
-      ) as _i3.Future<void>);
+  _i3.Future<void> clearBackups(String? userId) =>
+      (super.noSuchMethod(
+            Invocation.method(#clearBackups, [userId]),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
 }

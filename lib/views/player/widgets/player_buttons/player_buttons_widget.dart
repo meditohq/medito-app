@@ -8,8 +8,8 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 
+import '../../../../models/player/repeat_mode.dart';
 import '../../../../providers/player/repeat_state_provider.dart';
-import '../../../../src/audio_pigeon.g.dart';
 import 'play_pause_button_widget.dart';
 
 class PlayerButtonsWidget extends ConsumerWidget {

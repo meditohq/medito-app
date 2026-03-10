@@ -23,15 +23,11 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
+// ignore_for_file: invalid_use_of_internal_member
 
 class _FakeLocalAllStats_0 extends _i1.SmartFake implements _i2.LocalAllStats {
-  _FakeLocalAllStats_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
+  _FakeLocalAllStats_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
 }
 
 /// A class which mocks [StatsService].
@@ -43,46 +39,36 @@ class MockStatsService extends _i1.Mock implements _i3.StatsService {
   }
 
   @override
-  _i4.Future<bool> hasRecentlySync() => (super.noSuchMethod(
-        Invocation.method(
-          #hasRecentlySync,
-          [],
-        ),
-        returnValue: _i4.Future<bool>.value(false),
-      ) as _i4.Future<bool>);
+  _i4.Future<bool> hasRecentlySync() =>
+      (super.noSuchMethod(
+            Invocation.method(#hasRecentlySync, []),
+            returnValue: _i4.Future<bool>.value(false),
+          )
+          as _i4.Future<bool>);
 
   @override
-  _i4.Future<_i2.LocalAllStats> fetchAllStats() => (super.noSuchMethod(
-        Invocation.method(
-          #fetchAllStats,
-          [],
-        ),
-        returnValue: _i4.Future<_i2.LocalAllStats>.value(_FakeLocalAllStats_0(
-          this,
-          Invocation.method(
-            #fetchAllStats,
-            [],
-          ),
-        )),
-      ) as _i4.Future<_i2.LocalAllStats>);
+  _i4.Future<_i2.LocalAllStats> fetchAllStats() =>
+      (super.noSuchMethod(
+            Invocation.method(#fetchAllStats, []),
+            returnValue: _i4.Future<_i2.LocalAllStats>.value(
+              _FakeLocalAllStats_0(this, Invocation.method(#fetchAllStats, [])),
+            ),
+          )
+          as _i4.Future<_i2.LocalAllStats>);
 
   @override
-  _i4.Future<void> postStats(_i2.LocalAllStats? stats) => (super.noSuchMethod(
-        Invocation.method(
-          #postStats,
-          [stats],
-        ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+  _i4.Future<void> postStats(_i2.LocalAllStats? stats) =>
+      (super.noSuchMethod(
+            Invocation.method(#postStats, [stats]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 
   @override
   void setBackupServiceForTesting(_i5.StatsBackupService? backupService) =>
       super.noSuchMethod(
-        Invocation.method(
-          #setBackupServiceForTesting,
-          [backupService],
-        ),
+        Invocation.method(#setBackupServiceForTesting, [backupService]),
         returnValueForMissingStub: null,
       );
 }

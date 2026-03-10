@@ -1,5 +1,5 @@
 PODS:
-  - app_links (6.4.1):
+  - app_links (7.0.0):
     - Flutter
   - app_tracking_transparency (0.0.1):
     - Flutter
@@ -14,7 +14,7 @@ PODS:
     - Flutter
   - dynamic_app_icon_flutter_plus (0.0.1):
     - Flutter
-  - facebook_app_events (0.20.0):
+  - facebook_app_events (0.24.0):
     - FBSDKCoreKit (~> 18.0)
     - Flutter
   - FBAEMKit (18.0.3):
@@ -260,12 +260,12 @@ PODS:
     - StripeUICore (= 25.6.4)
   - StripeUICore (25.6.4):
     - StripeCore (= 25.6.4)
-  - Superscript (0.2.8)
-  - SuperwallKit (4.7.0):
-    - Superscript (= 0.2.8)
+  - Superscript (1.0.13)
+  - SuperwallKit (4.13.0):
+    - Superscript (= 1.0.13)
   - superwallkit_flutter (0.0.1):
     - Flutter
-    - SuperwallKit (= 4.7.0)
+    - SuperwallKit (= 4.13.0)
   - url_launcher_ios (0.0.1):
     - Flutter
 
@@ -395,14 +395,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  app_links: 3dbc685f76b1693c66a6d9dd1e9ab6f73d97dc0a
+  app_links: a754cbec3c255bd4bbb4d236ecc06f28cd9a7ce8
   app_tracking_transparency: 3d84f147f67ca82d3c15355c36b1fa6b66ca7c92
   audio_service: aa99a6ba2ae7565996015322b0bb024e1d25c6fd
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   do_not_disturb: 7b70fa69b7a8f30b5310bf20ac7a2a6ccff143f4
   dynamic_app_icon_flutter_plus: 9235d8a780d99c6c53af52930567e33b42875395
-  facebook_app_events: cfa07e73912a052992b5f218f79a19a66a99bf1a
+  facebook_app_events: 58a1b62fd50f6009907bd167fc26b3d043e97197
   FBAEMKit: 2a6b529993713c185b02bc36f8c91129bf78dfb0
   FBSDKCoreKit: 65d7f7a7d6fcc3aa6eb6e093ec737a4184fc6049
   FBSDKCoreKit_Basics: 7bc9d8fde8f70985fba2ed7c1d07e319f969a991
@@ -451,9 +451,9 @@ SPEC CHECKSUMS:
   StripePaymentSheet: 29443db7e8635e2d3a00758f1ecebbb17a24ff19
   StripePaymentsUI: 37551e684263db449368ccac27438947e1b45f84
   StripeUICore: f1e43a68ab1e1428f8738df821eb64efac1d871a
-  Superscript: 82dbb40f502823160e75503ebc1b6bac756a503d
-  SuperwallKit: 239843161a144ad08af40906ec0307779abd7d12
-  superwallkit_flutter: 1a8f16ff97d3a3be52be3f6585279cd82209feb2
+  Superscript: bcb4099b41bed108ab7e88cfc56af0ed1170b582
+  SuperwallKit: ded61b361f1893a5679fccdddd07f7ac273e290c
+  superwallkit_flutter: 79b118dc6499905899ea8ef1f58b575f1c366ac8
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
 
 PODFILE CHECKSUM: c3ccb4d598b644b897981e35e5f4a583a20e8474

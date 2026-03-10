@@ -18,7 +18,7 @@ publish_to: none
 version: 3.5.50+30198
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: "^3.8.0"
   flutter: ">=3.38.0"
 
 dependencies:
@@ -55,7 +55,7 @@ dependencies:
   image: ^4.1.4
   in_app_review: ^2.0.10
   intl: ^0.20.2
-  json_annotation: ^4.9.0
+  json_annotation: ^4.11.0
   just_audio: ^0.10.5
   package_info_plus: ^9.0.0
   path_provider: ^2.1.2

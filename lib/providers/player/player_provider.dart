@@ -6,6 +6,7 @@ import 'package:medito/models/models.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
+import '../../models/player/repeat_mode.dart' as app_repeat;
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/utils.dart';
 import '../shared_preference/shared_preference_provider.dart';
@@ -228,11 +229,16 @@ class PlayerProvider extends Notifier<TrackModel?> {
     }
   }
 
-  void setRepeatMode(RepeatMode mode) {
+  void setRepeatMode(app_repeat.RepeatMode mode) {
+    final pigeonMode = switch (mode) {
+      app_repeat.RepeatMode.none => RepeatMode.none,
+      app_repeat.RepeatMode.once => RepeatMode.once,
+      app_repeat.RepeatMode.infinite => RepeatMode.infinite,
+    };
     if (Platform.isAndroid) {
-      _api.setRepeatMode(mode);
+      _api.setRepeatMode(pigeonMode);
     } else {
-      iosAudioHandler.setCustomRepeatMode(mode);
+      iosAudioHandler.setCustomRepeatMode(pigeonMode);
     }
   }
 

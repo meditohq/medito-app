@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../src/audio_pigeon.g.dart';
+import '../../models/player/repeat_mode.dart';
 import '../../utils/logger.dart';
 
 part 'repeat_state_provider.g.dart';
