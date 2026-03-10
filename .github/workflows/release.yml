@@ -52,6 +52,23 @@ jobs:
       - uses: subosito/flutter-action@v2.12.0
         with:
           channel: stable
+          cache: true
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
 
       - name: Flutter pub get
         run: flutter pub get
@@ -86,10 +103,8 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
-
-      - name: Install Android gems
-        working-directory: android
-        run: bundle install
+          bundler-cache: true
+          working-directory: android
 
       - name: Upload to Play Store
         working-directory: android
@@ -112,6 +127,21 @@ jobs:
       - uses: subosito/flutter-action@v2.12.0
         with:
           channel: stable
+          cache: true
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
 
       - name: Flutter pub get
         run: flutter pub get
@@ -130,6 +160,13 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
+
+      - name: Cache Fastlane gems
+        uses: actions/cache@v4
+        with:
+          path: ~/.gem
+          key: ${{ runner.os }}-gem-fastlane-${{ hashFiles('ios/Gemfile.lock') }}
+          restore-keys: ${{ runner.os }}-gem-fastlane-
 
       - name: Install Fastlane
         run: gem install fastlane --no-document
