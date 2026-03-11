@@ -61,8 +61,8 @@ class AuthApiService {
       HTTPConstants.authSignIn,
       body: {
         'client_id': clientId,
-        if (email != null) 'email': email,
-        if (otp != null) 'code': otp,
+        'email': ?email,
+        'code': ?otp,
       },
     );
 

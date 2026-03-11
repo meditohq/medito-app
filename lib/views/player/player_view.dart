@@ -12,7 +12,6 @@ import 'package:medito/utils/utils.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/models/player/repeat_mode.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';

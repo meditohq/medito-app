@@ -56,7 +56,7 @@ class HeaderService {
         'app-version': _deviceInfo.appVersion,
         'device-time': '${DateTime.now()}',
         'device-platform': _deviceInfo.platform,
-        if (_fcmToken != null) 'fcmt': _fcmToken!,
+        'fcmt': ?_fcmToken,
         'currency-name': _deviceInfo.currencyName,
       };
 }

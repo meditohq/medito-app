@@ -373,8 +373,8 @@ class OneTimePaymentController extends _$OneTimePaymentController {
 
       final utmParams = await _getStoredUtmParameters();
       final metadata = <String, dynamic>{
-        if (userId != null) 'user_id': userId,
-        if (userEmail != null) 'email': userEmail,
+        'user_id': ?userId,
+        'email': ?userEmail,
         ...utmParams,
       };
 
@@ -438,8 +438,8 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
 
       final utmParams = await _getStoredUtmParameters();
       final metadata = <String, dynamic>{
-        if (userId != null) 'user_id': userId,
-        if (userEmail != null) 'email': userEmail,
+        'user_id': ?userId,
+        'email': ?userEmail,
         ...utmParams,
       };
 
@@ -505,8 +505,8 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
 
       final utmParams = await _getStoredUtmParameters();
       final metadata = <String, dynamic>{
-        if (userId != null) 'user_id': userId,
-        if (userEmail != null) 'email': userEmail,
+        'user_id': ?userId,
+        'email': ?userEmail,
         ...utmParams,
       };
 

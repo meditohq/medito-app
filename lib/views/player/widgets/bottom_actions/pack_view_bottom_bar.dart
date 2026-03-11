@@ -19,6 +19,7 @@ import '../../../../providers/pack/pack_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
 import '../../../../widgets/medito_huge_icon.dart';
 import '../../../../widgets/snackbar_widget.dart';
+import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 
 class PackViewBottomBar extends ConsumerWidget {
@@ -170,8 +171,6 @@ class PackViewBottomBar extends ConsumerWidget {
     var favouriteColour = isFavorite
         ? ColorConstants.lightPurple
         : Theme.of(context).colorScheme.onSurface;
-    var favouriteIcon =
-        isFavorite ? MeditoIcons.starSolid : MeditoIcons.star;
     var pinColour = isUpNext
         ? ColorConstants.lightPurple
         : Theme.of(context).colorScheme.onSurface;
@@ -205,8 +204,8 @@ class PackViewBottomBar extends ConsumerWidget {
             )
           : null,
       rightItem: BottomActionBarItem(
-        child: MeditoIcon(
-          assetName: favouriteIcon,
+        child: AnimatedFavouriteIcon(
+          isFavorite: isFavorite,
           color: favouriteColour,
         ),
         onTap: () {

@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="meditofoundation.medito"
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -81,6 +82,13 @@
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize">
+
+            <!-- Flutter versions without activity-alias support need a launcher intent here. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
 
             <!-- Intent filter for custom scheme (supports paths and UTM-only links) -->
             <intent-filter>

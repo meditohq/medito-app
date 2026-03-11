@@ -128,16 +128,24 @@ jobs:
           PY
 
       - name: Write google-services.json
-        run: printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
 
       - name: Write firebase_options.dart
-        run: printf "%s" "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+        env:
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+        run: printf '%s' "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
 
       - name: Write keystore.properties
-        run: printf "%s" "${{ secrets.KEYSTORE_PROPERTIES }}" > android/keystore.properties
+        env:
+          KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
+        run: printf '%s' "$KEYSTORE_PROPERTIES" > android/keystore.properties
 
       - name: Write keystore file
-        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/meditokey.jks
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+        run: printf '%s' "$KEYSTORE_FILE" | base64 -d > android/meditokey.jks
 
       - name: Build APK
         run: |
@@ -247,7 +255,9 @@ jobs:
           PY
 
       - name: Write GoogleService-Info.plist
-        run: printf "%s" "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
+        env:
+          GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        run: printf '%s' "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
 
       - uses: ruby/setup-ruby@v1
         with:

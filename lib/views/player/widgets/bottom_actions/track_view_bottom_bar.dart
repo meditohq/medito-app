@@ -12,6 +12,7 @@ import '../../../../providers/favorites/favorites_provider.dart';
 import '../../../../providers/meditation/track_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
 import '../../../../widgets/medito_huge_icon.dart';
+import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 
 class TrackViewBottomBar extends ConsumerWidget {
@@ -152,7 +153,6 @@ class TrackViewBottomBar extends ConsumerWidget {
     var colour = isFavorite
         ? ColorConstants.lightPurple
         : Theme.of(context).colorScheme.onSurface;
-    var icon = isFavorite ? MeditoIcons.starSolid : MeditoIcons.star;
 
     return BottomActionBar(
       layout: BottomActionBarLayout.compactRight,
@@ -176,8 +176,8 @@ class TrackViewBottomBar extends ConsumerWidget {
       rightItem: isDailyMeditation
           ? null
           : BottomActionBarItem(
-              child: MeditoIcon(
-                assetName: icon,
+              child: AnimatedFavouriteIcon(
+                isFavorite: isFavorite,
                 color: colour,
               ),
               onTap: () {
