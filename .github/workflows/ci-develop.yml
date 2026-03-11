@@ -30,21 +30,7 @@ jobs:
       - name: Flutter version
         uses: subosito/flutter-action@v2.12.0
         with:
-          channel: 'stable'
-
-      - name: Flutter Stable
-        uses: nick-invision/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 2
-          command: flutter channel stable
-
-      - name: Flutter Upgrade
-        uses: nick-invision/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 2
-          command: flutter upgrade
+          flutter-version: '3.38.7'
 
       - name: Flutter Pub Get
         uses: nick-invision/retry@v2

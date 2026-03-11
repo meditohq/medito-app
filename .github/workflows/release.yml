@@ -51,7 +51,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          channel: stable
+          flutter-version: '3.38.7'
           cache: true
 
       - name: Cache pub packages
@@ -180,7 +180,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          channel: stable
+          flutter-version: '3.38.7'
           cache: true
 
       - name: Cache pub packages
