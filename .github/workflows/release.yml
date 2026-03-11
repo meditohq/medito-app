@@ -102,7 +102,28 @@ jobs:
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Write .prod.json
-        run: printf "%s" "${{ secrets.PROD_ENV }}" > .prod.json
+        run: |
+          python3 - <<'PY'
+          import json, re, sys
+
+          raw = """${{ secrets.PROD_ENV }}"""
+
+          try:
+            data = json.loads(raw)
+          except json.JSONDecodeError:
+            data = {}
+            for line in raw.strip().strip("{}").splitlines():
+              line = line.strip().rstrip(",")
+              if ":" in line:
+                key, _, value = line.partition(":")
+                data[key.strip()] = value.strip()
+
+          if not data:
+            sys.exit("Failed to parse PROD_ENV secret")
+
+          with open(".prod.json", "w") as f:
+            json.dump(data, f, indent=2)
+          PY
 
       - name: Write google-services.json
         run: printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
@@ -195,7 +216,28 @@ jobs:
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Write .prod.json
-        run: printf "%s" "${{ secrets.PROD_ENV }}" > .prod.json
+        run: |
+          python3 - <<'PY'
+          import json, re, sys
+
+          raw = """${{ secrets.PROD_ENV }}"""
+
+          try:
+            data = json.loads(raw)
+          except json.JSONDecodeError:
+            data = {}
+            for line in raw.strip().strip("{}").splitlines():
+              line = line.strip().rstrip(",")
+              if ":" in line:
+                key, _, value = line.partition(":")
+                data[key.strip()] = value.strip()
+
+          if not data:
+            sys.exit("Failed to parse PROD_ENV secret")
+
+          with open(".prod.json", "w") as f:
+            json.dump(data, f, indent=2)
+          PY
 
       - name: Write GoogleService-Info.plist
         run: printf "%s" "${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}" > ios/Runner/GoogleService-Info.plist
