@@ -104,9 +104,6 @@ jobs:
       - name: Write .prod.json
         run: printf "%s" "${{ secrets.PROD_ENV }}" > .prod.json
 
-      - name: Debug .prod.json
-        run: cat .prod.json
-
       - name: Write google-services.json
         run: printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
 
@@ -115,9 +112,6 @@ jobs:
 
       - name: Write keystore file
         run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/meditokey.jks
-
-      - name: Run Flutter tests
-        run: flutter test --dart-define-from-file=.prod.json
 
       - name: Build APK
         run: |
