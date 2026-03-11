@@ -19,8 +19,6 @@ class AnimatedFavouriteIcon extends StatelessWidget {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
       reverseDuration: const Duration(milliseconds: 180),
-      switchInCurve: Curves.easeOutBack,
-      switchOutCurve: Curves.easeIn,
       transitionBuilder: (child, animation) {
         final fadeAnimation = CurvedAnimation(
           parent: animation,
