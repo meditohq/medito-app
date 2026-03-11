@@ -17,6 +17,7 @@ import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/views/home/customise_home_layout_screen.dart';
 
+import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/donation/superwall_donation_screen.dart';
 import 'package:medito/views/favorites/favorites_view.dart';
@@ -157,6 +158,14 @@ Future<bool?> handleDonationNavigation(
     return false;
   } else {
     AppLogger.d('ROUTES', 'Opening donation screen from $sourceRouteName');
+  }
+
+  // Stripe's publishable key is set lazily when paymentConfigProvider resolves.
+  // Without this, isPlatformPaySupported() throws StripeConfigException.
+  try {
+    await ref.read(paymentConfigProvider.future);
+  } catch (e) {
+    AppLogger.w('ROUTES', 'Could not preload payment config: $e');
   }
 
   // Check if we should use Superwall or web donation
