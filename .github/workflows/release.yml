@@ -18,7 +18,7 @@ on:
       play_store_track:
         description: 'Play Store track (Android)'
         required: true
-        default: 'internal'
+        default: 'production'
         type: choice
         options:
           - internal
@@ -167,7 +167,7 @@ jobs:
         run: |
           bundle exec fastlane android upload_apk \
             apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
-            track:"${{ inputs.play_store_track || 'internal' }}"
+            track:"${{ inputs.play_store_track || 'production' }}"
 
   ios-deploy:
     name: iOS – Build & Deploy to TestFlight
