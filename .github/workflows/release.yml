@@ -102,11 +102,13 @@ jobs:
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Write .prod.json
+        env:
+          PROD_ENV: ${{ secrets.PROD_ENV }}
         run: |
           python3 - <<'PY'
-          import json, re, sys
+          import json, os, sys
 
-          raw = """${{ secrets.PROD_ENV }}"""
+          raw = os.environ["PROD_ENV"]
 
           try:
             data = json.loads(raw)
@@ -216,11 +218,13 @@ jobs:
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Write .prod.json
+        env:
+          PROD_ENV: ${{ secrets.PROD_ENV }}
         run: |
           python3 - <<'PY'
-          import json, re, sys
+          import json, os, sys
 
-          raw = """${{ secrets.PROD_ENV }}"""
+          raw = os.environ["PROD_ENV"]
 
           try:
             data = json.loads(raw)
