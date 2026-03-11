@@ -130,6 +130,9 @@ jobs:
       - name: Write google-services.json
         run: printf "%s" "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
 
+      - name: Write firebase_options.dart
+        run: printf "%s" "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+
       - name: Write keystore.properties
         run: printf "%s" "${{ secrets.KEYSTORE_PROPERTIES }}" > android/keystore.properties
 
