@@ -38,6 +38,14 @@ platform :ios do
       )
     end
 
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      team_id: ENV["DEVELOPER_PORTAL_TEAM_ID"],
+      code_sign_identity: "iPhone Distribution",
+      profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
+    )
+
     build_app(
       workspace: "Runner.xcworkspace",
       configuration: "Release",
@@ -75,6 +83,14 @@ platform :ios do
         "--no-codesign"
       )
     end
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      team_id: ENV["DEVELOPER_PORTAL_TEAM_ID"],
+      code_sign_identity: "iPhone Distribution",
+      profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
+    )
 
     build_app(
       workspace: "Runner.xcworkspace",
