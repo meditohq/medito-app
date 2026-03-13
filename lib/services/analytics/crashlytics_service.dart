@@ -14,6 +14,8 @@ class CrashlyticsService {
 
   CrashlyticsService._internal();
 
+  var _analyticsEnabled = false;
+
   static const _imageRelatedKeywords = [
     'Image',
     'CachedNetworkImage',
@@ -38,7 +40,11 @@ class CrashlyticsService {
     'ClientException',
   ];
 
+  /// Only call when the user has Firebase analytics enabled in settings.
+  /// When disabled, main() skips this so the SDK is never initialised.
   Future<void> initialize() async {
+    _analyticsEnabled = true;
+
     if (kDebugMode) {
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
     } else {
@@ -48,7 +54,6 @@ class CrashlyticsService {
     // Set up Flutter error handling
     final originalOnError = FlutterError.onError;
     FlutterError.onError = (errorDetails) {
-      // Don't report network connection errors to Crashlytics
       if (errorDetails.exception is NetworkConnectionError) {
         return;
       }
@@ -60,13 +65,17 @@ class CrashlyticsService {
         return;
       }
 
-      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+      try {
+        FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+      } catch (_) {
+        // SDK can throw when offline (e.g. "No internet connection"); don't crash the app
+      }
       originalOnError?.call(errorDetails);
     };
 
     // Set up platform error handling
     PlatformDispatcher.instance.onError = (error, stack) {
-      if (error is SocketException) {
+      if (error is SocketException || error is NetworkConnectionError) {
         return false;
       }
 
@@ -77,7 +86,11 @@ class CrashlyticsService {
         return false;
       }
 
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      try {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      } catch (_) {
+        // SDK can throw when offline (e.g. "No internet connection"); don't crash the app
+      }
 
       return true;
     };
@@ -251,38 +264,52 @@ class CrashlyticsService {
     String? reason,
     Iterable<Object>? information,
   }) {
-    // Don't report network connection errors to Crashlytics
-    if (exception is NetworkConnectionError) {
-      return;
-    }
+    if (!_analyticsEnabled) return;
+    if (exception is NetworkConnectionError) return;
 
-    FirebaseCrashlytics.instance.recordError(
-      exception,
-      stack,
-      fatal: fatal,
-      reason: reason,
-      information: information ?? const [],
-    );
+    try {
+      FirebaseCrashlytics.instance.recordError(
+        exception,
+        stack,
+        fatal: fatal,
+        reason: reason,
+        information: information ?? const [],
+      );
+    } catch (_) {
+      // SDK can throw when offline (e.g. "No internet connection"); don't crash the app
+    }
   }
 
   void recordFlutterError(FlutterErrorDetails details) {
-    FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    if (!_analyticsEnabled) return;
+    try {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    } catch (_) {
+      // SDK can throw when offline; don't crash the app
+    }
   }
 
   void log(String message) {
+    if (!_analyticsEnabled) return;
     FirebaseCrashlytics.instance.log(message);
   }
 
   Future<void> setCustomKey(String key, dynamic value) async {
+    if (!_analyticsEnabled) return;
     await FirebaseCrashlytics.instance.setCustomKey(key, value);
   }
 
   void recordAppError(AppError error) {
-    FirebaseCrashlytics.instance.recordError(
-      error,
-      StackTrace.current,
-      reason: 'User reported error: ${error.toString()}',
-      fatal: false,
-    );
+    if (!_analyticsEnabled) return;
+    try {
+      FirebaseCrashlytics.instance.recordError(
+        error,
+        StackTrace.current,
+        reason: 'User reported error: ${error.toString()}',
+        fatal: false,
+      );
+    } catch (_) {
+      // SDK can throw when offline; don't crash the app
+    }
   }
 }

@@ -24,6 +24,7 @@ import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
@@ -70,14 +71,20 @@ void main() async {
     // Don't re-throw - let the app continue without Superwall
   }
 
+  var prefs = await initializeSharedPreferences();
+
   // Initialize Firebase (non-blocking when offline)
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // Initialize Crashlytics
-    await CrashlyticsService().initialize();
+    final analyticsEnabled =
+        prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+            true;
+    if (analyticsEnabled) {
+      await CrashlyticsService().initialize();
+    }
   } catch (e) {
     AppLogger.e('MAIN', 'Firebase initialization failed: $e');
     // Continue without Firebase - app should still work offline
@@ -102,8 +109,6 @@ void main() async {
     // Continue without audio service
   }
   usePathUrlStrategy();
-
-  var prefs = await initializeSharedPreferences();
 
   runApp(
     DevicePreview(
