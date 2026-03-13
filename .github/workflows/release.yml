@@ -47,7 +47,7 @@ jobs:
     name: Android – Build & Deploy
     runs-on: ubuntu-latest
     environment: prod
-    if: github.event_name != 'workflow_dispatch' || inputs.platforms == 'both' || inputs.platforms == 'android'
+    if: false
 
     steps:
       - uses: actions/checkout@v4
