@@ -41,6 +41,19 @@ on:
         options:
           - 'true'
           - 'false'
+      release_notes:
+        description: 'Release notes (applied to en-US, en-GB, es-MX)'
+        required: false
+        default: ''
+        type: string
+      ios_lane:
+        description: 'iOS lane: beta (TestFlight) or release (App Store draft)'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+          - beta
+          - release
 
 jobs:
   android-deploy:
@@ -310,4 +323,5 @@ jobs:
           FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-        run: fastlane beta
+          RELEASE_NOTES: ${{ inputs.release_notes }}
+        run: fastlane ${{ inputs.ios_lane || 'beta' }}

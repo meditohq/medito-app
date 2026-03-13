@@ -104,7 +104,16 @@ platform :ios do
       }
     )
 
-    upload_to_app_store()
+    notes = ENV["RELEASE_NOTES"] || ""
+    upload_to_app_store(
+      submit_for_review: false,
+      force: true,
+      release_notes: {
+        "en-US" => notes,
+        "en-GB" => notes,
+        "es-MX" => notes
+      }
+    )
     cleanup_keychain()
   end
 end

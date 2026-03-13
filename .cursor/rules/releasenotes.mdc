@@ -1,0 +1,24 @@
+---
+description: Keeping RELEASE_NOTES.md up to date as features are built
+globs:
+alwaysApply: true
+---
+When you implement a change, update the `Unreleased` section of `RELEASE_NOTES.txt` if and only if the change is something a user would notice or care about.
+
+Rules:
+- Write from the user's perspective. Focus on what they can now do or what feels better — not what changed in the code.
+- Keep entries short (one line). Plain English, no jargon.
+- Do NOT add entries for: refactors, internal architecture changes, code cleanup, test changes, CI/CD changes, dependency bumps, bug fixes the user would never have noticed.
+- DO add entries for: new features, visible UI changes, performance improvements the user would feel, fixed bugs that were affecting the user experience.
+- Never add more than one bullet per logical change.
+- Do not add a version number — entries go under `## Unreleased`.
+
+Examples of good entries:
+- Meditation timer now remembers your last used duration
+- Fixed a crash when opening the app on first launch
+- Stats page loads noticeably faster
+
+Examples of bad entries (do not write these):
+- Refactored HomeViewModel to use StateFlow
+- Updated Riverpod to 2.5.1
+- Moved API call to repository layer
