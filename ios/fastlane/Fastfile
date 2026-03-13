@@ -2,6 +2,12 @@ require 'base64'
 
 default_platform(:ios)
 
+def match_readonly?
+  value = ENV["MATCH_READONLY"] || "true"
+
+  return value.strip.downcase != "false"
+end
+
 platform :ios do
 
   before_all do
@@ -15,7 +21,7 @@ platform :ios do
 
     match(
       type: 'appstore',
-      readonly: true,
+      readonly: match_readonly?,
       git_url: "https://github.com/meditohq/fastlane-certificates.git",
       git_basic_authorization: Base64.strict_encode64("x-access-token:#{ENV['MATCH_GIT_TOKEN']}")
     )
@@ -50,7 +56,7 @@ platform :ios do
 
     match(
       type: 'appstore',
-      readonly: true,
+      readonly: match_readonly?,
       git_url: "https://github.com/meditohq/fastlane-certificates.git",
       git_basic_authorization: Base64.strict_encode64("x-access-token:#{ENV['MATCH_GIT_TOKEN']}")
     )

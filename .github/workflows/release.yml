@@ -33,6 +33,14 @@ on:
           - both
           - android
           - ios
+      match_readonly:
+        description: 'Keep match in readonly mode (set false to refresh certs/profiles)'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 jobs:
   android-deploy:
@@ -277,6 +285,7 @@ jobs:
         working-directory: ios
         env:
           PAYWALL_ENV: ${{ inputs.paywall_env || 'live' }}
+          MATCH_READONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.match_readonly || 'true' }}
           MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
