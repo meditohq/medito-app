@@ -52,7 +52,7 @@ dependencies:
   haptic_feedback: ^0.6.4+3
   health: ^13.3.1
   http: ^1.6.0
-  image: ^4.1.4
+  image: ^4.8.0
   in_app_review: ^2.0.10
   intl: ^0.20.2
   json_annotation: ^4.9.0

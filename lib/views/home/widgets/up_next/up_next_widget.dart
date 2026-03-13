@@ -18,9 +18,11 @@ import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/player/player_view.dart';
+import '../home_gradient_border.dart';
 
 const _kCardBorderRadius = 24.0;
 const _kPlayButtonSize = 48.0;
+const _kPlayButtonBorderWidth = 0.8;
 
 class UpNextWidget extends ConsumerWidget {
   const UpNextWidget({super.key});
@@ -77,7 +79,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
             await _onSkip(context);
             return false;
           },
-          child: GestureDetector(
+            child: GestureDetector(
             onTap: () => _onTap(context),
             child: Container(
               decoration: BoxDecoration(
@@ -91,88 +93,85 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(padding16),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      'UP NEXT',
-                                      style:
-                                          theme.textTheme.bodySmall?.copyWith(
-                                        fontFamily: teachers,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 1.2,
-                                        color: theme.colorScheme.onSurface
-                                            .withValues(alpha: 0.6),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      widget.data.pack.title,
-                                      style:
-                                          theme.textTheme.bodySmall?.copyWith(
-                                        fontFamily: teachers,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 1.2,
-                                        color: theme.colorScheme.onSurface
-                                            .withValues(alpha: 0.6),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  nextSession.title,
-                                  style:
-                                      theme.textTheme.headlineSmall?.copyWith(
-                                    fontFamily: sourceSerif,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.2,
-                                    color: onSurface,
-                                  ),
-                                ),
-                                if (nextSession.subtitle != null) ...[
-                                  const SizedBox(height: 4),
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(padding16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
                                   Text(
-                                    nextSession.subtitle!,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                    'UP NEXT',
+                                    style: theme.textTheme.bodySmall?.copyWith(
                                       fontFamily: teachers,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: onSurface.withValues(alpha: 0.6),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 1.2,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    widget.data.pack.title,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontFamily: teachers,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 1.2,
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.6),
+                                    ),
                                   ),
                                 ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                nextSession.title,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontFamily: sourceSerif,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.2,
+                                  color: onSurface,
+                                ),
+                              ),
+                              if (nextSession.subtitle != null) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  nextSession.subtitle!,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontFamily: teachers,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: onSurface.withValues(alpha: 0.6),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ],
-                            ),
+                            ],
                           ),
-                          const SizedBox(width: padding16),
-                          _PlayButton(onTap: () => _onTap(context)),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: padding16),
+                        _PlayButton(onTap: () => _onTap(context)),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -191,11 +190,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.skip_next_rounded,
-                  color: iconColor,
-                  size: 32,
-                ),
+                Icon(Icons.skip_next_rounded, color: iconColor, size: 32),
                 const SizedBox(height: 4),
                 Text(
                   l10n.skip,
@@ -258,7 +253,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
       );
 
       if (selectedAudio != null && trackState != null) {
-        await ref.read(playerProvider.notifier).loadSelectedTrack(
+        await ref
+            .read(playerProvider.notifier)
+            .loadSelectedTrack(
               trackModel: trackState,
               file: selectedAudio.files.first,
             );
@@ -327,17 +324,18 @@ class _PlayButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: _kPlayButtonSize,
-        height: _kPlayButtonSize,
-        decoration: BoxDecoration(
-          color: ColorConstants.brightSky,
-          borderRadius: BorderRadius.circular(_kPlayButtonSize / 2),
-        ),
-        child: const Icon(
-          Icons.play_arrow_rounded,
-          color: ColorConstants.ebony,
-          size: 28,
+      child: HomeGradientBorder(
+        backgroundColor: ColorConstants.brightSky,
+        borderRadius: _kPlayButtonSize / 2,
+        borderWidth: _kPlayButtonBorderWidth,
+        child: SizedBox(
+          width: _kPlayButtonSize,
+          height: _kPlayButtonSize,
+          child: const Icon(
+            Icons.play_arrow_rounded,
+            color: ColorConstants.ebony,
+            size: 28,
+          ),
         ),
       ),
     );

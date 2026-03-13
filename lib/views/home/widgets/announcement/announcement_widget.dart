@@ -63,8 +63,12 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       return const SizedBox.shrink();
     }
 
-    var bgColor =
+    final rawBgColor =
         ColorConstants.getColorFromString(widget.announcement.colorBackground);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark
+        ? rawBgColor
+        : Color.lerp(rawBgColor, Colors.black, 0.08) ?? rawBgColor;
 
     return SizeTransition(
       sizeFactor: _sizeAnimation,

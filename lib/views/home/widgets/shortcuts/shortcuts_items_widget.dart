@@ -8,9 +8,13 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 
 import '../../../../widgets/medito_huge_icon.dart';
+import '../home_gradient_border.dart';
 
 class ShortcutsItemsWidget extends ConsumerWidget {
   const ShortcutsItemsWidget({super.key, required this.data});
+
+  static const _kItemBorderWidth = 0.5;
+  static const _kItemBorderRadius = 24.0;
 
   final List<ShortcutsModel> data;
 
@@ -46,8 +50,15 @@ class ShortcutsItemsWidget extends ConsumerWidget {
         runSpacing: runSpacing,
         alignment: WrapAlignment.start,
         children: data
-            .map((e) => _buildShortcutItem(
-                context, ref, e, containerSize, containerSize))
+            .map(
+              (e) => _buildShortcutItem(
+                context,
+                ref,
+                e,
+                containerSize,
+                containerSize,
+              ),
+            )
             .toList(),
       ),
     );
@@ -68,41 +79,37 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     final backgroundColor = isCourses
         ? ColorConstants.lightPurple
         : (e.isHighlighted
-            ? ColorConstants.brightSky
-            : Theme.of(context).cardColor);
+              ? ColorConstants.brightSky
+              : Theme.of(context).cardColor);
     final iconColor = isCourses
         ? Colors.white
         : (e.isHighlighted
-            ? ColorConstants.onyx
-            : Theme.of(context).colorScheme.onSurface);
+              ? ColorConstants.onyx
+              : Theme.of(context).colorScheme.onSurface);
     final textColor = Theme.of(context).colorScheme.onSurface;
-
-    final borderColor =
-        Color.lerp(backgroundColor, Colors.white, 0.3) ?? backgroundColor;
 
     final iconSize = (width * 0.5).clamp(24.0, 32.0);
 
-    final squareButton = Container(
-      width: width,
-      height: width,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: borderColor,
-          width: 0.5,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _handleChipPress(context, ref, e),
-          borderRadius: BorderRadius.circular(24),
-          child: Center(
-            child: MeditoHugeIcon(
-              icon: e.icon ?? '',
-              size: iconSize,
-              color: iconColor,
+    final squareButton = HomeGradientBorder(
+      backgroundColor: backgroundColor,
+      borderRadius: _kItemBorderRadius,
+      borderWidth: _kItemBorderWidth,
+      child: SizedBox(
+        width: width,
+        height: width,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _handleChipPress(context, ref, e),
+            borderRadius: BorderRadius.circular(
+              _kItemBorderRadius - _kItemBorderWidth,
+            ),
+            child: Center(
+              child: MeditoHugeIcon(
+                icon: e.icon ?? '',
+                size: iconSize,
+                color: iconColor,
+              ),
             ),
           ),
         ),
@@ -121,10 +128,10 @@ class ShortcutsItemsWidget extends ConsumerWidget {
             child: Text(
               e.title ?? '',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontFamily: teachers,
-                    fontSize: 12,
-                    color: textColor,
-                  ),
+                fontFamily: teachers,
+                fontSize: 12,
+                color: textColor,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,

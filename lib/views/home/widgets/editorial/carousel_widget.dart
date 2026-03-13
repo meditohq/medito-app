@@ -80,12 +80,12 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
           child: Text(
             AppLocalizations.of(context)!.carouselTitle,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontFamily: teachers,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                  height: 28 / 24,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+              fontFamily: teachers,
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              height: 28 / 24,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ),
         height8,
@@ -109,7 +109,11 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   }
 
   Widget _buildCarouselItem(
-      BuildContext context, WidgetRef ref, int index, HomeCarouselModel item) {
+    BuildContext context,
+    WidgetRef ref,
+    int index,
+    HomeCarouselModel item,
+  ) {
     final screenSize = MediaQuery.of(context).size;
     final isHorizontal = screenSize.width > screenSize.height;
     final isTablet = screenSize.shortestSide >= 600;
@@ -118,11 +122,11 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     var baseCardWidth = isHorizontal || isTablet
         ? (screenSize.longestSide / 2) - (3 * padding16)
         : screenSize.width - (3 * padding16);
-    
+
     var cardWidth = isSmallPhone
         ? baseCardWidth * _kSmallPhoneWidthMultiplier
         : baseCardWidth;
-    
+
     var aspectRatio = isSmallPhone
         ? _kSmallPhoneAspectRatio
         : _kCardAspectRatio;
@@ -138,84 +142,86 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         width: cardWidth,
         child: _buildBanner(
           item,
-          GestureDetector(
-            onTap: () {
-              handleNavigation(
-                item.type,
-                [item.path.toString().getIdFromPath(), item.path],
-                context,
-                ref: ref,
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(_kCardBorderRadius),
-                border: Border.all(
-                  color: Color.lerp(
-                        Theme.of(context).cardColor,
-                        Colors.white,
-                        0.3,
-                      ) ??
-                      Theme.of(context).cardColor,
-                  width: 0.5,
+          _buildGradientBorderCard(context, item, ref, aspectRatio),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGradientBorderCard(
+    BuildContext context,
+    HomeCarouselModel item,
+    WidgetRef ref,
+    double aspectRatio,
+  ) {
+    final cardColor = Theme.of(context).cardColor;
+
+    return GestureDetector(
+      onTap: () {
+        handleNavigation(
+          item.type,
+          [item.path.toString().getIdFromPath(), item.path],
+          context,
+          ref: ref,
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(_kCardBorderRadius),
+          border: Border.all(
+            color: Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
+            width: 0.5,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(_kCardBorderRadius),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AspectRatio(
+                aspectRatio: aspectRatio,
+                child: NetworkImageWidget(
+                  url: item.coverUrl,
+                  shouldCache: true,
                 ),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(_kCardBorderRadius),
+              Padding(
+                padding: const EdgeInsets.all(padding16),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AspectRatio(
-                      aspectRatio: aspectRatio,
-                      child: NetworkImageWidget(
-                          url: item.coverUrl, shouldCache: true),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(padding16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  fontFamily: sourceSerif,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w400,
-                                  height: 28 / 24,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
+                    Text(
+                      item.title,
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            fontFamily: sourceSerif,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w400,
+                            height: 28 / 24,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
-                          const SizedBox(height: _kSmallSpacing),
-                          Text(
-                            item.subtitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(
-                                  fontFamily: teachers,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.2,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                          ),
-                          const SizedBox(height: padding20),
-                          if (item.buttons != null && item.buttons!.isNotEmpty)
-                            _buildButtons(item, context, ref),
-                        ],
-                      ),
                     ),
+                    const SizedBox(height: _kSmallSpacing),
+                    Text(
+                      item.subtitle,
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontFamily: teachers,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            height: 1.2,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                    ),
+                    const SizedBox(height: padding20),
+                    if (item.buttons != null && item.buttons!.isNotEmpty)
+                      _buildButtons(item, context, ref),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -249,7 +255,10 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   }
 
   Widget _buildButtons(
-      HomeCarouselModel item, BuildContext context, WidgetRef ref) {
+    HomeCarouselModel item,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     return Row(
       children: item.buttons!.asMap().entries.map((entry) {
         var index = entry.key;
@@ -279,12 +288,12 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                       button.title,
                       maxLines: 1,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontFamily: teachers,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
-                            color: ColorConstants.onyx,
-                          ),
+                        fontFamily: teachers,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        color: ColorConstants.onyx,
+                      ),
                     ),
                   ),
                 ),
