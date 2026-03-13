@@ -33,7 +33,8 @@ platform :ios do
         "flutter build ios --release " \
         "--dart-define-from-file=.prod.json " \
         "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
-        "--dart-define=PAYWALL_ENV=#{paywall_env}"
+        "--dart-define=PAYWALL_ENV=#{paywall_env} " \
+        "--no-codesign"
       )
     end
 
@@ -70,7 +71,8 @@ platform :ios do
         "flutter build ios --release " \
         "--dart-define-from-file=.prod.json " \
         "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
-        "--dart-define=PAYWALL_ENV=live"
+        "--dart-define=PAYWALL_ENV=live " \
+        "--no-codesign"
       )
     end
 
