@@ -12,6 +12,7 @@ import 'package:medito/providers/notification/reminder_provider.dart'
 import 'package:medito/services/paywall_manager_service.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
+import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
@@ -60,6 +61,7 @@ class DebugInfoScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.copy),
             onPressed: () => _copyDebugInfo(context, ref),
+            onLongPress: () => _openOnboardingFlow(context),
             tooltip: AppLocalizations.of(context)!.copy,
           ),
         ],
@@ -314,6 +316,14 @@ class DebugInfoScreen extends ConsumerWidget {
     AppLogger.d('DEBUG_INFO_SCREEN',
         'Calculated scheduled date from ID $reminderId (day offset: $dayOffset, days to add: $daysToAdd): $scheduledDate');
     return scheduledDate;
+  }
+
+  void _openOnboardingFlow(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const OnboardingPagerScreen(),
+      ),
+    );
   }
 
   void _copyDebugInfo(BuildContext context, WidgetRef ref) async {
