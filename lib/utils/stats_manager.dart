@@ -883,74 +883,94 @@ class StatsManager {
     var now = _getCurrentDate();
     var today = DateTime(now.year, now.month, now.day);
 
-    // Early return for empty audio completed list
     if (allStats.audioCompleted == null || allStats.audioCompleted!.isEmpty) {
       return 0.0;
     }
 
-    // Convert audio completed to dates (year-month-day format)
     var audioDates = allStats.audioCompleted!.map((audio) {
       var date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
       return DateTime(date.year, date.month, date.day);
     }).toList();
 
-    // Remove duplicate dates and future dates
     audioDates =
         audioDates.where((date) => !date.isAfter(today)).toSet().toList();
 
-    // Convert freeze dates (year-month-day format)
     var freezeDates = allStats.freezeUsageDates.map((timestamp) {
       var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
       return DateTime(date.year, date.month, date.day);
     }).toList();
 
-    // Remove duplicate freeze dates and future dates
-    // Only include freeze dates that don't already have audio activity
     freezeDates = freezeDates
         .where((date) => !date.isAfter(today) && !audioDates.contains(date))
         .toSet()
         .toList();
 
-    // Combine audio and freeze dates for consistency calculation
     var allActivityDates = {...audioDates, ...freezeDates}.toList();
 
-    // If no valid dates, return 0
     if (allActivityDates.isEmpty) {
       return 0.0;
     }
 
-    // Sort dates in ascending order to find first session
     allActivityDates.sort();
     var firstSessionDate = allActivityDates.first;
-
-    // Calculate days since first session (inclusive)
     var daysSinceFirstSession = today.difference(firstSessionDate).inDays + 1;
 
-    // If first session is today, return 1.0 if activity today, 0.0 otherwise
     if (daysSinceFirstSession == 1) {
       return allActivityDates.any((date) => date.isAtSameMomentAs(today))
           ? 1.0
           : 0.0;
     }
 
-    // For users with less than 30 days history
+    // Bootstrap phase: simple ratio for the first 30 days
     if (daysSinceFirstSession < 30) {
-      var activeDays = allActivityDates.length;
-
-      return (activeDays / daysSinceFirstSession).clamp(0.0, 1.0);
+      return (allActivityDates.length / daysSinceFirstSession).clamp(0.0, 1.0);
     }
 
-    // For users with 30+ days history, only look at last 30 days
-    var daysToCheck =
-        List.generate(30, (index) => today.subtract(Duration(days: index)));
-    var activeDaysInRange = daysToCheck
-        .where((date) => allActivityDates.any((activityDate) =>
-            activityDate.year == date.year &&
-            activityDate.month == date.month &&
-            activityDate.day == date.day))
-        .length;
+    // EMA phase: replay history day by day starting from day 30,
+    // seeding with the ratio at day 29.
+    const alpha = 0.1;
+    const gracePenalty = 0.5; // value used for a single isolated missed day
 
-    return (activeDaysInRange / 30.0);
+    var day29 = firstSessionDate.add(const Duration(days: 28));
+    var activeDaysAtDay29 = allActivityDates
+        .where((d) => !d.isAfter(day29))
+        .length;
+    var ema = activeDaysAtDay29 / 29.0;
+
+    var day30 = firstSessionDate.add(const Duration(days: 29));
+    var currentDay = day30;
+
+    while (!currentDay.isAfter(today)) {
+      var hadActivity = allActivityDates.any((d) =>
+          d.year == currentDay.year &&
+          d.month == currentDay.month &&
+          d.day == currentDay.day);
+
+      double dayValue;
+      if (hadActivity) {
+        dayValue = 1.0;
+      } else {
+        var prevDay = currentDay.subtract(const Duration(days: 1));
+        var nextDay = currentDay.add(const Duration(days: 1));
+        var prevActive = allActivityDates.any((d) =>
+            d.year == prevDay.year &&
+            d.month == prevDay.month &&
+            d.day == prevDay.day);
+        var nextActive = nextDay.isAfter(today)
+            ? false
+            : allActivityDates.any((d) =>
+                d.year == nextDay.year &&
+                d.month == nextDay.month &&
+                d.day == nextDay.day);
+        // Single isolated miss gets half penalty; consecutive misses get full penalty
+        dayValue = (prevActive || nextActive) ? gracePenalty : 0.0;
+      }
+
+      ema = alpha * dayValue + (1 - alpha) * ema;
+      currentDay = currentDay.add(const Duration(days: 1));
+    }
+
+    return ema.clamp(0.0, 1.0);
   }
 
   // Test helpers

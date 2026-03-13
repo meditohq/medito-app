@@ -1,6 +1,7 @@
 Unreleased
 - Favourite star now does a subtle spin as it appears on track and pack screens
 - Home cards now have a subtler gradient border with a slightly darker right edge
+- Consistency score now recovers more quickly after a break, and a single missed day has much less impact
 
 3.5.71
 - Bug fixes and performance improvements
