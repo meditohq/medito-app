@@ -32,7 +32,11 @@ class Pack extends _$Pack {
 
     try {
       var pack = await packRepository.fetchPacks(packId);
+      if (!ref.mounted) return;
+
       var localStats = await statsManager.localAllStats;
+      if (!ref.mounted) return;
+
       var tracksChecked = localStats.tracksChecked ?? [];
 
       var updatedItems = pack.items.map((item) {
@@ -41,6 +45,8 @@ class Pack extends _$Pack {
 
       state = AsyncData(pack.copyWith(items: updatedItems));
     } catch (error, stackTrace) {
+      if (!ref.mounted) return;
+
       if (error is AppError) {
         state = AsyncError(error, stackTrace);
       } else {
@@ -48,7 +54,7 @@ class Pack extends _$Pack {
       }
     }
 
-    ref.keepAlive();
+    if (ref.mounted) ref.keepAlive();
   }
 
   Future<void> toggleIsComplete({
@@ -58,12 +64,14 @@ class Pack extends _$Pack {
   }) async {
     final statsManager = StatsManager();
     await statsManager.initialize();
-    
+    if (!ref.mounted) return;
+
     if (isComplete) {
       await statsManager.removeTrackChecked(trackId);
     } else {
       await statsManager.addTrackChecked(trackId);
     }
+    if (!ref.mounted) return;
 
     // Refresh stats provider from local to ensure UI shows updated stats
     try {
@@ -71,6 +79,7 @@ class Pack extends _$Pack {
     } catch (_) {
       // Silently fail if refresh fails - the local state update is more important
     }
+    if (!ref.mounted) return;
 
     // Refresh upNextProvider to update the Up Next widget
     try {
@@ -78,6 +87,7 @@ class Pack extends _$Pack {
     } catch (_) {
       // Silently fail if refresh fails
     }
+    if (!ref.mounted) return;
 
     state = state.whenData((pack) {
       var updatedItems = pack.items.map((item) {
