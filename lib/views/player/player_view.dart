@@ -186,7 +186,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      if (imageUrl.isNotEmpty)
+                      if (imageUrl.isNotEmpty &&
+                          !HTTPConstants.isDeadDomain(imageUrl))
                         _FadingNetworkImage(
                           imageUrl: imageUrl,
                         ),

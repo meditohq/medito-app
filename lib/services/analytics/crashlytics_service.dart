@@ -182,11 +182,20 @@ class CrashlyticsService {
       final isCdnMeditoError = lowerExceptionString.contains('cdn.medito.app');
       final isConnectionClosed =
           lowerExceptionString.contains('connection closed');
+      final looksLikeImageUrl = lowerExceptionString.contains('.webp') ||
+          lowerExceptionString.contains('.png') ||
+          lowerExceptionString.contains('.jpg') ||
+          lowerExceptionString.contains('cdn.') ||
+          lowerExceptionString.contains('fourthwall');
 
       // If it's related to cdn.medito.app or involves connection closed, check if we should ignore it
       if (isCdnMeditoError || isConnectionClosed) {
         // If it's an image loading error, always ignore it
         if (_isImageLoadingError(stack)) {
+          return true;
+        }
+        // Connection closed for a URL that looks like an image (works when stack is minified in release)
+        if (isConnectionClosed && looksLikeImageUrl) {
           return true;
         }
         // Also check if the stack trace contains URLs from dead domains
@@ -211,6 +220,17 @@ class CrashlyticsService {
           }
         }
       }
+    }
+
+    // Fallback: ignore by exception string when stack suggests image loading
+    // (handles wrapped or rethrown SocketException, e.g. from FlutterError)
+    final exceptionStr = exception.toString();
+    final lowerExceptionStr = exceptionStr.toLowerCase();
+    final isSocketHostLookup = lowerExceptionStr.contains('socketexception') &&
+        (lowerExceptionStr.contains('failed host lookup') ||
+            lowerExceptionStr.contains('no address associated with hostname'));
+    if (isSocketHostLookup && _isImageLoadingError(stack)) {
+      return true;
     }
 
     if (!_isImageLoadingError(stack)) return false;
