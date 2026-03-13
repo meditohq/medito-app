@@ -1,5 +1,5 @@
 Unreleased
--
+- Consistency score now recovers more quickly after a break, and a single missed day has much less impact
 
 3.5.71
 - Bug fixes and performance improvements

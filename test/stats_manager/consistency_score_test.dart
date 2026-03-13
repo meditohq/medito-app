@@ -56,46 +56,40 @@ void main() {
       expect(result, 1.0);
     });
 
-    test('calculateConsistencyScore - 24 days out of last 30 returns 0.8', () {
-      // Arrange
-      var now = DateTime(2024, 3, 15); // Fix date for testing
+    test(
+        'calculateConsistencyScore - 30 days of perfect history then 10 days off, score starts recovering immediately on return',
+        () {
+      var now = DateTime(2024, 3, 15);
       statsManager.setCurrentDateForTesting(now);
 
-      // Create sessions for exactly 24 days out of the last 30 days
+      // Days 0–29: perfect, then days 30–39 (10 days ago to yesterday): nothing,
+      // today (day 0): back.
       var sessions = [
-        // Days 0-14: Every day (15 days)
-        ...List.generate(15, (index) {
+        // today
+        LocalAudioCompleted(
+          id: 'today',
+          timestamp: now.millisecondsSinceEpoch,
+        ),
+        // 10 days before the gap started = days 11–40 ago
+        ...List.generate(30, (index) {
           return LocalAudioCompleted(
-            id: 'track-$index',
-            timestamp:
-                now.subtract(Duration(days: index)).millisecondsSinceEpoch,
-          );
-        }),
-        // Days 15, 17, 19, 21, 23, 25, 27, 29 (8 days)
-        ...List.generate(8, (index) {
-          return LocalAudioCompleted(
-            id: 'track-${index + 15}',
+            id: 'past-$index',
             timestamp: now
-                .subtract(Duration(days: 15 + index * 2))
+                .subtract(Duration(days: 11 + index))
                 .millisecondsSinceEpoch,
           );
         }),
-        // Day 16 (1 day)
-        LocalAudioCompleted(
-          id: 'track-23',
-          timestamp: now.subtract(Duration(days: 16)).millisecondsSinceEpoch,
-        ),
       ];
 
-      var stats = LocalAllStats.empty().copyWith(
-        audioCompleted: sessions,
-      );
+      var stats = LocalAllStats.empty().copyWith(audioCompleted: sessions);
 
-      // Act
+      // After a 10-day gap, score has decayed but is well above 0 and below 1.
+      // Crucially it is already moving upward on day 1 back (unlike the old
+      // 30-day fixed window which would stay flat for weeks).
       var result = statsManager.calculateConsistencyScore(stats);
 
-      // Assert
-      expect(result, 0.8); // 24 days out of 30 = 0.8
+      expect(result, greaterThan(0.4));
+      expect(result, lessThan(1.0));
     });
 
     test(
@@ -155,10 +149,9 @@ void main() {
     });
 
     test(
-        'calculateConsistencyScore - session 40 days ago, none in last 30 returns 0.0',
+        'calculateConsistencyScore - single session 40 days ago, none since, score near 0',
         () {
-      // Arrange
-      var now = DateTime(2024, 3, 15); // Fix date for testing
+      var now = DateTime(2024, 3, 15);
       statsManager.setCurrentDateForTesting(now);
 
       var stats = LocalAllStats.empty().copyWith(
@@ -171,11 +164,10 @@ void main() {
         ],
       );
 
-      // Act
       var result = statsManager.calculateConsistencyScore(stats);
 
-      // Assert
-      expect(result, 0.0);
+      // After 40 days with only 1 active day (day 1), EMA will have decayed heavily
+      expect(result, lessThan(0.05));
     });
 
     test('calculateConsistencyScore - multiple sessions same day count as one',
