@@ -198,7 +198,7 @@ class _AppIconItem extends StatelessWidget {
       child: SizedBox(
         width: 72,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
@@ -221,20 +221,26 @@ class _AppIconItem extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            Text(
-              option.displayName(context),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7),
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Text(
+                  option.displayName(context),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                ),
+              ),
             ),
           ],
         ),

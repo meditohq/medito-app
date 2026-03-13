@@ -2669,7 +2669,7 @@ abstract class AppLocalizations {
   /// Label for the near-black app icon option
   ///
   /// In en, this message translates to:
-  /// **'Nearblack'**
+  /// **'Dark'**
   String get appIconNearBlack;
 
   /// Label for the dusk gradient app icon option (now the default)

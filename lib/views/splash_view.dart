@@ -75,20 +75,30 @@ class SplashViewState extends ConsumerState<SplashView>
       var auth = ref.read(authRepositorySyncProvider);
       if (auth.currentUser != null) {
         AppLogger.d(
-            'SPLASH', 'Current user before resume check: ${auth.currentUser}');
+          'SPLASH',
+          'Current user before resume check: ${auth.currentUser}',
+        );
 
         if (await auth.isLoggedIn()) {
           AppLogger.d('SPLASH', 'Checking auth status on resume');
           // getToken will only refresh if the current token is expired
           try {
             await auth.getToken();
-            AppLogger.i('SPLASH',
-                'Token refresh successful on resume, current user: ${auth.currentUser}');
             AppLogger.i(
-                'SPLASH', 'User email after resume: ${auth.getUserEmail()}');
+              'SPLASH',
+              'Token refresh successful on resume, current user: ${auth.currentUser}',
+            );
+            AppLogger.i(
+              'SPLASH',
+              'User email after resume: ${auth.getUserEmail()}',
+            );
           } catch (e, stackTrace) {
             AppLogger.e(
-                'SPLASH', 'Token refresh failed on resume', e, stackTrace);
+              'SPLASH',
+              'Token refresh failed on resume',
+              e,
+              stackTrace,
+            );
             // Auth repository handles whether to force logout or not for different error types
           }
         }
@@ -108,7 +118,9 @@ class SplashViewState extends ConsumerState<SplashView>
         await _initializeFirebase();
       } catch (e) {
         AppLogger.w(
-            'SPLASH', 'Firebase initialization failed, continuing offline: $e');
+          'SPLASH',
+          'Firebase initialization failed, continuing offline: $e',
+        );
         // Continue without Firebase - app should still work offline
       }
 
@@ -116,8 +128,10 @@ class SplashViewState extends ConsumerState<SplashView>
       try {
         await _initializeAnalytics();
       } catch (e) {
-        AppLogger.w('SPLASH',
-            'Analytics initialization failed, continuing offline: $e');
+        AppLogger.w(
+          'SPLASH',
+          'Analytics initialization failed, continuing offline: $e',
+        );
         // Continue without analytics - app should still work offline
       }
 
@@ -164,14 +178,19 @@ class SplashViewState extends ConsumerState<SplashView>
       await FirebaseAnalyticsService()
           .initialize(requestAttPermissionImmediately: false)
           .timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          AppLogger.w('SPLASH', 'Firebase Analytics initialization timed out');
-          throw Exception('Firebase Analytics initialization timeout');
-        },
-      );
+            const Duration(seconds: 5),
+            onTimeout: () {
+              AppLogger.w(
+                'SPLASH',
+                'Firebase Analytics initialization timed out',
+              );
+              throw Exception('Firebase Analytics initialization timeout');
+            },
+          );
       AppLogger.i(
-          'SPLASH', 'Firebase Analytics initialized with consent mode v2');
+        'SPLASH',
+        'Firebase Analytics initialized with consent mode v2',
+      );
 
       // Initialize Meta SDK and log first open once
       await MetaSdkService.instance.init().timeout(
@@ -191,7 +210,11 @@ class SplashViewState extends ConsumerState<SplashView>
     } catch (e, stackTrace) {
       // Log the error but don't prevent app startup
       AppLogger.e(
-          'SPLASH', 'Error initializing Firebase Analytics', e, stackTrace);
+        'SPLASH',
+        'Error initializing Firebase Analytics',
+        e,
+        stackTrace,
+      );
       CrashlyticsService().recordError(
         e,
         stackTrace,
@@ -207,7 +230,9 @@ class SplashViewState extends ConsumerState<SplashView>
       AppLogger.i('SPLASH', 'Starting auth initialization');
       await auth.initializeUser();
       AppLogger.i(
-          'SPLASH', 'Auth initialized, current user: ${auth.currentUser}');
+        'SPLASH',
+        'Auth initialized, current user: ${auth.currentUser}',
+      );
       AppLogger.i('SPLASH', 'User email from auth: ${auth.getUserEmail()}');
 
       // Set user ID for analytics immediately after user initialization
@@ -221,7 +246,11 @@ class SplashViewState extends ConsumerState<SplashView>
         }
       } catch (e, stackTrace) {
         AppLogger.e(
-            'SPLASH', 'Error setting user ID for analytics', e, stackTrace);
+          'SPLASH',
+          'Error setting user ID for analytics',
+          e,
+          stackTrace,
+        );
       }
 
       // Apply stored UTM parameters from deep links (e.g., Apple Ads)
@@ -230,13 +259,19 @@ class SplashViewState extends ConsumerState<SplashView>
         await FirebaseAnalyticsService.applyStoredUtmParameters();
       } catch (e, stackTrace) {
         AppLogger.e(
-            'SPLASH', 'Error applying stored UTM parameters', e, stackTrace);
+          'SPLASH',
+          'Error applying stored UTM parameters',
+          e,
+          stackTrace,
+        );
       }
 
       final currentUser = auth.currentUser;
       final isLoggedIn = await auth.isLoggedIn();
-      AppLogger.i('SPLASH',
-          'Auth state: ${isLoggedIn ? 'logged in' : 'not logged in'}, has email: ${currentUser?.email != null}');
+      AppLogger.i(
+        'SPLASH',
+        'Auth state: ${isLoggedIn ? 'logged in' : 'not logged in'}, has email: ${currentUser?.email != null}',
+      );
 
       if (isLoggedIn && currentUser != null) {
         AppLogger.i('SPLASH', 'Initializing services for verified user...');
@@ -250,16 +285,17 @@ class SplashViewState extends ConsumerState<SplashView>
           AppLogger.i('SPLASH', 'Navigation to main app...');
           await Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => const RootPageView(
-                firstChild: BottomNavigationBarView(),
-              ),
+              builder: (context) =>
+                  const RootPageView(firstChild: BottomNavigationBarView()),
             ),
           );
         } catch (e) {
           // If services initialization fails (likely due to network issues),
           // navigate to downloads view for offline access
           AppLogger.w(
-              'SPLASH', 'Services initialization failed, going offline: $e');
+            'SPLASH',
+            'Services initialization failed, going offline: $e',
+          );
           if (!mounted) return;
 
           showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
@@ -280,10 +316,11 @@ class SplashViewState extends ConsumerState<SplashView>
       }
     } catch (e, stackTrace) {
       AppLogger.e(
-          'SPLASH',
-          'Error in _checkAuthAndInitialize, navigating to DownloadsView',
-          e,
-          stackTrace);
+        'SPLASH',
+        'Error in _checkAuthAndInitialize, navigating to DownloadsView',
+        e,
+        stackTrace,
+      );
       CrashlyticsService().recordError(
         e,
         stackTrace,
@@ -320,15 +357,18 @@ class SplashViewState extends ConsumerState<SplashView>
         if (userId != null && userId.isNotEmpty) {
           await FirebaseAnalyticsService().setUserId(userId);
           await MetaSdkService.instance.setUserId(userId);
-          AppLogger.i('SPLASH',
-              'User ID set for analytics after anonymous sign in: $userId');
+          AppLogger.i(
+            'SPLASH',
+            'User ID set for analytics after anonymous sign in: $userId',
+          );
         }
       } catch (e, stackTrace) {
         AppLogger.e(
-            'SPLASH',
-            'Error setting user ID for analytics after anonymous sign in',
-            e,
-            stackTrace);
+          'SPLASH',
+          'Error setting user ID for analytics after anonymous sign in',
+          e,
+          stackTrace,
+        );
       }
 
       await _initializeServices();
@@ -337,9 +377,7 @@ class SplashViewState extends ConsumerState<SplashView>
       if (!mounted) return;
 
       await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const OnboardingPagerScreen(),
-        ),
+        MaterialPageRoute(builder: (context) => const OnboardingPagerScreen()),
       );
     } on EmailExistsError catch (_) {
       if (!mounted) return;
@@ -348,20 +386,16 @@ class SplashViewState extends ConsumerState<SplashView>
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          title: Text(
-            AppLocalizations.of(context)!.emailExistsDialogTitle,
-          ),
-          content: Text(
-            AppLocalizations.of(context)!.emailExistsDialogMessage,
-          ),
+          title: Text(AppLocalizations.of(context)!.emailExistsDialogTitle),
+          content: Text(AppLocalizations.of(context)!.emailExistsDialogMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(
                 AppLocalizations.of(context)!.emailExistsContinueNewAccount,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: ColorConstants.brightSky,
-                    ),
+                  color: ColorConstants.brightSky,
+                ),
               ),
             ),
             TextButton(
@@ -379,15 +413,13 @@ class SplashViewState extends ConsumerState<SplashView>
       if (shouldUseExistingAccount == true) {
         await Navigator.of(context)
             .push(
-          MaterialPageRoute(
-            builder: (context) => const SignUpLogInPage(),
-          ),
-        )
+              MaterialPageRoute(builder: (context) => const SignUpLogInPage()),
+            )
             .then((value) {
-          if (value == true) {
-            _checkAuthAndInitialize();
-          }
-        });
+              if (value == true) {
+                _checkAuthAndInitialize();
+              }
+            });
       } else {
         // User wants to continue with a new account
         // Clear the stored client ID so a new one will be generated
@@ -397,8 +429,12 @@ class SplashViewState extends ConsumerState<SplashView>
         await _handleAnonymousSignIn();
       }
     } catch (e, stackTrace) {
-      AppLogger.e('SPLASH', 'Failed to initialize user (anonymous sign-in)', e,
-          stackTrace);
+      AppLogger.e(
+        'SPLASH',
+        'Failed to initialize user (anonymous sign-in)',
+        e,
+        stackTrace,
+      );
       CrashlyticsService().recordError(
         e,
         stackTrace,
@@ -438,8 +474,10 @@ class SplashViewState extends ConsumerState<SplashView>
       } catch (e, stackTrace) {
         // Check if this is a network error - if so, don't prevent app initialization
         if (e is NetworkConnectionError || e is TimeoutError) {
-          AppLogger.w('SPLASH',
-              'Network error fetching user data, continuing offline: $e');
+          AppLogger.w(
+            'SPLASH',
+            'Network error fetching user data, continuing offline: $e',
+          );
         } else {
           AppLogger.e('SPLASH', 'Error fetching user data', e, stackTrace);
           CrashlyticsService().recordError(
@@ -486,7 +524,9 @@ class SplashViewState extends ConsumerState<SplashView>
                 child: SvgPicture.asset(
                   AssetConstants.icLogo,
                   colorFilter: const ColorFilter.mode(
-                      Colors.white, BlendMode.srcIn),
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
                   width: 168,
                 ),
               )
@@ -516,8 +556,10 @@ class SplashViewState extends ConsumerState<SplashView>
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 16, top: 16),
+                                  padding: const EdgeInsets.only(
+                                    left: 16,
+                                    top: 16,
+                                  ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
@@ -525,8 +567,9 @@ class SplashViewState extends ConsumerState<SplashView>
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
                                           color: Colors.white.withAlpha(
-                                              ((0.1).clamp(0.0, 1.0) * 255)
-                                                  .round()),
+                                            ((0.1).clamp(0.0, 1.0) * 255)
+                                                .round(),
+                                          ),
                                           shape: BoxShape.circle,
                                         ),
                                         child: SvgPicture.asset(
@@ -549,14 +592,19 @@ class SplashViewState extends ConsumerState<SplashView>
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(32, 40, 32, 0),
+                                  padding: const EdgeInsets.fromLTRB(
+                                    32,
+                                    40,
+                                    32,
+                                    0,
+                                  ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        AppLocalizations.of(context)!
-                                            .splashHeadline,
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.splashHeadline,
                                         style: Theme.of(context)
                                             .textTheme
                                             .displayLarge
@@ -575,49 +623,84 @@ class SplashViewState extends ConsumerState<SplashView>
                                               child: PageView.builder(
                                                 controller: _pageController,
                                                 onPageChanged: (index) =>
-                                                    setState(() =>
-                                                        _currentPageIndex =
-                                                            index),
+                                                    setState(
+                                                      () => _currentPageIndex =
+                                                          index,
+                                                    ),
                                                 itemCount: 3,
-                                                itemBuilder: (context, index) =>
-                                                    Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  children: [
-                                                    Text(
-                                                      _getBenefitTitle(index),
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .displayLarge
-                                                          ?.copyWith(
-                                                            fontSize: 28,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            height: 1.3,
-                                                            color: Colors.white,
-                                                          ),
-                                                    ),
-                                                    const SizedBox(height: 16),
-                                                    Text(
-                                                      _getBenefitSubtitle(
-                                                          index),
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyMedium
-                                                          ?.copyWith(
-                                                            fontSize: 20,
-                                                            height: 1.4,
-                                                            color: Colors.white
-                                                                .withAlpha(((0.9).clamp(
-                                                                            0.0,
-                                                                            1.0) *
-                                                                        255)
-                                                                    .round()),
-                                                          ),
-                                                    ),
-                                                  ],
+                                                itemBuilder: (context, index) => LayoutBuilder(
+                                                  builder: (context, pageConstraints) {
+                                                    return SingleChildScrollView(
+                                                      child: ConstrainedBox(
+                                                        constraints:
+                                                            BoxConstraints(
+                                                              minHeight:
+                                                                  pageConstraints
+                                                                      .maxHeight,
+                                                            ),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Text(
+                                                              _getBenefitTitle(
+                                                                index,
+                                                              ),
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: Theme.of(context)
+                                                                  .textTheme
+                                                                  .displayLarge
+                                                                  ?.copyWith(
+                                                                    fontSize:
+                                                                        28,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    height: 1.3,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 16,
+                                                            ),
+                                                            Text(
+                                                              _getBenefitSubtitle(
+                                                                index,
+                                                              ),
+                                                              maxLines: 3,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: Theme.of(context)
+                                                                  .textTheme
+                                                                  .bodyMedium
+                                                                  ?.copyWith(
+                                                                    fontSize:
+                                                                        20,
+                                                                    height: 1.4,
+                                                                    color: Colors.white.withAlpha(
+                                                                      ((0.9).clamp(
+                                                                                0.0,
+                                                                                1.0,
+                                                                              ) *
+                                                                              255)
+                                                                          .round(),
+                                                                    ),
+                                                                  ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                             ),
@@ -641,7 +724,11 @@ class SplashViewState extends ConsumerState<SplashView>
                                 if (_showAccountButtons) ...[
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
-                                        32, 0, 32, 24),
+                                      32,
+                                      0,
+                                      32,
+                                      24,
+                                    ),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
@@ -653,26 +740,27 @@ class SplashViewState extends ConsumerState<SplashView>
                                               // Log analytics event for signup button tap
                                               await FirebaseAnalyticsService()
                                                   .logEvent(
-                                                name: FirebaseAnalyticsService
-                                                    .eventOnboardingSplashscreenSignupTap,
-                                              );
+                                                    name: FirebaseAnalyticsService
+                                                        .eventOnboardingSplashscreenSignupTap,
+                                                  );
 
                                               await Navigator.of(context)
                                                   .push(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const SignUpLogInPage(),
-                                                ),
-                                              )
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const SignUpLogInPage(),
+                                                    ),
+                                                  )
                                                   .then((value) {
-                                                if (value == true) {
-                                                  _checkAuthAndInitialize();
-                                                }
-                                              });
+                                                    if (value == true) {
+                                                      _checkAuthAndInitialize();
+                                                    }
+                                                  });
                                             },
                                             child: Text(
-                                              AppLocalizations.of(context)!
-                                                  .createAccountLogInButtonText,
+                                              AppLocalizations.of(
+                                                context,
+                                              )!.createAccountLogInButtonText,
                                             ),
                                           ),
                                         ),
@@ -682,16 +770,16 @@ class SplashViewState extends ConsumerState<SplashView>
                                           height: 48,
                                           child: OutlinedButton(
                                             style: OutlinedButton.styleFrom(
-                                              backgroundColor: Theme.of(context)
-                                                  .colorScheme
-                                                  .surface,
-                                              foregroundColor: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
+                                              backgroundColor: Theme.of(
+                                                context,
+                                              ).colorScheme.surface,
+                                              foregroundColor: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
                                               side: BorderSide(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline,
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.outline,
                                               ),
                                             ),
                                             onPressed: _isSigningIn
@@ -700,9 +788,9 @@ class SplashViewState extends ConsumerState<SplashView>
                                                     // Log analytics event for continue button tap
                                                     await FirebaseAnalyticsService()
                                                         .logEvent(
-                                                      name: FirebaseAnalyticsService
-                                                          .eventOnboardingSplashscreenContinueTap,
-                                                    );
+                                                          name: FirebaseAnalyticsService
+                                                              .eventOnboardingSplashscreenContinueTap,
+                                                        );
 
                                                     await _handleAnonymousSignIn();
                                                   },
@@ -712,13 +800,13 @@ class SplashViewState extends ConsumerState<SplashView>
                                                     height: 20,
                                                     child:
                                                         CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                    ),
+                                                          strokeWidth: 2,
+                                                        ),
                                                   )
                                                 : Text(
                                                     AppLocalizations.of(
-                                                            context)!
-                                                        .continueAsGuest,
+                                                      context,
+                                                    )!.continueAsGuest,
                                                   ),
                                           ),
                                         ),

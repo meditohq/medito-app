@@ -558,7 +558,7 @@
   "@appIconDefault": {
     "description": "Label for the default app icon option"
   },
-  "appIconNearBlack": "Nearblack",
+  "appIconNearBlack": "Dark",
   "@appIconNearBlack": {
     "description": "Label for the near-black app icon option"
   },
