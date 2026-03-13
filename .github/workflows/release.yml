@@ -272,6 +272,13 @@ jobs:
           GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
         run: printf '%s' "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
 
+      - name: Validate plist files
+        run: |
+          plutil -lint ios/Runner/GoogleService-Info.plist
+          plutil -lint ios/Runner/Info.plist
+          plutil -lint ios/Runner/Runner.entitlements
+          plutil -lint ios/Runner/RunnerRelease.entitlements
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
