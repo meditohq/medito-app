@@ -6,6 +6,9 @@
 name: Flutter
 
 on:
+  push:
+    tags-ignore:
+      - '*'
   workflow_dispatch:
 
 jobs:

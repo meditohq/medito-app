@@ -3,8 +3,7 @@ name: Build & Deploy
 on:
   push:
     tags:
-      - '*.*.*'
-      - 'v*.*.*'
+      - '**'
   workflow_dispatch:
     inputs:
       paywall_env:
@@ -60,7 +59,7 @@ jobs:
     name: Android – Build & Deploy
     runs-on: ubuntu-latest
     environment: prod
-    if: false
+    if: github.event_name != 'workflow_dispatch' || inputs.platforms == 'both' || inputs.platforms == 'android'
 
     steps:
       - uses: actions/checkout@v4
@@ -306,7 +305,7 @@ jobs:
       - name: Install Fastlane
         run: gem install fastlane --no-document
 
-      - name: Build & upload to TestFlight
+      - name: Build & upload iOS release
         working-directory: ios
         env:
           PAYWALL_ENV: ${{ inputs.paywall_env || 'live' }}
@@ -324,4 +323,4 @@ jobs:
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           RELEASE_NOTES: ${{ inputs.release_notes }}
-        run: fastlane ${{ inputs.ios_lane || 'beta' }}
+        run: fastlane ${{ github.event_name == 'push' && 'release' || inputs.ios_lane || 'beta' }}
