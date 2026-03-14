@@ -8,7 +8,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 
-import '../../../../models/player/repeat_mode.dart';
+import '../../../../models/player/repeat_mode.dart' as medito_repeat;
 import '../../../../providers/player/repeat_state_provider.dart';
 import 'play_pause_button_widget.dart';
 
@@ -98,7 +98,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  Widget _repeatButton(BuildContext context, RepeatMode repeatMode) {
+  Widget _repeatButton(BuildContext context, medito_repeat.RepeatMode repeatMode) {
     return _RepeatButtonWithLabel(
       repeatMode: repeatMode,
       onRepeat: onRepeat,
@@ -112,7 +112,7 @@ class _RepeatButtonWithLabel extends ConsumerStatefulWidget {
     required this.onRepeat,
   });
 
-  final RepeatMode repeatMode;
+  final medito_repeat.RepeatMode repeatMode;
   final VoidCallback onRepeat;
 
   @override
@@ -136,20 +136,20 @@ class _RepeatButtonWithLabelState
     final localizations = AppLocalizations.of(context)!;
 
     final nextMode = switch (widget.repeatMode) {
-      RepeatMode.none => RepeatMode.once,
-      RepeatMode.once => RepeatMode.infinite,
-      RepeatMode.infinite => RepeatMode.none,
+      medito_repeat.RepeatMode.none => medito_repeat.RepeatMode.once,
+      medito_repeat.RepeatMode.once => medito_repeat.RepeatMode.infinite,
+      medito_repeat.RepeatMode.infinite => medito_repeat.RepeatMode.none,
     };
 
     String labelText;
     switch (nextMode) {
-      case RepeatMode.none:
+      case medito_repeat.RepeatMode.none:
         labelText = localizations.repeatModeNormal;
         break;
-      case RepeatMode.once:
+      case medito_repeat.RepeatMode.once:
         labelText = localizations.repeatModeOnce;
         break;
-      case RepeatMode.infinite:
+      case medito_repeat.RepeatMode.infinite:
         labelText = localizations.repeatModeForever;
         break;
     }
@@ -178,14 +178,14 @@ class _RepeatButtonWithLabelState
     Color? iconColor;
 
     switch (repeatMode) {
-      case RepeatMode.none:
+      case medito_repeat.RepeatMode.none:
         iconColor = Colors.white.withValues(alpha: 0.5);
         break;
-      case RepeatMode.once:
+      case medito_repeat.RepeatMode.once:
         iconAsset = MeditoIcons.repeatOnce;
         iconColor = Colors.white;
         break;
-      case RepeatMode.infinite:
+      case medito_repeat.RepeatMode.infinite:
         iconColor = Colors.white;
         break;
     }
