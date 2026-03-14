@@ -73,8 +73,11 @@ void main() {
       final updatedStats = statsState.value!;
       // After applying freeze, streakFreezes should be 0
       expect(updatedStats.streakFreezes, 0);
-      // Freeze usage dates should have one entry
-      expect(updatedStats.freezeUsageDates.length, 1);
+      // A freeze entry should have been added to audioCompleted
+      expect(
+        updatedStats.audioCompleted!.where((a) => a.id == 'streak-freeze').length,
+        1,
+      );
     });
 
     test(

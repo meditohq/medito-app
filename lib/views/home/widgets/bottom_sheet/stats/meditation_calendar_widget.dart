@@ -83,12 +83,11 @@ class _MeditationCalendarWidgetState
     final today = DateTime.now();
     final todayStart = DateTime(today.year, today.month, today.day);
 
-    // Add real data
     if (stats.audioCompleted != null && stats.audioCompleted!.isNotEmpty) {
       for (final audio in stats.audioCompleted!) {
+        if (isFreezeSession(audio)) continue;
         final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
         final dayStart = DateTime(date.year, date.month, date.day);
-
         if (!dayStart.isAfter(todayStart)) {
           dates.add(dayStart);
         }
@@ -104,13 +103,24 @@ class _MeditationCalendarWidgetState
     final todayStart = DateTime(today.year, today.month, today.day);
     final meditationDates = _getMeditationDates(stats);
 
+    // Legacy freeze dates stored in freezeUsageDates
     for (final timestamp in stats.freezeUsageDates) {
       final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
       final dayStart = DateTime(date.year, date.month, date.day);
-
-      // Only include freeze dates that don't have meditation activity and aren't in the future
       if (!dayStart.isAfter(todayStart) && !meditationDates.contains(dayStart)) {
         dates.add(dayStart);
+      }
+    }
+
+    // New freeze entries stored in audioCompleted
+    if (stats.audioCompleted != null) {
+      for (final audio in stats.audioCompleted!) {
+        if (!isFreezeSession(audio)) continue;
+        final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+        final dayStart = DateTime(date.year, date.month, date.day);
+        if (!dayStart.isAfter(todayStart) && !meditationDates.contains(dayStart)) {
+          dates.add(dayStart);
+        }
       }
     }
 
@@ -129,10 +139,10 @@ class _MeditationCalendarWidgetState
     final dayStart = DateTime(day.year, day.month, day.day);
     final dayEnd = dayStart.add(const Duration(days: 1));
 
-    // Add real sessions
     if (widget.stats.audioCompleted != null &&
         widget.stats.audioCompleted!.isNotEmpty) {
       sessions.addAll(widget.stats.audioCompleted!.where((audio) {
+        if (isFreezeSession(audio)) return false;
         final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
         return date
                 .isAfter(dayStart.subtract(const Duration(milliseconds: 1))) &&

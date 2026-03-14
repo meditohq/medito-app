@@ -470,6 +470,10 @@ bool isManualSession(LocalAudioCompleted session) {
       session.id == TypeConstants.manual4;
 }
 
+bool isFreezeSession(LocalAudioCompleted session) {
+  return session.id == TypeConstants.streakFreeze;
+}
+
 /// Gets the display title for a manual session based on its ID
 String getManualSessionTitle(String id, AppLocalizations l10n) {
   switch (id) {

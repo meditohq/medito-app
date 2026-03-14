@@ -2,4 +2,5 @@
     <string name="app_name">Medito</string>
     <string name="widget_description">Meditation streak and calendar</string>
     <string name="consistency_widget_description">Meditation consistency score and calendar</string>
+    <string name="up_next_widget_description">Your next meditation session</string>
 </resources>

@@ -94,8 +94,11 @@ void main() {
 
       // Check that Mar 7 was marked as a freeze usage date
       var mar7 = DateTime(2025, 3, 7);
-      var mar7FreezeApplied = afterFreeze!.freezeUsageDates.any((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      final freezeEntries1 = afterFreeze!.audioCompleted!
+          .where((a) => a.id == 'streak-freeze')
+          .toList();
+      var mar7FreezeApplied = freezeEntries1.any((a) {
+        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
         return date.year == mar7.year &&
             date.month == mar7.month &&
             date.day == mar7.day;
@@ -112,8 +115,8 @@ void main() {
       // STEP 7: Verify freeze count was decremented
       expect(afterFreeze.streakFreezes, 1,
           reason: 'Available freezes should be reduced by 1');
-      expect(afterFreeze.freezeUsageDates.length, 1,
-          reason: 'Should have 1 freeze usage date');
+      expect(freezeEntries1.length, 1,
+          reason: 'Should have 1 freeze usage entry in audioCompleted');
 
       // STEP 8: Test that suggesting freeze again returns false (already handled)
       var shouldSuggestAgain = await statsManager.shouldSuggestStreakFreeze();
@@ -193,16 +196,19 @@ void main() {
       // Check that both Mar 8 and Mar 9 were marked as freeze usage dates
       var mar8 = DateTime(2025, 3, 8);
       var mar9 = DateTime(2025, 3, 9);
+      final freezeEntries2 = afterFreeze!.audioCompleted!
+          .where((a) => a.id == 'streak-freeze')
+          .toList();
 
-      var mar8FreezeApplied = afterFreeze!.freezeUsageDates.any((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      var mar8FreezeApplied = freezeEntries2.any((a) {
+        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
         return date.year == mar8.year &&
             date.month == mar8.month &&
             date.day == mar8.day;
       });
 
-      var mar9FreezeApplied = afterFreeze.freezeUsageDates.any((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      var mar9FreezeApplied = freezeEntries2.any((a) {
+        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
         return date.year == mar9.year &&
             date.month == mar9.month &&
             date.day == mar9.day;
@@ -223,8 +229,8 @@ void main() {
       // STEP 7: Verify freeze counts were decremented
       expect(afterFreeze.streakFreezes, 0,
           reason: 'All available freezes should be used');
-      expect(afterFreeze.freezeUsageDates.length, 2,
-          reason: 'Should have 2 freeze usage dates');
+      expect(freezeEntries2.length, 2,
+          reason: 'Should have 2 freeze usage entries in audioCompleted');
     });
 
     test('integration flow: no suggestion when no freezes available', () async {
@@ -293,8 +299,11 @@ void main() {
       expect(afterFreeze, isNotNull);
       expect(afterFreeze!.streakFreezes, 0,
           reason: 'Freeze count should remain 0');
-      expect(afterFreeze.freezeUsageDates.length, 0,
-          reason: 'No freeze usage dates should be added');
+      expect(
+        afterFreeze.audioCompleted!.where((a) => a.id == 'streak-freeze').length,
+        0,
+        reason: 'No freeze entries should be added to audioCompleted',
+      );
     });
 
     test('integration flow: no suggestion when no recent activity', () async {
@@ -358,8 +367,11 @@ void main() {
       expect(afterFreeze, isNotNull);
       expect(afterFreeze!.streakFreezes, 2,
           reason: 'Freezes should remain unused since application failed');
-      expect(afterFreeze.freezeUsageDates.length, 0,
-          reason: 'No freeze usage dates should be added when application fails');
+      expect(
+        afterFreeze.audioCompleted!.where((a) => a.id == 'streak-freeze').length,
+        0,
+        reason: 'No freeze entries should be added when application fails',
+      );
     });
   });
 }

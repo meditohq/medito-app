@@ -1,0 +1,49 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="260dp"
+    android:height="110dp"
+    android:viewportWidth="260"
+    android:viewportHeight="110">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#121212"
+        android:pathData="M12,0 L248,0 Q260,0 260,12 L260,98 Q260,110 248,110 L12,110 Q0,110 0,98 L0,12 Q0,0 12,0 Z" />
+
+    <!-- "UP NEXT" label -->
+    <path
+        android:fillColor="#808080"
+        android:pathData="M16,20 L55,20 L55,24 L16,24 Z" />
+
+    <!-- Pack title (purple) -->
+    <path
+        android:fillColor="#917DF0"
+        android:pathData="M61,20 L110,20 L110,24 L61,24 Z" />
+
+    <!-- Session title (bold, white) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,32 L160,32 L160,40 L16,40 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,44 L120,44 L120,52 L16,52 Z" />
+
+    <!-- Subtitle -->
+    <path
+        android:fillColor="#B3B3B3"
+        android:pathData="M16,58 L90,58 L90,63 L16,63 Z" />
+
+    <!-- Progress text -->
+    <path
+        android:fillColor="#808080"
+        android:pathData="M16,82 L75,82 L75,87 L16,87 Z" />
+
+    <!-- Play button circle (purple) -->
+    <path
+        android:fillColor="#917DF0"
+        android:pathData="M222,55 A22,22 0 1,1 222,54.99 Z" />
+
+    <!-- Play triangle (white) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M216,47 L232,55 L216,63 Z" />
+</vector>

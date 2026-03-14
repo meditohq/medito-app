@@ -720,9 +720,17 @@ void main() {
         expect(result, true);
         var updatedStats = statsManager.currentStats;
         expect(updatedStats?.streakFreezes, 1);
-        expect(updatedStats?.freezeUsageDates.length, 1);
-        expect(updatedStats?.freezeUsageDates.first,
-            yesterday.millisecondsSinceEpoch);
+        final freezeEntries = updatedStats?.audioCompleted
+            ?.where((a) => a.id == 'streak-freeze')
+            .toList();
+        expect(freezeEntries?.length, 1);
+        final appliedDate = DateTime.fromMillisecondsSinceEpoch(
+            freezeEntries!.first.timestamp);
+        expect(
+          DateTime(appliedDate.year, appliedDate.month, appliedDate.day),
+          DateTime(yesterday.year, yesterday.month, yesterday.day),
+          reason: 'Freeze entry should be stamped on yesterday',
+        );
         expect(updatedStats?.streakCurrent, 3);
       });
 
@@ -943,11 +951,14 @@ void main() {
 
         // Assert
         var result = statsManager.currentStats;
-        expect(result?.freezeUsageDates.length, 1);
+        final freezeEntries2 = result?.audioCompleted
+            ?.where((a) => a.id == 'streak-freeze')
+            .toList();
+        expect(freezeEntries2?.length, 1);
 
         // Convert timestamp back to date and verify it's yesterday
-        var appliedDate =
-            DateTime.fromMillisecondsSinceEpoch(result!.freezeUsageDates[0]);
+        var appliedDate = DateTime.fromMillisecondsSinceEpoch(
+            freezeEntries2!.first.timestamp);
         var appliedDay =
             DateTime(appliedDate.year, appliedDate.month, appliedDate.day);
         expect(appliedDay.difference(yesterday).inDays, 0,
@@ -1132,25 +1143,27 @@ void main() {
         expect(afterFreezes.streakFreezes, 1,
             reason: 'Should have used 1 of the 3 available freezes');
 
-        // Should have 2 new freeze usage dates
-        expect(afterFreezes.freezeUsageDates.length, 2);
+        // Should have 2 new freeze entries in audioCompleted
+        final freezeEntries3 = afterFreezes.audioCompleted!
+            .where((a) => a.id == 'streak-freeze')
+            .toList();
+        expect(freezeEntries3.length, 2);
 
-        // Convert timestamps to dates for verification
-        var freezeDates = afterFreezes.freezeUsageDates.map((timestamp) {
-          var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+        var freezeDates3 = freezeEntries3.map((a) {
+          var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
           return DateTime(date.year, date.month, date.day);
         }).toList();
 
         // Verify freezes were applied to yesterday and two days ago
         expect(
-            freezeDates.any((date) =>
+            freezeDates3.any((date) =>
                 date.year == yesterday.year &&
                 date.month == yesterday.month &&
                 date.day == yesterday.day),
             true);
 
         expect(
-            freezeDates.any((date) =>
+            freezeDates3.any((date) =>
                 date.year == twoDaysAgo.year &&
                 date.month == twoDaysAgo.month &&
                 date.day == twoDaysAgo.day),
@@ -1216,32 +1229,32 @@ void main() {
         expect(afterFreezes.streakFreezes, 0,
             reason: 'Should have used all 3 available freezes');
 
-        // Should have 3 freeze usage dates
-        expect(afterFreezes.freezeUsageDates.length, 3);
+        final freezeEntries4 = afterFreezes.audioCompleted!
+            .where((a) => a.id == 'streak-freeze')
+            .toList();
+        expect(freezeEntries4.length, 3);
 
-        // Convert timestamps to dates for verification
-        var freezeDates = afterFreezes.freezeUsageDates.map((timestamp) {
-          var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+        var freezeDates4 = freezeEntries4.map((a) {
+          var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
           return DateTime(date.year, date.month, date.day);
         }).toList();
 
-        // Verify freezes were applied to the three missing days
         expect(
-            freezeDates.any((date) =>
+            freezeDates4.any((date) =>
                 date.year == apr9.year &&
                 date.month == apr9.month &&
                 date.day == apr9.day),
             true);
 
         expect(
-            freezeDates.any((date) =>
+            freezeDates4.any((date) =>
                 date.year == apr8.year &&
                 date.month == apr8.month &&
                 date.day == apr8.day),
             true);
 
         expect(
-            freezeDates.any((date) =>
+            freezeDates4.any((date) =>
                 date.year == apr7.year &&
                 date.month == apr7.month &&
                 date.day == apr7.day),
@@ -1321,19 +1334,19 @@ void main() {
           expect(afterFreezes.streakFreezes, 0,
               reason: 'Should have used all $numFreezes available freezes');
 
-          // Should have numFreezes freeze usage dates
-          expect(afterFreezes.freezeUsageDates.length, numFreezes);
+          final freezeEntriesN = afterFreezes.audioCompleted!
+              .where((a) => a.id == 'streak-freeze')
+              .toList();
+          expect(freezeEntriesN.length, numFreezes);
 
-          // Convert timestamps to dates for verification
-          var freezeDates = afterFreezes.freezeUsageDates.map((timestamp) {
-            var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+          var freezeDatesN = freezeEntriesN.map((a) {
+            var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
             return DateTime(date.year, date.month, date.day);
           }).toList();
 
-          // Verify freezes were applied to the expected missing days
           for (var missingDay in missingDays) {
             expect(
-                freezeDates.any((date) =>
+                freezeDatesN.any((date) =>
                     date.year == missingDay.year &&
                     date.month == missingDay.month &&
                     date.day == missingDay.day),
@@ -1447,8 +1460,13 @@ void main() {
         var updatedStats = statsManager.currentStats;
         expect(updatedStats?.streakFreezes, 2,
             reason: 'Freeze count should remain unchanged');
-        expect(updatedStats?.freezeUsageDates.length, 0,
-            reason: 'No freeze usage dates should be added');
+        expect(
+          updatedStats?.audioCompleted
+              ?.where((a) => a.id == 'streak-freeze')
+              .length,
+          0,
+          reason: 'No freeze entries should be added to audioCompleted',
+        );
       });
 
       test(

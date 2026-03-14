@@ -2,8 +2,11 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="110dp"
     android:minHeight="50dp"
+    android:maxResizeWidth="400dp"
+    android:maxResizeHeight="200dp"
     android:targetCellWidth="2"
     android:targetCellHeight="1"
+    android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="300000"
     android:previewImage="@drawable/widget_consistency_preview"
     android:description="@string/consistency_widget_description">

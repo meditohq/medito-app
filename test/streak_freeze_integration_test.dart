@@ -215,13 +215,15 @@ void main() {
       // Verify that the streak has been updated correctly after applying the freeze
       var afterFreeze = statsManager.currentStats;
       expect(afterFreeze, isNotNull);
-      expect(afterFreeze!.freezeUsageDates.length, 1,
-          reason: 'Should have one freeze usage date');
+      final freezeEntriesA = afterFreeze!.audioCompleted!
+          .where((a) => a.id == 'streak-freeze')
+          .toList();
+      expect(freezeEntriesA.length, 1, reason: 'Should have one freeze entry');
 
       // Mar 7 freeze should be applied
       var mar7 = DateTime(2025, 3, 7);
-      expect(afterFreeze.freezeUsageDates.any((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      expect(freezeEntriesA.any((a) {
+        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
         return date.year == mar7.year &&
             date.month == mar7.month &&
             date.day == mar7.day;
@@ -297,22 +299,23 @@ void main() {
       // Verify that the streak has been updated correctly after applying the freezes
       var afterFreeze = statsManager.currentStats;
       expect(afterFreeze, isNotNull);
-      expect(afterFreeze!.freezeUsageDates.length, 2,
-          reason: 'Should have two freeze usage dates');
+      final freezeEntriesB = afterFreeze!.audioCompleted!
+          .where((a) => a.id == 'streak-freeze')
+          .toList();
+      expect(freezeEntriesB.length, 2, reason: 'Should have two freeze entries');
 
-      // Both Mar 8 and Mar 9 freezes should be applied
       var mar8 = DateTime(2025, 3, 8);
       var mar9 = DateTime(2025, 3, 9);
 
-      expect(afterFreeze.freezeUsageDates.any((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      expect(freezeEntriesB.any((a) {
+        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
         return date.year == mar8.year &&
             date.month == mar8.month &&
             date.day == mar8.day;
       }), true, reason: 'March 8 should be marked as a freeze usage date');
 
-      expect(afterFreeze.freezeUsageDates.any((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      expect(freezeEntriesB.any((a) {
+        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
         return date.year == mar9.year &&
             date.month == mar9.month &&
             date.day == mar9.day;
@@ -396,8 +399,13 @@ void main() {
       // Verify that nothing changed
       var afterFreeze = statsManager.currentStats;
       expect(afterFreeze, isNotNull);
-      expect(afterFreeze!.freezeUsageDates.length, 0,
-          reason: 'Should have no freeze usage dates');
+      expect(
+        afterFreeze!.audioCompleted!
+            .where((a) => a.id == 'streak-freeze')
+            .length,
+        0,
+        reason: 'Should have no freeze entries in audioCompleted',
+      );
       expect(afterFreeze.streakFreezes, 1,
           reason: 'Available freezes should remain unchanged');
     });

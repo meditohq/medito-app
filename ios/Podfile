@@ -38,11 +38,13 @@ target 'Runner' do
   end
 end
 
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     # Set deployment target for all configs first to ensure consistency
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+
     end
     
     # Apply Flutter specific settings (called per target, not per config)
@@ -74,10 +76,41 @@ post_install do |installer|
 
       # Finally, force Automatic signing for Pods targets AFTER other settings
       config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
+
       config.build_settings['DEVELOPMENT_TEAM'] = nil
       config.build_settings['CODE_SIGN_IDENTITY'] = ''
       config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ''
       config.build_settings['PROVISIONING_PROFILE'] = ''
     end 
+  end
+
+  # Superscript's cel.swift uses `#if canImport(celFFI)` to decide whether to
+  # import the celFFI C module. The module lives inside libcel.xcframework, and
+  # CocoaPods copies it to PODS_XCFRAMEWORKS_BUILD_DIR via xcframeworks.sh at
+  # build time. On a clean simulator build that script hasn't run yet when Swift
+  # starts compiling, so `canImport(celFFI)` returns false and all the raw FFI
+  # types are undefined.
+  #
+  # Fix: patch the generated xcconfig to point HEADER_SEARCH_PATHS at the
+  # static xcframework slices directly (using sdk-conditional variables so only
+  # one module map is visible per destination). We keep $(inherited) so all
+  # other paths from parent configs still apply, but we drop the dynamic
+  # ${PODS_XCFRAMEWORKS_BUILD_DIR} path to avoid "Redefinition of module" when
+  # xcframeworks.sh also runs.
+  superscript_xcconfig_dir = File.join(
+    installer.config.project_pods_root,
+    'Target Support Files', 'Superscript'
+  )
+  cel = '${PODS_ROOT}/Superscript/Frameworks/libcel.xcframework'
+  ['debug', 'release', 'profile'].each do |name|
+    path = File.join(superscript_xcconfig_dir, "Superscript.#{name}.xcconfig")
+    next unless File.exist?(path)
+    content = File.read(path)
+    content = content.gsub(
+      /HEADER_SEARCH_PATHS = \$\(inherited\) "\$\{PODS_XCFRAMEWORKS_BUILD_DIR\}\/Superscript\/Headers"/,
+      "HEADER_SEARCH_PATHS[sdk=iphonesimulator*] = $(inherited) \"#{cel}/ios-arm64_x86_64-simulator/Headers\"\n" \
+      "HEADER_SEARCH_PATHS[sdk=iphoneos*] = $(inherited) \"#{cel}/ios-arm64/Headers\""
+    )
+    File.write(path, content)
   end
 end

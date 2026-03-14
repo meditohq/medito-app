@@ -37,8 +37,8 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import meditofoundation.medito.R
 import es.antonborri.home_widget.actionStartActivity
-import HomeWidgetGlanceState
-import HomeWidgetGlanceStateDefinition
+import es.antonborri.home_widget.HomeWidgetGlanceState
+import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
 import meditofoundation.medito.MainActivity
 import org.json.JSONArray
 import java.util.Calendar
