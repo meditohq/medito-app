@@ -108,6 +108,9 @@ jobs:
         if: steps.cache-pigeon.outputs.cache-hit != 'true'
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
+      - name: Run Flutter Analyze
+        run: flutter analyze
+
       - name: Run Unit Tests
         run: flutter test --dart-define-from-file=.prod.json
 
