@@ -1,0 +1,14 @@
+{
+  "name": "Medito Flutter",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "jdkDistro": "tem"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/install-flutter.sh",
+  "remoteEnv": {
+    "PATH": "/opt/flutter/bin:${PATH}"
+  }
+}
