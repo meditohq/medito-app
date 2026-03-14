@@ -58,7 +58,10 @@ platform :ios do
       }
     )
 
-    upload_to_testflight(skip_submission: true)
+    upload_to_testflight(
+      skip_submission: true,
+      changelog: ENV["RELEASE_NOTES"] || ""
+    )
     cleanup_keychain()
   end
 

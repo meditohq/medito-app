@@ -184,6 +184,7 @@ jobs:
         working-directory: android
         env:
           PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+          RELEASE_NOTES: ${{ inputs.release_notes }}
         run: |
           bundle exec fastlane android upload_apk \
             apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \

@@ -9,6 +9,7 @@ on:
   push:
     tags-ignore:
       - '*'
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -107,6 +108,9 @@ jobs:
       - name: Run Pigeon generator
         if: steps.cache-pigeon.outputs.cache-hit != 'true'
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+
+      - name: Flutter Analyze
+        run: flutter analyze --dart-define-from-file=.prod.json
 
       - name: Run Unit Tests
         run: flutter test --dart-define-from-file=.prod.json
