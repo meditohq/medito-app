@@ -342,12 +342,16 @@ void main() {
       // Verify that the streak has been updated correctly after applying the freeze
       var afterFreeze = statsManager.currentStats;
       expect(afterFreeze, isNotNull);
-      expect(afterFreeze!.freezeUsageDates.length, 1);
+
+      final freezeEntries = afterFreeze!.audioCompleted!
+          .where((a) => a.id == 'streak-freeze')
+          .toList();
+      expect(freezeEntries.length, 1);
 
       // Mar 7 freeze should be applied
       var mar7 = DateTime(2025, 3, 7);
-      expect(afterFreeze.freezeUsageDates.any((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      expect(freezeEntries.any((a) {
+        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
         return date.year == mar7.year &&
             date.month == mar7.month &&
             date.day == mar7.day;
@@ -430,12 +434,18 @@ void main() {
       // Verify that the streak has been updated correctly after applying the freeze
       var afterSecondFreeze = statsManager.currentStats;
       expect(afterSecondFreeze, isNotNull);
-      expect(afterSecondFreeze!.freezeUsageDates.length,
-          2); // Now have 2 freezes used
+
+      // Feb 19 legacy freeze stays in freezeUsageDates; Feb 26 new freeze goes
+      // into audioCompleted as a streak-freeze entry
+      expect(afterSecondFreeze!.freezeUsageDates.length, 1);
+      final newFreezeEntries = afterSecondFreeze.audioCompleted!
+          .where((a) => a.id == 'streak-freeze')
+          .toList();
+      expect(newFreezeEntries.length, 1);
 
       // Feb 26 freeze should be applied
-      expect(afterSecondFreeze.freezeUsageDates.any((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      expect(newFreezeEntries.any((a) {
+        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
         return date.year == feb26.year &&
             date.month == feb26.month &&
             date.day == feb26.day;
@@ -512,7 +522,12 @@ void main() {
       // Check stats after applying freezes
       var afterFirstFreeze = statsManager.currentStats;
       expect(afterFirstFreeze, isNotNull);
-      expect(afterFirstFreeze!.freezeUsageDates.length, 2);
+      expect(
+        afterFirstFreeze!.audioCompleted!
+            .where((a) => a.id == 'streak-freeze')
+            .length,
+        2,
+      );
       expect(afterFirstFreeze.streakFreezes, 0);
 
       // After applying freezes, streak should be 5 (3 days of activity + 2 freeze days)
