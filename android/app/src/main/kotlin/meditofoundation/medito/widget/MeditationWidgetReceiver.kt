@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.glance.appwidget.updateAll
-import HomeWidgetGlanceWidgetReceiver
+import es.antonborri.home_widget.HomeWidgetGlanceWidgetReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
