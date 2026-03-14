@@ -2,9 +2,12 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="110dp"
     android:minHeight="50dp"
+    android:maxResizeWidth="400dp"
+    android:maxResizeHeight="200dp"
     android:targetCellWidth="2"
     android:targetCellHeight="1"
+    android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="300000"
-    android:previewImage="@drawable/widget_streak_preview"
-    android:description="@string/widget_description">
+    android:previewImage="@drawable/widget_up_next_preview"
+    android:description="@string/up_next_widget_description">
 </appwidget-provider>
