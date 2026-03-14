@@ -1,6 +1,10 @@
 Unreleased
 -
 
+3.5.74
+- iOS homescreen widgets (Streak and Consistency Score)
+- New "Up Next" home screen widget lets you jump straight into your next meditation from your home screen
+
 3.5.72
 - Favourite star now does a subtle spin as it appears on track and pack screens
 - Home cards now have a subtler gradient border with a slightly darker right edge
