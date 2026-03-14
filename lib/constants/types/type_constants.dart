@@ -34,6 +34,8 @@ class TypeConstants {
   static const String manual2 = 'manual2'; // Afternoon (12:00-17:59)
   static const String manual3 = 'manual3'; // Evening (18:00-22:59)
   static const String manual4 = 'manual4'; // Night (23:00-4:59)
+
+  static const String streakFreeze = 'streak-freeze';
 }
 
 class RouteConstants {

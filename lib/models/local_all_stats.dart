@@ -31,6 +31,7 @@ class LocalAllStats {
   final int updated;
   final int? streakFreezes;
   final int? maxStreakFreezes;
+  @JsonKey(defaultValue: [])
   final List<int> freezeUsageDates;
   final double consistencyScore;
 
