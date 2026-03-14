@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import '../utils/logger.dart';
 
 class HomeWidgetService {
+  static const String _appGroupId = 'group.org.medito.widget';
   static const String _widgetName = 'MeditationWidgetReceiver';
   static const String _consistencyWidgetName = 'ConsistencyWidgetReceiver';
   static const String _streakCurrentKey = 'streak_current';
@@ -21,6 +22,12 @@ class HomeWidgetService {
   static const String _totalTracksCompletedKey = 'total_tracks_completed';
   static const String _consistencyScoreKey = 'consistency_score';
   static const String _themePreferenceKey = 'theme_preference';
+
+  static Future<void> _configure() async {
+    if (Platform.isIOS) {
+      await HomeWidget.setAppGroupId(_appGroupId);
+    }
+  }
 
   /// Saves the theme preference to the widget
   static Future<void> saveThemePreference(String themePreference) async {
@@ -35,7 +42,6 @@ class HomeWidgetService {
       );
       AppLogger.d('WIDGET', 'Saved theme preference: $themePreference');
 
-      // Update both widgets when theme changes (Android only)
       await _updateWidget(_widgetName);
       await _updateWidget(_consistencyWidgetName);
     } catch (e) {
@@ -48,206 +54,106 @@ class HomeWidgetService {
     required LocalAllStats stats,
     BuildContext? context,
   }) async {
-    if (!Platform.isAndroid) {
+    if (!Platform.isAndroid && !Platform.isIOS) {
       return;
     }
 
     try {
-      // Extract meditation dates from audioCompleted
-      final meditationDates = <int>[];
-      if (stats.audioCompleted != null) {
-        for (final audio in stats.audioCompleted!) {
-          final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-          final dayStart = DateTime(date.year, date.month, date.day);
-          meditationDates.add(dayStart.millisecondsSinceEpoch);
-        }
-      }
+      // Resolve localised strings before any await so we never touch BuildContext
+      // across an async gap.
+      final l10n = context != null ? AppLocalizations.of(context) : null;
+      final dayLabel = l10n?.day ?? 'day';
+      final daysLabel = l10n?.days ?? 'days';
 
-      // Remove duplicates
-      final uniqueMeditationDates = meditationDates.toSet().toList();
+      await _configure();
 
-      // Extract freeze usage dates
+      final meditationDates = _extractMeditationDates(stats);
       final freezeDates = stats.freezeUsageDates.toList();
 
-      // Get localized "day" and "days" labels
-      String dayLabel = 'day';
-      String daysLabel = 'days';
-      if (context != null) {
-        final l10n = AppLocalizations.of(context);
-        if (l10n != null) {
-          dayLabel = l10n.day;
-          daysLabel = l10n.days;
-        }
-      }
+      await HomeWidget.saveWidgetData<int>(_streakCurrentKey, stats.streakCurrent);
+      await HomeWidget.saveWidgetData<String>(_meditationDatesKey, jsonEncode(meditationDates));
+      await HomeWidget.saveWidgetData<String>(_freezeDatesKey, jsonEncode(freezeDates));
+      await HomeWidget.saveWidgetData<String>(_dayLabelKey, dayLabel);
+      await HomeWidget.saveWidgetData<String>(_daysLabelKey, daysLabel);
+      await HomeWidget.saveWidgetData<int>(_lastUpdatedKey, DateTime.now().millisecondsSinceEpoch);
+      await HomeWidget.saveWidgetData<int>(_totalTracksCompletedKey, stats.totalTracksCompleted);
 
-      // Save data to widget
-      await HomeWidget.saveWidgetData<int>(
-        _streakCurrentKey,
-        stats.streakCurrent,
-      );
+      final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
+      await HomeWidget.saveWidgetData<int>(_consistencyScoreKey, consistencyPercentage);
 
-      await HomeWidget.saveWidgetData<String>(
-        _meditationDatesKey,
-        jsonEncode(uniqueMeditationDates),
-      );
-
-      await HomeWidget.saveWidgetData<String>(
-        _freezeDatesKey,
-        jsonEncode(freezeDates),
-      );
-
-      await HomeWidget.saveWidgetData<String>(
-        _dayLabelKey,
-        dayLabel,
-      );
-
-      await HomeWidget.saveWidgetData<String>(
-        _daysLabelKey,
-        daysLabel,
-      );
-
-      await HomeWidget.saveWidgetData<int>(
-        _lastUpdatedKey,
-        DateTime.now().millisecondsSinceEpoch,
-      );
-
-      await HomeWidget.saveWidgetData<int>(
-        _totalTracksCompletedKey,
-        stats.totalTracksCompleted,
-      );
-
-      // Save consistency score as integer percentage (0-100) to avoid type conversion issues
-      final consistencyPercentage =
-          (stats.consistencyScore * 100).round().clamp(0, 100);
-      await HomeWidget.saveWidgetData<int>(
-        _consistencyScoreKey,
-        consistencyPercentage,
-      );
-
-      // Update both widgets - try home_widget package first, fallback to manual broadcast (Android only)
-      await _updateWidget(_widgetName);
-      await _updateWidget(_consistencyWidgetName);
+      await _triggerWidgetRefresh();
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to update widget', e);
     }
   }
 
-  /// Updates the widget using stats from a provider/notifier
-  /// This version doesn't require a BuildContext for localization
+  /// Updates the widget using stats from a provider/notifier (no BuildContext needed)
   static Future<void> updateWidgetFromStats(LocalAllStats stats) async {
-    if (!Platform.isAndroid) {
+    if (!Platform.isAndroid && !Platform.isIOS) {
       return;
     }
 
     try {
-      // Extract meditation dates from audioCompleted
-      final meditationDates = <int>[];
-      if (stats.audioCompleted != null) {
-        for (final audio in stats.audioCompleted!) {
-          final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-          final dayStart = DateTime(date.year, date.month, date.day);
-          meditationDates.add(dayStart.millisecondsSinceEpoch);
-        }
-      }
+      await _configure();
 
-      // Remove duplicates
-      final uniqueMeditationDates = meditationDates.toSet().toList();
-
-      // Extract freeze usage dates
+      final meditationDates = _extractMeditationDates(stats);
       final freezeDates = stats.freezeUsageDates.toList();
+      final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
 
-      // Save data to widget (using default labels) with timeout to prevent ANR
-      try {
-        await HomeWidget.saveWidgetData<int>(
-          _streakCurrentKey,
-          stats.streakCurrent,
-        ).timeout(const Duration(seconds: 2));
-      } catch (e) {
-        AppLogger.w(
-            'WIDGET', 'saveWidgetData timeout/error for streak_current: $e');
-      }
+      await _saveWithTimeout(_streakCurrentKey, stats.streakCurrent);
+      await _saveWithTimeout(_meditationDatesKey, jsonEncode(meditationDates));
+      await _saveWithTimeout(_freezeDatesKey, jsonEncode(freezeDates));
+      await _saveWithTimeout(_dayLabelKey, 'day');
+      await _saveWithTimeout(_daysLabelKey, 'days');
+      await _saveWithTimeout(_lastUpdatedKey, DateTime.now().millisecondsSinceEpoch);
+      await _saveWithTimeout(_totalTracksCompletedKey, stats.totalTracksCompleted);
+      await _saveWithTimeout(_consistencyScoreKey, consistencyPercentage);
 
-      try {
-        await HomeWidget.saveWidgetData<String>(
-          _meditationDatesKey,
-          jsonEncode(uniqueMeditationDates),
-        ).timeout(const Duration(seconds: 2));
-      } catch (e) {
-        AppLogger.w(
-            'WIDGET', 'saveWidgetData timeout/error for meditation_dates: $e');
-      }
-
-      try {
-        await HomeWidget.saveWidgetData<String>(
-          _freezeDatesKey,
-          jsonEncode(freezeDates),
-        ).timeout(const Duration(seconds: 2));
-      } catch (e) {
-        AppLogger.w(
-            'WIDGET', 'saveWidgetData timeout/error for freeze_dates: $e');
-      }
-
-      try {
-        await HomeWidget.saveWidgetData<String>(
-          _dayLabelKey,
-          'day',
-        ).timeout(const Duration(seconds: 2));
-      } catch (e) {
-        AppLogger.w('WIDGET', 'saveWidgetData timeout/error for day_label: $e');
-      }
-
-      try {
-        await HomeWidget.saveWidgetData<String>(
-          _daysLabelKey,
-          'days',
-        ).timeout(const Duration(seconds: 2));
-      } catch (e) {
-        AppLogger.w(
-            'WIDGET', 'saveWidgetData timeout/error for days_label: $e');
-      }
-
-      try {
-        await HomeWidget.saveWidgetData<int>(
-          _lastUpdatedKey,
-          DateTime.now().millisecondsSinceEpoch,
-        ).timeout(const Duration(seconds: 2));
-      } catch (e) {
-        AppLogger.w(
-            'WIDGET', 'saveWidgetData timeout/error for last_updated: $e');
-      }
-
-      try {
-        await HomeWidget.saveWidgetData<int>(
-          _totalTracksCompletedKey,
-          stats.totalTracksCompleted,
-        ).timeout(const Duration(seconds: 2));
-      } catch (e) {
-        AppLogger.w('WIDGET',
-            'saveWidgetData timeout/error for total_tracks_completed: $e');
-      }
-
-      // Save consistency score as integer percentage (0-100) to avoid type conversion issues
-      final consistencyPercentage =
-          (stats.consistencyScore * 100).round().clamp(0, 100);
-      try {
-        await HomeWidget.saveWidgetData<int>(
-          _consistencyScoreKey,
-          consistencyPercentage,
-        ).timeout(const Duration(seconds: 2));
-      } catch (e) {
-        AppLogger.w(
-            'WIDGET', 'saveWidgetData timeout/error for consistency_score: $e');
-      }
-      // Update both widgets - try home_widget package first, fallback to manual broadcast (Android only)
-      await _updateWidget(_widgetName);
-      await _updateWidget(_consistencyWidgetName);
+      await _triggerWidgetRefresh();
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to update widget (fromStats)', e);
     }
   }
 
-  /// Updates widgets using manual broadcast
-  /// Android only - iOS widgets update automatically via App Groups
+  static List<int> _extractMeditationDates(LocalAllStats stats) {
+    final dates = <int>[];
+    if (stats.audioCompleted != null) {
+      for (final audio in stats.audioCompleted!) {
+        final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+        final dayStart = DateTime(date.year, date.month, date.day);
+        dates.add(dayStart.millisecondsSinceEpoch);
+      }
+    }
+
+    return dates.toSet().toList();
+  }
+
+  static Future<void> _saveWithTimeout<T>(String key, T value) async {
+    try {
+      await HomeWidget.saveWidgetData<T>(key, value).timeout(const Duration(seconds: 2));
+    } catch (e) {
+      AppLogger.w('WIDGET', 'saveWidgetData timeout/error for $key: $e');
+    }
+  }
+
+  static Future<void> _triggerWidgetRefresh() async {
+    if (Platform.isAndroid) {
+      await _sendWidgetUpdateBroadcast();
+    } else if (Platform.isIOS) {
+      await _updateWidgetsIOS();
+    }
+  }
+
+  static Future<void> _updateWidgetsIOS() async {
+    try {
+      await HomeWidget.updateWidget(iOSName: 'StreakWidget');
+      await HomeWidget.updateWidget(iOSName: 'ConsistencyWidget');
+      AppLogger.d('WIDGET', 'iOS widget reload triggered');
+    } catch (e) {
+      AppLogger.e('WIDGET', 'Failed to trigger iOS widget reload', e);
+    }
+  }
+
   static Future<void> _updateWidget(String widgetName) async {
     if (!Platform.isAndroid) {
       return;
@@ -256,8 +162,6 @@ class HomeWidgetService {
     await _sendWidgetUpdateBroadcast();
   }
 
-  /// Manually sends a broadcast to trigger widget update for Glance widgets
-  /// Android only
   static Future<void> _sendWidgetUpdateBroadcast() async {
     if (!Platform.isAndroid) {
       return;
@@ -277,7 +181,6 @@ class HomeWidgetService {
   }
 
   /// Requests to pin a widget to the home screen (Android only)
-  /// widgetType: "meditation" or "consistency"
   static Future<bool> pinWidget({String widgetType = 'consistency'}) async {
     if (!Platform.isAndroid) {
       return false;
@@ -290,9 +193,11 @@ class HomeWidgetService {
         {'widgetType': widgetType},
       );
       AppLogger.d('WIDGET', 'Widget pin request sent for type: $widgetType');
+
       return result ?? false;
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to pin widget', e);
+
       return false;
     }
   }
