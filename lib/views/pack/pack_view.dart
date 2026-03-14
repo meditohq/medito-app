@@ -67,7 +67,7 @@ class _PackViewState extends ConsumerState<PackView>
           onBackPressed: popContext,
         ),
         loading: () => backButton,
-        error: (_, __) => backButton,
+        error: (_, _) => backButton,
       ),
       body: packAsyncValue.when(
         skipLoadingOnRefresh: false,

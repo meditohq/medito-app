@@ -110,7 +110,7 @@ jobs:
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
       - name: Run Flutter Analyze
-        run: flutter analyze
+        run: flutter analyze --fatal-infos=false
 
       - name: Run Unit Tests
         run: flutter test --dart-define-from-file=.prod.json

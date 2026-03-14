@@ -84,8 +84,10 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   freezed: ^3.2.5
   json_serializable: 6.13.0
+  firebase_core_platform_interface: any
   mocktail: ^1.0.4
   mockito: ^5.6.3
+  plugin_platform_interface: any
   pigeon: ^26.2.3
   riverpod_generator: ^4.0.3
   integration_test:

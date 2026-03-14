@@ -19,7 +19,7 @@ class SecureStorage {
     : storage =
           storage ??
           fs.FlutterSecureStorage(
-            aOptions: fs.AndroidOptions(encryptedSharedPreferences: true),
+            aOptions: fs.AndroidOptions(),
             iOptions: fs.IOSOptions(
               accessibility: fs.KeychainAccessibility.first_unlock,
             ),

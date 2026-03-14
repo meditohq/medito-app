@@ -123,7 +123,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.08),
+                        .withValues(alpha: 0.08),
                     width: 1,
                   ),
                 ),

@@ -78,7 +78,7 @@ class NetworkImageWidget extends ConsumerWidget {
         ),
         foregroundDecoration: BoxDecoration(gradient: gradient),
       ),
-      placeholder: (_, __) => _shimmerLoading(),
+      placeholder: (_, _) => _shimmerLoading(),
       errorWidget: (context, url, error) {
         // If scaled image fails, try original
         if (url != originalUrl) {
@@ -93,7 +93,7 @@ class NetworkImageWidget extends ConsumerWidget {
               ),
               foregroundDecoration: BoxDecoration(gradient: gradient),
             ),
-            placeholder: (_, __) => _shimmerLoading(),
+            placeholder: (_, _) => _shimmerLoading(),
             errorWidget: (context, url, error) =>
                 errorWidget ??
                 Image.asset(AssetConstants.placeholder, fit: BoxFit.cover),

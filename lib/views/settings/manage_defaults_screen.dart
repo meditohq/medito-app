@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
-import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
@@ -98,7 +97,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
                                   guideNameAsync.when(
                                     data: (name) => name ?? l10n.notSet,
                                     loading: () => l10n.loading,
-                                    error: (_, __) => l10n.notSet,
+                                    error: (_, _) => l10n.notSet,
                                   ),
                                   style: Theme.of(context)
                                       .textTheme

@@ -118,7 +118,7 @@ class _SwitchTile extends ConsumerWidget {
         value: true,
         onChanged: null,
       ),
-      error: (_, __) => SwitchListTile(
+      error: (_, _) => SwitchListTile(
         title: Text(label),
         value: true,
         onChanged: null,

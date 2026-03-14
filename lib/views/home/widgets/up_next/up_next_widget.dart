@@ -33,7 +33,7 @@ class UpNextWidget extends ConsumerWidget {
 
     return upNextAsync.when(
       loading: () => const _UpNextShimmer(),
-      error: (_, __) => const _UpNextShimmer(),
+      error: (_, _) => const _UpNextShimmer(),
       data: (upNextData) {
         if (upNextData.nextSession == null) {
           return const SizedBox.shrink();

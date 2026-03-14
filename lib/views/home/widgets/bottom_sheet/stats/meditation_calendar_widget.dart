@@ -659,7 +659,7 @@ class _SessionItemWidget extends ConsumerWidget {
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                     ),
-                    error: (_, __) => Text(
+                    error: (_, _) => Text(
                       'Track ${session.id}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontFamily: dmSans,

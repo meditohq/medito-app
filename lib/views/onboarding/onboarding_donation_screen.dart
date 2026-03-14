@@ -23,6 +23,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
       name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
     );
 
+    if (!context.mounted) return;
+
     final didSucceed = await handleDonationNavigation(
       context,
       ref,
