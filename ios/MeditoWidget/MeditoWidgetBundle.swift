@@ -6,5 +6,6 @@ struct MeditoWidgetBundle: WidgetBundle {
     var body: some Widget {
         StreakWidget()
         ConsistencyWidget()
+        UpNextWidget()
     }
 }

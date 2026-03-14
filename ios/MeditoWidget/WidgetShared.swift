@@ -73,6 +73,7 @@ struct WidgetColors {
 struct CalendarStrip: View {
     let allActivityDates: Set<Date>
     let colors: WidgetColors
+    var circleSize: CGFloat = 20
 
     private var last5Days: [Date] {
         let cal = Calendar.current
@@ -84,20 +85,20 @@ struct CalendarStrip: View {
         HStack(spacing: 4) {
             ForEach(last5Days, id: \.self) { day in
                 let active = allActivityDates.contains(day)
-                VStack(spacing: 2) {
+                VStack(spacing: 3) {
                     Text(dayLetter(for: day))
-                        .font(.system(size: 9))
+                        .font(.system(size: circleSize * 0.45))
                         .foregroundStyle(colors.secondaryTextColor)
                     ZStack {
                         Circle()
                             .fill(active ? Color(hex: "917DF0") : colors.inactiveColor)
                         if active {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 8, weight: .bold))
+                                .font(.system(size: circleSize * 0.38, weight: .bold))
                                 .foregroundStyle(.white)
                         }
                     }
-                    .frame(width: 20, height: 20)
+                    .frame(width: circleSize, height: circleSize)
                 }
                 .frame(maxWidth: .infinity)
             }

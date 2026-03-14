@@ -24,6 +24,7 @@ struct ConsistencyProvider: TimelineProvider {
 
 struct ConsistencyWidgetView: View {
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.widgetFamily) var family
     let entry: ConsistencyEntry
 
     private var effectiveDark: Bool {
@@ -35,6 +36,7 @@ struct ConsistencyWidgetView: View {
     }
 
     private var colors: WidgetColors { effectiveDark ? .dark : .light }
+    private var isMedium: Bool { family == .systemMedium }
 
     private var allActivityDates: Set<Date> {
         entry.data.meditationDates.union(entry.data.freezeDates)
@@ -45,20 +47,21 @@ struct ConsistencyWidgetView: View {
     }
 
     var body: some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 4) {
+        VStack(spacing: isMedium ? 12 : 6) {
+            HStack(spacing: 6) {
                 Image(systemName: hasActivityToday ? "flame.fill" : "flame")
                     .foregroundStyle(hasActivityToday ? Color(hex: "917DF0") : colors.inactiveColor)
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.system(size: isMedium ? 26 : 20, weight: .bold))
                 Text("\(entry.data.consistencyScore)")
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.system(size: isMedium ? 32 : 24, weight: .bold))
                     .foregroundStyle(colors.textColor)
                 Text("%")
-                    .font(.system(size: 14))
+                    .font(.system(size: isMedium ? 18 : 14))
                     .foregroundStyle(colors.textColor)
             }
-            CalendarStrip(allActivityDates: allActivityDates, colors: colors)
+            CalendarStrip(allActivityDates: allActivityDates, colors: colors, circleSize: isMedium ? 28 : 20)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .padding(12)
         .widgetBackground(color: colors.backgroundColor)
     }

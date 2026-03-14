@@ -22,6 +22,11 @@ class HomeWidgetService {
   static const String _totalTracksCompletedKey = 'total_tracks_completed';
   static const String _consistencyScoreKey = 'consistency_score';
   static const String _themePreferenceKey = 'theme_preference';
+  static const String _upNextTitleKey = 'up_next_title';
+  static const String _upNextSubtitleKey = 'up_next_subtitle';
+  static const String _upNextPackTitleKey = 'up_next_pack_title';
+  static const String _upNextCompletedKey = 'up_next_completed';
+  static const String _upNextTotalKey = 'up_next_total';
 
   static Future<void> _configure() async {
     if (Platform.isIOS) {
@@ -177,6 +182,35 @@ class HomeWidgetService {
       AppLogger.w('WIDGET', 'Widget update broadcast timeout');
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to send manual widget update broadcast', e);
+    }
+  }
+
+  /// Updates the Up Next widget with the current session info
+  static Future<void> updateUpNextWidget({
+    required String title,
+    required String packTitle,
+    String? subtitle,
+    required int completed,
+    required int total,
+  }) async {
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      return;
+    }
+
+    try {
+      await _configure();
+      await HomeWidget.saveWidgetData<String>(_upNextTitleKey, title);
+      await HomeWidget.saveWidgetData<String>(_upNextPackTitleKey, packTitle);
+      await HomeWidget.saveWidgetData<String>(_upNextSubtitleKey, subtitle ?? '');
+      await HomeWidget.saveWidgetData<int>(_upNextCompletedKey, completed);
+      await HomeWidget.saveWidgetData<int>(_upNextTotalKey, total);
+
+      await _triggerWidgetRefresh();
+      if (Platform.isIOS) {
+        await HomeWidget.updateWidget(iOSName: 'UpNextWidget');
+      }
+    } catch (e) {
+      AppLogger.e('WIDGET', 'Failed to update up next widget', e);
     }
   }
 

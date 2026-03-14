@@ -48,6 +48,7 @@
 		EDFD4D0D2C9359BF0066E874 /* WidgetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */; };
 		EDFD4D0F2C9359BF0066E874 /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */; };
 		EDFD4D112C9359BF0066E874 /* ConsistencyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */; };
+		EDFD4D2B2C9359BF0066E874 /* UpNextWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */; };
 		EDFD4D122C9359BF0066E874 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDFD4D072C9359BF0066E874 /* Assets.xcassets */; };
 		EDFD4D242C9359BF0066E874 /* MeditoWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F7C33FCECFCB2BD7A48BA96A /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
@@ -155,6 +156,7 @@
 		EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetShared.swift; sourceTree = "<group>"; };
 		EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidget.swift; sourceTree = "<group>"; };
 		EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsistencyWidget.swift; sourceTree = "<group>"; };
+		EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpNextWidget.swift; sourceTree = "<group>"; };
 		F5F696C23AC21F365306D45A /* blush@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "blush@3x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -429,6 +431,7 @@
 				EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */,
 				EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */,
 				EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */,
+				EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */,
 				ED8A5BE12CCCE11E0043D20A /* Resources */,
 				ED8A5B812CCCDB480043D20A /* Design */,
 				ED8A5B3B2CCCCB800043D20A /* Modifier */,
@@ -815,6 +818,7 @@
 				EDFD4D0D2C9359BF0066E874 /* WidgetShared.swift in Sources */,
 				EDFD4D0F2C9359BF0066E874 /* StreakWidget.swift in Sources */,
 				EDFD4D112C9359BF0066E874 /* ConsistencyWidget.swift in Sources */,
+				EDFD4D2B2C9359BF0066E874 /* UpNextWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

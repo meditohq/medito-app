@@ -3,6 +3,7 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/repositories.dart';
+import 'package:medito/services/home_widget_service.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -96,12 +97,23 @@ class UpNext extends _$UpNext {
         );
       }
 
-      state = AsyncData(UpNextData(
+      final upNextData = UpNextData(
         pack: updatedPack,
         nextSession: nextSession,
         completedCount: completedCount,
         totalCount: updatedItems.length,
-      ));
+      );
+      state = AsyncData(upNextData);
+
+      if (nextSession != null) {
+        HomeWidgetService.updateUpNextWidget(
+          title: nextSession.title,
+          packTitle: updatedPack.title,
+          subtitle: nextSession.subtitle,
+          completed: completedCount,
+          total: updatedItems.length,
+        ).ignore();
+      }
     } catch (error, stackTrace) {
       state = AsyncError(error, stackTrace);
     }
