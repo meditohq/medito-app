@@ -9,6 +9,7 @@ struct UpNextEntry: TimelineEntry {
     let title: String
     let subtitle: String
     let packTitle: String
+    let trackId: String
     let completed: Int
     let total: Int
     let themePreference: String
@@ -19,6 +20,7 @@ struct UpNextEntry: TimelineEntry {
             title: "Introduction to Mindfulness",
             subtitle: "Breath awareness",
             packTitle: "Basics",
+            trackId: "",
             completed: 2,
             total: 10,
             themePreference: "system"
@@ -46,6 +48,7 @@ struct UpNextProvider: TimelineProvider {
             title: d?.string(forKey: "up_next_title") ?? "",
             subtitle: d?.string(forKey: "up_next_subtitle") ?? "",
             packTitle: d?.string(forKey: "up_next_pack_title") ?? "",
+            trackId: d?.string(forKey: "up_next_track_id") ?? "",
             completed: d?.integer(forKey: "up_next_completed") ?? 0,
             total: d?.integer(forKey: "up_next_total") ?? 0,
             themePreference: d?.string(forKey: "theme_preference") ?? "system"
@@ -92,7 +95,8 @@ private struct UpNextLabel: View {
     }
 }
 
-// MARK: - Small layout
+// MARK: - Small layout (.systemSmall)
+// Play circle centred with title below — uncluttered, mirrors Android TINY.
 
 private struct UpNextSmallView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -107,40 +111,41 @@ private struct UpNextSmallView: View {
     }
 
     private var colors: WidgetColors { isDark ? .dark : .light }
-    private var labelColor: Color { colors.textColor.opacity(0.45) }
-    private var displayTitle: String {
-        entry.title.isEmpty ? "No session up next" : entry.title
-    }
+    private var labelColor: Color { colors.textColor.opacity(0.4) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            UpNextLabel(packTitle: entry.packTitle, labelColor: labelColor)
-
-            Text(displayTitle)
-                .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(colors.textColor)
-                .lineLimit(3)
-                .fixedSize(horizontal: false, vertical: false)
-                .padding(.top, 2)
-
-            Spacer(minLength: 0)
-
-            HStack(alignment: .bottom) {
-                if entry.total > 0 {
-                    Text("\(entry.completed)/\(entry.total)")
-                        .font(.system(size: 10))
-                        .foregroundStyle(colors.secondaryTextColor)
-                }
+        VStack(spacing: 0) {
+            // "UP NEXT" label pinned to top-left
+            HStack {
+                Text("UP NEXT")
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(labelColor)
                 Spacer()
-                PlayCircleView(size: 34)
             }
+
+            Spacer()
+
+            // Play circle + title centred
+            VStack(spacing: 8) {
+                PlayCircleView(size: 44)
+                if !entry.title.isEmpty {
+                    Text(entry.title)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(colors.textColor)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                }
+            }
+
+            Spacer()
         }
         .padding(12)
         .widgetBackground(color: colors.backgroundColor)
     }
 }
 
-// MARK: - Medium layout
+// MARK: - Medium layout (.systemMedium)
+// Two columns: text block on left, play button on right — mirrors Android WIDE.
 
 private struct UpNextMediumView: View {
     @Environment(\.colorScheme) var colorScheme
@@ -155,14 +160,12 @@ private struct UpNextMediumView: View {
     }
 
     private var colors: WidgetColors { isDark ? .dark : .light }
-    private var labelColor: Color { colors.textColor.opacity(0.45) }
-    private var displayTitle: String {
-        entry.title.isEmpty ? "No session up next" : entry.title
-    }
+    private var labelColor: Color { colors.textColor.opacity(0.4) }
+    private var displayTitle: String { entry.title.isEmpty ? "No session up next" : entry.title }
 
     var body: some View {
         HStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 5) {
                 UpNextLabel(packTitle: entry.packTitle, labelColor: labelColor)
 
                 Text(displayTitle)
@@ -170,7 +173,6 @@ private struct UpNextMediumView: View {
                     .foregroundStyle(colors.textColor)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: false)
-                    .padding(.top, 2)
 
                 if !entry.subtitle.isEmpty {
                     Text(entry.subtitle)
@@ -178,20 +180,14 @@ private struct UpNextMediumView: View {
                         .foregroundStyle(colors.secondaryTextColor)
                         .lineLimit(1)
                 }
-
-                if entry.total > 0 {
-                    Text("\(entry.completed) of \(entry.total) sessions")
-                        .font(.system(size: 11))
-                        .foregroundStyle(colors.secondaryTextColor)
-                        .padding(.top, 2)
-                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            PlayCircleView(size: 44)
+            PlayCircleView(size: 48)
         }
-        .frame(maxHeight: .infinity, alignment: .center)
-        .padding(14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
         .widgetBackground(color: colors.backgroundColor)
     }
 }
@@ -202,13 +198,21 @@ struct UpNextWidgetEntryView: View {
     @Environment(\.widgetFamily) var family
     let entry: UpNextEntry
 
+    private var deepLinkURL: URL? {
+        guard !entry.trackId.isEmpty else { return nil }
+        return URL(string: "org.meditofoundation://tracks/\(entry.trackId)")
+    }
+
     var body: some View {
-        switch family {
-        case .systemSmall:
-            UpNextSmallView(entry: entry)
-        default:
-            UpNextMediumView(entry: entry)
+        Group {
+            switch family {
+            case .systemSmall:
+                UpNextSmallView(entry: entry)
+            default:
+                UpNextMediumView(entry: entry)
+            }
         }
+        .widgetURL(deepLinkURL)
     }
 }
 

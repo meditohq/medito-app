@@ -109,6 +109,7 @@ class UpNext extends _$UpNext {
         HomeWidgetService.updateUpNextWidget(
           title: nextSession.title,
           packTitle: updatedPack.title,
+          trackId: nextSession.id,
           subtitle: nextSession.subtitle,
           completed: completedCount,
           total: updatedItems.length,

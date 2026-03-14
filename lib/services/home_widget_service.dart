@@ -27,6 +27,7 @@ class HomeWidgetService {
   static const String _upNextPackTitleKey = 'up_next_pack_title';
   static const String _upNextCompletedKey = 'up_next_completed';
   static const String _upNextTotalKey = 'up_next_total';
+  static const String _upNextTrackIdKey = 'up_next_track_id';
 
   static Future<void> _configure() async {
     if (Platform.isIOS) {
@@ -189,6 +190,7 @@ class HomeWidgetService {
   static Future<void> updateUpNextWidget({
     required String title,
     required String packTitle,
+    required String trackId,
     String? subtitle,
     required int completed,
     required int total,
@@ -202,6 +204,7 @@ class HomeWidgetService {
       await HomeWidget.saveWidgetData<String>(_upNextTitleKey, title);
       await HomeWidget.saveWidgetData<String>(_upNextPackTitleKey, packTitle);
       await HomeWidget.saveWidgetData<String>(_upNextSubtitleKey, subtitle ?? '');
+      await HomeWidget.saveWidgetData<String>(_upNextTrackIdKey, trackId);
       await HomeWidget.saveWidgetData<int>(_upNextCompletedKey, completed);
       await HomeWidget.saveWidgetData<int>(_upNextTotalKey, total);
 
