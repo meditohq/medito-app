@@ -71,7 +71,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
               return displayTypeAsync.when(
                 loading: () => _buildShimmer(),
-                error: (_, __) {
+                error: (_, _) {
                   // Fallback to default behavior on error
                   final displayValue = _controller.getDisplayValue(stats);
                   final progressValue = _controller.getProgressValue(stats);
@@ -137,7 +137,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
             return displayTypeAsync.when(
               loading: () => _buildShimmer(),
-              error: (_, __) {
+              error: (_, _) {
                 // Fallback to default behavior on error
                 final displayValue = _controller.getDisplayValue(stats);
                 final progressValue = _controller.getProgressValue(stats);
@@ -190,7 +190,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
   Widget _buildWithBadge(AsyncValue<bool> hasSeenStreakCircle, Widget child) {
     return hasSeenStreakCircle.when(
       loading: () => child,
-      error: (_, __) => child,
+      error: (_, _) => child,
       data: (seen) {
         if (seen) return child;
 

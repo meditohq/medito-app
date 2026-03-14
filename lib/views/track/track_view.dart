@@ -74,7 +74,7 @@ class _TrackViewState extends ConsumerState<TrackView>
           onBackPressed: popContext,
         ),
         loading: () => backButton,
-        error: (_, __) => backButton,
+        error: (_, _) => backButton,
       ),
       body: SafeArea(
         child: OrientationBuilder(

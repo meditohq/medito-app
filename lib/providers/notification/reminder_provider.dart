@@ -31,7 +31,7 @@ class ReminderProvider {
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await _flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
   }
 
   Future<void> clearBadge() async {
@@ -43,10 +43,10 @@ class ReminderProvider {
           presentBadge: false,
           presentSound: false);
       await _flutterLocalNotificationsPlugin.show(
-        0,
-        null,
-        null,
-        const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
+        id: 0,
+        title: null,
+        body: null,
+        notificationDetails: const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
       );
     }
   }
@@ -54,7 +54,7 @@ class ReminderProvider {
   Future<void> cancelDailyNotification() async {
     await _initFuture;
     try {
-      await _flutterLocalNotificationsPlugin.cancel(dailyNotificationId);
+      await _flutterLocalNotificationsPlugin.cancel(id: dailyNotificationId);
       AppLogger.d('REMINDER',
           'Cancelled daily notification (id: $dailyNotificationId)');
     } catch (e, s) {
@@ -87,22 +87,21 @@ class ReminderProvider {
           AppLogger.d('XXXX',
               'Scheduling reminder ID=${item.id}, scheduledDate=${item.scheduledDate}, payload=$payload, title=${item.title}');
           await _flutterLocalNotificationsPlugin.zonedSchedule(
-            item.id,
-            item.title,
-            item.body,
-            item.scheduledDate,
-            const NotificationDetails(
+            id: item.id,
+            title: item.title,
+            body: item.body,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            scheduledDate: item.scheduledDate,
+            notificationDetails: const NotificationDetails(
               android: AndroidNotificationDetails(
                 androidNotificationChannelId,
                 androidNotificationChannelName,
-                icon: androidNotificationIcon,
                 channelDescription: androidNotificationChannelDescription,
+                icon: androidNotificationIcon,
                 importance: Importance.max,
                 priority: Priority.high,
               ),
             ),
-            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-            payload: payload,
           );
           AppLogger.d('XXXX',
               'Successfully scheduled reminder ID=${item.id} at ${item.scheduledDate}');
@@ -149,7 +148,7 @@ class ReminderProvider {
       var cancelledCount = 0;
       for (var i = 0; i < smartSeriesCount; i++) {
         try {
-          await _flutterLocalNotificationsPlugin.cancel(smartBaseId + i);
+          await _flutterLocalNotificationsPlugin.cancel(id: smartBaseId + i);
           cancelledCount++;
         } catch (e, s) {
           AppLogger.e('REMINDER',
@@ -162,7 +161,7 @@ class ReminderProvider {
         }
       }
       try {
-        await _flutterLocalNotificationsPlugin.cancel(smartBaseId + 15);
+        await _flutterLocalNotificationsPlugin.cancel(id: smartBaseId + 15);
         cancelledCount++;
       } catch (e, s) {
         AppLogger.e('REMINDER',

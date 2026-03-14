@@ -49,7 +49,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                   height: 100,
                   child: Center(child: CircularProgressIndicator()),
                 ),
-                error: (_, __) => AnimatedOpacity(
+                error: (_, _) => AnimatedOpacity(
                   opacity: 1.0,
                   duration: const Duration(milliseconds: 500),
                   child: _buildDonationWidget(context, donationPageModel, isSnoozed: false),
@@ -274,14 +274,14 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
   Future<void> _snoozeDonationAsk(BuildContext context) async {
     try {
       await ref.read(donationSnoozeProvider.notifier).snoozeForDays(30);
-      if (mounted) {
+      if (context.mounted) {
         showSnackBar(
           context,
           AppLocalizations.of(context)!.donationAskHiddenMessage,
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         showSnackBar(
           context,
           AppLocalizations.of(context)!.anErrorOccurred,

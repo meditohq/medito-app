@@ -543,6 +543,5 @@ class MockStatsService implements StatsService {
 
   @override
   void setBackupServiceForTesting(StatsBackupService backupService) {
-    // TODO: implement setBackupServiceForTesting
   }
 }

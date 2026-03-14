@@ -123,7 +123,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
               if (_isCardVisible)
                 hasSeenStreakCircle.when(
                   loading: () => const SizedBox.shrink(),
-                  error: (_, __) => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
                   data: (seen) {
                     if (seen) return const SizedBox.shrink();
                     return AnimatedOpacity(
@@ -305,7 +305,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                     ),
                   ),
                 ),
-                error: (_, __) => const SizedBox.shrink(),
+                error: (_, _) => const SizedBox.shrink(),
                 data: (stats) {
                   if (stats.updated == 0) return const SizedBox.shrink();
                   return MeditationCalendarWidget(stats: stats);
@@ -499,7 +499,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
               height: 16,
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (_, _) => const SizedBox.shrink(),
             data: (displayType) {
               final isStreakSelected =
                   displayType == StreakCircleDisplayType.currentStreak;

@@ -7,6 +7,7 @@ import '../models/track/track_model.dart';
 import '../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../services/report_service.dart';
 import '../utils/duration_extensions.dart';
+import '../utils/logger.dart';
 import '../utils/utils.dart';
 import '../widgets/snackbar_widget.dart';
 
@@ -214,16 +215,17 @@ class ReportDialogWidget extends ConsumerWidget {
         guideName: track.audio.isNotEmpty ? track.audio.first.guideName : null,
       );
 
-      showSnackBar(
-        context,
-        AppLocalizations.of(context)!.reportDialogHelpLink,
-        onActionPressed: () =>
-            launchURLInBrowser('https://medito.support.site/'),
-        actionLabel: AppLocalizations.of(context)!.helpPage,
-      );
+      if (context.mounted) {
+        showSnackBar(
+          context,
+          AppLocalizations.of(context)!.reportDialogHelpLink,
+          onActionPressed: () =>
+              launchURLInBrowser('https://medito.support.site/'),
+          actionLabel: AppLocalizations.of(context)!.helpPage,
+        );
+      }
     } catch (e) {
-      // Handle error silently for better UX
-      debugPrint('Error launching report form: $e');
+      AppLogger.d('REPORT', 'Error launching report form: $e');
     }
   }
 }

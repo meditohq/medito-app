@@ -111,7 +111,7 @@ Future<bool> handleStats(
     // Check if user earned a new streak freeze
     bool isStreakFreezeEnabled = false;
     final context = navigatorKey.currentContext;
-    if (context != null) {
+    if (context != null && context.mounted) {
       try {
         final container = ProviderScope.containerOf(context);
         final featureFlags = container.read(featureFlagsProvider);
@@ -171,12 +171,14 @@ Future<bool> handleStats(
         await scheduler.rescheduleAfterSession(
           endMs: endMs,
           durationMs: durationMs,
-          l10n: context != null ? AppLocalizations.of(context) : null,
+          l10n: context != null && context.mounted
+              ? AppLocalizations.of(context)
+              : null,
         );
         AppLogger.d('STATS', 'Smart Reminder series scheduled');
 
         // Update the reminder time provider state to reflect the new time saved to SharedPreferences
-        if (context != null) {
+        if (context != null && context.mounted) {
           try {
             final container = ProviderScope.containerOf(context);
             container.read(reminderTimeProvider.notifier).refreshFromPrefs();
@@ -357,7 +359,7 @@ Future<void> _checkAndAwardStreakFreeze({
           final context = navigatorKey.currentContext;
           AppLogger.d('STREAK_FREEZE',
               'Navigator context available: ${context != null}');
-          if (context != null) {
+          if (context != null && context.mounted) {
             AppLogger.d('STREAK_FREEZE', 'Showing snackbar...');
             showSnackBar(
                 context, AppLocalizations.of(context)!.streakFreezeEarned);
@@ -540,7 +542,7 @@ Future<bool> addManualSession({
     // Check if user earned a new streak freeze
     bool isStreakFreezeEnabled = false;
     final context = navigatorKey.currentContext;
-    if (context != null) {
+    if (context != null && context.mounted) {
       try {
         final container = ProviderScope.containerOf(context);
         final featureFlags = container.read(featureFlagsProvider);

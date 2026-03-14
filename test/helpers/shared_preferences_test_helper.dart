@@ -15,7 +15,8 @@ class SharedPreferencesTestHelper {
     // Create a mock map to hold the preferences
     final Map<String, Object> preferences = <String, Object>{};
 
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
       switch (methodCall.method) {
         case 'getAll':
           return preferences;

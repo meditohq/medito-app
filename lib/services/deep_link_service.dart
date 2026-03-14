@@ -76,9 +76,11 @@ class DeepLinkService {
       } else if (uri.scheme == 'https' && uri.host == 'medito.app') {
         pathSegments = uri.pathSegments;
       } else {
-        final localizations = AppLocalizations.of(context);
-        if (localizations != null) {
-          showSnackBar(context, localizations.invalidDeepLink);
+        if (context.mounted) {
+          final localizations = AppLocalizations.of(context);
+          if (localizations != null) {
+            showSnackBar(context, localizations.invalidDeepLink);
+          }
         }
         return;
       }
@@ -109,9 +111,11 @@ class DeepLinkService {
       });
     } catch (e) {
       AppLogger.e('DEEPLINK', 'Error handling deep link', e);
-      final localizations = AppLocalizations.of(context);
-      if (localizations != null) {
-        showSnackBar(context, localizations.deepLinkError);
+      if (context.mounted) {
+        final localizations = AppLocalizations.of(context);
+        if (localizations != null) {
+          showSnackBar(context, localizations.deepLinkError);
+        }
       }
     }
   }

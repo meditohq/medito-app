@@ -138,7 +138,7 @@ class FirebaseMessagingHandler {
     );
 
     _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         final payload = response.payload;
         if (payload != null && payload.isNotEmpty) {
@@ -205,17 +205,16 @@ class FirebaseMessagingHandler {
         _channel != null &&
         !kIsWeb) {
       _flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
+        id: notification.hashCode,
+        title: notification.title,
+        body: notification.body,
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             _channel!.id,
             _channel!.name,
             channelDescription: _channel!.description,
-            // Using the app logo for notifications
             icon: 'logo',
-            channelShowBadge: false, // Disable badges for this channel
+            channelShowBadge: false,
           ),
         ),
         payload: json.encode(message.data),
@@ -267,10 +266,10 @@ class FirebaseMessagingHandler {
 
       // This approach ensures the badge is cleared
       await _flutterLocalNotificationsPlugin.show(
-        0,
-        null,
-        null,
-        const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
+        id: 0,
+        title: null,
+        body: null,
+        notificationDetails: const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
       );
     }
   }

@@ -136,7 +136,7 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
                     controller: _scrollController,
                     scrollDirection: Axis.horizontal,
                     itemCount: AppIconOption.values.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    separatorBuilder: (_, _) => const SizedBox(width: 12),
                     itemBuilder: (context, index) {
                       final option = AppIconOption.values[index];
                       final isSelected = _currentIconName == option.iconName;

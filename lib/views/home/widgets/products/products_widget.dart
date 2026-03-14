@@ -319,7 +319,7 @@ class ProductGroupCard extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
+          SizedBox(
             width: cardWidth,
             height: cardWidth,
             child: HomeGradientBorder(

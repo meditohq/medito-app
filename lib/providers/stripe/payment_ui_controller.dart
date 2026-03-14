@@ -51,17 +51,17 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      await _handlePaymentResult(context, result, paywallId, 'onetime', userId,
-          paywallSource, onSuccess);
+      if (context.mounted) {
+        await _handlePaymentResult(context, result, paywallId, 'onetime',
+            userId, paywallSource, onSuccess);
+      }
 
       return result;
     } catch (e) {
-      _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
+      final error = PaymentErrorHandler.handleStripeError(e);
+      if (context.mounted) _showErrorSnackbar(context, error);
 
-      return PaymentResult.failure(
-        errorMessage:
-            PaymentErrorHandler.handleStripeError(e).userFriendlyMessage,
-      );
+      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
     }
   }
 
@@ -90,19 +90,19 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      await _handlePaymentResult(context, result, paywallId, 'monthly', userId,
-          paywallSource, onSuccess);
+      if (context.mounted) {
+        await _handlePaymentResult(context, result, paywallId, 'monthly',
+            userId, paywallSource, onSuccess);
+      }
 
       return result;
     } catch (e, st) {
       AppLogger.e(
           'PAYMENT_UI', 'Error initiating monthly subscription: $e\n$st');
-      _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
+      final error = PaymentErrorHandler.handleStripeError(e);
+      if (context.mounted) _showErrorSnackbar(context, error);
 
-      return PaymentResult.failure(
-        errorMessage:
-            PaymentErrorHandler.handleStripeError(e).userFriendlyMessage,
-      );
+      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
     }
   }
 
@@ -131,17 +131,17 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
       );
 
-      await _handlePaymentResult(context, result, paywallId, 'yearly', userId,
-          paywallSource, onSuccess);
+      if (context.mounted) {
+        await _handlePaymentResult(context, result, paywallId, 'yearly',
+            userId, paywallSource, onSuccess);
+      }
 
       return result;
     } catch (e) {
-      _showErrorSnackbar(context, PaymentErrorHandler.handleStripeError(e));
+      final error = PaymentErrorHandler.handleStripeError(e);
+      if (context.mounted) _showErrorSnackbar(context, error);
 
-      return PaymentResult.failure(
-        errorMessage:
-            PaymentErrorHandler.handleStripeError(e).userFriendlyMessage,
-      );
+      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
     }
   }
 
