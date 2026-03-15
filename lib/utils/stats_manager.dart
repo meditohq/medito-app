@@ -700,7 +700,7 @@ class StatsManager {
               .toList() ??
           [];
 
-      var freezeDates = [
+      var freezeDates = <DateTime>{
         ...stats.freezeUsageDates.map((timestamp) {
           var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
           return DateTime(date.year, date.month, date.day);
@@ -711,7 +711,7 @@ class StatsManager {
           var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
           return DateTime(date.year, date.month, date.day);
         }),
-      ].toSet().toList();
+      }.toList();
 
       // Combine all activity dates
       var allActivityDates = {...audioDates, ...freezeDates}.toList();
@@ -778,7 +778,7 @@ class StatsManager {
         .toList();
 
     // All existing freeze dates: legacy freezeUsageDates + new freeze entries in audioCompleted
-    var existingFreezeDates = [
+    var existingFreezeDates = <DateTime>{
       ..._allStats!.freezeUsageDates.map(
           (ts) => DateTime.fromMillisecondsSinceEpoch(ts)).map(
           (d) => DateTime(d.year, d.month, d.day)),
@@ -786,7 +786,7 @@ class StatsManager {
           .where((a) => isFreezeSession(a))
           .map((a) => DateTime.fromMillisecondsSinceEpoch(a.timestamp))
           .map((d) => DateTime(d.year, d.month, d.day)),
-    ].toSet().toList();
+    }.toList();
 
     // If yesterday already has activity (audio or freeze), there's no gap to fill
     var yesterdayHasActivity = audioDates.any((date) =>
