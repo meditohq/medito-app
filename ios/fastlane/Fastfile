@@ -17,6 +17,14 @@ platform :ios do
   lane :beta do |options|
     setup_keychain()
 
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      is_key_content_base64: false,
+      in_house: false
+    )
+
     paywall_env = options[:paywall_env] || ENV["PAYWALL_ENV"] || "live"
 
     fetch_profiles()
@@ -54,6 +62,14 @@ platform :ios do
 
   lane :release do |options|
     setup_keychain()
+
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      is_key_content_base64: false,
+      in_house: false
+    )
 
     fetch_profiles()
 
