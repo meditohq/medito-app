@@ -186,7 +186,7 @@ jobs:
         run: |
           notes="$RELEASE_NOTES_INPUT"
           if [ -z "$notes" ]; then
-            notes=$(awk '/^Unreleased/{ unrel_seen=1; next } /^[0-9]/{ if (in_v) exit; in_v=1; next } in_v && /^-/{ print }' release_notes.txt)
+            notes=$(awk '/^[0-9]/{in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
@@ -321,24 +321,7 @@ jobs:
         run: |
           notes="$RELEASE_NOTES_INPUT"
           if [ -z "$notes" ]; then
-            notes=$(awk '
-              /^Unreleased/ { unrel_seen = 1; next }
-              /^[0-9]/ {
-                if (!in_v) {
-                  # Start capturing at the first version header after "Unreleased",
-                  # or the first version header in the file if no "Unreleased" exists.
-                  if (unrel_seen || !unrel_seen) {
-                    in_v = 1
-                    next
-                  }
-                } else {
-                  # Reaching another version header ends the current block.
-                  exit
-                }
-              }
-              in_v && /^-/ { print; next }
-              in_v && NF && !/^- / { exit }
-            ' release_notes.txt)
+            notes=$(awk '/^[0-9]/{in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
