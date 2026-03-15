@@ -4,7 +4,7 @@ class ConfigConstants {
 
   // URL constants
   static const String meditoUrl = 'https://meditofoundation.org/';
-  static const String donationFormUrl = 'https://meditofoundation.org/donate';
+  static const String donationFormUrl = 'https://donate.meditofoundation.org';
   static const String donationPortalUrl = 'https://bit.ly/3yFqVbM';
   static const String contactFormBaseUrl = 'https://tally.so/r/wLGBaO';
   static const String dontKillMyAppUrl = 'https://dontkillmyapp.com';

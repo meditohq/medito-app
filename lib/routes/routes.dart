@@ -48,8 +48,8 @@ Future<void> handleNavigation(
     var packId = type.contains('pack3')
         ? ids[2]!
         : type.contains('pack2')
-            ? ids[1]!
-            : ids.first!;
+        ? ids[1]!
+        : ids.first!;
     if (packId == 'favorites') {
       await _pushRoute(const FavoritesView(), ref);
     } else {
@@ -172,7 +172,7 @@ Future<bool?> handleDonationNavigation(
   final useSuperwall = await shouldUseSuperwallForDonation();
 
   if (!useSuperwall) {
-    final uri = Uri.parse('https://meditofoundation.org/donate');
+    final uri = Uri.parse('https://donate.meditofoundation.org');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {

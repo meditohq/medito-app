@@ -1919,7 +1919,7 @@ abstract class AppLocalizations {
   /// No description provided for @donationFormUrl.
   ///
   /// In en, this message translates to:
-  /// **'https://meditofoundation.org/donate'**
+  /// **'https://donate.meditofoundation.org'**
   String get donationFormUrl;
 
   /// No description provided for @payPalDonationUrl.

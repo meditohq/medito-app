@@ -33,7 +33,7 @@ Text(AppLocalizations.of(context)!.welcomeMessage)
 ```dart
 // In config_constants.dart
 static const String apiBaseUrl = 'https://api.medito.app';
-static const String donationFormUrl = 'https://meditofoundation.org/donate';
+static const String donationFormUrl = 'https://donate.meditofoundation.org';
 ```
 
 **❌ Incorrect - UI String in ConfigConstants:**

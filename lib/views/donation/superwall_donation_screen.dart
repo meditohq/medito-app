@@ -56,8 +56,10 @@ class _SuperwallDonationScreenState
   void _addTimeoutFallback() {
     Future.delayed(const Duration(seconds: 10), () {
       if (mounted && _isLoading) {
-        AppLogger.w('SUPERWALL_DONATION_SCREEN',
-            'Paywall loading timeout - falling back to web donation');
+        AppLogger.w(
+          'SUPERWALL_DONATION_SCREEN',
+          'Paywall loading timeout - falling back to web donation',
+        );
         setState(() {
           _isLoading = false;
         });
@@ -87,11 +89,15 @@ class _SuperwallDonationScreenState
 
           if (mounted && !_isProcessingPayment) {
             AppLogger.d(
-                'SUPERWALL_DONATION_SCREEN', 'User dismissed - closing screen');
+              'SUPERWALL_DONATION_SCREEN',
+              'User dismissed - closing screen',
+            );
             Navigator.of(context).pop(false);
           } else if (_isProcessingPayment) {
-            AppLogger.d('SUPERWALL_DONATION_SCREEN',
-                'Payment in progress - keeping screen open for completion');
+            AppLogger.d(
+              'SUPERWALL_DONATION_SCREEN',
+              'Payment in progress - keeping screen open for completion',
+            );
           }
         },
         onError: (error) {
@@ -103,14 +109,18 @@ class _SuperwallDonationScreenState
           }
         },
         onDonationInitiated: (amount, isMonthly) async {
-          AppLogger.d('SUPERWALL_DONATION_SCREEN',
-              'Donation initiated: amount: $amount, isMonthly: $isMonthly');
+          AppLogger.d(
+            'SUPERWALL_DONATION_SCREEN',
+            'Donation initiated: amount: $amount, isMonthly: $isMonthly',
+          );
 
           // Mark that we're processing payment so onPaywallDismissed doesn't close the screen
           _isProcessingPayment = true;
 
           AppLogger.d(
-              'SUPERWALL_DONATION_SCREEN', 'Dismissing Superwall paywall...');
+            'SUPERWALL_DONATION_SCREEN',
+            'Dismissing Superwall paywall...',
+          );
           Superwall.shared.dismiss();
 
           // Trigger native payment sheet instead of just showing snackbar
@@ -121,9 +131,10 @@ class _SuperwallDonationScreenState
       );
     } catch (error) {
       AppLogger.e(
-          'SUPERWALL_DONATION_SCREEN',
-          'Failed to trigger Superwall paywall, falling back to web donation',
-          error);
+        'SUPERWALL_DONATION_SCREEN',
+        'Failed to trigger Superwall paywall, falling back to web donation',
+        error,
+      );
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -141,10 +152,15 @@ class _SuperwallDonationScreenState
 
   /// Process the donation payment using native payment methods
   Future<void> _processDonationPayment(
-      BuildContext context, num amount, bool isMonthly) async {
+    BuildContext context,
+    num amount,
+    bool isMonthly,
+  ) async {
     try {
-      AppLogger.d('SUPERWALL_DONATION_SCREEN',
-          'Processing donation payment: amount=$amount, isMonthly=$isMonthly');
+      AppLogger.d(
+        'SUPERWALL_DONATION_SCREEN',
+        'Processing donation payment: amount=$amount, isMonthly=$isMonthly',
+      );
 
       final uiController = ref.read(paymentUIControllerProvider.notifier);
       final paywallId = _currentPaywallId ?? 'unknown';
@@ -157,8 +173,10 @@ class _SuperwallDonationScreenState
 
       // If user is not logged in, collect email for identification
       if (!isLoggedIn || (userEmail == null || userEmail.isEmpty)) {
-        AppLogger.d('SUPERWALL_DONATION_SCREEN',
-            'User not logged in or no email - collecting email for payment identification');
+        AppLogger.d(
+          'SUPERWALL_DONATION_SCREEN',
+          'User not logged in or no email - collecting email for payment identification',
+        );
 
         userEmail = await _collectEmailForPayment(context);
         if (userEmail == null) {
@@ -174,8 +192,9 @@ class _SuperwallDonationScreenState
       final paymentConfig = await ref.read(paymentConfigProvider.future);
 
       // Get available payment methods
-      final availableMethods =
-          await ref.read(availablePaymentMethodsProvider.future);
+      final availableMethods = await ref.read(
+        availablePaymentMethodsProvider.future,
+      );
 
       if (availableMethods.isEmpty) {
         await _fallbackToWebDonation();
@@ -193,15 +212,19 @@ class _SuperwallDonationScreenState
         }
       }
 
-      AppLogger.d('SUPERWALL_DONATION_SCREEN',
-          'Selected payment method: ${selectedMethod.type}');
+      AppLogger.d(
+        'SUPERWALL_DONATION_SCREEN',
+        'Selected payment method: ${selectedMethod.type}',
+      );
 
       // Amount is already in cents from Superwall
       final amountInCents = amount.toInt();
 
       // Trigger the appropriate payment based on type
-      AppLogger.d('SUPERWALL_DONATION_SCREEN',
-          'Initiating ${isMonthly ? "monthly subscription" : "one-time payment"} for $amountInCents cents (${(amountInCents / 100).toStringAsFixed(2)} ${paymentConfig.pricing.currency})');
+      AppLogger.d(
+        'SUPERWALL_DONATION_SCREEN',
+        'Initiating ${isMonthly ? "monthly subscription" : "one-time payment"} for $amountInCents cents (${(amountInCents / 100).toStringAsFixed(2)} ${paymentConfig.pricing.currency})',
+      );
 
       final result = isMonthly
           ? await uiController.initiateMonthlySubscription(
@@ -229,18 +252,22 @@ class _SuperwallDonationScreenState
 
       switch (result) {
         case PaymentSuccess():
-          AppLogger.d('SUPERWALL_DONATION_SCREEN',
-              'Payment flow completed successfully');
+          AppLogger.d(
+            'SUPERWALL_DONATION_SCREEN',
+            'Payment flow completed successfully',
+          );
 
           if (mounted) {
-            AppLogger.d('SUPERWALL_DONATION_SCREEN',
-                'Closing donation screen after successful payment');
+            AppLogger.d(
+              'SUPERWALL_DONATION_SCREEN',
+              'Closing donation screen after successful payment',
+            );
             Navigator.of(context).pop(true);
           }
         case PaymentFailure(
-            errorMessage: final errorMessage,
-            paymentIntentId: final paymentIntentId,
-          ):
+          errorMessage: final errorMessage,
+          paymentIntentId: final paymentIntentId,
+        ):
           AppLogger.w(
             'SUPERWALL_DONATION_SCREEN',
             'Payment failed: $errorMessage (${paymentIntentId ?? 'unknown'})',
@@ -250,16 +277,21 @@ class _SuperwallDonationScreenState
             Navigator.of(context).pop(false);
           }
         case PaymentCancelled():
-          AppLogger.d('SUPERWALL_DONATION_SCREEN',
-              'Payment cancelled - closing donation screen');
+          AppLogger.d(
+            'SUPERWALL_DONATION_SCREEN',
+            'Payment cancelled - closing donation screen',
+          );
 
           if (mounted) {
             Navigator.of(context).pop(false);
           }
       }
     } catch (error) {
-      AppLogger.e('SUPERWALL_DONATION_SCREEN',
-          'Failed to process donation payment', error);
+      AppLogger.e(
+        'SUPERWALL_DONATION_SCREEN',
+        'Failed to process donation payment',
+        error,
+      );
 
       if (mounted) {
         showSnackBar(
@@ -308,8 +340,9 @@ class _SuperwallDonationScreenState
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(AppLocalizations.of(context)!
-                        .emailForReceiptDescription),
+                    Text(
+                      AppLocalizations.of(context)!.emailForReceiptDescription,
+                    ),
                     const SizedBox(height: 16),
                     AutofillGroup(
                       child: TextField(
@@ -327,18 +360,18 @@ class _SuperwallDonationScreenState
                           labelStyle: TextStyle(
                             color:
                                 Theme.of(context).brightness == Brightness.light
-                                    ? const Color(0xFF6B7280)
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                ? const Color(0xFF6B7280)
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                           ),
                           floatingLabelStyle: TextStyle(
                             color:
                                 Theme.of(context).brightness == Brightness.light
-                                    ? const Color(0xFF6B7280)
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                ? const Color(0xFF6B7280)
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                           ),
                           border: const OutlineInputBorder(),
                           filled: true,
@@ -364,10 +397,11 @@ class _SuperwallDonationScreenState
                         onChanged: (_) => setState(() {}),
                         inputFormatters: [
                           TextInputFormatter.withFunction(
-                              (oldValue, newValue) => TextEditingValue(
-                                    text: newValue.text.toLowerCase(),
-                                    selection: newValue.selection,
-                                  )),
+                            (oldValue, newValue) => TextEditingValue(
+                              text: newValue.text.toLowerCase(),
+                              selection: newValue.selection,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -375,80 +409,86 @@ class _SuperwallDonationScreenState
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: [
-                        '@gmail.com',
-                        '@icloud.com',
-                        '@me.com',
-                        '@outlook.com',
-                        '@yahoo.com',
-                        '@pm.me',
-                        '@hotmail.com',
-                        '@live.com',
-                      ].map((domain) {
-                        return OutlinedButton(
-                          onPressed: () {
-                            keepKeyboardClosed = true;
-                            focusNode.unfocus();
+                      children:
+                          [
+                            '@gmail.com',
+                            '@icloud.com',
+                            '@me.com',
+                            '@outlook.com',
+                            '@yahoo.com',
+                            '@pm.me',
+                            '@hotmail.com',
+                            '@live.com',
+                          ].map((domain) {
+                            return OutlinedButton(
+                              onPressed: () {
+                                keepKeyboardClosed = true;
+                                focusNode.unfocus();
 
-                            final currentText = emailController.text.trim();
-                            String newText;
+                                final currentText = emailController.text.trim();
+                                String newText;
 
-                            if (currentText.isEmpty) {
-                              newText = domain;
-                            } else if (currentText.contains('@')) {
-                              final localPart = currentText.split('@').first;
-                              newText = '$localPart$domain';
-                            } else {
-                              newText = '$currentText$domain';
-                            }
+                                if (currentText.isEmpty) {
+                                  newText = domain;
+                                } else if (currentText.contains('@')) {
+                                  final localPart = currentText
+                                      .split('@')
+                                      .first;
+                                  newText = '$localPart$domain';
+                                } else {
+                                  newText = '$currentText$domain';
+                                }
 
-                            final lowerText = newText.toLowerCase();
-                            emailController.text = lowerText;
-                            emailController.selection =
-                                TextSelection.fromPosition(
-                              TextPosition(offset: lowerText.length),
+                                final lowerText = newText.toLowerCase();
+                                emailController.text = lowerText;
+                                emailController.selection =
+                                    TextSelection.fromPosition(
+                                      TextPosition(offset: lowerText.length),
+                                    );
+                                setState(() {});
+                              },
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.surface,
+                                foregroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface,
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text(
+                                domain,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.copyWith(fontSize: 12),
+                              ),
                             );
-                            setState(() {});
-                          },
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.surface,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onSurface,
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                            domain,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(fontSize: 12),
-                          ),
-                        );
-                      }).toList(),
+                          }).toList(),
                     ),
                   ],
                 ),
                 actions: [
                   TextButton(
                     onPressed: () {
-                      final enteredEmail =
-                          emailController.text.trim().toLowerCase();
+                      final enteredEmail = emailController.text
+                          .trim()
+                          .toLowerCase();
                       if (_isValidEmail(enteredEmail)) {
                         Navigator.of(dialogContext).pop(enteredEmail);
                       } else {
                         ScaffoldMessenger.of(dialogContext).showSnackBar(
                           SnackBar(
                             content: Text(
-                                AppLocalizations.of(context)!.invalidEmail),
+                              AppLocalizations.of(context)!.invalidEmail,
+                            ),
                           ),
                         );
                       }
@@ -479,7 +519,7 @@ class _SuperwallDonationScreenState
   Future<void> _fallbackToWebDonation() async {
     try {
       AppLogger.d('SUPERWALL_DONATION_SCREEN', 'Opening web donation fallback');
-      final uri = Uri.parse('https://meditofoundation.org/donate');
+      final uri = Uri.parse('https://donate.meditofoundation.org');
 
       // Close the screen first
       if (mounted) {
@@ -496,11 +536,16 @@ class _SuperwallDonationScreenState
         // If we can't open the URL, show snackbar on the previous screen
         // Note: context might not be available after pop, so we'll skip the snackbar
         AppLogger.w(
-            'SUPERWALL_DONATION_SCREEN', 'Unable to launch web donation URL');
+          'SUPERWALL_DONATION_SCREEN',
+          'Unable to launch web donation URL',
+        );
       }
     } catch (error) {
       AppLogger.e(
-          'SUPERWALL_DONATION_SCREEN', 'Failed to open web donation', error);
+        'SUPERWALL_DONATION_SCREEN',
+        'Failed to open web donation',
+        error,
+      );
       // Screen is already closed, so we can't show snackbar here
     }
   }
@@ -530,11 +575,10 @@ class _SuperwallDonationScreenState
                 Text(
                   AppLocalizations.of(context)!.thisMayTakeAMoment,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.6),
-                      ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],

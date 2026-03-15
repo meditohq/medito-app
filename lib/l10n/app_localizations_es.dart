@@ -1002,7 +1002,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get donateViaBankTransferText => 'Donar vía Transferencia Bancaria';
 
   @override
-  String get donationFormUrl => 'https://meditofoundation.org/donate';
+  String get donationFormUrl => 'https://donate.meditofoundation.org';
 
   @override
   String get payPalDonationUrl => 'https://paypal.me/meditofoundation';

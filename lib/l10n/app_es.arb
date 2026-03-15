@@ -302,7 +302,7 @@
   "donateViaDonationFormText": "Donar vía Formulario de Donación",
   "donateViaPayPalText": "Donar vía PayPal",
   "donateViaBankTransferText": "Donar vía Transferencia Bancaria",
-  "donationFormUrl": "https://meditofoundation.org/donate",
+  "donationFormUrl": "https://donate.meditofoundation.org",
   "payPalDonationUrl": "https://paypal.me/meditofoundation",
   "bankTransferDetailsUrl": "https://meditofoundation.org/about/bank-details",
   "donationPortalUrl": "https://bit.ly/3yFqVbM",
