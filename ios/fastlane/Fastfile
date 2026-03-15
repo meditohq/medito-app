@@ -19,7 +19,7 @@ platform :ios do
 
     paywall_env = options[:paywall_env] || ENV["PAYWALL_ENV"] || "live"
 
-    widget_bundle_id = fetch_profiles()
+    fetch_profiles()
 
     Dir.chdir("..") do
       sh(
@@ -31,7 +31,7 @@ platform :ios do
       )
     end
 
-    apply_code_signing(widget_bundle_id)
+    apply_code_signing()
 
     build_app(
       workspace: "Runner.xcworkspace",
@@ -40,8 +40,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"],
-          widget_bundle_id => ENV["sigh_#{widget_bundle_id}_appstore_profile-name"]
+          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
@@ -56,7 +55,7 @@ platform :ios do
   lane :release do |options|
     setup_keychain()
 
-    widget_bundle_id = fetch_profiles()
+    fetch_profiles()
 
     Dir.chdir("..") do
       sh(
@@ -68,7 +67,7 @@ platform :ios do
       )
     end
 
-    apply_code_signing(widget_bundle_id)
+    apply_code_signing()
 
     build_app(
       workspace: "Runner.xcworkspace",
@@ -77,8 +76,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"],
-          widget_bundle_id => ENV["sigh_#{widget_bundle_id}_appstore_profile-name"]
+          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"]
         }
       }
     )
@@ -97,44 +95,26 @@ platform :ios do
   end
 end
 
-# Downloads provisioning profiles for the main app and widget extension.
-# Returns the widget bundle ID so callers can reference the widget profile.
 def fetch_profiles
-  widget_bundle_id = "#{ENV["DEVELOPER_APP_IDENTIFIER"]}.widget"
-
   match(
     type: 'appstore',
     readonly: match_readonly?,
-    app_identifier: [ENV["DEVELOPER_APP_IDENTIFIER"], widget_bundle_id],
+    app_identifier: [ENV["DEVELOPER_APP_IDENTIFIER"]],
     git_url: "https://github.com/meditohq/fastlane-certificates.git",
     git_basic_authorization: Base64.strict_encode64("x-access-token:#{ENV['MATCH_GIT_TOKEN']}"),
     keychain_name: ENV["TEMP_KEYCHAIN_USER"],
     keychain_password: ENV["TEMP_KEYCHAIN_PASSWORD"]
   )
-
-  widget_bundle_id
 end
 
-# Applies manual code signing settings to each target separately so that
-# the MeditoWidgetExtension gets its own profile rather than the main app's.
-def apply_code_signing(widget_bundle_id)
-  shared = {
+def apply_code_signing
+  update_code_signing_settings(
     use_automatic_signing: false,
     path: "Runner.xcodeproj",
     team_id: ENV["DEVELOPER_PORTAL_TEAM_ID"],
-    code_sign_identity: "iPhone Distribution"
-  }
-
-  update_code_signing_settings(
-    **shared,
+    code_sign_identity: "iPhone Distribution",
     targets: ["Runner"],
     profile_name: ENV["PROVISIONING_PROFILE_SPECIFIER"]
-  )
-
-  update_code_signing_settings(
-    **shared,
-    targets: ["MeditoWidgetExtension"],
-    profile_name: ENV["sigh_#{widget_bundle_id}_appstore_profile-name"]
   )
 end
 
