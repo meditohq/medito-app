@@ -10,6 +10,7 @@ import 'package:medito/firebase_options.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/root/root_combine_provider.dart';
+import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
@@ -465,6 +466,10 @@ class SplashViewState extends ConsumerState<SplashView>
       final headerService = HeaderService(deviceInfo);
       await headerService.initialise();
       AppLogger.i('SPLASH', 'Header service initialized');
+
+      // Kick off payment config fetch in the background so it is ready before
+      // the donation screen opens. Errors are handled inside the provider.
+      ref.read(paymentConfigProvider.future).ignore();
 
       // Initialize user data (don't fail if network is unavailable)
       try {

@@ -84,90 +84,23 @@ class SuperwallConfig {
       AppLogger.d(
           'SUPERWALL_CONFIG', 'Superwall.configure() returned successfully');
 
-      // Wait for Superwall to be fully configured
-      AppLogger.d('SUPERWALL_CONFIG',
-          'Waiting for Superwall configuration to complete...');
-
-      // Poll configuration status until it's ready
-      var configStatus = ConfigurationStatus.pending;
-      var attempts = 0;
-      const maxAttempts = 5; // Reduced from 60 to 5 seconds for faster offline startup
-      AppLogger.d('SUPERWALL_CONFIG',
-          'Starting configuration polling loop (max $maxAttempts attempts)...');
-
-      while (configStatus == ConfigurationStatus.pending &&
-          attempts < maxAttempts) {
-        await Future.delayed(const Duration(seconds: 1));
-        attempts++;
-        AppLogger.d('SUPERWALL_CONFIG', 'Polling attempt $attempts...');
-
-        try {
-          configStatus = await Superwall.shared.getConfigurationStatus();
-          AppLogger.d('SUPERWALL_CONFIG',
-              'Configuration status: $configStatus (attempt $attempts)');
-
-          // Log additional details for iOS debugging
-          if (Platform.isIOS && configStatus == ConfigurationStatus.pending) {
-            AppLogger.d('SUPERWALL_CONFIG',
-                'iOS: Still pending after $attempts seconds. This may be normal for iOS.');
-          }
-        } catch (e) {
-          AppLogger.d('SUPERWALL_CONFIG',
-              'Still waiting for configuration... (attempt $attempts), error: $e');
-
-          // Log more details for iOS errors
-          if (Platform.isIOS) {
-            AppLogger.d(
-                'SUPERWALL_CONFIG', 'iOS: Configuration error details: $e');
-          }
-        }
-
-        if (attempts >= maxAttempts) {
-          AppLogger.w('SUPERWALL_CONFIG',
-              'Reached maximum polling attempts ($maxAttempts)');
-        }
+      // When using a custom PurchaseController we own the subscription status.
+      // Set it before returning so Superwall never times out waiting for it.
+      try {
+        await Superwall.shared
+            .setSubscriptionStatus(SubscriptionStatus.inactive);
+        AppLogger.d('SUPERWALL_CONFIG', 'Subscription status set to inactive');
+      } catch (e) {
+        AppLogger.e('SUPERWALL_CONFIG',
+            'Failed to set subscription status', e);
       }
 
+      // Mark configured and return immediately. The SDK finishes its own
+      // network handshake in the background; isSuperwallConfigured() handles
+      // any remaining wait at the point we actually need to show a paywall.
+      _isConfigured = true;
       AppLogger.d('SUPERWALL_CONFIG',
-          'Polling loop completed. Final status: $configStatus');
-
-      if (configStatus != ConfigurationStatus.pending) {
-        AppLogger.d('SUPERWALL_CONFIG',
-            'Configuration successful, setting up additional features...');
-
-        // Set subscription status to inactive since we don't have subscriptions
-        try {
-          AppLogger.d(
-              'SUPERWALL_CONFIG', 'Setting subscription status to inactive...');
-          await Superwall.shared
-              .setSubscriptionStatus(SubscriptionStatus.inactive);
-          AppLogger.d('SUPERWALL_CONFIG',
-              'Subscription status set to inactive successfully');
-        } catch (e) {
-          AppLogger.e(
-              'SUPERWALL_CONFIG', 'Failed to set subscription status', e);
-        }
-
-        // Mark as configured first
-        _isConfigured = true;
-
-        // Do not fetch payment config here; it is provided via Riverpod cache
-        AppLogger.d('SUPERWALL_CONFIG',
-            'Skipping payment config fetch; will use cached provider value');
-        AppLogger.d('SUPERWALL_CONFIG',
-            '=== Superwall configuration completed successfully ===');
-      } else {
-        AppLogger.w('SUPERWALL_CONFIG',
-            'Superwall configuration timed out after $maxAttempts attempts');
-        AppLogger.w('SUPERWALL_CONFIG',
-            'Continuing app startup - Superwall will retry configuration in background');
-
-        // Mark as configured anyway to prevent blocking app startup
-        _isConfigured = true;
-
-        // Don't throw exception - let the app continue
-        // Superwall will retry configuration when needed
-      }
+          '=== Superwall configuration completed successfully ===');
 
       return superwall;
     } catch (e, stackTrace) {
