@@ -1,9 +1,9 @@
 ---
-description: Keeping RELEASE_NOTES.md up to date as features are built
+description: Keeping release_notes.txt up to date as features are built
 globs:
 alwaysApply: true
 ---
-When you implement a change, update the `Unreleased` section of `RELEASE_NOTES.txt` if and only if the change is something a user would notice or care about.
+When you implement a change, update the `Unreleased` section of `release_notes.txt` if and only if the change is something a user would notice or care about.
 
 Rules:
 - Write from the user's perspective. Focus on what they can now do or what feels better — not what changed in the code.
