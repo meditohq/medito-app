@@ -101,7 +101,7 @@ class UpNextWidget : GlanceAppWidget() {
                     .apply { setPackage(context.packageName) },
             )
         } else {
-            actionStartActivity<MainActivity>()
+            actionStartActivity(Intent(context, MainActivity::class.java))
         }
 
         Box(
