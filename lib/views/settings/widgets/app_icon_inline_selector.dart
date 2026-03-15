@@ -193,9 +193,14 @@ class _AppIconItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Semantics(
+      label: option.displayName(context),
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
       onTap: onTap,
-      child: SizedBox(
+      child: ExcludeSemantics(
+        child: SizedBox(
         width: 72,
         child: Column(
           mainAxisSize: MainAxisSize.max,
@@ -244,6 +249,8 @@ class _AppIconItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      ),
       ),
     );
   }

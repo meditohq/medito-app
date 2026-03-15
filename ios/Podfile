@@ -64,16 +64,6 @@ post_install do |installer|
       config.build_settings['OTHER_LDFLAGS'] ||= '$(inherited)'
       config.build_settings['OTHER_LDFLAGS'] += ' -framework AppTrackingTransparency'
 
-      # Exclude arm64 for simulator builds (Apple Silicon workaround)
-      # This is needed because some pods (like SuperwallKit, Stripe) don't support arm64 simulator
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-      
-      # Specifically handle pods that don't support arm64 simulator
-      if target.name.include?('SuperwallKit') || target.name.include?('Stripe')
-        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-        config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
-      end
-
       # Finally, force Automatic signing for Pods targets AFTER other settings
       config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
 

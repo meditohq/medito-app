@@ -43,6 +43,7 @@ class JournalEntryViewState extends ConsumerState<JournalEntryView> {
           _isSaving
               ? const Center(child: CircularProgressIndicator())
               : IconButton(
+                  tooltip: AppLocalizations.of(context)!.saveJournalEntry,
                   icon: const Icon(Icons.save),
                   onPressed: _saveJournalEntry,
                 ),

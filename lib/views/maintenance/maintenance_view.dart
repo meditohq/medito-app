@@ -103,6 +103,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
               top: 16,
               right: 16,
               child: IconButton(
+                tooltip: AppLocalizations.of(context)!.close,
                 icon: const Icon(
                   Icons.close,
                   color: Colors.white,

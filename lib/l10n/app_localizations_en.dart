@@ -1816,4 +1816,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sessions => 'sessions';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get pause => 'Pause';
+
+  @override
+  String get skipBackward10Seconds => 'Skip back 10 seconds';
+
+  @override
+  String get skipForward10Seconds => 'Skip forward 10 seconds';
+
+  @override
+  String get repeat => 'Repeat';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get downloadAudio => 'Download audio';
+
+  @override
+  String get deleteDownload => 'Delete download';
+
+  @override
+  String get playbackSpeed => 'Playback speed';
+
+  @override
+  String get reportIssue => 'Report issue';
+
+  @override
+  String get viewStreak => 'View streak';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get upNext => 'Up next';
+
+  @override
+  String get donationInfo => 'Donation info';
+
+  @override
+  String get clearSearch => 'Clear search';
+
+  @override
+  String get saveJournalEntry => 'Save journal entry';
+
+  @override
+  String get clearDefault => 'Clear default guide';
+
+  @override
+  String get lockedContent => 'Locked';
 }

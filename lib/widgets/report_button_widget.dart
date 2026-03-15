@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 
 import '../constants/colors/color_constants.dart';
@@ -21,6 +22,7 @@ class ReportButtonWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       onPressed: () => _showReportDialog(context, ref),
+      tooltip: AppLocalizations.of(context)!.reportIssue,
       icon: MeditoIcon(
         assetName: MeditoIcons.alert,
         color: ColorConstants.white.withValues(alpha: 0.5),

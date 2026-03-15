@@ -497,6 +497,7 @@ class SearchBox extends StatelessWidget {
           ),
         ),
         suffixIcon: IconButton(
+          tooltip: AppLocalizations.of(context)!.clearSearch,
           icon: Icon(
             Icons.clear,
             color: Theme.of(context).colorScheme.onSurface,

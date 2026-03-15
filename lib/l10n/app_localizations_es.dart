@@ -124,7 +124,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get buildNumber => 'buildNumber';
 
   @override
-  String get dismiss => 'Descartar';
+  String get dismiss => 'Cerrar';
 
   @override
   String get debugInfo => 'Información de depuración';
@@ -1843,4 +1843,58 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get sessions => 'sessions';
+
+  @override
+  String get play => 'Reproducir';
+
+  @override
+  String get pause => 'Pausar';
+
+  @override
+  String get skipBackward10Seconds => 'Retroceder 10 segundos';
+
+  @override
+  String get skipForward10Seconds => 'Avanzar 10 segundos';
+
+  @override
+  String get repeat => 'Repetir';
+
+  @override
+  String get close => 'Cerrar';
+
+  @override
+  String get downloadAudio => 'Descargar audio';
+
+  @override
+  String get deleteDownload => 'Eliminar descarga';
+
+  @override
+  String get playbackSpeed => 'Velocidad de reproducción';
+
+  @override
+  String get reportIssue => 'Reportar problema';
+
+  @override
+  String get viewStreak => 'Ver racha';
+
+  @override
+  String get refresh => 'Actualizar';
+
+  @override
+  String get upNext => 'A continuación';
+
+  @override
+  String get donationInfo => 'Información sobre donaciones';
+
+  @override
+  String get clearSearch => 'Borrar búsqueda';
+
+  @override
+  String get saveJournalEntry => 'Guardar entrada del diario';
+
+  @override
+  String get clearDefault => 'Borrar guía predeterminada';
+
+  @override
+  String get lockedContent => 'Bloqueado';
 }

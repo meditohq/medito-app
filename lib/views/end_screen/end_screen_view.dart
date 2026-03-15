@@ -549,6 +549,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   ),
                 ),
                 IconButton(
+                  tooltip: AppLocalizations.of(context)!.dismiss,
                   icon: MeditoIcon(
                     assetName: MeditoIcons.xmark,
                     size: 20,

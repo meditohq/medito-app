@@ -48,7 +48,8 @@ class RowItemWidget extends StatelessWidget {
           : BorderSide.none,
     );
 
-    return InkWell(
+    return MergeSemantics(
+      child: InkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -109,6 +110,7 @@ class RowItemWidget extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 

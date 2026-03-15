@@ -101,6 +101,7 @@ platform :ios do
     upload_to_app_store(
       submit_for_review: false,
       force: true,
+      run_precheck_before_submit: false,
       release_notes: {
         "en-US" => notes,
         "en-GB" => notes,

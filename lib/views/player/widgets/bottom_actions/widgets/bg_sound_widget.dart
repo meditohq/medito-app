@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
@@ -75,6 +76,7 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
             ),
           );
         },
+        tooltip: AppLocalizations.of(context)!.backgroundSounds,
         icon: widget.isBackgroundSoundSelected
             ? _spinningIcon()
             : MeditoIcon(

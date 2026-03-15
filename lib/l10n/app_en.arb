@@ -1119,5 +1119,81 @@
   "sessions": "sessions",
   "@sessions": {
     "description": "Plural form of sessions"
+  },
+  "play": "Play",
+  "@play": {
+    "description": "Accessibility label for the play button in the player"
+  },
+  "pause": "Pause",
+  "@pause": {
+    "description": "Accessibility label for the pause button in the player"
+  },
+  "skipBackward10Seconds": "Skip back 10 seconds",
+  "@skipBackward10Seconds": {
+    "description": "Accessibility label for the skip-back button in the player"
+  },
+  "skipForward10Seconds": "Skip forward 10 seconds",
+  "@skipForward10Seconds": {
+    "description": "Accessibility label for the skip-forward button in the player"
+  },
+  "repeat": "Repeat",
+  "@repeat": {
+    "description": "Accessibility label for the repeat button in the player"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Accessibility label for the close button in the player"
+  },
+  "downloadAudio": "Download audio",
+  "@downloadAudio": {
+    "description": "Accessibility label for the download button in the player"
+  },
+  "deleteDownload": "Delete download",
+  "@deleteDownload": {
+    "description": "Accessibility label for the delete-download button in the player"
+  },
+  "playbackSpeed": "Playback speed",
+  "@playbackSpeed": {
+    "description": "Accessibility label for the playback speed control in the player"
+  },
+  "reportIssue": "Report issue",
+  "@reportIssue": {
+    "description": "Accessibility label for the report button in the player"
+  },
+  "viewStreak": "View streak",
+  "@viewStreak": {
+    "description": "Accessibility label for the streak circle button on the home screen"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Accessibility label for the retry/refresh button"
+  },
+  "upNext": "Up next",
+  "@upNext": {
+    "description": "Accessibility label prefix for the Up Next card on the home screen"
+  },
+  "dismiss": "Dismiss",
+  "@dismiss": {
+    "description": "Accessibility label for dismiss/close buttons"
+  },
+  "donationInfo": "Donation info",
+  "@donationInfo": {
+    "description": "Accessibility label for the donation information button"
+  },
+  "clearSearch": "Clear search",
+  "@clearSearch": {
+    "description": "Accessibility label for the clear search button"
+  },
+  "saveJournalEntry": "Save journal entry",
+  "@saveJournalEntry": {
+    "description": "Accessibility label for the save button in the journal entry screen"
+  },
+  "clearDefault": "Clear default guide",
+  "@clearDefault": {
+    "description": "Accessibility label for the button that clears the saved default guide preference"
+  },
+  "lockedContent": "Locked",
+  "@lockedContent": {
+    "description": "Accessibility label for a locked track item"
   }
 }

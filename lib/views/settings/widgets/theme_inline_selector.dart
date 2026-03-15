@@ -94,9 +94,14 @@ class _ThemeButton extends StatelessWidget {
         : Theme.of(context).colorScheme.onSurface;
 
     return Expanded(
-      child: GestureDetector(
+      child: Semantics(
+        label: label,
+        button: true,
+        selected: isSelected,
+        child: GestureDetector(
         onTap: onTap,
-        child: AnimatedContainer(
+        child: ExcludeSemantics(
+          child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
@@ -132,9 +137,11 @@ class _ThemeButton extends StatelessWidget {
                           isSelected ? FontWeight.w600 : FontWeight.w400,
                     ),
               ),
-            ],
+              ],
           ),
         ),
+      ),
+      ),
       ),
     );
   }
