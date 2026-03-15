@@ -118,3 +118,6 @@ build_and_upload_ios.sh
 
 # Scripts
 ios_credentials.sh
+
+# Claude Code local settings
+.claude/settings.local.json
