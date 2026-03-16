@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/main.dart' show appReadyCompleter;
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
@@ -47,6 +48,19 @@ class DeepLinkService {
     } catch (e) {
       AppLogger.e('DEEPLINK', 'Error checking initial link', e);
     }
+  }
+
+  // Waits until the app has finished auth/init, then navigates.
+  Future<void> _navigateWhenReady(String path, String id) async {
+    try {
+      await appReadyCompleter.future.timeout(const Duration(seconds: 15));
+    } on TimeoutException {
+      AppLogger.w('DEEPLINK', 'App not ready after 15s, deep link dropped');
+      return;
+    }
+
+    if (!context.mounted) return;
+    handleNavigation(path, [id], context, ref: ref);
   }
 
   void dispose() {
@@ -104,11 +118,7 @@ class DeepLinkService {
 
       AppLogger.d('DEEPLINK', 'Navigating to: $path with id: $id');
 
-      Future.delayed(const Duration(seconds: 2), () {
-        if (context.mounted) {
-          handleNavigation(path, [id], context, ref: ref);
-        }
-      });
+      _navigateWhenReady(path, id);
     } catch (e) {
       AppLogger.e('DEEPLINK', 'Error handling deep link', e);
       if (context.mounted) {
