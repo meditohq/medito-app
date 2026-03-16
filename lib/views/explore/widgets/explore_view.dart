@@ -69,7 +69,6 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   void initState() {
     super.initState();
     _logScreenView();
-    AppLogger.d('ExploreView', 'initState');
   }
 
   @override
@@ -121,7 +120,6 @@ class ExploreViewState extends ConsumerState<ExploreView> {
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.d('ExploreView', 'build started');
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -265,7 +263,6 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   }
 
   List<Widget> _buildContentSlivers(WidgetRef ref) {
-    AppLogger.d('ExploreView', '_buildContentSlivers query: $_searchQuery');
     if (_searchQuery.isEmpty) {
       final explorePacksAsync = ref.watch(explorePacksProvider);
       return explorePacksAsync.when(

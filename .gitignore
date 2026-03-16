@@ -121,3 +121,4 @@ ios_credentials.sh
 
 # Claude Code local settings
 .claude/settings.local.json
+.claude/settings.json
