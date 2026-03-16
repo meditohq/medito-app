@@ -3,10 +3,6 @@
 import 'dart:async';
 import 'dart:io';
 
-// Completes when the app has finished auth/init and landed on the main screen.
-// Deep link navigation waits for this before pushing any route.
-final appReadyCompleter = Completer<void>();
-
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +39,10 @@ import 'package:medito/config/debug_options.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+
+// Completes when the app has finished auth/init and landed on the main screen.
+// Deep link navigation waits for this before pushing any route.
+final appReadyCompleter = Completer<void>();
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
