@@ -3,6 +3,10 @@
 import 'dart:async';
 import 'dart:io';
 
+// Completes when the app has finished auth/init and landed on the main screen.
+// Deep link navigation waits for this before pushing any route.
+final appReadyCompleter = Completer<void>();
+
 import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

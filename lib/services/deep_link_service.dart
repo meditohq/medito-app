@@ -52,25 +52,13 @@ class DeepLinkService {
 
   // Waits until the app has finished auth/init, then navigates.
   Future<void> _navigateWhenReady(String path, String id) async {
-    var timedOut = false;
     try {
       await appReadyCompleter.future.timeout(const Duration(seconds: 15));
     } on TimeoutException {
-      timedOut = true;
-      AppLogger.w(
-        'DEEPLINK',
-        'App not reported ready after 15s, proceeding with deep link navigation anyway',
-      );
+      AppLogger.w('DEEPLINK', 'App not ready after 15s, proceeding anyway');
     }
 
     if (!context.mounted) return;
-
-    if (timedOut) {
-      AppLogger.d(
-        'DEEPLINK',
-        'Context is mounted after timeout; performing best-effort deep link navigation',
-      );
-    }
 
     handleNavigation(path, [id], context, ref: ref);
   }
