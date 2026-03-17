@@ -317,6 +317,7 @@ class SplashViewState extends ConsumerState<SplashView>
           _showAccountButtons = true;
           _isLoading = false;
         });
+        if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
       }
     } catch (e, stackTrace) {
       AppLogger.e(
@@ -337,6 +338,8 @@ class SplashViewState extends ConsumerState<SplashView>
         _showAccountButtons = true;
         _isLoading = false;
       });
+
+      if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
 
       showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
 
@@ -379,6 +382,8 @@ class SplashViewState extends ConsumerState<SplashView>
       ref.read(meRefreshProvider)();
 
       if (!mounted) return;
+
+      if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
 
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const OnboardingPagerScreen()),
@@ -447,6 +452,8 @@ class SplashViewState extends ConsumerState<SplashView>
       if (!mounted) return;
 
       showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
+
+      if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
 
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(
