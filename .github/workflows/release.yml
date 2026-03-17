@@ -181,8 +181,10 @@ jobs:
           working-directory: android
 
       - name: Set release notes
+        env:
+          RELEASE_NOTES_INPUT: ${{ inputs.release_notes }}
         run: |
-          notes="${{ inputs.release_notes }}"
+          notes="$RELEASE_NOTES_INPUT"
           if [ -z "$notes" ]; then
             notes=$(awk '/^[0-9]/{in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
@@ -314,8 +316,10 @@ jobs:
         run: gem install fastlane --no-document
 
       - name: Set release notes
+        env:
+          RELEASE_NOTES_INPUT: ${{ inputs.release_notes }}
         run: |
-          notes="${{ inputs.release_notes }}"
+          notes="$RELEASE_NOTES_INPUT"
           if [ -z "$notes" ]; then
             notes=$(awk '/^[0-9]/{in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
