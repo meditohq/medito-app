@@ -317,7 +317,6 @@ class SplashViewState extends ConsumerState<SplashView>
           _showAccountButtons = true;
           _isLoading = false;
         });
-        if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
       }
     } catch (e, stackTrace) {
       AppLogger.e(
@@ -339,9 +338,9 @@ class SplashViewState extends ConsumerState<SplashView>
         _isLoading = false;
       });
 
-      if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
-
       showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
+
+      await Navigator.of(context).push(
 
       await Navigator.of(context).push(
         MaterialPageRoute(
