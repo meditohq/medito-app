@@ -382,8 +382,6 @@ class SplashViewState extends ConsumerState<SplashView>
 
       if (!mounted) return;
 
-      if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
-
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const OnboardingPagerScreen()),
       );
