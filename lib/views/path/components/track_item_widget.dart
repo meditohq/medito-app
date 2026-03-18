@@ -127,7 +127,7 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
         button: !locked,
         enabled: !locked,
         child: GestureDetector(
-        onTap: () => locked ? null : handleItemTap(context, ref),
+        onTap: locked ? null : () => handleItemTap(context, ref),
         onTapDown: locked ? null : (_) => setState(() => _isPressed = true),
         onTapUp: locked ? null : (_) => setState(() => _isPressed = false),
         onTapCancel: locked ? null : () => setState(() => _isPressed = false),
