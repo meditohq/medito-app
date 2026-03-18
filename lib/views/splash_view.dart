@@ -345,6 +345,7 @@ class SplashViewState extends ConsumerState<SplashView>
           builder: (context) => const DownloadsView(isRoot: false),
         ),
       );
+      if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
     }
   }
 
