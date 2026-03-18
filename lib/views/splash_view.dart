@@ -450,8 +450,6 @@ class SplashViewState extends ConsumerState<SplashView>
 
       showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
 
-      if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
-
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const DownloadsView(isRoot: true),
