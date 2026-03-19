@@ -1,4 +1,7 @@
 Unreleased
+-
+
+3.6.0
 - Player buttons (play/pause, skip, repeat, close, and more) now have proper labels for screen readers like TalkBack and VoiceOver
 - iOS homescreen widgets (Streak and Consistency Score)
 - New "Up Next" home screen widget lets you jump straight into your next meditation from your home screen
