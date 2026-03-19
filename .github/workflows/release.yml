@@ -186,7 +186,7 @@ jobs:
         run: |
           notes="$RELEASE_NOTES_INPUT"
           if [ -z "$notes" ]; then
-            notes=$(awk '^[0-9]/{ if (in_v) exit; in_v=1; next } in_v && /^-/{ print }' release_notes.txt)
+            notes=$(awk '/^[0-9]/{in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
