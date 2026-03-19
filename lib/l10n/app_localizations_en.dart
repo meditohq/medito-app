@@ -1406,6 +1406,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appIconDusk => 'Dusk';
 
   @override
+  String get appIconPurple => 'Classic';
+
+  @override
   String get appIconBlush => 'Blush';
 
   @override

@@ -2678,6 +2678,12 @@ abstract class AppLocalizations {
   /// **'Dusk'**
   String get appIconDusk;
 
+  /// Label for the original purple app icon option
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get appIconPurple;
+
   /// Label for the blush pink gradient app icon option
   ///
   /// In en, this message translates to:

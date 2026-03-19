@@ -1,9 +1,11 @@
 import 'package:dynamic_app_icon_flutter_plus/dynamic_app_icon_flutter_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
 enum AppIconOption {
   defaultIcon(null, 'assets/images/app_icons/default.png'),
+  purple('purple', 'assets/images/app_icons/purple.png', androidOnly: true),
   nearblack('nearblack', 'assets/images/app_icons/nearblack.png'),
   pink('pink', 'assets/images/app_icons/pink.png'),
   ocean('ocean', 'assets/images/app_icons/ocean.png'),
@@ -12,14 +14,20 @@ enum AppIconOption {
 
   final String? iconName;
   final String previewAsset;
+  final bool androidOnly;
 
-  const AppIconOption(this.iconName, this.previewAsset);
+  const AppIconOption(this.iconName, this.previewAsset, {this.androidOnly = false});
+
+  static List<AppIconOption> get availableOptions => values
+      .where((o) => !o.androidOnly || defaultTargetPlatform == TargetPlatform.android)
+      .toList();
 
   String displayName(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return switch (this) {
       AppIconOption.defaultIcon => l10n.appIconDusk,
+      AppIconOption.purple => l10n.appIconPurple,
       AppIconOption.nearblack => l10n.appIconNearBlack,
       AppIconOption.pink => l10n.appIconPink,
       AppIconOption.ocean => l10n.appIconOcean,
@@ -91,7 +99,7 @@ class AppIconSelectionDialogState extends State<AppIconSelectionDialog> {
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: AppIconOption.values
+          children: AppIconOption.availableOptions
               .map((option) => _buildIconOption(context, option))
               .toList(),
         ),

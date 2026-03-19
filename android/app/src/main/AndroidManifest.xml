@@ -143,6 +143,19 @@
         </activity-alias>
 
         <activity-alias
+            android:name=".MainActivity.purple"
+            android:targetActivity=".MainActivity"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_purple"
+            android:label="@string/app_name"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
             android:name=".MainActivity.nearblack"
             android:targetActivity=".MainActivity"
             android:exported="true"

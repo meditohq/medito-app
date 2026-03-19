@@ -145,31 +145,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         path: TypeConstants.theme,
       ),
-      SettingsItem(
-        section: AppLocalizations.of(context)!.customizationSection,
-        type: TypeConstants.appIcon,
-        title: AppLocalizations.of(context)!.appIconTitle,
-        icon: Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface,
-              width: 1.5,
+      if (Platform.isAndroid)
+        SettingsItem(
+          section: AppLocalizations.of(context)!.customizationSection,
+          type: TypeConstants.appIcon,
+          title: AppLocalizations.of(context)!.appIconTitle,
+          icon: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface,
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(6),
             ),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          padding: const EdgeInsets.all(3),
-          child: SvgPicture.asset(
-            AssetConstants.icLogo,
-            colorFilter: ColorFilter.mode(
-              Theme.of(context).colorScheme.onSurface,
-              BlendMode.srcIn,
+            padding: const EdgeInsets.all(3),
+            child: SvgPicture.asset(
+              AssetConstants.icLogo,
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.onSurface,
+                BlendMode.srcIn,
+              ),
             ),
           ),
+          path: TypeConstants.appIcon,
         ),
-        path: TypeConstants.appIcon,
-      ),
       SettingsItem(
         section: AppLocalizations.of(context)!.customizationSection,
         type: TypeConstants.route,
