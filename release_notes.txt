@@ -1,4 +1,7 @@
 Unreleased
+-
+
+3.6.0
 - Player buttons (play/pause, skip, repeat, close, and more) now have proper labels for screen readers like TalkBack and VoiceOver
 
 3.5.74
