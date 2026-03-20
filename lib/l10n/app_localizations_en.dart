@@ -790,11 +790,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get packSetAsUpNext =>
-      'This pack will now appear in the Up Next section on the homepage';
+      'This pack will now appear in the Your Path section on the homepage';
 
   @override
   String get packUnpinnedFromUpNext =>
-      'This pack has been removed from the Up Next section';
+      'This pack has been removed from the Your Path section';
 
   @override
   String get smartReminders => 'Smart Reminders';
@@ -1776,7 +1776,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get completedAt => 'Completed at';
 
   @override
-  String get upNextTitle => 'Up Next';
+  String get upNextTitle => 'Your Path';
 
   @override
   String upNextSessionCount(int current, int total) {
@@ -1806,7 +1806,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get defaultsNote =>
-      'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.';
+      'These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.';
 
   @override
   String get streakFreezeUsed => 'Streak freeze used';
@@ -1854,7 +1854,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refresh => 'Refresh';
 
   @override
-  String get upNext => 'Up next';
+  String get upNext => 'Your path';
 
   @override
   String get donationInfo => 'Donation info';
@@ -1870,4 +1870,85 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lockedContent => 'Locked';
+
+  @override
+  String get yourPathExplainerText => 'Your path guides you through meditation from scratch — starting at just 1 min and building gradually.';
+
+  @override
+  String get gotIt => 'Got it';
+
+  @override
+  String get yourPathSwipeHint => 'Swipe the card left any time to skip a session.';
+
+  @override
+  String get onboardingExperienceQuestion => 'Have you meditated before?';
+
+  @override
+  String get onboardingExperienceSubtext => 'This helps us show you the right starting point.';
+
+  @override
+  String get onboardingExperienceNever => 'Never tried it';
+
+  @override
+  String get onboardingExperienceSome => 'A little, here and there';
+
+  @override
+  String get onboardingExperienceRegular => 'I have a regular practice';
+
+  @override
+  String get onboardingIntentQuestion => 'What are you hoping to get from meditation?';
+
+  @override
+  String get onboardingIntentSubtext => 'Pick whichever feels most true right now.';
+
+  @override
+  String get onboardingIntentLearn => 'Learn how to meditate properly';
+
+  @override
+  String get onboardingIntentHabit => 'Build a daily habit';
+
+  @override
+  String get onboardingIntentManage => 'Manage stress, sleep, or emotions';
+
+  @override
+  String get onboardingResultHeadingA => 'Let\'s teach you to meditate';
+
+  @override
+  String get onboardingResultBodyA => 'We\'ll guide you step by step, starting with just 1 minute. No experience needed.';
+
+  @override
+  String get onboardingResultHeadingB => 'Here\'s your starting point';
+
+  @override
+  String get onboardingResultBodyB => 'We\'ll ease you in with short guided sessions that build on each other.';
+
+  @override
+  String get onboardingResultHeadingC => 'Welcome back to your practice';
+
+  @override
+  String get onboardingResultBodyC => 'Since you already have a practice, Your Daily is a great place to keep showing up.';
+
+  @override
+  String get yourPath => 'Your path';
+
+  @override
+  String get onboardingResultSessionTitle => 'Day 1: What is meditation?';
+
+  @override
+  String get onboardingResultSessionSub => 'Starts at 1 min · builds gradually';
+
+  @override
+  String get onboardingResultSwipeHint => 'Swipe this card any time to skip a session';
+
+  @override
+  String get yourDaily => 'Your Daily';
+
+  @override
+  String get yourDailyDescription => 'Prefer something lighter today? Choose from 3, 5, 10, 15 or 20 min sessions.';
+
+  @override
+  String get yourPathSecondaryNote => 'Your path is here whenever you want a deeper journey.';
+
+  @override
+  String get getStarted => 'Get started';
 }

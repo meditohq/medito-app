@@ -245,7 +245,7 @@ class PackViewBottomBar extends ConsumerWidget {
       ref.invalidate(upNextProvider);
       if (context.mounted) showSnackBar(context, l10n.packUnpinnedFromUpNext);
     } else if (!isUpNext) {
-      // Pin: set this pack as up next
+      // Pin: set this pack as Your Path
       await prefs.setString(SharedPreferenceConstants.upNextPackId, packId);
       ref.invalidate(upNextPackIdProvider);
       ref.invalidate(upNextProvider);

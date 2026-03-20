@@ -1565,13 +1565,13 @@ abstract class AppLocalizations {
   /// No description provided for @packSetAsUpNext.
   ///
   /// In en, this message translates to:
-  /// **'This pack will now appear in the Up Next section on the homepage'**
+  /// **'This pack will now appear in the Your Path section on the homepage'**
   String get packSetAsUpNext;
 
   /// No description provided for @packUnpinnedFromUpNext.
   ///
   /// In en, this message translates to:
-  /// **'This pack has been removed from the Up Next section'**
+  /// **'This pack has been removed from the Your Path section'**
   String get packUnpinnedFromUpNext;
 
   /// Label for the smart reminders feature toggle
@@ -3344,10 +3344,10 @@ abstract class AppLocalizations {
   /// **'Completed at'**
   String get completedAt;
 
-  /// Title for the up next section on the home screen
+  /// Title for the Your Path section on the home screen
   ///
   /// In en, this message translates to:
-  /// **'Up Next'**
+  /// **'Your Path'**
   String get upNextTitle;
 
   /// Shows the current session number out of total sessions
@@ -3398,10 +3398,10 @@ abstract class AppLocalizations {
   /// **'Not set'**
   String get notSet;
 
-  /// Note explaining how defaults work in Up Next
+  /// Note explaining how defaults work in Your Path
   ///
   /// In en, this message translates to:
-  /// **'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.'**
+  /// **'These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.'**
   String get defaultsNote;
 
   /// Text shown when a streak freeze was used on a particular day
@@ -3494,10 +3494,10 @@ abstract class AppLocalizations {
   /// **'Refresh'**
   String get refresh;
 
-  /// Accessibility label prefix for the Up Next card on the home screen
+  /// Accessibility label prefix for the Your Path card on the home screen
   ///
   /// In en, this message translates to:
-  /// **'Up next'**
+  /// **'Your path'**
   String get upNext;
 
   /// Accessibility label for the donation information button
@@ -3529,6 +3529,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Locked'**
   String get lockedContent;
+
+  /// Explainer strip text shown below the Your Path card on first use
+  ///
+  /// In en, this message translates to:
+  /// **'Your path guides you through meditation from scratch — starting at just 1 min and building gradually.'**
+  String get yourPathExplainerText;
+
+  /// Button text to dismiss the Your Path explainer strip
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get gotIt;
+
+  /// Second stage text in the Your Path explainer strip
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe the card left any time to skip a session.'**
+  String get yourPathSwipeHint;
+
+  /// First onboarding question about meditation experience
+  ///
+  /// In en, this message translates to:
+  /// **'Have you meditated before?'**
+  String get onboardingExperienceQuestion;
+
+  /// Subtext for the first onboarding question
+  ///
+  /// In en, this message translates to:
+  /// **'This helps us show you the right starting point.'**
+  String get onboardingExperienceSubtext;
+
+  /// Option for users who have never meditated
+  ///
+  /// In en, this message translates to:
+  /// **'Never tried it'**
+  String get onboardingExperienceNever;
+
+  /// Option for users with some meditation experience
+  ///
+  /// In en, this message translates to:
+  /// **'A little, here and there'**
+  String get onboardingExperienceSome;
+
+  /// Option for users with a regular meditation practice
+  ///
+  /// In en, this message translates to:
+  /// **'I have a regular practice'**
+  String get onboardingExperienceRegular;
+
+  /// Second onboarding question about meditation intent
+  ///
+  /// In en, this message translates to:
+  /// **'What are you hoping to get from meditation?'**
+  String get onboardingIntentQuestion;
+
+  /// Subtext for the second onboarding question
+  ///
+  /// In en, this message translates to:
+  /// **'Pick whichever feels most true right now.'**
+  String get onboardingIntentSubtext;
+
+  /// Intent option: learn meditation
+  ///
+  /// In en, this message translates to:
+  /// **'Learn how to meditate properly'**
+  String get onboardingIntentLearn;
+
+  /// Intent option: build a habit
+  ///
+  /// In en, this message translates to:
+  /// **'Build a daily habit'**
+  String get onboardingIntentHabit;
+
+  /// Intent option: manage stress/sleep/emotions
+  ///
+  /// In en, this message translates to:
+  /// **'Manage stress, sleep, or emotions'**
+  String get onboardingIntentManage;
+
+  /// Result heading for beginners or those wanting to learn
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s teach you to meditate'**
+  String get onboardingResultHeadingA;
+
+  /// Result body for beginners or those wanting to learn
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll guide you step by step, starting with just 1 minute. No experience needed.'**
+  String get onboardingResultBodyA;
+
+  /// Result heading for users with some experience
+  ///
+  /// In en, this message translates to:
+  /// **'Here\'s your starting point'**
+  String get onboardingResultHeadingB;
+
+  /// Result body for users with some experience
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll ease you in with short guided sessions that build on each other.'**
+  String get onboardingResultBodyB;
+
+  /// Result heading for experienced meditators
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back to your practice'**
+  String get onboardingResultHeadingC;
+
+  /// Result body for experienced meditators
+  ///
+  /// In en, this message translates to:
+  /// **'Since you already have a practice, Your Daily is a great place to keep showing up.'**
+  String get onboardingResultBodyC;
+
+  /// Label for the Your Path card in onboarding result
+  ///
+  /// In en, this message translates to:
+  /// **'Your path'**
+  String get yourPath;
+
+  /// Preview session title shown on the onboarding result screen
+  ///
+  /// In en, this message translates to:
+  /// **'Day 1: What is meditation?'**
+  String get onboardingResultSessionTitle;
+
+  /// Preview session subtitle shown on the onboarding result screen
+  ///
+  /// In en, this message translates to:
+  /// **'Starts at 1 min · builds gradually'**
+  String get onboardingResultSessionSub;
+
+  /// Hint text on the onboarding result screen about swiping
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe this card any time to skip a session'**
+  String get onboardingResultSwipeHint;
+
+  /// Label for the Your Daily card
+  ///
+  /// In en, this message translates to:
+  /// **'Your Daily'**
+  String get yourDaily;
+
+  /// Description for the Your Daily card on the onboarding result screen
+  ///
+  /// In en, this message translates to:
+  /// **'Prefer something lighter today? Choose from 3, 5, 10, 15 or 20 min sessions.'**
+  String get yourDailyDescription;
+
+  /// Secondary note for experienced meditators about Your Path
+  ///
+  /// In en, this message translates to:
+  /// **'Your path is here whenever you want a deeper journey.'**
+  String get yourPathSecondaryNote;
+
+  /// CTA button text on the onboarding result screen
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get getStarted;
 }
 
 class _AppLocalizationsDelegate

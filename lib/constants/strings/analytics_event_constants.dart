@@ -183,6 +183,26 @@ class AnalyticsEventConstants {
   /// Paywall source identifier for announcement
   static const String paywallSourceAnnouncement = 'announcement';
 
+  // Meditation onboarding events
+  /// Event logged when the meditation onboarding flow starts
+  static const String meditationOnboardingStarted = 'meditation_onboarding_started';
+
+  /// Event logged when a question is answered in the meditation onboarding
+  static const String meditationOnboardingAnswer = 'meditation_onboarding_answer';
+
+  /// Event logged when the meditation onboarding flow is completed
+  static const String meditationOnboardingCompleted = 'meditation_onboarding_completed';
+
+  /// Event logged when the meditation onboarding flow is abandoned
+  static const String meditationOnboardingAbandoned = 'meditation_onboarding_abandoned';
+
+  // Your Path explainer strip events
+  /// Event logged when the Your Path explainer strip is shown
+  static const String yourPathExplainerShown = 'your_path_explainer_shown';
+
+  /// Event logged when the Your Path explainer strip is dismissed
+  static const String yourPathExplainerDismissed = 'your_path_explainer_dismissed';
+
   // Analytics parameter names
   /// Parameter name for donation/payment amount
   static const String paramAmount = 'amount';

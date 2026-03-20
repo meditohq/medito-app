@@ -186,7 +186,7 @@ class HomeWidgetService {
     }
   }
 
-  /// Updates the Up Next widget with the current session info
+  /// Updates the Your Path widget with the current session info
   static Future<void> updateUpNextWidget({
     required String title,
     required String packTitle,
@@ -213,7 +213,7 @@ class HomeWidgetService {
         await HomeWidget.updateWidget(iOSName: 'UpNextWidget');
       }
     } catch (e) {
-      AppLogger.e('WIDGET', 'Failed to update up next widget', e);
+      AppLogger.e('WIDGET', 'Failed to update Your Path widget', e);
     }
   }
 

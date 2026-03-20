@@ -247,8 +247,8 @@
   "enableNotificationsCta": "Enable Notifications",
   "skipForNow": "Skip for Now",
   "skip": "Skip",
-  "packSetAsUpNext": "This pack will now appear in the Up Next section on the homepage",
-  "packUnpinnedFromUpNext": "This pack has been removed from the Up Next section",
+  "packSetAsUpNext": "This pack will now appear in the Your Path section on the homepage",
+  "packUnpinnedFromUpNext": "This pack has been removed from the Your Path section",
   "smartReminders": "Smart Reminders",
   "turnOnSmartReminders": "Turn on Smart Reminders",
   "smartRemindersOn": "Smart Reminders On",
@@ -1058,9 +1058,9 @@
   "@completedAt": {
     "description": "Label prefix for meditation completion time"
   },
-  "upNextTitle": "Up Next",
+  "upNextTitle": "Your Path",
   "@upNextTitle": {
-    "description": "Title for the up next section on the home screen"
+    "description": "Title for the Your Path section on the home screen"
   },
   "upNextSessionCount": "Session {current} of {total}",
   "@upNextSessionCount": {
@@ -1104,9 +1104,9 @@
   "@notSet": {
     "description": "Text shown when a default value is not set"
   },
-  "defaultsNote": "These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.",
+  "defaultsNote": "These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.",
   "@defaultsNote": {
-    "description": "Note explaining how defaults work in Up Next"
+    "description": "Note explaining how defaults work in Your Path"
   },
   "streakFreezeUsed": "Streak freeze used",
   "@streakFreezeUsed": {
@@ -1168,9 +1168,9 @@
   "@refresh": {
     "description": "Accessibility label for the retry/refresh button"
   },
-  "upNext": "Up next",
+  "upNext": "Your path",
   "@upNext": {
-    "description": "Accessibility label prefix for the Up Next card on the home screen"
+    "description": "Accessibility label prefix for the Your Path card on the home screen"
   },
   "dismiss": "Dismiss",
   "@dismiss": {
@@ -1195,5 +1195,113 @@
   "lockedContent": "Locked",
   "@lockedContent": {
     "description": "Accessibility label for a locked track item"
+  },
+  "yourPathExplainerText": "Your path guides you through meditation from scratch — starting at just 1 min and building gradually.",
+  "@yourPathExplainerText": {
+    "description": "Explainer strip text shown below the Your Path card on first use"
+  },
+  "gotIt": "Got it",
+  "@gotIt": {
+    "description": "Button text to dismiss the Your Path explainer strip"
+  },
+  "yourPathSwipeHint": "Swipe the card left any time to skip a session.",
+  "@yourPathSwipeHint": {
+    "description": "Second stage text in the Your Path explainer strip"
+  },
+  "onboardingExperienceQuestion": "Have you meditated before?",
+  "@onboardingExperienceQuestion": {
+    "description": "First onboarding question about meditation experience"
+  },
+  "onboardingExperienceSubtext": "This helps us show you the right starting point.",
+  "@onboardingExperienceSubtext": {
+    "description": "Subtext for the first onboarding question"
+  },
+  "onboardingExperienceNever": "Never tried it",
+  "@onboardingExperienceNever": {
+    "description": "Option for users who have never meditated"
+  },
+  "onboardingExperienceSome": "A little, here and there",
+  "@onboardingExperienceSome": {
+    "description": "Option for users with some meditation experience"
+  },
+  "onboardingExperienceRegular": "I have a regular practice",
+  "@onboardingExperienceRegular": {
+    "description": "Option for users with a regular meditation practice"
+  },
+  "onboardingIntentQuestion": "What are you hoping to get from meditation?",
+  "@onboardingIntentQuestion": {
+    "description": "Second onboarding question about meditation intent"
+  },
+  "onboardingIntentSubtext": "Pick whichever feels most true right now.",
+  "@onboardingIntentSubtext": {
+    "description": "Subtext for the second onboarding question"
+  },
+  "onboardingIntentLearn": "Learn how to meditate properly",
+  "@onboardingIntentLearn": {
+    "description": "Intent option: learn meditation"
+  },
+  "onboardingIntentHabit": "Build a daily habit",
+  "@onboardingIntentHabit": {
+    "description": "Intent option: build a habit"
+  },
+  "onboardingIntentManage": "Manage stress, sleep, or emotions",
+  "@onboardingIntentManage": {
+    "description": "Intent option: manage stress/sleep/emotions"
+  },
+  "onboardingResultHeadingA": "Let's teach you to meditate",
+  "@onboardingResultHeadingA": {
+    "description": "Result heading for beginners or those wanting to learn"
+  },
+  "onboardingResultBodyA": "We'll guide you step by step, starting with just 1 minute. No experience needed.",
+  "@onboardingResultBodyA": {
+    "description": "Result body for beginners or those wanting to learn"
+  },
+  "onboardingResultHeadingB": "Here's your starting point",
+  "@onboardingResultHeadingB": {
+    "description": "Result heading for users with some experience"
+  },
+  "onboardingResultBodyB": "We'll ease you in with short guided sessions that build on each other.",
+  "@onboardingResultBodyB": {
+    "description": "Result body for users with some experience"
+  },
+  "onboardingResultHeadingC": "Welcome back to your practice",
+  "@onboardingResultHeadingC": {
+    "description": "Result heading for experienced meditators"
+  },
+  "onboardingResultBodyC": "Since you already have a practice, Your Daily is a great place to keep showing up.",
+  "@onboardingResultBodyC": {
+    "description": "Result body for experienced meditators"
+  },
+  "yourPath": "Your path",
+  "@yourPath": {
+    "description": "Label for the Your Path card in onboarding result"
+  },
+  "onboardingResultSessionTitle": "Day 1: What is meditation?",
+  "@onboardingResultSessionTitle": {
+    "description": "Preview session title shown on the onboarding result screen"
+  },
+  "onboardingResultSessionSub": "Starts at 1 min · builds gradually",
+  "@onboardingResultSessionSub": {
+    "description": "Preview session subtitle shown on the onboarding result screen"
+  },
+  "onboardingResultSwipeHint": "Swipe this card any time to skip a session",
+  "@onboardingResultSwipeHint": {
+    "description": "Hint text on the onboarding result screen about swiping"
+  },
+  "yourDaily": "Your Daily",
+  "@yourDaily": {
+    "description": "Label for the Your Daily card"
+  },
+  "yourDailyDescription": "Prefer something lighter today? Choose from 3, 5, 10, 15 or 20 min sessions.",
+  "@yourDailyDescription": {
+    "description": "Description for the Your Daily card on the onboarding result screen"
+  },
+  "yourPathSecondaryNote": "Your path is here whenever you want a deeper journey.",
+  "@yourPathSecondaryNote": {
+    "description": "Secondary note for experienced meditators about Your Path"
+  },
+  "getStarted": "Get started",
+  "@getStarted": {
+    "description": "CTA button text on the onboarding result screen"
   }
 }

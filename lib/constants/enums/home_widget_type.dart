@@ -4,7 +4,7 @@ enum HomeWidgetType {
   carousel, // For the featured content carousel
   products, // For the shop to support section
   quote, // For the daily quote
-  upNext; // For the up next basics pack widget
+  upNext; // For the Your Path basics pack widget
 
   // Helper method to convert string to enum value
   static HomeWidgetType fromString(String value) {

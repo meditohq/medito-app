@@ -76,7 +76,7 @@ void main() {
             SharedPreferenceConstants.blackFridayDismissed, true);
 
         final order = container.read(homeWidgetOrderProvider);
-        // When not Black Friday (current date), should return custom order with upNext prepended
+        // When not Black Friday (current date), should return custom order with Your Path prepended
         expect(order, [
           HomeWidgetType.upNext,
           ...customOrder,
@@ -100,7 +100,7 @@ void main() {
             SharedPreferenceConstants.blackFridayDismissed, true);
 
         final order = container.read(homeWidgetOrderProvider);
-        // Should return custom order when dismissed, even during Black Friday, with upNext prepended
+        // Should return custom order when dismissed, even during Black Friday, with Your Path prepended
         expect(order, [
           HomeWidgetType.upNext,
           ...customOrder,
@@ -202,7 +202,7 @@ void main() {
         );
 
         final order = container.read(homeWidgetOrderProvider);
-        // Should return order with upNext prepended when shortcuts missing
+        // Should return order with Your Path prepended when shortcuts missing
         expect(order, [
           HomeWidgetType.upNext,
           ...customOrder,
@@ -221,7 +221,7 @@ void main() {
         );
 
         final order = container.read(homeWidgetOrderProvider);
-        // Should return order with upNext prepended when products missing
+        // Should return order with Your Path prepended when products missing
         expect(order, [
           HomeWidgetType.upNext,
           ...customOrder,

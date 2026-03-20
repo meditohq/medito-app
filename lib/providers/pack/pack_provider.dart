@@ -81,7 +81,7 @@ class Pack extends _$Pack {
     }
     if (!ref.mounted) return;
 
-    // Refresh upNextProvider to update the Up Next widget
+    // Refresh upNextProvider to update the Your Path widget
     try {
       await ref.read(upNextProvider.notifier).refresh();
     } catch (_) {

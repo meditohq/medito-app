@@ -7,6 +7,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/services/superwall_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/all_set_screen.dart';
+import 'package:medito/views/onboarding/meditation_onboarding_screen.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/views/onboarding/tracking_permission_screen.dart';
@@ -23,6 +24,7 @@ class OnboardingPagerScreen extends ConsumerStatefulWidget {
 class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
+  bool _showMeditationOnboarding = true;
 
   List<Widget> _pages = [];
   final List<String> _images = [
@@ -87,8 +89,18 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     );
   }
 
+  void _onMeditationOnboardingComplete() {
+    setState(() => _showMeditationOnboarding = false);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_showMeditationOnboarding) {
+      return MeditationOnboardingScreen(
+        onComplete: _onMeditationOnboardingComplete,
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
