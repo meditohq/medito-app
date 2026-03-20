@@ -37,16 +37,12 @@ import 'package:medito/services/deep_link_service.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
 import 'scaffold_messenger_key.dart';
+import 'app_globals.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
-// Completes when the app has finished auth/init and landed on the main screen.
-// Deep link navigation waits for this before pushing any route.
-// This is non-final so it can be reset after a force logout.
-var appReadyCompleter = Completer<void>();
 
-var audioStateNotifier = AudioStateNotifier();
 bool _hasInitialized = false;
 
 Future<void> _configureStripe() async {

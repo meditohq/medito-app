@@ -18,7 +18,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:medito/main.dart' show appReadyCompleter;
+import 'package:medito/app_globals.dart' show appReadyCompleter;
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';

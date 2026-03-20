@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/main.dart' show appReadyCompleter;
+import 'package:medito/app_globals.dart' show appReadyCompleter;
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/snackbar_widget.dart';

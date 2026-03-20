@@ -1,4 +1,3 @@
-import 'package:medito/main.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
@@ -103,6 +102,8 @@ class AudioStateNotifier extends Notifier<PlaybackState> {
     );
   }
 }
+
+var audioStateNotifier = AudioStateNotifier();
 
 final audioStateProvider =
     NotifierProvider<AudioStateNotifier, PlaybackState>(() {
