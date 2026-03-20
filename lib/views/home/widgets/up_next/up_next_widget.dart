@@ -14,11 +14,12 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
-import 'package:medito/providers/player/player_provider.dart';
-import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/player/player_view.dart';
+import 'dart:async';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/providers/providers.dart';
 import '../home_gradient_border.dart';
 
 const _kCardBorderRadius = 24.0;
@@ -80,106 +81,114 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
             await _onSkip(context);
             return false;
           },
-            child: Semantics(
-              label: '${l10n.upNext}: ${widget.data.pack.title} – ${nextSession.title}',
-              button: true,
-              customSemanticsActions: {
-                CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
-              },
-              child: GestureDetector(
+          child: Semantics(
+            label:
+                '${l10n.upNext}: ${widget.data.pack.title} – ${nextSession.title}',
+            button: true,
+            customSemanticsActions: {
+              CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
+            },
+            child: GestureDetector(
               onTap: () => _onTap(context),
               child: Container(
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(_kCardBorderRadius),
-                border: Border.all(
-                  color: Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
-                  width: 0.5,
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(_kCardBorderRadius),
+                  border: Border.all(
+                    color:
+                        Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
+                    width: 0.5,
+                  ),
                 ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(_kCardBorderRadius),
-                child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(padding16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(_kCardBorderRadius),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(padding16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'UP NEXT',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      fontFamily: teachers,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 1.2,
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.6),
-                                    ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'UP NEXT',
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              fontFamily: teachers,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: 1.2,
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.6),
+                                            ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        widget.data.pack.title,
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              fontFamily: teachers,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: 1.2,
+                                              color: theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.6),
+                                            ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    widget.data.pack.title,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      fontFamily: teachers,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 1.2,
-                                      color: theme.colorScheme.onSurface
-                                          .withValues(alpha: 0.6),
-                                    ),
+                                    nextSession.title,
+                                    style: theme.textTheme.headlineSmall
+                                        ?.copyWith(
+                                          fontFamily: sourceSerif,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w500,
+                                          height: 1.2,
+                                          color: onSurface,
+                                        ),
                                   ),
+                                  if (nextSession.subtitle != null) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      nextSession.subtitle!,
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            fontFamily: teachers,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                            color: onSurface.withValues(
+                                              alpha: 0.6,
+                                            ),
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ],
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                nextSession.title,
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  fontFamily: sourceSerif,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500,
-                                  height: 1.2,
-                                  color: onSurface,
-                                ),
-                              ),
-                              if (nextSession.subtitle != null) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  nextSession.subtitle!,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontFamily: teachers,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: onSurface.withValues(alpha: 0.6),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: padding16),
+                            _PlayButton(onTap: () => _onTap(context)),
+                          ],
                         ),
-                        const SizedBox(width: padding16),
-                        _PlayButton(onTap: () => _onTap(context)),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
         ),
       ),
-    ),
-    ),
     );
   }
 
@@ -219,6 +228,18 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     final nextSession = widget.data.nextSession;
     if (nextSession == null) return;
 
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.upNextSkipped,
+            parameters: {
+              AnalyticsEventConstants.paramSessionId: nextSession.id,
+              AnalyticsEventConstants.paramPackId: widget.data.pack.id,
+            },
+          ),
+    );
+
     final statsManager = StatsManager();
     await statsManager.initialize();
     await statsManager.addTrackChecked(nextSession.id);
@@ -235,6 +256,18 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
   Future<void> _onTap(BuildContext context) async {
     final nextSession = widget.data.nextSession;
     if (nextSession == null) return;
+
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.upNextTapped,
+            parameters: {
+              AnalyticsEventConstants.paramSessionId: nextSession.id,
+              AnalyticsEventConstants.paramPackId: widget.data.pack.id,
+            },
+          ),
+    );
 
     final guideNameAsync = ref.read(guideNamePreferenceProvider);
     final preferredDuration = ref.read(durationPreferenceProvider);
