@@ -7,7 +7,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 
-import '../../../../widgets/medito_huge_icon.dart';
+import '../../../../widgets/medito_icon.dart';
 import '../home_gradient_border.dart';
 
 class ShortcutsItemsWidget extends ConsumerWidget {
@@ -105,7 +105,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
               _kItemBorderRadius - _kItemBorderWidth,
             ),
             child: Center(
-              child: MeditoHugeIcon(
+              child: MeditoRemoteIcon(
                 icon: e.icon ?? '',
                 size: iconSize,
                 color: iconColor,

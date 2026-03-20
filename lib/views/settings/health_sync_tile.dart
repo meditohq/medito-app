@@ -7,7 +7,7 @@ import 'package:medito/constants/icons/medito_icons.dart';
 import '../../widgets/snackbar_widget.dart';
 import '../../l10n/app_localizations.dart';
 import '../home/widgets/bottom_sheet/row_item_widget.dart';
-import '../../widgets/medito_huge_icon.dart';
+import '../../widgets/medito_icon.dart';
 
 class HealthSyncTile extends StatelessWidget {
   const HealthSyncTile({super.key, this.hasUnderline = true});

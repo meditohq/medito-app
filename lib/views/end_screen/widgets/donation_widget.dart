@@ -5,7 +5,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../services/analytics/firebase_analytics_service.dart';
-import '../../../widgets/medito_huge_icon.dart';
+import '../../../widgets/medito_icon.dart';
 import '../../../widgets/snackbar_widget.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';

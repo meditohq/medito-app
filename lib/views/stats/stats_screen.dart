@@ -8,7 +8,7 @@ import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
@@ -332,7 +332,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
     bool hasUnderline = true,
   }) {
     return RowItemWidget(
-      icon: MeditoHugeIcon(icon: title),
+      icon: MeditoRemoteIcon(icon: title),
       iconColor: Theme.of(context).colorScheme.onSurface,
       trailingIconSize: 20,
       title: value,

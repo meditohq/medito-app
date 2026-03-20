@@ -10,7 +10,7 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/track/track_view.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'manual_session_dialog.dart';

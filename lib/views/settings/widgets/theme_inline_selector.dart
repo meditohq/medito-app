@@ -4,7 +4,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/theme_provider.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 
 class ThemeInlineSelector extends ConsumerWidget {
   const ThemeInlineSelector({super.key});

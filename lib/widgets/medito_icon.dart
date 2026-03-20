@@ -43,10 +43,10 @@ class MeditoIcon extends StatelessWidget {
   }
 }
 
-class MeditoHugeIcon extends StatelessWidget {
+class MeditoRemoteIcon extends StatelessWidget {
   static const String streakIcon = 'streak';
 
-  const MeditoHugeIcon({
+  const MeditoRemoteIcon({
     super.key,
     required this.icon,
     this.color,
@@ -69,6 +69,9 @@ class MeditoHugeIcon extends StatelessWidget {
       size: size,
     );
   }
+
+  static String assetForKey(String key) =>
+      _iconAssetMap[key] ?? MeditoIcons.help;
 
   static const Map<String, String> _iconAssetMap = {
     'Current Streak': MeditoIcons.fire,

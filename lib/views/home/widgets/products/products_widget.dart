@@ -10,7 +10,7 @@ import 'package:medito/services/products_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/utils/black_friday_utils.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/constants/constants.dart';

@@ -7,7 +7,7 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/utils/utils.dart';
 
 class QuoteWidget extends ConsumerStatefulWidget {

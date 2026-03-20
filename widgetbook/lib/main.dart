@@ -24,13 +24,19 @@ class WidgetbookApp extends StatelessWidget {
             WidgetbookTheme(name: 'Light', data: ThemeData(brightness: Brightness.light)),
           ],
           initialTheme: WidgetbookTheme(name: 'Dark', data: ThemeData(brightness: Brightness.dark)),
-          themeBuilder: (context, theme, child) => Theme(
-            data: appTheme(
+          themeBuilder: (context, theme, child) {
+            final themeData = appTheme(
               context,
               theme.brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light,
-            ),
-            child: child,
-          ),
+            );
+            return Theme(
+              data: themeData,
+              child: Material(
+                color: themeData.scaffoldBackgroundColor,
+                child: child,
+              ),
+            );
+          },
         ),
         TextScaleAddon(min: 1.0, max: 2.0),
       ],

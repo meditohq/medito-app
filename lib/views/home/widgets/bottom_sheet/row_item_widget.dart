@@ -1,6 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/utils/utils.dart';
 
 class RowItemWidget extends StatelessWidget {
@@ -115,9 +115,9 @@ class RowItemWidget extends StatelessWidget {
   }
 
   Widget _buildIconWithColor() {
-    if (iconColor != null && icon is MeditoHugeIcon) {
-      final meditoIcon = icon as MeditoHugeIcon;
-      return MeditoHugeIcon(
+    if (iconColor != null && icon is MeditoRemoteIcon) {
+      final meditoIcon = icon as MeditoRemoteIcon;
+      return MeditoRemoteIcon(
         icon: meditoIcon.icon,
         color: iconColor,
         size: meditoIcon.size,

@@ -11,7 +11,7 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/settings/manage_defaults_screen.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 // removed unused snackbar import
 
 class ExpandableSectionWidget extends ConsumerStatefulWidget {

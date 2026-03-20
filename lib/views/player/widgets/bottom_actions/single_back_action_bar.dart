@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 
 import 'bottom_action_bar.dart';
 

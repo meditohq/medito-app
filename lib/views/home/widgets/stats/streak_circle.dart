@@ -8,7 +8,7 @@ import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import '../../../../constants/colors/color_constants.dart';
 import 'streak_circle_constants.dart';
 import 'package:medito/utils/utils.dart';

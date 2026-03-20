@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 
 import '../../utils/permission_handler.dart';
 import '../bottom_navigation/bottom_navigation_bar_view.dart';

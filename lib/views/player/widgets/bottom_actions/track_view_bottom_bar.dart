@@ -11,7 +11,7 @@ import '../../../../models/track/track_model.dart';
 import '../../../../providers/favorites/favorites_provider.dart';
 import '../../../../providers/meditation/track_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
-import '../../../../widgets/medito_huge_icon.dart';
+import '../../../../widgets/medito_icon.dart';
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 

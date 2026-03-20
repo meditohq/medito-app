@@ -7,7 +7,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 
 class SmartReminderTile extends ConsumerWidget {
   const SmartReminderTile({super.key});

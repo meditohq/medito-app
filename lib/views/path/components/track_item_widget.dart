@@ -13,7 +13,7 @@ import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/player/player_view.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 
 class TrackItemWidget extends ConsumerStatefulWidget {
   final PackItemsModel item;

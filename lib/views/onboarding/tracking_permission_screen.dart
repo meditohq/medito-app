@@ -7,7 +7,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/app_tracking_transparency_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/utils/utils.dart';
 

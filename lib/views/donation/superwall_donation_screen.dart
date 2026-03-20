@@ -13,7 +13,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/paywall_manager_service.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';

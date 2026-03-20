@@ -22,7 +22,7 @@ import 'package:medito/views/settings/widgets/theme_inline_selector.dart';
 import 'package:medito/views/settings/widgets/widget_option_tile.dart';
 import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/widgets/medito_huge_icon.dart';
+import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 
 import '../home/widgets/header/home_header_widget.dart';
