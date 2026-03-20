@@ -33,6 +33,7 @@
 .pub-cache/
 .pub/
 /build/
+widgetbook/build/
 
 # Android related
 **/android/**/gradle-wrapper.jar
