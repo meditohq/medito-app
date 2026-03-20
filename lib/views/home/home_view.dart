@@ -150,14 +150,16 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   Future<void> _onRefresh() async {
-    await ref.read(statsProvider.notifier).refresh();
     ref.invalidate(fetchLatestAnnouncementProvider);
-    await ref.read(fetchLatestAnnouncementProvider.future);
     ref.invalidate(refreshHomeAPIsProvider);
-    await ref.read(refreshHomeAPIsProvider.future);
     ref.invalidate(refreshProductsProvider);
-    await ref.read(refreshProductsProvider.future);
     ref.invalidate(upNextProvider);
+    await Future.wait([
+      ref.read(statsProvider.notifier).refresh(),
+      ref.read(fetchLatestAnnouncementProvider.future),
+      ref.read(refreshHomeAPIsProvider.future),
+      ref.read(refreshProductsProvider.future),
+    ]);
   }
 
   void _onStatsButtonTapped(BuildContext context) {

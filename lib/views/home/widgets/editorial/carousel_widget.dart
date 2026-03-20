@@ -156,72 +156,76 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   ) {
     final cardColor = Theme.of(context).cardColor;
 
-    return GestureDetector(
-      onTap: () {
-        handleNavigation(
-          item.type,
-          [item.path.toString().getIdFromPath(), item.path],
-          context,
-          ref: ref,
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(_kCardBorderRadius),
-          border: Border.all(
-            color: Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
-            width: 0.5,
+    return Semantics(
+      label: item.title,
+      button: true,
+      child: GestureDetector(
+        onTap: () {
+          handleNavigation(
+            item.type,
+            [item.path.toString().getIdFromPath(), item.path],
+            context,
+            ref: ref,
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(_kCardBorderRadius),
+            border: Border.all(
+              color: Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
+              width: 0.5,
+            ),
           ),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(_kCardBorderRadius),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AspectRatio(
-                aspectRatio: aspectRatio,
-                child: NetworkImageWidget(
-                  url: item.coverUrl,
-                  shouldCache: true,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_kCardBorderRadius),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AspectRatio(
+                  aspectRatio: aspectRatio,
+                  child: NetworkImageWidget(
+                    url: item.coverUrl,
+                    shouldCache: true,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(padding16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.title,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            fontFamily: sourceSerif,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w400,
-                            height: 28 / 24,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                    ),
-                    const SizedBox(height: _kSmallSpacing),
-                    Text(
-                      item.subtitle,
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(
-                            fontFamily: teachers,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            height: 1.2,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                    ),
-                    const SizedBox(height: padding20),
-                    if (item.buttons != null && item.buttons!.isNotEmpty)
-                      _buildButtons(item, context, ref),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.all(padding16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(
+                              fontFamily: sourceSerif,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w400,
+                              height: 28 / 24,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                      ),
+                      const SizedBox(height: _kSmallSpacing),
+                      Text(
+                        item.subtitle,
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontFamily: teachers,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              height: 1.2,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                      ),
+                      const SizedBox(height: padding20),
+                      if (item.buttons != null && item.buttons!.isNotEmpty)
+                        _buildButtons(item, context, ref),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -6,6 +6,7 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/settings/settings_providers.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 import 'package:medito/widgets/medito_huge_icon.dart';
 import '../../../../constants/colors/color_constants.dart';
@@ -210,8 +211,17 @@ class StreakCircleState extends ConsumerState<StreakCircle>
     );
   }
 
-  Widget _buildStreakCircle(bool isStreakDoneToday, String displayValue,
-      double progressValue, bool showConsistencyScore) {
+  Widget _buildStreakCircle(
+    bool isStreakDoneToday,
+    String displayValue,
+    double progressValue,
+    bool showConsistencyScore,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final semanticLabel = showConsistencyScore
+        ? '${l10n.consistencyScore}: $displayValue%'
+        : '$displayValue ${l10n.dayStreak}';
+
     return Container(
       decoration: isStreakDoneToday
           ? BoxDecoration(
@@ -235,74 +245,81 @@ class StreakCircleState extends ConsumerState<StreakCircle>
         padding: isStreakDoneToday ? const EdgeInsets.all(2) : EdgeInsets.zero,
         child: Material(
           color: Colors.transparent,
-          child: InkWell(
-            onTap: widget.onTap,
-            borderRadius:
-                BorderRadius.circular(StreakCircleConstants.borderRadius),
-            child: Ink(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius:
-                    BorderRadius.circular(StreakCircleConstants.borderRadius),
-              ),
-              child: Padding(
-                padding: StreakCircleConstants.padding,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (showConsistencyScore)
-                      SizedBox(
-                        width: StreakCircleConstants.iconSize,
-                        height: StreakCircleConstants.iconSize,
-                        child: CircularProgressIndicator(
-                          value: progressValue,
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacityValue(0.2),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            isStreakDoneToday
-                                ? ColorConstants.lightPurple
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                          strokeWidth: 2,
-                          strokeCap: StrokeCap.round,
-                        ),
-                      )
-                    else
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          if (isStreakDoneToday)
-                            MeditoIcon(
-                              assetName: MeditoIcons.fire,
-                              size: StreakCircleConstants.iconSize,
-                              color: Theme.of(context).colorScheme.onSurface,
+          child: Semantics(
+            label: semanticLabel,
+            button: true,
+            child: InkWell(
+              onTap: widget.onTap,
+              borderRadius:
+                  BorderRadius.circular(StreakCircleConstants.borderRadius),
+              child: Ink(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(
+                      StreakCircleConstants.borderRadius),
+                ),
+                child: Padding(
+                  padding: StreakCircleConstants.padding,
+                  child: ExcludeSemantics(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (showConsistencyScore)
+                          SizedBox(
+                            width: StreakCircleConstants.iconSize,
+                            height: StreakCircleConstants.iconSize,
+                            child: CircularProgressIndicator(
+                              value: progressValue,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacityValue(0.2),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isStreakDoneToday
+                                    ? ColorConstants.lightPurple
+                                    : Theme.of(context).colorScheme.onSurface,
+                              ),
+                              strokeWidth: 2,
+                              strokeCap: StrokeCap.round,
                             ),
-                          MeditoIcon(
-                            assetName: MeditoIcons.fire,
-                            color: isStreakDoneToday
-                                ? ColorConstants.lightPurple
-                                : Theme.of(context).colorScheme.onSurface,
-                            size: StreakCircleConstants.innerIconSize,
+                          )
+                        else
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              if (isStreakDoneToday)
+                                MeditoIcon(
+                                  assetName: MeditoIcons.fire,
+                                  size: StreakCircleConstants.iconSize,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                              MeditoIcon(
+                                assetName: MeditoIcons.fire,
+                                color: isStreakDoneToday
+                                    ? ColorConstants.lightPurple
+                                    : Theme.of(context).colorScheme.onSurface,
+                                size: StreakCircleConstants.innerIconSize,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    const SizedBox(width: 8),
-                    Text(
-                      displayValue + (showConsistencyScore ? '%' : ''),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: StreakCircleConstants.fontSize,
-                        fontWeight: isStreakDoneToday
-                            ? FontWeight.bold
-                            : FontWeight.w400,
-                        fontFamily: dmMono,
-                        height: StreakCircleConstants.lineHeight,
-                      ),
+                        const SizedBox(width: 8),
+                        Text(
+                          displayValue + (showConsistencyScore ? '%' : ''),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: StreakCircleConstants.fontSize,
+                            fontWeight: isStreakDoneToday
+                                ? FontWeight.bold
+                                : FontWeight.w400,
+                            fontFamily: dmMono,
+                            height: StreakCircleConstants.lineHeight,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -362,25 +379,32 @@ class StreakCircleState extends ConsumerState<StreakCircle>
         padding: isStreakDoneToday ? const EdgeInsets.all(2) : EdgeInsets.zero,
         child: Material(
           color: Colors.transparent,
-          child: InkWell(
-            onTap: widget.onTap,
-            borderRadius:
-                BorderRadius.circular(StreakCircleConstants.borderRadius),
-            child: Ink(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius:
-                    BorderRadius.circular(StreakCircleConstants.borderRadius),
-              ),
-              child: Padding(
-                padding: StreakCircleConstants.padding,
-                child: MeditoIcon(
-                  assetName:
-                      isStreakDoneToday ? MeditoIcons.fire : MeditoIcons.sun,
-                  size: StreakCircleConstants.iconSize,
-                  color: isStreakDoneToday
-                      ? ColorConstants.lightPurple
-                      : Theme.of(context).colorScheme.onSurface,
+          child: Semantics(
+            label: AppLocalizations.of(context)!.viewStreak,
+            button: true,
+            child: InkWell(
+              onTap: widget.onTap,
+              borderRadius:
+                  BorderRadius.circular(StreakCircleConstants.borderRadius),
+              child: Ink(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(
+                      StreakCircleConstants.borderRadius),
+                ),
+                child: Padding(
+                  padding: StreakCircleConstants.padding,
+                  child: ExcludeSemantics(
+                    child: MeditoIcon(
+                      assetName: isStreakDoneToday
+                          ? MeditoIcons.fire
+                          : MeditoIcons.sun,
+                      size: StreakCircleConstants.iconSize,
+                      color: isStreakDoneToday
+                          ? ColorConstants.lightPurple
+                          : Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -398,11 +422,17 @@ class StreakCircleState extends ConsumerState<StreakCircle>
       ),
       child: Padding(
         padding: StreakCircleConstants.padding,
-        child: GestureDetector(
-          onTap: () => ref.refresh(statsProvider),
-          child: MeditoIcon(
-            assetName: MeditoIcons.help,
-            color: ColorConstants.white,
+        child: Semantics(
+          label: AppLocalizations.of(context)!.refresh,
+          button: true,
+          child: GestureDetector(
+            onTap: () => ref.refresh(statsProvider),
+            child: ExcludeSemantics(
+              child: MeditoIcon(
+                assetName: MeditoIcons.help,
+                color: ColorConstants.white,
+              ),
+            ),
           ),
         ),
       ),

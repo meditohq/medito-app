@@ -320,7 +320,7 @@ abstract class AppLocalizations {
   /// **'buildNumber'**
   String get buildNumber;
 
-  /// No description provided for @dismiss.
+  /// Accessibility label for dismiss/close buttons
   ///
   /// In en, this message translates to:
   /// **'Dismiss'**
@@ -3421,6 +3421,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'sessions'**
   String get sessions;
+
+  /// Accessibility label for the play button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get play;
+
+  /// Accessibility label for the pause button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get pause;
+
+  /// Accessibility label for the skip-back button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Skip back 10 seconds'**
+  String get skipBackward10Seconds;
+
+  /// Accessibility label for the skip-forward button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Skip forward 10 seconds'**
+  String get skipForward10Seconds;
+
+  /// Accessibility label for the repeat button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat'**
+  String get repeat;
+
+  /// Accessibility label for the close button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Accessibility label for the download button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Download audio'**
+  String get downloadAudio;
+
+  /// Accessibility label for the delete-download button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Delete download'**
+  String get deleteDownload;
+
+  /// Accessibility label for the playback speed control in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Playback speed'**
+  String get playbackSpeed;
+
+  /// Accessibility label for the report button in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Report issue'**
+  String get reportIssue;
+
+  /// Accessibility label for the streak circle button on the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'View streak'**
+  String get viewStreak;
+
+  /// Accessibility label for the retry/refresh button
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// Accessibility label prefix for the Up Next card on the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Up next'**
+  String get upNext;
+
+  /// Accessibility label for the donation information button
+  ///
+  /// In en, this message translates to:
+  /// **'Donation info'**
+  String get donationInfo;
+
+  /// Accessibility label for the clear search button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// Accessibility label for the save button in the journal entry screen
+  ///
+  /// In en, this message translates to:
+  /// **'Save journal entry'**
+  String get saveJournalEntry;
+
+  /// Accessibility label for the button that clears the saved default guide preference
+  ///
+  /// In en, this message translates to:
+  /// **'Clear default guide'**
+  String get clearDefault;
+
+  /// Accessibility label for a locked track item
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get lockedContent;
 }
 
 class _AppLocalizationsDelegate

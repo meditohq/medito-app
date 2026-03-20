@@ -162,16 +162,22 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                 ),
                 if (showBlackFridayStyle) ...[
                   const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () => _dismissBlackFriday(context, ref),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Icons.close,
-                        size: 20,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  Semantics(
+                    label: AppLocalizations.of(context)!.dismiss,
+                    button: true,
+                    child: GestureDetector(
+                      onTap: () => _dismissBlackFriday(context, ref),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: ExcludeSemantics(
+                          child: Icon(
+                            Icons.close,
+                            size: 20,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -326,9 +332,12 @@ class ProductGroupCard extends ConsumerWidget {
               backgroundColor: backgroundColor,
               borderRadius: _kCardBorderRadius,
               borderWidth: _kCardBorderWidth,
-              child: Material(
+                child: Material(
                 color: Colors.transparent,
-                child: InkWell(
+                child: Semantics(
+                  label: productGroup.name,
+                  button: true,
+                  child: InkWell(
                   onTap: () async {
                     // Log analytics event
                     var analytics = ref.read(analyticsServiceProvider);
@@ -460,6 +469,7 @@ class ProductGroupCard extends ConsumerWidget {
                 ),
               ),
             ),
+          ),
           ),
           const SizedBox(height: 8),
           Text(

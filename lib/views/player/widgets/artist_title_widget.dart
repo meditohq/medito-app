@@ -62,12 +62,16 @@ class ArtistTitleWidget extends ConsumerWidget {
 
     return SizedBox(
       height: 30, // Fixed height for subtitle
-      child: InkWell(
-        onTap: () => _handleArtistNameTap(),
-        child: Center(
-          child: Text(
-            artistName ?? '',
-            style: style,
+      child: Semantics(
+        link: isPlayerScreen && artistUrlPath != null,
+        button: isPlayerScreen && artistUrlPath != null,
+        child: InkWell(
+          onTap: () => _handleArtistNameTap(),
+          child: Center(
+            child: Text(
+              artistName ?? '',
+              style: style,
+            ),
           ),
         ),
       ),

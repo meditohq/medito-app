@@ -33,6 +33,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final repeatMode = ref.watch(repeatStateProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (isPortrait) {
       return Column(
@@ -47,11 +48,11 @@ class PlayerButtonsWidget extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _rewindButton(),
+              _rewindButton(l10n),
               const SizedBox(width: 32),
-              _repeatButton(context, repeatMode),
+              _repeatButton(context, repeatMode, l10n),
               const SizedBox(width: 32),
-              _forwardButton(),
+              _forwardButton(l10n),
             ],
           ),
         ],
@@ -61,24 +62,25 @@ class PlayerButtonsWidget extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _rewindButton(),
+          _rewindButton(l10n),
           const SizedBox(width: 32),
           PlayPauseButtonWidget(
             isPlaying: isPlaying,
             onPlayPause: onPlayPause,
           ),
           const SizedBox(width: 32),
-          _forwardButton(),
+          _forwardButton(l10n),
           const SizedBox(width: 32),
-          _repeatButton(context, repeatMode),
+          _repeatButton(context, repeatMode, l10n),
         ],
       );
     }
   }
 
-  IconButton _rewindButton() {
+  IconButton _rewindButton(AppLocalizations l10n) {
     return IconButton(
       onPressed: onSkip10SecondsBackward,
+      tooltip: l10n.skipBackward10Seconds,
       icon: const MeditoIcon(
         assetName: MeditoIcons.backward15,
         size: 40,
@@ -87,9 +89,10 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  IconButton _forwardButton() {
+  IconButton _forwardButton(AppLocalizations l10n) {
     return IconButton(
       onPressed: onSkip10SecondsForward,
+      tooltip: l10n.skipForward10Seconds,
       icon: const MeditoIcon(
         assetName: MeditoIcons.forward15,
         size: 40,
@@ -98,10 +101,15 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  Widget _repeatButton(BuildContext context, medito_repeat.RepeatMode repeatMode) {
+  Widget _repeatButton(
+    BuildContext context,
+    medito_repeat.RepeatMode repeatMode,
+    AppLocalizations l10n,
+  ) {
     return _RepeatButtonWithLabel(
       repeatMode: repeatMode,
       onRepeat: onRepeat,
+      l10n: l10n,
     );
   }
 }
@@ -110,10 +118,12 @@ class _RepeatButtonWithLabel extends ConsumerStatefulWidget {
   const _RepeatButtonWithLabel({
     required this.repeatMode,
     required this.onRepeat,
+    required this.l10n,
   });
 
   final medito_repeat.RepeatMode repeatMode;
   final VoidCallback onRepeat;
+  final AppLocalizations l10n;
 
   @override
   ConsumerState<_RepeatButtonWithLabel> createState() =>
@@ -133,7 +143,7 @@ class _RepeatButtonWithLabelState
   }
 
   void _handleTap() {
-    final localizations = AppLocalizations.of(context)!;
+    final l10n = widget.l10n;
 
     final nextMode = switch (widget.repeatMode) {
       medito_repeat.RepeatMode.none => medito_repeat.RepeatMode.once,
@@ -144,13 +154,13 @@ class _RepeatButtonWithLabelState
     String labelText;
     switch (nextMode) {
       case medito_repeat.RepeatMode.none:
-        labelText = localizations.repeatModeNormal;
+        labelText = l10n.repeatModeNormal;
         break;
       case medito_repeat.RepeatMode.once:
-        labelText = localizations.repeatModeOnce;
+        labelText = l10n.repeatModeOnce;
         break;
       case medito_repeat.RepeatMode.infinite:
-        labelText = localizations.repeatModeForever;
+        labelText = l10n.repeatModeForever;
         break;
     }
 
@@ -169,6 +179,14 @@ class _RepeatButtonWithLabelState
         });
       }
     });
+  }
+
+  String _tooltipForMode(medito_repeat.RepeatMode mode) {
+    return switch (mode) {
+      medito_repeat.RepeatMode.none => widget.l10n.repeat,
+      medito_repeat.RepeatMode.once => widget.l10n.repeatModeOnce,
+      medito_repeat.RepeatMode.infinite => widget.l10n.repeatModeForever,
+    };
   }
 
   @override
@@ -196,6 +214,7 @@ class _RepeatButtonWithLabelState
       children: [
         IconButton(
           onPressed: _handleTap,
+          tooltip: _tooltipForMode(repeatMode),
           icon: MeditoIcon(
             assetName: iconAsset,
             size: 32,

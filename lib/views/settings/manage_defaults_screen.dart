@@ -117,6 +117,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
                           if (guideNameAsync.hasValue &&
                               guideNameAsync.value != null)
                             IconButton(
+                              tooltip: l10n.clearDefault,
                               icon: const Icon(Icons.delete_outline),
                               color: Theme.of(context).colorScheme.onSurface,
                               onPressed: () async {

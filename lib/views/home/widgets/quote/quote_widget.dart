@@ -36,6 +36,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
             bottom: -12,
             child: IconButton(
               padding: EdgeInsets.zero,
+              tooltip: AppLocalizations.of(context)!.share,
               onPressed: _shareQuote,
               icon: MeditoIcon(
                 assetName: Platform.isIOS

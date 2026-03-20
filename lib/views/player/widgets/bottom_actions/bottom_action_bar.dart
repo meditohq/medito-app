@@ -10,8 +10,13 @@ enum BottomActionBarLayout {
 class BottomActionBarItem {
   final Widget child;
   final VoidCallback? onTap;
+  final String? semanticLabel;
 
-  const BottomActionBarItem({required this.child, required this.onTap});
+  const BottomActionBarItem({
+    required this.child,
+    required this.onTap,
+    this.semanticLabel,
+  });
 }
 
 class BottomActionBar extends StatelessWidget {
@@ -37,6 +42,7 @@ class BottomActionBar extends StatelessWidget {
 
     return IconButton(
       onPressed: item.onTap,
+      tooltip: item.semanticLabel,
       icon: item.child,
     );
   }

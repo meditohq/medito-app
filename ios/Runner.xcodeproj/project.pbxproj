@@ -78,6 +78,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				EDFD4D242C9359BF0066E874 /* MeditoWidgetExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -504,6 +505,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EDFD4D262C9359BF0066E874 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				ED8A5BC82CCCE1060043D20A /* Fonts */,

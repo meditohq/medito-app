@@ -180,11 +180,20 @@ jobs:
           bundler-cache: true
           working-directory: android
 
+      - name: Set release notes
+        env:
+          RELEASE_NOTES_INPUT: ${{ inputs.release_notes }}
+        run: |
+          notes="$RELEASE_NOTES_INPUT"
+          if [ -z "$notes" ]; then
+            notes=$(awk '/^Unreleased/{ unrel_seen=1; next } /^[0-9]/{ if (in_v) exit; in_v=1; next } in_v && /^-/{ print }' release_notes.txt)
+          fi
+          { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
+
       - name: Upload to Play Store
         working-directory: android
         env:
           PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
-          RELEASE_NOTES: ${{ inputs.release_notes }}
         run: |
           bundle exec fastlane android upload_apk \
             apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
@@ -306,6 +315,33 @@ jobs:
       - name: Install Fastlane
         run: gem install fastlane --no-document
 
+      - name: Set release notes
+        env:
+          RELEASE_NOTES_INPUT: ${{ inputs.release_notes }}
+        run: |
+          notes="$RELEASE_NOTES_INPUT"
+          if [ -z "$notes" ]; then
+            notes=$(awk '
+              /^Unreleased/ { unrel_seen = 1; next }
+              /^[0-9]/ {
+                if (!in_v) {
+                  # Start capturing at the first version header after "Unreleased",
+                  # or the first version header in the file if no "Unreleased" exists.
+                  if (unrel_seen || !unrel_seen) {
+                    in_v = 1
+                    next
+                  }
+                } else {
+                  # Reaching another version header ends the current block.
+                  exit
+                }
+              }
+              in_v && /^-/ { print; next }
+              in_v && NF && !/^- / { exit }
+            ' release_notes.txt)
+          fi
+          { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
+
       - name: Build & upload iOS release
         working-directory: ios
         env:
@@ -322,5 +358,4 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
-          RELEASE_NOTES: ${{ inputs.release_notes }}
         run: fastlane ${{ github.event_name == 'push' && 'release' || inputs.ios_lane || 'beta' }}

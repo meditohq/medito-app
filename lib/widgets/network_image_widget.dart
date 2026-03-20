@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:shimmer/shimmer.dart';
 
-class NetworkImageWidget extends ConsumerWidget {
+class NetworkImageWidget extends StatelessWidget {
   final String url;
   final double? height, width;
   final bool shouldCache;
@@ -38,7 +37,7 @@ class NetworkImageWidget extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     // Skip loading images from dead domains
     if (HTTPConstants.isDeadDomain(url)) {
       return errorWidget ??

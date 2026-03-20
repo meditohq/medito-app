@@ -19,8 +19,8 @@ VERSION=$(grep "^version:" "$PUBSPEC" | sed 's/version: //' | cut -d'+' -f1)
 echo -n "$VERSION" | pbcopy
 echo "✓ Version $VERSION copied to clipboard"
 
-# Reorganise RELEASE_NOTES.txt
-NOTES_FILE="$SCRIPT_DIR/RELEASE_NOTES.txt"
+# Reorganise release_notes.txt
+NOTES_FILE="$SCRIPT_DIR/release_notes.txt"
 
 python3 - "$NOTES_FILE" "$VERSION" <<'EOF'
 import sys
@@ -70,5 +70,5 @@ new_content = (
 with open(path, "w") as f:
     f.write(new_content)
 
-print(f"✓ RELEASE_NOTES.txt updated — unreleased notes moved to {version}")
+print(f"✓ release_notes.txt updated — unreleased notes moved to {version}")
 EOF

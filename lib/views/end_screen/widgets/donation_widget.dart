@@ -115,6 +115,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 ),
               ),
               IconButton(
+                tooltip: AppLocalizations.of(context)!.donationInfo,
                 icon: MeditoIcon(
                   assetName: MeditoIcons.help,
                   size: 20,

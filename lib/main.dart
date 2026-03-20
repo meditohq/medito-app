@@ -40,6 +40,11 @@ import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
+// Completes when the app has finished auth/init and landed on the main screen.
+// Deep link navigation waits for this before pushing any route.
+// This is non-final so it can be reset after a force logout.
+var appReadyCompleter = Completer<void>();
+
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 bool _hasInitialized = false;
@@ -215,8 +220,10 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       ),
       data: (_) {
         // Initialize deep link service once we have context
-        _deepLinkService ??= DeepLinkService(ref: ref, context: context);
-        _deepLinkService?.initialize();
+        if (_deepLinkService == null) {
+          _deepLinkService = DeepLinkService(ref: ref, context: context);
+          _deepLinkService!.initialize();
+        }
 
         // Initialize auth state listener to handle navigation on force logout
         ref.watch(authStateListenerProvider);
@@ -342,6 +349,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void _handleForceLogout(BuildContext context) {
     // Add a small delay to ensure we're not in the middle of another operation
     Future.delayed(const Duration(milliseconds: 500), () {
+      // Always reset the completer so deep links arriving during re-authentication
+      // will wait for the app to be ready again rather than bypassing the check.
+      appReadyCompleter = Completer<void>();
       // Check if we're already showing the SplashView by examining current route
       final currentRoute = ModalRoute.of(context);
       final isAlreadyOnSplash = currentRoute != null &&

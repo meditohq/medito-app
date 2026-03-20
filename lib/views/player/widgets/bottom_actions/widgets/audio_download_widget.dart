@@ -76,8 +76,8 @@ class AudioDownloadWidget extends ConsumerWidget {
   ) {
     if (isDownloaded) {
       return IconButton(
-        onPressed: () =>
-            _handleRemoveDownload(ref, context),
+        onPressed: () => _handleRemoveDownload(ref, context),
+        tooltip: AppLocalizations.of(context)!.deleteDownload,
         icon: const MeditoIcon(
           assetName: MeditoIcons.downloadCircleSolid,
           color: ColorConstants.white,
@@ -89,6 +89,7 @@ class AudioDownloadWidget extends ConsumerWidget {
     } else {
       return IconButton(
         onPressed: () => _handleDownload(ref, context),
+        tooltip: AppLocalizations.of(context)!.downloadAudio,
         icon: const MeditoIcon(
           assetName: MeditoIcons.downloadCircle,
           color: ColorConstants.white,

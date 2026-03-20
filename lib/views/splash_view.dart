@@ -18,6 +18,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/main.dart' show appReadyCompleter;
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
@@ -284,6 +285,7 @@ class SplashViewState extends ConsumerState<SplashView>
           if (!mounted) return;
 
           AppLogger.i('SPLASH', 'Navigation to main app...');
+          if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
           await Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) =>
@@ -301,6 +303,7 @@ class SplashViewState extends ConsumerState<SplashView>
 
           showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
 
+          if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
           await Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => const DownloadsView(isRoot: true),
@@ -342,6 +345,7 @@ class SplashViewState extends ConsumerState<SplashView>
           builder: (context) => const DownloadsView(isRoot: false),
         ),
       );
+      if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
     }
   }
 

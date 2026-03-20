@@ -116,28 +116,33 @@ class ShortcutsItemsWidget extends ConsumerWidget {
       ),
     );
 
-    return SizedBox(
-      width: width,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          squareButton,
-          const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              e.title ?? '',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontFamily: teachers,
-                fontSize: 12,
-                color: textColor,
+    return Semantics(
+      label: e.title,
+      button: true,
+      excludeSemantics: true,
+      child: SizedBox(
+        width: width,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            squareButton,
+            const SizedBox(height: 8),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                e.title ?? '',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontFamily: teachers,
+                  fontSize: 12,
+                  color: textColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

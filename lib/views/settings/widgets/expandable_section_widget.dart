@@ -68,7 +68,11 @@ class _ExpandableSectionWidgetState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        InkWell(
+        Semantics(
+          label: AppLocalizations.of(context)!.advanced,
+          button: true,
+          expanded: _isExpanded,
+          child: InkWell(
           onTap: () {
             setState(() {
               _isExpanded = !_isExpanded;
@@ -76,7 +80,8 @@ class _ExpandableSectionWidgetState
           },
           child: Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 24.0, bottom: 8.0),
-            child: Row(
+            child: ExcludeSemantics(
+              child: Row(
               children: [
                 Text(
                   AppLocalizations.of(context)!.advanced,
@@ -94,6 +99,8 @@ class _ExpandableSectionWidgetState
               ],
             ),
           ),
+          ),
+        ),
         ),
         if (_isExpanded)
           Consumer(

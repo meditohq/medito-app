@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
@@ -79,9 +80,15 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
             await _onSkip(context);
             return false;
           },
-            child: GestureDetector(
-            onTap: () => _onTap(context),
-            child: Container(
+            child: Semantics(
+              label: '${l10n.upNext}: ${widget.data.pack.title} – ${nextSession.title}',
+              button: true,
+              customSemanticsActions: {
+                CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
+              },
+              child: GestureDetector(
+              onTap: () => _onTap(context),
+              child: Container(
               decoration: BoxDecoration(
                 color: cardColor,
                 borderRadius: BorderRadius.circular(_kCardBorderRadius),
@@ -171,6 +178,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
           ),
         ),
       ),
+    ),
     ),
     );
   }
@@ -322,19 +330,25 @@ class _PlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: HomeGradientBorder(
-        backgroundColor: ColorConstants.brightSky,
-        borderRadius: _kPlayButtonSize / 2,
-        borderWidth: _kPlayButtonBorderWidth,
-        child: SizedBox(
-          width: _kPlayButtonSize,
-          height: _kPlayButtonSize,
-          child: const Icon(
-            Icons.play_arrow_rounded,
-            color: ColorConstants.ebony,
-            size: 28,
+    return Semantics(
+      label: AppLocalizations.of(context)!.play,
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: HomeGradientBorder(
+          backgroundColor: ColorConstants.brightSky,
+          borderRadius: _kPlayButtonSize / 2,
+          borderWidth: _kPlayButtonBorderWidth,
+          child: const SizedBox(
+            width: _kPlayButtonSize,
+            height: _kPlayButtonSize,
+            child: ExcludeSemantics(
+              child: Icon(
+                Icons.play_arrow_rounded,
+                color: ColorConstants.ebony,
+                size: 28,
+              ),
+            ),
           ),
         ),
       ),

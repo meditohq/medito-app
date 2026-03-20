@@ -258,12 +258,18 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                     return Center(
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
-                        child: GestureDetector(
-                          onTap: () =>
-                              ref.read(statsProvider.notifier).refresh(),
-                          child: MeditoIcon(
-                            assetName: MeditoIcons.help,
-                            color: Theme.of(context).colorScheme.onSurface,
+                        child: Semantics(
+                          label: AppLocalizations.of(context)!.refresh,
+                          button: true,
+                          child: GestureDetector(
+                            onTap: () =>
+                                ref.read(statsProvider.notifier).refresh(),
+                            child: ExcludeSemantics(
+                              child: MeditoIcon(
+                                assetName: MeditoIcons.help,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -513,7 +519,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                     .setDisplayType(newType);
               }
 
-              return InkWell(
+              return MergeSemantics(
+                child: InkWell(
                 onTap: handleToggle,
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
@@ -556,6 +563,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                     ],
                   ),
                 ),
+              ),
               );
             },
           );
