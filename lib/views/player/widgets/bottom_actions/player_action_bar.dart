@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/main.dart';
+import 'package:medito/scaffold_messenger_key.dart';
 import 'package:medito/models/track/track_model.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';

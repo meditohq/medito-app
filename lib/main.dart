@@ -36,6 +36,7 @@ import 'package:medito/services/deep_link_service.dart';
 // ignore: depend_on_referenced_packages
 import 'package:device_preview/device_preview.dart';
 import 'package:medito/config/debug_options.dart';
+import 'scaffold_messenger_key.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -45,7 +46,6 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 // This is non-final so it can be reset after a force logout.
 var appReadyCompleter = Completer<void>();
 
-final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 var audioStateNotifier = AudioStateNotifier();
 bool _hasInitialized = false;
 

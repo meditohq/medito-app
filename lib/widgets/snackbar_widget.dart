@@ -1,7 +1,7 @@
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
 
-import '../main.dart';
+import '../scaffold_messenger_key.dart';
 
 void showSnackBar(
   BuildContext? context,
