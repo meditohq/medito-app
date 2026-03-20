@@ -34,6 +34,7 @@
 .pub/
 /build/
 widgetbook/build/
+*.cache.dill.track.dill
 
 # Android related
 **/android/**/gradle-wrapper.jar
