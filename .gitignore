@@ -100,7 +100,7 @@ ios/Runner.xcodeproj/project.pbxproj
 ios/Flutter/AppFrameworkInfo.plist
 android/app/src/google-services.json
 android/app/local.properties
-firebase.json
+# firebase.json is tracked — needed for Cloud Functions deployment
 lib/firebase_options.dart
 *.symbols
 .prod.json
@@ -120,6 +120,9 @@ build_and_upload_ios.sh
 
 # Scripts
 ios_credentials.sh
+
+# Firebase Functions
+firebase/functions/node_modules/
 
 # Claude Code local settings
 .claude/settings.local.json
