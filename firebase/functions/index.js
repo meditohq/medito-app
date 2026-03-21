@@ -2,14 +2,31 @@ const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const { logger } = require("firebase-functions");
+const crypto = require("crypto");
 
-// Store your GitHub PAT in Firebase secrets:
+// Store your secrets in Firebase:
 //   firebase functions:secrets:set GITHUB_TOKEN
+//   firebase functions:secrets:set WEBHOOK_SECRET
 const githubToken = defineSecret("GITHUB_TOKEN");
+const webhookSecret = defineSecret("WEBHOOK_SECRET");
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 const GITHUB_OWNER = "meditohq";
 const GITHUB_REPO = "medito-app";
+
+// ─── Helper: Verify HMAC signature ──────────────────────────────────────────
+function verifySignature(secret, body, signatureHeader) {
+  if (!signatureHeader) return false;
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(typeof body === "string" ? body : JSON.stringify(body))
+    .digest("hex");
+  const signature = signatureHeader.replace(/^sha256=/, "");
+  return crypto.timingSafeEqual(
+    Buffer.from(expected, "hex"),
+    Buffer.from(signature, "hex")
+  );
+}
 
 // ─── Helper: Trigger GitHub repository_dispatch ──────────────────────────────
 async function triggerGitHubPR({ title, description, severity, source, eventType, data }) {
@@ -82,11 +99,15 @@ exports.onFirestoreIssueCreated = onDocumentCreated(
 // Call this from Firebase Alerts, Crashlytics hooks, or any external service.
 //
 // POST https://<region>-<project>.cloudfunctions.net/webhookToGitHubPR
+// Headers: X-Webhook-Signature: sha256=<HMAC hex digest>
 // Body: { "title": "...", "description": "...", "severity": "critical", ... }
+//
+// Set the shared secret:
+//   firebase functions:secrets:set WEBHOOK_SECRET
 //
 exports.webhookToGitHubPR = onRequest(
   {
-    secrets: [githubToken],
+    secrets: [githubToken, webhookSecret],
     cors: false,
   },
   async (req, res) => {
@@ -95,7 +116,23 @@ exports.webhookToGitHubPR = onRequest(
       return;
     }
 
-    const { title, description, severity, source, event_type, data } = req.body;
+    // Verify HMAC signature
+    const secret = webhookSecret.value();
+    if (!secret) {
+      logger.error("WEBHOOK_SECRET is not configured");
+      res.status(500).json({ error: "Server misconfiguration" });
+      return;
+    }
+
+    const signature = req.get("X-Webhook-Signature");
+    if (!verifySignature(secret, req.rawBody || req.body, signature)) {
+      res.status(401).json({ error: "Invalid or missing signature" });
+      return;
+    }
+
+    // Guard against missing/malformed body
+    const body = req.body ?? {};
+    const { title, description, severity, source, event_type, data } = body;
 
     if (!title) {
       res.status(400).json({ error: "Missing required field: title" });

@@ -17,14 +17,21 @@ jobs:
     steps:
       - name: Validate payload
         id: validate
+        env:
+          TITLE: ${{ github.event.client_payload.title }}
         run: |
-          TITLE="${{ github.event.client_payload.title }}"
+          # Strip newlines/carriage-returns to prevent output injection
+          TITLE=$(printf '%s' "$TITLE" | tr '\n\r' '  ')
           if [ -z "$TITLE" ]; then
             echo "::error::Missing required field: client_payload.title"
             exit 1
           fi
           # Sanitise branch name: lowercase, replace non-alphanum with hyphens
-          SAFE=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//' | cut -c1-60)
+          SAFE=$(printf '%s' "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//' | cut -c1-60)
+          # Fallback if title was only punctuation/whitespace
+          if [ -z "$SAFE" ]; then
+            SAFE="alert"
+          fi
           BRANCH="firebase/${SAFE}-$(date +%s)"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
@@ -105,7 +112,7 @@ jobs:
           gh pr create \
             --base develop \
             --head "${{ steps.validate.outputs.branch }}" \
-            --title "🔥 [Firebase] ${TITLE}" \
+            --title "${SEVERITY_LABEL} [Firebase] ${TITLE}" \
             --body "$(cat <<PR_EOF
           ## Firebase Alert
 
