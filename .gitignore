@@ -121,6 +121,9 @@ build_and_upload_ios.sh
 # Scripts
 ios_credentials.sh
 
+# Firebase Functions
+firebase/functions/node_modules/
+
 # Claude Code local settings
 .claude/settings.local.json
 .claude/settings.json
