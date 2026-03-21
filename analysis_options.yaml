@@ -9,6 +9,7 @@ analyzer:
     - lib/generated_plugin_registrant.dart
     - lib/**/*.g.dart
     - lib/**/*.freezed.dart
+    - widgetbook/**
 
 linter:
   rules:
