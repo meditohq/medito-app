@@ -247,8 +247,8 @@
   "enableNotificationsCta": "Enable Notifications",
   "skipForNow": "Skip for Now",
   "skip": "Skip",
-  "packSetAsUpNext": "This pack will now appear in the Up Next section on the homepage",
-  "packUnpinnedFromUpNext": "This pack has been removed from the Up Next section",
+  "packSetAsUpNext": "This pack will now appear in the Your Path section on the homepage",
+  "packUnpinnedFromUpNext": "This pack has been removed from the Your Path section",
   "smartReminders": "Smart Reminders",
   "turnOnSmartReminders": "Turn on Smart Reminders",
   "smartRemindersOn": "Smart Reminders On",
@@ -1062,9 +1062,9 @@
   "@completedAt": {
     "description": "Label prefix for meditation completion time"
   },
-  "upNextTitle": "Up Next",
+  "upNextTitle": "Your Path",
   "@upNextTitle": {
-    "description": "Title for the up next section on the home screen"
+    "description": "Title for the Your Path section on the home screen"
   },
   "upNextSessionCount": "Session {current} of {total}",
   "@upNextSessionCount": {
@@ -1108,7 +1108,7 @@
   "@notSet": {
     "description": "Text shown when a default value is not set"
   },
-  "defaultsNote": "These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.",
+  "defaultsNote": "These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.",
   "@defaultsNote": {
     "description": "Note explaining how defaults work in Up Next"
   },
@@ -1172,9 +1172,9 @@
   "@refresh": {
     "description": "Accessibility label for the retry/refresh button"
   },
-  "upNext": "Up next",
+  "upNext": "Your Path",
   "@upNext": {
-    "description": "Accessibility label prefix for the Up Next card on the home screen"
+    "description": "Accessibility label prefix for the Your Path card on the home screen"
   },
   "dismiss": "Dismiss",
   "@dismiss": {
@@ -1199,5 +1199,89 @@
   "lockedContent": "Locked",
   "@lockedContent": {
     "description": "Accessibility label for a locked track item"
+  },
+  "yourPathExplainerText": "Your path guides you through meditation from scratch. Starts at just 1 min and builds gradually.",
+  "@yourPathExplainerText": {
+    "description": "Stage 1 text in the Your Path explainer strip shown below the card on the home screen"
+  },
+  "yourPathExplainerSwipeHint": "Swipe left to skip.",
+  "@yourPathExplainerSwipeHint": {
+    "description": "Stage 2 text in the Your Path explainer strip, shown after the user taps Got it"
+  },
+  "onboardingStep1of2": "1 of 2",
+  "@onboardingStep1of2": {
+    "description": "Step indicator label on onboarding question screen 1"
+  },
+  "onboardingStep2of2": "2 of 2",
+  "@onboardingStep2of2": {
+    "description": "Step indicator label on onboarding question screen 2"
+  },
+  "onboardingExperienceQuestion": "Have you meditated before?",
+  "@onboardingExperienceQuestion": {
+    "description": "Question on onboarding screen 1 — asking about the user's meditation experience"
+  },
+  "onboardingExperienceSubtext": "This helps us show you the right starting point.",
+  "@onboardingExperienceSubtext": {
+    "description": "Subtext below the question on onboarding screen 1"
+  },
+  "onboardingExperienceNever": "Never tried it",
+  "@onboardingExperienceNever": {
+    "description": "Option 1 on onboarding screen 1 — user has never meditated"
+  },
+  "onboardingExperienceALittle": "A little, here and there",
+  "@onboardingExperienceALittle": {
+    "description": "Option 2 on onboarding screen 1 — user has meditated a little"
+  },
+  "onboardingExperienceRegular": "I have a regular practice",
+  "@onboardingExperienceRegular": {
+    "description": "Option 3 on onboarding screen 1 — user has a regular meditation practice"
+  },
+  "onboardingIntentQuestion": "What are you hoping to get from meditation?",
+  "@onboardingIntentQuestion": {
+    "description": "Question on onboarding screen 2 — asking about the user's intention"
+  },
+  "onboardingIntentSubtext": "Pick whichever feels most true right now.",
+  "@onboardingIntentSubtext": {
+    "description": "Subtext below the question on onboarding screen 2"
+  },
+  "onboardingIntentLearn": "Learn how to meditate properly",
+  "@onboardingIntentLearn": {
+    "description": "Option 1 on onboarding screen 2 — user wants to learn to meditate"
+  },
+  "onboardingIntentHabit": "Build a daily habit",
+  "@onboardingIntentHabit": {
+    "description": "Option 2 on onboarding screen 2 — user wants to build a daily habit"
+  },
+  "onboardingIntentStress": "Manage stress, sleep, or emotions",
+  "@onboardingIntentStress": {
+    "description": "Option 3 on onboarding screen 2 — user wants to manage stress, sleep, or emotions"
+  },
+  "onboardingResultLearnHeading": "You're in the right place.",
+  "@onboardingResultLearnHeading": {
+    "description": "Heading on the onboarding result screen for users who are new or want to learn (State A)"
+  },
+  "onboardingResultLearnBody": "We'll start you off with just 1 minute and build from there. No experience needed — just show up.",
+  "@onboardingResultLearnBody": {
+    "description": "Body text on the onboarding result screen for State A"
+  },
+  "onboardingResultEaseInHeading": "Good to have you here.",
+  "@onboardingResultEaseInHeading": {
+    "description": "Heading on the onboarding result screen for users with some experience (State B)"
+  },
+  "onboardingResultEaseInBody": "We'll ease you back in with short sessions that build on each other. Go at whatever pace suits you.",
+  "@onboardingResultEaseInBody": {
+    "description": "Body text on the onboarding result screen for State B"
+  },
+  "onboardingResultPracticeHeading": "Welcome to Medito.",
+  "@onboardingResultPracticeHeading": {
+    "description": "Heading on the onboarding result screen for users with a regular practice (State C)"
+  },
+  "onboardingResultPracticeBody": "Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.",
+  "@onboardingResultPracticeBody": {
+    "description": "Body text on the onboarding result screen for State C"
+  },
+  "onboardingResultCta": "Get started",
+  "@onboardingResultCta": {
+    "description": "CTA button label on the onboarding result screen"
   }
 }

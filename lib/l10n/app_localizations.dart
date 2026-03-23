@@ -1565,13 +1565,13 @@ abstract class AppLocalizations {
   /// No description provided for @packSetAsUpNext.
   ///
   /// In en, this message translates to:
-  /// **'This pack will now appear in the Up Next section on the homepage'**
+  /// **'This pack will now appear in the Your Path section on the homepage'**
   String get packSetAsUpNext;
 
   /// No description provided for @packUnpinnedFromUpNext.
   ///
   /// In en, this message translates to:
-  /// **'This pack has been removed from the Up Next section'**
+  /// **'This pack has been removed from the Your Path section'**
   String get packUnpinnedFromUpNext;
 
   /// Label for the smart reminders feature toggle
@@ -3350,10 +3350,10 @@ abstract class AppLocalizations {
   /// **'Completed at'**
   String get completedAt;
 
-  /// Title for the up next section on the home screen
+  /// Title for the Your Path section on the home screen
   ///
   /// In en, this message translates to:
-  /// **'Up Next'**
+  /// **'Your Path'**
   String get upNextTitle;
 
   /// Shows the current session number out of total sessions
@@ -3407,7 +3407,7 @@ abstract class AppLocalizations {
   /// Note explaining how defaults work in Up Next
   ///
   /// In en, this message translates to:
-  /// **'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.'**
+  /// **'These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.'**
   String get defaultsNote;
 
   /// Text shown when a streak freeze was used on a particular day
@@ -3500,10 +3500,10 @@ abstract class AppLocalizations {
   /// **'Refresh'**
   String get refresh;
 
-  /// Accessibility label prefix for the Up Next card on the home screen
+  /// Accessibility label prefix for the Your Path card on the home screen
   ///
   /// In en, this message translates to:
-  /// **'Up next'**
+  /// **'Your Path'**
   String get upNext;
 
   /// Accessibility label for the donation information button
@@ -3535,6 +3535,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Locked'**
   String get lockedContent;
+
+  /// Stage 1 text in the Your Path explainer strip shown below the card on the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Your path guides you through meditation from scratch. Starts at just 1 min and builds gradually.'**
+  String get yourPathExplainerText;
+
+  /// Stage 2 text in the Your Path explainer strip, shown after the user taps Got it
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe left to skip.'**
+  String get yourPathExplainerSwipeHint;
+
+  /// Step indicator label on onboarding question screen 1
+  ///
+  /// In en, this message translates to:
+  /// **'1 of 2'**
+  String get onboardingStep1of2;
+
+  /// Step indicator label on onboarding question screen 2
+  ///
+  /// In en, this message translates to:
+  /// **'2 of 2'**
+  String get onboardingStep2of2;
+
+  /// Question on onboarding screen 1 — asking about the user's meditation experience
+  ///
+  /// In en, this message translates to:
+  /// **'Have you meditated before?'**
+  String get onboardingExperienceQuestion;
+
+  /// Subtext below the question on onboarding screen 1
+  ///
+  /// In en, this message translates to:
+  /// **'This helps us show you the right starting point.'**
+  String get onboardingExperienceSubtext;
+
+  /// Option 1 on onboarding screen 1 — user has never meditated
+  ///
+  /// In en, this message translates to:
+  /// **'Never tried it'**
+  String get onboardingExperienceNever;
+
+  /// Option 2 on onboarding screen 1 — user has meditated a little
+  ///
+  /// In en, this message translates to:
+  /// **'A little, here and there'**
+  String get onboardingExperienceALittle;
+
+  /// Option 3 on onboarding screen 1 — user has a regular meditation practice
+  ///
+  /// In en, this message translates to:
+  /// **'I have a regular practice'**
+  String get onboardingExperienceRegular;
+
+  /// Question on onboarding screen 2 — asking about the user's intention
+  ///
+  /// In en, this message translates to:
+  /// **'What are you hoping to get from meditation?'**
+  String get onboardingIntentQuestion;
+
+  /// Subtext below the question on onboarding screen 2
+  ///
+  /// In en, this message translates to:
+  /// **'Pick whichever feels most true right now.'**
+  String get onboardingIntentSubtext;
+
+  /// Option 1 on onboarding screen 2 — user wants to learn to meditate
+  ///
+  /// In en, this message translates to:
+  /// **'Learn how to meditate properly'**
+  String get onboardingIntentLearn;
+
+  /// Option 2 on onboarding screen 2 — user wants to build a daily habit
+  ///
+  /// In en, this message translates to:
+  /// **'Build a daily habit'**
+  String get onboardingIntentHabit;
+
+  /// Option 3 on onboarding screen 2 — user wants to manage stress, sleep, or emotions
+  ///
+  /// In en, this message translates to:
+  /// **'Manage stress, sleep, or emotions'**
+  String get onboardingIntentStress;
+
+  /// Heading on the onboarding result screen for users who are new or want to learn (State A)
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re in the right place.'**
+  String get onboardingResultLearnHeading;
+
+  /// Body text on the onboarding result screen for State A
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll start you off with just 1 minute and build from there. No experience needed — just show up.'**
+  String get onboardingResultLearnBody;
+
+  /// Heading on the onboarding result screen for users with some experience (State B)
+  ///
+  /// In en, this message translates to:
+  /// **'Good to have you here.'**
+  String get onboardingResultEaseInHeading;
+
+  /// Body text on the onboarding result screen for State B
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll ease you back in with short sessions that build on each other. Go at whatever pace suits you.'**
+  String get onboardingResultEaseInBody;
+
+  /// Heading on the onboarding result screen for users with a regular practice (State C)
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Medito.'**
+  String get onboardingResultPracticeHeading;
+
+  /// Body text on the onboarding result screen for State C
+  ///
+  /// In en, this message translates to:
+  /// **'Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.'**
+  String get onboardingResultPracticeBody;
+
+  /// CTA button label on the onboarding result screen
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get onboardingResultCta;
 }
 
 class _AppLocalizationsDelegate

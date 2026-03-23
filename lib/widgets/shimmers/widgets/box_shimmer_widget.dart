@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:medito/utils/utils.dart';
 
 class BoxShimmerWidget extends StatelessWidget {
   const BoxShimmerWidget({
@@ -20,17 +19,24 @@ class BoxShimmerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark
+        ? const Color(0xFF3A3A44)
+        : const Color(0xFFE0E0E0);
+    final highlightColor = isDark
+        ? const Color(0xFF4E4E5A)
+        : const Color(0xFFF5F5F5);
 
     return SizedBox(
       width: width ?? size.width,
       height: height ?? size.height,
       child: Shimmer.fromColors(
-        baseColor: Theme.of(context).colorScheme.surface,
-        highlightColor: Theme.of(context).colorScheme.surface.withOpacityValue(0.4),
+        baseColor: baseColor,
+        highlightColor: highlightColor,
         period: Duration(milliseconds: delayInMiliSeconds),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
+            color: baseColor,
             borderRadius: BorderRadius.all(
               Radius.circular(borderRadius),
             ),

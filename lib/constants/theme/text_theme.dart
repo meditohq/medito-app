@@ -108,6 +108,15 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
           color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
           fontFamily: dmSans,
         ),
+        titleLarge: TextStyle(
+          // onboarding option button label
+          fontSize: 16,
+          letterSpacing: 0.2,
+          fontWeight: FontWeight.w500,
+          height: 1.3,
+          color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
+          fontFamily: dmSans,
+        ),
         labelLarge: TextStyle(
           // shortcut title
           fontSize: 20,

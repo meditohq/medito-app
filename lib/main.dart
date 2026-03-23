@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -96,19 +95,8 @@ void main() async {
 
   // Initialize Meta (Facebook) App Events
   await MetaSdkService.instance.init();
+  AppLogger.d('MAIN', 'Meta SDK init complete');
 
-  try {
-    await initializeAudioService().timeout(
-      const Duration(seconds: 3),
-      onTimeout: () {
-        AppLogger.w('MAIN', 'Audio service initialization timed out');
-        // Don't throw - audio service is not critical for basic app functionality
-      },
-    );
-  } catch (e) {
-    AppLogger.e('MAIN', 'Audio service initialization failed: $e');
-    // Continue without audio service
-  }
   usePathUrlStrategy();
 
   runApp(
@@ -126,16 +114,10 @@ void setupAudioCallback() {
   MeditoAudioServiceCallbackApi.setUp(AudioStateProvider(audioStateNotifier));
 }
 
-Future<void> initializeAudioService() async {
-  if (Platform.isIOS) {
-    await AudioService.init(
-      builder: () => iosAudioHandler,
-      config: AudioServiceConfig(
-        fastForwardInterval: const Duration(seconds: 10),
-        rewindInterval: const Duration(seconds: 10),
-      ),
-    );
-  } else if (Platform.isAndroid) {
+void initializeAudioService() {
+  // iOS uses iosAudioHandler directly - AudioService.init is not needed and hangs.
+  // Android uses the pigeon callback setup.
+  if (Platform.isAndroid) {
     setupAudioCallback();
   }
 }

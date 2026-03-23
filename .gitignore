@@ -127,3 +127,4 @@ firebase/functions/node_modules/
 # Claude Code local settings
 .claude/settings.local.json
 .claude/settings.json
+/firebase/functions/build

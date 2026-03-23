@@ -790,11 +790,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get packSetAsUpNext =>
-      'This pack will now appear in the Up Next section on the homepage';
+      'This pack will now appear in the Your Path section on the homepage';
 
   @override
   String get packUnpinnedFromUpNext =>
-      'This pack has been removed from the Up Next section';
+      'This pack has been removed from the Your Path section';
 
   @override
   String get smartReminders => 'Smart Reminders';
@@ -1779,7 +1779,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get completedAt => 'Completed at';
 
   @override
-  String get upNextTitle => 'Up Next';
+  String get upNextTitle => 'Your Path';
 
   @override
   String upNextSessionCount(int current, int total) {
@@ -1809,7 +1809,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get defaultsNote =>
-      'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.';
+      'These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.';
 
   @override
   String get streakFreezeUsed => 'Streak freeze used';
@@ -1857,7 +1857,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refresh => 'Refresh';
 
   @override
-  String get upNext => 'Up next';
+  String get upNext => 'Your Path';
 
   @override
   String get donationInfo => 'Donation info';
@@ -1873,4 +1873,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lockedContent => 'Locked';
+
+  @override
+  String get yourPathExplainerText =>
+      'Your path guides you through meditation from scratch. Starts at just 1 min and builds gradually.';
+
+  @override
+  String get yourPathExplainerSwipeHint => 'Swipe left to skip.';
+
+  @override
+  String get onboardingStep1of2 => '1 of 2';
+
+  @override
+  String get onboardingStep2of2 => '2 of 2';
+
+  @override
+  String get onboardingExperienceQuestion => 'Have you meditated before?';
+
+  @override
+  String get onboardingExperienceSubtext =>
+      'This helps us show you the right starting point.';
+
+  @override
+  String get onboardingExperienceNever => 'Never tried it';
+
+  @override
+  String get onboardingExperienceALittle => 'A little, here and there';
+
+  @override
+  String get onboardingExperienceRegular => 'I have a regular practice';
+
+  @override
+  String get onboardingIntentQuestion =>
+      'What are you hoping to get from meditation?';
+
+  @override
+  String get onboardingIntentSubtext =>
+      'Pick whichever feels most true right now.';
+
+  @override
+  String get onboardingIntentLearn => 'Learn how to meditate properly';
+
+  @override
+  String get onboardingIntentHabit => 'Build a daily habit';
+
+  @override
+  String get onboardingIntentStress => 'Manage stress, sleep, or emotions';
+
+  @override
+  String get onboardingResultLearnHeading => 'You\'re in the right place.';
+
+  @override
+  String get onboardingResultLearnBody =>
+      'We\'ll start you off with just 1 minute and build from there. No experience needed — just show up.';
+
+  @override
+  String get onboardingResultEaseInHeading => 'Good to have you here.';
+
+  @override
+  String get onboardingResultEaseInBody =>
+      'We\'ll ease you back in with short sessions that build on each other. Go at whatever pace suits you.';
+
+  @override
+  String get onboardingResultPracticeHeading => 'Welcome to Medito.';
+
+  @override
+  String get onboardingResultPracticeBody =>
+      'Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.';
+
+  @override
+  String get onboardingResultCta => 'Get started';
 }

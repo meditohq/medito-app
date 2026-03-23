@@ -20,9 +20,12 @@ class HomeRepositoryImpl extends HomeRepository {
 
   @override
   Future<HomeModel> fetchHome() async {
+    print('[HOME_REPO] Fetching home...');
     var response = await client.getRequest(HTTPConstants.home);
-
-    return HomeModel.fromJson(response);
+    print('[HOME_REPO] Got response, parsing...');
+    final model = HomeModel.fromJson(response);
+    print('[HOME_REPO] Parsed successfully');
+    return model;
   }
 
   @override

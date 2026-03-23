@@ -11,6 +11,7 @@ import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/utils/audio_completion_tracker.dart';
 import 'package:medito/services/home_widget_service.dart';
 import 'package:medito/constants/types/type_constants.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 
 // Key Rules for a Normal Streak (Without Streak Freezes)
@@ -38,8 +39,10 @@ class StatsManager {
   static const _syncTtl = Duration(seconds: 60);
 
   late StatsService _statsService;
+  late SharedPreferences _prefs;
   LocalAllStats? _allStats;
   bool _isInitialized = false;
+  Completer<void>? _initCompleter;
   DateTime? _testDate;
   DateTime? _lastSyncedAt;
   bool _dirty = false;
@@ -47,7 +50,7 @@ class StatsManager {
   StatsManager._internal();
 
   Future<bool> _acquireLock() async {
-    var prefs = await SharedPreferences.getInstance();
+    var prefs = _prefs;
     var lastLockTime = prefs.getInt(_syncLockKey) ?? 0;
     var now = _getCurrentDate().millisecondsSinceEpoch;
 
@@ -62,24 +65,36 @@ class StatsManager {
   }
 
   Future<void> _releaseLock() async {
-    var prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_syncLockKey);
+    await _prefs.remove(_syncLockKey);
   }
 
   Future<void> initialize() async {
-    if (!_isInitialized) {
+    if (_isInitialized) return;
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+      return;
+    }
+    _initCompleter = Completer<void>();
+    try {
+      _prefs = await SharedPreferences.getInstance();
       _statsService = StatsService(
         httpApiService: HttpApiService(),
-        prefs: await SharedPreferences.getInstance(),
+        prefs: _prefs,
       );
-      await _loadLastSyncedAt();
+      await _loadLastSyncedAt(_prefs);
       _isInitialized = true;
+      _initCompleter!.complete();
+    } catch (e) {
+      AppLogger.e('STATS_MANAGER', 'Initialization failed', e);
+      _initCompleter!.completeError(e);
+      _initCompleter = null;
+      rethrow;
     }
   }
 
-  Future<void> _loadLastSyncedAt() async {
+  Future<void> _loadLastSyncedAt([SharedPreferences? prefsArg]) async {
     try {
-      var prefs = await SharedPreferences.getInstance();
+      var prefs = prefsArg ?? _prefs;
       var lastSyncedTimestamp =
           prefs.getInt(SharedPreferenceConstants.statsLastSyncedAt);
       if (lastSyncedTimestamp != null && lastSyncedTimestamp > 0) {
@@ -97,7 +112,7 @@ class StatsManager {
 
   Future<void> _saveLastSyncedAt() async {
     try {
-      var prefs = await SharedPreferences.getInstance();
+      var prefs = _prefs;
       if (_lastSyncedAt != null) {
         await prefs.setInt(SharedPreferenceConstants.statsLastSyncedAt,
             _lastSyncedAt!.millisecondsSinceEpoch);
@@ -253,7 +268,7 @@ class StatsManager {
 
     // If _allStats is null, try to load from SharedPreferences
     if (localAllStats == null) {
-      var prefs = await SharedPreferences.getInstance();
+      var prefs = _prefs;
       var localAllStatsJson =
          prefs.getString(SharedPreferenceConstants.localAllStatsKey);
 
@@ -507,7 +522,7 @@ class StatsManager {
 
     //dev.log'StatsManager: Saving local stats');
 
-    var prefs = await SharedPreferences.getInstance();
+    var prefs = _prefs;
     if (_allStats != null) {
       await prefs.setString(SharedPreferenceConstants.localAllStatsKey,
           jsonEncode(_allStats!.toJson()));
@@ -516,7 +531,7 @@ class StatsManager {
 
   Future<LocalAllStats> _loadLocalAllStats() async {
     try {
-      var prefs = await SharedPreferences.getInstance();
+      var prefs = _prefs;
       var json =
            prefs.getString(SharedPreferenceConstants.localAllStatsKey);
       if (json != null) {
@@ -634,7 +649,7 @@ class StatsManager {
   }
 
   Future<void> clearAllStats() async {
-    var prefs = await SharedPreferences.getInstance();
+    var prefs = _prefs;
     await prefs.remove(SharedPreferenceConstants.localAllStatsKey);
     _allStats = LocalAllStats.empty();
     // Reset sync timestamp so that sync will run after clearing
@@ -1017,12 +1032,10 @@ class StatsManager {
   Future<void> setLastSyncedAtForTesting(DateTime? dateTime) async {
     _lastSyncedAt = dateTime;
     if (dateTime != null) {
-      var prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(SharedPreferenceConstants.statsLastSyncedAt,
+      await _prefs.setInt(SharedPreferenceConstants.statsLastSyncedAt,
           dateTime.millisecondsSinceEpoch);
     } else {
-      var prefs = await SharedPreferences.getInstance();
-      await prefs.remove(SharedPreferenceConstants.statsLastSyncedAt);
+      await _prefs.remove(SharedPreferenceConstants.statsLastSyncedAt);
     }
   }
 
@@ -1034,12 +1047,13 @@ class StatsManager {
   @visibleForTesting
   Future<void> initializeForTesting({StatsService? statsService}) async {
     if (!_isInitialized) {
+      _prefs = await SharedPreferences.getInstance();
       _statsService = statsService ??
           StatsService(
             httpApiService: HttpApiService(),
-            prefs: await SharedPreferences.getInstance(),
+            prefs: _prefs,
           );
-      await _loadLastSyncedAt();
+      await _loadLastSyncedAt(_prefs);
       _isInitialized = true;
     }
   }
