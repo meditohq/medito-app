@@ -128,3 +128,4 @@ firebase/functions/node_modules/
 .claude/settings.local.json
 .claude/settings.json
 /firebase/functions/build
+/.claude/worktrees
