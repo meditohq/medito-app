@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/theme/app_theme.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/config/superwall_config.dart';
@@ -63,39 +64,45 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    // Make Superwall configuration non-blocking with shorter timeout when offline
-    await SuperwallConfig.configure().timeout(const Duration(seconds: 5));
-  } catch (e) {
-    AppLogger.w('MAIN', 'Superwall configuration failed/timed out: $e');
-    // Don't re-throw - let the app continue without Superwall
+  if (!isMockMode) {
+    try {
+      // Make Superwall configuration non-blocking with shorter timeout when offline
+      await SuperwallConfig.configure().timeout(const Duration(seconds: 5));
+    } catch (e) {
+      AppLogger.w('MAIN', 'Superwall configuration failed/timed out: $e');
+      // Don't re-throw - let the app continue without Superwall
+    }
+  } else {
+    AppLogger.d('MAIN', 'Mock mode: skipping Superwall, Firebase, Stripe, Meta SDK');
   }
 
   var prefs = await initializeSharedPreferences();
 
-  // Initialize Firebase (non-blocking when offline)
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+  if (!isMockMode) {
+    // Initialize Firebase (non-blocking when offline)
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
-    final analyticsEnabled =
-        prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
-            true;
-    if (analyticsEnabled) {
-      await CrashlyticsService().initialize();
+      final analyticsEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+              true;
+      if (analyticsEnabled) {
+        await CrashlyticsService().initialize();
+      }
+    } catch (e) {
+      AppLogger.e('MAIN', 'Firebase initialization failed: $e');
+      // Continue without Firebase - app should still work offline
     }
-  } catch (e) {
-    AppLogger.e('MAIN', 'Firebase initialization failed: $e');
-    // Continue without Firebase - app should still work offline
+
+    // Initialize Stripe
+    await _configureStripe();
+
+    // Initialize Meta (Facebook) App Events
+    await MetaSdkService.instance.init();
+    AppLogger.d('MAIN', 'Meta SDK init complete');
   }
-
-  // Initialize Stripe
-  await _configureStripe();
-
-  // Initialize Meta (Facebook) App Events
-  await MetaSdkService.instance.init();
-  AppLogger.d('MAIN', 'Meta SDK init complete');
 
   usePathUrlStrategy();
 

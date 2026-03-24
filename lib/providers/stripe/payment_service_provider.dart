@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../constants/http/http_constants.dart';
 import '../../utils/logger.dart';
 import '../../models/stripe/payment_config_model.dart';
+import '../../mock/mock_donation_api_service.dart';
 import '../../services/network/donation_api_service.dart';
 import '../../exceptions/app_error.dart';
 import '../device_and_app_info/device_and_app_info_provider.dart';
@@ -69,7 +70,7 @@ class PaymentServiceImpl implements PaymentService {
 PaymentService paymentService(Ref ref) {
   return PaymentServiceImpl(
     ref: ref,
-    donationClient: DonationApiService(),
+    donationClient: isMockMode ? MockDonationApiService() : DonationApiService(),
   );
 }
 

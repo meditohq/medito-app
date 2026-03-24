@@ -14,6 +14,7 @@ import '../../constants/stripe/stripe_constants.dart';
 import '../../models/stripe/payment_error_model.dart';
 import '../../models/stripe/payment_intent_model.dart';
 import '../../models/stripe/payment_method_model.dart' as local_models;
+import '../../mock/mock_donation_api_service.dart';
 import '../../services/network/donation_api_service.dart';
 
 part 'payment_providers.freezed.dart';
@@ -557,6 +558,7 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
 
 @Riverpod(keepAlive: true)
 IDonationApiService donationService(Ref ref) {
+  if (isMockMode) return MockDonationApiService();
   return DonationApiService();
 }
 

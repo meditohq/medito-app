@@ -12,6 +12,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/services/secure_storage_service.dart';
+import 'package:medito/mock/mock_http_api_service.dart';
 
 // Event bus or callback type for auth events
 typedef AuthStateCallback = void Function(AuthEvent event);
@@ -38,10 +39,22 @@ class HttpApiService {
   final List<AuthStateCallback> _authCallbacks = [];
 
   factory HttpApiService() {
-    _instance ??= HttpApiService._internal();
+    if (isMockMode) {
+      _instance ??= MockHttpApiService();
+    } else {
+      _instance ??= HttpApiService._internal();
+    }
     AppLogger.d(
         'HTTP', 'Returning singleton instance #${_instance!._instanceId}');
     return _instance!;
+  }
+
+  /// Package-visible constructor for subclasses (e.g. MockHttpApiService).
+  HttpApiService.internal() {
+    AppLogger.d('HTTP', 'Creating new HttpApiService instance #$_instanceId');
+    _client.connectionTimeout = kTimeoutDuration;
+    _initializeHeaders();
+    _refreshTokenCompleter.complete();
   }
 
   HttpApiService._internal() {
