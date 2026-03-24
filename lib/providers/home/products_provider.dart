@@ -77,7 +77,7 @@ final productsProvider = FutureProvider<List<ProductGroupModel>>((ref) async {
     return groupedProducts; // Return the correctly grouped and shuffled list
   } catch (e) {
     AppLogger.e('PRODUCTS_PROVIDER', 'Error loading products', e);
-    rethrow;
+    return [];
   }
 });
 
@@ -95,6 +95,6 @@ final refreshProductsProvider =
     return products;
   } catch (e) {
     AppLogger.e('PRODUCTS_PROVIDER', 'Error refreshing products', e);
-    rethrow;
+    return [];
   }
 });
