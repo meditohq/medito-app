@@ -17,6 +17,7 @@ import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/views/home/customise_home_layout_screen.dart';
 
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/donation/superwall_donation_screen.dart';
@@ -153,6 +154,11 @@ Future<bool?> handleDonationNavigation(
   String? sourceRouteName, {
   NavigatorState? navigator,
 }) async {
+  if (isMockMode) {
+    AppLogger.d('ROUTES', 'Mock mode: skipping paywall');
+    return true;
+  }
+
   if (ref == null) {
     AppLogger.w('ROUTES', 'Cannot open donation screen: ref is null');
     return false;
