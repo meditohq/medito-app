@@ -52,7 +52,7 @@ class DndNotifier extends Notifier<bool> {
       final hasAccess = await _dndPlugin.isNotificationPolicyAccessGranted();
       if (hasAccess && state) {
         await _dndPlugin.setInterruptionFilter(
-          enable ? InterruptionFilter.priority : InterruptionFilter.all,
+          enable ? InterruptionFilter.alarms : InterruptionFilter.all,
         );
       }
     } catch (e) {
