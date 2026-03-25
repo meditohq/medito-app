@@ -4,10 +4,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../constants/http/http_constants.dart';
 import '../../utils/logger.dart';
 import '../../models/stripe/payment_config_model.dart';
-import '../../mock/mock_donation_api_service.dart';
 import '../../services/network/donation_api_service.dart';
 import '../../exceptions/app_error.dart';
 import '../device_and_app_info/device_and_app_info_provider.dart';
+import 'payment_providers.dart';
 
 part 'payment_service_provider.g.dart';
 
@@ -50,11 +50,9 @@ class PaymentServiceImpl implements PaymentService {
 
       AppLogger.d('PAYMENT', 'Stripe publishableKey: ${config.publishableKey}');
 
-      if (!isMockMode) {
-        Stripe.publishableKey = config.publishableKey;
-        Stripe.merchantIdentifier = config.merchantIdentifier;
-        await Stripe.instance.applySettings();
-      }
+      Stripe.publishableKey = config.publishableKey;
+      Stripe.merchantIdentifier = config.merchantIdentifier;
+      await Stripe.instance.applySettings();
 
       return config;
     } catch (error) {
@@ -66,12 +64,47 @@ class PaymentServiceImpl implements PaymentService {
   }
 }
 
+/// Mock implementation of [PaymentService] that returns hardcoded config
+/// without touching any Stripe SDK APIs.
+class MockPaymentServiceImpl implements PaymentService {
+  @override
+  Future<PaymentConfigModel> getPaymentConfig({
+    String? currency,
+    String? country,
+  }) async {
+    AppLogger.d('PAYMENT', 'Mock mode: returning hardcoded payment config');
+    final resolvedCurrency = currency ?? 'USD';
+    final resolvedCountry = country ?? 'US';
+    return PaymentConfigModel(
+      publishableKey: 'pk_test_mock',
+      merchantIdentifier: 'merchant.com.medito.mock',
+      merchantName: 'Medito',
+      countryCode: resolvedCountry,
+      currencyCode: resolvedCurrency,
+      supportedNetworks: const ['visa', 'mastercard', 'amex'],
+      pricing: PaymentPricing(
+        oneTime: const [500, 1000, 2000, 5000],
+        monthly: const [500, 1000, 2000],
+        yearly: const [5000, 10000, 20000],
+        currency: resolvedCurrency,
+        country: resolvedCountry,
+        suggested: const SuggestedPricing(
+          oneTime: 1000,
+          monthly: 1000,
+          yearly: 10000,
+        ),
+      ),
+    );
+  }
+}
+
 // Riverpod providers - paymentService must be defined first
 @Riverpod(keepAlive: true)
 PaymentService paymentService(Ref ref) {
+  if (isMockMode) return MockPaymentServiceImpl();
   return PaymentServiceImpl(
     ref: ref,
-    donationClient: isMockMode ? MockDonationApiService() : DonationApiService(),
+    donationClient: ref.read(donationServiceProvider),
   );
 }
 

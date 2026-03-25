@@ -473,7 +473,7 @@ class SplashViewState extends ConsumerState<SplashView>
 
       // Kick off payment config fetch in the background so it is ready before
       // the donation screen opens. Errors are handled inside the provider.
-      if (!isMockMode) ref.read(paymentConfigProvider.future).ignore();
+      ref.read(paymentConfigProvider.future).ignore();
 
       // Initialize user data (don't fail if network is unavailable)
       try {
