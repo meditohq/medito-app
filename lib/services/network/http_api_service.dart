@@ -49,13 +49,10 @@ class HttpApiService {
     return _instance!;
   }
 
-  /// Package-visible constructor for subclasses (e.g. MockHttpApiService).
-  HttpApiService.internal() {
-    AppLogger.d('HTTP', 'Creating new HttpApiService instance #$_instanceId');
-    _client.connectionTimeout = kTimeoutDuration;
-    _initializeHeaders();
-    _refreshTokenCompleter.complete();
-  }
+  /// Public constructor intended for subclasses (e.g. MockHttpApiService).
+  /// Delegates to the private `_internal` constructor to ensure consistent
+  /// initialization logic.
+  HttpApiService.internal() : this._internal();
 
   HttpApiService._internal() {
     AppLogger.d('HTTP', 'Creating new HttpApiService instance #$_instanceId');
