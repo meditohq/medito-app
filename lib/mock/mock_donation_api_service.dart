@@ -47,11 +47,13 @@ class MockDonationApiService implements IDonationApiService {
     }
     if (path.startsWith('payment-intents')) {
       return {
-        'id': 'pi_mock_001',
-        'client_secret': 'pi_mock_secret',
-        'status': 'requires_payment_method',
-        'amount': 500,
-        'currency': 'usd',
+        'data': {
+          'id': 'pi_mock_001',
+          'clientSecret': 'pi_mock_secret',
+          'status': 'requires_payment_method',
+          'amount': 500,
+          'currency': 'usd',
+        },
       };
     }
     AppLogger.w('MOCK_DONATION', 'No mock data for: $path');
