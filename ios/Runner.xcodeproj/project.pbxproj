@@ -48,9 +48,9 @@
 		EDFD4D0D2C9359BF0066E874 /* WidgetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */; };
 		EDFD4D0F2C9359BF0066E874 /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */; };
 		EDFD4D112C9359BF0066E874 /* ConsistencyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */; };
-		EDFD4D2B2C9359BF0066E874 /* UpNextWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */; };
 		EDFD4D122C9359BF0066E874 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDFD4D072C9359BF0066E874 /* Assets.xcassets */; };
 		EDFD4D242C9359BF0066E874 /* MeditoWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EDFD4D2B2C9359BF0066E874 /* UpNextWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */; };
 		F7C33FCECFCB2BD7A48BA96A /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
@@ -501,6 +501,7 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				DA924EFF1FA9E02F0BAC8C9E /* [CP] Embed Pods Frameworks */,
 				1F09CDF1A6D489A27D3AF8EB /* [CP] Copy Pods Resources */,
+				0B1891764E04B3E106D6812F /* FlutterFire: "flutterfire upload-crashlytics-symbols" */,
 			);
 			buildRules = (
 			);
@@ -641,6 +642,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0B1891764E04B3E106D6812F /* FlutterFire: "flutterfire upload-crashlytics-symbols" */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "FlutterFire: \"flutterfire upload-crashlytics-symbols\"";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\n#!/bin/bash\nPATH=\"${PATH}:$FLUTTER_ROOT/bin:${PUB_CACHE}/bin:$HOME/.pub-cache/bin\"\n\nif [ -z \"$PODS_ROOT\" ] || [ ! -d \"$PODS_ROOT/FirebaseCrashlytics\" ]; then\n  # Cannot use \"BUILD_DIR%/Build/*\" as per Firebase documentation, it points to \"flutter-project/build/ios/*\" path which doesn't have run script\n  DERIVED_DATA_PATH=$(echo \"$BUILD_ROOT\" | sed -E 's|(.*DerivedData/[^/]+).*|\\1|')\n  PATH_TO_CRASHLYTICS_UPLOAD_SCRIPT=\"${DERIVED_DATA_PATH}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\nelse\n  PATH_TO_CRASHLYTICS_UPLOAD_SCRIPT=\"$PODS_ROOT/FirebaseCrashlytics/run\"\nfi\n\n# Command to upload symbols script used to upload symbols to Firebase server\nflutterfire upload-crashlytics-symbols --upload-symbols-script-path=\"$PATH_TO_CRASHLYTICS_UPLOAD_SCRIPT\" --platform=ios --apple-project-path=\"${SRCROOT}\" --env-platform-name=\"${PLATFORM_NAME}\" --env-configuration=\"${CONFIGURATION}\" --env-project-dir=\"${PROJECT_DIR}\" --env-built-products-dir=\"${BUILT_PRODUCTS_DIR}\" --env-dwarf-dsym-folder-path=\"${DWARF_DSYM_FOLDER_PATH}\" --env-dwarf-dsym-file-name=\"${DWARF_DSYM_FILE_NAME}\" --env-infoplist-path=\"${INFOPLIST_PATH}\" --default-config=default\n";
+		};
 		1F09CDF1A6D489A27D3AF8EB /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

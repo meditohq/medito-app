@@ -1,15 +1,1 @@
-{
-  "functions": [
-    {
-      "source": "firebase/functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ]
-    }
-  ]
-}
+{"functions":[{"source":"firebase/functions","codebase":"default","ignore":["node_modules",".git","firebase-debug.log","firebase-debug.*.log","*.local"]}],"flutter":{"platforms":{"android":{"default":{"projectId":"medito-9165c","appId":"1:225683727641:android:0ef94e4f07e69584a15188","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"medito-9165c","appId":"1:225683727641:ios:a816f9ffb440006ca15188","uploadDebugSymbols":true,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"medito-9165c","configurations":{"android":"1:225683727641:android:0ef94e4f07e69584a15188","ios":"1:225683727641:ios:a816f9ffb440006ca15188","web":"1:225683727641:web:a53d6d14ec696783a15188"}}}}}}
