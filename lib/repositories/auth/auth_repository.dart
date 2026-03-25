@@ -8,7 +8,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:medito/services/network/http_api_service.dart';
-import 'package:medito/mock/mock_auth_api_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/repositories/me/me_repository.dart';
 import 'package:flutter/foundation.dart';
@@ -832,7 +831,6 @@ final authRepositoryProvider = FutureProvider<AuthRepository>((ref) async {
   // Return the repository with dependencies injected
   return AuthRepositoryImpl(
     preferences: preferences,
-    authService: isMockMode ? MockAuthApiService() : null,
   );
 });
 

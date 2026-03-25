@@ -101,7 +101,6 @@ class MockPaymentServiceImpl implements PaymentService {
 // Riverpod providers - paymentService must be defined first
 @Riverpod(keepAlive: true)
 PaymentService paymentService(Ref ref) {
-  if (isMockMode) return MockPaymentServiceImpl();
   return PaymentServiceImpl(
     ref: ref,
     donationClient: ref.read(donationServiceProvider),

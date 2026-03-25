@@ -41,6 +41,10 @@ import 'app_globals.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:medito/mock/mock_auth_api_service.dart';
+import 'package:medito/mock/mock_donation_api_service.dart';
+import 'package:medito/providers/stripe/payment_providers.dart';
+import 'package:medito/providers/stripe/payment_service_provider.dart';
 
 
 bool _hasInitialized = false;
@@ -110,7 +114,23 @@ void main() async {
     DevicePreview(
       enabled: DebugOptions.enableDevicePreview,
       builder: (context) => ProviderScope(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          if (isMockMode) ...[
+            donationServiceProvider.overrideWith(
+              (ref) => MockDonationApiService(),
+            ),
+            paymentServiceProvider.overrideWith(
+              (ref) => MockPaymentServiceImpl(),
+            ),
+            authRepositoryProvider.overrideWith((ref) async {
+              return AuthRepositoryImpl(
+                preferences: prefs,
+                authService: MockAuthApiService(),
+              );
+            }),
+          ],
+        ],
         child: const ParentWidget(),
       ),
     ),
