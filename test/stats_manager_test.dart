@@ -998,10 +998,10 @@ void main() {
 
         // Assert
         expect(statsManager.currentStats?.streakCurrent, 2,
-            reason: 'Current streak should be updated to 2 after freeze (freeze doesn\'t count)');
+            reason: 'Current streak should be 2 after freeze (freeze doesn\'t count)');
         expect(statsManager.currentStats?.streakLongest, 2,
             reason:
-                'Longest streak should be updated to 2 since current streak now exceeds previous longest');
+                'Longest streak should be updated to match current streak of 2');
       });
 
       test('applyStreakFreeze - updates timestamp', () async {

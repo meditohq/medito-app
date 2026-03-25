@@ -452,7 +452,7 @@ void main() {
             date.day == feb26.day;
       }), true);
 
-      // Streak should now be 7 days (Feb 20-25 real + Feb 27 real, with Feb 19 and Feb 26 being freezes)
+      // Streak should now be 7 real meditation days (Feb 20-25 and Feb 27; freezes on Feb 19 and Feb 26 don't count)
       expect(afterSecondFreeze.streakCurrent, 7);
       expect(afterSecondFreeze.streakLongest,
           20); // Longest streak remains unchanged
