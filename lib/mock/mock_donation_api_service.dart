@@ -39,8 +39,10 @@ class MockDonationApiService implements IDonationApiService {
     }
     if (path == 'config') {
       return {
-        'publishable_key': 'pk_test_mock',
-        'merchant_id': 'merchant.com.medito.mock',
+        'data': {
+          'publishableKey': 'pk_test_mock',
+          'merchantId': 'merchant.com.medito.mock',
+        },
       };
     }
     if (path.startsWith('payment-intents')) {
