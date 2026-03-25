@@ -129,3 +129,4 @@ firebase/functions/node_modules/
 .claude/settings.json
 /firebase/functions/build
 /.claude/worktrees
+/android/.kotlin
