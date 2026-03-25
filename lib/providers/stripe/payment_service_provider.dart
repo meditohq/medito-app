@@ -50,10 +50,11 @@ class PaymentServiceImpl implements PaymentService {
 
       AppLogger.d('PAYMENT', 'Stripe publishableKey: ${config.publishableKey}');
 
-      Stripe.publishableKey = config.publishableKey;
-      Stripe.merchantIdentifier = config.merchantIdentifier;
-
-      await Stripe.instance.applySettings();
+      if (!isMockMode) {
+        Stripe.publishableKey = config.publishableKey;
+        Stripe.merchantIdentifier = config.merchantIdentifier;
+        await Stripe.instance.applySettings();
+      }
 
       return config;
     } catch (error) {
