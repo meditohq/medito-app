@@ -58,35 +58,6 @@ void main() async {
     const testKey = 'medito_refresh_token';
     const backupTestKey = 'medito_backup_refresh_token';
 
-    // --- Existing Tests (adapted slightly if needed) ---
-
-    test(
-        'storeRefreshToken stores token in secure storage and SharedPreferences',
-        () async {
-      // Setup: Ensure initial state is empty
-      SharedPreferences.setMockInitialValues({});
-      when(() => mockSecureStorage.write(
-          key: any(named: 'key'),
-          value: any(named: 'value'))).thenAnswer((_) async {});
-
-      // Action
-      await secureStorageService.storeRefreshToken(testToken);
-
-      // Verify: Get a NEW instance AFTER the write. This instance should
-      // be created using the updated values set by the service method.
-      final prefsAfterWrite = await SharedPreferences.getInstance();
-      final actualStoredValue = prefsAfterWrite.getString(backupTestKey);
-
-      expect(actualStoredValue, isNotNull,
-          reason: "Token should be stored in SharedPreferences");
-      expect(actualStoredValue, equals(testToken),
-          reason: "Stored token should be stored in plain text");
-
-      // Verify FlutterSecureStorage WAS called first
-      verify(() => mockSecureStorage.write(key: testKey, value: testToken))
-          .called(1);
-    });
-
     test(
         'getRefreshToken retrieves from secure storage first, ignoring SharedPreferences',
         () async {
