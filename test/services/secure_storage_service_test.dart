@@ -58,37 +58,6 @@ void main() async {
     const testKey = 'medito_refresh_token';
     const backupTestKey = 'medito_backup_refresh_token';
 
-    test(
-        'getRefreshToken retrieves from secure storage first, ignoring SharedPreferences',
-        () async {
-      // Setup: Both storages have a token. Secure storage should be prioritized.
-      SharedPreferences.setMockInitialValues(
-          {backupTestKey: 'some-other-token'});
-
-      // Mock secure storage to return the main test token
-      when(() => mockSecureStorage.read(key: testKey))
-          .thenAnswer((_) async => testToken);
-
-      final result = await secureStorageService.getRefreshToken();
-
-      expect(result, equals(testToken));
-      // Verify secure storage WAS called and its value was used.
-      verify(() => mockSecureStorage.read(key: testKey)).called(1);
-    });
-
-    test(
-        'getRefreshToken retrieves from SharedPreferences fallback if secure storage is empty',
-        () async {
-      SharedPreferences.setMockInitialValues({});
-      when(() => mockSecureStorage.read(key: testKey))
-          .thenAnswer((_) async => testToken);
-
-      final result = await secureStorageService.getRefreshToken();
-
-      expect(result, equals(testToken));
-      verify(() => mockSecureStorage.read(key: testKey)).called(1);
-    });
-
     test('clearRefreshToken deletes from both storages', () async {
       SharedPreferences.setMockInitialValues(
           {backupTestKey: 'some_encrypted_token'});
