@@ -230,6 +230,9 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
+
       - name: Cache build_runner outputs
         id: cache-buildrunner
         uses: actions/cache@v4
