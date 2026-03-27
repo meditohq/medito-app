@@ -3593,7 +3593,7 @@ abstract class AppLocalizations {
   /// Question on onboarding screen 2 — asking about the user's intention
   ///
   /// In en, this message translates to:
-  /// **'What are you hoping to get from meditation?'**
+  /// **'What are you hoping to get from Medito?'**
   String get onboardingIntentQuestion;
 
   /// Subtext below the question on onboarding screen 2

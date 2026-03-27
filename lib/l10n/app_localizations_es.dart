@@ -1932,7 +1932,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingIntentQuestion =>
-      '¿Qué esperas obtener de la meditación?';
+      '¿Qué esperas obtener de la Medito?';
 
   @override
   String get onboardingIntentSubtext =>

@@ -1236,7 +1236,7 @@
   "@onboardingExperienceRegular": {
     "description": "Option 3 on onboarding screen 1 — user has a regular meditation practice"
   },
-  "onboardingIntentQuestion": "What are you hoping to get from meditation?",
+  "onboardingIntentQuestion": "What are you hoping to get from Medito?",
   "@onboardingIntentQuestion": {
     "description": "Question on onboarding screen 2 — asking about the user's intention"
   },
