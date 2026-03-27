@@ -37,7 +37,7 @@ extension OnboardingResultStateLabel on OnboardingResultState {
 ///
 /// [intentIndex] — answer to "What are you hoping to get from meditation?"
 ///   0 = Learn how to meditate properly
-///   1 = Build a daily habit
+///   1 = Build a regular habit
 ///   2 = Manage stress, sleep, or emotions
 OnboardingResultState deriveOnboardingState({
   required int experienceIndex,

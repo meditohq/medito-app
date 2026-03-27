@@ -1915,7 +1915,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingIntentLearn => 'Learn how to meditate properly';
 
   @override
-  String get onboardingIntentHabit => 'Build a daily habit';
+  String get onboardingIntentHabit => 'Build a regular habit';
 
   @override
   String get onboardingIntentStress => 'Manage stress, sleep, or emotions';

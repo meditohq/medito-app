@@ -1248,9 +1248,9 @@
   "@onboardingIntentLearn": {
     "description": "Option 1 on onboarding screen 2 — user wants to learn to meditate"
   },
-  "onboardingIntentHabit": "Build a daily habit",
+  "onboardingIntentHabit": "Build a regular habit",
   "@onboardingIntentHabit": {
-    "description": "Option 2 on onboarding screen 2 — user wants to build a daily habit"
+    "description": "Option 2 on onboarding screen 2 — user wants to build a regular habit"
   },
   "onboardingIntentStress": "Manage stress, sleep, or emotions",
   "@onboardingIntentStress": {

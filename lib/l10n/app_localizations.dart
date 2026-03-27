@@ -3608,10 +3608,10 @@ abstract class AppLocalizations {
   /// **'Learn how to meditate properly'**
   String get onboardingIntentLearn;
 
-  /// Option 2 on onboarding screen 2 — user wants to build a daily habit
+  /// Option 2 on onboarding screen 2 — user wants to build a regular habit
   ///
   /// In en, this message translates to:
-  /// **'Build a daily habit'**
+  /// **'Build a regular habit'**
   String get onboardingIntentHabit;
 
   /// Option 3 on onboarding screen 2 — user wants to manage stress, sleep, or emotions
