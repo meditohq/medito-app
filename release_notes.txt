@@ -1,5 +1,6 @@
 Unreleased
--
+- Classic purple app icon is now available on Android
+- Fixed app icon display in the settings screen on iOS
 
 3.6.4
 - Player buttons (play/pause, skip, repeat, close, and more) now have proper labels for screen readers like TalkBack and VoiceOver
