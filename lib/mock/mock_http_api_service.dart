@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/mock/mock_data.dart';
 import 'package:medito/services/network/http_api_service.dart';
@@ -11,6 +13,10 @@ class MockHttpApiService extends HttpApiService {
     setAuthHeader('mock-access-token');
   }
 
+  Map<String, dynamic> _toJsonMap(Map<String, dynamic> raw) {
+    return jsonDecode(jsonEncode(raw)) as Map<String, dynamic>;
+  }
+
   @override
   Future<Map<String, dynamic>> getRequest(
     String path, {
@@ -18,7 +24,7 @@ class MockHttpApiService extends HttpApiService {
   }) async {
     await Future.delayed(const Duration(milliseconds: 100));
     AppLogger.d('MOCK_HTTP', 'GET $path');
-    return _matchResponse(path);
+    return _toJsonMap(_matchResponse(path));
   }
 
   @override
@@ -28,7 +34,7 @@ class MockHttpApiService extends HttpApiService {
   }) async {
     await Future.delayed(const Duration(milliseconds: 100));
     AppLogger.d('MOCK_HTTP', 'POST $path');
-    return _matchResponse(path);
+    return _toJsonMap(_matchResponse(path));
   }
 
   @override
