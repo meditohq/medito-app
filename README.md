@@ -42,36 +42,27 @@ Contributors can run the app without any API keys or Firebase setup using mock m
    dart run build_runner build --delete-conflicting-outputs
    ```
 
-3. Create a minimal `android/keystore.properties` for debug signing (copy the example and fill in the Android debug keystore):
+3. Create `android/keystore.properties` using your own debug keystore. The Android SDK auto-creates one at `~/.android/debug.keystore` with default credentials:
    ```
    cp android/keystore.properties.example android/keystore.properties
    ```
-   Then edit `android/keystore.properties`:
+   Then edit `android/keystore.properties` with your keystore details:
    ```
-   storePassword=android
-   keyPassword=android
-   keyAlias=androiddebugkey
-   storeFile=/Users/<you>/.android/debug.keystore
+   storePassword=<your-keystore-password>
+   keyPassword=<your-key-password>
+   keyAlias=<your-key-alias>
+   storeFile=<absolute-path-to-your-keystore>
    appId=meditofoundation.medito
    versionCode=1
    versionName=1.0.0
    ```
+   For the default Android debug keystore the password, key password, and alias are `android`, `android`, and `androiddebugkey` respectively.
 
-4. Create a placeholder `android/app/google-services.json` (Firebase is skipped in mock mode, but Gradle requires the file):
-   ```json
-   {
-     "project_info": { "project_number": "000000000000", "project_id": "medito-mock", "storage_bucket": "medito-mock.appspot.com" },
-     "client": [
-       { "client_info": { "mobilesdk_app_id": "1:000000000000:android:0000000000000001", "android_client_info": { "package_name": "meditofoundation.medito.dev" } }, "oauth_client": [], "api_key": [{ "current_key": "mock_api_key" }], "services": { "appinvite_service": { "other_platform_oauth_client": [] } } },
-       { "client_info": { "mobilesdk_app_id": "1:000000000000:android:0000000000000000", "android_client_info": { "package_name": "meditofoundation.medito" } }, "oauth_client": [], "api_key": [{ "current_key": "mock_api_key" }], "services": { "appinvite_service": { "other_platform_oauth_client": [] } } }
-     ],
-     "configuration_version": "1"
-   }
-   ```
+4. Create a placeholder `android/app/google-services.json` (Firebase is skipped in mock mode, but Gradle requires the file)
 
-5. Run the app with the `--dart-define=MOCK_MODE=true` flag and the `dev` flavor:
+5. Run the app using the **"Flutter (Mock)"** run configuration in VS Code or Android Studio, or from the terminal:
    ```
-   flutter run --dart-define=MOCK_MODE=true --flavor dev -d <device-id>
+   flutter run --flavor dev --dart-define=MOCK_MODE=true -d <device-id>
    ```
 
 In mock mode, Firebase, Superwall, Stripe, and Meta SDK are all skipped. The app runs with sample content so you can work on UI and logic without real credentials.
@@ -116,23 +107,27 @@ This project supports separate development and production configurations. Here's
 
 #### Visual Studio Code
 
-1. Open the project in VSCode.
-2. Go to the Run and Debug view (Ctrl+Shift+D or Cmd+Shift+D on macOS).
-3. In the dropdown at the top of the sidebar, you can choose between:
-   - "Flutter (Dev)" for development configuration
-   - "Flutter (Prod)" for production configuration
-4. Click the play button or press F5 to start debugging with the selected configuration.
+Add the following to your `.vscode/launch.json` (this file is gitignored, so each developer maintains their own):
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "name": "Flutter (Dev)", "request": "launch", "type": "dart", "args": ["--flavor", "dev", "--dart-define-from-file=../.staging.json"] },
+    { "name": "Flutter (Prod)", "request": "launch", "type": "dart", "args": ["--flavor", "prod"] },
+    { "name": "Flutter (Mock)", "request": "launch", "type": "dart", "args": ["--flavor", "dev", "--dart-define=MOCK_MODE=true"] }
+  ]
+}
+```
 
 #### Android Studio
 
 1. Open the project in Android Studio.
 2. In the toolbar, you'll see a dropdown next to the run button.
-3. Select either "Flutter (Dev)" or "Flutter (Prod)" from this dropdown.
+3. Select "Flutter (Dev)", "Flutter (Prod)", or "Flutter (Mock)" from this dropdown.
 4. Click the run button or press Shift+F10 to run the selected configuration.
 
-These configurations are defined in:
-- `.vscode/launch.json` for VSCode
-- `.run/Flutter_Dev.run.xml` and `.run/Flutter_Prod.run.xml` for Android Studio
+These configurations are defined in `.run/Flutter (Dev).run.xml`, `.run/Flutter (Prod).run.xml`, and `.run/Flutter (Mock).run.xml`.
 
 Ensure that your `android/app/build.gradle` file has the corresponding flavor configurations set up correctly.
 
