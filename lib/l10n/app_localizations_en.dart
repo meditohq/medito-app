@@ -1905,7 +1905,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingIntentQuestion =>
-      'What are you hoping to get from meditation?';
+      'What are you hoping to get from Medito?';
 
   @override
   String get onboardingIntentSubtext =>

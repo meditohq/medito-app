@@ -111,6 +111,24 @@ class SecureStorageService {
     return token.length > 10 && _isPrintableAscii(token);
   }
 
+  // Store refresh token in SharedPreferences
+  Future<void> _storeRefreshToken(String token) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_backupRefreshTokenKey, token);
+      dev.log(
+        '[SECURE_STORAGE] Refresh token stored in SharedPreferences',
+        level: 800,
+      );
+    } catch (e) {
+      dev.log(
+        '[SECURE_STORAGE] Error storing refresh token',
+        error: e,
+        level: 800,
+      );
+    }
+  }
+
   // Retrieve refresh token from SharedPreferences
   Future<String?> _getRefreshToken() async {
     try {
@@ -222,6 +240,45 @@ class SecureStorageService {
       // still continue to try backup so user isn't logged out entirely.
     }
 
+    // 2. Emit analytics that we are about to write the backup copy.
+    FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventTokenBackupStorageAttempt,
+      parameters: {
+        'timestamp': DateTime.now().toIso8601String(),
+        'token_length': token.length,
+      },
+    );
+
+    // 3. Write the XOR-encrypted backup to SharedPreferences.
+    try {
+      await _storeRefreshToken(token);
+
+      FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventTokenBackupStorageResult,
+        parameters: {
+          'result': 'success',
+          'timestamp': DateTime.now().toIso8601String(),
+          'token_length': token.length,
+        },
+      );
+    } catch (e) {
+      // Log and bubble up.
+      FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventTokenBackupStorageResult,
+        parameters: {
+          'result': 'failure',
+          'error': e.toString(),
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+      CrashlyticsService().recordError(
+        e,
+        StackTrace.current,
+        reason:
+            'SecureStorage: Failed to write refresh token to backup storage',
+      );
+      rethrow;
+    }
   }
 
   // Priority order for reads: secure-storage first, then backup SharedPrefs.

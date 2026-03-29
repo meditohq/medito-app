@@ -75,7 +75,6 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
       } else {
         await DynamicAppIconFlutterPlus.setAlternateIconName(
           option.iconName,
-          showAlert: false,
         );
         if (mounted) {
           setState(() => _currentIconName = option.iconName);
@@ -135,10 +134,10 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
                   ListView.separated(
                     controller: _scrollController,
                     scrollDirection: Axis.horizontal,
-                    itemCount: AppIconOption.values.length,
+                    itemCount: AppIconOption.availableOptions.length,
                     separatorBuilder: (_, _) => const SizedBox(width: 12),
                     itemBuilder: (context, index) {
-                      final option = AppIconOption.values[index];
+                      final option = AppIconOption.availableOptions[index];
                       final isSelected = _currentIconName == option.iconName;
 
                       return _AppIconItem(
