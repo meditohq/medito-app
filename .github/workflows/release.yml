@@ -230,6 +230,9 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
+
       - name: Cache build_runner outputs
         id: cache-buildrunner
         uses: actions/cache@v4
@@ -346,7 +349,7 @@ jobs:
         working-directory: ios
         env:
           PAYWALL_ENV: ${{ inputs.paywall_env || 'live' }}
-          MATCH_READONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.match_readonly || 'true' }}
+          MATCH_READONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.match_readonly || 'false' }}
           MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}

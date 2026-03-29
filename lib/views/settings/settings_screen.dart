@@ -145,8 +145,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         path: TypeConstants.theme,
       ),
-      if (Platform.isAndroid)
-        SettingsItem(
+      SettingsItem(
           section: AppLocalizations.of(context)!.customizationSection,
           type: TypeConstants.appIcon,
           title: AppLocalizations.of(context)!.appIconTitle,
