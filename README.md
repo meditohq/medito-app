@@ -14,18 +14,49 @@ The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App
 
 **NOTE:** If you install the Medito app using the APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
 
-## How to Contribute
+### Contributions (Running in Mock Mode (no keys required))
 
-We are a small team and are not looking for people who can contribute to the project at the moment. We don't have time to onboard anyone, sorry.
+Contributors can run the app without any API keys or Firebase setup using mock mode. All network calls are intercepted and return hardcoded sample data — no real credentials are needed.
 
-~~To contribute, please message us on our Telegram channel. You can access it by joining [https://t.me/meditoapp](https://t.me/meditoapp) and then going to "Discussion." Let us know that you are looking to contribute to the code, specify for how many hours per week, and how many years of experience with Flutter you have. Also, please include a link to your GitHub profile or portfolio.~~
+1. Clone the repository and install dependencies:
+   ```
+   git clone https://github.com/meditohq/medito-app.git
+   cd medito-app
+   flutter pub get
+   ```
 
-## How to Build the Project
+2. Generate required code (Pigeon + Riverpod):
+   ```
+   flutter pub run pigeon --input pigeon_conf.dart
+   dart run build_runner build --delete-conflicting-outputs
+   ```
 
-We cannot provide keys at the moment due to various constraints. This will hopefully change in the near future.
-~~You will not be able to run the project without the necessary keys. Please message us on Telegram first to request access to these keys. We use external libraries that require specific keys, and we will need to chat with you directly to provide these.~~
+3. Create `android/keystore.properties` using your own debug keystore. The Android SDK auto-creates one at `~/.android/debug.keystore` with default credentials:
+   ```
+   cp android/keystore.properties.example android/keystore.properties
+   ```
+   Then edit `android/keystore.properties` with your keystore details:
+   ```
+   storePassword=<your-keystore-password>
+   keyPassword=<your-key-password>
+   keyAlias=<your-key-alias>
+   storeFile=<absolute-path-to-your-keystore>
+   appId=meditofoundation.medito
+   versionCode=1
+   versionName=1.0.0
+   ```
+   For the default Android debug keystore the password, key password, and alias are `android`, `android`, and `androiddebugkey` respectively.
 
-### Setup
+4. Create a placeholder `android/app/google-services.json` (Firebase is skipped in mock mode, but Gradle requires the file)
+
+5. Run the app using the **"Flutter (Mock)"** run configuration in VS Code or Android Studio, or from the terminal:
+   ```
+   flutter run --flavor dev --dart-define=MOCK_MODE=true -d <device-id>
+   ```
+
+In mock mode, Firebase, Superwall, Stripe, and Meta SDK are all skipped. The app runs with sample content so you can work on UI and logic without real credentials.
+
+### Setup (with real keys)
 
 1. Clone the repository:
    ```
@@ -65,23 +96,27 @@ This project supports separate development and production configurations. Here's
 
 #### Visual Studio Code
 
-1. Open the project in VSCode.
-2. Go to the Run and Debug view (Ctrl+Shift+D or Cmd+Shift+D on macOS).
-3. In the dropdown at the top of the sidebar, you can choose between:
-   - "Flutter (Dev)" for development configuration
-   - "Flutter (Prod)" for production configuration
-4. Click the play button or press F5 to start debugging with the selected configuration.
+Add the following to your `.vscode/launch.json` (this file is gitignored, so each developer maintains their own):
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "name": "Flutter (Dev)", "request": "launch", "type": "dart", "args": ["--flavor", "dev", "--dart-define-from-file=../.staging.json"] },
+    { "name": "Flutter (Prod)", "request": "launch", "type": "dart", "args": ["--flavor", "prod"] },
+    { "name": "Flutter (Mock)", "request": "launch", "type": "dart", "args": ["--flavor", "dev", "--dart-define=MOCK_MODE=true"] }
+  ]
+}
+```
 
 #### Android Studio
 
 1. Open the project in Android Studio.
 2. In the toolbar, you'll see a dropdown next to the run button.
-3. Select either "Flutter (Dev)" or "Flutter (Prod)" from this dropdown.
+3. Select "Flutter (Dev)", "Flutter (Prod)", or "Flutter (Mock)" from this dropdown.
 4. Click the run button or press Shift+F10 to run the selected configuration.
 
-These configurations are defined in:
-- `.vscode/launch.json` for VSCode
-- `.run/Flutter_Dev.run.xml` and `.run/Flutter_Prod.run.xml` for Android Studio
+These configurations are defined in `.run/Flutter (Dev).run.xml`, `.run/Flutter (Prod).run.xml`, and `.run/Flutter (Mock).run.xml`.
 
 Ensure that your `android/app/build.gradle` file has the corresponding flavor configurations set up correctly.
 
