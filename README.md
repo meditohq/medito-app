@@ -14,18 +14,7 @@ The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App
 
 **NOTE:** If you install the Medito app using the APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
 
-## How to Contribute
-
-We are a small team and are not looking for people who can contribute to the project at the moment. We don't have time to onboard anyone, sorry.
-
-~~To contribute, please message us on our Telegram channel. You can access it by joining [https://t.me/meditoapp](https://t.me/meditoapp) and then going to "Discussion." Let us know that you are looking to contribute to the code, specify for how many hours per week, and how many years of experience with Flutter you have. Also, please include a link to your GitHub profile or portfolio.~~
-
-## How to Build the Project
-
-We cannot provide keys at the moment due to various constraints. This will hopefully change in the near future.
-~~You will not be able to run the project without the necessary keys. Please message us on Telegram first to request access to these keys. We use external libraries that require specific keys, and we will need to chat with you directly to provide these.~~
-
-### Running in Mock Mode (no keys required)
+### Contributions (Running in Mock Mode (no keys required))
 
 Contributors can run the app without any API keys or Firebase setup using mock mode. All network calls are intercepted and return hardcoded sample data — no real credentials are needed.
 
