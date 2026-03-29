@@ -1,5 +1,6 @@
 import '../../utils/logger.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/services/network/http_api_service.dart';
 
@@ -13,6 +14,7 @@ class HeaderService {
   }
 
   void _initFcmTokenListener() {
+    if (isMockMode) return;
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
       _fcmToken = fcmToken;
       _updateHeaders();
@@ -20,6 +22,10 @@ class HeaderService {
   }
 
   Future<void> initialise() async {
+    if (isMockMode) {
+      _updateHeaders();
+      return;
+    }
     try {
       _fcmToken = await FirebaseMessaging.instance.getToken();
       if (_fcmToken == null) {
