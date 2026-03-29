@@ -25,7 +25,58 @@ We are a small team and are not looking for people who can contribute to the pro
 We cannot provide keys at the moment due to various constraints. This will hopefully change in the near future.
 ~~You will not be able to run the project without the necessary keys. Please message us on Telegram first to request access to these keys. We use external libraries that require specific keys, and we will need to chat with you directly to provide these.~~
 
-### Setup
+### Running in Mock Mode (no keys required)
+
+Contributors can run the app without any API keys or Firebase setup using mock mode. All network calls are intercepted and return hardcoded sample data — no real credentials are needed.
+
+1. Clone the repository and install dependencies:
+   ```
+   git clone https://github.com/meditohq/medito-app.git
+   cd medito-app
+   flutter pub get
+   ```
+
+2. Generate required code (Pigeon + Riverpod):
+   ```
+   flutter pub run pigeon --input pigeon_conf.dart
+   dart run build_runner build --delete-conflicting-outputs
+   ```
+
+3. Create a minimal `android/keystore.properties` for debug signing (copy the example and fill in the Android debug keystore):
+   ```
+   cp android/keystore.properties.example android/keystore.properties
+   ```
+   Then edit `android/keystore.properties`:
+   ```
+   storePassword=android
+   keyPassword=android
+   keyAlias=androiddebugkey
+   storeFile=/Users/<you>/.android/debug.keystore
+   appId=meditofoundation.medito
+   versionCode=1
+   versionName=1.0.0
+   ```
+
+4. Create a placeholder `android/app/google-services.json` (Firebase is skipped in mock mode, but Gradle requires the file):
+   ```json
+   {
+     "project_info": { "project_number": "000000000000", "project_id": "medito-mock", "storage_bucket": "medito-mock.appspot.com" },
+     "client": [
+       { "client_info": { "mobilesdk_app_id": "1:000000000000:android:0000000000000001", "android_client_info": { "package_name": "meditofoundation.medito.dev" } }, "oauth_client": [], "api_key": [{ "current_key": "mock_api_key" }], "services": { "appinvite_service": { "other_platform_oauth_client": [] } } },
+       { "client_info": { "mobilesdk_app_id": "1:000000000000:android:0000000000000000", "android_client_info": { "package_name": "meditofoundation.medito" } }, "oauth_client": [], "api_key": [{ "current_key": "mock_api_key" }], "services": { "appinvite_service": { "other_platform_oauth_client": [] } } }
+     ],
+     "configuration_version": "1"
+   }
+   ```
+
+5. Run the app with the `--dart-define=MOCK_MODE=true` flag and the `dev` flavor:
+   ```
+   flutter run --dart-define=MOCK_MODE=true --flavor dev -d <device-id>
+   ```
+
+In mock mode, Firebase, Superwall, Stripe, and Meta SDK are all skipped. The app runs with sample content so you can work on UI and logic without real credentials.
+
+### Setup (with real keys)
 
 1. Clone the repository:
    ```
