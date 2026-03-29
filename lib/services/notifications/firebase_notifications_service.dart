@@ -13,6 +13,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
@@ -38,6 +39,10 @@ class FirebaseMessagingHandler {
   FirebaseMessagingHandler(this.ref);
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
+    if (isMockMode) {
+      AppLogger.d('FIREBASE_NOTIFICATIONS', 'Mock mode: skipping Firebase Messaging init');
+      return;
+    }
     try {
       await _setupFlutterNotifications();
       _configureFirebaseMessaging(context, ref);

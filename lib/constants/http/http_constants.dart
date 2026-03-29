@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 
+bool get isMockMode =>
+    const String.fromEnvironment('MOCK_MODE', defaultValue: 'false') == 'true';
+
 class EnvConfig {
   final String environment;
   final String contentBaseUrl;
