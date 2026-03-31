@@ -536,8 +536,8 @@ void main() {
       expect(result?.totalTracksCompleted, 8,
           reason:
               'Should use remote value for numeric fields since it has newer timestamp');
-      expect(result?.streakCurrent, 4,
-          reason: 'Should have the correct streak current value');
+      expect(result?.streakCurrent, 3,
+          reason: 'Should have the correct streak current value (freeze bridges gap but doesn\'t count)');
       expect(result?.streakLongest, 5,
           reason: 'Should have the correct streak longest value');
       expect(result?.totalTimeListened, 800,
@@ -1897,10 +1897,10 @@ void main() {
         var result = statsManager.calculateStreak(stats);
 
         // Assert
-        // Should have a streak of 6 (Feb 22-28) because freeze covers the gap on Feb 26
+        // Should have a streak of 6 real meditation days (Feb 22-25, 27, 28) because freeze covers the gap on Feb 26
         // The streak breaks at Feb 21 (between Feb 20 and Feb 22)
-        expect(result.streakCurrent, 7);
-        expect(result.streakLongest, 7);
+        expect(result.streakCurrent, 6);
+        expect(result.streakLongest, 6);
       });
 
       test('calculateStreak - with freezes on both Feb 21 and Feb 26', () {
@@ -1945,9 +1945,9 @@ void main() {
         var result = statsManager.calculateStreak(stats);
 
         // Assert
-        // Should have a streak of 9 (Feb 20-28) because freezes cover both gaps
-        expect(result.streakCurrent, 9);
-        expect(result.streakLongest, 9);
+        // Should have a streak of 7 real meditation days (Feb 20, 22-25, 27, 28) because freezes cover both gaps
+        expect(result.streakCurrent, 7);
+        expect(result.streakLongest, 7);
       });
 
       test('shouldSuggestStreakFreeze - suggests freeze for gap on Feb 26',
