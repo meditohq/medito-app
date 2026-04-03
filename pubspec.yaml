@@ -46,7 +46,7 @@ dependencies:
   flutter_riverpod: ^3.3.1
   flutter_secure_storage: ^10.0.0
   flutter_staggered_grid_view: ^0.7.0
-  flutter_stripe: 12.4.0
+  flutter_stripe: 12.5.0
   flutter_svg: ^2.2.4
   facebook_app_events: ^0.26.0
   freezed_annotation: ^3.1.0
