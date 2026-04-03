@@ -1550,6 +1550,24 @@ abstract class AppLocalizations {
   /// **'Enable Notifications'**
   String get enableNotificationsCta;
 
+  /// No description provided for @onboardingBatteryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'One Setting, Smoother Meditations'**
+  String get onboardingBatteryTitle;
+
+  /// No description provided for @onboardingBatteryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone can pause Medito mid-session. One quick change prevents this.'**
+  String get onboardingBatteryBody;
+
+  /// No description provided for @onboardingBatteryOptimize.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Setting'**
+  String get onboardingBatteryOptimize;
+
   /// No description provided for @skipForNow.
   ///
   /// In en, this message translates to:
@@ -3608,10 +3626,10 @@ abstract class AppLocalizations {
   /// **'Learn how to meditate properly'**
   String get onboardingIntentLearn;
 
-  /// Option 2 on onboarding screen 2 — user wants to build a daily habit
+  /// Option 2 on onboarding screen 2 — user wants to build a regular habit
   ///
   /// In en, this message translates to:
-  /// **'Build a daily habit'**
+  /// **'Build a regular habit'**
   String get onboardingIntentHabit;
 
   /// Option 3 on onboarding screen 2 — user wants to manage stress, sleep, or emotions
