@@ -1274,7 +1274,6 @@ void main() {
           var twoDaysAgo = DateTime(today.year, today.month, today.day - 2);
           var threeDaysAgo = DateTime(today.year, today.month, today.day - 3);
           var fourDaysAgo = DateTime(today.year, today.month, today.day - 4);
-          var fiveDaysAgo = DateTime(today.year, today.month, today.day - 5);
           statsManager.setCurrentDateForTesting(today);
 
           var stats = LocalAllStats.empty().copyWith(
