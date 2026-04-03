@@ -188,6 +188,7 @@ jobs:
           if [ -z "$notes" ]; then
             notes=$(awk '/^[0-9]/{in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
+          notes="${notes:0:500}"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
       - name: Upload to Play Store
@@ -343,6 +344,7 @@ jobs:
               in_v && NF && !/^- / { exit }
             ' release_notes.txt)
           fi
+          notes="${notes:0:500}"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
       - name: Build & upload iOS release
