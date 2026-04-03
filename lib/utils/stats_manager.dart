@@ -24,7 +24,7 @@ import 'package:medito/utils/stats_updater.dart';
 // Key Rules for Streak Freezes
 // 	1.	Streak freezes prevent a reset but must be activated manually. If a user opens the app after missing a day, they will have the option to use a streak freeze before the streak resets.
 // 	2.	Each streak freeze covers only one missed day. If a user misses multiple days, they need an equal number of streak freezes to restore their streak.
-// 	3.	Streak freezes apply to specific missed days. If a freeze is used, it fills in a skipped day, making it look like the user meditated on that day.
+// 	3.	Streak freezes apply to specific missed days. If a freeze is used, it bridges the gap so the streak is not broken, but does not add to the streak counter since no meditation was completed.
 // 	4.	The app only suggests a streak restoration if the user has enough streak freezes. If a user misses multiple days but does not have enough streak freezes to cover all of them, the app does not offer a partial restoration.
 // 	5.	Streak freezes do not apply automatically. Users must choose to use them when they open the app after missing a day.
 // 	6.	After using a streak freeze, meditating that day continues the streak. If a streak freeze is applied and the user meditates, the streak progresses as if no days were missed.
@@ -441,7 +441,7 @@ class StatsManager {
       return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
     }
 
-    // Check if there's activity on today
+    // Check if there's any activity (real or freeze) on today
     var hasActivityToday = allActivityDates.any(
       (date) =>
           date.year == today.year &&
@@ -449,7 +449,15 @@ class StatsManager {
           date.day == today.day,
     );
 
-    // Check yesterday's activity
+    // Check if there's real meditation activity on today
+    var hasRealActivityToday = audioDates.any(
+      (date) =>
+          date.year == today.year &&
+          date.month == today.month &&
+          date.day == today.day,
+    );
+
+    // Check yesterday's activity (real or freeze, for continuity)
     // DST-safe: Duration(days:1) can skip a calendar day at spring-forward.
     var yesterday = DateTime(today.year, today.month, today.day - 1);
     //dev.log
@@ -469,17 +477,20 @@ class StatsManager {
       return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
     }
 
-    // If there's activity today but not yesterday, streak is 1
+    // If there's activity today but not yesterday, streak starts fresh
     if (hasActivityToday && !hasActivityYesterday) {
-      //dev.log'Activity today but not yesterday, returning streak = 1');
+      // Only count as 1 if there's real meditation today, not just a freeze
+      var realStreak = hasRealActivityToday ? 1 : 0;
+      //dev.log'Activity today but not yesterday, returning streak = $realStreak');
       return allStats.copyWith(
-        streakCurrent: 1,
-        streakLongest: longestStreak > 1 ? longestStreak : 1,
+        streakCurrent: realStreak,
+        streakLongest: longestStreak > realStreak ? longestStreak : realStreak,
       );
     }
 
-    // Start with a streak of 1 if we have activity today, or 0 otherwise
-    var streak = hasActivityToday ? 1 : 0;
+    // Start counting: only real meditation days count toward the streak number,
+    // but freeze days maintain continuity (don't break the streak).
+    var streak = hasRealActivityToday ? 1 : 0;
 
     // Count consecutive days starting from yesterday
     var checkDate = yesterday;
@@ -494,9 +505,18 @@ class StatsManager {
       );
 
       if (hasActivityOnDate) {
-        streak++;
+        // Only count real meditation days toward the streak number
+        var hasRealActivityOnDate = audioDates.any(
+          (date) =>
+              date.year == checkDate.year &&
+              date.month == checkDate.month &&
+              date.day == checkDate.day,
+        );
+        if (hasRealActivityOnDate) {
+          streak++;
+        }
         //dev.log
-        //            'Found activity on ${checkDate.toIso8601String()}, streak = $streak');
+        //            'Found activity on ${checkDate.toIso8601String()}, real=$hasRealActivityOnDate, streak = $streak');
         // DST-safe day decrement.
         checkDate = DateTime(
           checkDate.year,
