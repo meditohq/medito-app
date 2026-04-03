@@ -797,6 +797,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enableNotificationsCta => 'Habilitar Notificaciones';
 
   @override
+  String get onboardingBatteryTitle =>
+      'Mantén las Meditaciones Sin Interrupciones';
+
+  @override
+  String get onboardingBatteryBody =>
+      'Algunos dispositivos Android detienen apps en segundo plano, lo que puede interrumpir tus sesiones. Desactiva la optimización de batería para meditar sin interrupciones.';
+
+  @override
+  String get onboardingBatteryOptimize => 'Desactivar Optimización de Batería';
+
+  @override
   String get skipForNow => 'Omitir por Ahora';
 
   @override
@@ -1932,7 +1943,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingIntentQuestion =>
-      '¿Qué esperas obtener de la Medito?';
+      '¿Qué esperas obtener de Medito?';
 
   @override
   String get onboardingIntentSubtext =>

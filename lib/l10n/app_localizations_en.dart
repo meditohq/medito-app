@@ -783,6 +783,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableNotificationsCta => 'Enable Notifications';
 
   @override
+  String get onboardingBatteryTitle => 'One Setting, Smoother Meditations';
+
+  @override
+  String get onboardingBatteryBody =>
+      'Your phone can pause Medito mid-session. One quick change prevents this.';
+
+  @override
+  String get onboardingBatteryOptimize => 'Update Setting';
+
+  @override
   String get skipForNow => 'Skip for Now';
 
   @override
@@ -1915,7 +1925,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingIntentLearn => 'Learn how to meditate properly';
 
   @override
-  String get onboardingIntentHabit => 'Build a daily habit';
+  String get onboardingIntentHabit => 'Build a regular habit';
 
   @override
   String get onboardingIntentStress => 'Manage stress, sleep, or emotions';
