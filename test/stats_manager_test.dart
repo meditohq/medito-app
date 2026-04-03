@@ -1364,8 +1364,8 @@ void main() {
             true,
           );
 
-          // Streak should be 4 days (today + 2 earlier activity days; 2 freezes bridge gaps but don't count)
-          expect(afterFreezes.streakCurrent, 4);
+          // Streak should be 3 days (today + threeDaysAgo + fourDaysAgo; 2 freezes bridge gaps but don't count)
+          expect(afterFreezes.streakCurrent, 3);
         },
       );
 
