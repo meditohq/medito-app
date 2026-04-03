@@ -1942,8 +1942,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get onboardingExperienceRegular => 'Tengo una práctica regular';
 
   @override
-  String get onboardingIntentQuestion =>
-      '¿Qué esperas obtener de Medito?';
+  String get onboardingIntentQuestion => '¿Qué esperas obtener de Medito?';
 
   @override
   String get onboardingIntentSubtext =>

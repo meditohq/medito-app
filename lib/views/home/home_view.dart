@@ -23,7 +23,6 @@ import 'widgets/up_next/your_path_explainer_strip.dart';
 
 import '../../providers/home/announcement_provider.dart';
 import '../../providers/home/up_next_provider.dart';
-import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -128,16 +127,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                           child = const HomeProductsSection();
                           break;
                         case HomeWidgetType.upNext:
-                          final prefs = ref.read(sharedPreferencesProvider);
-                          final hasSeenExplainer = prefs.getBool(
-                                SharedPreferenceConstants.hasSeenYourPathExplainer,
-                              ) ??
-                              false;
                           child = UpNextWidget(
                             key: ValueKey(type.name),
-                            inlineStrip: hasSeenExplainer
-                                ? null
-                                : const YourPathExplainerStrip(),
+                            inlineStrip: const YourPathExplainerStrip(),
                           );
                           break;
                       }
