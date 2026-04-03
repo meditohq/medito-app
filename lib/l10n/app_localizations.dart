@@ -1550,6 +1550,24 @@ abstract class AppLocalizations {
   /// **'Enable Notifications'**
   String get enableNotificationsCta;
 
+  /// No description provided for @onboardingBatteryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'One Setting, Smoother Meditations'**
+  String get onboardingBatteryTitle;
+
+  /// No description provided for @onboardingBatteryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone can pause Medito mid-session. One quick change prevents this.'**
+  String get onboardingBatteryBody;
+
+  /// No description provided for @onboardingBatteryOptimize.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Setting'**
+  String get onboardingBatteryOptimize;
+
   /// No description provided for @skipForNow.
   ///
   /// In en, this message translates to:

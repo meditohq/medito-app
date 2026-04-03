@@ -33,6 +33,7 @@ dependencies:
   cached_network_image: ^3.4.1
   crypto: ^3.0.7
   device_info_plus: ^12.3.0
+  disable_battery_optimization: ^1.1.2
   do_not_disturb: ^1.0.3
   email_validator: ^3.0.0
   equatable: ^2.0.8

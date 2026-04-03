@@ -24,7 +24,6 @@ import 'widgets/up_next/your_path_explainer_strip.dart';
 import '../../providers/home/announcement_provider.dart';
 import '../../providers/home/up_next_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
-import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 class HomeView extends ConsumerStatefulWidget {

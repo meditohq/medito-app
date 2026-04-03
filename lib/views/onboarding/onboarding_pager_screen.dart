@@ -13,6 +13,7 @@ import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/views/onboarding/onboarding_question_screen.dart';
 import 'package:medito/views/onboarding/onboarding_result_screen.dart';
+import 'package:medito/views/onboarding/battery_optimization_screen.dart';
 import 'package:medito/views/onboarding/tracking_permission_screen.dart';
 import 'package:medito/widgets/onboarding/progress_indicator_widget.dart';
 
@@ -31,6 +32,8 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   // Answers from the question screens (set before advancing to result).
   int? _experienceIndex;
   int? _intentIndex;
+
+  bool _showBatteryScreen = false;
 
   final List<String> _images = [
     AssetConstants.onboardingImage1,
@@ -93,6 +96,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
       NotificationsScreen(onNext: _nextPage),
       OnboardingDonationScreen(onNext: _nextPage),
       if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),
+      if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
       OnboardingQuestionScreen(
         question: l10n.onboardingExperienceQuestion,
         subtext: l10n.onboardingExperienceSubtext,
@@ -133,6 +137,9 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   @override
   void initState() {
     super.initState();
+    shouldShowBatteryOptimizationScreen().then((show) {
+      if (mounted) setState(() => _showBatteryScreen = show);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadSuperwallConfig();
       unawaited(
