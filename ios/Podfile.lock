@@ -31,18 +31,18 @@ PODS:
   - Firebase/Messaging (12.9.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 12.9.0)
-  - firebase_analytics (12.1.3):
+  - firebase_analytics (12.2.0):
     - firebase_core
     - FirebaseAnalytics (= 12.9.0)
     - Flutter
-  - firebase_core (4.5.0):
+  - firebase_core (4.6.0):
     - Firebase/CoreOnly (= 12.9.0)
     - Flutter
-  - firebase_crashlytics (5.0.8):
+  - firebase_crashlytics (5.1.0):
     - Firebase/Crashlytics (= 12.9.0)
     - firebase_core
     - Flutter
-  - firebase_messaging (16.1.2):
+  - firebase_messaging (16.1.3):
     - Firebase/Messaging (= 12.9.0)
     - firebase_core
     - Flutter
@@ -262,11 +262,11 @@ PODS:
   - StripeUICore (25.9.0):
     - StripeCore (= 25.9.0)
   - Superscript (1.0.13)
-  - SuperwallKit (4.13.0):
+  - SuperwallKit (4.14.1):
     - Superscript (= 1.0.13)
   - superwallkit_flutter (0.0.1):
     - Flutter
-    - SuperwallKit (= 4.13.0)
+    - SuperwallKit (= 4.14.1)
   - url_launcher_ios (0.0.1):
     - Flutter
 
@@ -408,10 +408,10 @@ SPEC CHECKSUMS:
   FBSDKCoreKit: 65d7f7a7d6fcc3aa6eb6e093ec737a4184fc6049
   FBSDKCoreKit_Basics: 7bc9d8fde8f70985fba2ed7c1d07e319f969a991
   Firebase: 065f2bb395062046623036d8e6dc857bc2521d56
-  firebase_analytics: 6903a46192a92993abde88152a14ce1df1c0de2f
-  firebase_core: afac1aac13c931e0401c7e74ed1276112030efab
-  firebase_crashlytics: a316d8dddba772359d93dc38d303ed964579b7a6
-  firebase_messaging: 7cb2727feb789751fc6936bcc8e08408970e2820
+  firebase_analytics: 8288e2480a2b2a5eb2cc3c474e4a4327e8dc520b
+  firebase_core: 8e6f58412ca227827c366b92e7cee047a2148c60
+  firebase_crashlytics: c399f9682c474beb06a89c11dfab04db537f3cd2
+  firebase_messaging: c3aa897e0d40109cfb7927c40dc0dea799863f3b
   FirebaseAnalytics: cd7d01d352f3c237c9a0e31552c257cd0b0c0352
   FirebaseCore: 428912f751178b06bef0a1793effeb4a5e09a9b8
   FirebaseCoreExtension: e911052d59cd0da237a45d706fc0f81654f035c1
@@ -453,8 +453,8 @@ SPEC CHECKSUMS:
   StripePaymentsUI: e2f00f9be6fea280d6188b805fdb5199a96e1151
   StripeUICore: bfe8754c2d78eeb0fc4ce147316a7e5129b58423
   Superscript: bcb4099b41bed108ab7e88cfc56af0ed1170b582
-  SuperwallKit: ded61b361f1893a5679fccdddd07f7ac273e290c
-  superwallkit_flutter: 79b118dc6499905899ea8ef1f58b575f1c366ac8
+  SuperwallKit: 841ee108a1a152d83e4c4db8497208dfe1bc61ed
+  superwallkit_flutter: a3585d5f11a8bad748e25affecad1aa6734818af
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
 
 PODFILE CHECKSUM: 70711685981fa6e8d5ae69773bdc62f054d536fc

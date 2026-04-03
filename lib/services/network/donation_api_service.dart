@@ -69,6 +69,9 @@ class DonationApiService implements IDonationApiService {
       );
 
   Uri _buildUri(String path, [Map<String, dynamic>? queryParams]) {
+    if (donationBaseUrl.isEmpty) {
+      throw ArgumentError('DONATION_BASE_URL is not configured');
+    }
     final fullUrl = '$donationBaseUrl$path';
 
     return Uri.parse(fullUrl).replace(queryParameters: queryParams);
