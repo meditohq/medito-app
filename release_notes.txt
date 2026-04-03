@@ -1,4 +1,7 @@
 Unreleased
+-
+
+3.6.7
 - Classic purple app icon is now available on Android
 - Fixed app icon display in the settings screen on iOS
 - Fixed AirPlay not showing up on the iOS lock screen
