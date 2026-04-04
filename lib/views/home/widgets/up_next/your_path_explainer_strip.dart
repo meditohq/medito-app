@@ -208,9 +208,8 @@ class _Stage1Content extends StatelessWidget {
           TextButton(
             onPressed: onGotIt,
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              minimumSize: const Size(44, 44),
               foregroundColor: ColorConstants.lightBlue,
             ),
             child: Text(

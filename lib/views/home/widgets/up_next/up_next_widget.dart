@@ -24,7 +24,7 @@ import '../home_gradient_border.dart';
 
 const _kCardBorderRadius = 24.0;
 const _kPlayButtonSize = 48.0;
-const _kPlayButtonBorderWidth = 0.8;
+const _kPlayButtonBorderWidth = 0.5;
 
 class UpNextWidget extends ConsumerWidget {
   /// Optional widget rendered inside the card below the main content (e.g. the
@@ -100,82 +100,60 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
       opacity: _skipping ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 150),
       child: Padding(
-      padding: const EdgeInsets.only(
-        left: padding16,
-        right: padding16,
-        bottom: padding16,
-      ),
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: Dismissible(
-          key: Key('up_next_${nextSession.id}'),
-          direction: DismissDirection.endToStart,
-          background: _getSkipBackground(context, l10n),
-          movementDuration: const Duration(milliseconds: 1),
-          confirmDismiss: (_) async {
-            await _onSkip(context);
-            return false;
-          },
-          child: Semantics(
-            label:
-                '${l10n.upNext}: ${widget.data.pack.title} — ${nextSession.title}',
-            button: true,
-            customSemanticsActions: {
-              CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
+        padding: const EdgeInsets.only(
+          left: padding16,
+          right: padding16,
+          bottom: padding16,
+        ),
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: Dismissible(
+            key: Key('up_next_${nextSession.id}'),
+            direction: DismissDirection.endToStart,
+            background: _getSkipBackground(context, l10n),
+            movementDuration: const Duration(milliseconds: 1),
+            confirmDismiss: (_) async {
+              await _onSkip(context);
+              return false;
             },
-            child: GestureDetector(
-              onTap: () => _onTap(context),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: borderRadius,
-                  border: Border.all(
-                    color:
-                        Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
-                    width: 0.5,
+            child: Semantics(
+              label:
+                  '${l10n.upNext}: ${widget.data.pack.title} — ${nextSession.title}',
+              button: true,
+              customSemanticsActions: {
+                CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
+              },
+              child: GestureDetector(
+                onTap: () => _onTap(context),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: borderRadius,
+                    border: Border.all(
+                      color:
+                          Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
+                      width: 0.5,
+                    ),
                   ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(_kCardBorderRadius),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(padding16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'YOUR PATH',
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              fontFamily: teachers,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 1.2,
-                                              color: ColorConstants.lightBlue,
-                                            ),
-                                      ),
-                                      Text(
-                                        '  ·  ',
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              fontFamily: teachers,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              color: ColorConstants.lightBlue,
-                                            ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          widget.data.pack.title,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(_kCardBorderRadius),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(padding16),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'YOUR PATH',
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
                                                 fontFamily: teachers,
@@ -184,41 +162,64 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                                 letterSpacing: 1.2,
                                                 color: ColorConstants.lightBlue,
                                               ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    nextSession.title,
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                          fontFamily: sourceSerif,
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.2,
-                                          color: onSurface,
+                                        Text(
+                                          '  ·  ',
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                fontFamily: teachers,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: ColorConstants.lightBlue,
+                                              ),
                                         ),
-                                  ),
-                                ],
+                                        Expanded(
+                                          child: Text(
+                                            widget.data.pack.title,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  fontFamily: teachers,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  letterSpacing: 1.2,
+                                                  color:
+                                                      ColorConstants.lightBlue,
+                                                ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      nextSession.title,
+                                      style: theme.textTheme.headlineSmall
+                                          ?.copyWith(
+                                            fontFamily: sourceSerif,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.2,
+                                            color: onSurface,
+                                          ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: padding16),
-                            _PlayButton(onTap: () => _onTap(context)),
-                          ],
+                              const SizedBox(width: padding16),
+                              _PlayButton(onTap: () => _onTap(context)),
+                            ],
+                          ),
                         ),
-                      ),
-                      if (widget.inlineStrip != null) widget.inlineStrip!,
-                    ],
+                        if (widget.inlineStrip != null) widget.inlineStrip!,
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ),
       ),
     );
   }

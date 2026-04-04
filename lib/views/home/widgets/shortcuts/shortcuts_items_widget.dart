@@ -36,15 +36,15 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     var size = MediaQuery.of(context).size;
     var isWideScreen = size.width > 600;
     final columns = isWideScreen ? 8 : 4;
-    final horizontalPadding = 16.0;
-    final spacing = 20.0;
-    final runSpacing = 12.0;
+    const horizontalPadding = padding16;
+    const spacing = padding20;
+    const runSpacing = padding12;
     final totalSpacing = (columns - 1) * spacing;
     final totalPadding = horizontalPadding * 2;
     final containerSize = (size.width - totalPadding - totalSpacing) / columns;
 
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+      padding: const EdgeInsets.only(left: padding16, right: padding16, bottom: padding16),
       child: Wrap(
         spacing: spacing,
         runSpacing: runSpacing,
