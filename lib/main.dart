@@ -47,7 +47,9 @@ import 'package:medito/providers/stripe/payment_providers.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 
 
-bool _hasInitialized = false;
+// Completer used as both the guard and the barrier for duplicate main() calls.
+// It is set synchronously before any await, so a second call always finds it non-null.
+Completer<void>? _initCompleter;
 
 Future<void> _configureStripe() async {
   // Configure Stripe settings - publishableKey and merchantIdentifier will be set from backend config
@@ -58,11 +60,12 @@ Future<void> _configureStripe() async {
 }
 
 void main() async {
-  if (_hasInitialized) {
+  if (_initCompleter != null) {
     AppLogger.d('MAIN', 'App already initialized, skipping main()');
+    await _initCompleter!.future;
     return;
   }
-  _hasInitialized = true;
+  _initCompleter = Completer<void>();
 
   AppLogger.d('MAIN', 'Starting app initialization');
 
@@ -108,7 +111,11 @@ void main() async {
     AppLogger.d('MAIN', 'Meta SDK init complete');
   }
 
+  initializeAudioService();
+
   usePathUrlStrategy();
+
+  _initCompleter?.complete();
 
   runApp(
     DevicePreview(
