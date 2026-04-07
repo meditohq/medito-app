@@ -166,11 +166,16 @@ class StatsManager {
     var remoteStats = await _statsService.fetchAllStats();
 
     // If we got empty stats but have valid local stats, keep the local stats
+    // but still recalculate streak against current date
     if (remoteStats.totalTracksCompleted == 0 &&
         (remoteStats.audioCompleted?.isEmpty ?? true) &&
         _allStats != null &&
         _allStats!.totalTracksCompleted > 0) {
       //dev.log'StatsManager: Keeping local stats instead of empty remote stats');
+      _allStats = calculateStreak(_allStats!);
+      final newConsistencyScore = calculateConsistencyScore(_allStats!);
+      _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
+      await _saveLocalAllStatsToSharedPrefs();
       return;
     }
 

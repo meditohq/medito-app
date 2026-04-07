@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -195,9 +196,10 @@ Future<String> deviceAppAndUserInfo(Ref ref) async {
   var stats = await ref.read(statsProvider.future);
 
   var basicInfo = _formatBasicInfo(me, deviceInfo, email);
+  var streakDebugInfo = _formatStreakDebugInfo(stats);
   var audioCompletionInfo = await _formatAudioCompletionInfo(stats);
 
-  return '$basicInfo$audioCompletionInfo';
+  return '$basicInfo$streakDebugInfo$audioCompletionInfo';
 }
 
 String _formatBasicInfo(
@@ -217,6 +219,105 @@ String _formatBasicInfo(
   var isMonthlyDonorString = 'd: ${me?.hasActiveSubscription ?? false}';
 
   return '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$isMonthlyDonorString';
+}
+
+String _formatStreakDebugInfo(LocalAllStats? stats) {
+  if (stats == null) return '';
+
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final buf = StringBuffer();
+
+  buf.writeln(
+    '\n\nnow: ${now.day.toString().padLeft(2, '0')}/'
+    '${now.month.toString().padLeft(2, '0')}/'
+    '${now.year} '
+    '${now.hour.toString().padLeft(2, '0')}:'
+    '${now.minute.toString().padLeft(2, '0')} '
+    '${now.timeZoneName}',
+  );
+  buf.writeln('streak: current=${stats.streakCurrent} longest=${stats.streakLongest}');
+  buf.writeln('freezes: ${stats.streakFreezes ?? 0}/${stats.maxStreakFreezes ?? 0} available');
+
+  // Count entries
+  final allAudio = stats.audioCompleted ?? [];
+  final freezeEntries =
+      allAudio.where((a) => a.id == TypeConstants.streakFreeze).toList();
+  final realEntries = allAudio.length - freezeEntries.length;
+  buf.writeln('audio entries: total=${allAudio.length} real=$realEntries freeze=${freezeEntries.length}');
+
+  // Freeze dates from audioCompleted
+  final freezeDatesFromAudio = freezeEntries.map((a) {
+    final d = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
+    return DateTime(d.year, d.month, d.day);
+  }).toSet().toList()
+    ..sort((a, b) => b.compareTo(a));
+
+  // Legacy freeze usage dates
+  final legacyFreezeDates = stats.freezeUsageDates.map((ts) {
+    final d = DateTime.fromMillisecondsSinceEpoch(ts);
+    return DateTime(d.year, d.month, d.day);
+  }).toSet().toList()
+    ..sort((a, b) => b.compareTo(a));
+
+  String fmtDate(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+
+  if (freezeDatesFromAudio.isNotEmpty) {
+    buf.writeln('freeze dates: ${freezeDatesFromAudio.map(fmtDate).join(', ')}');
+  }
+  if (legacyFreezeDates.isNotEmpty) {
+    buf.writeln('legacy freeze dates: ${legacyFreezeDates.map(fmtDate).join(', ')}');
+  }
+
+  // Find streak break point
+  final audioDates = allAudio
+      .where((a) => a.id != TypeConstants.streakFreeze)
+      .map((a) {
+        final d = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
+        return DateTime(d.year, d.month, d.day);
+      })
+      .toSet()
+      .toList();
+
+  final allFreezeDates = {
+    ...freezeDatesFromAudio,
+    ...legacyFreezeDates,
+  }.where((d) => !audioDates.contains(d) && !d.isAfter(today)).toSet();
+
+  final allActivityDates = {...audioDates, ...allFreezeDates};
+
+  final hasToday = allActivityDates.any(
+    (d) => d.year == today.year && d.month == today.month && d.day == today.day,
+  );
+  final yesterday = DateTime(today.year, today.month, today.day - 1);
+  final hasYesterday = allActivityDates.any(
+    (d) =>
+        d.year == yesterday.year &&
+        d.month == yesterday.month &&
+        d.day == yesterday.day,
+  );
+
+  if (!hasToday && !hasYesterday) {
+    buf.writeln('streak break: no activity today or yesterday');
+  } else {
+    var checkDate = hasYesterday ? yesterday : today;
+    while (true) {
+      final hasActivity = allActivityDates.any(
+        (d) =>
+            d.year == checkDate.year &&
+            d.month == checkDate.month &&
+            d.day == checkDate.day,
+      );
+      if (!hasActivity) {
+        buf.writeln('streak break: ${fmtDate(checkDate)}');
+        break;
+      }
+      checkDate = DateTime(checkDate.year, checkDate.month, checkDate.day - 1);
+    }
+  }
+
+  return buf.toString();
 }
 
 Future<String> _formatAudioCompletionInfo(LocalAllStats? stats) async {
