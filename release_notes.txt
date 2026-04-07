@@ -1,5 +1,5 @@
 Unreleased
--
+- Fixed app name displaying as "App Killer Manager" on some Android devices
 
 3.6.10
 - Classic purple app icon is now available on Android
