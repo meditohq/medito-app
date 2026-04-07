@@ -124,6 +124,7 @@ android {
         
         resValue "string", "facebook_app_id", facebookAppId
         resValue "string", "facebook_client_token", facebookClientToken
+        resValue "string", "app_name_override", "Medito"
     }
 
     buildFeatures {
