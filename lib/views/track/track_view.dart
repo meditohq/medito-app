@@ -53,7 +53,7 @@ class _TrackViewState extends ConsumerState<TrackView>
   Widget build(BuildContext context) {
     super.build(context);
     final trackAsyncValue = ref.watch(tracksProvider(trackId: widget.trackId));
-    final guideNameState = ref.watch(guideNamePreferenceProvider);
+    final guideName = ref.watch(guideNamePreferenceProvider);
     final lastSelectedDuration = ref.watch(durationPreferenceProvider);
 
     void popContext() => Navigator.pop(context);
@@ -85,10 +85,10 @@ class _TrackViewState extends ConsumerState<TrackView>
                 child: trackAsyncValue.when(
                   data: (trackModel) {
                     // Derive active state from providers and model
-                    final activeAudio = (guideNameState.value != null)
+                    final activeAudio = (guideName != null)
                         ? trackModel.audio.firstWhere(
                             (audio) =>
-                                audio.guideName == guideNameState.value,
+                                audio.guideName == guideName,
                             orElse: () => trackModel.audio.first,
                           )
                         : trackModel.audio.first;
@@ -238,7 +238,7 @@ class _TrackViewState extends ConsumerState<TrackView>
   }) {
     var showGuideNameDropdown =
         trackModel.audio.first.guideName.isNotNullAndNotEmpty();
-    final guideNameState = ref.watch(guideNamePreferenceProvider);
+    final guideName = ref.watch(guideNamePreferenceProvider);
 
     if (isLandscape) {
       return Row(children: [
@@ -249,7 +249,7 @@ class _TrackViewState extends ConsumerState<TrackView>
             activeAudio,
             activeFile,
             isLandscape: true,
-            guideNameState: guideNameState,
+            guideNameState: guideName,
           )),
         const SizedBox(width: 12),
         Expanded(
@@ -268,7 +268,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       const SizedBox(height: 24),
       if (useCompactLayout && showGuideNameDropdown)
         _buildCompactPickers(
-            trackModel, activeAudio, activeFile, guideNameState)
+            trackModel, activeAudio, activeFile, guideName)
       else ...[
         if (showGuideNameDropdown) ...[
           _guideNameDropdown(
@@ -276,7 +276,7 @@ class _TrackViewState extends ConsumerState<TrackView>
             activeAudio,
             activeFile,
             isLandscape: false,
-            guideNameState: guideNameState,
+            guideNameState: guideName,
           ),
           const SizedBox(height: 12),
         ],
@@ -291,7 +291,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackModel trackModel,
     TrackAudioModel activeAudio,
     TrackFilesModel activeFile,
-    AsyncValue<String?> guideNameState,
+    String? guideNameState,
   ) {
     return Row(
       children: [
@@ -475,16 +475,10 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackAudioModel activeAudio,
     TrackFilesModel activeFile, {
     required bool isLandscape,
-    required AsyncValue<String?> guideNameState,
+    required String? guideNameState,
   }) {
     // We already checked logic in parent, but double check
     if (activeAudio.guideName.isNotNullAndNotEmpty()) {
-      if (guideNameState.isLoading) {
-        return const SizedBox(
-          height: 40,
-          child: Center(child: CircularProgressIndicator()),
-        );
-      }
       return DropdownWidget<TrackAudioModel>(
         value: activeAudio,
         iconData: Icons.face,

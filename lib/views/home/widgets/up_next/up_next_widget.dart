@@ -304,9 +304,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
           ),
     );
 
-    final guideNameAsync = ref.read(guideNamePreferenceProvider);
+    final guideName = ref.read(guideNamePreferenceProvider);
     final preferredDuration = ref.read(durationPreferenceProvider);
-    final guideName = guideNameAsync.hasValue ? guideNameAsync.value : null;
 
     if (guideName != null && preferredDuration != null) {
       await PermissionHandler.requestMediaPlaybackPermission(context);
@@ -329,11 +328,15 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
       );
 
       if (selectedAudio != null && trackState != null) {
+        final bestFile = _findClosestDurationFile(
+          selectedAudio.files,
+          preferredDuration,
+        );
         await ref
             .read(playerProvider.notifier)
             .loadSelectedTrack(
               trackModel: trackState,
-              file: selectedAudio.files.first,
+              file: bestFile,
             );
         _navigateToPlayer(context);
       } else {
@@ -388,6 +391,18 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     }
 
     return closest ?? audioList.first;
+  }
+
+  static TrackFilesModel _findClosestDurationFile(
+    List<TrackFilesModel> files,
+    int? targetDuration,
+  ) {
+    if (targetDuration == null) return files.first;
+    return files.reduce((a, b) {
+      final aDiff = (a.duration - targetDuration).abs();
+      final bDiff = (b.duration - targetDuration).abs();
+      return aDiff < bDiff ? a : b;
+    });
   }
 }
 

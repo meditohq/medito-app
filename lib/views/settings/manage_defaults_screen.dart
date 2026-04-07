@@ -22,7 +22,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
   }
 
   Widget _buildMain(BuildContext context, WidgetRef ref) {
-    final guideNameAsync = ref.watch(guideNamePreferenceProvider);
+    final guideName = ref.watch(guideNamePreferenceProvider);
     final duration = ref.watch(durationPreferenceProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -41,7 +41,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
             greeting: l10n.manageDefaults,
           ),
         ),
-        _buildContent(context, ref, guideNameAsync, duration, l10n),
+        _buildContent(context, ref, guideName, duration, l10n),
       ],
     );
   }
@@ -49,7 +49,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
   Widget _buildContent(
     BuildContext context,
     WidgetRef ref,
-    AsyncValue<String?> guideNameAsync,
+    String? guideName,
     int? duration,
     AppLocalizations l10n,
   ) {
@@ -94,11 +94,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 4.0),
                                 Text(
-                                  guideNameAsync.when(
-                                    data: (name) => name ?? l10n.notSet,
-                                    loading: () => l10n.loading,
-                                    error: (_, _) => l10n.notSet,
-                                  ),
+                                  guideName ?? l10n.notSet,
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleSmall
@@ -114,22 +110,19 @@ class ManageDefaultsScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          if (guideNameAsync.hasValue &&
-                              guideNameAsync.value != null)
+                          if (guideName != null)
                             IconButton(
                               tooltip: l10n.clearDefault,
                               icon: const Icon(Icons.delete_outline),
                               color: Theme.of(context).colorScheme.onSurface,
-                              onPressed: () async {
-                                await ref
+                              onPressed: () {
+                                ref
                                     .read(guideNamePreferenceProvider.notifier)
                                     .clearGuideName();
-                                if (context.mounted) {
-                                  showSnackBar(
-                                    context,
-                                    l10n.defaultGuideNameCleared,
-                                  );
-                                }
+                                showSnackBar(
+                                  context,
+                                  l10n.defaultGuideNameCleared,
+                                );
                               },
                             ),
                         ],

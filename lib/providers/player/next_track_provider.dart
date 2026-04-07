@@ -15,14 +15,18 @@ class NextTrackNotifier extends AsyncNotifier<void> {
       final track = await ref.read(tracksProvider(trackId: trackId).future);
       final selectedAudio = _selectBestAudioMatch(
         track.audio,
-        guideName: ref.read(guideNamePreferenceProvider).value,
+        guideName: ref.read(guideNamePreferenceProvider),
         preferredDuration: ref.read(durationPreferenceProvider),
       );
 
       if (selectedAudio != null) {
+        final bestFile = _findClosestDurationFile(
+          selectedAudio.files,
+          ref.read(durationPreferenceProvider),
+        );
         ref.read(playerProvider.notifier).cacheTrackData(
               track: track,
-              file: selectedAudio.files.first,
+              file: bestFile,
             );
       }
       state = AsyncValue.data(null);
@@ -58,6 +62,18 @@ class NextTrackNotifier extends AsyncNotifier<void> {
     }
 
     return closest ?? audioList.first;
+  }
+
+  static TrackFilesModel _findClosestDurationFile(
+    List<TrackFilesModel> files,
+    int? targetDuration,
+  ) {
+    if (targetDuration == null) return files.first;
+    return files.reduce((a, b) {
+      final aDiff = (a.duration - targetDuration).abs();
+      final bDiff = (b.duration - targetDuration).abs();
+      return aDiff < bDiff ? a : b;
+    });
   }
 }
 
