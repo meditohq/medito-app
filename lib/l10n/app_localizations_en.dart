@@ -1953,4 +1953,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingResultCta => 'Get started';
+
+  @override
+  String get addToFavorites => 'Add to favorites';
+
+  @override
+  String get removeFromFavorites => 'Remove from favorites';
+
+  @override
+  String get pinToUpNext => 'Pin to Your Path';
+
+  @override
+  String get unpinFromUpNext => 'Unpin from Your Path';
 }

@@ -1981,4 +1981,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingResultCta => 'Empezar';
+
+  @override
+  String get addToFavorites => 'Agregar a favoritos';
+
+  @override
+  String get removeFromFavorites => 'Quitar de favoritos';
+
+  @override
+  String get pinToUpNext => 'Fijar en Tu Camino';
+
+  @override
+  String get unpinFromUpNext => 'Desfijar de Tu Camino';
 }

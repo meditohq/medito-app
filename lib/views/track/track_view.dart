@@ -329,9 +329,10 @@ class _TrackViewState extends ConsumerState<TrackView>
           backgroundColor: ColorConstants.white,
           foregroundColor: ColorConstants.black,
         ),
-        child: const Icon(
+        child: Icon(
           Icons.play_arrow_rounded,
           size: 32,
+          semanticLabel: AppLocalizations.of(context)!.play,
         ),
       ),
     );

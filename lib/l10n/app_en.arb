@@ -1286,5 +1286,21 @@
   "onboardingResultCta": "Get started",
   "@onboardingResultCta": {
     "description": "CTA button label on the onboarding result screen"
+  },
+  "addToFavorites": "Add to favorites",
+  "@addToFavorites": {
+    "description": "Accessibility label for the favorite button when the item is not yet favorited"
+  },
+  "removeFromFavorites": "Remove from favorites",
+  "@removeFromFavorites": {
+    "description": "Accessibility label for the favorite button when the item is already favorited"
+  },
+  "pinToUpNext": "Pin to Your Path",
+  "@pinToUpNext": {
+    "description": "Accessibility label for the pin button when the pack is not pinned"
+  },
+  "unpinFromUpNext": "Unpin from Your Path",
+  "@unpinFromUpNext": {
+    "description": "Accessibility label for the pin button when the pack is already pinned"
   }
 }

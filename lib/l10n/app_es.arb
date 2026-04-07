@@ -1046,5 +1046,9 @@
   "onboardingResultEaseInBody": "Te reintroduciremos con sesiones cortas que se complementan entre sí. Ve a tu propio ritmo.",
   "onboardingResultPracticeHeading": "Bienvenido a Medito.",
   "onboardingResultPracticeBody": "Tu Diario es un gran lugar para mantener tu práctica. Una nueva sesión te espera cada día.",
-  "onboardingResultCta": "Empezar"
+  "onboardingResultCta": "Empezar",
+  "addToFavorites": "Agregar a favoritos",
+  "removeFromFavorites": "Quitar de favoritos",
+  "pinToUpNext": "Fijar en Tu Camino",
+  "unpinFromUpNext": "Desfijar de Tu Camino"
 }

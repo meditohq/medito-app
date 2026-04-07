@@ -193,6 +193,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             color: Theme.of(context).colorScheme.onSurface,
           ),
           onTap: () => Navigator.pop(context),
+          semanticLabel: AppLocalizations.of(context)!.close,
         ),
         leftCenterItem: BottomActionBarItem(
           child: const SizedBox.shrink(),
@@ -208,6 +209,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             color: Theme.of(context).colorScheme.onSurface,
           ),
           onTap: _navigateToHome,
+          semanticLabel: AppLocalizations.of(context)!.home,
         ),
         layout: BottomActionBarLayout.edgeAligned,
       ),

@@ -154,6 +154,8 @@ class TrackViewBottomBar extends ConsumerWidget {
         ? ColorConstants.lightPurple
         : Theme.of(context).colorScheme.onSurface;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return BottomActionBar(
       layout: BottomActionBarLayout.compactRight,
       leftItem: BottomActionBarItem(
@@ -162,6 +164,7 @@ class TrackViewBottomBar extends ConsumerWidget {
           color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: onBackPressed,
+        semanticLabel: l10n.goBack,
       ),
       rightCenterItem: BottomActionBarItem(
         child: MeditoIcon(
@@ -172,6 +175,7 @@ class TrackViewBottomBar extends ConsumerWidget {
         onTap: Platform.isIOS
             ? () => _showBottomSheet(context)
             : () => _shareTrack(context),
+        semanticLabel: l10n.shareTrack,
       ),
       rightItem: isDailyMeditation
           ? null
@@ -180,6 +184,9 @@ class TrackViewBottomBar extends ConsumerWidget {
                 isFavorite: isFavorite,
                 color: colour,
               ),
+              semanticLabel: isFavorite
+                  ? l10n.removeFromFavorites
+                  : l10n.addToFavorites,
               onTap: () {
                 if (isFavorite) {
                   ref

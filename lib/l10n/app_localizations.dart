@@ -3679,6 +3679,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get started'**
   String get onboardingResultCta;
+
+  /// Accessibility label for the favorite button when the item is not yet favorited
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites'**
+  String get addToFavorites;
+
+  /// Accessibility label for the favorite button when the item is already favorited
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites'**
+  String get removeFromFavorites;
+
+  /// Accessibility label for the pin button when the pack is not pinned
+  ///
+  /// In en, this message translates to:
+  /// **'Pin to Your Path'**
+  String get pinToUpNext;
+
+  /// Accessibility label for the pin button when the pack is already pinned
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin from Your Path'**
+  String get unpinFromUpNext;
 }
 
 class _AppLocalizationsDelegate
