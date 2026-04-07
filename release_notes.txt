@@ -1,7 +1,8 @@
 Unreleased
 -
 
-3.6.11
+3.6.12
+- Improve accessibility for screen readers
 - Fixed app name displaying as "App Killer Manager" on some Android devices
 
 3.6.10
