@@ -3,8 +3,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class _FakeAuthRepository implements AuthRepository {
+  @override
+  User? get currentUser => null;
+  @override
+  Future<String> getToken() async => '';
+  @override
+  String? getUserEmail() => null;
+  @override
+  Future<void> initializeUser() async {}
+  @override
+  Future<bool> isLoggedIn() async => false;
+  @override
+  Future<void> migrateEmailToStorage() async {}
+  @override
+  Future<void> requestOtp(String email) async {}
+  @override
+  void resetAuthState() {}
+  @override
+  Future<void> signInAnonymously() async {}
+  @override
+  Future<bool> signOut() async => true;
+  @override
+  Future<bool> verifyOtp(String email, String otp) async => false;
+}
 
 void main() {
   late ProviderContainer container;
@@ -14,7 +40,11 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     // Initialize SharedPreferences before creating container
     await SharedPreferences.getInstance();
-    container = ProviderContainer();
+    container = ProviderContainer(
+      overrides: [
+        authRepositorySyncProvider.overrideWithValue(_FakeAuthRepository()),
+      ],
+    );
     statsManager = container.read(statsManagerProvider);
   });
 
@@ -63,7 +93,11 @@ void main() {
     test('refreshFromLocal - handles errors gracefully', () async {
       // Arrange - create a stats manager that will error
       container.dispose();
-      container = ProviderContainer();
+      container = ProviderContainer(
+        overrides: [
+          authRepositorySyncProvider.overrideWithValue(_FakeAuthRepository()),
+        ],
+      );
       
       // Get the notifier
       final notifier = container.read(statsProvider.notifier);
