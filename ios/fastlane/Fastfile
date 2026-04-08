@@ -33,6 +33,7 @@ platform :ios do
       sh(
         "flutter build ios --release " \
         "--dart-define-from-file=.prod.json " \
+        "--dart-define=MOCK_MODE=false " \
         "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
         "--dart-define=PAYWALL_ENV=#{paywall_env} " \
         "--no-codesign"
@@ -78,6 +79,7 @@ platform :ios do
       sh(
         "flutter build ios --release " \
         "--dart-define-from-file=.prod.json " \
+        "--dart-define=MOCK_MODE=false " \
         "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
         "--dart-define=PAYWALL_ENV=live " \
         "--no-codesign"

@@ -171,8 +171,41 @@ jobs:
         run: |
           flutter build apk --flavor prod --release \
             --dart-define-from-file=.prod.json \
+            --dart-define=MOCK_MODE=false \
             --dart-define=PAYWALL_ENV=${{ inputs.paywall_env || 'live' }} \
             --obfuscate --split-debug-info=./symbols
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Smoke test on emulator
+        timeout-minutes: 12
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            export PATH="$PATH:$HOME/.maestro/bin"
+            adb install build/app/outputs/apk/prod/release/app-prod-release.apk
+            # Grant notification permission upfront so the OS dialog doesn't block the flow
+            adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
+            maestro test .maestro/smoke.yaml --no-ansi --debug-output .maestro/debug
+
+      - name: Upload Maestro debug output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-debug
+          path: .maestro/debug/
+          retention-days: 7
 
       - uses: ruby/setup-ruby@v1
         with:
