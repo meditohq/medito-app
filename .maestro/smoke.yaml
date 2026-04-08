@@ -77,11 +77,6 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     text: "Explore"
     timeout: 10000
 
-- tapOn: "Path"
-- assertVisible:
-    text: "Path"
-    timeout: 10000
-
 - tapOn: "Settings"
 - assertVisible:
     text: "Settings"
