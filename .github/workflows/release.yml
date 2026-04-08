@@ -193,11 +193,9 @@ jobs:
           disable-animations: true
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
-            export PATH="$PATH:$HOME/.maestro/bin"
             adb install build/app/outputs/apk/prod/release/app-prod-release.apk
-            # Grant notification permission upfront so the OS dialog doesn't block the flow
             adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
-            maestro test .maestro/smoke.yaml --no-ansi --debug-output .maestro/debug
+            $HOME/.maestro/bin/maestro test .maestro/smoke.yaml --no-ansi --debug-output .maestro/debug
 
       - name: Upload Maestro debug output
         if: failure()
