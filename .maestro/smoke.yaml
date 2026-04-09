@@ -21,7 +21,6 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # ── Onboarding: Donation ──
 # Tap "Next" which either opens the Superwall paywall (native modal) or
 # an external browser (when Google Pay / Superwall aren't available on CI).
-# Either way, press back to dismiss and return to the donation screen.
 - extendedWaitUntil:
     visible: "Next"
     timeout: 10000
@@ -30,17 +29,26 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - takeScreenshot: after-donation-next
 
 # On devices with Google Pay + Superwall, the paywall appears with donation tabs.
-# On CI emulators without Google Pay, Chrome opens instead.
-# Verify paywall tabs if Superwall loaded, then dismiss either way.
+# Verify and dismiss.
 - runFlow:
     when:
       visible: "(?i)monthly"
     commands:
       - assertVisible: "(?i)yearly"
       - takeScreenshot: superwall-paywall
-- pressKey: back
+      - pressKey: back
 
-# After dismissing the paywall/browser, "Skip for Now" appears on the donation screen
+# On CI emulators without Google Pay, Chrome opens instead.
+# Press back to close Chrome, then re-focus the app.
+- runFlow:
+    when:
+      notVisible: "Skip for Now"
+    commands:
+      - pressKey: back
+      - launchApp:
+          stopApp: false
+
+# "Skip for Now" should now be visible on the donation screen
 - extendedWaitUntil:
     visible: "Skip for Now"
     timeout: 15000
