@@ -2,6 +2,10 @@ appId: meditofoundation.medito
 name: Smoke Test – Onboarding, Navigate, Verify Content
 ---
 
+# ── Launch app ──
+- launchApp:
+    clearState: true
+
 # ── Splash screen ──
 - extendedWaitUntil:
     visible: "Continue"
