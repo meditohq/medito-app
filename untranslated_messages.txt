@@ -17,6 +17,8 @@
     "defaultsNote",
     "streakFreezeUsed",
     "session",
-    "sessions"
+    "sessions",
+    "yourPathExplainerText",
+    "yourPathExplainerSwipeHint"
   ]
 }

@@ -90,6 +90,8 @@ async function createIssueAndTriggerPR({ title, description, severity, source, e
     JSON.stringify(data || {}, null, 2),
     "```",
     "",
+    `[View in Firebase Console](https://console.firebase.google.com/project/medito-9165c/crashlytics)`,
+    "",
     "---",
     "*Auto-created by Firebase Cloud Function*",
   ].join("\n");

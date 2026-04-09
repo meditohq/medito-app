@@ -21,8 +21,8 @@ class HomeRepositoryImpl extends HomeRepository {
   @override
   Future<HomeModel> fetchHome() async {
     var response = await client.getRequest(HTTPConstants.home);
-
-    return HomeModel.fromJson(response);
+    final model = HomeModel.fromJson(response);
+    return model;
   }
 
   @override

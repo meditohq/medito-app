@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
@@ -133,7 +134,7 @@ class FirebaseAnalyticsService {
 
     try {
       // Initialize the analytics instance now that Firebase should be ready
-      if (_runningInTest) {
+      if (_runningInTest || isMockMode) {
         _analytics = _NoopAnalytics() as dynamic; // cast to satisfy type
       } else {
         _analytics = FirebaseAnalytics.instance;

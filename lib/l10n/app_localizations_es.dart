@@ -797,6 +797,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enableNotificationsCta => 'Habilitar Notificaciones';
 
   @override
+  String get onboardingBatteryTitle =>
+      'Mantén las Meditaciones Sin Interrupciones';
+
+  @override
+  String get onboardingBatteryBody =>
+      'Algunos dispositivos Android detienen apps en segundo plano, lo que puede interrumpir tus sesiones. Desactiva la optimización de batería para meditar sin interrupciones.';
+
+  @override
+  String get onboardingBatteryOptimize => 'Desactivar Optimización de Batería';
+
+  @override
   String get skipForNow => 'Omitir por Ahora';
 
   @override
@@ -804,11 +815,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get packSetAsUpNext =>
-      'Este paquete ahora aparecerá en la sección Próximo en la página de inicio';
+      'Este paquete ahora aparecerá en la sección Tu Camino en la página de inicio';
 
   @override
   String get packUnpinnedFromUpNext =>
-      'Este paquete ha sido eliminado de la sección Próximo';
+      'Este paquete ha sido eliminado de la sección Tu Camino';
 
   @override
   String get smartReminders => 'Recordatorios Inteligentes';
@@ -1806,7 +1817,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get completedAt => 'Completado a las';
 
   @override
-  String get upNextTitle => 'Up Next';
+  String get upNextTitle => 'Your Path';
 
   @override
   String upNextSessionCount(int current, int total) {
@@ -1836,7 +1847,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get defaultsNote =>
-      'These defaults are set from your last selection on any track. Up Next uses them to skip the selection screen.';
+      'These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.';
 
   @override
   String get streakFreezeUsed => 'Streak freeze used';
@@ -1884,7 +1895,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get refresh => 'Actualizar';
 
   @override
-  String get upNext => 'A continuación';
+  String get upNext => 'Tu Camino';
 
   @override
   String get donationInfo => 'Información sobre donaciones';
@@ -1900,4 +1911,86 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get lockedContent => 'Bloqueado';
+
+  @override
+  String get yourPathExplainerText =>
+      'Your path guides you through meditation from scratch. Starts at just 1 min and builds gradually.';
+
+  @override
+  String get yourPathExplainerSwipeHint => 'Swipe left to skip.';
+
+  @override
+  String get onboardingStep1of2 => '1 de 2';
+
+  @override
+  String get onboardingStep2of2 => '2 de 2';
+
+  @override
+  String get onboardingExperienceQuestion => '¿Has meditado antes?';
+
+  @override
+  String get onboardingExperienceSubtext =>
+      'Esto nos ayuda a mostrarte el punto de partida correcto.';
+
+  @override
+  String get onboardingExperienceNever => 'Nunca lo he intentado';
+
+  @override
+  String get onboardingExperienceALittle => 'Un poco, de vez en cuando';
+
+  @override
+  String get onboardingExperienceRegular => 'Tengo una práctica regular';
+
+  @override
+  String get onboardingIntentQuestion => '¿Qué esperas obtener de Medito?';
+
+  @override
+  String get onboardingIntentSubtext =>
+      'Elige la que más resuene contigo ahora mismo.';
+
+  @override
+  String get onboardingIntentLearn => 'Aprender a meditar correctamente';
+
+  @override
+  String get onboardingIntentHabit => 'Crear un hábito diario';
+
+  @override
+  String get onboardingIntentStress =>
+      'Gestionar el estrés, el sueño o las emociones';
+
+  @override
+  String get onboardingResultLearnHeading => 'Estás en el lugar correcto.';
+
+  @override
+  String get onboardingResultLearnBody =>
+      'Empezaremos con solo 1 minuto e iremos avanzando. Sin experiencia necesaria, solo preséntate.';
+
+  @override
+  String get onboardingResultEaseInHeading => 'Qué bueno tenerte aquí.';
+
+  @override
+  String get onboardingResultEaseInBody =>
+      'Te reintroduciremos con sesiones cortas que se complementan entre sí. Ve a tu propio ritmo.';
+
+  @override
+  String get onboardingResultPracticeHeading => 'Bienvenido a Medito.';
+
+  @override
+  String get onboardingResultPracticeBody =>
+      'Tu Diario es un gran lugar para mantener tu práctica. Una nueva sesión te espera cada día.';
+
+  @override
+  String get onboardingResultCta => 'Empezar';
+
+  @override
+  String get addToFavorites => 'Agregar a favoritos';
+
+  @override
+  String get removeFromFavorites => 'Quitar de favoritos';
+
+  @override
+  String get pinToUpNext => 'Fijar en Tu Camino';
+
+  @override
+  String get unpinFromUpNext => 'Desfijar de Tu Camino';
 }

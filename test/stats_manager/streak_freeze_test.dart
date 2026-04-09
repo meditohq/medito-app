@@ -51,8 +51,8 @@ void main() {
 
       var result = statsManager.calculateStreak(mockStats);
 
-      expect(result.streakCurrent, 5); // 4 audio days + 1 freeze day
-      expect(result.streakLongest, 5);
+      expect(result.streakCurrent, 4); // 4 real audio days (freeze bridges the gap but doesn't count)
+      expect(result.streakLongest, 4);
     });
 
     test(
@@ -97,8 +97,9 @@ void main() {
 
       var result = statsManager.calculateStreak(mockStats);
 
-      // Should count 6 days of audio (20-25) + 2 freeze days (19 and 26) = 8 days
-      expect(result.streakCurrent, 8);
+      // Should count 6 days of audio (20-25) but not the 2 freeze days (19 and 26)
+      // Freeze days maintain continuity but don't add to the counter
+      expect(result.streakCurrent, 6);
       expect(result.streakLongest, 20); // Longest streak remains unchanged
     });
 
@@ -185,8 +186,8 @@ void main() {
 
       var result = statsManager.calculateStreak(mockStats);
 
-      // Streak should be 7 (Mar 1-7 with Mar 6 being a freeze)
-      expect(result.streakCurrent, 7);
+      // Streak should be 6 (Mar 1-7 with Mar 6 being a freeze that doesn't count)
+      expect(result.streakCurrent, 6);
       expect(result.streakLongest, 10);
     });
 
@@ -229,9 +230,9 @@ void main() {
 
       var result = statsManager.calculateStreak(mockStats);
 
-      // Streak should be 3 (Mar 5-7 with Mar 6 being a freeze)
+      // Streak should be 2 (Mar 5 and Mar 7 are real, Mar 6 is freeze)
       // The gap on Mar 4 breaks the earlier streak
-      expect(result.streakCurrent, 3);
+      expect(result.streakCurrent, 2);
       expect(result.streakLongest, 10);
     });
 
@@ -275,8 +276,8 @@ void main() {
 
       var result = statsManager.calculateStreak(mockStats);
 
-      // Streak should be 7 (Mar 1-7 with Mar 4 and Mar 6 being freezes)
-      expect(result.streakCurrent, 7);
+      // Streak should be 5 (Mar 1-3, Mar 5, Mar 7 are real; Mar 4 and Mar 6 are freezes that don't count)
+      expect(result.streakCurrent, 5);
       expect(result.streakLongest, 10);
     });
 
@@ -357,8 +358,8 @@ void main() {
             date.day == mar7.day;
       }), true);
 
-      // Streak should now be 6 days (Mar 3-8 with Mar 7 being a freeze)
-      expect(afterFreeze.streakCurrent, 6);
+      // Streak should now be 5 days (Mar 3-8, with Mar 7 being a freeze that doesn't count)
+      expect(afterFreeze.streakCurrent, 5);
       expect(afterFreeze.streakLongest, 10);
       // Available freezes should be reduced by 1
       expect(afterFreeze.streakFreezes, 0);
@@ -451,8 +452,8 @@ void main() {
             date.day == feb26.day;
       }), true);
 
-      // Streak should now be 8 days (Feb 20-27 with Feb 19 and Feb 26 being freezes)
-      expect(afterSecondFreeze.streakCurrent, 9);
+      // Streak should now be 7 real meditation days (Feb 20-25 and Feb 27; freezes on Feb 19 and Feb 26 don't count)
+      expect(afterSecondFreeze.streakCurrent, 7);
       expect(afterSecondFreeze.streakLongest,
           20); // Longest streak remains unchanged
 
@@ -530,8 +531,8 @@ void main() {
       );
       expect(afterFirstFreeze.streakFreezes, 0);
 
-      // After applying freezes, streak should be 5 (3 days of activity + 2 freeze days)
-      expect(afterFirstFreeze.streakCurrent, 5);
+      // After applying freezes, streak should be 3 (3 days of real activity; freeze days don't count)
+      expect(afterFirstFreeze.streakCurrent, 3);
     });
   });
 }

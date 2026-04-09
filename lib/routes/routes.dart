@@ -160,6 +160,11 @@ Future<bool?> handleDonationNavigation(
     AppLogger.d('ROUTES', 'Opening donation screen from $sourceRouteName');
   }
 
+  if (isMockMode) {
+    AppLogger.d('ROUTES', 'Mock mode: skipping payment and paywall flows');
+    return false;
+  }
+
   // Stripe's publishable key is set lazily when paymentConfigProvider resolves.
   // Without this, isPlatformPaySupported() throws StripeConfigException.
   try {

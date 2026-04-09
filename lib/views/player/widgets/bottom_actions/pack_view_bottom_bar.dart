@@ -174,6 +174,8 @@ class PackViewBottomBar extends ConsumerWidget {
         ? ColorConstants.lightPurple
         : Theme.of(context).colorScheme.onSurface;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return BottomActionBar(
       layout: BottomActionBarLayout.compactRight,
       leftItem: BottomActionBarItem(
@@ -182,6 +184,7 @@ class PackViewBottomBar extends ConsumerWidget {
           color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: onBackPressed,
+        semanticLabel: l10n.goBack,
       ),
       rightCenterItem: BottomActionBarItem(
         child: MeditoIcon(
@@ -192,6 +195,7 @@ class PackViewBottomBar extends ConsumerWidget {
         onTap: Platform.isIOS
             ? () => _showBottomSheet(context)
             : () => _sharePack(context),
+        semanticLabel: l10n.share,
       ),
       leftCenterItem: containsOnlyTracks
           ? BottomActionBarItem(
@@ -200,6 +204,8 @@ class PackViewBottomBar extends ConsumerWidget {
                 color: pinColour,
               ),
               onTap: () => _onPinTap(context, ref, isUpNext, isDefaultPack),
+              semanticLabel:
+                  isUpNext ? l10n.unpinFromUpNext : l10n.pinToUpNext,
             )
           : null,
       rightItem: BottomActionBarItem(
@@ -207,6 +213,8 @@ class PackViewBottomBar extends ConsumerWidget {
           isFavorite: isFavorite,
           color: favouriteColour,
         ),
+        semanticLabel:
+            isFavorite ? l10n.removeFromFavorites : l10n.addToFavorites,
         onTap: () {
           if (isFavorite) {
             ref

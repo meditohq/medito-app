@@ -35,7 +35,7 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
   bool _isPressed = false;
 
   Future<void> handleItemTap(BuildContext context, WidgetRef ref) async {
-    final guideNameAsync = ref.read(guideNamePreferenceProvider);
+    final guideName = ref.read(guideNamePreferenceProvider);
     final preferredDuration = ref.read(durationPreferenceProvider);
     final trackId = widget.item.id;
     final cachedTrack = ref.read(playerProvider);
@@ -52,14 +52,18 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
 
     final selectedAudio = _selectBestAudioMatch(
       trackState?.audio ?? [],
-      guideName: guideNameAsync.value,
+      guideName: guideName,
       preferredDuration: preferredDuration,
     );
 
     if (selectedAudio != null && trackState != null) {
+      final bestFile = _findClosestDurationFile(
+        selectedAudio.files,
+        preferredDuration,
+      );
       await ref.read(playerProvider.notifier).loadSelectedTrack(
             trackModel: trackState,
-            file: selectedAudio.files.first,
+            file: bestFile,
           );
       _navigateToPlayer(context, ref);
     }
@@ -99,6 +103,18 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
     }
 
     return closest ?? audioList.first;
+  }
+
+  static TrackFilesModel _findClosestDurationFile(
+    List<TrackFilesModel> files,
+    int? targetDuration,
+  ) {
+    if (targetDuration == null) return files.first;
+    return files.reduce((a, b) {
+      final aDiff = (a.duration - targetDuration).abs();
+      final bDiff = (b.duration - targetDuration).abs();
+      return aDiff < bDiff ? a : b;
+    });
   }
 
   @override

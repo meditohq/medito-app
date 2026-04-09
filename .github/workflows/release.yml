@@ -171,8 +171,39 @@ jobs:
         run: |
           flutter build apk --flavor prod --release \
             --dart-define-from-file=.prod.json \
+            --dart-define=MOCK_MODE=false \
             --dart-define=PAYWALL_ENV=${{ inputs.paywall_env || 'live' }} \
             --obfuscate --split-debug-info=./symbols
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Smoke test on emulator
+        timeout-minutes: 12
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            adb install build/app/outputs/apk/prod/release/app-prod-release.apk
+            adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
+            $HOME/.maestro/bin/maestro test .maestro/smoke.yaml --no-ansi --debug-output .maestro/debug
+
+      - name: Upload Maestro debug output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-debug
+          path: .maestro/debug/
+          retention-days: 7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -186,8 +217,9 @@ jobs:
         run: |
           notes="$RELEASE_NOTES_INPUT"
           if [ -z "$notes" ]; then
-            notes=$(awk '/^[0-9]/{in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
+            notes=$(awk '/^[0-9]/{if(in_v)exit; in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
+          notes="${notes:0:500}"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
       - name: Upload to Play Store
@@ -229,6 +261,9 @@ jobs:
 
       - name: Flutter pub get
         run: flutter pub get
+
+      - name: Install FlutterFire CLI
+        run: dart pub global activate flutterfire_cli
 
       - name: Cache build_runner outputs
         id: cache-buildrunner
@@ -340,13 +375,14 @@ jobs:
               in_v && NF && !/^- / { exit }
             ' release_notes.txt)
           fi
+          notes="${notes:0:500}"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
       - name: Build & upload iOS release
         working-directory: ios
         env:
           PAYWALL_ENV: ${{ inputs.paywall_env || 'live' }}
-          MATCH_READONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.match_readonly || 'true' }}
+          MATCH_READONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.match_readonly || 'false' }}
           MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}

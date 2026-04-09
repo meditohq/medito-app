@@ -24,39 +24,68 @@ import '../home_gradient_border.dart';
 
 const _kCardBorderRadius = 24.0;
 const _kPlayButtonSize = 48.0;
-const _kPlayButtonBorderWidth = 0.8;
+const _kPlayButtonBorderWidth = 0.5;
 
 class UpNextWidget extends ConsumerWidget {
-  const UpNextWidget({super.key});
+  /// Optional widget rendered inside the card below the main content (e.g. the
+  /// explainer strip). When provided it collapses inside the card so the
+  /// rounded corners are always intact.
+  final Widget? inlineStrip;
+
+  const UpNextWidget({super.key, this.inlineStrip});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final upNextAsync = ref.watch(upNextProvider);
 
-    return upNextAsync.when(
-      loading: () => const _UpNextShimmer(),
-      error: (_, _) => const _UpNextShimmer(),
+    final child = upNextAsync.when(
+      loading: () => const _UpNextShimmer(key: ValueKey('shimmer')),
+      error: (_, _) => const SizedBox.shrink(key: ValueKey('error')),
       data: (upNextData) {
         if (upNextData.nextSession == null) {
-          return const SizedBox.shrink();
+          return const SizedBox.shrink(key: ValueKey('empty'));
         }
 
-        return _UpNextContent(data: upNextData);
+        return _UpNextContent(
+          key: ValueKey(upNextData.nextSession!.id),
+          data: upNextData,
+          inlineStrip: inlineStrip,
+        );
       },
+    );
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      transitionBuilder: (child, animation) {
+        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        final scale = Tween<double>(begin: 0.94, end: 1.0).animate(curved);
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(scale: scale, child: child),
+        );
+      },
+      child: child,
     );
   }
 }
 
 class _UpNextContent extends ConsumerStatefulWidget {
   final UpNextData data;
+  final Widget? inlineStrip;
 
-  const _UpNextContent({required this.data});
+  const _UpNextContent({
+    super.key,
+    required this.data,
+    this.inlineStrip,
+  });
 
   @override
   ConsumerState<_UpNextContent> createState() => _UpNextContentState();
 }
 
 class _UpNextContentState extends ConsumerState<_UpNextContent> {
+  bool _skipping = false;
+
   @override
   Widget build(BuildContext context) {
     final nextSession = widget.data.nextSession!;
@@ -65,123 +94,126 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     final onSurface = theme.colorScheme.onSurface;
     final l10n = AppLocalizations.of(context)!;
 
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: padding16,
-        right: padding16,
-        bottom: padding16,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(_kCardBorderRadius),
-        child: Dismissible(
-          key: Key('up_next_${nextSession.id}'),
-          direction: DismissDirection.endToStart,
-          background: _getSkipBackground(context, l10n),
-          confirmDismiss: (_) async {
-            await _onSkip(context);
-            return false;
-          },
-          child: Semantics(
-            label:
-                '${l10n.upNext}: ${widget.data.pack.title} – ${nextSession.title}',
-            button: true,
-            customSemanticsActions: {
-              CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
+    final borderRadius = BorderRadius.circular(_kCardBorderRadius);
+
+    return AnimatedOpacity(
+      opacity: _skipping ? 0.0 : 1.0,
+      duration: const Duration(milliseconds: 150),
+      child: Padding(
+        padding: const EdgeInsets.only(
+          left: padding16,
+          right: padding16,
+          bottom: padding16,
+        ),
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: Dismissible(
+            key: Key('up_next_${nextSession.id}'),
+            direction: DismissDirection.endToStart,
+            background: _getSkipBackground(context, l10n),
+            movementDuration: const Duration(milliseconds: 1),
+            confirmDismiss: (_) async {
+              await _onSkip(context);
+              return false;
             },
-            child: GestureDetector(
-              onTap: () => _onTap(context),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(_kCardBorderRadius),
-                  border: Border.all(
-                    color:
-                        Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
-                    width: 0.5,
+            child: Semantics(
+              label:
+                  '${l10n.upNext}: ${widget.data.pack.title} — ${nextSession.title}',
+              button: true,
+              customSemanticsActions: {
+                CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
+              },
+              child: GestureDetector(
+                onTap: () => _onTap(context),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: borderRadius,
+                    border: Border.all(
+                      color:
+                          Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
+                      width: 0.5,
+                    ),
                   ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(_kCardBorderRadius),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(padding16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'UP NEXT',
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              fontFamily: teachers,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 1.2,
-                                              color: theme.colorScheme.onSurface
-                                                  .withValues(alpha: 0.6),
-                                            ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        widget.data.pack.title,
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              fontFamily: teachers,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 1.2,
-                                              color: theme.colorScheme.onSurface
-                                                  .withValues(alpha: 0.6),
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    nextSession.title,
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                          fontFamily: sourceSerif,
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.2,
-                                          color: onSurface,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(_kCardBorderRadius),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(padding16),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'YOUR PATH',
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                fontFamily: teachers,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                letterSpacing: 1.2,
+                                                color: ColorConstants.lightBlue,
+                                              ),
                                         ),
-                                  ),
-                                  if (nextSession.subtitle != null) ...[
+                                        Text(
+                                          '  ·  ',
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                fontFamily: teachers,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: ColorConstants.lightBlue,
+                                              ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            widget.data.pack.title,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  fontFamily: teachers,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  letterSpacing: 1.2,
+                                                  color:
+                                                      ColorConstants.lightBlue,
+                                                ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      nextSession.subtitle!,
-                                      style: theme.textTheme.bodyMedium
+                                      nextSession.title,
+                                      style: theme.textTheme.headlineSmall
                                           ?.copyWith(
-                                            fontFamily: teachers,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: onSurface.withValues(
-                                              alpha: 0.6,
-                                            ),
+                                            fontFamily: sourceSerif,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.2,
+                                            color: onSurface,
                                           ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
-                                ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: padding16),
-                            _PlayButton(onTap: () => _onTap(context)),
-                          ],
+                              const SizedBox(width: padding16),
+                              _PlayButton(onTap: () => _onTap(context)),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        if (widget.inlineStrip != null) widget.inlineStrip!,
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -205,13 +237,14 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.skip_next_rounded, color: iconColor, size: 32),
+                Icon(Icons.skip_next_rounded, color: iconColor, size: 28),
                 const SizedBox(height: 4),
                 Text(
                   l10n.skip,
-                  style: theme.textTheme.bodyMedium?.copyWith(
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: iconColor,
                     fontWeight: FontWeight.w600,
                   ),
@@ -227,6 +260,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
   Future<void> _onSkip(BuildContext context) async {
     final nextSession = widget.data.nextSession;
     if (nextSession == null) return;
+
+    setState(() => _skipping = true);
 
     unawaited(
       ref
@@ -250,7 +285,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
       // Silently fail if refresh fails
     }
 
-    ref.invalidate(upNextProvider);
+    await ref.read(upNextProvider.notifier).refresh();
   }
 
   Future<void> _onTap(BuildContext context) async {
@@ -269,9 +304,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
           ),
     );
 
-    final guideNameAsync = ref.read(guideNamePreferenceProvider);
+    final guideName = ref.read(guideNamePreferenceProvider);
     final preferredDuration = ref.read(durationPreferenceProvider);
-    final guideName = guideNameAsync.hasValue ? guideNameAsync.value : null;
 
     if (guideName != null && preferredDuration != null) {
       await PermissionHandler.requestMediaPlaybackPermission(context);
@@ -294,11 +328,15 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
       );
 
       if (selectedAudio != null && trackState != null) {
+        final bestFile = _findClosestDurationFile(
+          selectedAudio.files,
+          preferredDuration,
+        );
         await ref
             .read(playerProvider.notifier)
             .loadSelectedTrack(
               trackModel: trackState,
-              file: selectedAudio.files.first,
+              file: bestFile,
             );
         _navigateToPlayer(context);
       } else {
@@ -354,6 +392,18 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
 
     return closest ?? audioList.first;
   }
+
+  static TrackFilesModel _findClosestDurationFile(
+    List<TrackFilesModel> files,
+    int? targetDuration,
+  ) {
+    if (targetDuration == null) return files.first;
+    return files.reduce((a, b) {
+      final aDiff = (a.duration - targetDuration).abs();
+      final bDiff = (b.duration - targetDuration).abs();
+      return aDiff < bDiff ? a : b;
+    });
+  }
 }
 
 class _PlayButton extends StatelessWidget {
@@ -390,7 +440,7 @@ class _PlayButton extends StatelessWidget {
 }
 
 class _UpNextShimmer extends StatelessWidget {
-  const _UpNextShimmer();
+  const _UpNextShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {

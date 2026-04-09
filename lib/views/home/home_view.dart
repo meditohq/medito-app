@@ -19,6 +19,7 @@ import 'widgets/products/home_products_section.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
 import 'widgets/up_next/up_next_widget.dart';
+import 'widgets/up_next/your_path_explainer_strip.dart';
 
 import '../../providers/home/announcement_provider.dart';
 import '../../providers/home/up_next_provider.dart';
@@ -34,7 +35,6 @@ class HomeView extends ConsumerStatefulWidget {
 class _HomeViewState extends ConsumerState<HomeView>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   final _analytics = FirebaseAnalyticsService();
-
   @override
   void initState() {
     super.initState();
@@ -129,6 +129,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                         case HomeWidgetType.upNext:
                           child = UpNextWidget(
                             key: ValueKey(type.name),
+                            inlineStrip: const YourPathExplainerStrip(),
                           );
                           break;
                       }

@@ -22,7 +22,7 @@ void main() {
       var audioCompleted = List.generate(100, (index) {
         return LocalAudioCompleted(
           id: index.toString(),
-          timestamp: today.subtract(Duration(days: index)).millisecondsSinceEpoch,
+          timestamp: DateTime(today.year, today.month, today.day - index).millisecondsSinceEpoch,
         );
       });
 

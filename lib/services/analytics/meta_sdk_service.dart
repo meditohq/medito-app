@@ -15,7 +15,7 @@ class MetaSdkService {
 
   static final MetaSdkService instance = MetaSdkService._();
   bool _initialised = false;
-  final FacebookAppEvents _events = FacebookAppEvents();
+  FacebookAppEvents? _events;
   static const MethodChannel _channel =
       MethodChannel('com.medito.app/facebook');
 
@@ -26,8 +26,15 @@ class MetaSdkService {
 
     AppLogger.d('META', 'Init Facebook App Events (appId=$facebookAppId)');
 
+    if (facebookAppId.isEmpty) {
+      AppLogger.w('META', 'Facebook App ID is empty, skipping SDK init');
+      _initialised = true;
+      return;
+    }
+
     // facebook_app_events initialises using platform configs.
     // If consent gating is required, handle it before enabling tracking.
+    _events = FacebookAppEvents();
 
     _initialised = true;
   }
@@ -62,9 +69,9 @@ class MetaSdkService {
   Future<void> setUserId(String? userId) async {
     try {
       if (userId == null || userId.isEmpty) {
-        await _events.clearUserID();
+        await _events?.clearUserID();
       } else {
-        await _events.setUserID(userId);
+        await _events?.setUserID(userId);
       }
       AppLogger.d('META', 'Set user ID for FB events: $userId');
     } catch (e) {
@@ -89,7 +96,7 @@ class MetaSdkService {
         return;
       }
 
-      await _events.logEvent(name: name, parameters: params);
+      await _events?.logEvent(name: name, parameters: params);
       if (kDebugMode) {
         AppLogger.d('META', 'Logged FB event: $name');
       }

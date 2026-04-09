@@ -35,94 +35,83 @@ class UpNextData {
   bool get isCompleted => completedCount >= totalCount;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class UpNext extends _$UpNext {
   @override
-  AsyncValue<UpNextData> build() {
-    fetchUpNext();
+  Future<UpNextData> build() => _load();
 
-    return const AsyncLoading();
-  }
-
-  Future<void> fetchUpNext() async {
+  Future<UpNextData> _load() async {
     final packRepository = ref.read(packRepositoryProvider);
+    final prefs = ref.read(sharedPreferencesProvider);
     final statsManager = StatsManager();
-    await statsManager.initialize();
-
-    state = const AsyncLoading();
-
-    try {
-      final prefs = ref.read(sharedPreferencesProvider);
-      var packId = ref.read(upNextPackIdProvider);
-      final isDefaultPack = packId == ConfigConstants.basicsPackId;
-      
-      var pack = await packRepository.fetchPacks(packId);
-      var localStats = await statsManager.localAllStats;
-      var tracksChecked = localStats.tracksChecked ?? [];
-
-      var updatedItems = pack.items.map((item) {
-        return item.copyWith(isCompleted: tracksChecked.contains(item.id));
-      }).toList();
-
-      var updatedPack = pack.copyWith(items: updatedItems);
-      var completedCount = updatedItems.where((item) => item.isCompleted == true).length;
-      final isCompleted = completedCount >= updatedItems.length;
-
-      // If pack is completed and not default, switch back to default
-      if (isCompleted && !isDefaultPack) {
-        await prefs.remove(SharedPreferenceConstants.upNextPackId);
-        ref.invalidate(upNextPackIdProvider);
-        packId = ConfigConstants.basicsPackId;
-        pack = await packRepository.fetchPacks(packId);
-        localStats = await statsManager.localAllStats;
-        tracksChecked = localStats.tracksChecked ?? [];
-        updatedItems = pack.items.map((item) {
-          return item.copyWith(isCompleted: tracksChecked.contains(item.id));
-        }).toList();
-        updatedPack = pack.copyWith(items: updatedItems);
-        completedCount = updatedItems.where((item) => item.isCompleted == true).length;
-      }
-
-      // Check if the current pack (now potentially default) is completed
-      final currentPackCompleted = completedCount >= updatedItems.length;
-
-      // Find next session - if default pack is also completed, return null
-      PackItemsModel? nextSession;
-      if (currentPackCompleted && packId == ConfigConstants.basicsPackId) {
-        nextSession = null;
-      } else {
-        nextSession = updatedItems.firstWhere(
-          (item) => item.isCompleted != true,
-          orElse: () => updatedItems.first,
-        );
-      }
-
-      final upNextData = UpNextData(
-        pack: updatedPack,
-        nextSession: nextSession,
-        completedCount: completedCount,
-        totalCount: updatedItems.length,
-      );
-      state = AsyncData(upNextData);
-
-      if (nextSession != null) {
-        HomeWidgetService.updateUpNextWidget(
-          title: nextSession.title,
-          packTitle: updatedPack.title,
-          trackId: nextSession.id,
-          subtitle: nextSession.subtitle,
-          completed: completedCount,
-          total: updatedItems.length,
-        ).ignore();
-      }
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
+    if (!statsManager.isInitialized) {
+      await statsManager.initialize();
     }
 
-    ref.keepAlive();
+    var packId = ref.read(upNextPackIdProvider);
+    final isDefaultPack = packId == ConfigConstants.basicsPackId;
+    var pack = await packRepository.fetchPacks(packId);
+    var localStats = await statsManager.localAllStats;
+    var tracksChecked = localStats.tracksChecked ?? [];
+
+    var updatedItems = pack.items.map((item) {
+      return item.copyWith(isCompleted: tracksChecked.contains(item.id));
+    }).toList();
+
+    var updatedPack = pack.copyWith(items: updatedItems);
+    var completedCount =
+        updatedItems.where((item) => item.isCompleted == true).length;
+    final isCompleted = completedCount >= updatedItems.length;
+
+    // If pack is completed and not default, switch back to default
+    if (isCompleted && !isDefaultPack) {
+      await prefs.remove(SharedPreferenceConstants.upNextPackId);
+      packId = ConfigConstants.basicsPackId;
+      pack = await packRepository.fetchPacks(packId);
+      localStats = await statsManager.localAllStats;
+      tracksChecked = localStats.tracksChecked ?? [];
+      updatedItems = pack.items.map((item) {
+        return item.copyWith(isCompleted: tracksChecked.contains(item.id));
+      }).toList();
+      updatedPack = pack.copyWith(items: updatedItems);
+      completedCount =
+          updatedItems.where((item) => item.isCompleted == true).length;
+    }
+
+    final currentPackCompleted = completedCount >= updatedItems.length;
+
+    PackItemsModel? nextSession;
+    if (currentPackCompleted && packId == ConfigConstants.basicsPackId) {
+      nextSession = null;
+    } else {
+      nextSession = updatedItems.firstWhere(
+        (item) => item.isCompleted != true,
+        orElse: () => updatedItems.first,
+      );
+    }
+
+    final upNextData = UpNextData(
+      pack: updatedPack,
+      nextSession: nextSession,
+      completedCount: completedCount,
+      totalCount: updatedItems.length,
+    );
+
+    if (nextSession != null) {
+      HomeWidgetService.updateUpNextWidget(
+        title: nextSession.title,
+        packTitle: updatedPack.title,
+        trackId: nextSession.id,
+        subtitle: nextSession.subtitle,
+        completed: completedCount,
+        total: updatedItems.length,
+      ).ignore();
+    }
+
+    return upNextData;
   }
 
   Future<void> refresh() async {
-    await fetchUpNext();
+    state = await AsyncValue.guard(_load);
   }
 }

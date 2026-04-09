@@ -68,4 +68,7 @@ class SharedPreferenceConstants {
 
   // Up Next pack preference
   static const String upNextPackId = 'up_next_pack_id';
+
+  // Your Path explainer strip — set to true once the strip has been dismissed
+  static const String hasSeenYourPathExplainer = 'has_seen_your_path_explainer';
 }

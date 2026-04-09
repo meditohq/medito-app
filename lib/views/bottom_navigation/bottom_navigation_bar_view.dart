@@ -14,6 +14,7 @@ import 'package:medito/views/path/path_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/providers/feature_flags_provider.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
@@ -109,6 +110,8 @@ class _BottomNavigationBarViewState
   }
 
   BottomActionBarItem _buildHomeNavigationItem() {
+    final l10n = AppLocalizations.of(context)!;
+
     return BottomActionBarItem(
       child: MeditoIcon(
         assetName: MeditoIcons.home,
@@ -117,10 +120,13 @@ class _BottomNavigationBarViewState
             : Theme.of(context).colorScheme.onSurface,
       ),
       onTap: () => _onDestinationSelected(0),
+      semanticLabel: l10n.home,
     );
   }
 
   BottomActionBarItem _buildSearchNavigationItem() {
+    final l10n = AppLocalizations.of(context)!;
+
     return BottomActionBarItem(
       child: GestureDetector(
         onDoubleTap: () {
@@ -141,10 +147,13 @@ class _BottomNavigationBarViewState
         ),
       ),
       onTap: () => _onDestinationSelected(1),
+      semanticLabel: l10n.explore,
     );
   }
 
   BottomActionBarItem _buildJourneyNavigationItem() {
+    final l10n = AppLocalizations.of(context)!;
+
     return BottomActionBarItem(
       child: MeditoIcon(
         assetName: MeditoIcons.road,
@@ -153,10 +162,13 @@ class _BottomNavigationBarViewState
             : Theme.of(context).colorScheme.onSurface,
       ),
       onTap: () => _onDestinationSelected(2),
+      semanticLabel: l10n.path,
     );
   }
 
   BottomActionBarItem _buildSettingsNavigationItem() {
+    final l10n = AppLocalizations.of(context)!;
+
     return BottomActionBarItem(
       child: MeditoIcon(
         assetName: MeditoIcons.settings,
@@ -165,6 +177,7 @@ class _BottomNavigationBarViewState
             : Theme.of(context).colorScheme.onSurface,
       ),
       onTap: () => _onDestinationSelected(3),
+      semanticLabel: l10n.settings,
     );
   }
 

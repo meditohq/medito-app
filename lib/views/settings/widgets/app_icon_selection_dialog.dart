@@ -68,10 +68,7 @@ class AppIconSelectionDialogState extends State<AppIconSelectionDialog> {
 
   Future<void> _setIcon(AppIconOption option) async {
     try {
-      await DynamicAppIconFlutterPlus.setAlternateIconName(
-        option.iconName,
-        showAlert: false,
-      );
+      await DynamicAppIconFlutterPlus.setAlternateIconName(option.iconName);
       setState(() => _currentIconName = option.iconName);
       if (mounted) {
         Navigator.of(context).pop();

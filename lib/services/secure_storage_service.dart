@@ -115,9 +115,6 @@ class SecureStorageService {
   Future<void> _storeRefreshToken(String token) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      // Store the token as-is (plain) to avoid corruption that can occur
-      // when using the previous XOR "encryption" scheme. We keep the same
-      // key so older versions of the app can still read their data.
       await prefs.setString(_backupRefreshTokenKey, token);
       dev.log(
         '[SECURE_STORAGE] Refresh token stored in SharedPreferences',

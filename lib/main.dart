@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:audio_service/audio_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/theme/app_theme.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/config/superwall_config.dart';
@@ -41,9 +41,15 @@ import 'app_globals.dart';
 import 'package:medito/widgets/maintenance_checker_widget.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:medito/mock/mock_auth_api_service.dart';
+import 'package:medito/mock/mock_donation_api_service.dart';
+import 'package:medito/providers/stripe/payment_providers.dart';
+import 'package:medito/providers/stripe/payment_service_provider.dart';
 
 
-bool _hasInitialized = false;
+// Completer used as both the guard and the barrier for duplicate main() calls.
+// It is set synchronously before any await, so a second call always finds it non-null.
+Completer<void>? _initCompleter;
 
 Future<void> _configureStripe() async {
   // Configure Stripe settings - publishableKey and merchantIdentifier will be set from backend config
@@ -54,68 +60,84 @@ Future<void> _configureStripe() async {
 }
 
 void main() async {
-  if (_hasInitialized) {
+  if (_initCompleter != null) {
     AppLogger.d('MAIN', 'App already initialized, skipping main()');
+    await _initCompleter!.future;
     return;
   }
-  _hasInitialized = true;
+  _initCompleter = Completer<void>();
 
   AppLogger.d('MAIN', 'Starting app initialization');
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    // Make Superwall configuration non-blocking with shorter timeout when offline
-    await SuperwallConfig.configure().timeout(const Duration(seconds: 5));
-  } catch (e) {
-    AppLogger.w('MAIN', 'Superwall configuration failed/timed out: $e');
-    // Don't re-throw - let the app continue without Superwall
+  if (!isMockMode) {
+    try {
+      // Make Superwall configuration non-blocking with shorter timeout when offline
+      await SuperwallConfig.configure().timeout(const Duration(seconds: 5));
+    } catch (e) {
+      AppLogger.w('MAIN', 'Superwall configuration failed/timed out: $e');
+      // Don't re-throw - let the app continue without Superwall
+    }
+  } else {
+    AppLogger.d('MAIN', 'Mock mode: skipping Superwall, Firebase, Stripe, Meta SDK');
   }
 
   var prefs = await initializeSharedPreferences();
 
-  // Initialize Firebase (non-blocking when offline)
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+  if (!isMockMode) {
+    // Initialize Firebase (non-blocking when offline)
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
-    final analyticsEnabled =
-        prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
-            true;
-    if (analyticsEnabled) {
-      await CrashlyticsService().initialize();
+      final analyticsEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+              true;
+      if (analyticsEnabled) {
+        await CrashlyticsService().initialize();
+      }
+    } catch (e) {
+      AppLogger.e('MAIN', 'Firebase initialization failed: $e');
+      // Continue without Firebase - app should still work offline
     }
-  } catch (e) {
-    AppLogger.e('MAIN', 'Firebase initialization failed: $e');
-    // Continue without Firebase - app should still work offline
+
+    // Initialize Stripe
+    await _configureStripe();
+
+    // Initialize Meta (Facebook) App Events
+    await MetaSdkService.instance.init();
+    AppLogger.d('MAIN', 'Meta SDK init complete');
   }
 
-  // Initialize Stripe
-  await _configureStripe();
+  initializeAudioService();
 
-  // Initialize Meta (Facebook) App Events
-  await MetaSdkService.instance.init();
-
-  try {
-    await initializeAudioService().timeout(
-      const Duration(seconds: 3),
-      onTimeout: () {
-        AppLogger.w('MAIN', 'Audio service initialization timed out');
-        // Don't throw - audio service is not critical for basic app functionality
-      },
-    );
-  } catch (e) {
-    AppLogger.e('MAIN', 'Audio service initialization failed: $e');
-    // Continue without audio service
-  }
   usePathUrlStrategy();
+
+  _initCompleter?.complete();
 
   runApp(
     DevicePreview(
       enabled: DebugOptions.enableDevicePreview,
       builder: (context) => ProviderScope(
-        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          if (isMockMode) ...[
+            donationServiceProvider.overrideWith(
+              (ref) => MockDonationApiService(),
+            ),
+            paymentServiceProvider.overrideWith(
+              (ref) => MockPaymentServiceImpl(),
+            ),
+            authRepositoryProvider.overrideWith((ref) async {
+              return AuthRepositoryImpl(
+                preferences: prefs,
+                authService: MockAuthApiService(),
+              );
+            }),
+          ],
+        ],
         child: const ParentWidget(),
       ),
     ),
@@ -126,16 +148,10 @@ void setupAudioCallback() {
   MeditoAudioServiceCallbackApi.setUp(AudioStateProvider(audioStateNotifier));
 }
 
-Future<void> initializeAudioService() async {
-  if (Platform.isIOS) {
-    await AudioService.init(
-      builder: () => iosAudioHandler,
-      config: AudioServiceConfig(
-        fastForwardInterval: const Duration(seconds: 10),
-        rewindInterval: const Duration(seconds: 10),
-      ),
-    );
-  } else if (Platform.isAndroid) {
+void initializeAudioService() {
+  // iOS uses iosAudioHandler directly - AudioService.init is not needed and hangs.
+  // Android uses the pigeon callback setup.
+  if (Platform.isAndroid) {
     setupAudioCallback();
   }
 }

@@ -1,0 +1,47 @@
+## Widgetbook Rule
+
+When creating a new reusable widget, add a corresponding use case file to the widgetbook.
+
+### Where to add it
+- Create a new file at `widgetbook/lib/use_cases/<widget_name_snake_case>.dart`
+- Follow the naming convention of existing use cases (e.g. `loading_button.dart`, `onboarding_option_button.dart`)
+
+### Structure
+Each use case file should:
+1. Import the widget from `package:medito/...`
+2. Import `package:widgetbook/widgetbook.dart` and `package:widgetbook_annotation/widgetbook_annotation.dart`
+3. Define at least one `@UseCase` function per notable state (e.g. default, loading, selected, error)
+4. Use `context.knobs` for configurable properties where appropriate
+
+### Example
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:medito/widgets/buttons/loading_button_widget.dart';
+import 'package:widgetbook/widgetbook.dart';
+import 'package:widgetbook_annotation/widgetbook_annotation.dart';
+
+@UseCase(name: 'Default', type: LoadingButtonWidget)
+Widget defaultLoadingButton(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.all(24),
+    child: LoadingButtonWidget(
+      btnText: context.knobs.string(
+        label: 'Button text',
+        initialValue: 'Get Started',
+      ),
+      isLoading: context.knobs.boolean(
+        label: 'Loading',
+        initialValue: false,
+      ),
+      onPressed: () {},
+    ),
+  );
+}
+```
+
+### After adding the use case
+Run the widgetbook code generator to update `main.directories.g.dart`:
+```
+cd widgetbook && dart run build_runner build --delete-conflicting-outputs
+```

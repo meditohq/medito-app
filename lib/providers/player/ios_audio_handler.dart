@@ -64,7 +64,12 @@ class IosAudioHandler extends BaseAudioHandler {
         _player.pause();
       });
 
-      await session.configure(AudioSessionConfiguration.speech());
+      await session.configure(const AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playback,
+        avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.none,
+        avAudioSessionMode: AVAudioSessionMode.defaultMode,
+        avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      ));
 
       _setupPlaybackState();
       _setupEventListeners();

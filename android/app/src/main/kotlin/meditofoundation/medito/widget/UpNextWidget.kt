@@ -97,7 +97,7 @@ class UpNextWidget : GlanceAppWidget() {
 
         val tapAction = if (trackId.isNotEmpty()) {
             actionStartActivity(
-                Intent(Intent.ACTION_VIEW, Uri.parse("org.meditofoundation://tracks/$trackId"))
+                Intent(Intent.ACTION_VIEW, Uri.parse("org.meditofoundation://medito/tracks/$trackId"))
                     .apply { setPackage(context.packageName) },
             )
         } else {

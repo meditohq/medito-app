@@ -37,7 +37,7 @@
     </queries>
 
     <application
-        android:label="@string/app_name"
+        android:label="@string/app_name_override"
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher_dusk"
@@ -134,7 +134,7 @@
             android:targetActivity=".MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_dusk"
-            android:label="@string/app_name"
+            android:label="@string/app_name_override"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -147,7 +147,7 @@
             android:targetActivity=".MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_purple"
-            android:label="@string/app_name"
+            android:label="@string/app_name_override"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -160,7 +160,7 @@
             android:targetActivity=".MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_nearblack"
-            android:label="@string/app_name"
+            android:label="@string/app_name_override"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -173,7 +173,7 @@
             android:targetActivity=".MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_blush"
-            android:label="@string/app_name"
+            android:label="@string/app_name_override"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -186,7 +186,7 @@
             android:targetActivity=".MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_ocean"
-            android:label="@string/app_name"
+            android:label="@string/app_name_override"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -199,7 +199,7 @@
             android:targetActivity=".MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_forest"
-            android:label="@string/app_name"
+            android:label="@string/app_name_override"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -212,7 +212,7 @@
             android:targetActivity=".MainActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher_pink"
-            android:label="@string/app_name"
+            android:label="@string/app_name_override"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

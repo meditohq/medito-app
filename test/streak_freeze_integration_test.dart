@@ -229,9 +229,9 @@ void main() {
             date.day == mar7.day;
       }), true, reason: 'March 7 should be marked as a freeze usage date');
 
-      // Streak should now be 6 days (Mar 3-8 with Mar 7 being a freeze)
-      expect(afterFreeze.streakCurrent, 6,
-          reason: 'Streak should be 6 days with freeze applied');
+      // Streak should now be 5 days (Mar 3-8, with Mar 7 being a freeze that doesn't count)
+      expect(afterFreeze.streakCurrent, 5,
+          reason: 'Streak should be 5 days with freeze applied (freeze doesn\'t count)');
       expect(afterFreeze.streakLongest, 10,
           reason: 'Longest streak should remain unchanged');
       // Available freezes should be reduced by 1
@@ -321,9 +321,9 @@ void main() {
             date.day == mar9.day;
       }), true, reason: 'March 9 should be marked as a freeze usage date');
 
-      // Streak should now be 6 days (Mar 5-10 with Mar 8 and 9 being freezes)
-      expect(afterFreeze.streakCurrent, 6,
-          reason: 'Streak should be 6 days with both freezes applied');
+      // Streak should now be 4 days (Mar 5-10, with Mar 8 and 9 being freezes that don't count)
+      expect(afterFreeze.streakCurrent, 4,
+          reason: 'Streak should be 4 days with both freezes applied (freezes don\'t count)');
       expect(afterFreeze.streakLongest, 10,
           reason: 'Longest streak should remain unchanged');
       // All freezes should be used

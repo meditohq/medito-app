@@ -106,9 +106,9 @@ void main() {
       expect(mar7FreezeApplied, true,
           reason: 'March 7 should be marked as a freeze usage date');
 
-      // STEP 6: Verify streak was restored
-      expect(afterFreeze.streakCurrent, 6,
-          reason: 'Streak should be 6 days (Mar 3-8 with Mar 7 as freeze)');
+      // STEP 6: Verify streak was restored (freeze bridges gap but doesn't count)
+      expect(afterFreeze.streakCurrent, 5,
+          reason: 'Streak should be 5 days (Mar 3-8, with Mar 7 as freeze that doesn\'t count)');
       expect(afterFreeze.streakLongest, 10,
           reason: 'Longest streak should remain unchanged');
 
@@ -219,10 +219,10 @@ void main() {
       expect(mar9FreezeApplied, true,
           reason: 'March 9 should be marked as a freeze usage date');
 
-      // STEP 6: Verify streak was restored
-      expect(afterFreeze.streakCurrent, 6,
+      // STEP 6: Verify streak was restored (freeze bridges gaps but doesn't count)
+      expect(afterFreeze.streakCurrent, 4,
           reason:
-              'Streak should be 6 days (Mar 5-10 with Mar 8 and 9 as freezes)');
+              'Streak should be 4 days (Mar 5-10, with Mar 8 and 9 as freezes that don\'t count)');
       expect(afterFreeze.streakLongest, 10,
           reason: 'Longest streak should remain unchanged');
 

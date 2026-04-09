@@ -1,0 +1,14 @@
+{
+  "ENVIRONMENT": "mock",
+  "MOCK_MODE": "true",
+  "APP_KEY": "mock-app-key",
+  "CONTENT_BASE_URL": "https://mock.medito.invalid/",
+  "AUTH_URL": "https://mock-auth.medito.invalid/",
+  "EDIT_STATS_URL": "https://mock-stats.medito.invalid/",
+  "DONATION_BASE_URL": "https://mock-donation.medito.invalid/",
+  "DONATION_TOKEN": "mock-donation-token",
+  "SUPERWALL_API_KEY": "",
+  "PAYWALL_ENV": "dev",
+  "FACEBOOK_APP_ID": "",
+  "FACEBOOK_CLIENT_TOKEN": ""
+}

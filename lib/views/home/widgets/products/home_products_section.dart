@@ -22,6 +22,8 @@ class HomeProductsSection extends ConsumerWidget {
         return const SizedBox.shrink();
       },
       data: (List<ProductGroupModel> productGroups) {
+        if (productGroups.isEmpty) return const SizedBox.shrink();
+
         // Shuffle the order of product groups
         var shuffledProducts = List<ProductGroupModel>.from(productGroups)
           ..shuffle();
