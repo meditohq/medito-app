@@ -23,7 +23,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # an external browser (when Google Pay / Superwall aren't available on CI).
 - extendedWaitUntil:
     visible: "Next"
-    timeout: 10000
+    timeout: 20000
 - tapOn: "Next"
 - waitForAnimationToEnd
 - takeScreenshot: after-donation-next
