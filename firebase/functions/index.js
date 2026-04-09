@@ -22,6 +22,13 @@ const webhookSecret = defineSecret("WEBHOOK_SECRET");
 const GITHUB_OWNER = "meditohq";
 const GITHUB_REPO = "medito-app";
 
+const SEVERITY_LABELS = {
+  critical: "critical",
+  high: "high",
+  medium: "medium",
+  low: "low",
+};
+
 // ─── Helper: Verify HMAC signature ──────────────────────────────────────────
 function verifySignature(secret, body, signatureHeader) {
   if (!signatureHeader) return false;
@@ -36,12 +43,69 @@ function verifySignature(secret, body, signatureHeader) {
   );
 }
 
-// ─── Helper: Trigger GitHub repository_dispatch ──────────────────────────────
-async function triggerGitHubPR({ title, description, severity, source, eventType, data }) {
+// ─── Helper: GitHub API request ──────────────────────────────────────────────
+async function githubAPI(method, path, body) {
   const token = githubToken.value();
-  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`;
+  const response = await fetch(`https://api.github.com${path}`, {
+    method,
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
 
-  const payload = {
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`GitHub API ${method} ${path} → ${response.status}: ${text}`);
+  }
+
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+// ─── Helper: Create GitHub Issue then trigger PR workflow ────────────────────
+async function createIssueAndTriggerPR({ title, description, severity, source, eventType, data }) {
+  const severityLabel = SEVERITY_LABELS[severity] || "medium";
+
+  // 1. Create GitHub Issue
+  const issueBody = [
+    `## ${source || "Firebase"} Alert`,
+    "",
+    `| Field | Value |`,
+    `|-------|-------|`,
+    `| **Source** | ${source || "firebase"} |`,
+    `| **Event** | ${eventType || "unknown"} |`,
+    `| **Severity** | ${severityLabel} |`,
+    `| **Time** | ${new Date().toISOString()} |`,
+    "",
+    "## Description",
+    "",
+    description || "No description provided.",
+    "",
+    "## Raw Data",
+    "",
+    "```json",
+    JSON.stringify(data || {}, null, 2),
+    "```",
+    "",
+    "---",
+    "*Auto-created by Firebase Cloud Function*",
+  ].join("\n");
+
+  const labels = ["firebase-alert", severityLabel].filter(Boolean);
+
+  const issue = await githubAPI("POST", `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues`, {
+    title: title || "Untitled Firebase Alert",
+    body: issueBody,
+    labels,
+  });
+
+  logger.info("GitHub issue created", { number: issue.number, title });
+
+  // 2. Trigger repository_dispatch so the Action creates a linked PR
+  await githubAPI("POST", `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`, {
     event_type: "firebase-alert",
     client_payload: {
       title: title || "Untitled Firebase Alert",
@@ -49,42 +113,25 @@ async function triggerGitHubPR({ title, description, severity, source, eventType
       severity: severity || "medium",
       source: source || "firebase",
       event_type: eventType || "unknown",
+      issue_number: issue.number,
       timestamp: new Date().toISOString(),
       data: data || {},
     },
-  };
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${token}`,
-      "X-GitHub-Api-Version": "2022-11-28",
-    },
-    body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`GitHub API error ${response.status}: ${body}`);
-  }
-
-  logger.info("GitHub repository_dispatch triggered", { title, severity });
+  logger.info("GitHub repository_dispatch triggered", { issue: issue.number, title });
 }
 
 // ─── Crashlytics Alert Triggers ──────────────────────────────────────────────
-//
-// These fire automatically when Firebase Crashlytics detects issues.
-// No manual setup needed beyond deploying — Firebase routes alerts natively.
 
 // New fatal crash
 exports.onCrashlyticsFatalIssue = onNewFatalIssuePublished(
   { secrets: [githubToken] },
   async (event) => {
     const issue = event.data.payload.issue;
-    await triggerGitHubPR({
+    await createIssueAndTriggerPR({
       title: `Fatal crash: ${issue.title}`,
-      description: `${issue.subtitle}\n\nAffected version(s): ${event.data.payload.issue.appVersion || "unknown"}`,
+      description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
       severity: "critical",
       source: "crashlytics",
       eventType: "new_fatal_issue",
@@ -98,7 +145,7 @@ exports.onCrashlyticsNonfatalIssue = onNewNonfatalIssuePublished(
   { secrets: [githubToken] },
   async (event) => {
     const issue = event.data.payload.issue;
-    await triggerGitHubPR({
+    await createIssueAndTriggerPR({
       title: `Non-fatal issue: ${issue.title}`,
       description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
       severity: "medium",
@@ -114,7 +161,7 @@ exports.onCrashlyticsAnrIssue = onNewAnrIssuePublished(
   { secrets: [githubToken] },
   async (event) => {
     const issue = event.data.payload.issue;
-    await triggerGitHubPR({
+    await createIssueAndTriggerPR({
       title: `ANR: ${issue.title}`,
       description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
       severity: "high",
@@ -130,7 +177,7 @@ exports.onCrashlyticsRegression = onRegressionAlertPublished(
   { secrets: [githubToken] },
   async (event) => {
     const issue = event.data.payload.issue;
-    await triggerGitHubPR({
+    await createIssueAndTriggerPR({
       title: `Regression: ${issue.title}`,
       description: `A previously closed issue has reappeared.\n\n${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
       severity: "critical",
@@ -150,7 +197,7 @@ exports.onCrashlyticsStabilityDigest = onStabilityDigestPublished(
       .map((i) => `- **${i.type}**: ${i.issue.title} (${i.eventCount} events, ${i.userCount} users)`)
       .join("\n");
 
-    await triggerGitHubPR({
+    await createIssueAndTriggerPR({
       title: `Stability digest: ${trendingIssues.length} trending issue(s)`,
       description: `Emerging issues causing a significant number of crashes:\n\n${issueList}`,
       severity: "high",
@@ -167,7 +214,7 @@ exports.onCrashlyticsVelocityAlert = onVelocityAlertPublished(
   async (event) => {
     const issue = event.data.payload.issue;
     const crashCount = event.data.payload.crashCount || "unknown";
-    await triggerGitHubPR({
+    await createIssueAndTriggerPR({
       title: `Crash spike: ${issue.title}`,
       description: `A sudden increase in crashes has been detected.\n\n${issue.subtitle}\n\nCrash count: ${crashCount}`,
       severity: "critical",
@@ -178,11 +225,7 @@ exports.onCrashlyticsVelocityAlert = onVelocityAlertPublished(
   }
 );
 
-// ─── Firestore trigger: auto-create PR when a document is added ──────────────
-//
-// Any document created in "firebase_issues/{docId}" triggers a PR.
-// Adjust the collection path to match your Firestore structure.
-//
+// ─── Firestore trigger ───────────────────────────────────────────────────────
 exports.onFirestoreIssueCreated = onDocumentCreated(
   {
     document: "firebase_issues/{docId}",
@@ -197,7 +240,7 @@ exports.onFirestoreIssueCreated = onDocumentCreated(
 
     const doc = snap.data();
 
-    await triggerGitHubPR({
+    await createIssueAndTriggerPR({
       title: doc.title || `Firestore issue: ${event.params.docId}`,
       description: doc.description || "",
       severity: doc.severity || "medium",
@@ -209,16 +252,6 @@ exports.onFirestoreIssueCreated = onDocumentCreated(
 );
 
 // ─── HTTP endpoint: generic webhook receiver ─────────────────────────────────
-//
-// Call this from any external service.
-//
-// POST https://<region>-<project>.cloudfunctions.net/webhookToGitHubPR
-// Headers: X-Webhook-Signature: sha256=<HMAC hex digest>
-// Body: { "title": "...", "description": "...", "severity": "critical", ... }
-//
-// Set the shared secret:
-//   firebase functions:secrets:set WEBHOOK_SECRET
-//
 exports.webhookToGitHubPR = onRequest(
   {
     secrets: [githubToken, webhookSecret],
@@ -244,7 +277,6 @@ exports.webhookToGitHubPR = onRequest(
       return;
     }
 
-    // Guard against missing/malformed body
     const body = req.body ?? {};
     const { title, description, severity, source, event_type, data } = body;
 
@@ -254,7 +286,7 @@ exports.webhookToGitHubPR = onRequest(
     }
 
     try {
-      await triggerGitHubPR({
+      await createIssueAndTriggerPR({
         title,
         description,
         severity,
@@ -262,9 +294,9 @@ exports.webhookToGitHubPR = onRequest(
         eventType: event_type,
         data,
       });
-      res.status(200).json({ success: true, message: "GitHub PR workflow triggered" });
+      res.status(200).json({ success: true, message: "GitHub issue + PR workflow triggered" });
     } catch (err) {
-      logger.error("Failed to trigger GitHub PR", err);
+      logger.error("Failed to create issue / trigger PR", err);
       res.status(500).json({ error: err.message });
     }
   }

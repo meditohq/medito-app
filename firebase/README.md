@@ -1,6 +1,6 @@
-# Firebase Webhook → GitHub PR
+# Firebase → GitHub Issue + PR
 
-Automatically create GitHub Pull Requests from Firebase Crashlytics alerts, Firestore events, or any custom webhook trigger.
+Automatically create GitHub Issues **and** linked Pull Requests from Firebase Crashlytics alerts, Firestore events, or any custom webhook trigger. Copilot is assigned as reviewer and assignee on every PR.
 
 ## Architecture
 
@@ -9,11 +9,14 @@ Crashlytics alert (fatal, ANR, regression, velocity, digest)
   ↓
 Cloud Function (native alert trigger)
   ↓
-GitHub repository_dispatch API
+1. Creates GitHub Issue (with labels + details)
+2. Triggers repository_dispatch with issue number
   ↓
 GitHub Action workflow
   ↓
-New branch + PR created automatically
+Creates PR linked to the issue (Closes #N)
+  ↓
+Assigns Copilot as reviewer + assignee
 ```
 
 ## Crashlytics Triggers
@@ -36,19 +39,30 @@ These fire **automatically** after deployment — no manual wiring needed:
 1. Go to **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**
 2. Create a token with these permissions on `meditohq/medito-app`:
    - **Contents**: Read and Write
+   - **Issues**: Read and Write
 3. Copy the token
 
 ### 2. Store secrets in Firebase
 
 ```bash
-# GitHub PAT (required for all triggers)
+# GitHub PAT (required — used to create issues and trigger PRs)
 firebase functions:secrets:set GITHUB_TOKEN --project medito-9165c
 
 # Shared secret for HTTP webhook (only needed for webhookToGitHubPR)
 firebase functions:secrets:set WEBHOOK_SECRET --project medito-9165c
 ```
 
-### 3. Deploy the Cloud Functions
+### 3. Create GitHub labels (one-time)
+
+The Cloud Function labels issues with `firebase-alert` and a severity tag. Create these labels in your repo:
+
+- `firebase-alert`
+- `critical`
+- `high`
+- `medium`
+- `low`
+
+### 4. Deploy the Cloud Functions
 
 ```bash
 cd firebase/functions
@@ -56,16 +70,15 @@ npm install
 firebase deploy --only functions --project medito-9165c
 ```
 
-After deploying, the Crashlytics triggers are active immediately. Any new crash, ANR, regression, or velocity alert from Crashlytics will automatically create a GitHub PR.
+After deploying, the Crashlytics triggers are active immediately.
 
-### 4. Test it
+### 5. Test it
 
 **Option A — Wait for a real Crashlytics alert** (the triggers fire automatically).
 
 **Option B — Via the HTTP endpoint (requires HMAC signature):**
 
 ```bash
-# Generate signature
 SECRET="your-webhook-secret"
 BODY='{"title":"Test alert","description":"Testing the pipeline","severity":"low","source":"manual-test","event_type":"test"}'
 SIGNATURE=$(echo -n "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')
@@ -89,35 +102,19 @@ Add a document to the `firebase_issues` collection in Firestore:
 }
 ```
 
-**Option D — Test with GitHub API directly (bypasses Cloud Functions):**
+## What gets created
 
-```bash
-curl -X POST \
-  https://api.github.com/repos/meditohq/medito-app/dispatches \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer <YOUR_GITHUB_TOKEN>" \
-  -d '{
-    "event_type": "firebase-alert",
-    "client_payload": {
-      "title": "Test: Firebase webhook PR",
-      "description": "Testing the webhook-to-PR pipeline",
-      "severity": "low",
-      "source": "manual-test",
-      "event_type": "test"
-    }
-  }'
-```
+For each Firebase alert, you get:
 
-## Payload Schema (HTTP endpoint)
+1. **GitHub Issue** with:
+   - Title matching the alert
+   - Labels: `firebase-alert` + severity (`critical`, `high`, etc.)
+   - Full alert details in the body
 
-| Field         | Type   | Required | Description                              |
-|---------------|--------|----------|------------------------------------------|
-| `title`       | string | Yes      | Short title for the PR                   |
-| `description` | string | No       | Detailed description of the issue        |
-| `severity`    | string | No       | `critical`, `high`, `medium`, or `low`   |
-| `source`      | string | No       | Origin (e.g., `crashlytics`, `firestore`)|
-| `event_type`  | string | No       | Type of event (e.g., `crash_spike`)      |
-| `data`        | object | No       | Any additional structured data           |
+2. **GitHub PR** with:
+   - Title prefixed with severity emoji
+   - Body containing `Closes #<issue>` to auto-close the issue on merge
+   - Copilot assigned as reviewer and assignee
 
 ## Files
 
