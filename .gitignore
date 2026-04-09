@@ -132,3 +132,6 @@ firebase/functions/node_modules/
 /firebase/functions/build
 /.claude/worktrees
 /android/.kotlin
+
+# Maestro test debug output
+.maestro/debug/

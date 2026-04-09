@@ -28,29 +28,16 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Next"
 - waitForAnimationToEnd
 - takeScreenshot: after-donation-next
-- pressKey: back
-# Press back a second time in case the browser left a disambiguation dialog
-# or an extra layer. If we're already on the donation screen this is harmless
-# because "Skip for Now" will still be there.
+# Verify the Superwall paywall rendered correctly with donation tabs
+- assertVisible: "(?i)monthly"
+- assertVisible: "(?i)yearly"
 - pressKey: back
 
-# After dismissing, "Skip for Now" appears on the donation screen.
-# If the double-back overshot and we landed on the notifications screen,
-# re-launch the app to recover.
-- runFlow:
-    when:
-      visible: "Skip for Now"
-    commands:
-      - tapOn: "Skip for Now"
-
-# If the back presses landed us somewhere unexpected, re-launch to recover.
-# The app remembers onboarding progress, so launchApp will resume.
-- runFlow:
-    when:
-      notVisible: "1 of 2"
-    commands:
-      - launchApp:
-          stopApp: false
+# After dismissing the paywall, "Skip for Now" appears on the donation screen
+- extendedWaitUntil:
+    visible: "Skip for Now"
+    timeout: 15000
+- tapOn: "Skip for Now"
 
 # ── Onboarding: Battery optimization (may or may not appear) ──
 - runFlow:
@@ -87,14 +74,34 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 30000
 
 # ── Navigate all tabs ──
+# Note: Path tab is currently disabled in BottomActionBar homePage layout
 - tapOn: "Explore"
 - assertVisible: "Explore"
-
-- tapOn: "Path"
-- assertVisible: "Path"
 
 - tapOn: "Settings"
 - assertVisible: "Settings"
 
 - tapOn: "Home"
 - assertVisible: "Home"
+
+# ── Play a session via Your Daily ──
+- extendedWaitUntil:
+    visible: "Your Daily"
+    timeout: 15000
+- tapOn: "Your Daily"
+
+# Track view loads with a play button
+- extendedWaitUntil:
+    visible: "Play"
+    timeout: 15000
+- tapOn: "Play"
+
+# Player screen: verify the timer is advancing (format is MM:SS)
+# First wait for the player to appear and start playback
+- extendedWaitUntil:
+    visible: "Pause"
+    timeout: 15000
+
+# Take a screenshot and verify the timer moved past 00:00
+- takeScreenshot: player-playing
+- assertVisible: "00:[0-5][1-9]"
