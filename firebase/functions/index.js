@@ -30,17 +30,27 @@ const SEVERITY_LABELS = {
 };
 
 // ─── Helper: Verify HMAC signature ──────────────────────────────────────────
-function verifySignature(secret, body, signatureHeader) {
-  if (!signatureHeader) return false;
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(typeof body === "string" ? body : JSON.stringify(body))
-    .digest("hex");
-  const signature = signatureHeader.replace(/^sha256=/, "");
-  return crypto.timingSafeEqual(
-    Buffer.from(expected, "hex"),
-    Buffer.from(signature, "hex")
-  );
+function verifySignature(secret, rawBody, signatureHeader) {
+  if (!signatureHeader || !signatureHeader.startsWith("sha256=")) return false;
+
+  try {
+    // Compute HMAC over raw bytes when available, otherwise canonical JSON
+    const payload = Buffer.isBuffer(rawBody) ? rawBody : JSON.stringify(rawBody);
+    const expected = crypto
+      .createHmac("sha256", secret)
+      .update(payload)
+      .digest();
+
+    const signature = signatureHeader.slice("sha256=".length);
+    if (!/^[a-fA-F0-9]{64}$/.test(signature)) return false;
+
+    const provided = Buffer.from(signature, "hex");
+    if (provided.length !== expected.length) return false;
+
+    return crypto.timingSafeEqual(expected, provided);
+  } catch {
+    return false;
+  }
 }
 
 // ─── Helper: GitHub API request ──────────────────────────────────────────────

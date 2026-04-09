@@ -47,9 +47,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Create branch with empty commit
+        env:
+          TITLE: ${{ github.event.client_payload.title }}
         run: |
           git checkout -b "${{ steps.validate.outputs.branch }}"
-          git commit --allow-empty -m "firebase: ${{ github.event.client_payload.title }}"
+          SAFE_TITLE=$(printf '%s' "$TITLE" | tr '\n\r' '  ' | cut -c1-100)
+          git commit --allow-empty -m "firebase: ${SAFE_TITLE}"
 
       - name: Push branch
         run: git push -u origin "${{ steps.validate.outputs.branch }}"
