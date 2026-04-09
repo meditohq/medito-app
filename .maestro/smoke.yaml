@@ -28,25 +28,20 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - waitForAnimationToEnd
 - takeScreenshot: after-donation-next
 
-# On devices with Google Pay + Superwall, the paywall appears with donation tabs.
-# Verify and dismiss.
+# If Superwall loaded, verify the donation tabs are present
 - runFlow:
     when:
       visible: "(?i)monthly"
     commands:
       - assertVisible: "(?i)yearly"
       - takeScreenshot: superwall-paywall
-      - pressKey: back
 
-# On CI emulators without Google Pay, Chrome opens instead.
-# Press back to close Chrome, then re-focus the app.
-- runFlow:
-    when:
-      notVisible: "Skip for Now"
-    commands:
-      - pressKey: back
-      - launchApp:
-          stopApp: false
+# Dismiss whatever opened (paywall or browser) and return to the app.
+# pressKey back closes the overlay; launchApp ensures the app is foregrounded
+# (no-op if already there, recovers if Chrome took focus).
+- pressKey: back
+- launchApp:
+    stopApp: false
 
 # "Skip for Now" should now be visible on the donation screen
 - extendedWaitUntil:
