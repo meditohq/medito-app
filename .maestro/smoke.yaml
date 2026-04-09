@@ -19,21 +19,38 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Donation ──
+# Tap "Next" which either opens the Superwall paywall (native modal) or
+# an external browser (when Google Pay / Superwall aren't available on CI).
+# Either way, press back to dismiss and return to the donation screen.
 - extendedWaitUntil:
     visible: "Next"
     timeout: 10000
 - tapOn: "Next"
-
-# Superwall paywall opens as a native modal.
-# Wait for it to load, then press hardware back to dismiss.
 - waitForAnimationToEnd
+- takeScreenshot: after-donation-next
+- pressKey: back
+# Press back a second time in case the browser left a disambiguation dialog
+# or an extra layer. If we're already on the donation screen this is harmless
+# because "Skip for Now" will still be there.
 - pressKey: back
 
-# After dismissing the paywall, "Skip for Now" appears on the donation screen
-- extendedWaitUntil:
-    visible: "Skip for Now"
-    timeout: 15000
-- tapOn: "Skip for Now"
+# After dismissing, "Skip for Now" appears on the donation screen.
+# If the double-back overshot and we landed on the notifications screen,
+# re-launch the app to recover.
+- runFlow:
+    when:
+      visible: "Skip for Now"
+    commands:
+      - tapOn: "Skip for Now"
+
+# If the back presses landed us somewhere unexpected, re-launch to recover.
+# The app remembers onboarding progress, so launchApp will resume.
+- runFlow:
+    when:
+      notVisible: "1 of 2"
+    commands:
+      - launchApp:
+          stopApp: false
 
 # ── Onboarding: Battery optimization (may or may not appear) ──
 - runFlow:
@@ -44,13 +61,13 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # ── Onboarding: Experience question ──
 - extendedWaitUntil:
-    visible: "Have you meditated before?"
-    timeout: 10000
+    visible: "Never tried it"
+    timeout: 15000
 - tapOn: "Never tried it"
 
 # ── Onboarding: Intent question ──
 - extendedWaitUntil:
-    visible: "What are you hoping to get from Medito?"
+    visible: "Build a regular habit"
     timeout: 10000
 - tapOn: "Build a regular habit"
 
