@@ -1,5 +1,13 @@
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onRequest } = require("firebase-functions/v2/https");
+const {
+  onNewFatalIssuePublished,
+  onNewNonfatalIssuePublished,
+  onNewAnrIssuePublished,
+  onRegressionAlertPublished,
+  onStabilityDigestPublished,
+  onVelocityAlertPublished,
+} = require("firebase-functions/v2/alerts/crashlytics");
 const { defineSecret } = require("firebase-functions/params");
 const { logger } = require("firebase-functions");
 const crypto = require("crypto");
@@ -64,9 +72,115 @@ async function triggerGitHubPR({ title, description, severity, source, eventType
   logger.info("GitHub repository_dispatch triggered", { title, severity });
 }
 
-// ─── 1. Firestore trigger: auto-create PR when a document is added ───────────
+// ─── Crashlytics Alert Triggers ──────────────────────────────────────────────
 //
-// Example: any document created in "firebase_issues/{docId}" triggers a PR.
+// These fire automatically when Firebase Crashlytics detects issues.
+// No manual setup needed beyond deploying — Firebase routes alerts natively.
+
+// New fatal crash
+exports.onCrashlyticsFatalIssue = onNewFatalIssuePublished(
+  { secrets: [githubToken] },
+  async (event) => {
+    const issue = event.data.payload.issue;
+    await triggerGitHubPR({
+      title: `Fatal crash: ${issue.title}`,
+      description: `${issue.subtitle}\n\nAffected version(s): ${event.data.payload.issue.appVersion || "unknown"}`,
+      severity: "critical",
+      source: "crashlytics",
+      eventType: "new_fatal_issue",
+      data: event.data.payload,
+    });
+  }
+);
+
+// New non-fatal issue
+exports.onCrashlyticsNonfatalIssue = onNewNonfatalIssuePublished(
+  { secrets: [githubToken] },
+  async (event) => {
+    const issue = event.data.payload.issue;
+    await triggerGitHubPR({
+      title: `Non-fatal issue: ${issue.title}`,
+      description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
+      severity: "medium",
+      source: "crashlytics",
+      eventType: "new_nonfatal_issue",
+      data: event.data.payload,
+    });
+  }
+);
+
+// New ANR (Application Not Responding)
+exports.onCrashlyticsAnrIssue = onNewAnrIssuePublished(
+  { secrets: [githubToken] },
+  async (event) => {
+    const issue = event.data.payload.issue;
+    await triggerGitHubPR({
+      title: `ANR: ${issue.title}`,
+      description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
+      severity: "high",
+      source: "crashlytics",
+      eventType: "new_anr_issue",
+      data: event.data.payload,
+    });
+  }
+);
+
+// Regressed issue (was closed, came back)
+exports.onCrashlyticsRegression = onRegressionAlertPublished(
+  { secrets: [githubToken] },
+  async (event) => {
+    const issue = event.data.payload.issue;
+    await triggerGitHubPR({
+      title: `Regression: ${issue.title}`,
+      description: `A previously closed issue has reappeared.\n\n${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
+      severity: "critical",
+      source: "crashlytics",
+      eventType: "regression",
+      data: event.data.payload,
+    });
+  }
+);
+
+// Stability digest (trending issues summary)
+exports.onCrashlyticsStabilityDigest = onStabilityDigestPublished(
+  { secrets: [githubToken] },
+  async (event) => {
+    const trendingIssues = event.data.payload.trendingIssues || [];
+    const issueList = trendingIssues
+      .map((i) => `- **${i.type}**: ${i.issue.title} (${i.eventCount} events, ${i.userCount} users)`)
+      .join("\n");
+
+    await triggerGitHubPR({
+      title: `Stability digest: ${trendingIssues.length} trending issue(s)`,
+      description: `Emerging issues causing a significant number of crashes:\n\n${issueList}`,
+      severity: "high",
+      source: "crashlytics",
+      eventType: "stability_digest",
+      data: event.data.payload,
+    });
+  }
+);
+
+// Velocity alert (sudden spike in crashes)
+exports.onCrashlyticsVelocityAlert = onVelocityAlertPublished(
+  { secrets: [githubToken] },
+  async (event) => {
+    const issue = event.data.payload.issue;
+    const crashCount = event.data.payload.crashCount || "unknown";
+    await triggerGitHubPR({
+      title: `Crash spike: ${issue.title}`,
+      description: `A sudden increase in crashes has been detected.\n\n${issue.subtitle}\n\nCrash count: ${crashCount}`,
+      severity: "critical",
+      source: "crashlytics",
+      eventType: "velocity_alert",
+      data: event.data.payload,
+    });
+  }
+);
+
+// ─── Firestore trigger: auto-create PR when a document is added ──────────────
+//
+// Any document created in "firebase_issues/{docId}" triggers a PR.
 // Adjust the collection path to match your Firestore structure.
 //
 exports.onFirestoreIssueCreated = onDocumentCreated(
@@ -94,9 +208,9 @@ exports.onFirestoreIssueCreated = onDocumentCreated(
   }
 );
 
-// ─── 2. HTTP endpoint: generic webhook receiver ──────────────────────────────
+// ─── HTTP endpoint: generic webhook receiver ─────────────────────────────────
 //
-// Call this from Firebase Alerts, Crashlytics hooks, or any external service.
+// Call this from any external service.
 //
 // POST https://<region>-<project>.cloudfunctions.net/webhookToGitHubPR
 // Headers: X-Webhook-Signature: sha256=<HMAC hex digest>

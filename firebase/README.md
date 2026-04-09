@@ -1,13 +1,13 @@
 # Firebase Webhook → GitHub PR
 
-Automatically create GitHub Pull Requests from Firebase events (Firestore changes, Crashlytics alerts, or any custom trigger).
+Automatically create GitHub Pull Requests from Firebase Crashlytics alerts, Firestore events, or any custom webhook trigger.
 
 ## Architecture
 
 ```
-Firebase Event
+Crashlytics alert (fatal, ANR, regression, velocity, digest)
   ↓
-Cloud Function (trigger or HTTP)
+Cloud Function (native alert trigger)
   ↓
 GitHub repository_dispatch API
   ↓
@@ -16,6 +16,19 @@ GitHub Action workflow
 New branch + PR created automatically
 ```
 
+## Crashlytics Triggers
+
+These fire **automatically** after deployment — no manual wiring needed:
+
+| Function | Fires when | Severity |
+|----------|-----------|----------|
+| `onCrashlyticsFatalIssue` | New fatal crash detected | critical |
+| `onCrashlyticsNonfatalIssue` | New non-fatal issue detected | medium |
+| `onCrashlyticsAnrIssue` | New ANR (App Not Responding) | high |
+| `onCrashlyticsRegression` | A closed issue reappears in a new version | critical |
+| `onCrashlyticsStabilityDigest` | Trending/emerging issues summary | high |
+| `onCrashlyticsVelocityAlert` | Sudden spike in crash rate | critical |
+
 ## Setup
 
 ### 1. Create a GitHub Personal Access Token (PAT)
@@ -23,15 +36,16 @@ New branch + PR created automatically
 1. Go to **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**
 2. Create a token with these permissions on `meditohq/medito-app`:
    - **Contents**: Read and Write
-   - **Pull requests**: Read and Write
 3. Copy the token
 
-### 2. Store the token as a Firebase secret
+### 2. Store secrets in Firebase
 
 ```bash
-cd firebase/functions
-firebase functions:secrets:set GITHUB_TOKEN
-# Paste your GitHub PAT when prompted
+# GitHub PAT (required for all triggers)
+firebase functions:secrets:set GITHUB_TOKEN --project medito-9165c
+
+# Shared secret for HTTP webhook (only needed for webhookToGitHubPR)
+firebase functions:secrets:set WEBHOOK_SECRET --project medito-9165c
 ```
 
 ### 3. Deploy the Cloud Functions
@@ -39,32 +53,31 @@ firebase functions:secrets:set GITHUB_TOKEN
 ```bash
 cd firebase/functions
 npm install
-firebase deploy --only functions
+firebase deploy --only functions --project medito-9165c
 ```
+
+After deploying, the Crashlytics triggers are active immediately. Any new crash, ANR, regression, or velocity alert from Crashlytics will automatically create a GitHub PR.
 
 ### 4. Test it
 
-**Option A — Via the HTTP endpoint:**
+**Option A — Wait for a real Crashlytics alert** (the triggers fire automatically).
+
+**Option B — Via the HTTP endpoint (requires HMAC signature):**
 
 ```bash
+# Generate signature
+SECRET="your-webhook-secret"
+BODY='{"title":"Test alert","description":"Testing the pipeline","severity":"low","source":"manual-test","event_type":"test"}'
+SIGNATURE=$(echo -n "$BODY" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')
+
 curl -X POST \
-  https://<REGION>-<PROJECT_ID>.cloudfunctions.net/webhookToGitHubPR \
+  https://<REGION>-medito-9165c.cloudfunctions.net/webhookToGitHubPR \
   -H "Content-Type: application/json" \
-  -d '{
-    "title": "Crashlytics: High crash rate in AudioPlayer",
-    "description": "Crash rate exceeded 1% on Android 14 devices in the AudioPlayer screen.",
-    "severity": "critical",
-    "source": "crashlytics",
-    "event_type": "crash_spike",
-    "data": {
-      "crash_count": 1523,
-      "affected_users": 890,
-      "version": "3.6.1"
-    }
-  }'
+  -H "X-Webhook-Signature: sha256=$SIGNATURE" \
+  -d "$BODY"
 ```
 
-**Option B — Via Firestore (auto-trigger):**
+**Option C — Via Firestore (auto-trigger):**
 
 Add a document to the `firebase_issues` collection in Firestore:
 
@@ -76,7 +89,7 @@ Add a document to the `firebase_issues` collection in Firestore:
 }
 ```
 
-**Option C — Test locally with `curl` + GitHub API directly:**
+**Option D — Test with GitHub API directly (bypasses Cloud Functions):**
 
 ```bash
 curl -X POST \
@@ -95,7 +108,7 @@ curl -X POST \
   }'
 ```
 
-## Payload Schema
+## Payload Schema (HTTP endpoint)
 
 | Field         | Type   | Required | Description                              |
 |---------------|--------|----------|------------------------------------------|
@@ -106,16 +119,9 @@ curl -X POST \
 | `event_type`  | string | No       | Type of event (e.g., `crash_spike`)      |
 | `data`        | object | No       | Any additional structured data           |
 
-## Connecting to Firebase Alerts
-
-To forward Firebase Alerts (Crashlytics, Performance, App Distribution) to this webhook:
-
-1. Go to **Firebase Console → Project Settings → Integrations**
-2. Set up a **Cloud Function trigger** for the alert type you want
-3. Or use **Firebase Alerting** to call the `webhookToGitHubPR` HTTP endpoint
-
 ## Files
 
 - `.github/workflows/firebase-webhook-pr.yml` — GitHub Action that creates the PR
-- `firebase/functions/index.js` — Cloud Functions (Firestore trigger + HTTP endpoint)
+- `firebase/functions/index.js` — Cloud Functions (Crashlytics triggers + Firestore trigger + HTTP endpoint)
 - `firebase/functions/package.json` — Node.js dependencies
+- `firebase.json` — Firebase project config pointing to functions source
