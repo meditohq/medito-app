@@ -3,40 +3,35 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 ---
 
 # ── Splash screen ──
-- assertVisible:
-    text: "Continue"
+- extendedWaitUntil:
+    visible: "Continue"
     timeout: 30000
 - tapOn: "Continue"
 
 # ── Onboarding: Notifications ──
-- assertVisible:
-    text: "Skip for Now"
+- extendedWaitUntil:
+    visible: "Skip for Now"
     timeout: 20000
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Donation ──
-- assertVisible:
-    text: "Next"
+- extendedWaitUntil:
+    visible: "Next"
     timeout: 10000
 - tapOn: "Next"
 
 # Superwall paywall opens as a native modal.
-# Wait a moment for it to appear, then press back to dismiss it.
+# Wait for it to load, then press hardware back to dismiss.
 - waitForAnimationToEnd
-- extendedWaitUntil:
-    visible:
-      text: ".*"
-    timeout: 8000
 - pressKey: back
 
 # After dismissing the paywall, "Skip for Now" appears on the donation screen
-- assertVisible:
-    text: "Skip for Now"
+- extendedWaitUntil:
+    visible: "Skip for Now"
     timeout: 15000
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Battery optimization (may or may not appear) ──
-# If the battery screen shows, skip it; otherwise we're already on the question
 - runFlow:
     when:
       visible: "Update Setting"
@@ -44,45 +39,41 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       - tapOn: "Skip for Now"
 
 # ── Onboarding: Experience question ──
-- assertVisible:
-    text: "Have you meditated before?"
+- extendedWaitUntil:
+    visible: "Have you meditated before?"
     timeout: 10000
 - tapOn: "Never tried it"
 
 # ── Onboarding: Intent question ──
-- assertVisible:
-    text: "What are you hoping to get from Medito?"
+- extendedWaitUntil:
+    visible: "What are you hoping to get from Medito?"
     timeout: 10000
 - tapOn: "Build a regular habit"
 
 # ── Onboarding: Result screen ──
-- assertVisible:
-    text: "Get started"
+- extendedWaitUntil:
+    visible: "Get started"
     timeout: 10000
 - tapOn: "Get started"
 
 # ── Home screen loaded ──
 # After onboarding the app fetches real data; a skeleton shimmer shows first.
-# Give it enough time to complete the network request and render content.
-- assertVisible:
-    text: "Home"
+- extendedWaitUntil:
+    visible: "Home"
     timeout: 30000
-- assertVisible:
-    text: "Explore"
+- extendedWaitUntil:
+    visible: "Explore"
     timeout: 30000
 
 # ── Navigate all tabs ──
 - tapOn: "Explore"
-- assertVisible:
-    text: "Explore"
-    timeout: 10000
+- assertVisible: "Explore"
+
+- tapOn: "Path"
+- assertVisible: "Path"
 
 - tapOn: "Settings"
-- assertVisible:
-    text: "Settings"
-    timeout: 10000
+- assertVisible: "Settings"
 
 - tapOn: "Home"
-- assertVisible:
-    text: "Home"
-    timeout: 10000
+- assertVisible: "Home"
