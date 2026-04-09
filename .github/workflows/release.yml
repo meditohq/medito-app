@@ -203,7 +203,20 @@ jobs:
         with:
           name: maestro-debug
           path: .maestro/debug/
-          retention-days: 7
+          retention-days: 30
+
+      - name: Embed failure screenshots in job summary
+        if: failure()
+        run: |
+          echo "## Maestro Smoke Test Failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          for img in .maestro/debug/**/*.png; do
+            [ -f "$img" ] || continue
+            echo "### $(basename "$img")" >> "$GITHUB_STEP_SUMMARY"
+            base64_img=$(base64 -w 0 "$img")
+            echo "<img src=\"data:image/png;base64,$base64_img\" width=\"320\" />" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+          done
 
       - uses: ruby/setup-ruby@v1
         with:

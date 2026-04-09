@@ -1,0 +1,167 @@
+name: Smoke Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    name: Build & Run Maestro Smoke Test
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2.12.0
+        with:
+          flutter-version: '3.41.4'
+          cache: true
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Cache build_runner outputs
+        id: cache-buildrunner
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib/**/*.g.dart
+            lib/**/*.freezed.dart
+          key: ${{ runner.os }}-buildrunner-${{ hashFiles('lib/**/*.dart', 'pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-buildrunner-
+
+      - name: Run build_runner
+        if: steps.cache-buildrunner.outputs.cache-hit != 'true'
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Cache pigeon outputs
+        id: cache-pigeon
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib/src/audio_pigeon.g.dart
+            android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pigeon-
+
+      - name: Run pigeon
+        if: steps.cache-pigeon.outputs.cache-hit != 'true'
+        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+
+      - name: Write .prod.json
+        env:
+          PROD_ENV: ${{ secrets.PROD_ENV }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+
+          raw = os.environ["PROD_ENV"]
+
+          try:
+            data = json.loads(raw)
+          except json.JSONDecodeError:
+            data = {}
+            for line in raw.strip().strip("{}").splitlines():
+              line = line.strip().rstrip(",")
+              if ":" in line:
+                key, _, value = line.partition(":")
+                data[key.strip()] = value.strip()
+
+          if not data:
+            sys.exit("Failed to parse PROD_ENV secret")
+
+          with open(".prod.json", "w") as f:
+            json.dump(data, f, indent=2)
+          PY
+
+      - name: Write google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+
+      - name: Write firebase_options.dart
+        env:
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+        run: printf '%s' "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
+
+      - name: Write keystore.properties
+        env:
+          KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
+        run: printf '%s' "$KEYSTORE_PROPERTIES" > android/keystore.properties
+
+      - name: Write keystore file
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+        run: printf '%s' "$KEYSTORE_FILE" | base64 -d > android/meditokey.jks
+
+      - name: Build APK
+        run: |
+          flutter build apk --flavor prod --release \
+            --dart-define-from-file=.prod.json \
+            --dart-define=MOCK_MODE=false \
+            --dart-define=PAYWALL_ENV=live \
+            --obfuscate --split-debug-info=./symbols
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Smoke test on emulator
+        timeout-minutes: 12
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            adb install build/app/outputs/apk/prod/release/app-prod-release.apk
+            adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
+            $HOME/.maestro/bin/maestro test .maestro/smoke.yaml --no-ansi --debug-output .maestro/debug
+
+      - name: Upload Maestro debug output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-debug
+          path: .maestro/debug/
+          retention-days: 30
+
+      - name: Embed failure screenshots in job summary
+        if: failure()
+        run: |
+          echo "## Maestro Smoke Test Failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          for img in .maestro/debug/**/*.png; do
+            [ -f "$img" ] || continue
+            echo "### $(basename "$img")" >> "$GITHUB_STEP_SUMMARY"
+            base64_img=$(base64 -w 0 "$img")
+            echo "<img src=\"data:image/png;base64,$base64_img\" width=\"320\" />" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+          done
