@@ -135,3 +135,6 @@ firebase/functions/node_modules/
 
 # Maestro test debug output
 .maestro/debug/
+after-donation-next.png
+player-playing.png
+superwall-paywall.png
