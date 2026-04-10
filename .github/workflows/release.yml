@@ -211,11 +211,11 @@ jobs:
         run: |
           echo "## Maestro Smoke Test Failed" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Screenshots are available in the **maestro-debug** artifact above." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Screenshots captured" >> "$GITHUB_STEP_SUMMARY"
           find /tmp/maestro-debug -name '*.png' 2>/dev/null | sort | while read -r img; do
-            echo "### $(basename "$img")" >> "$GITHUB_STEP_SUMMARY"
-            base64_img=$(base64 -w 0 "$img")
-            echo "<img src=\"data:image/png;base64,$base64_img\" width=\"320\" />" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- \`$(basename "$img")\`" >> "$GITHUB_STEP_SUMMARY"
           done
 
       - uses: ruby/setup-ruby@v1

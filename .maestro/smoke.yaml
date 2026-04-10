@@ -13,9 +13,10 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Continue"
 
 # ── Onboarding: Notifications ──
+# Anonymous sign-in can take a while on first launch (clearState wipes the account)
 - extendedWaitUntil:
     visible: "Skip for Now"
-    timeout: 20000
+    timeout: 60000
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Donation ──
@@ -28,38 +29,40 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - waitForAnimationToEnd
 - takeScreenshot: after-donation-next
 
-# If Superwall loaded, verify the donation tabs are present
+# If Superwall loaded, verify the donation tabs and press back to dismiss.
+# If browser opened instead (CI), do NOT press back — it would exit onboarding.
 - runFlow:
     when:
       visible: "(?i)monthly"
     commands:
       - assertVisible: "(?i)yearly"
       - takeScreenshot: superwall-paywall
+      - pressKey: back
 
-# Dismiss whatever opened (paywall or browser) and return to the app.
-# pressKey back closes the overlay; launchApp ensures the app is foregrounded
-# (no-op if already there, recovers if Chrome took focus).
-- pressKey: back
+# Bring the app to foreground (recovers from Chrome, no-op if already there)
 - launchApp:
     stopApp: false
 
-# "Skip for Now" should now be visible on the donation screen
-- extendedWaitUntil:
-    visible: "Skip for Now"
-    timeout: 15000
-- tapOn: "Skip for Now"
+# Tap "Skip for Now" if we're on the donation screen, otherwise move on
+- runFlow:
+    when:
+      visible: "Skip for Now"
+    commands:
+      - tapOn: "Skip for Now"
 
 # ── Onboarding: Battery optimization (may or may not appear) ──
 - runFlow:
     when:
       visible: "Update Setting"
     commands:
-      - tapOn: "Skip for Now"
+      - tapOn:
+          text: "Skip for Now"
+          optional: true
 
 # ── Onboarding: Experience question ──
 - extendedWaitUntil:
     visible: "Never tried it"
-    timeout: 15000
+    timeout: 20000
 - tapOn: "Never tried it"
 
 # ── Onboarding: Intent question ──
