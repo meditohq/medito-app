@@ -30,7 +30,6 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - takeScreenshot: after-donation-next
 
 # If Superwall loaded, verify the donation tabs and press back to dismiss.
-# If browser opened instead (CI), do NOT press back — it would exit onboarding.
 - runFlow:
     when:
       visible: "(?i)monthly"
@@ -39,16 +38,23 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       - takeScreenshot: superwall-paywall
       - pressKey: back
 
-# Bring the app to foreground (recovers from Chrome, no-op if already there)
-- launchApp:
-    stopApp: false
-
-# Tap "Skip for Now" if we're on the donation screen, otherwise move on
+# If browser opened (CI), it stole focus. Press Home first to leave Chrome
+# cleanly, then reopen our app. This preserves the donation screen's state
+# (including _hasAttemptedDonation) because the activity is just resumed,
+# not recreated.
 - runFlow:
     when:
-      visible: "Skip for Now"
+      notVisible: "Skip for Now"
     commands:
-      - tapOn: "Skip for Now"
+      - pressKey: home
+      - launchApp:
+          stopApp: false
+
+# "Skip for Now" should now be visible on the donation screen
+- extendedWaitUntil:
+    visible: "Skip for Now"
+    timeout: 15000
+- tapOn: "Skip for Now"
 
 # ── Onboarding: Battery optimization (may or may not appear) ──
 - runFlow:
