@@ -195,14 +195,15 @@ jobs:
             curl -Ls "https://get.maestro.mobile.dev" | bash
             adb install build/app/outputs/apk/prod/release/app-prod-release.apk
             adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
-            $HOME/.maestro/bin/maestro test .maestro/smoke.yaml --no-ansi --debug-output ${{ github.workspace }}/maestro-debug
+            mkdir -p /tmp/maestro-debug
+            $HOME/.maestro/bin/maestro test .maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug
 
       - name: Upload Maestro debug output
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: maestro-debug
-          path: maestro-debug/
+          path: /tmp/maestro-debug/
           retention-days: 30
 
       - name: Embed failure screenshots in job summary
@@ -210,7 +211,7 @@ jobs:
         run: |
           echo "## Maestro Smoke Test Failed" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          find maestro-debug -name '*.png' | sort | while read -r img; do
+          find /tmp/maestro-debug -name '*.png' 2>/dev/null | sort | while read -r img; do
             echo "### $(basename "$img")" >> "$GITHUB_STEP_SUMMARY"
             base64_img=$(base64 -w 0 "$img")
             echo "<img src=\"data:image/png;base64,$base64_img\" width=\"320\" />" >> "$GITHUB_STEP_SUMMARY"
