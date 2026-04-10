@@ -39,9 +39,11 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Flutter pub get
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         run: flutter pub get
 
       - name: Cache build_runner outputs
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         id: cache-buildrunner
         uses: actions/cache@v4
         with:
@@ -52,10 +54,11 @@ jobs:
           restore-keys: ${{ runner.os }}-buildrunner-
 
       - name: Run build_runner
-        if: steps.cache-buildrunner.outputs.cache-hit != 'true'
+        if: steps.cache-apk.outputs.cache-hit != 'true' && steps.cache-buildrunner.outputs.cache-hit != 'true'
         run: flutter packages pub run build_runner build --delete-conflicting-outputs
 
       - name: Cache pigeon outputs
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         id: cache-pigeon
         uses: actions/cache@v4
         with:
@@ -66,10 +69,18 @@ jobs:
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
-        if: steps.cache-pigeon.outputs.cache-hit != 'true'
+        if: steps.cache-apk.outputs.cache-hit != 'true' && steps.cache-pigeon.outputs.cache-hit != 'true'
         run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
 
+      - name: Cache APK
+        id: cache-apk
+        uses: actions/cache@v4
+        with:
+          path: build/app/outputs/apk/prod/release/app-prod-release.apk
+          key: ${{ runner.os }}-apk-prod-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'android/**/*.gradle*', 'android/app/src/**/*.kt') }}
+
       - name: Write .prod.json
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         env:
           PROD_ENV: ${{ secrets.PROD_ENV }}
         run: |
@@ -96,26 +107,31 @@ jobs:
           PY
 
       - name: Write google-services.json
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
 
       - name: Write firebase_options.dart
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         env:
           FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
         run: printf '%s' "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
 
       - name: Write keystore.properties
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         env:
           KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
         run: printf '%s' "$KEYSTORE_PROPERTIES" > android/keystore.properties
 
       - name: Write keystore file
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         env:
           KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
         run: printf '%s' "$KEYSTORE_FILE" | base64 -d > android/meditokey.jks
 
       - name: Build APK
+        if: steps.cache-apk.outputs.cache-hit != 'true'
         run: |
           flutter build apk --flavor prod --release \
             --dart-define-from-file=.prod.json \
