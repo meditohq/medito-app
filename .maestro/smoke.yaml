@@ -50,11 +50,14 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       - launchApp:
           stopApp: false
 
-# "Skip for Now" should now be visible on the donation screen
-- extendedWaitUntil:
-    visible: "Skip for Now"
+# "Skip for Now" should now be visible on the donation screen.
+# On small screens the button may be below the fold, so scroll to it.
+- scrollUntilVisible:
+    element: "Skip for Now"
+    direction: DOWN
     timeout: 15000
 - tapOn: "Skip for Now"
+- takeScreenshot: after-donation-skip
 
 # ── Onboarding: Battery optimization (may or may not appear) ──
 - runFlow:
