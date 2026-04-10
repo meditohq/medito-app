@@ -153,6 +153,7 @@ jobs:
           name: maestro-debug
           path: /tmp/maestro-debug/
           retention-days: 30
+          include-hidden-files: true
 
       - name: Embed failure screenshots in job summary
         if: failure()

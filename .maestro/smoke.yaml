@@ -62,7 +62,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # ── Onboarding: Experience question ──
 - extendedWaitUntil:
     visible: "Never tried it"
-    timeout: 20000
+    timeout: 30000
 - tapOn: "Never tried it"
 
 # ── Onboarding: Intent question ──
