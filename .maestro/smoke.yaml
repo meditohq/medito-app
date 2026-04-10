@@ -1,5 +1,8 @@
-appId: meditofoundation.medito
+appId: ${APP_ID}
 name: Smoke Test – Onboarding, Navigate, Verify Content
+env:
+  APP_ID: meditofoundation.medito
+  PLATFORM: android
 ---
 
 # ── Launch app ──
@@ -21,7 +24,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # ── Onboarding: Donation ──
 # Tap "Next" which either opens the Superwall paywall (native modal) or
-# an external browser (when Google Pay / Superwall aren't available on CI).
+# an external browser (when Google Pay / Superwall aren't available).
 - extendedWaitUntil:
     visible: "Next"
     timeout: 20000
@@ -29,19 +32,36 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - waitForAnimationToEnd
 - takeScreenshot: after-donation-next
 
-# If Superwall loaded, verify the donation tabs and press back to dismiss.
+# If Superwall loaded, verify the donation tabs are present.
+# On Android: press back to dismiss the paywall.
+# On iOS: wait for the close (X) button to appear and tap it.
 - runFlow:
     when:
       visible: "(?i)monthly"
     commands:
       - assertVisible: "(?i)yearly"
       - takeScreenshot: superwall-paywall
-      - pressKey: back
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: back
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - extendedWaitUntil:
+                visible: "(?i)close|✕|×"
+                timeout: 10000
+            - tapOn:
+                text: "(?i)close|✕|×"
+                optional: true
+            - pressKey: home
+            - launchApp:
+                stopApp: false
 
-# If browser opened (CI), it stole focus. Press Home first to leave Chrome
-# cleanly, then reopen our app. This preserves the donation screen's state
-# (including _hasAttemptedDonation) because the activity is just resumed,
-# not recreated.
+# If browser opened (CI / no Google Pay), it stole focus. Press Home first
+# to leave the browser cleanly, then reopen our app.
 - runFlow:
     when:
       notVisible: "Skip for Now"
@@ -59,7 +79,20 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     retryTapIfNoChange: true
 - takeScreenshot: after-donation-skip
 
-# ── Onboarding: Battery optimization (may or may not appear) ──
+# ── Onboarding: Tracking permission (iOS only) ──
+- runFlow:
+    when:
+      visible: "Help Us Improve Medito"
+    commands:
+      - tapOn: "Continue"
+      # ATT system dialog may appear — tap Allow if visible
+      - runFlow:
+          when:
+            visible: "Allow"
+          commands:
+            - tapOn: "Allow"
+
+# ── Onboarding: Battery optimization (Android only, conditional) ──
 - runFlow:
     when:
       visible: "Update Setting"
