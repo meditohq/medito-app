@@ -216,6 +216,13 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
       - name: Cache iOS app
         id: cache-ios-app
         uses: actions/cache@v4
@@ -295,6 +302,19 @@ jobs:
         env:
           GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
         run: printf '%s' "$GOOGLE_SERVICE_INFO_PLIST" | base64 -d > ios/Runner/GoogleService-Info.plist
+
+      - name: Install pods
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        working-directory: ios
+        run: |
+          echo "Xcode: $(xcodebuild -version | head -1)"
+          echo "System CocoaPods: $(pod --version)"
+          if ! pod --version | grep -q '^1\.16\.'; then
+            echo "Installing CocoaPods 1.16.x to match Podfile.lock…"
+            gem install cocoapods -v '~> 1.16.2' --no-document
+            echo "Installed CocoaPods: $(pod --version)"
+          fi
+          pod install
 
       - name: Build iOS simulator app
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
