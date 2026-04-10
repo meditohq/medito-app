@@ -2,10 +2,21 @@ name: Smoke Test
 
 on:
   workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Platforms to test'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - android
+          - ios
 
 jobs:
   android-smoke-test:
     name: Android Smoke Test
+    if: inputs.platforms == 'both' || inputs.platforms == 'android'
     runs-on: ubuntu-latest
     environment: prod
 
@@ -186,6 +197,7 @@ jobs:
 
   ios-smoke-test:
     name: iOS Smoke Test
+    if: inputs.platforms == 'both' || inputs.platforms == 'ios'
     runs-on: macos-latest
     environment: prod
 
