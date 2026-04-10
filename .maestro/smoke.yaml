@@ -104,9 +104,12 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - assertVisible: "Home"
 
 # ── Play a session via Your Daily ──
-- extendedWaitUntil:
-    visible: "Your Daily"
+# On small screens the shortcut may be below the fold
+- scrollUntilVisible:
+    element: "Your Daily"
+    direction: DOWN
     timeout: 15000
+    centerElement: true
 - tapOn: "Your Daily"
 
 # Track view loads with a play button
