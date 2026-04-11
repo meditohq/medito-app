@@ -353,8 +353,6 @@ jobs:
           xcrun simctl install booted "build/ios/iphonesimulator/Medito Dev.app"
           mkdir -p /tmp/maestro-debug
           $HOME/.maestro/bin/maestro test \
-            -e PLATFORM=ios \
-            -e APP_ID=org.meditofoundation \
             .maestro/smoke.yaml \
             --no-ansi --debug-output /tmp/maestro-debug
 

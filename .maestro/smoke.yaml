@@ -7,7 +7,6 @@ env:
 
 # ── Launch app ──
 - launchApp:
-    clearState: true
 
 # ── Splash screen ──
 - extendedWaitUntil:
