@@ -19,9 +19,11 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
   bool _hasAttemptedDonation = false;
 
   void _handleDonationAction(BuildContext context) async {
-    await FirebaseAnalyticsService().logEvent(
-      name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
-    );
+    if (!_hasAttemptedDonation) {
+      await FirebaseAnalyticsService().logEvent(
+        name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+      );
+    }
 
     if (!context.mounted) return;
 

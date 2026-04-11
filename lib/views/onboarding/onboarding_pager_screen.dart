@@ -34,6 +34,14 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   int? _intentIndex;
 
   bool _showBatteryScreen = false;
+  bool _questionFlowStartedLogged = false;
+
+  int get _firstQuestionPageIndex {
+    var index = 2; // after Notifications (0) and Donation (1)
+    if (Platform.isIOS) index++;
+    if (_showBatteryScreen) index++;
+    return index;
+  }
 
   final List<String> _images = [
     AssetConstants.onboardingImage1,
@@ -127,6 +135,11 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   }
 
   Future<void> _onGetStarted() async {
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.onboardingCompleted,
+      ),
+    );
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => const BottomNavigationBarView(),
@@ -142,11 +155,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadSuperwallConfig();
-      unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
-        ),
-      );
     });
   }
 
@@ -210,6 +218,14 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
                 itemCount: pages.length,
                 onPageChanged: (index) {
                   setState(() => _currentPage = index);
+                  if (index == _firstQuestionPageIndex && !_questionFlowStartedLogged) {
+                    _questionFlowStartedLogged = true;
+                    unawaited(
+                      ref.read(analyticsServiceProvider).logEvent(
+                        name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
+                      ),
+                    );
+                  }
                 },
                 itemBuilder: (context, index) => pages[index],
               ),
