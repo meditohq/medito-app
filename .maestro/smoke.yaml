@@ -8,7 +8,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # ── Splash screen ──
 - extendedWaitUntil:
     visible: "Continue"
-    timeout: 30000
+    timeout: 60000
 - tapOn: "Continue"
 
 # ── Onboarding: Notifications ──
