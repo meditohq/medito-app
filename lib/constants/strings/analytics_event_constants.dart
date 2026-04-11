@@ -245,13 +245,14 @@ class AnalyticsEventConstants {
   static const String onboardingQuestionFlowStarted =
       'onboarding_question_flow_started';
 
-  /// Event logged when the user answers a question in the new onboarding flow
-  /// Parameters: paramQuestion (question key), paramAnswer (selected option key)
-  static const String onboardingQuestionAnswered =
-      'onboarding_question_answered';
+  /// Event logged when the user answers the experience level question
+  /// Parameter: paramAnswer ('never_tried', 'a_little', 'regular_practice')
+  static const String onboardingExperienceAnswered =
+      'onboarding_experience_answered';
 
-  /// Parameter for the question identifier in onboarding question events
-  static const String paramQuestion = 'question';
+  /// Event logged when the user answers the intent question
+  /// Parameter: paramAnswer ('learn_properly', 'build_habit', 'stress_sleep_emotions')
+  static const String onboardingIntentAnswered = 'onboarding_intent_answered';
 
   /// Parameter for the selected answer in onboarding question events
   static const String paramAnswer = 'answer';

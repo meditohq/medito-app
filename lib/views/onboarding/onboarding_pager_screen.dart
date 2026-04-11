@@ -56,28 +56,30 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     );
   }
 
-  void _logAnswer({required String question, required String answer}) {
+  void _onExperienceSelected(int index) {
+    const answers = ['never_tried', 'a_little', 'regular_practice'];
     unawaited(
       ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.onboardingQuestionAnswered,
+        name: AnalyticsEventConstants.onboardingExperienceAnswered,
         parameters: {
-          AnalyticsEventConstants.paramQuestion: question,
-          AnalyticsEventConstants.paramAnswer: answer,
+          AnalyticsEventConstants.paramAnswer: answers[index],
         },
       ),
     );
-  }
-
-  void _onExperienceSelected(int index) {
-    const answers = ['never_tried', 'a_little', 'regular_practice'];
-    _logAnswer(question: 'experience_level', answer: answers[index]);
     setState(() => _experienceIndex = index);
     _nextPage();
   }
 
   void _onIntentSelected(int index) {
     const answers = ['learn_properly', 'build_habit', 'stress_sleep_emotions'];
-    _logAnswer(question: 'intent', answer: answers[index]);
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.onboardingIntentAnswered,
+        parameters: {
+          AnalyticsEventConstants.paramAnswer: answers[index],
+        },
+      ),
+    );
     final state = deriveOnboardingState(
       experienceIndex: _experienceIndex ?? 0,
       intentIndex: index,
