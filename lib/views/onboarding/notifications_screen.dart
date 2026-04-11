@@ -93,16 +93,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   Future<void> _setupRemindersAndAdvance() async {
     if (!mounted) return;
 
-    // Log analytics event for set reminder tap
-    await FirebaseAnalyticsService().logEvent(
-      name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
-    );
-
     final accepted = await PermissionHandler.requestAlarmPermission(context);
     if (!accepted || !mounted) {
       setState(() => _isProcessing = false);
       return;
     }
+
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
+    );
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
@@ -225,7 +224,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _navigateNext,
+        onPressed: () async {
+          await FirebaseAnalyticsService().logEvent(
+            name: FirebaseAnalyticsService.eventOnboardingReminderConfirmTap,
+          );
+          _navigateNext();
+        },
         child: Text(
           AppLocalizations.of(context)!.smartRemindersOn,
           style: const TextStyle(color: Colors.white),
