@@ -227,7 +227,7 @@ jobs:
         id: cache-ios-app
         uses: actions/cache@v4
         with:
-          path: build/ios/iphonesimulator/Runner.app
+          path: build/ios/iphonesimulator/Medito Dev.app
           key: ${{ runner.os }}-ios-app-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'ios/Podfile.lock', 'ios/Runner.xcodeproj/project.pbxproj') }}
 
       - name: Flutter pub get
@@ -350,7 +350,7 @@ jobs:
       - name: Smoke test on simulator
         timeout-minutes: 12
         run: |
-          xcrun simctl install booted build/ios/iphonesimulator/Runner.app
+          xcrun simctl install booted "build/ios/iphonesimulator/Medito Dev.app"
           mkdir -p /tmp/maestro-debug
           $HOME/.maestro/bin/maestro test \
             -e PLATFORM=ios \
