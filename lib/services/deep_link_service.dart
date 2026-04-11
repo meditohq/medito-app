@@ -17,6 +17,13 @@ class DeepLinkService {
   final WidgetRef ref;
   final BuildContext context;
 
+  // Completes once the initial link check finishes (hit or miss).
+  // SplashView awaits this before applying stored UTM parameters to ensure
+  // deferred deep links from Apple Search Ads are stored first.
+  static final Completer<void> _initialLinkCompleter = Completer<void>();
+  static Future<void> get initialLinkProcessed =>
+      _initialLinkCompleter.future;
+
   DeepLinkService({
     required this.ref,
     required this.context,
@@ -43,10 +50,14 @@ class DeepLinkService {
       final initialUri = await _appLinks.getInitialLink();
       if (initialUri != null) {
         AppLogger.d('DEEPLINK', 'Got initial deep link: $initialUri');
-        handleDeepLink(initialUri);
+        await handleDeepLink(initialUri);
       }
     } catch (e) {
       AppLogger.e('DEEPLINK', 'Error checking initial link', e);
+    } finally {
+      if (!_initialLinkCompleter.isCompleted) {
+        _initialLinkCompleter.complete();
+      }
     }
   }
 

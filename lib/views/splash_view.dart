@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +18,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:medito/services/deep_link_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/app_globals.dart' show appReadyCompleter;
@@ -278,6 +281,20 @@ class SplashViewState extends ConsumerState<SplashView>
           'Error setting user ID for analytics',
           e,
           stackTrace,
+        );
+      }
+
+      // Wait for the initial deep link check to complete before applying UTM
+      // parameters. On a fresh install from Apple Search Ads the deferred deep
+      // link arrives via getInitialLink(); if we apply UTM params before that
+      // completes the params won't be in SharedPreferences yet.
+      try {
+        await DeepLinkService.initialLinkProcessed
+            .timeout(const Duration(seconds: 3));
+      } on TimeoutException {
+        AppLogger.w(
+          'SPLASH',
+          'Initial link processing timed out, proceeding with UTM apply',
         );
       }
 

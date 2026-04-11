@@ -202,6 +202,9 @@ class AnalyticsEventConstants {
   /// Parameter name for payment intent identifier
   static const String paramPaymentIntentId = 'payment_intent_id';
 
+  /// Parameter name for donation page A/B test variant
+  static const String paramVariantId = 'variant_id';
+
   /// Parameter name for revenue (used by Meta)
   static const String paramRevenue = 'revenue';
 
@@ -268,6 +271,11 @@ class AnalyticsEventConstants {
   /// Event logged when the user abandons the new onboarding question flow before completion
   static const String onboardingQuestionFlowAbandoned =
       'onboarding_question_flow_abandoned';
+
+  /// Event logged when the user answers the attribution question ("how did you hear about us?")
+  /// Parameter: paramAnswer ('google_ad', 'social_ad', 'friend', 'therapist', 'app_store', 'play_store', 'other')
+  static const String onboardingAttributionAnswered =
+      'onboarding_attribution_answered';
 
   // Favourite events
   /// Event logged when user adds a track to favourites from the track screen

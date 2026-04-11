@@ -80,9 +80,37 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
         },
       ),
     );
+    setState(() => _intentIndex = index);
+    _nextPage();
+  }
+
+  void _onAttributionSelected(int index) {
+    const answers = [
+      'google_ad',
+      'social_ad',
+      'friend',
+      'therapist',
+      'app_store',
+      'play_store',
+      'other',
+    ];
+    // On iOS the list omits 'play_store'; on Android it omits 'app_store'.
+    // The options list passed to the screen is platform-filtered, so the index
+    // aligns with the filtered answers list built in _buildPages.
+    final platformAnswers = Platform.isIOS
+        ? answers.where((a) => a != 'play_store').toList()
+        : answers.where((a) => a != 'app_store').toList();
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.onboardingAttributionAnswered,
+        parameters: {
+          AnalyticsEventConstants.paramAnswer: platformAnswers[index],
+        },
+      ),
+    );
     final state = deriveOnboardingState(
       experienceIndex: _experienceIndex ?? 0,
-      intentIndex: index,
+      intentIndex: _intentIndex ?? 0,
     );
     unawaited(
       ref.read(analyticsServiceProvider).logEvent(
@@ -92,7 +120,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
         },
       ),
     );
-    setState(() => _intentIndex = index);
     _nextPage();
   }
 
@@ -115,7 +142,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
           l10n.onboardingExperienceALittle,
           l10n.onboardingExperienceRegular,
         ],
-        stepLabel: l10n.onboardingStep1of2,
+        stepLabel: l10n.onboardingStep1of3,
         onOptionSelected: _onExperienceSelected,
       ),
       OnboardingQuestionScreen(
@@ -126,8 +153,25 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
           l10n.onboardingIntentHabit,
           l10n.onboardingIntentStress,
         ],
-        stepLabel: l10n.onboardingStep2of2,
+        stepLabel: l10n.onboardingStep2of3,
         onOptionSelected: _onIntentSelected,
+      ),
+      OnboardingQuestionScreen(
+        question: l10n.onboardingAttributionQuestion,
+        subtext: l10n.onboardingAttributionSubtext,
+        options: [
+          l10n.onboardingAttributionGoogleAd,
+          l10n.onboardingAttributionSocialAd,
+          l10n.onboardingAttributionFriend,
+          l10n.onboardingAttributionTherapist,
+          if (Platform.isIOS)
+            l10n.onboardingAttributionAppStore
+          else
+            l10n.onboardingAttributionPlayStore,
+          l10n.onboardingAttributionOther,
+        ],
+        stepLabel: l10n.onboardingStep3of3,
+        onOptionSelected: _onAttributionSelected,
       ),
       OnboardingResultScreen(
         state: resultState,

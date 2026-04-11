@@ -1259,6 +1259,54 @@
   "@onboardingIntentStress": {
     "description": "Option 3 on onboarding screen 2 — user wants to manage stress, sleep, or emotions"
   },
+  "onboardingStep1of3": "1 of 3",
+  "@onboardingStep1of3": {
+    "description": "Step indicator label on onboarding question screen 1 (of 3)"
+  },
+  "onboardingStep2of3": "2 of 3",
+  "@onboardingStep2of3": {
+    "description": "Step indicator label on onboarding question screen 2 (of 3)"
+  },
+  "onboardingStep3of3": "3 of 3",
+  "@onboardingStep3of3": {
+    "description": "Step indicator label on onboarding attribution question screen (of 3)"
+  },
+  "onboardingAttributionQuestion": "How did you hear about Medito?",
+  "@onboardingAttributionQuestion": {
+    "description": "Question on onboarding attribution screen — asking how the user discovered Medito"
+  },
+  "onboardingAttributionSubtext": "This helps us reach more people who need it.",
+  "@onboardingAttributionSubtext": {
+    "description": "Subtext below the attribution question on onboarding"
+  },
+  "onboardingAttributionGoogleAd": "Google ad",
+  "@onboardingAttributionGoogleAd": {
+    "description": "Attribution option — user found Medito via a Google ad"
+  },
+  "onboardingAttributionSocialAd": "Instagram or Facebook ad",
+  "@onboardingAttributionSocialAd": {
+    "description": "Attribution option — user found Medito via an Instagram or Facebook ad"
+  },
+  "onboardingAttributionFriend": "A friend told me",
+  "@onboardingAttributionFriend": {
+    "description": "Attribution option — user heard about Medito from a friend"
+  },
+  "onboardingAttributionTherapist": "Therapist or healthcare professional",
+  "@onboardingAttributionTherapist": {
+    "description": "Attribution option — user was recommended Medito by a therapist or healthcare professional"
+  },
+  "onboardingAttributionAppStore": "App Store",
+  "@onboardingAttributionAppStore": {
+    "description": "Attribution option (iOS only) — user found Medito by browsing the App Store"
+  },
+  "onboardingAttributionPlayStore": "Play Store",
+  "@onboardingAttributionPlayStore": {
+    "description": "Attribution option (Android only) — user found Medito by browsing the Play Store"
+  },
+  "onboardingAttributionOther": "Other",
+  "@onboardingAttributionOther": {
+    "description": "Attribution option — user found Medito via some other means"
+  },
   "onboardingResultLearnHeading": "You're in the right place.",
   "@onboardingResultLearnHeading": {
     "description": "Heading on the onboarding result screen for users who are new or want to learn (State A)"
