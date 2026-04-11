@@ -9,6 +9,7 @@ import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/strings/asset_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
+import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -51,13 +52,8 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0E0E16),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0E0E16),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+      bottomNavigationBar: SingleBackButtonActionBar(
+        onBackPressed: () => Navigator.of(context).pop(),
       ),
       body: SafeArea(
         child: Padding(
