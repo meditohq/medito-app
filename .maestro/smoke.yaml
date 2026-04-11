@@ -47,16 +47,13 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
             platform: iOS
           commands:
             # Donation page may open as Superwall native modal (has ✕ close button)
-            # or in SFSafariViewController (has ← Medito nav back button).
+            # or in SFSafariViewController. In either case try to close and fall
+            # through to the home+relaunch fallback below.
             - tapOn:
                 text: "(?i)close|✕|×"
                 optional: true
-            - tapOn:
-                text: "(?i)^Medito$"
-                optional: true
 
-# If neither close path worked the app is still in the browser.
-# Press Home + relaunch to get back to the donation screen.
+# If not back on the donation/onboarding screen, press Home and relaunch.
 - runFlow:
     when:
       notVisible: "Skip for Now"
@@ -65,14 +62,19 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       - launchApp:
           stopApp: false
 
-# "Skip for Now" should now be visible on the donation screen.
-- extendedWaitUntil:
-    visible: "Skip for Now"
-    timeout: 45000
-- tapOn:
-    text: "Skip for Now"
-    retryTapIfNoChange: true
-- takeScreenshot: after-donation-skip
+# ── Remaining onboarding ──
+# On iOS the browser donation page keeps the app running in the background and
+# onboarding may auto-advance while the browser is open, so every step after
+# the donation screen is conditional.
+
+- runFlow:
+    when:
+      visible: "Skip for Now"
+    commands:
+      - tapOn:
+          text: "Skip for Now"
+          retryTapIfNoChange: true
+      - takeScreenshot: after-donation-skip
 
 # ── Onboarding: Tracking permission (iOS only) ──
 - runFlow:
@@ -80,7 +82,6 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       visible: "Help Us Improve Medito"
     commands:
       - tapOn: "Continue"
-      # ATT system dialog may appear — tap Allow if visible
       - runFlow:
           when:
             visible: "Allow"
@@ -97,22 +98,25 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           optional: true
 
 # ── Onboarding: Experience question ──
-- extendedWaitUntil:
-    visible: "Never tried it"
-    timeout: 30000
-- tapOn: "Never tried it"
+- runFlow:
+    when:
+      visible: "Never tried it"
+    commands:
+      - tapOn: "Never tried it"
 
 # ── Onboarding: Intent question ──
-- extendedWaitUntil:
-    visible: "Build a regular habit"
-    timeout: 10000
-- tapOn: "Build a regular habit"
+- runFlow:
+    when:
+      visible: "Build a regular habit"
+    commands:
+      - tapOn: "Build a regular habit"
 
 # ── Onboarding: Result screen ──
-- extendedWaitUntil:
-    visible: "Get started"
-    timeout: 10000
-- tapOn: "Get started"
+- runFlow:
+    when:
+      visible: "Get started"
+    commands:
+      - tapOn: "Get started"
 
 # ── Home screen loaded ──
 # After onboarding the app fetches real data; a skeleton shimmer shows first.
