@@ -114,7 +114,7 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
       });
 
     return Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 16),
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

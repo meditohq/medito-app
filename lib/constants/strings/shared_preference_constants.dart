@@ -71,4 +71,7 @@ class SharedPreferenceConstants {
 
   // Your Path explainer strip — set to true once the strip has been dismissed
   static const String hasSeenYourPathExplainer = 'has_seen_your_path_explainer';
+
+  // Last selected main tab (home=0, explore=1)
+  static const String lastMainTabIndex = 'last_main_tab_index';
 }

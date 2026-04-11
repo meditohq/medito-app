@@ -9,6 +9,7 @@ class MeditoIcons {
   static const backward15 = AssetConstants.iconBackward15;
   static const bell = AssetConstants.iconBell;
   static const book = AssetConstants.iconBook;
+  static const brain = AssetConstants.iconBrain;
   static const bookSolid = AssetConstants.iconBookSolid;
   static const calendar = AssetConstants.iconCalendar;
   static const check = AssetConstants.iconCheck;

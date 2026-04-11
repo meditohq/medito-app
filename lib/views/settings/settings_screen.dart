@@ -246,14 +246,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildMain(
       BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
     return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         SliverAppBar(
           centerTitle: false,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           toolbarHeight: 56.0,
-          pinned: true,
-          floating: true,
+          pinned: false,
+          floating: false,
           elevation: 0.0,
           title: HomeHeaderWidget(
               greeting: AppLocalizations.of(context)!.settings),

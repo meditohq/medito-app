@@ -77,14 +77,12 @@ class _HomeViewState extends ConsumerState<HomeView>
             onRefresh: _onRefresh,
             edgeOffset: 150,
             child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverAppBar(
                   backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  floating: true,
-                  pinned: true,
+                  floating: false,
+                  pinned: false,
                   elevation: 0.0,
                   toolbarHeight: 56.0,
                   title: HeaderWidget(
@@ -99,47 +97,52 @@ class _HomeViewState extends ConsumerState<HomeView>
                     child: HomeAnnouncementSection(),
                   ),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      var type = widgetOrder[index];
-                      Widget child;
-                      switch (type) {
-                        case HomeWidgetType.shortcuts:
-                          child = ShortcutsItemsWidget(
-                            key: ValueKey(type.name),
-                            data: homeData.shortcuts,
-                          );
-                          break;
-                        case HomeWidgetType.carousel:
-                          child = CarouselWidget(
-                            key: ValueKey(type.name),
-                            carouselItems: homeData.carousel,
-                          );
-                          break;
-                        case HomeWidgetType.quote:
-                          child = QuoteWidget(
-                            key: ValueKey(type.name),
-                            data: homeData.todayQuote,
-                          );
-                          break;
-                        case HomeWidgetType.products:
-                          child = const HomeProductsSection();
-                          break;
-                        case HomeWidgetType.upNext:
-                          child = UpNextWidget(
-                            key: ValueKey(type.name),
-                            inlineStrip: const YourPathExplainerStrip(),
-                          );
-                          break;
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: child,
-                      );
-                    },
-                    childCount: widgetOrder.length,
+                SliverList.separated(
+                  separatorBuilder: (context, index) => Divider(
+                    height: 1,
+                    thickness: 0.5,
+                    indent: padding16,
+                    endIndent: padding16,
+                    color: ColorConstants.lightPurple.withValues(alpha: 0.2),
                   ),
+                  itemBuilder: (context, index) {
+                    var type = widgetOrder[index];
+                    Widget child;
+                    switch (type) {
+                      case HomeWidgetType.shortcuts:
+                        child = ShortcutsItemsWidget(
+                          key: ValueKey(type.name),
+                          data: homeData.shortcuts,
+                        );
+                        break;
+                      case HomeWidgetType.carousel:
+                        child = CarouselWidget(
+                          key: ValueKey(type.name),
+                          carouselItems: homeData.carousel,
+                        );
+                        break;
+                      case HomeWidgetType.quote:
+                        child = QuoteWidget(
+                          key: ValueKey(type.name),
+                          data: homeData.todayQuote,
+                        );
+                        break;
+                      case HomeWidgetType.products:
+                        child = const HomeProductsSection();
+                        break;
+                      case HomeWidgetType.upNext:
+                        child = UpNextWidget(
+                          key: ValueKey(type.name),
+                          inlineStrip: const YourPathExplainerStrip(),
+                        );
+                        break;
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: padding16),
+                      child: child,
+                    );
+                  },
+                  itemCount: widgetOrder.length,
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 20)),
               ],

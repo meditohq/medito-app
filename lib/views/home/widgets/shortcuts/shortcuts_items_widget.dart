@@ -38,13 +38,13 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     final columns = isWideScreen ? 8 : 4;
     const horizontalPadding = padding16;
     const spacing = padding12;
-    const runSpacing = padding8;
+    const runSpacing = 10.0;
     final totalSpacing = (columns - 1) * spacing;
     final totalPadding = horizontalPadding * 2;
     final containerSize = (size.width - totalPadding - totalSpacing) / columns;
 
     return Padding(
-      padding: const EdgeInsets.only(left: padding16, right: padding16, bottom: padding16),
+      padding: const EdgeInsets.symmetric(horizontal: padding16),
       child: Wrap(
         spacing: spacing,
         runSpacing: runSpacing,
@@ -64,10 +64,6 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     );
   }
 
-  bool _isCourses(String? title) {
-    return title?.toLowerCase() == 'courses';
-  }
-
   Widget _buildShortcutItem(
     BuildContext context,
     WidgetRef ref,
@@ -75,17 +71,8 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     double width,
     double height,
   ) {
-    final isCourses = _isCourses(e.title);
-    final backgroundColor = isCourses
-        ? ColorConstants.lightPurple
-        : (e.isHighlighted
-              ? ColorConstants.brightSky
-              : Theme.of(context).cardColor);
-    final iconColor = isCourses
-        ? Colors.white
-        : (e.isHighlighted
-              ? ColorConstants.onyx
-              : Theme.of(context).colorScheme.onSurface);
+    final backgroundColor = Theme.of(context).cardColor;
+    final iconColor = Theme.of(context).colorScheme.onSurface;
     final textColor = Theme.of(context).colorScheme.onSurface;
 
     final iconSize = (width * 0.5).clamp(24.0, 32.0);
@@ -98,12 +85,9 @@ class ShortcutsItemsWidget extends ConsumerWidget {
         width: width,
         height: width,
         child: Material(
-          color: Colors.transparent,
+          type: MaterialType.transparency,
           child: InkWell(
             onTap: () => _handleChipPress(context, ref, e),
-            borderRadius: BorderRadius.circular(
-              _kItemBorderRadius - _kItemBorderWidth,
-            ),
             child: Center(
               child: MeditoRemoteIcon(
                 icon: e.icon ?? '',
@@ -126,19 +110,24 @@ class ShortcutsItemsWidget extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             squareButton,
-            const SizedBox(height: 8),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                e.title ?? '',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontFamily: teachers,
-                  fontSize: 12,
-                  color: textColor,
+            GestureDetector(
+              onTap: () => _handleChipPress(context, ref, e),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    e.title ?? '',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontFamily: teachers,
+                      fontSize: 12,
+                      color: textColor.withOpacityValue(0.7),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
               ),
             ),
           ],

@@ -63,11 +63,7 @@ class MeditoRemoteIcon extends StatelessWidget {
 
     final asset = _iconAssetMap[icon] ?? MeditoIcons.help;
 
-    return MeditoIcon(
-      assetName: asset,
-      color: color,
-      size: size,
-    );
+    return MeditoIcon(assetName: asset, color: color, size: size);
   }
 
   static String assetForKey(String key) =>
@@ -86,7 +82,7 @@ class MeditoRemoteIcon extends StatelessWidget {
     'filledSearch': MeditoIcons.search,
     'duoSettings': MeditoIcons.settings,
     'filledSettings': MeditoIcons.settings,
-    'solidRoundedBook02': MeditoIcons.book,
+    'solidRoundedBook02': MeditoIcons.brain,
     'solidRoundedSun01': MeditoIcons.sun,
     'solidRoundedDownloadSquare02': MeditoIcons.downloadCircleNew,
     'solidRoundedTime01': MeditoIcons.timerOutline,

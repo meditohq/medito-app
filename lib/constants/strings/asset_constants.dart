@@ -14,6 +14,7 @@ class AssetConstants {
   static const String iconArrowRight = 'assets/images/arrow-right.svg';
   static const String iconBackward15 = 'assets/images/backward15-seconds.svg';
   static const String iconBell = 'assets/images/bell.svg';
+  static const String iconBrain = 'assets/images/brain.svg';
   static const String iconBook = 'assets/images/open-book.svg';
   static const String iconBookSolid = 'assets/images/book-solid.svg';
   static const String iconCalendar = 'assets/images/calendar.svg';

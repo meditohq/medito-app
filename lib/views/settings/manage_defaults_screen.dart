@@ -27,7 +27,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         SliverAppBar(
           centerTitle: false,

@@ -16,6 +16,7 @@ import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/utils/permission_handler.dart';
+import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
 import 'dart:async';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -57,7 +58,10 @@ class UpNextWidget extends ConsumerWidget {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),
       transitionBuilder: (child, animation) {
-        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
         final scale = Tween<double>(begin: 0.94, end: 1.0).animate(curved);
         return FadeTransition(
           opacity: curved,
@@ -73,11 +77,7 @@ class _UpNextContent extends ConsumerStatefulWidget {
   final UpNextData data;
   final Widget? inlineStrip;
 
-  const _UpNextContent({
-    super.key,
-    required this.data,
-    this.inlineStrip,
-  });
+  const _UpNextContent({super.key, required this.data, this.inlineStrip});
 
   @override
   ConsumerState<_UpNextContent> createState() => _UpNextContentState();
@@ -100,11 +100,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
       opacity: _skipping ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 150),
       child: Padding(
-        padding: const EdgeInsets.only(
-          left: padding16,
-          right: padding16,
-          bottom: padding16,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: padding16),
         child: ClipRRect(
           borderRadius: borderRadius,
           child: Dismissible(
@@ -157,35 +153,37 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
                                                 fontFamily: teachers,
-                                                fontSize: 12,
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                                 letterSpacing: 1.2,
-                                                color: ColorConstants.lightBlue,
+                                                color: ColorConstants.white
+                                                    .withOpacityValue(0.7),
                                               ),
                                         ),
-                                        const SizedBox(width: 6),
+                                        const SizedBox(width: 4),
                                         Text(
                                           '·',
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
                                                 fontFamily: teachers,
-                                                fontSize: 12,
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.w600,
-                                                color: ColorConstants.lightBlue,
+                                                color: ColorConstants.white
+                                                    .withOpacityValue(0.7),
                                               ),
                                         ),
-                                        const SizedBox(width: 6),
+                                        const SizedBox(width: 4),
                                         Expanded(
                                           child: Text(
                                             widget.data.pack.title,
                                             style: theme.textTheme.bodySmall
                                                 ?.copyWith(
                                                   fontFamily: teachers,
-                                                  fontSize: 12,
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   letterSpacing: 1.2,
-                                                  color:
-                                                      ColorConstants.lightBlue,
+                                                  color: ColorConstants.white
+                                                      .withOpacityValue(0.7),
                                                 ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -193,7 +191,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 4),
                                     Text(
                                       nextSession.title,
                                       style: theme.textTheme.headlineSmall
@@ -336,10 +333,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
         );
         await ref
             .read(playerProvider.notifier)
-            .loadSelectedTrack(
-              trackModel: trackState,
-              file: bestFile,
-            );
+            .loadSelectedTrack(trackModel: trackState, file: bestFile);
         _navigateToPlayer(context);
       } else {
         handleNavigation(

@@ -1,14 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
-import 'package:medito/l10n/app_localizations.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/views/home/widgets/quote/quote_share_sheet.dart';
 
 class QuoteWidget extends ConsumerStatefulWidget {
   const QuoteWidget({super.key, required this.data});
@@ -22,34 +17,11 @@ class QuoteWidget extends ConsumerStatefulWidget {
 class QuoteWidgetState extends ConsumerState<QuoteWidget> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: padding16),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: padding24, horizontal: padding20),
-            child: _buildQuoteContent(),
-          ),
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: IconButton(
-              tooltip: AppLocalizations.of(context)!.share,
-              onPressed: _shareQuote,
-              icon: MeditoIcon(
-                assetName: Platform.isIOS
-                    ? MeditoIcons.shareIos
-                    : MeditoIcons.shareAndroid,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withOpacityValue(0.8),
-                size: 16,
-              ),
-            ),
-          ),
-        ],
+    return GestureDetector(
+      onTap: _shareQuote,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: padding24),
+        child: _buildQuoteContent(),
       ),
     );
   }
@@ -57,14 +29,15 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
   void _shareQuote() {
     if (widget.data == null) return;
 
-    final shareText =
-        '${widget.data?.quote}\n- ${widget.data?.author}\n\n${AppLocalizations.of(context)!.shareStatsText}';
-    SharePlus.instance.share(ShareParams(text: shareText));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => QuoteShareScreen(data: widget.data!),
+      ),
+    );
   }
 
   Widget _buildQuoteContent() {
-    return SelectionArea(
-      child: Column(
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -95,7 +68,6 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
             ),
           ],
         ],
-      ),
     );
   }
 }
