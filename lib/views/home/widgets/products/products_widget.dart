@@ -207,7 +207,7 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                   controller: _scrollController,
                   shrinkWrap: true,
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.only(left: 16),
+                  padding: const EdgeInsets.only(left: 16, right: 4),
                   itemCount: sortedGroups.length,
                   itemBuilder: (context, index) {
                     final productGroup = sortedGroups[index];

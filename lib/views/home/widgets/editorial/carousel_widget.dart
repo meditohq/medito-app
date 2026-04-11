@@ -66,6 +66,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         SingleChildScrollView(
           controller: _scrollController,
           scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.only(right: padding16 / 2),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: widget.carouselItems.asMap().entries.map((entry) {
@@ -88,9 +89,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     return Padding(
       padding: EdgeInsets.only(
         left: index == 0 ? padding16 : padding16 / 2,
-        right: index == widget.carouselItems.length - 1
-            ? padding16
-            : padding16 / 2,
+        right: padding16 / 2,
       ),
       child: SizedBox(
         width: cardWidth,
