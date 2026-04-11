@@ -6,7 +6,7 @@ env:
 ---
 
 # ── Launch app ──
-- launchApp:
+- launchApp
 
 # ── Splash screen ──
 - extendedWaitUntil:
