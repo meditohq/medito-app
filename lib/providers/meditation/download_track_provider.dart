@@ -23,32 +23,42 @@ Future<void> removeDownloadedTrack(Ref ref, {required TrackModel track}) async {
   var fileName =
       '${track.id}-${firstItem.id}${getAudioFileExtension(firstItem.path)}';
 
+  AppLogger.d('DOWNLOAD', 'removeDownloadedTrack: checking file $fileName');
   var isDownloaded =
       await ref.read(downloaderRepositoryProvider).isFileDownloaded(fileName);
 
+  AppLogger.d('DOWNLOAD', 'removeDownloadedTrack: isDownloaded=$isDownloaded');
   if (isDownloaded) {
     await ref.read(audioDownloaderProvider.notifier).deleteTrackAudio(fileName);
-    await ref.read(deleteTrackFromPreferenceProvider(file: firstItem).future);
+    AppLogger.d('DOWNLOAD', 'removeDownloadedTrack: audio file deleted');
   }
+  AppLogger.d('DOWNLOAD', 'removeDownloadedTrack: calling deleteTrackFromPreference');
+  await ref.read(deleteTrackFromPreferenceProvider(file: firstItem).future);
+  AppLogger.d('DOWNLOAD', 'removeDownloadedTrack: done');
 }
 
 @riverpod
 Future<void> deleteTrackFromPreference(Ref ref,
     {required TrackFilesModel file}) async {
   try {
-    var downloadedTrackList = await ref.watch(downloadedTracksProvider.future);
-    
+    AppLogger.d('DOWNLOAD', 'deleteTrackFromPreference: fetching current list');
+    var downloadedTrackList = await ref.read(downloadedTracksProvider.future);
+    AppLogger.d('DOWNLOAD', 'deleteTrackFromPreference: got ${downloadedTrackList.length} tracks, mounted=${ref.mounted}');
+
     if (!ref.mounted) return;
-    
+
     downloadedTrackList.removeWhere((element) =>
         element.audio.first.files.indexWhere((e) => e.id == file.id) != -1);
 
+    AppLogger.d('DOWNLOAD', 'deleteTrackFromPreference: saving ${downloadedTrackList.length} tracks to prefs');
     await ref.read(
       addTrackListInPreferenceProvider(tracks: downloadedTrackList).future,
     );
+    AppLogger.d('DOWNLOAD', 'deleteTrackFromPreference: prefs saved, mounted=${ref.mounted}');
 
     if (!ref.mounted) return;
-    
+
+    AppLogger.d('DOWNLOAD', 'deleteTrackFromPreference: invalidating downloadedTracksProvider');
     ref.invalidate(downloadedTracksProvider);
   } catch (e) {
     AppLogger.e('DOWNLOAD', 'Error in deleteTrackFromPreference: $e');
