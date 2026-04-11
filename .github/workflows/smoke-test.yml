@@ -172,7 +172,7 @@ jobs:
             adb install build/app/outputs/apk/prod/release/app-prod-release.apk
             adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
             mkdir -p /tmp/maestro-debug
-            $HOME/.maestro/bin/maestro test -e PLATFORM=android .maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug
+            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug
 
       - name: Upload Maestro debug output
         if: failure()
@@ -353,6 +353,7 @@ jobs:
           xcrun simctl install booted "build/ios/iphonesimulator/Medito Dev.app"
           mkdir -p /tmp/maestro-debug
           $HOME/.maestro/bin/maestro test \
+            -e APP_ID=org.meditofoundation \
             .maestro/smoke.yaml \
             --no-ansi --debug-output /tmp/maestro-debug
 

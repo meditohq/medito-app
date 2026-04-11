@@ -1,8 +1,5 @@
 appId: ${APP_ID}
 name: Smoke Test – Onboarding, Navigate, Verify Content
-env:
-  APP_ID: meditofoundation.medito
-  PLATFORM: android
 ---
 
 # ── Launch app ──
