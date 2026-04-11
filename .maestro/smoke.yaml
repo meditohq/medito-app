@@ -46,9 +46,8 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           when:
             platform: iOS
           commands:
-            - extendedWaitUntil:
-                visible: "(?i)close|✕|×"
-                timeout: 10000
+            # Donation page may open as native modal or in browser.
+            # Tap close if present (native modal), then always return to app.
             - tapOn:
                 text: "(?i)close|✕|×"
                 optional: true
