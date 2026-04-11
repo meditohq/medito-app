@@ -585,8 +585,11 @@ class SplashViewState extends ConsumerState<SplashView>
                       SafeArea(
                         bottom: false,
                         child: SingleChildScrollView(
-                          child: SizedBox(
-                            height: constraints.maxHeight,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight -
+                                  MediaQuery.of(context).padding.top,
+                            ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [

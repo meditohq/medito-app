@@ -61,53 +61,57 @@ class TrackingPermissionScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      MeditoIcon(
-                        assetName: MeditoIcons.shield,
-                        size: 48,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        l10n.trackingPermissionTitle,
-                        style:
-                            Theme.of(context).textTheme.displayLarge?.copyWith(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        l10n.trackingPermissionBody,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontSize: 16,
-                              height: 1.5,
-                              color: Colors.white.withOpacityValue(0.9),
-                            ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildPrivacyNote(context, l10n),
-                    ],
-                  ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(32),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 64),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        MeditoIcon(
+                          assetName: MeditoIcons.shield,
+                          size: 48,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          l10n.trackingPermissionTitle,
+                          style:
+                              Theme.of(context).textTheme.displayLarge?.copyWith(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.trackingPermissionBody,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: 16,
+                                height: 1.5,
+                                color: Colors.white.withOpacityValue(0.9),
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildPrivacyNote(context, l10n),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    _buildActionButton(
+                      text: l10n.trackingPermissionAllow,
+                      onPressed: () async => await _handleContinue(context),
+                    ),
+                  ],
                 ),
               ),
-              _buildActionButton(
-                text: l10n.trackingPermissionAllow,
-                onPressed: () async => await _handleContinue(context),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

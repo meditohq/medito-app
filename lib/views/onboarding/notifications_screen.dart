@@ -149,65 +149,73 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.enableNotificationsTitle,
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(32),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 64),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.enableNotificationsTitle,
+                          style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                              ),
+                          textAlign: TextAlign.center,
                         ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    AppLocalizations.of(context)!.enableNotificationsBody,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 16,
-                          height: 1.5,
+                        const SizedBox(height: 24),
+                        Text(
+                          AppLocalizations.of(context)!.enableNotificationsBody,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontSize: 16,
+                                height: 1.5,
+                              ),
+                          textAlign: TextAlign.center,
                         ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  if (reminderTime != null)
-                    _buildSmartRemindersOnButton()
-                  else
-                    _buildActionButton(
-                      text: _notificationsGranted
-                          ? AppLocalizations.of(context)!.turnOnSmartReminders
-                          : AppLocalizations.of(context)!.setReminder,
-                      onPressed:
-                          _isProcessing ? null : _handleNotificationsPermission,
+                      ],
                     ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: TextButton(
-                      onPressed: () async {
-                        // Log analytics event for skip tap
-                        await FirebaseAnalyticsService().logEvent(
-                          name: FirebaseAnalyticsService
-                              .eventOnboardingReminderSkipTap,
-                        );
-                        _navigateNext();
-                      },
-                      child: Text(
-                        AppLocalizations.of(context)!.skipForNow,
-                      ),
+                    const SizedBox(height: 32),
+                    Column(
+                      children: [
+                        if (reminderTime != null)
+                          _buildSmartRemindersOnButton()
+                        else
+                          _buildActionButton(
+                            text: _notificationsGranted
+                                ? AppLocalizations.of(context)!.turnOnSmartReminders
+                                : AppLocalizations.of(context)!.setReminder,
+                            onPressed:
+                                _isProcessing ? null : _handleNotificationsPermission,
+                          ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextButton(
+                            onPressed: () async {
+                              // Log analytics event for skip tap
+                              await FirebaseAnalyticsService().logEvent(
+                                name: FirebaseAnalyticsService
+                                    .eventOnboardingReminderSkipTap,
+                              );
+                              _navigateNext();
+                            },
+                            child: Text(
+                              AppLocalizations.of(context)!.skipForNow,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

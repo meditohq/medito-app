@@ -21,25 +21,33 @@ class AllSetScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.allSetTitle,
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(32),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 64),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.allSetTitle,
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                          ),
+                      textAlign: TextAlign.center,
                     ),
-                textAlign: TextAlign.center,
+                    const SizedBox(height: 32),
+                    _buildActionButton(
+                      text: AppLocalizations.of(context)!.startMeditating,
+                      onPressed: () async => await _navigateToHome(context),
+                    ),
+                  ],
+                ),
               ),
-              _buildActionButton(
-                text: AppLocalizations.of(context)!.startMeditating,
-                onPressed: () async => await _navigateToHome(context),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
