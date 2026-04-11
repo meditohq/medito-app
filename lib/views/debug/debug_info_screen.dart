@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_initializing_formals
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,11 +12,11 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart'
     show reminderProvider, smartBaseId;
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/paywall_manager_service.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
-import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
 
@@ -58,18 +60,32 @@ class DebugInfoScreen extends ConsumerWidget {
         automaticallyImplyLeading: false,
         title:
             HomeHeaderWidget(greeting: AppLocalizations.of(context)!.debugInfo),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.copy),
-            onPressed: () => _copyDebugInfo(context, ref),
-            onLongPress: () => _openOnboardingFlow(context),
-            tooltip: AppLocalizations.of(context)!.copy,
-          ),
-        ],
       ),
       body: _buildBody(context, ref),
-      bottomNavigationBar: SingleBackButtonActionBar(
-        onBackPressed: () => Navigator.of(context).pop(),
+      bottomNavigationBar: _buildBottomBar(context, ref),
+    );
+  }
+
+  Widget _buildBottomBar(BuildContext context, WidgetRef ref) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+              onLongPress: () => _openOnboardingFlow(context),
+              tooltip: AppLocalizations.of(context)!.goBack,
+            ),
+            const Spacer(),
+            FilledButton.icon(
+              onPressed: () => _copyDebugInfo(context, ref),
+              icon: const Icon(Icons.copy, size: 18),
+              label: Text(AppLocalizations.of(context)!.copy),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -84,11 +100,20 @@ class DebugInfoScreen extends ConsumerWidget {
         );
   }
 
+  String _buildStatsBase64(WidgetRef ref) {
+    final stats = ref.read(statsProvider).asData?.value;
+    if (stats == null) return '';
+    final bytes = utf8.encode(jsonEncode(stats.toJson()));
+    final compressed = GZipCodec().encode(bytes);
+    return base64Encode(compressed);
+  }
+
   Widget _buildInfoView(
       BuildContext context, WidgetRef ref, String infoString) {
     final paywallManager = ref.read(paywallManagerServiceProvider);
     final donationPlacementId = paywallManager.getDonationPlacementId();
     final fullInfo = '$infoString\nDPI: $donationPlacementId';
+    final statsBase64 = _buildStatsBase64(ref);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -99,6 +124,24 @@ class DebugInfoScreen extends ConsumerWidget {
             fullInfo,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
+          if (statsBase64.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            const Divider(),
+            const SizedBox(height: 8),
+            Text(
+              'Stats (base64)',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            SelectableText(
+              statsBase64,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontFamily: 'monospace',
+                  ),
+            ),
+          ],
           if (kDebugMode) ...[
             const SizedBox(height: 24),
             const Divider(),
@@ -372,6 +415,11 @@ class DebugInfoScreen extends ConsumerWidget {
       AppLogger.d('DEBUG_INFO_SCREEN', 'Added scheduled events to copy text');
     } else {
       AppLogger.d('DEBUG_INFO_SCREEN', 'No scheduled events to add');
+    }
+
+    final statsBase64 = _buildStatsBase64(ref);
+    if (statsBase64.isNotEmpty) {
+      fullInfo = '$fullInfo\n\nstats_b64: $statsBase64';
     }
 
     await Clipboard.setData(ClipboardData(text: fullInfo));
