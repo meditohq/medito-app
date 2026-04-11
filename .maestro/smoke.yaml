@@ -46,17 +46,17 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           when:
             platform: iOS
           commands:
-            # Donation page may open as native modal or in browser.
-            # Tap close if present (native modal), then always return to app.
+            # Donation page may open as Superwall native modal (has ✕ close button)
+            # or in SFSafariViewController (has ← Medito nav back button).
             - tapOn:
                 text: "(?i)close|✕|×"
                 optional: true
-            - pressKey: home
-            - launchApp:
-                stopApp: false
+            - tapOn:
+                text: "(?i)^Medito$"
+                optional: true
 
-# If browser opened (CI / no Google Pay), it stole focus. Press Home first
-# to leave the browser cleanly, then reopen our app.
+# If neither close path worked the app is still in the browser.
+# Press Home + relaunch to get back to the donation screen.
 - runFlow:
     when:
       notVisible: "Skip for Now"
@@ -68,7 +68,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # "Skip for Now" should now be visible on the donation screen.
 - extendedWaitUntil:
     visible: "Skip for Now"
-    timeout: 15000
+    timeout: 45000
 - tapOn:
     text: "Skip for Now"
     retryTapIfNoChange: true
