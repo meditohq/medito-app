@@ -1,5 +1,7 @@
 Unreleased
--
+- Share daily quotes as beautiful images
+- Fixed deleting downloaded meditations
+- Improved text scaling for accessibility on splash and onboarding screens
 
 3.6.12
 - Improve accessibility for screen readers
