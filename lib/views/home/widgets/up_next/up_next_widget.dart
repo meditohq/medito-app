@@ -153,7 +153,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                     Row(
                                       children: [
                                         Text(
-                                          'YOUR PATH',
+                                          l10n.upNextTitle.toUpperCase(),
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
                                                 fontFamily: teachers,
@@ -163,8 +163,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                                 color: ColorConstants.lightBlue,
                                               ),
                                         ),
+                                        const SizedBox(width: 6),
                                         Text(
-                                          '  ·  ',
+                                          '·',
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
                                                 fontFamily: teachers,
@@ -173,6 +174,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                                 color: ColorConstants.lightBlue,
                                               ),
                                         ),
+                                        const SizedBox(width: 6),
                                         Expanded(
                                           child: Text(
                                             widget.data.pack.title,

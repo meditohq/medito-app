@@ -197,7 +197,7 @@ class _Stage1Content extends StatelessWidget {
             child: Text(
               text,
               style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: 'Teachers',
+                fontFamily: teachers,
                 fontSize: 13,
                 height: 1.4,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
@@ -215,7 +215,7 @@ class _Stage1Content extends StatelessWidget {
             child: Text(
               buttonLabel,
               style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: 'Teachers',
+                fontFamily: teachers,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: ColorConstants.lightBlue,
@@ -255,7 +255,7 @@ class _Stage2Content extends StatelessWidget {
             child: Text(
               text,
               style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: 'Teachers',
+                fontFamily: teachers,
                 fontSize: 13,
                 height: 1.4,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.75),

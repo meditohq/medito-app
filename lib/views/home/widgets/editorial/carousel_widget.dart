@@ -11,16 +11,9 @@ import 'package:medito/utils/utils.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/network_image_widget.dart';
 
-const _kAutoScrollDelay = Duration(seconds: 10);
-const _kScrollAnimationDuration = Duration(milliseconds: 500);
 const _kCardBorderRadius = 24.0;
-const _kCardAspectRatio = 2 / 1;
-const _kSmallPhoneAspectRatio = 2.2 / 1;
-const _kButtonHeight = 48.0;
-const _kBannerFontSize = 14.0;
-const _kSmallSpacing = 8.0;
-const _kSmallPhoneThreshold = 400.0;
-const _kSmallPhoneWidthMultiplier = 0.85;
+const _kCardAspectRatio = 2 / 3;
+const _kBannerFontSize = 16.0;
 
 class CarouselWidget extends ConsumerStatefulWidget {
   final List<HomeCarouselModel> carouselItems;
@@ -37,7 +30,6 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   @override
   void initState() {
     super.initState();
-    _scheduleScroll();
   }
 
   @override
@@ -46,28 +38,10 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     super.dispose();
   }
 
-  void _scheduleScroll() {
-    Future.delayed(_kAutoScrollDelay, () {
-      if (_scrollController.hasClients && widget.carouselItems.length > 1) {
-        var context = this.context;
-        var screenSize = MediaQuery.of(context).size;
-        var isHorizontal = screenSize.width > screenSize.height;
-        var isTablet = screenSize.shortestSide >= 600;
-        var isSmallPhone = screenSize.shortestSide < _kSmallPhoneThreshold;
-        var baseCardWidth = isHorizontal || isTablet
-            ? (screenSize.width / 2) - (3 * padding16)
-            : screenSize.width - (3 * padding16);
-        var cardWidth = isSmallPhone
-            ? baseCardWidth * _kSmallPhoneWidthMultiplier
-            : baseCardWidth;
-
-        _scrollController.animateTo(
-          cardWidth + padding16,
-          duration: _kScrollAnimationDuration,
-          curve: Curves.easeInOut,
-        );
-      }
-    });
+  double _cardWidth(Size screenSize) {
+    final isWide = screenSize.width > screenSize.height ||
+        screenSize.shortestSide >= 600;
+    return isWide ? screenSize.width / 5.0 : screenSize.width / 3.2;
   }
 
   @override
@@ -92,16 +66,11 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         SingleChildScrollView(
           controller: _scrollController,
           scrollDirection: Axis.horizontal,
-          child: IntrinsicHeight(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: widget.carouselItems.asMap().entries.map((entry) {
-                int index = entry.key;
-                HomeCarouselModel item = entry.value;
-                return _buildCarouselItem(context, ref, index, item);
-              }).toList(),
-            ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: widget.carouselItems.asMap().entries.map((entry) {
+              return _buildCarouselItem(context, ref, entry.key, entry.value);
+            }).toList(),
           ),
         ),
       ],
@@ -114,22 +83,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     int index,
     HomeCarouselModel item,
   ) {
-    final screenSize = MediaQuery.of(context).size;
-    final isHorizontal = screenSize.width > screenSize.height;
-    final isTablet = screenSize.shortestSide >= 600;
-    final isSmallPhone = screenSize.shortestSide < _kSmallPhoneThreshold;
-
-    var baseCardWidth = isHorizontal || isTablet
-        ? (screenSize.longestSide / 2) - (3 * padding16)
-        : screenSize.width - (3 * padding16);
-
-    var cardWidth = isSmallPhone
-        ? baseCardWidth * _kSmallPhoneWidthMultiplier
-        : baseCardWidth;
-
-    var aspectRatio = isSmallPhone
-        ? _kSmallPhoneAspectRatio
-        : _kCardAspectRatio;
+    final cardWidth = _cardWidth(MediaQuery.of(context).size);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -140,19 +94,15 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
       ),
       child: SizedBox(
         width: cardWidth,
-        child: _buildBanner(
-          item,
-          _buildGradientBorderCard(context, item, ref, aspectRatio),
-        ),
+        child: _buildBanner(item, _buildCard(context, item, ref)),
       ),
     );
   }
 
-  Widget _buildGradientBorderCard(
+  Widget _buildCard(
     BuildContext context,
     HomeCarouselModel item,
     WidgetRef ref,
-    double aspectRatio,
   ) {
     final cardColor = Theme.of(context).cardColor;
 
@@ -179,52 +129,41 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(_kCardBorderRadius),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AspectRatio(
-                  aspectRatio: aspectRatio,
-                  child: NetworkImageWidget(
-                    url: item.coverUrl,
-                    shouldCache: true,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(padding16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+            child: AspectRatio(
+              aspectRatio: _kCardAspectRatio,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  NetworkImageWidget(url: item.coverUrl, shouldCache: true),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(10, 36, 10, 12),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [Color(0xCC000000), Colors.transparent],
+                        ),
+                      ),
+                      child: Text(
                         item.title,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(
-                              fontFamily: sourceSerif,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w400,
-                              height: 28 / 24,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontFamily: dmSans,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          height: 1.2,
+                          color: Colors.white,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: _kSmallSpacing),
-                      Text(
-                        item.subtitle,
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(
-                              fontFamily: teachers,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              height: 1.2,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      const SizedBox(height: padding20),
-                      if (item.buttons != null && item.buttons!.isNotEmpty)
-                        _buildButtons(item, context, ref),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -233,19 +172,16 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   }
 
   Widget _buildBanner(HomeCarouselModel item, Widget child) {
-    if (item.showBanner != true) {
-      return child;
-    }
+    if (item.showBanner != true) return child;
 
     final bannerColor = item.bannerColor != null
         ? parseColor(item.bannerColor!)
         : ColorConstants.lightPurple;
-    var bannerLabel = item.bannerLabel;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(_kCardBorderRadius),
       child: Banner(
-        message: bannerLabel ?? AppLocalizations.of(context)!.neww,
+        message: item.bannerLabel ?? AppLocalizations.of(context)!.neww,
         location: BannerLocation.topStart,
         color: bannerColor,
         textStyle: TextStyle(
@@ -255,57 +191,6 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         ),
         child: child,
       ),
-    );
-  }
-
-  Widget _buildButtons(
-    HomeCarouselModel item,
-    BuildContext context,
-    WidgetRef ref,
-  ) {
-    return Row(
-      children: item.buttons!.asMap().entries.map((entry) {
-        var index = entry.key;
-        var button = entry.value;
-
-        return Expanded(
-          child: Row(
-            children: [
-              if (index > 0) const SizedBox(width: padding16),
-              Expanded(
-                child: SizedBox(
-                  height: _kButtonHeight,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorConstants.brightSky,
-                      foregroundColor: ColorConstants.onyx,
-                    ),
-                    onPressed: () {
-                      handleNavigation(
-                        button.type,
-                        [button.path.toString().getIdFromPath(), button.path],
-                        context,
-                        ref: ref,
-                      );
-                    },
-                    child: Text(
-                      button.title,
-                      maxLines: 1,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontFamily: teachers,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                        color: ColorConstants.onyx,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
     );
   }
 }

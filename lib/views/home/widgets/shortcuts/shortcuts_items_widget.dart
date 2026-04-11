@@ -37,8 +37,8 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     var isWideScreen = size.width > 600;
     final columns = isWideScreen ? 8 : 4;
     const horizontalPadding = padding16;
-    const spacing = padding20;
-    const runSpacing = padding12;
+    const spacing = padding12;
+    const runSpacing = padding8;
     final totalSpacing = (columns - 1) * spacing;
     final totalPadding = horizontalPadding * 2;
     final containerSize = (size.width - totalPadding - totalSpacing) / columns;
