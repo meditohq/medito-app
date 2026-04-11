@@ -303,6 +303,10 @@ jobs:
           GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
         run: printf '%s' "$GOOGLE_SERVICE_INFO_PLIST" | base64 -d > ios/Runner/GoogleService-Info.plist
 
+      - name: Install FlutterFire CLI
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        run: dart pub global activate flutterfire_cli
+
       - name: Install pods
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
         working-directory: ios
