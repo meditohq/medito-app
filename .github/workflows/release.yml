@@ -6,6 +6,22 @@ on:
       - '**'
   workflow_dispatch:
     inputs:
+      android_internal:
+        description: 'Android – Internal track'
+        type: boolean
+        default: false
+      android_production:
+        description: 'Android – Production track'
+        type: boolean
+        default: true
+      ios_testflight:
+        description: 'iOS – TestFlight'
+        type: boolean
+        default: true
+      ios_appstore:
+        description: 'iOS – App Store draft'
+        type: boolean
+        default: false
       paywall_env:
         description: 'Paywall environment'
         required: true
@@ -14,54 +30,22 @@ on:
         options:
           - live
           - dev
-      play_store_track:
-        description: 'Play Store track (Android)'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - internal
-          - beta
-          - production
-          - internal+production
-      platforms:
-        description: 'Platforms to build'
-        required: true
-        default: 'both'
-        type: choice
-        options:
-          - both
-          - android
-          - ios
       match_readonly:
         description: 'Keep match in readonly mode (set false to refresh certs/profiles)'
-        required: true
-        default: 'true'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+        type: boolean
+        default: true
       release_notes:
         description: 'Release notes (applied to en-US, en-GB, es-MX)'
         required: false
         default: ''
         type: string
-      ios_lane:
-        description: 'iOS lane: beta (TestFlight), release (App Store draft), or both'
-        required: true
-        default: 'beta'
-        type: choice
-        options:
-          - beta
-          - release
-          - both
 
 jobs:
-  android-deploy:
-    name: Android – Build & Deploy
+  android-build:
+    name: Android – Build
     runs-on: ubuntu-latest
     environment: prod
-    if: github.event_name != 'workflow_dispatch' || inputs.platforms == 'both' || inputs.platforms == 'android'
+    if: github.event_name != 'workflow_dispatch' || inputs.android_internal || inputs.android_production
 
     steps:
       - uses: actions/checkout@v4
@@ -177,6 +161,27 @@ jobs:
             --dart-define=PAYWALL_ENV=${{ inputs.paywall_env || 'live' }} \
             --obfuscate --split-debug-info=./symbols
 
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-prod-release
+          path: build/app/outputs/apk/prod/release/app-prod-release.apk
+          retention-days: 1
+
+  android-smoke-test:
+    name: Android – Smoke Test
+    needs: [android-build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-prod-release
+          path: build/app/outputs/apk/prod/release/
+
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -206,7 +211,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: maestro-debug
+          name: maestro-debug-android
           path: /tmp/maestro-debug/
           retention-days: 30
           include-hidden-files: true
@@ -214,14 +219,29 @@ jobs:
       - name: Embed failure screenshots in job summary
         if: failure()
         run: |
-          echo "## Maestro Smoke Test Failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Android Maestro Smoke Test Failed" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Screenshots are available in the **maestro-debug** artifact above." >> "$GITHUB_STEP_SUMMARY"
+          echo "Screenshots are available in the **maestro-debug-android** artifact above." >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "### Screenshots captured" >> "$GITHUB_STEP_SUMMARY"
           find /tmp/maestro-debug -name '*.png' 2>/dev/null | sort | while read -r img; do
             echo "- \`$(basename "$img")\`" >> "$GITHUB_STEP_SUMMARY"
           done
+
+  android-deploy:
+    name: Android – Deploy
+    needs: [android-smoke-test]
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-prod-release
+          path: build/app/outputs/apk/prod/release/
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -245,23 +265,26 @@ jobs:
         env:
           PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
         run: |
-          TRACK="${{ inputs.play_store_track || 'production' }}"
-          if [ "$TRACK" = "internal+production" ]; then
-            bundle exec fastlane android upload_apk \
-              apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
-              track:"internal"
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             bundle exec fastlane android upload_apk \
               apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
               track:"production"
           else
-            bundle exec fastlane android upload_apk \
-              apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
-              track:"$TRACK"
+            if [ "${{ inputs.android_internal }}" = "true" ]; then
+              bundle exec fastlane android upload_apk \
+                apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+                track:"internal"
+            fi
+            if [ "${{ inputs.android_production }}" = "true" ]; then
+              bundle exec fastlane android upload_apk \
+                apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+                track:"production"
+            fi
           fi
 
   ios-smoke-test:
     name: iOS – Smoke Test
-    if: github.event_name != 'workflow_dispatch' || inputs.platforms == 'both' || inputs.platforms == 'ios'
+    if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
     runs-on: macos-latest
     environment: prod
 
@@ -447,11 +470,11 @@ jobs:
           done
 
   ios-deploy:
-    name: iOS – Build & Deploy to TestFlight
+    name: iOS – Build & Deploy
     needs: [ios-smoke-test]
     runs-on: macos-latest
     environment: prod
-    if: github.event_name != 'workflow_dispatch' || inputs.platforms == 'both' || inputs.platforms == 'ios'
+    if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
 
     steps:
       - uses: actions/checkout@v4
@@ -598,7 +621,7 @@ jobs:
         working-directory: ios
         env:
           PAYWALL_ENV: ${{ inputs.paywall_env || 'live' }}
-          MATCH_READONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.match_readonly || 'false' }}
+          MATCH_READONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.match_readonly || false }}
           MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
@@ -611,8 +634,13 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
         run: |
-          if [ "${{ github.event_name == 'push' && 'release' || inputs.ios_lane || 'beta' }}" = "both" ]; then
-            fastlane beta && fastlane release
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            fastlane release
           else
-            fastlane ${{ github.event_name == 'push' && 'release' || inputs.ios_lane || 'beta' }}
+            if [ "${{ inputs.ios_testflight }}" = "true" ]; then
+              fastlane beta
+            fi
+            if [ "${{ inputs.ios_appstore }}" = "true" ]; then
+              fastlane release
+            fi
           fi
