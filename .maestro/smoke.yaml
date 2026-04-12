@@ -33,7 +33,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # ── Splash screen ──
 - extendedWaitUntil:
     visible: "Continue"
-    timeout: 60000
+    timeout: 120000
 - tapOn: "Continue"
 
 # ── Onboarding: Tracking permission (iOS only) ──

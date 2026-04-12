@@ -343,6 +343,8 @@ jobs:
           sys.exit(1)
           ")
           xcrun simctl boot "$DEVICE"
+          # Block until SpringBoard is fully ready (not just kernel boot)
+          xcrun simctl bootstatus "$DEVICE" -b
           echo "Booted simulator: $DEVICE"
 
       - name: Install Maestro
@@ -353,6 +355,8 @@ jobs:
         timeout-minutes: 12
         run: |
           xcrun simctl install booted "build/ios/iphonesimulator/Medito Dev.app"
+          # Give SpringBoard a few extra seconds to settle before Maestro connects
+          sleep 5
           mkdir -p /tmp/maestro-debug
           $HOME/.maestro/bin/maestro test \
             -e APP_ID=org.meditofoundation \
