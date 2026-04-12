@@ -4,6 +4,14 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # ── Launch app ──
 - launchApp
+- waitForAnimationToEnd
+
+# ── iOS simulator: dismiss OS-level "Sign in with Apple ID" dialog ──
+# The system dialog sits outside the app accessibility tree so we can't detect
+# its title text; instead we tap Cancel (optional) before waiting for the splash.
+- tapOn:
+    text: "Cancel"
+    optional: true
 
 # ── Splash screen ──
 - extendedWaitUntil:
