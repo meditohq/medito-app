@@ -607,6 +607,7 @@ class SplashViewState extends ConsumerState<SplashView>
                               minHeight: constraints.maxHeight -
                                   MediaQuery.of(context).padding.top,
                             ),
+                            child: IntrinsicHeight(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -791,6 +792,7 @@ class SplashViewState extends ConsumerState<SplashView>
                                 ],
                               ],
                             ),
+                            ), // IntrinsicHeight
                           ),
                         ),
                       ),

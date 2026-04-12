@@ -118,6 +118,16 @@ bool isInUS() {
 
 
 Future<bool> shouldUseSuperwallForDonation() async {
+  // Apple Pay is never available on simulator builds, and calling
+  // isPlatformPaySupported() on a simulator triggers the OS-level
+  // "Sign in with Apple ID" dialog that blocks the UI. Skip it entirely.
+  const kIsSimulatorBuild = bool.fromEnvironment('IS_SIMULATOR');
+  if (kIsSimulatorBuild) {
+    AppLogger.d('DONATION_UTILS',
+        'Simulator build — skipping Apple Pay check, using web donation');
+    return false;
+  }
+
   final isPlatformPaySupported =
       await Stripe.instance.isPlatformPaySupported();
   if (!isPlatformPaySupported) {

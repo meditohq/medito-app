@@ -3,7 +3,10 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 ---
 
 # ── Launch app ──
-- launchApp
+# clearState wipes SharedPreferences so the app always starts fresh (no stale
+# anonymous-auth state from a previous CI run that would skip the auth screen).
+- launchApp:
+    clearState: true
 
 # ── Android only: dismiss "Pixel Launcher isn't responding" ANR dialog on CI ──
 # Wrapped in platform:Android so iOS doesn't spend ~50 s on an irrelevant check.
