@@ -253,10 +253,189 @@ jobs:
   ios-smoke-test:
     name: iOS – Smoke Test
     if: github.event_name != 'workflow_dispatch' || inputs.platforms == 'both' || inputs.platforms == 'ios'
-    uses: ./.github/workflows/smoke-test.yml
-    with:
-      platforms: ios
-    secrets: inherit
+    runs-on: macos-latest
+    environment: prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2.12.0
+        with:
+          flutter-version: '3.41.4'
+          cache: true
+
+      - name: Cache pub packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: ${{ runner.os }}-pods-
+
+      - name: Cache iOS app
+        id: cache-ios-app
+        uses: actions/cache@v4
+        with:
+          path: build/ios/iphonesimulator/Medito Dev.app
+          key: ${{ runner.os }}-ios-app-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'ios/Podfile.lock', 'ios/Runner.xcodeproj/project.pbxproj') }}
+
+      - name: Flutter pub get
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        run: flutter pub get
+
+      - name: Cache build_runner outputs
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        id: cache-buildrunner
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib/**/*.g.dart
+            lib/**/*.freezed.dart
+          key: ${{ runner.os }}-buildrunner-${{ hashFiles('lib/**/*.dart', 'pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-buildrunner-
+
+      - name: Run build_runner
+        if: steps.cache-ios-app.outputs.cache-hit != 'true' && steps.cache-buildrunner.outputs.cache-hit != 'true'
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Cache pigeon outputs
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        id: cache-pigeon
+        uses: actions/cache@v4
+        with:
+          path: |
+            lib/src/audio_pigeon.g.dart
+            android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pigeon-
+
+      - name: Run pigeon
+        if: steps.cache-ios-app.outputs.cache-hit != 'true' && steps.cache-pigeon.outputs.cache-hit != 'true'
+        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+
+      - name: Write .prod.json
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        env:
+          PROD_ENV: ${{ secrets.PROD_ENV }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+
+          raw = os.environ["PROD_ENV"]
+
+          try:
+            data = json.loads(raw)
+          except json.JSONDecodeError:
+            data = {}
+            for line in raw.strip().strip("{}").splitlines():
+              line = line.strip().rstrip(",")
+              if ":" in line:
+                key, _, value = line.partition(":")
+                data[key.strip()] = value.strip()
+
+          if not data:
+            sys.exit("Failed to parse PROD_ENV secret")
+
+          with open(".prod.json", "w") as f:
+            json.dump(data, f, indent=2)
+          PY
+
+      - name: Write firebase_options.dart
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        env:
+          FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+        run: printf '%s' "$FIREBASE_OPTIONS_DART" > lib/firebase_options.dart
+
+      - name: Write GoogleService-Info.plist
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        env:
+          GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        run: printf '%s' "$GOOGLE_SERVICE_INFO_PLIST" | base64 -d > ios/Runner/GoogleService-Info.plist
+
+      - name: Install FlutterFire CLI
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        run: dart pub global activate flutterfire_cli
+
+      - name: Install pods
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        working-directory: ios
+        run: |
+          echo "Xcode: $(xcodebuild -version | head -1)"
+          echo "System CocoaPods: $(pod --version)"
+          if ! pod --version | grep -q '^1\.16\.'; then
+            echo "Installing CocoaPods 1.16.x to match Podfile.lock…"
+            gem install cocoapods -v '~> 1.16.2' --no-document
+            echo "Installed CocoaPods: $(pod --version)"
+          fi
+          pod install
+
+      - name: Build iOS simulator app
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        run: |
+          flutter build ios --simulator --no-codesign \
+            --dart-define-from-file=.prod.json \
+            --dart-define=MOCK_MODE=false \
+            --dart-define=PAYWALL_ENV=live \
+            --dart-define=IS_SIMULATOR=true
+
+      - name: Boot iOS simulator
+        run: |
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          for runtime, devices in data['devices'].items():
+            for d in devices:
+              if 'iPhone' in d['name'] and d['isAvailable']:
+                print(d['udid'])
+                sys.exit(0)
+          sys.exit(1)
+          ")
+          xcrun simctl boot "$DEVICE"
+          # Block until SpringBoard is fully ready (not just kernel boot)
+          xcrun simctl bootstatus "$DEVICE" -b
+          echo "Booted simulator: $DEVICE"
+
+      - name: Install Maestro
+        run: curl -Ls "https://get.maestro.mobile.dev" | bash
+
+      - name: Smoke test on simulator
+        timeout-minutes: 12
+        run: |
+          xcrun simctl install booted "build/ios/iphonesimulator/Medito Dev.app"
+          # Give SpringBoard a few extra seconds to settle before Maestro connects
+          sleep 5
+          mkdir -p /tmp/maestro-debug
+          $HOME/.maestro/bin/maestro test \
+            -e APP_ID=org.meditofoundation \
+            .maestro/smoke.yaml \
+            --no-ansi --debug-output /tmp/maestro-debug
+
+      - name: Upload Maestro debug output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-debug-ios
+          path: /tmp/maestro-debug/
+          retention-days: 30
+          include-hidden-files: true
+
+      - name: Embed failure screenshots in job summary
+        if: failure()
+        run: |
+          echo "## iOS Maestro Smoke Test Failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Screenshots are available in the **maestro-debug-ios** artifact above." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Screenshots captured" >> "$GITHUB_STEP_SUMMARY"
+          find /tmp/maestro-debug -name '*.png' 2>/dev/null | sort | while read -r img; do
+            echo "- \`$(basename "$img")\`" >> "$GITHUB_STEP_SUMMARY"
+          done
 
   ios-deploy:
     name: iOS – Build & Deploy to TestFlight
