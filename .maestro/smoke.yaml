@@ -15,10 +15,13 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           optional: true
 
 # ── iOS simulator: dismiss OS-level "Sign in with Apple ID" dialog ──
-# The system dialog sits outside the app accessibility tree; tap Cancel (optional).
-- tapOn:
-    text: "Cancel"
-    optional: true
+# runFlow when:visible skips instantly if the button isn't present,
+# unlike tapOn optional:true which blocks for the full default timeout.
+- runFlow:
+    when:
+      visible: "Cancel"
+    commands:
+      - tapOn: "Cancel"
 
 # ── Splash screen ──
 - extendedWaitUntil:
