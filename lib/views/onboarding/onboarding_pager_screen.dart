@@ -37,7 +37,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   bool _questionFlowStartedLogged = false;
 
   int get _firstQuestionPageIndex {
-    var index = 2; // after Notifications (0) and Donation (1)
+    var index = 1; // after Donation (0)
     if (Platform.isIOS) index++;
     if (_showBatteryScreen) index++;
     return index;
@@ -130,7 +130,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     );
 
     return [
-      NotificationsScreen(onNext: _nextPage),
       OnboardingDonationScreen(onNext: _nextPage),
       if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),
       if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
@@ -175,12 +174,13 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
       ),
       OnboardingResultScreen(
         state: resultState,
-        onGetStarted: _onGetStarted,
+        onGetStarted: _nextPage,
       ),
+      NotificationsScreen(onNext: _onComplete),
     ];
   }
 
-  Future<void> _onGetStarted() async {
+  Future<void> _onComplete() async {
     unawaited(
       ref.read(analyticsServiceProvider).logEvent(
         name: AnalyticsEventConstants.onboardingCompleted,
