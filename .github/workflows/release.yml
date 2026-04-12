@@ -23,6 +23,7 @@ on:
           - internal
           - beta
           - production
+          - internal+production
       platforms:
         description: 'Platforms to build'
         required: true
@@ -244,9 +245,19 @@ jobs:
         env:
           PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
         run: |
-          bundle exec fastlane android upload_apk \
-            apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
-            track:"${{ inputs.play_store_track || 'production' }}"
+          TRACK="${{ inputs.play_store_track || 'production' }}"
+          if [ "$TRACK" = "internal+production" ]; then
+            bundle exec fastlane android upload_apk \
+              apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+              track:"internal"
+            bundle exec fastlane android upload_apk \
+              apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+              track:"production"
+          else
+            bundle exec fastlane android upload_apk \
+              apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+              track:"$TRACK"
+          fi
 
   ios-smoke-test:
     name: iOS – Smoke Test
