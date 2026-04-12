@@ -14,9 +14,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
-  const NotificationsScreen({super.key, this.onNext});
+  const NotificationsScreen({super.key, this.onNext, this.intentIndex});
 
   final VoidCallback? onNext;
+
+  /// The index of the intent answer from the onboarding questionnaire.
+  /// 0 = learn_properly, 1 = build_habit, 2 = stress_sleep_emotions.
+  /// Null falls back to the generic copy.
+  final int? intentIndex;
 
   @override
   ConsumerState<NotificationsScreen> createState() =>
@@ -141,6 +146,32 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
   void _navigateNext() => widget.onNext?.call();
 
+  String _notificationsTitle(AppLocalizations l10n) {
+    switch (widget.intentIndex) {
+      case 0:
+        return l10n.enableNotificationsTitleLearn;
+      case 1:
+        return l10n.enableNotificationsTitleHabit;
+      case 2:
+        return l10n.enableNotificationsTitleStress;
+      default:
+        return l10n.enableNotificationsTitle;
+    }
+  }
+
+  String _notificationsBody(AppLocalizations l10n) {
+    switch (widget.intentIndex) {
+      case 0:
+        return l10n.enableNotificationsBodyLearn;
+      case 1:
+        return l10n.enableNotificationsBodyHabit;
+      case 2:
+        return l10n.enableNotificationsBodyStress;
+      default:
+        return l10n.enableNotificationsBody;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final reminderTime = ref.watch(reminderTimeProvider);
@@ -160,7 +191,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     Column(
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.enableNotificationsTitle,
+                          _notificationsTitle(AppLocalizations.of(context)!),
                           style: Theme.of(context).textTheme.displayLarge?.copyWith(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
@@ -169,7 +200,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          AppLocalizations.of(context)!.enableNotificationsBody,
+                          _notificationsBody(AppLocalizations.of(context)!),
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontSize: 16,
                                 height: 1.5,

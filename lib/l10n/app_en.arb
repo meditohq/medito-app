@@ -244,6 +244,30 @@
   },
   "enableNotificationsTitle": "Stay on Track with Meditation Reminders",
   "enableNotificationsBody": "Enable notifications so you never miss a session.",
+  "enableNotificationsTitleLearn": "Keep the learning going",
+  "@enableNotificationsTitleLearn": {
+    "description": "Notifications screen title for users who want to learn to meditate (intent: learn_properly)"
+  },
+  "enableNotificationsBodyLearn": "A daily reminder is the single biggest thing that helps beginners stick with it.",
+  "@enableNotificationsBodyLearn": {
+    "description": "Notifications screen body for users who want to learn to meditate (intent: learn_properly)"
+  },
+  "enableNotificationsTitleHabit": "Build the habit you're after",
+  "@enableNotificationsTitleHabit": {
+    "description": "Notifications screen title for users who want to build a habit (intent: build_habit)"
+  },
+  "enableNotificationsBodyHabit": "People who set a reminder are far more likely to meditate regularly.",
+  "@enableNotificationsBodyHabit": {
+    "description": "Notifications screen body for users who want to build a habit (intent: build_habit)"
+  },
+  "enableNotificationsTitleStress": "Make it part of your day",
+  "@enableNotificationsTitleStress": {
+    "description": "Notifications screen title for users managing stress, sleep, or emotions (intent: stress_sleep_emotions)"
+  },
+  "enableNotificationsBodyStress": "Just a few minutes daily is enough to start feeling the difference.",
+  "@enableNotificationsBodyStress": {
+    "description": "Notifications screen body for users managing stress, sleep, or emotions (intent: stress_sleep_emotions)"
+  },
   "enableNotificationsCta": "Enable Notifications",
   "onboardingBatteryTitle": "One Setting, Smoother Meditations",
   "onboardingBatteryBody": "Your phone can pause Medito mid-session. One quick change prevents this.",

@@ -171,7 +171,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
         stepLabel: l10n.onboardingStep3of3,
         onOptionSelected: _onAttributionSelected,
       ),
-      NotificationsScreen(onNext: _nextPage),
+      NotificationsScreen(onNext: _nextPage, intentIndex: _intentIndex),
       OnboardingDonationScreen(onNext: _nextPage),
       OnboardingResultScreen(
         state: resultState,
