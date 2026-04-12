@@ -280,7 +280,11 @@
   "turnOnSmartReminders": "Turn on Smart Reminders",
   "smartRemindersOn": "Smart Reminders On",
   "donationTitle": "Millions find calm here for free. Help keep it that way.",
-  "donationBody": "Medito is run by a small nonprofit team. No ads, no investors, no paywalls. Just donations from people who use the app.",
+  "donationBody": "Medito is run by a small nonprofit team — no ads, no investors, no paywalls. It stays free because people like you choose to support it.",
+  "donationPrimerCta": "Support Medito",
+  "@donationPrimerCta": {
+    "description": "CTA button on the onboarding donation primer screen, opens the donation paywall"
+  },
   "donateNow": "Become a supporter",
   "noThanks": "No thanks",
   "next": "Next",

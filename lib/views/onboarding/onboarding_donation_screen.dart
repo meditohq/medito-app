@@ -97,7 +97,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                     Column(
                       children: [
                         _buildActionButton(
-                          text: AppLocalizations.of(context)!.next,
+                          text: AppLocalizations.of(context)!.donationPrimerCta,
                           onPressed: () => _handleDonationAction(context),
                         ),
                         if (_hasAttemptedDonation) ...[
