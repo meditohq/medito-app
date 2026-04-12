@@ -1,4 +1,7 @@
 Unreleased
+-
+
+3.6.15
 - Share daily quotes as beautiful images
 - Fixed deleting downloaded meditations
 - Improved text scaling for accessibility on splash and onboarding screens
