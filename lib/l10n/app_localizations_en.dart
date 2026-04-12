@@ -780,6 +780,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enable notifications so you never miss a session.';
 
   @override
+  String get enableNotificationsTitleLearn => 'Keep the learning going';
+
+  @override
+  String get enableNotificationsBodyLearn =>
+      'A daily reminder is the single biggest thing that helps beginners stick with it.';
+
+  @override
+  String get enableNotificationsTitleHabit => 'Build the habit you\'re after';
+
+  @override
+  String get enableNotificationsBodyHabit =>
+      'People who set a reminder are far more likely to meditate regularly.';
+
+  @override
+  String get enableNotificationsTitleStress => 'Make it part of your day';
+
+  @override
+  String get enableNotificationsBodyStress =>
+      'Just a few minutes daily is enough to start feeling the difference.';
+
+  @override
   String get enableNotificationsCta => 'Enable Notifications';
 
   @override
@@ -1929,6 +1950,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingIntentStress => 'Manage stress, sleep, or emotions';
+
+  @override
+  String get onboardingStep1of3 => '1 of 3';
+
+  @override
+  String get onboardingStep2of3 => '2 of 3';
+
+  @override
+  String get onboardingStep3of3 => '3 of 3';
+
+  @override
+  String get onboardingAttributionQuestion => 'How did you hear about Medito?';
+
+  @override
+  String get onboardingAttributionSubtext =>
+      'This helps us reach more people who need it.';
+
+  @override
+  String get onboardingAttributionGoogleAd => 'Google ad';
+
+  @override
+  String get onboardingAttributionSocialAd => 'Instagram or Facebook ad';
+
+  @override
+  String get onboardingAttributionFriend => 'A friend told me';
+
+  @override
+  String get onboardingAttributionTherapist =>
+      'Therapist or healthcare professional';
+
+  @override
+  String get onboardingAttributionAppStore => 'App Store';
+
+  @override
+  String get onboardingAttributionPlayStore => 'Play Store';
+
+  @override
+  String get onboardingAttributionOther => 'Other';
 
   @override
   String get onboardingResultLearnHeading => 'You\'re in the right place.';

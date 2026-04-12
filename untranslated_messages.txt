@@ -1,5 +1,11 @@
 {
   "es": [
+    "enableNotificationsTitleLearn",
+    "enableNotificationsBodyLearn",
+    "enableNotificationsTitleHabit",
+    "enableNotificationsBodyHabit",
+    "enableNotificationsTitleStress",
+    "enableNotificationsBodyStress",
     "trackingPermissionTitle",
     "trackingPermissionBody",
     "trackingPermissionPrivacyNote",
@@ -19,6 +25,18 @@
     "session",
     "sessions",
     "yourPathExplainerText",
-    "yourPathExplainerSwipeHint"
+    "yourPathExplainerSwipeHint",
+    "onboardingStep1of3",
+    "onboardingStep2of3",
+    "onboardingStep3of3",
+    "onboardingAttributionQuestion",
+    "onboardingAttributionSubtext",
+    "onboardingAttributionGoogleAd",
+    "onboardingAttributionSocialAd",
+    "onboardingAttributionFriend",
+    "onboardingAttributionTherapist",
+    "onboardingAttributionAppStore",
+    "onboardingAttributionPlayStore",
+    "onboardingAttributionOther"
   ]
 }

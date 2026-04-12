@@ -1544,6 +1544,42 @@ abstract class AppLocalizations {
   /// **'Enable notifications so you never miss a session.'**
   String get enableNotificationsBody;
 
+  /// Notifications screen title for users who want to learn to meditate (intent: learn_properly)
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the learning going'**
+  String get enableNotificationsTitleLearn;
+
+  /// Notifications screen body for users who want to learn to meditate (intent: learn_properly)
+  ///
+  /// In en, this message translates to:
+  /// **'A daily reminder is the single biggest thing that helps beginners stick with it.'**
+  String get enableNotificationsBodyLearn;
+
+  /// Notifications screen title for users who want to build a habit (intent: build_habit)
+  ///
+  /// In en, this message translates to:
+  /// **'Build the habit you\'re after'**
+  String get enableNotificationsTitleHabit;
+
+  /// Notifications screen body for users who want to build a habit (intent: build_habit)
+  ///
+  /// In en, this message translates to:
+  /// **'People who set a reminder are far more likely to meditate regularly.'**
+  String get enableNotificationsBodyHabit;
+
+  /// Notifications screen title for users managing stress, sleep, or emotions (intent: stress_sleep_emotions)
+  ///
+  /// In en, this message translates to:
+  /// **'Make it part of your day'**
+  String get enableNotificationsTitleStress;
+
+  /// Notifications screen body for users managing stress, sleep, or emotions (intent: stress_sleep_emotions)
+  ///
+  /// In en, this message translates to:
+  /// **'Just a few minutes daily is enough to start feeling the difference.'**
+  String get enableNotificationsBodyStress;
+
   /// No description provided for @enableNotificationsCta.
   ///
   /// In en, this message translates to:
@@ -3637,6 +3673,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage stress, sleep, or emotions'**
   String get onboardingIntentStress;
+
+  /// Step indicator label on onboarding question screen 1 (of 3)
+  ///
+  /// In en, this message translates to:
+  /// **'1 of 3'**
+  String get onboardingStep1of3;
+
+  /// Step indicator label on onboarding question screen 2 (of 3)
+  ///
+  /// In en, this message translates to:
+  /// **'2 of 3'**
+  String get onboardingStep2of3;
+
+  /// Step indicator label on onboarding attribution question screen (of 3)
+  ///
+  /// In en, this message translates to:
+  /// **'3 of 3'**
+  String get onboardingStep3of3;
+
+  /// Question on onboarding attribution screen — asking how the user discovered Medito
+  ///
+  /// In en, this message translates to:
+  /// **'How did you hear about Medito?'**
+  String get onboardingAttributionQuestion;
+
+  /// Subtext below the attribution question on onboarding
+  ///
+  /// In en, this message translates to:
+  /// **'This helps us reach more people who need it.'**
+  String get onboardingAttributionSubtext;
+
+  /// Attribution option — user found Medito via a Google ad
+  ///
+  /// In en, this message translates to:
+  /// **'Google ad'**
+  String get onboardingAttributionGoogleAd;
+
+  /// Attribution option — user found Medito via an Instagram or Facebook ad
+  ///
+  /// In en, this message translates to:
+  /// **'Instagram or Facebook ad'**
+  String get onboardingAttributionSocialAd;
+
+  /// Attribution option — user heard about Medito from a friend
+  ///
+  /// In en, this message translates to:
+  /// **'A friend told me'**
+  String get onboardingAttributionFriend;
+
+  /// Attribution option — user was recommended Medito by a therapist or healthcare professional
+  ///
+  /// In en, this message translates to:
+  /// **'Therapist or healthcare professional'**
+  String get onboardingAttributionTherapist;
+
+  /// Attribution option (iOS only) — user found Medito by browsing the App Store
+  ///
+  /// In en, this message translates to:
+  /// **'App Store'**
+  String get onboardingAttributionAppStore;
+
+  /// Attribution option (Android only) — user found Medito by browsing the Play Store
+  ///
+  /// In en, this message translates to:
+  /// **'Play Store'**
+  String get onboardingAttributionPlayStore;
+
+  /// Attribution option — user found Medito via some other means
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get onboardingAttributionOther;
 
   /// Heading on the onboarding result screen for users who are new or want to learn (State A)
   ///
