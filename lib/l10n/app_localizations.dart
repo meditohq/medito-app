@@ -1655,8 +1655,14 @@ abstract class AppLocalizations {
   /// No description provided for @donationBody.
   ///
   /// In en, this message translates to:
-  /// **'Medito is run by a small nonprofit team. No ads, no investors, no paywalls. Just donations from people who use the app.'**
+  /// **'Medito is run by a small nonprofit team — no ads, no investors, no paywalls. It stays free because people like you choose to support it.'**
   String get donationBody;
+
+  /// CTA button on the onboarding donation primer screen, opens the donation paywall
+  ///
+  /// In en, this message translates to:
+  /// **'See how to help'**
+  String get donationPrimerCta;
 
   /// No description provided for @donateNow.
   ///

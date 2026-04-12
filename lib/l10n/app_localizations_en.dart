@@ -842,7 +842,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get donationBody =>
-      'Medito is run by a small nonprofit team. No ads, no investors, no paywalls. Just donations from people who use the app.';
+      'Medito is run by a small nonprofit team — no ads, no investors, no paywalls. It stays free because people like you choose to support it.';
+
+  @override
+  String get donationPrimerCta => 'See how to help';
 
   @override
   String get donateNow => 'Become a supporter';

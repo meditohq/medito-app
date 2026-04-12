@@ -6,6 +6,7 @@
     "enableNotificationsBodyHabit",
     "enableNotificationsTitleStress",
     "enableNotificationsBodyStress",
+    "donationPrimerCta",
     "trackingPermissionTitle",
     "trackingPermissionBody",
     "trackingPermissionPrivacyNote",

@@ -860,6 +860,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Medito es gestionado por un pequeño equipo sin fines de lucro. Sin anuncios, sin inversores, sin muros de pago — solo donaciones de personas que usan la app.';
 
   @override
+  String get donationPrimerCta => 'See how to help';
+
+  @override
   String get donateNow => 'Conviértete en colaborador';
 
   @override
