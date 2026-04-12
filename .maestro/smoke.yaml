@@ -4,11 +4,18 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # ── Launch app ──
 - launchApp
-- waitForAnimationToEnd
+
+# ── Android: dismiss "Pixel Launcher isn't responding" ANR dialog on CI emulators ──
+- runFlow:
+    when:
+      visible: "(?i)isn't responding"
+    commands:
+      - tapOn:
+          text: "Wait"
+          optional: true
 
 # ── iOS simulator: dismiss OS-level "Sign in with Apple ID" dialog ──
-# The system dialog sits outside the app accessibility tree so we can't detect
-# its title text; instead we tap Cancel (optional) before waiting for the splash.
+# The system dialog sits outside the app accessibility tree; tap Cancel (optional).
 - tapOn:
     text: "Cancel"
     optional: true
