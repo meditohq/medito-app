@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
@@ -31,6 +34,16 @@ class SmartReminderTile extends ConsumerWidget {
         final time = await service.enable();
         await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
         await ref.read(reminderTimeProvider.notifier).setTime(time);
+
+        unawaited(
+          ref.read(analyticsServiceProvider).logEvent(
+            name: AnalyticsEventConstants.notificationsEnabled,
+            parameters: {
+              AnalyticsEventConstants.paramSource:
+                  AnalyticsEventConstants.sourceSettings,
+            },
+          ),
+        );
       } else {
         final prefs = ref.read(sharedPreferencesProvider);
         final service = SmartRemindersService(

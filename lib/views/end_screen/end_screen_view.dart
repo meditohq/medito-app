@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
@@ -624,6 +627,16 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       final time = await service.enable();
       await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
       await ref.read(reminderTimeProvider.notifier).setTime(time);
+
+      unawaited(
+        ref.read(analyticsServiceProvider).logEvent(
+          name: AnalyticsEventConstants.notificationsEnabled,
+          parameters: {
+            AnalyticsEventConstants.paramSource:
+                AnalyticsEventConstants.sourceEndScreen,
+          },
+        ),
+      );
 
       if (mounted) {
         setState(() {});

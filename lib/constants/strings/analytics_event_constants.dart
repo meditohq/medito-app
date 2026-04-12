@@ -277,6 +277,19 @@ class AnalyticsEventConstants {
   static const String onboardingAttributionAnswered =
       'onboarding_attribution_answered';
 
+  /// Event logged when the user enables smart reminders/notifications.
+  /// Parameter: paramSource ('end_screen', 'settings')
+  static const String notificationsEnabled = 'notifications_enabled';
+
+  /// Parameter name for the source screen that triggered a notifications_enabled event
+  static const String paramSource = 'source';
+
+  /// Source value for notifications enabled from the end screen
+  static const String sourceEndScreen = 'end_screen';
+
+  /// Source value for notifications enabled from the settings screen
+  static const String sourceSettings = 'settings';
+
   // Favourite events
   /// Event logged when user adds a track to favourites from the track screen
   static const String trackFavourited = 'track_favourited';
