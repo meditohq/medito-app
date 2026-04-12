@@ -11,71 +11,6 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 60000
 - tapOn: "Continue"
 
-# ── Onboarding: Notifications ──
-# Anonymous sign-in can take a while on first launch (clearState wipes the account)
-- extendedWaitUntil:
-    visible: "Skip for Now"
-    timeout: 60000
-- tapOn: "Skip for Now"
-
-# ── Onboarding: Donation ──
-# Tap "Next" which either opens the Superwall paywall (native modal) or
-# an external browser (when Google Pay / Superwall aren't available).
-- extendedWaitUntil:
-    visible: "Next"
-    timeout: 20000
-- tapOn: "Next"
-- waitForAnimationToEnd
-- takeScreenshot: after-donation-next
-
-# If Superwall loaded, verify the donation tabs are present.
-# On Android: press back to dismiss the paywall.
-# On iOS: wait for the close (X) button to appear and tap it.
-- runFlow:
-    when:
-      visible: "(?i)monthly"
-    commands:
-      - assertVisible: "(?i)yearly"
-      - takeScreenshot: superwall-paywall
-      - runFlow:
-          when:
-            platform: Android
-          commands:
-            - pressKey: back
-      - runFlow:
-          when:
-            platform: iOS
-          commands:
-            # Donation page may open as Superwall native modal (has ✕ close button)
-            # or in SFSafariViewController. In either case try to close and fall
-            # through to the home+relaunch fallback below.
-            - tapOn:
-                text: "(?i)close|✕|×"
-                optional: true
-
-# If not back on the donation/onboarding screen, press Home and relaunch.
-- runFlow:
-    when:
-      notVisible: "Skip for Now"
-    commands:
-      - pressKey: home
-      - launchApp:
-          stopApp: false
-
-# ── Remaining onboarding ──
-# On iOS the browser donation page keeps the app running in the background and
-# onboarding may auto-advance while the browser is open, so every step after
-# the donation screen is conditional.
-
-- runFlow:
-    when:
-      visible: "Skip for Now"
-    commands:
-      - tapOn:
-          text: "Skip for Now"
-          retryTapIfNoChange: true
-      - takeScreenshot: after-donation-skip
-
 # ── Onboarding: Tracking permission (iOS only) ──
 - runFlow:
     when:
@@ -98,18 +33,78 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           optional: true
 
 # ── Onboarding: Experience question ──
-- runFlow:
-    when:
-      visible: "Never tried it"
-    commands:
-      - tapOn: "Never tried it"
+# Anonymous sign-in can take a while on first launch (clearState wipes the account)
+- extendedWaitUntil:
+    visible: "Never tried it"
+    timeout: 60000
+- tapOn: "Never tried it"
 
 # ── Onboarding: Intent question ──
+- extendedWaitUntil:
+    visible: "Build a regular habit"
+    timeout: 10000
+- tapOn: "Build a regular habit"
+
+# ── Onboarding: Attribution question ──
+- extendedWaitUntil:
+    visible: "A friend told me"
+    timeout: 10000
+- tapOn: "A friend told me"
+
+# ── Onboarding: Notifications ──
+- extendedWaitUntil:
+    visible: "Skip for Now"
+    timeout: 20000
+- tapOn: "Skip for Now"
+
+# ── Onboarding: Donation ──
+# Tap "See how to help" which opens the donation paywall
+- extendedWaitUntil:
+    visible: "See how to help"
+    timeout: 20000
+- tapOn: "See how to help"
+- waitForAnimationToEnd
+- takeScreenshot: after-donation-tap
+
+# If paywall loaded, verify the donation tabs are present then dismiss.
+# On Android: press back. On iOS: tap the close (X) button.
 - runFlow:
     when:
-      visible: "Build a regular habit"
+      visible: "(?i)monthly"
     commands:
-      - tapOn: "Build a regular habit"
+      - assertVisible: "(?i)yearly"
+      - takeScreenshot: donation-paywall
+      - runFlow:
+          when:
+            platform: Android
+          commands:
+            - pressKey: back
+      - runFlow:
+          when:
+            platform: iOS
+          commands:
+            - tapOn:
+                text: "(?i)close|✕|×"
+                optional: true
+
+# If not back on the donation screen, press Home and relaunch.
+- runFlow:
+    when:
+      notVisible: "See how to help"
+    commands:
+      - pressKey: home
+      - launchApp:
+          stopApp: false
+
+# After dismissing the paywall, "Skip for Now" appears below the button.
+- runFlow:
+    when:
+      visible: "Skip for Now"
+    commands:
+      - tapOn:
+          text: "Skip for Now"
+          retryTapIfNoChange: true
+      - takeScreenshot: after-donation-skip
 
 # ── Onboarding: Result screen ──
 - runFlow:
