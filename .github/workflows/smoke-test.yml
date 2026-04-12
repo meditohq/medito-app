@@ -1,12 +1,6 @@
 name: Smoke Test
 
 on:
-  workflow_call:
-    inputs:
-      platforms:
-        description: 'Platforms to test (both | android | ios)'
-        default: 'both'
-        type: string
   workflow_dispatch:
     inputs:
       platforms:
