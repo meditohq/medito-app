@@ -37,9 +37,9 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   bool _questionFlowStartedLogged = false;
 
   int get _firstQuestionPageIndex {
-    var index = 1; // after Donation (0)
-    if (Platform.isIOS) index++;
-    if (_showBatteryScreen) index++;
+    var index = 0; // questions come first (after optional system screens only)
+    if (Platform.isIOS) index++; // tracking permission
+    if (_showBatteryScreen) index++; // battery optimization
     return index;
   }
 
@@ -130,7 +130,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     );
 
     return [
-      OnboardingDonationScreen(onNext: _nextPage),
       if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),
       if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
       OnboardingQuestionScreen(
@@ -172,15 +171,16 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
         stepLabel: l10n.onboardingStep3of3,
         onOptionSelected: _onAttributionSelected,
       ),
+      NotificationsScreen(onNext: _nextPage),
+      OnboardingDonationScreen(onNext: _nextPage),
       OnboardingResultScreen(
         state: resultState,
-        onGetStarted: _nextPage,
+        onGetStarted: _onGetStarted,
       ),
-      NotificationsScreen(onNext: _onComplete),
     ];
   }
 
-  Future<void> _onComplete() async {
+  Future<void> _onGetStarted() async {
     unawaited(
       ref.read(analyticsServiceProvider).logEvent(
         name: AnalyticsEventConstants.onboardingCompleted,
