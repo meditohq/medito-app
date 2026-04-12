@@ -46,13 +46,14 @@ on:
         default: ''
         type: string
       ios_lane:
-        description: 'iOS lane: beta (TestFlight) or release (App Store draft)'
+        description: 'iOS lane: beta (TestFlight), release (App Store draft), or both'
         required: true
         default: 'beta'
         type: choice
         options:
           - beta
           - release
+          - both
 
 jobs:
   android-deploy:
@@ -598,4 +599,9 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
-        run: fastlane ${{ github.event_name == 'push' && 'release' || inputs.ios_lane || 'beta' }}
+        run: |
+          if [ "${{ github.event_name == 'push' && 'release' || inputs.ios_lane || 'beta' }}" = "both" ]; then
+            fastlane beta && fastlane release
+          else
+            fastlane ${{ github.event_name == 'push' && 'release' || inputs.ios_lane || 'beta' }}
+          fi
