@@ -5,23 +5,30 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # ── Launch app ──
 - launchApp
 
-# ── Android: dismiss "Pixel Launcher isn't responding" ANR dialog on CI emulators ──
+# ── Android only: dismiss "Pixel Launcher isn't responding" ANR dialog on CI ──
+# Wrapped in platform:Android so iOS doesn't spend ~50 s on an irrelevant check.
 - runFlow:
     when:
-      visible: "(?i)isn't responding"
+      platform: Android
     commands:
-      - tapOn:
-          text: "Wait"
-          optional: true
+      - runFlow:
+          when:
+            visible: "(?i)isn't responding"
+          commands:
+            - tapOn:
+                text: "Wait"
+                optional: true
 
-# ── iOS simulator: dismiss OS-level "Sign in with Apple ID" dialog ──
-# runFlow when:visible skips instantly if the button isn't present,
-# unlike tapOn optional:true which blocks for the full default timeout.
+# ── iOS only: dismiss OS-level "Sign in with Apple ID" dialog if present ──
 - runFlow:
     when:
-      visible: "Cancel"
+      platform: iOS
     commands:
-      - tapOn: "Cancel"
+      - runFlow:
+          when:
+            visible: "Cancel"
+          commands:
+            - tapOn: "Cancel"
 
 # ── Splash screen ──
 - extendedWaitUntil:
