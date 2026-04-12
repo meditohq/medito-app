@@ -167,14 +167,25 @@ Future<bool?> handleDonationNavigation(
 
   // Stripe's publishable key is set lazily when paymentConfigProvider resolves.
   // Without this, isPlatformPaySupported() throws StripeConfigException.
+  // Timeout guards against the API hanging indefinitely (e.g. on emulators).
   try {
-    await ref.read(paymentConfigProvider.future);
+    await ref
+        .read(paymentConfigProvider.future)
+        .timeout(const Duration(seconds: 5));
+  } on TimeoutException {
+    AppLogger.w('ROUTES', 'Payment config load timed out — proceeding without Stripe init');
   } catch (e) {
     AppLogger.w('ROUTES', 'Could not preload payment config: $e');
   }
 
   // Check if we should use Superwall or web donation
-  final useSuperwall = await shouldUseSuperwallForDonation();
+  bool useSuperwall;
+  try {
+    useSuperwall = await shouldUseSuperwallForDonation();
+  } catch (e) {
+    AppLogger.w('ROUTES', 'shouldUseSuperwallForDonation threw: $e — falling back to web');
+    useSuperwall = false;
+  }
 
   if (!useSuperwall) {
     final uri = Uri.parse('https://donate.meditofoundation.org');

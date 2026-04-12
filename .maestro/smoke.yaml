@@ -134,13 +134,38 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - assertVisible: "Home"
 
 # ── Play a session via Your Daily ──
+# Wait for the skeleton shimmer to resolve and real content to load.
+# On a fresh install, anonymous auth + home API can take up to 60 s.
+- extendedWaitUntil:
+    visible: "Your Daily"
+    timeout: 60000
 # On small screens the shortcut may be below the fold
 - scrollUntilVisible:
     element: "Your Daily"
     direction: DOWN
     timeout: 15000
+    speed: 20
+    waitToSettleTimeoutMs: 500
     centerElement: true
 - tapOn: "Your Daily"
+
+# Your Daily may open a track (Play visible immediately) or a pack (list of sessions).
+# If it opened a pack, tap the first session in the list to reach a track view.
+- runFlow:
+    when:
+      notVisible: "Play"
+    commands:
+      - extendedWaitUntil:
+          visible: "(?i)\\d+ - \\d+ min"
+          timeout: 10000
+      - scrollUntilVisible:
+          element: "(?i)\\d+ - \\d+ min"
+          direction: DOWN
+          timeout: 10000
+          visibilityPercentage: 50
+      - tapOn:
+          text: "(?i)\\d+ - \\d+ min"
+          index: 0
 
 # Track view loads with a play button
 - extendedWaitUntil:
