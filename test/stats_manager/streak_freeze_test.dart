@@ -277,6 +277,289 @@ void main() {
       expect(result.streakCurrent, 5);
       expect(result.streakLongest, 10);
     });
+  });
 
+  group('StatsManager - Streak Freeze Edge Cases', () {
+    test('calculateStreak returns 0 when all entries are freeze-only (no real sessions)',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var mar6 = DateTime(2025, 3, 6);
+      var mar7 = DateTime(2025, 3, 7);
+
+      // Only freeze entries in audioCompleted, no real sessions
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar7.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar6.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 5,
+        streakLongest: 10,
+        totalTracksCompleted: 0,
+        totalTimeListened: 0,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // No real sessions → streak must be 0 regardless of freeze entries
+      expect(result.streakCurrent, 0);
+      expect(result.streakLongest, 10); // Longest streak unchanged
+    });
+
+    test('calculateStreak returns 0 when today is freeze-only and yesterday has no activity',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var mar5 = DateTime(2025, 3, 5);
+      var mar7 = DateTime(2025, 3, 7);
+
+      // Real sessions exist but not on yesterday; today is freeze-only
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar7.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '1', timestamp: mar5.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 0,
+        streakLongest: 5,
+        totalTracksCompleted: 1,
+        totalTimeListened: 60,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // Today is freeze-only and yesterday has no activity → streak 0
+      expect(result.streakCurrent, 0);
+    });
+
+    test('calculateStreak counts real sessions going back when today is freeze-only',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var mar5 = DateTime(2025, 3, 5);
+      var mar6 = DateTime(2025, 3, 6);
+      var mar7 = DateTime(2025, 3, 7);
+
+      // Today is freeze-only; yesterday and earlier have real sessions
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar7.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '1', timestamp: mar6.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '2', timestamp: mar5.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 0,
+        streakLongest: 0,
+        totalTracksCompleted: 2,
+        totalTimeListened: 120,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // Today's freeze bridges to yesterday; streak = 2 real days (Mar 5-6)
+      // Freeze-only today does not increment the counter
+      expect(result.streakCurrent, 2);
+    });
+
+    test('calculateStreak treats day as real when it has both a real session and a freeze entry',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var mar7 = DateTime(2025, 3, 7);
+
+      // Today has both a real session and a freeze entry
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: '1', timestamp: mar7.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar7.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 0,
+        streakLongest: 0,
+        totalTracksCompleted: 1,
+        totalTimeListened: 60,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // Real session wins — day counts as real, streak = 1
+      expect(result.streakCurrent, 1);
+    });
+
+    test('calculateStreak returns correct count when today and yesterday are both freeze-only',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var mar5 = DateTime(2025, 3, 5);
+      var mar6 = DateTime(2025, 3, 6);
+      var mar7 = DateTime(2025, 3, 7);
+
+      // Today and yesterday are freeze-only; real session 2 days ago
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar7.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar6.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '1', timestamp: mar5.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 0,
+        streakLongest: 0,
+        totalTracksCompleted: 1,
+        totalTimeListened: 60,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // Two consecutive freeze days bridge back to 1 real session
+      expect(result.streakCurrent, 1);
+    });
+
+    test('calculateStreak does not inflate longestStreak with freeze-only days',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var mar3 = DateTime(2025, 3, 3);
+      var mar4 = DateTime(2025, 3, 4); // freeze
+      var mar5 = DateTime(2025, 3, 5);
+      var mar6 = DateTime(2025, 3, 6); // freeze
+      var mar7 = DateTime(2025, 3, 7);
+
+      // 3 real days, 2 freeze bridges — streak = 3, not 5
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: '1', timestamp: mar7.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar6.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '2', timestamp: mar5.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar4.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '3', timestamp: mar3.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 0,
+        streakLongest: 0,
+        totalTracksCompleted: 3,
+        totalTimeListened: 180,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // Freeze days bridge gaps but do not count — streak is 3 real days, not 5
+      expect(result.streakCurrent, 3);
+      expect(result.streakLongest, 3);
+    });
+
+    test('calculateStreak is unaffected by a freeze entry from months ago',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var jan1 = DateTime(2025, 1, 1); // Old freeze — 65 days ago
+      var mar6 = DateTime(2025, 3, 6);
+      var mar7 = DateTime(2025, 3, 7);
+
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: '1', timestamp: mar7.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '2', timestamp: mar6.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: jan1.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 0,
+        streakLongest: 0,
+        totalTracksCompleted: 2,
+        totalTimeListened: 120,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // Old freeze does not affect current streak — streak = 2 (Mar 6-7)
+      expect(result.streakCurrent, 2);
+    });
+
+    test('calculateStreak handles duplicate freeze entries on the same day correctly',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var mar5 = DateTime(2025, 3, 5);
+      var mar6 = DateTime(2025, 3, 6);
+      var mar7 = DateTime(2025, 3, 7);
+
+      // Mar 6 has two freeze entries (e.g. from both legacy and new-style storage)
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: '1', timestamp: mar7.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: 'streak-freeze', timestamp: mar6.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '1', timestamp: mar5.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 0,
+        streakLongest: 0,
+        totalTracksCompleted: 2,
+        totalTimeListened: 120,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [
+          mar6.millisecondsSinceEpoch, // Same day as audioCompleted freeze
+        ],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // Duplicate freeze on same day should not cause double-counting or errors
+      // Streak = 2 real days (Mar 5 and Mar 7), freeze bridges the gap
+      expect(result.streakCurrent, 2);
+    });
+
+    test('calculateStreak returns 0 when no activity within yesterday or today despite old real sessions',
+        () {
+      final testDate = DateTime(2025, 3, 7);
+      statsManager.setCurrentDateForTesting(testDate);
+
+      var mar1 = DateTime(2025, 3, 1);
+      var mar2 = DateTime(2025, 3, 2);
+      var mar3 = DateTime(2025, 3, 3);
+
+      // Real sessions exist but all more than 1 day ago — streak should be 0
+      var mockStats = LocalAllStats(
+        tracksChecked: [],
+        audioCompleted: [
+          LocalAudioCompleted(id: '1', timestamp: mar3.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '2', timestamp: mar2.millisecondsSinceEpoch),
+          LocalAudioCompleted(id: '3', timestamp: mar1.millisecondsSinceEpoch),
+        ],
+        streakCurrent: 3,
+        streakLongest: 10,
+        totalTracksCompleted: 3,
+        totalTimeListened: 180,
+        updated: testDate.millisecondsSinceEpoch,
+        freezeUsageDates: [],
+      );
+
+      var result = statsManager.calculateStreak(mockStats);
+
+      // No activity today or yesterday — streak resets to 0
+      expect(result.streakCurrent, 0);
+      expect(result.streakLongest, 10); // Longest streak preserved
+    });
   });
 }
