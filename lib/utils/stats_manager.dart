@@ -381,170 +381,65 @@ class StatsManager {
     var today = DateTime(now.year, now.month, now.day);
     var longestStreak = allStats.streakLongest;
 
-    //dev.log'===== STREAK CALCULATION DEBUG =====');
-    //dev.log'Current date for calculation: ${today.toIso8601String()}');
-    //dev.log'Initial longest streak: $longestStreak');
+    // Build a map of calendar day → hasRealSession.
+    // true  = at least one real meditation that day
+    // false = only freeze entries that day (bridges gap, doesn't count)
+    final activityByDate = <DateTime, bool>{};
 
-    // Split audioCompleted into real sessions and freeze entries
-    final realAudio =
-        allStats.audioCompleted?.where((a) => !isFreezeSession(a)).toList() ??
-        [];
-
-    // Early return when there are no real meditation sessions
-    if (realAudio.isEmpty) {
-      return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
+    for (final entry in allStats.audioCompleted ?? []) {
+      final date = DateTime.fromMillisecondsSinceEpoch(entry.timestamp);
+      final day = DateTime(date.year, date.month, date.day);
+      if (day.isAfter(today)) continue;
+      final isReal = !isFreezeSession(entry);
+      // Once a day is marked real, keep it real even if a freeze also exists
+      activityByDate[day] = (activityByDate[day] ?? false) || isReal;
     }
 
-    // Convert real audio completed to dates (year-month-day format)
-    var audioDates = realAudio.map((audio) {
-      var date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-      return DateTime(date.year, date.month, date.day);
-    }).toList();
-
-    // Combine freeze dates from the legacy freezeUsageDates field and the
-    // newer freeze entries stored directly in audioCompleted
-    var freezeDates = [
-      ...allStats.freezeUsageDates.map((timestamp) {
-        var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-        return DateTime(date.year, date.month, date.day);
-      }),
-      ...(allStats.audioCompleted ?? []).where((a) => isFreezeSession(a)).map((
-        a,
-      ) {
-        var date = DateTime.fromMillisecondsSinceEpoch(a.timestamp);
-        return DateTime(date.year, date.month, date.day);
-      }),
-    ].toList();
-
-    // Remove duplicate dates
-    audioDates = audioDates.toSet().toList();
-    //dev.log
-    //'Unique audio dates: ${audioDates.map((d) => d.toIso8601String()).toList()}');
-
-    freezeDates = freezeDates.toSet().toList();
-    //dev.log
-    // 'Unique freeze dates: ${freezeDates.map((d) => d.toIso8601String()).toList()}');
-
-    // Only use freeze dates that don't already have activity and aren't in the future
-    freezeDates = freezeDates
-        .where((date) => !audioDates.contains(date) && !date.isAfter(today))
-        .toList();
-    //dev.log
-    //'Filtered freeze dates: ${freezeDates.map((d) => d.toIso8601String()).toList()}');
-
-    // Combine all activity dates and freeze dates
-    var allActivityDates = [...audioDates, ...freezeDates];
-
-    // Sort dates in descending order (newest first)
-    allActivityDates.sort((a, b) => b.compareTo(a));
-    //dev.log
-    // 'All activity dates (sorted): ${allActivityDates.map((d) => d.toIso8601String()).toList()}');
-
-    // No dates at all
-    if (allActivityDates.isEmpty) {
-      //dev.log'No activity dates, returning zero streak');
-      return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
-    }
-
-    // Check if there's any activity (real or freeze) on today
-    var hasActivityToday = allActivityDates.any(
-      (date) =>
-          date.year == today.year &&
-          date.month == today.month &&
-          date.day == today.day,
-    );
-
-    // Check if there's real meditation activity on today
-    var hasRealActivityToday = audioDates.any(
-      (date) =>
-          date.year == today.year &&
-          date.month == today.month &&
-          date.day == today.day,
-    );
-
-    // Check yesterday's activity (real or freeze, for continuity)
-    // DST-safe: Duration(days:1) can skip a calendar day at spring-forward.
-    var yesterday = DateTime(today.year, today.month, today.day - 1);
-    //dev.log
-    //'Checking for activity on yesterday: ${yesterday.toIso8601String()}');
-
-    var hasActivityYesterday = allActivityDates.any(
-      (date) =>
-          date.year == yesterday.year &&
-          date.month == yesterday.month &&
-          date.day == yesterday.day,
-    );
-    //dev.log'Has activity yesterday: $hasActivityYesterday');
-
-    // If there's no activity today or yesterday, streak is 0
-    if (!hasActivityToday && !hasActivityYesterday) {
-      //dev.log'No activity today or yesterday, returning streak = 0');
-      return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
-    }
-
-    // If there's activity today but not yesterday, streak starts fresh
-    if (hasActivityToday && !hasActivityYesterday) {
-      // Only count as 1 if there's real meditation today, not just a freeze
-      var realStreak = hasRealActivityToday ? 1 : 0;
-      //dev.log'Activity today but not yesterday, returning streak = $realStreak');
-      return allStats.copyWith(
-        streakCurrent: realStreak,
-        streakLongest: longestStreak > realStreak ? longestStreak : realStreak,
-      );
-    }
-
-    // Start counting: only real meditation days count toward the streak number,
-    // but freeze days maintain continuity (don't break the streak).
-    var streak = hasRealActivityToday ? 1 : 0;
-
-    // Count consecutive days starting from yesterday
-    var checkDate = yesterday;
-    //dev.log'Starting to count consecutive days from yesterday');
-
-    while (true) {
-      var hasActivityOnDate = allActivityDates.any(
-        (date) =>
-            date.year == checkDate.year &&
-            date.month == checkDate.month &&
-            date.day == checkDate.day,
-      );
-
-      if (hasActivityOnDate) {
-        // Only count real meditation days toward the streak number
-        var hasRealActivityOnDate = audioDates.any(
-          (date) =>
-              date.year == checkDate.year &&
-              date.month == checkDate.month &&
-              date.day == checkDate.day,
-        );
-        if (hasRealActivityOnDate) {
-          streak++;
-        }
-        //dev.log
-        //            'Found activity on ${checkDate.toIso8601String()}, real=$hasRealActivityOnDate, streak = $streak');
-        // DST-safe day decrement.
-        checkDate = DateTime(
-          checkDate.year,
-          checkDate.month,
-          checkDate.day - 1,
-        );
-      } else {
-        // No activity on this date, break the streak
-        //dev.log
-        // 'No activity on ${checkDate.toIso8601String()}, breaking streak');
-        break;
+    // Legacy freeze dates (local-only field, kept for backwards compatibility)
+    for (final ts in allStats.freezeUsageDates) {
+      final date = DateTime.fromMillisecondsSinceEpoch(ts);
+      final day = DateTime(date.year, date.month, date.day);
+      if (!day.isAfter(today)) {
+        activityByDate[day] ??= false;
       }
     }
 
-    // Update longest streak if necessary
-    if (streak > longestStreak) {
-      //dev.log'New longest streak: $streak (was $longestStreak)');
-      longestStreak = streak;
+    // No real sessions at all → streak is 0
+    if (!activityByDate.values.any((isReal) => isReal)) {
+      return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
     }
 
-    //dev.log
-    // 'Final streak calculation: current=$streak, longest=$longestStreak');
-    //dev.log'===== END STREAK CALCULATION =====');
+    // DST-safe yesterday
+    final yesterday = DateTime(today.year, today.month, today.day - 1);
+
+    final hasActivityToday = activityByDate.containsKey(today);
+    final hasActivityYesterday = activityByDate.containsKey(yesterday);
+
+    // Streak is 0 if neither today nor yesterday has any activity
+    if (!hasActivityToday && !hasActivityYesterday) {
+      return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
+    }
+
+    // Activity today but not yesterday → fresh streak of 1 (or 0 if freeze-only today)
+    if (hasActivityToday && !hasActivityYesterday) {
+      final streak = (activityByDate[today]!) ? 1 : 0;
+      return allStats.copyWith(
+        streakCurrent: streak,
+        streakLongest: longestStreak > streak ? longestStreak : streak,
+      );
+    }
+
+    // Walk backwards counting consecutive days.
+    // Real days increment the counter; freeze-only days bridge the gap without incrementing.
+    var streak = (activityByDate[today] ?? false) ? 1 : 0;
+    var checkDate = yesterday;
+
+    while (activityByDate.containsKey(checkDate)) {
+      if (activityByDate[checkDate]!) streak++;
+      checkDate = DateTime(checkDate.year, checkDate.month, checkDate.day - 1);
+    }
+
+    if (streak > longestStreak) longestStreak = streak;
 
     return allStats.copyWith(
       streakCurrent: streak,
