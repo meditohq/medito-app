@@ -252,11 +252,6 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
           }),
         );
 
-        final featureFlags = ref.watch(featureFlagsProvider);
-        if (featureFlags.isStreakFreezeEnabled) {
-          // _checkForFreezeUsage(ref);
-        }
-
         final locale = ref.watch(localeProvider);
         final themeMode = ref.watch(themeProvider);
 

@@ -4,7 +4,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
-import 'package:medito/providers/feature_flags_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/streak_circle_provider.dart';
@@ -347,41 +346,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
     );
   }
 
-  Widget _buildStreakFreezeRow(
-    BuildContext context,
-    LocalAllStats stats,
-    WidgetRef ref,
-  ) {
-    final isStreakFreezeEnabled =
-        ref.watch(featureFlagsProvider).isStreakFreezeEnabled;
-
-    if (!isStreakFreezeEnabled) {
-      return const SizedBox.shrink();
-    }
-
-    final currentFreezes = stats.streakFreezes ?? 0;
-    final maxFreezes = stats.maxStreakFreezes ?? 0;
-
-    return RowItemWidget(
-      icon: MeditoIcon(
-        assetName: MeditoIcons.snow,
-        color: Theme.of(context).colorScheme.onSurface,
-        size: 20,
-      ),
-      iconColor: Theme.of(context).colorScheme.onSurface,
-      trailingIconSize: 20,
-      title: '$currentFreezes / $maxFreezes',
-      subTitle: 'Streak Freezes',
-      hasUnderline: false,
-      isTrailingIcon: false,
-      titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            fontFamily: dmSans,
-          ),
-    );
-  }
-
   String _formatTotalTimeListened(int milliseconds) {
     var hours = milliseconds ~/ (1000 * 60 * 60);
     var minutes = (milliseconds % (1000 * 60 * 60)) ~/ (1000 * 60);
@@ -403,9 +367,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
   }
 
   Column _statsList(BuildContext context, LocalAllStats stats, WidgetRef ref) {
-    final isStreakFreezeEnabled =
-        ref.watch(featureFlagsProvider).isStreakFreezeEnabled;
-    final shouldShowTotalTimeUnderline = isStreakFreezeEnabled;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -449,9 +410,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                 context,
                 AppLocalizations.of(context)!.totalTimeListened,
                 _formatTotalTimeListened(stats.totalTimeListened),
-                hasUnderline: shouldShowTotalTimeUnderline,
+                hasUnderline: false,
               ),
-              _buildStreakFreezeRow(context, stats, ref),
             ],
           ),
         ),

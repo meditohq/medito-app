@@ -7,7 +7,6 @@ import '../constants/types/type_constants.dart';
 import '../constants/strings/shared_preference_constants.dart';
 import '../providers/notification/reminder_provider.dart';
 import '../services/reminders/smart_reminders_service.dart';
-import '../providers/feature_flags_provider.dart';
 import '../providers/stats_provider.dart';
 import '../providers/home/up_next_provider.dart';
 import '../providers/settings/settings_providers.dart';
@@ -82,10 +81,6 @@ Future<bool> handleStats(
 
     var duration = payload[TypeConstants.durationIdKey];
 
-    // Get stats before update for comparison
-    var statsBefore = await statsManager.localAllStats;
-    var previousStreak = statsBefore.streakCurrent;
-
     await statsManager.addAudioCompleted(newAudioCompleted, duration);
     AppLogger.d('STATS',
         'Stats updated successfully for track ${newAudioCompleted.id}');
@@ -107,31 +102,6 @@ Future<bool> handleStats(
     } catch (analyticsError) {
       AppLogger.e('STATS', 'Failed to log analytics event', analyticsError);
     }
-
-    // Check if user earned a new streak freeze
-    bool isStreakFreezeEnabled = false;
-    final context = navigatorKey.currentContext;
-    if (context != null && context.mounted) {
-      try {
-        final container = ProviderScope.containerOf(context);
-        final featureFlags = container.read(featureFlagsProvider);
-        isStreakFreezeEnabled = featureFlags.isStreakFreezeEnabled;
-      } catch (_) {
-        // Fallback: read directly from SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        isStreakFreezeEnabled = prefs.getBool('streak_freeze_enabled') ?? false;
-      }
-    } else {
-      // Fallback: read directly from SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      isStreakFreezeEnabled = prefs.getBool('streak_freeze_enabled') ?? false;
-    }
-
-    await _checkAndAwardStreakFreeze(
-      statsManager: statsManager,
-      previousStreak: previousStreak,
-      isStreakFreezeEnabled: isStreakFreezeEnabled,
-    );
 
     // Refresh the stats provider and invalidate upNextProvider
     await _refreshStatsAndUpNext();
@@ -298,112 +268,6 @@ Future<bool> _updateHealthKit(Map<String, dynamic> payload) async {
   return await HealthKitManager().writeMindfulnessData(start, end);
 }
 
-const int _streakFreezeInterval = 3;
-
-Future<void> _checkAndAwardStreakFreeze({
-  required StatsManager statsManager,
-  required int previousStreak,
-  required bool isStreakFreezeEnabled,
-}) async {
-  try {
-    AppLogger.d('STREAK_FREEZE', '=== Starting streak freeze check ===');
-    AppLogger.d('STREAK_FREEZE', 'Previous streak: $previousStreak');
-    AppLogger.d('STREAK_FREEZE', 'Feature enabled: $isStreakFreezeEnabled');
-
-    if (!isStreakFreezeEnabled) {
-      AppLogger.d('STREAK_FREEZE', 'Feature disabled, returning early');
-      return;
-    }
-
-    var currentStats = await statsManager.localAllStats;
-    var currentStreak = currentStats.streakCurrent;
-    AppLogger.d('STREAK_FREEZE', 'Current streak: $currentStreak');
-
-    final previousMilestone = (previousStreak / _streakFreezeInterval).floor();
-    final currentMilestone = (currentStreak / _streakFreezeInterval).floor();
-    AppLogger.d('STREAK_FREEZE',
-        'Previous milestone: $previousMilestone, Current milestone: $currentMilestone');
-    AppLogger.d('STREAK_FREEZE',
-        'Streak % $_streakFreezeInterval = ${currentStreak % _streakFreezeInterval}');
-    if (currentStreak > 0 &&
-        currentMilestone > previousMilestone &&
-        currentStreak % _streakFreezeInterval == 0) {
-      AppLogger.d('STREAK_FREEZE', 'Milestone conditions met!');
-
-      // Check if user hasn't already reached max streak freezes
-      final currentFreezes = currentStats.streakFreezes ?? 0;
-      final maxFreezes = currentStats.maxStreakFreezes ?? 0;
-      AppLogger.d('STREAK_FREEZE',
-          'Current freezes: $currentFreezes, Max freezes: $maxFreezes');
-
-      if (currentFreezes < maxFreezes) {
-        AppLogger.d('STREAK_FREEZE', 'Under max freezes limit');
-
-        // Check if we've already awarded a freeze today (max 1 per day)
-        final hasAwardedToday = await _hasAwardedFreezeToday();
-        AppLogger.d('STREAK_FREEZE', 'Already awarded today: $hasAwardedToday');
-
-        if (!hasAwardedToday) {
-          AppLogger.d('STREAK_FREEZE', 'AWARDING STREAK FREEZE!');
-
-          // Award one new streak freeze
-          await statsManager.awardStreakFreeze();
-
-          // Mark that we've awarded a freeze today
-          await _markFreezeAwardedToday();
-
-          AppLogger.d('STREAK_FREEZE',
-              'Awarded streak freeze for reaching $currentStreak-day milestone');
-
-          // Show snackbar notification
-          final context = navigatorKey.currentContext;
-          AppLogger.d('STREAK_FREEZE',
-              'Navigator context available: ${context != null}');
-          if (context != null && context.mounted) {
-            AppLogger.d('STREAK_FREEZE', 'Showing snackbar...');
-            showSnackBar(
-                context, AppLocalizations.of(context)!.streakFreezeEarned);
-          } else {
-            AppLogger.w('STREAK_FREEZE', 'No context available for snackbar');
-          }
-        } else {
-          AppLogger.d('STREAK_FREEZE',
-              'Skipped awarding freeze - already awarded one today');
-        }
-      } else {
-        AppLogger.d('STREAK_FREEZE', 'Already at max freezes');
-      }
-    } else {
-      AppLogger.d('STREAK_FREEZE', 'Milestone conditions NOT met');
-      AppLogger.d('STREAK_FREEZE', 'currentStreak > 0: ${currentStreak > 0}');
-      AppLogger.d('STREAK_FREEZE',
-          'currentMilestone > previousMilestone: ${currentMilestone > previousMilestone}');
-      AppLogger.d(
-          'STREAK_FREEZE', 'currentStreak % 7 == 0: ${currentStreak % 7 == 0}');
-    }
-  } catch (e) {
-    AppLogger.e('STREAK_FREEZE', 'Error checking for streak freeze award', e);
-  }
-}
-
-/// Checks if a streak freeze has already been awarded today
-Future<bool> _hasAwardedFreezeToday() async {
-  final prefs = await SharedPreferences.getInstance();
-  final lastAwardDate = prefs.getString('last_streak_freeze_award_date');
-  final today =
-      DateTime.now().toIso8601String().substring(0, 10); // YYYY-MM-DD format
-
-  return lastAwardDate == today;
-}
-
-/// Marks that a streak freeze has been awarded today
-Future<void> _markFreezeAwardedToday() async {
-  final prefs = await SharedPreferences.getInstance();
-  final today =
-      DateTime.now().toIso8601String().substring(0, 10); // YYYY-MM-DD format
-  await prefs.setString('last_streak_freeze_award_date', today);
-}
-
 /// Saves a consistency score entry to historical data
 /// Each entry contains the score and datetime timestamp
 Future<void> saveConsistencyScoreHistory(
@@ -534,39 +398,10 @@ Future<bool> addManualSession({
     // Initialize stats manager if not provided
     statsManager ??= StatsManager()..initialize();
 
-    // Get stats before update for comparison
-    final statsBefore = await statsManager.localAllStats;
-    final previousStreak = statsBefore.streakCurrent;
-
     // Add the manual session (this will update streaks, consistency score, etc.)
     await statsManager.addAudioCompleted(manualSession, durationMs);
     AppLogger.d('STATS',
         'Manual session added successfully for ${dateTime.toString()}');
-
-    // Check if user earned a new streak freeze
-    bool isStreakFreezeEnabled = false;
-    final context = navigatorKey.currentContext;
-    if (context != null && context.mounted) {
-      try {
-        final container = ProviderScope.containerOf(context);
-        final featureFlags = container.read(featureFlagsProvider);
-        isStreakFreezeEnabled = featureFlags.isStreakFreezeEnabled;
-      } catch (_) {
-        // Fallback: read directly from SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        isStreakFreezeEnabled = prefs.getBool('streak_freeze_enabled') ?? false;
-      }
-    } else {
-      // Fallback: read directly from SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      isStreakFreezeEnabled = prefs.getBool('streak_freeze_enabled') ?? false;
-    }
-
-    await _checkAndAwardStreakFreeze(
-      statsManager: statsManager,
-      previousStreak: previousStreak,
-      isStreakFreezeEnabled: isStreakFreezeEnabled,
-    );
 
     // Refresh the stats provider and invalidate upNextProvider
     await _refreshStatsAndUpNext();
