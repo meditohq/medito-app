@@ -102,9 +102,11 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # iOS:     external Safari → the "< Medito" back pill lives outside the
 #          XCUITest a11y tree, so we relaunch the app without stopping it,
 #          which brings the backgrounded Medito process back to foreground.
+# Timeout is generous — Safari cold-start on a fresh simulator + DNS +
+# TLS + page render can take 30-50s on CI runners.
 - extendedWaitUntil:
     visible: "(?i)yearly"
-    timeout: 20000
+    timeout: 60000
 - assertVisible: "(?i)monthly"
 - takeScreenshot: donation-paywall
 - runFlow:
