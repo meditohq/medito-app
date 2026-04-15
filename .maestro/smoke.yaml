@@ -86,7 +86,9 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Donation ──
-# Tap "See how to help" which opens the donation paywall
+# Tap "See how to help". On simulators this opens donate.meditofoundation.org
+# in the external browser (Apple Pay / Google Pay isn't available, so the app
+# falls back from the Superwall paywall to the web donation page).
 - extendedWaitUntil:
     visible: "See how to help"
     timeout: 20000
@@ -94,35 +96,30 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - waitForAnimationToEnd
 - takeScreenshot: after-donation-tap
 
-# If paywall loaded, verify the donation tabs are present then dismiss.
-# On Android: press back. On iOS: tap the close (X) button.
+# Wait for the donation web page to render (it has Monthly/Yearly tabs),
+# screenshot it, then return to the app.
+# Android: external Chrome → back button returns to the app.
+# iOS:     external Safari → tap the "< Medito" pill at the top-left.
+- extendedWaitUntil:
+    visible: "(?i)yearly"
+    timeout: 20000
+- assertVisible: "(?i)monthly"
+- takeScreenshot: donation-paywall
 - runFlow:
     when:
-      visible: "(?i)monthly"
+      platform: Android
     commands:
-      - assertVisible: "(?i)yearly"
-      - takeScreenshot: donation-paywall
-      - runFlow:
-          when:
-            platform: Android
-          commands:
-            - pressKey: back
-      - runFlow:
-          when:
-            platform: iOS
-          commands:
-            - tapOn:
-                text: "(?i)close|✕|×"
-                optional: true
+      - pressKey: back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: "Medito"
 
-# If not back on the donation screen, press Home and relaunch.
-- runFlow:
-    when:
-      notVisible: "See how to help"
-    commands:
-      - pressKey: home
-      - launchApp:
-          stopApp: false
+# Wait until we're back on the onboarding donation screen.
+- extendedWaitUntil:
+    visible: "See how to help"
+    timeout: 15000
 
 # After dismissing the paywall, "Skip for Now" appears below the button.
 - runFlow:
