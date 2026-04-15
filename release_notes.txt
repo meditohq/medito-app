@@ -1,5 +1,5 @@
 Unreleased
--
+- Bug fixes and improvements
 
 3.6.15
 - Share daily quotes as beautiful images
