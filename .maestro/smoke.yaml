@@ -126,8 +126,12 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     when:
       platform: iOS
     commands:
-      - launchApp:
-          stopApp: false
+      # launchApp: stopApp: false proved unreliable here — reported COMPLETED
+      # but left the simulator on the home screen with Medito backgrounded.
+      # openLink with the app's URL scheme reliably foregrounds the running
+      # instance; the deep-link handler treats an empty path as "just open
+      # the app" (deep_link_service.dart:114), so no route change.
+      - openLink: "org.meditofoundation://"
 
 # Wait until we're back on the onboarding donation screen.
 - extendedWaitUntil:
