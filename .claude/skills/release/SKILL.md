@@ -35,7 +35,17 @@ git tag -l <new-version>
 
 If it does, stop and tell the user — this usually means the release was already cut.
 
-## 3. Run prepare_release.sh
+## 3. Draft the release notes and have the user review them
+
+The `Unreleased` section of `release_notes.txt` is what `prepare_release.sh` will move under the new version heading, so it needs to be accurate *before* step 4 runs. Don't skip this — shipping stale or empty release notes is the most common way this workflow goes wrong.
+
+Invoke the `update-release-notes` skill (via the Skill tool) to populate `Unreleased` from recent commits. You can pass a commit count via arguments if the user mentioned one; otherwise let it use its default.
+
+After that skill finishes, show the user the current `Unreleased` section (e.g. read `release_notes.txt` and quote the block) and ask them to confirm or edit before moving on. Wait for explicit approval — don't proceed to step 4 on silence.
+
+If the user wants changes, either apply them yourself based on their feedback or let them edit the file directly and confirm when ready. Only continue once they've signed off on the notes.
+
+## 4. Run prepare_release.sh
 
 From the project root:
 
@@ -50,7 +60,7 @@ This script:
 
 If the script prints `No unreleased notes found — nothing to do.`, stop and ask the user whether to proceed anyway — usually you want notes in a release.
 
-## 4. Sanity-check the diff
+## 5. Sanity-check the diff
 
 Run:
 
@@ -61,7 +71,7 @@ git diff pubspec.yaml release_notes.txt
 
 Only `pubspec.yaml` and `release_notes.txt` should have changed. If anything else is modified, stop and show the user before continuing.
 
-## 5. Commit
+## 6. Commit
 
 Stage only the two expected files and commit:
 
@@ -72,7 +82,7 @@ git commit -m "chore: release <new-version>"
 
 Do **not** use `git add -A` — if the pre-flight check missed something, we don't want to accidentally sweep it into the release commit.
 
-## 6. Tag the commit
+## 7. Tag the commit
 
 Tags in this repo use bare semver (no `v` prefix — check recent tags with `git tag --sort=-creatordate | head` if unsure). Tag the commit you just made:
 
@@ -80,7 +90,7 @@ Tags in this repo use bare semver (no `v` prefix — check recent tags with `git
 git tag <new-version>
 ```
 
-## 7. Push
+## 8. Push
 
 Push the branch and the tag to origin:
 
@@ -89,7 +99,7 @@ git push
 git push origin <new-version>
 ```
 
-## 8. Report back
+## 9. Report back
 
 Tell the user concisely:
 - The version that was released
