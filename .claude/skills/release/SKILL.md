@@ -25,7 +25,7 @@ Before making changes, confirm the repo is in a sane state:
 git status --porcelain
 ```
 
-If there are uncommitted changes, stop and ask the user how to proceed — the release commit should only contain version + release notes updates, nothing else.
+If the worktree has any changes (modified, staged, or untracked), **show the user the full output and ask them to confirm before proceeding**. Don't block outright — untracked files like new skills or scratch notes can't end up in the release commit anyway (step 5 only stages `pubspec.yaml` and `release_notes.txt` explicitly). But the user should eyeball the list in case something important is lurking.
 
 Also verify the tag doesn't already exist:
 
