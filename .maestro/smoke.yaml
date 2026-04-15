@@ -40,6 +40,14 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Continue"
 
 # ── Onboarding: Tracking permission (iOS only) ──
+# Wait for the next onboarding screen to render before checking the
+# conditional. Without this wait, `when: visible` races against the
+# page transition and falsely skips the tracking block, then the later
+# "Never tried it" assertion times out on the still-visible tracking
+# screen (flaky — only repro'd when rendering was slower than usual).
+- extendedWaitUntil:
+    visible: "Help Us Improve Medito|Never tried it"
+    timeout: 30000
 - runFlow:
     when:
       visible: "Help Us Improve Medito"
