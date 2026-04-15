@@ -99,7 +99,9 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # Wait for the donation web page to render (it has Monthly/Yearly tabs),
 # screenshot it, then return to the app.
 # Android: external Chrome → back button returns to the app.
-# iOS:     external Safari → tap the "< Medito" pill at the top-left.
+# iOS:     external Safari → the "< Medito" back pill lives outside the
+#          XCUITest a11y tree, so we relaunch the app without stopping it,
+#          which brings the backgrounded Medito process back to foreground.
 - extendedWaitUntil:
     visible: "(?i)yearly"
     timeout: 20000
@@ -114,7 +116,8 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     when:
       platform: iOS
     commands:
-      - tapOn: "Medito"
+      - launchApp:
+          stopApp: false
 
 # Wait until we're back on the onboarding donation screen.
 - extendedWaitUntil:
