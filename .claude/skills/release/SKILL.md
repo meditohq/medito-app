@@ -45,7 +45,7 @@ After that skill finishes, show the user the current `Unreleased` section (e.g. 
 
 If the user wants changes, either apply them yourself based on their feedback or let them edit the file directly and confirm when ready. Only continue once they've signed off on the notes.
 
-## 4. Run prepare_release.sh
+## 4. Run prepare_release.sh and bump the build number
 
 From the project root:
 
@@ -59,6 +59,17 @@ This script:
 - Moves the `Unreleased` entries in `release_notes.txt` under a new section headed with the version, leaving a fresh empty `Unreleased` at the top
 
 If the script prints `No unreleased notes found — nothing to do.`, stop and ask the user whether to proceed anyway — usually you want notes in a release.
+
+**Then bump the build number.** The build number (the integer after `+` in the `version:` line) must increment by exactly 1 on every release — `prepare_release.sh` preserves the existing build number, so you need to bump it yourself afterwards.
+
+```bash
+# Read current build, add 1, replace in pubspec.yaml
+OLD_BUILD=$(grep "^version:" pubspec.yaml | sed 's/version: //' | cut -d'+' -f2)
+NEW_BUILD=$((OLD_BUILD + 1))
+sed -i '' "s/^version: .*/version: <new-version>+$NEW_BUILD/" pubspec.yaml
+```
+
+Confirm the result with `grep "^version:" pubspec.yaml` before continuing. E.g. `3.6.15+302390` → `3.6.16+302391`.
 
 ## 5. Sanity-check the diff
 
