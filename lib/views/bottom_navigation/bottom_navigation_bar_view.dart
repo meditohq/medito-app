@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
@@ -25,7 +24,7 @@ class BottomNavigationBarView extends ConsumerStatefulWidget {
 
 class _BottomNavigationBarViewState
     extends ConsumerState<BottomNavigationBarView> {
-  late var _currentPageIndex;
+  late int _currentPageIndex;
   final _searchFocusNode = FocusNode();
   final _exploreViewKey = GlobalKey<ExploreViewState>();
 
