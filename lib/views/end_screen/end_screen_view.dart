@@ -19,6 +19,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/medito_icon.dart';
@@ -325,7 +326,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                     fontSize: 40,
                     fontWeight: FontWeight.w400,
                     height: 1,
-                    color: ColorConstants.lightPurple,
+                    color: context.brandPurple,
                   ),
               textAlign: TextAlign.left,
             ),
@@ -449,7 +450,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                       color: isFreeze
                           ? ColorConstants.graphite
                           : isMeditated
-                              ? ColorConstants.lightPurple
+                              ? context.brandPurple
                               : ColorConstants.moon,
                     ),
               ),
@@ -475,7 +476,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                     MeditoIcon(
                       assetName: MeditoIcons.checkCircleSolid,
                       size: 32,
-                      color: ColorConstants.lightPurple,
+                      color: context.brandPurple,
                     )
                   else
                     _buildCircle(32, ColorConstants.moon),
@@ -523,16 +524,16 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         right: padding16,
         bottom: 16,
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Theme.of(context).cardColor,
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 15,
-        ),
-        child: Column(
+      child: HomeGradientBorder(
+        backgroundColor: Theme.of(context).cardColor,
+        borderRadius: 14,
+        borderWidth: 0.5,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 15,
+          ),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -606,6 +607,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               ),
             ),
           ],
+          ),
         ),
       ),
     );

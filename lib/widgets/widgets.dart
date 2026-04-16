@@ -1,4 +1,5 @@
 export 'buttons/loading_button_widget.dart';
+export 'dialogs/dialogs.dart';
 export 'drop_down_widget.dart';
 export 'errors/medito_error_widget.dart';
 export 'handle_bar_widget.dart';

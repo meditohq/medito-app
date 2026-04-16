@@ -131,7 +131,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: ColorConstants.lightPurple,
+          backgroundColor: context.brandPurple,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 8),
           shape: RoundedRectangleBorder(

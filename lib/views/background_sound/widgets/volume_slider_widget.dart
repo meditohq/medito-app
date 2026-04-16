@@ -29,7 +29,7 @@ class VolumeSliderWidget extends ConsumerWidget {
         min: 0,
         max: 100,
         divisions: 100,
-        activeColor: ColorConstants.lightPurple,
+        activeColor: context.brandPurple,
         inactiveColor: ColorConstants.greyIsTheNewGrey,
         onChanged: (double newValue) {
           ref.read(backgroundSoundsNotifierProvider.notifier).handleOnChangeVolume(newValue);

@@ -35,13 +35,13 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
             onError: ColorConstants.white,
           )
         : const ColorScheme.light(
-            primary: ColorConstants.lightPurple,
+            primary: ColorConstants.lightPrimary,
             onPrimary: ColorConstants.white,
             secondary: ColorConstants.lightSecondary,
             onSecondary: ColorConstants.white,
             surface: ColorConstants.lightSurface,
             onSurface: ColorConstants.lightOnSurface,
-            error: ColorConstants.amber,
+            error: ColorConstants.lightError,
             onError: ColorConstants.white,
           ),
     scaffoldBackgroundColor:
@@ -56,12 +56,16 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
             isDark ? Brightness.light : Brightness.dark,
         statusBarColor: ColorConstants.transparent,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       ),
     ),
-    // Enhanced button themes
+    // Enhanced button themes.
+    // Light mode uses lightPrimary (#5D4EC0, 6.35:1 on white — AA) for both
+    // fills and text; dark mode keeps the brand lightPurple on dark surfaces.
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: ColorConstants.lightPurple,
+        backgroundColor:
+            isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
         foregroundColor: ColorConstants.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -77,8 +81,12 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.transparent,
-        foregroundColor: ColorConstants.lightPurple,
-        side: const BorderSide(color: ColorConstants.lightPurple),
+        foregroundColor:
+            isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
+        side: BorderSide(
+          color:
+              isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -91,7 +99,8 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: ColorConstants.lightPurple,
+        foregroundColor:
+            isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
         textStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -141,13 +150,20 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return ColorConstants.lightPurple;
+          // White thumb sits on the coloured track in both modes.
+          return ColorConstants.white;
         }
-        return ColorConstants.white;
+        // Unselected: white thumb reads well on the dark track; on the light
+        // grey track we need a darker thumb for visible contrast.
+        return isDark ? ColorConstants.white : ColorConstants.lightSecondary;
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return ColorConstants.lightPurple.withValues(alpha: 0.3);
+          // Light mode: use solid lightPrimary for a 3:1+ track against the
+          // white thumb. Dark mode keeps the semi-transparent brand purple.
+          return isDark
+              ? ColorConstants.lightPurple.withValues(alpha: 0.3)
+              : ColorConstants.lightPrimary;
         }
         return isDark
             ? ColorConstants.greyIsTheNewGrey
@@ -156,7 +172,8 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     ),
     // Progress indicator theme
     progressIndicatorTheme: ProgressIndicatorThemeData(
-      color: ColorConstants.lightPurple,
+      color:
+          isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
       linearTrackColor:
           isDark ? ColorConstants.greyIsTheNewGrey : ColorConstants.lightGrey,
       circularTrackColor:

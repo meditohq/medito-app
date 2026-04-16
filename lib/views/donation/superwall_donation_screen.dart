@@ -8,6 +8,7 @@ import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
+import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -334,66 +335,40 @@ class _SuperwallDonationScreenState
 
             return PopScope(
               canPop: false, // Prevent back button from dismissing dialog
-              child: AlertDialog(
-                title: Text(AppLocalizations.of(context)!.emailForReceipt),
+              child: MeditoDialog(
+                title: AppLocalizations.of(context)!.emailForReceipt,
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    MeditoDialogBody(
                       AppLocalizations.of(context)!.emailForReceiptDescription,
                     ),
                     const SizedBox(height: 16),
                     AutofillGroup(
-                      child: TextField(
+                      child: MeditoDialogTextField(
                         controller: emailController,
                         focusNode: focusNode,
-                        keyboardType: TextInputType.emailAddress,
                         autofocus: true,
-                        autofillHints: const [AutofillHints.email],
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.email,
-                          labelStyle: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                ? const Color(0xFF6B7280)
-                                : Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                          ),
-                          floatingLabelStyle: TextStyle(
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                ? const Color(0xFF6B7280)
-                                : Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                          ),
-                          border: const OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Theme.of(context).colorScheme.surface,
-                          suffixIcon: emailController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: MeditoIcon(
-                                    assetName: MeditoIcons.xmark,
-                                    size: 20,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.6),
-                                  ),
-                                  onPressed: () {
-                                    emailController.clear();
-                                    focusNode.requestFocus();
-                                    setState(() {});
-                                  },
-                                )
-                              : null,
-                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        labelText: AppLocalizations.of(context)!.email,
+                        suffixIcon: emailController.text.isNotEmpty
+                            ? IconButton(
+                                icon: MeditoIcon(
+                                  assetName: MeditoIcons.xmark,
+                                  size: 20,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.6),
+                                ),
+                                onPressed: () {
+                                  emailController.clear();
+                                  focusNode.requestFocus();
+                                  setState(() {});
+                                },
+                              )
+                            : null,
                         onChanged: (_) => setState(() {}),
                         inputFormatters: [
                           TextInputFormatter.withFunction(
@@ -476,7 +451,8 @@ class _SuperwallDonationScreenState
                   ],
                 ),
                 actions: [
-                  TextButton(
+                  MeditoDialogPrimaryButton(
+                    label: AppLocalizations.of(context)!.next,
                     onPressed: () {
                       final enteredEmail = emailController.text
                           .trim()
@@ -493,7 +469,6 @@ class _SuperwallDonationScreenState
                         );
                       }
                     },
-                    child: Text(AppLocalizations.of(context)!.next),
                   ),
                 ],
               ),

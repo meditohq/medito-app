@@ -965,7 +965,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginWarningExplanation.
   ///
   /// In en, this message translates to:
-  /// **'If you already have a Medito account:\\n• Your previous meditation data will be downloaded\\n• Your current unsaved progress will be lost\\n\\nIf you\'re new to Medito:\\n• A new account will be created\\n• Your current progress will be saved to this account'**
+  /// **'If you already have a Medito account:\n• Your previous meditation data will be downloaded\n• Your current unsaved progress will be lost\n\nIf you\'re new to Medito:\n• A new account will be created\n• Your current progress will be saved to this account'**
   String get loginWarningExplanation;
 
   /// No description provided for @createNewAccount.
@@ -3313,6 +3313,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Session'**
   String get addSession;
+
+  /// Title for the dialog confirming deletion of a tracked session
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Session'**
+  String get deleteSessionTitle;
+
+  /// Confirmation message shown when the user long-presses a session to delete it
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this session? This will update your streak and stats.'**
+  String get deleteSessionConfirmation;
+
+  /// Error snackbar shown when deleting a session fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete session.'**
+  String get deleteSessionError;
 
   /// Label for date selection
   ///

@@ -126,11 +126,19 @@ class AppDelegate: FlutterAppDelegate {
             let shortcut = INShortcut(userActivity: activity)
             let viewController = INUIAddVoiceShortcutViewController(shortcut: shortcut)
             viewController.delegate = self
-            
-            if let controller = window?.rootViewController {
+
+            if let controller = keyWindow()?.rootViewController {
                 controller.present(viewController, animated: true, completion: nil)
             }
         }
+    }
+
+    private func keyWindow() -> UIWindow? {
+        if let window = window { return window }
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first(where: { $0.isKeyWindow })
     }
 }
 

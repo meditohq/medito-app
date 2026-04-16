@@ -525,6 +525,48 @@ class StatsManager {
     }
   }
 
+  Future<void> removeAudioCompleted(LocalAudioCompleted session) async {
+    if (_allStats == null) {
+      await sync();
+    }
+    if (_allStats == null) return;
+
+    final currentList = _allStats!.audioCompleted ?? [];
+    final updatedList = currentList
+        .where((a) =>
+            !(a.id == session.id && a.timestamp == session.timestamp))
+        .toList();
+
+    if (updatedList.length == currentList.length) {
+      // Nothing matched — don't write an update
+      return;
+    }
+
+    _dirty = true;
+
+    final newTotalTracks = (_allStats!.totalTracksCompleted - 1).clamp(0, 1 << 31);
+
+    _allStats = _allStats!.copyWith(
+      audioCompleted: updatedList,
+      totalTracksCompleted: newTotalTracks,
+      updated: _getCurrentDate().millisecondsSinceEpoch,
+    );
+
+    _allStats = calculateStreak(_allStats!);
+    final newConsistencyScore = calculateConsistencyScore(_allStats!);
+    _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
+    await saveConsistencyScoreHistory(newConsistencyScore);
+    await _saveLocalAllStatsToSharedPrefs();
+    await _statsService.postStats(_allStats!);
+    _lastSyncedAt = _getCurrentDate();
+    await _saveLastSyncedAt();
+    _dirty = false;
+
+    HomeWidgetService.updateWidgetFromStats(_allStats!).catchError((e) {
+      // Silently fail - widget updates are not critical
+    });
+  }
+
   Future<void> addTrackChecked(String? id) async {
     assert(id != null, 'Track ID cannot be null');
     if (_allStats == null) {

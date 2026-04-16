@@ -74,7 +74,7 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
                 child: FilledButton(
                   onPressed: _sharing ? null : _share,
                   style: FilledButton.styleFrom(
-                    backgroundColor: ColorConstants.lightPurple,
+                    backgroundColor: context.brandPurple,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: padding16),
                     shape: RoundedRectangleBorder(

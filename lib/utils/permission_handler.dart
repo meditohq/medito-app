@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_localizations.dart';
+import '../widgets/dialogs/dialogs.dart';
 
 class PermissionHandler {
   static const String _alarmPermissionDialogKey =
@@ -49,28 +50,19 @@ class PermissionHandler {
 
       final result = await showDialog<bool>(
         context: context,
-        builder: (context) => LayoutBuilder(
-          builder: (context, constraints) {
-            return AlertDialog(
-              title: Text(AppLocalizations.of(context)!.reminderPermissions),
-              content: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: constraints.maxHeight * 0.7,
-                  maxWidth: constraints.maxWidth * 0.7,
-                ),
-                child: SingleChildScrollView(
-                  child: Text(AppLocalizations.of(context)!
-                      .weNeedYourPermissionReminder),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(AppLocalizations.of(context)!.requestPermission),
-                ),
-              ],
-            );
-          },
+        builder: (context) => MeditoDialog(
+          title: AppLocalizations.of(context)!.reminderPermissions,
+          content: SingleChildScrollView(
+            child: MeditoDialogBody(
+              AppLocalizations.of(context)!.weNeedYourPermissionReminder,
+            ),
+          ),
+          actions: [
+            MeditoDialogPrimaryButton(
+              label: AppLocalizations.of(context)!.requestPermission,
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
         ),
       );
 
@@ -111,29 +103,19 @@ class PermissionHandler {
 
       final result = await showDialog<bool>(
         context: context,
-        builder: (context) => LayoutBuilder(
-          builder: (context, constraints) {
-            return AlertDialog(
-              title:
-                  Text(AppLocalizations.of(context)!.mediaPlaybackPermissions),
-              content: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: constraints.maxHeight * 0.7,
-                  maxWidth: constraints.maxWidth * 0.7,
-                ),
-                child: SingleChildScrollView(
-                  child: Text(
-                      AppLocalizations.of(context)!.weNeedYourPermissionMedia),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(AppLocalizations.of(context)!.requestPermission),
-                ),
-              ],
-            );
-          },
+        builder: (context) => MeditoDialog(
+          title: AppLocalizations.of(context)!.mediaPlaybackPermissions,
+          content: SingleChildScrollView(
+            child: MeditoDialogBody(
+              AppLocalizations.of(context)!.weNeedYourPermissionMedia,
+            ),
+          ),
+          actions: [
+            MeditoDialogPrimaryButton(
+              label: AppLocalizations.of(context)!.requestPermission,
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
         ),
       );
 

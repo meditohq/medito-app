@@ -140,19 +140,25 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
     String feedbackMessage,
     VoidCallback onTap,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(2),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(8),
-          color: ColorConstants.ebony,
+          borderRadius: BorderRadius.circular(12),
+          color: isDark
+              ? ColorConstants.ebony
+              : Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.06),
         ),
         child: Text(
           emoji,
-          style: const TextStyle(fontSize: 36),
+          style: const TextStyle(fontSize: 32),
         ),
       ),
     );

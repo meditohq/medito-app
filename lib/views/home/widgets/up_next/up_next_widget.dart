@@ -121,19 +121,11 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
               },
               child: GestureDetector(
                 onTap: () => _onTap(context),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: borderRadius,
-                    border: Border.all(
-                      color:
-                          Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
-                      width: 0.5,
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(_kCardBorderRadius),
-                    child: Column(
+                child: HomeGradientBorder(
+                  backgroundColor: cardColor,
+                  borderRadius: _kCardBorderRadius,
+                  borderWidth: 0.5,
+                  child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -156,7 +148,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                                 letterSpacing: 1.2,
-                                                color: ColorConstants.white
+                                                color: onSurface
                                                     .withOpacityValue(0.7),
                                               ),
                                         ),
@@ -168,7 +160,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                                 fontFamily: teachers,
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
-                                                color: ColorConstants.white
+                                                color: onSurface
                                                     .withOpacityValue(0.7),
                                               ),
                                         ),
@@ -182,7 +174,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                   letterSpacing: 1.2,
-                                                  color: ColorConstants.white
+                                                  color: onSurface
                                                       .withOpacityValue(0.7),
                                                 ),
                                             maxLines: 1,
@@ -219,8 +211,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _getSkipBackground(BuildContext context, AppLocalizations l10n) {
@@ -415,7 +406,7 @@ class _PlayButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: HomeGradientBorder(
-          backgroundColor: ColorConstants.brightSky,
+          backgroundColor: context.brandPurple,
           borderRadius: _kPlayButtonSize / 2,
           borderWidth: _kPlayButtonBorderWidth,
           child: const SizedBox(
@@ -424,7 +415,7 @@ class _PlayButton extends StatelessWidget {
             child: ExcludeSemantics(
               child: Icon(
                 Icons.play_arrow_rounded,
-                color: ColorConstants.ebony,
+                color: Colors.white,
                 size: 28,
               ),
             ),

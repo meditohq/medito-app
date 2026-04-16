@@ -469,7 +469,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginWarningExplanation =>
-      'If you already have a Medito account:\\n• Your previous meditation data will be downloaded\\n• Your current unsaved progress will be lost\\n\\nIf you\'re new to Medito:\\n• A new account will be created\\n• Your current progress will be saved to this account';
+      'If you already have a Medito account:\n• Your previous meditation data will be downloaded\n• Your current unsaved progress will be lost\n\nIf you\'re new to Medito:\n• A new account will be created\n• Your current progress will be saved to this account';
 
   @override
   String get createNewAccount => 'Create New Account';
@@ -1762,6 +1762,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addSession => 'Add Session';
+
+  @override
+  String get deleteSessionTitle => 'Delete Session';
+
+  @override
+  String get deleteSessionConfirmation =>
+      'Are you sure you want to delete this session? This will update your streak and stats.';
+
+  @override
+  String get deleteSessionError => 'Failed to delete session.';
 
   @override
   String get date => 'Date';

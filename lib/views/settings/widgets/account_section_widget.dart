@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
@@ -11,6 +10,7 @@ import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
@@ -40,18 +40,22 @@ class AccountSectionWidget extends ConsumerWidget {
     final accountService = ref.watch(accountServiceProvider);
 
     return Padding(
-      padding: inCard ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 8.0),
+      padding: inCard
+          ? EdgeInsets.zero
+          : const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 16.0,
+            ),
             child: Text(
               email,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
           RowItemWidget(
@@ -62,8 +66,8 @@ class AccountSectionWidget extends ConsumerWidget {
             ),
             title: AppLocalizations.of(context)!.signOutButtonText,
             titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             hasUnderline: true,
             onTap: () async {
               try {
@@ -76,9 +80,7 @@ class AccountSectionWidget extends ConsumerWidget {
 
                 if (context.mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const SplashView(),
-                    ),
+                    MaterialPageRoute(builder: (context) => const SplashView()),
                     (route) => false,
                   );
                   showSnackBar(
@@ -105,43 +107,26 @@ class AccountSectionWidget extends ConsumerWidget {
             ),
             title: AppLocalizations.of(context)!.deleteAccountButtonText,
             titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             hasUnderline: !inCard,
             onTap: () async {
-              final confirmed = await showDialog<bool>(
+              final confirmed =
+                  await showDialog<bool>(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      backgroundColor: ColorConstants.ebony,
-                      title: Text(
-                        AppLocalizations.of(context)!.deleteAccountTitle,
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface),
-                      ),
-                      content: Text(
+                    builder: (context) => MeditoDialog(
+                      title: AppLocalizations.of(context)!.deleteAccountTitle,
+                      content: MeditoDialogBody(
                         AppLocalizations.of(context)!.deleteAccountConfirmation,
-                        style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withAlpha(
-                                    ((0.7).clamp(0.0, 1.0) * 255).round())),
                       ),
                       actions: [
-                        TextButton(
+                        MeditoDialogSecondaryButton(
+                          label: AppLocalizations.of(context)!.cancel,
                           onPressed: () => Navigator.of(context).pop(false),
-                          child: Text(
-                            AppLocalizations.of(context)!.cancel,
-                            style: const TextStyle(
-                                color: ColorConstants.brightSky),
-                          ),
                         ),
-                        TextButton(
+                        MeditoDialogDestructiveButton(
+                          label: AppLocalizations.of(context)!.delete,
                           onPressed: () => Navigator.of(context).pop(true),
-                          child: Text(
-                            AppLocalizations.of(context)!.delete,
-                            style: const TextStyle(color: Colors.red),
-                          ),
                         ),
                       ],
                     ),
@@ -201,14 +186,12 @@ class AccountSectionWidget extends ConsumerWidget {
           ),
           title: AppLocalizations.of(context)!.signInSignUp,
           titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
           hasUnderline: !inCard,
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const SignUpLogInPage(),
-              ),
+              MaterialPageRoute(builder: (context) => const SignUpLogInPage()),
             );
           },
         ),

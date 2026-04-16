@@ -175,7 +175,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
 
     final bannerColor = item.bannerColor != null
         ? parseColor(item.bannerColor!)
-        : ColorConstants.lightPurple;
+        : context.brandPurple;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(_kCardBorderRadius),

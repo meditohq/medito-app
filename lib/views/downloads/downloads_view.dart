@@ -198,33 +198,19 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     bool? confirmDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            AppLocalizations.of(context)!.confirmDeletionTitle,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          content: Text(
+        return MeditoDialog(
+          title: AppLocalizations.of(context)!.confirmDeletionTitle,
+          content: MeditoDialogBody(
             '${AppLocalizations.of(context)!.confirmDeletionMessage} ${item.title}?',
-            style: Theme.of(context).textTheme.bodyMedium,
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text(
-                AppLocalizations.of(context)!.cancel,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+          actions: [
+            MeditoDialogSecondaryButton(
+              label: AppLocalizations.of(context)!.cancel,
+              onPressed: () => Navigator.of(context).pop(false),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: Text(
-                AppLocalizations.of(context)!.delete,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+            MeditoDialogDestructiveButton(
+              label: AppLocalizations.of(context)!.delete,
+              onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
         );
