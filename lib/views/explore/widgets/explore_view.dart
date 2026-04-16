@@ -202,63 +202,77 @@ class ExploreViewState extends ConsumerState<ExploreView> {
       });
     }
 
+    final tabs = ExploreFilter.values
+        .where((filter) => filter != ExploreFilter.all)
+        .toList();
+
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: padding16),
+        padding: const EdgeInsets.fromLTRB(padding16, 4, padding16, 0),
         child: Row(
-          children: [
-            Expanded(
-              child: Wrap(
-                spacing: 8,
-                children: ExploreFilter.values
-                    .where((filter) => filter != ExploreFilter.all)
-                    .map((filter) {
-                  final count =
-                      filter == ExploreFilter.packs ? packsCount : tracksCount;
-                  return _buildFilterChip(filter, count);
-                }).toList(),
-              ),
-            ),
-          ],
+          children: tabs.map((filter) {
+            final count =
+                filter == ExploreFilter.packs ? packsCount : tracksCount;
+            return Expanded(child: _buildFilterTab(filter, count));
+          }).toList(),
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(ExploreFilter filter, int count) {
+  Widget _buildFilterTab(ExploreFilter filter, int count) {
+    final theme = Theme.of(context);
     final isSelected = _currentFilter == filter;
+    final selectedColor = theme.colorScheme.onSurface;
+    final unselectedColor = theme.colorScheme.onSurface.withOpacityValue(0.5);
 
-    return ChoiceChip(
-      label: Text(
-        '${filter.label(context)} ($count)',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+    return InkWell(
+      onTap: () => setState(() => _currentFilter = filter),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
               color: isSelected
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onSurface,
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.outline.withOpacityValue(0.2),
+              width: isSelected ? 2 : 1,
             ),
-      ),
-      selected: isSelected,
-      selectedColor: Theme.of(context).colorScheme.primary,
-      onSelected: (selected) {
-        if (selected) {
-          setState(() => _currentFilter = filter);
-        }
-      },
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      iconTheme: IconThemeData(
-        color: isSelected
-            ? Theme.of(context).colorScheme.onPrimary
-            : Theme.of(context).colorScheme.onSurface,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.outline,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              filter.label(context),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: isSelected ? selectedColor : unselectedColor,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.colorScheme.primary.withOpacityValue(0.15)
+                    : theme.colorScheme.onSurface.withOpacityValue(0.08),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$count',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: isSelected ? theme.colorScheme.primary : unselectedColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 
@@ -477,6 +491,12 @@ class SearchBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final outlineSide = BorderSide(
+      color: theme.colorScheme.outline.withOpacityValue(0.3),
+      width: 0.5,
+    );
+
     return TextField(
       controller: controller,
       focusNode: focusNode,
@@ -489,7 +509,7 @@ class SearchBox extends StatelessWidget {
             child: MeditoIcon(
               assetName: MeditoIcons.search,
               size: 24,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ),
@@ -497,42 +517,41 @@ class SearchBox extends StatelessWidget {
           tooltip: AppLocalizations.of(context)!.clearSearch,
           icon: Icon(
             Icons.clear,
-            color: Theme.of(context).colorScheme.onSurface,
+            color: theme.colorScheme.onSurface,
           ),
           onPressed: onClear,
         ),
         filled: true,
-        fillColor:
-            Theme.of(context).colorScheme.surfaceTint.withOpacityValue(0.1),
+        fillColor: theme.cardColor,
         hintStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.69),
+          color: theme.colorScheme.onSurface.withOpacityValue(0.69),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: outlineSide,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: outlineSide,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: outlineSide,
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: outlineSide,
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: outlineSide,
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: outlineSide,
         ),
       ),
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      style: TextStyle(color: theme.colorScheme.onSurface),
       onChanged: onChanged,
     );
   }
