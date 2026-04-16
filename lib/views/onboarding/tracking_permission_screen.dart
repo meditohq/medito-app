@@ -5,6 +5,7 @@ import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/services/app_tracking_transparency_service.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/widgets/medito_icon.dart';
@@ -27,7 +28,7 @@ class TrackingPermissionScreen extends StatelessWidget {
         final prefs = await SharedPreferences.getInstance();
         if (status != TrackingStatus.authorized) {
           await prefs.setBool(
-              FirebaseAnalyticsService.analyticsEnabledKey, false);
+              SharedPreferenceConstants.analyticsFirebaseEnabled, false);
         }
 
         // Update Facebook SDK with ATT status for iOS 14+ SKAdNetwork support

@@ -25,6 +25,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
@@ -85,6 +86,19 @@ void main() async {
 
   var prefs = await initializeSharedPreferences();
 
+  // ATT denial and consent flows previously wrote to 'analytics_enabled'
+  // while the settings screen wrote to 'analytics_firebase_enabled'.
+  // Consolidate: if the old key was set to false, honour that opt-out.
+  const legacyKey = 'analytics_enabled';
+  if (prefs.containsKey(legacyKey)) {
+    final legacyValue = prefs.getBool(legacyKey)!;
+    if (!legacyValue) {
+      await prefs.setBool(
+          SharedPreferenceConstants.analyticsFirebaseEnabled, false);
+    }
+    await prefs.remove(legacyKey);
+  }
+
   if (!isMockMode) {
     // Initialize Firebase (non-blocking when offline)
     try {
@@ -97,6 +111,11 @@ void main() async {
               true;
       if (analyticsEnabled) {
         await CrashlyticsService().initialize();
+      } else {
+        // Explicitly disable Crashlytics collection so the SDK doesn't
+        // phone home even though Firebase core is initialised.
+        await FirebaseCrashlytics.instance
+            .setCrashlyticsCollectionEnabled(false);
       }
     } catch (e) {
       AppLogger.e('MAIN', 'Firebase initialization failed: $e');
@@ -107,6 +126,8 @@ void main() async {
     await _configureStripe();
 
     // Initialize Meta (Facebook) App Events
+    // init() now checks the analyticsMetaEnabled preference internally
+    // and skips SDK construction when disabled.
     await MetaSdkService.instance.init();
     AppLogger.d('MAIN', 'Meta SDK init complete');
   }
