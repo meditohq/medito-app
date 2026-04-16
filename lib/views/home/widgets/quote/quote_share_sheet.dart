@@ -246,7 +246,9 @@ class _FlowLinesPainter extends CustomPainter {
         path.lineTo(x, y);
 
         if (x < -40 || x > size.width + 40 ||
-            y < -40 || y > size.height + 40) break;
+            y < -40 || y > size.height + 40) {
+          break;
+        }
       }
 
       canvas.drawPath(path, paint);
