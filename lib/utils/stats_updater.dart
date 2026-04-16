@@ -11,7 +11,6 @@ import '../providers/stats_provider.dart';
 import '../providers/home/up_next_provider.dart';
 import '../providers/settings/settings_providers.dart';
 import '../routes/routes.dart';
-import '../widgets/snackbar_widget.dart';
 import '../l10n/app_localizations.dart';
 import 'completed_tracks_storage.dart';
 import 'health_kit_manager.dart';
