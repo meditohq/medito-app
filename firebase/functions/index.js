@@ -75,11 +75,10 @@ async function githubAPI(method, path, body) {
   return response.json();
 }
 
-// ─── Helper: Create GitHub Issue then trigger PR workflow ────────────────────
-async function createIssueAndTriggerPR({ title, description, severity, source, eventType, data }) {
+// ─── Helper: Create GitHub Issue ────────────────────────────────────────────
+async function createGitHubIssue({ title, description, severity, source, eventType, data }) {
   const severityLabel = SEVERITY_LABELS[severity] || "medium";
 
-  // 1. Create GitHub Issue
   const issueBody = [
     `## ${source || "Firebase"} Alert`,
     "",
@@ -115,23 +114,6 @@ async function createIssueAndTriggerPR({ title, description, severity, source, e
   });
 
   logger.info("GitHub issue created", { number: issue.number, title });
-
-  // 2. Trigger repository_dispatch so the Action creates a linked PR
-  await githubAPI("POST", `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/dispatches`, {
-    event_type: "firebase-alert",
-    client_payload: {
-      title: title || "Untitled Firebase Alert",
-      description: description || "",
-      severity: severity || "medium",
-      source: source || "firebase",
-      event_type: eventType || "unknown",
-      issue_number: issue.number,
-      timestamp: new Date().toISOString(),
-      data: data || {},
-    },
-  });
-
-  logger.info("GitHub repository_dispatch triggered", { issue: issue.number, title });
 }
 
 // ─── Crashlytics Alert Triggers ──────────────────────────────────────────────
@@ -141,7 +123,7 @@ exports.onCrashlyticsFatalIssue = onNewFatalIssuePublished(
   { secrets: [githubToken] },
   async (event) => {
     const issue = event.data.payload.issue;
-    await createIssueAndTriggerPR({
+    await createGitHubIssue({
       title: `Fatal crash: ${issue.title}`,
       description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
       severity: "critical",
@@ -157,7 +139,7 @@ exports.onCrashlyticsNonfatalIssue = onNewNonfatalIssuePublished(
   { secrets: [githubToken] },
   async (event) => {
     const issue = event.data.payload.issue;
-    await createIssueAndTriggerPR({
+    await createGitHubIssue({
       title: `Non-fatal issue: ${issue.title}`,
       description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
       severity: "medium",
@@ -173,7 +155,7 @@ exports.onCrashlyticsAnrIssue = onNewAnrIssuePublished(
   { secrets: [githubToken] },
   async (event) => {
     const issue = event.data.payload.issue;
-    await createIssueAndTriggerPR({
+    await createGitHubIssue({
       title: `ANR: ${issue.title}`,
       description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
       severity: "high",
@@ -189,7 +171,7 @@ exports.onCrashlyticsRegression = onRegressionAlertPublished(
   { secrets: [githubToken] },
   async (event) => {
     const issue = event.data.payload.issue;
-    await createIssueAndTriggerPR({
+    await createGitHubIssue({
       title: `Regression: ${issue.title}`,
       description: `A previously closed issue has reappeared.\n\n${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
       severity: "critical",
@@ -209,7 +191,7 @@ exports.onCrashlyticsStabilityDigest = onStabilityDigestPublished(
       .map((i) => `- **${i.type}**: ${i.issue.title} (${i.eventCount} events, ${i.userCount} users)`)
       .join("\n");
 
-    await createIssueAndTriggerPR({
+    await createGitHubIssue({
       title: `Stability digest: ${trendingIssues.length} trending issue(s)`,
       description: `Emerging issues causing a significant number of crashes:\n\n${issueList}`,
       severity: "high",
@@ -226,7 +208,7 @@ exports.onCrashlyticsVelocityAlert = onVelocityAlertPublished(
   async (event) => {
     const issue = event.data.payload.issue;
     const crashCount = event.data.payload.crashCount || "unknown";
-    await createIssueAndTriggerPR({
+    await createGitHubIssue({
       title: `Crash spike: ${issue.title}`,
       description: `A sudden increase in crashes has been detected.\n\n${issue.subtitle}\n\nCrash count: ${crashCount}`,
       severity: "critical",
@@ -252,7 +234,7 @@ exports.onFirestoreIssueCreated = onDocumentCreated(
 
     const doc = snap.data();
 
-    await createIssueAndTriggerPR({
+    await createGitHubIssue({
       title: doc.title || `Firestore issue: ${event.params.docId}`,
       description: doc.description || "",
       severity: doc.severity || "medium",
@@ -298,7 +280,7 @@ exports.webhookToGitHubPR = onRequest(
     }
 
     try {
-      await createIssueAndTriggerPR({
+      await createGitHubIssue({
         title,
         description,
         severity,
