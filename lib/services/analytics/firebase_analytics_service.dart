@@ -42,9 +42,6 @@ class FirebaseAnalyticsService {
       _analytics; // FirebaseAnalytics or _NoopAnalytics - not late final anymore
   bool _initialized = false;
 
-  // Keys and constants
-  static const String analyticsEnabledKey =
-      SharedPreferenceConstants.analyticsFirebaseEnabled;
 
   // Analytics event names - These reference shared constants for consistency across all analytics platforms
   // For new code, prefer using AnalyticsEventConstants directly
