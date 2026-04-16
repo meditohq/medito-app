@@ -59,7 +59,9 @@ class _HomeViewState extends ConsumerState<HomeView>
     final home = ref.watch(fetchHomeProvider);
 
     return home.when(
-      loading: () => const HomeShimmerWidget(),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
       error: (err, stack) {
         final error = err is AppError ? err : const UnknownError();
 
