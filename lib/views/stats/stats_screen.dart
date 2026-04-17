@@ -6,7 +6,8 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
-import 'package:medito/providers/streak_circle_provider.dart';
+import 'package:medito/widgets/dialogs/medito_dialog.dart';
+import 'package:medito/widgets/dialogs/medito_dialog_buttons.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
@@ -26,9 +27,6 @@ class StatsScreen extends ConsumerStatefulWidget {
 
 class _StatsScreenState extends ConsumerState<StatsScreen>
     with TickerProviderStateMixin {
-  bool _isCardVisible = true;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
   late TabController _tabController;
 
   @override
@@ -39,33 +37,29 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       vsync: this,
       initialIndex: widget.initialTabIndex,
     );
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _animation = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
-    ).animate(_animationController);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _animationController.dispose();
     super.dispose();
   }
 
-  void _fadeAndHideCard() {
-    _animationController.forward();
-    _animationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        setState(() {
-          _isCardVisible = false;
-        });
-        ref.read(streakCircleProvider.notifier).markAsSeen();
-      }
-    });
+  void _showConsistencyScoreInfo() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog<void>(
+      context: context,
+      builder: (context) => MeditoDialog(
+        title: l10n.consistencyScoreInfoTitle,
+        content: MeditoDialogBody(l10n.consistencyScoreInfoMessage),
+        actions: [
+          MeditoDialogPrimaryButton(
+            label: l10n.gotIt,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -153,7 +147,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
 
   Widget _buildStatsTab() {
     var statsAsync = ref.watch(statsProvider);
-    var hasSeenStreakCircle = ref.watch(streakCircleProvider);
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -164,125 +157,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 16),
-              if (_isCardVisible)
-                hasSeenStreakCircle.when(
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, _) => const SizedBox.shrink(),
-                  data: (seen) {
-                    if (seen) return const SizedBox.shrink();
-                    return AnimatedOpacity(
-                      opacity: _animation.value,
-                      duration: const Duration(milliseconds: 300),
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                          top: 16,
-                          left: 16,
-                          right: 16,
-                          bottom: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surface.withOpacityValue(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            width: 1,
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                MeditoIcon(
-                                  assetName: MeditoIcons.fire,
-                                  size: 20,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!
-                                        .statsWelcomeTitle,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineMedium
-                                        ?.copyWith(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          fontFamily: dmSans,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                        ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              AppLocalizations.of(
-                                context,
-                              )!
-                                  .statsWelcomeMessage,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    fontSize: 14,
-                                    height: 1.4,
-                                    fontFamily: dmSans,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                            ),
-                            const SizedBox(height: 16),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: ElevatedButton(
-                                onPressed: _fadeAndHideCard,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.surface,
-                                  foregroundColor: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                ),
-                                child: Text(
-                                  AppLocalizations.of(context)!.gotIt,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                        fontSize: 14,
-                                      ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
               statsAsync.when(
                 loading: () => const Center(
                   child: Padding(
@@ -374,6 +248,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
     String title,
     String value, {
     bool hasUnderline = true,
+    VoidCallback? onTap,
   }) {
     return RowItemWidget(
       icon: MeditoRemoteIcon(icon: title),
@@ -382,7 +257,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       title: value,
       subTitle: title,
       hasUnderline: hasUnderline,
-      isTrailingIcon: false,
+      isTrailingIcon: onTap != null,
+      trailingIcon: Icons.info_outline,
+      onTap: onTap,
       titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -435,6 +312,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                 context,
                 AppLocalizations.of(context)!.consistencyScore,
                 '${(stats.consistencyScore * 100).round()}%',
+                onTap: _showConsistencyScoreInfo,
               ),
               _buildStatRow(
                 context,

@@ -2510,17 +2510,17 @@ abstract class AppLocalizations {
   /// **'No results found for your search'**
   String get noResultsFound;
 
-  /// No description provided for @statsWelcomeTitle.
+  /// No description provided for @consistencyScoreInfoTitle.
   ///
   /// In en, this message translates to:
-  /// **'Introducing Consistency Score!'**
-  String get statsWelcomeTitle;
+  /// **'Consistency Score'**
+  String get consistencyScoreInfoTitle;
 
-  /// No description provided for @statsWelcomeMessage.
+  /// No description provided for @consistencyScoreInfoMessage.
   ///
   /// In en, this message translates to:
-  /// **'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication. Your home screen will show your best score to keep you motivated.'**
-  String get statsWelcomeMessage;
+  /// **'Your consistency score reflects how regularly you\'ve meditated over the last 30 days. Unlike streaks, it doesn\'t reset on missed days.'**
+  String get consistencyScoreInfoMessage;
 
   /// No description provided for @accountDeletionInitiated.
   ///

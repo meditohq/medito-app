@@ -1317,11 +1317,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noResultsFound => 'No results found for your search';
 
   @override
-  String get statsWelcomeTitle => 'Introducing Consistency Score!';
+  String get consistencyScoreInfoTitle => 'Consistency Score';
 
   @override
-  String get statsWelcomeMessage =>
-      'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication. Your home screen will show your best score to keep you motivated.';
+  String get consistencyScoreInfoMessage =>
+      'Your consistency score reflects how regularly you\'ve meditated over the last 30 days. Unlike streaks, it doesn\'t reset on missed days.';
 
   @override
   String get accountDeletionInitiated =>

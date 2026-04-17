@@ -1344,11 +1344,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noResultsFound => 'No se encontraron resultados para tu búsqueda';
 
   @override
-  String get statsWelcomeTitle => '¡Presentamos la Puntuación de Consistencia!';
+  String get consistencyScoreInfoTitle => 'Puntuación de Consistencia';
 
   @override
-  String get statsWelcomeMessage =>
-      'Hemos agregado una puntuación de consistencia para ayudarte a sentirte más realizado. A diferencia de las rachas, no se reinicia en días perdidos, reflejando tu dedicación general. Tu pantalla de inicio mostrará tu mejor puntuación para mantenerte motivado.';
+  String get consistencyScoreInfoMessage =>
+      'Tu puntuación de consistencia refleja con qué regularidad has meditado en los últimos 30 días. A diferencia de las rachas, no se reinicia en días perdidos.';
 
   @override
   String get accountDeletionInitiated =>
