@@ -166,7 +166,9 @@ jobs:
         with:
           name: app-prod-release
           path: build/app/outputs/apk/prod/release/app-prod-release.apk
-          retention-days: 1
+          # 90 days so the next release's upgrade test can pull the
+          # previously-shipped APK as its "old version" baseline.
+          retention-days: 90
 
   android-smoke-test:
     name: Android – Smoke Test
@@ -228,9 +230,119 @@ jobs:
             echo "- \`$(basename "$img")\`" >> "$GITHUB_STEP_SUMMARY"
           done
 
+  android-upgrade-test:
+    name: Android – Upgrade Test
+    needs: [android-smoke-test]
+    runs-on: ubuntu-latest
+    # Deploy is gated on this job. If no previous release artifact exists
+    # (first time this job runs, or artifact retention has lapsed) the job
+    # skips gracefully rather than failing the release.
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # NEW APK (this release) — already built and uploaded upstream.
+      - name: Download NEW APK
+        uses: actions/download-artifact@v4
+        with:
+          name: app-prod-release
+          path: /tmp/new/
+
+      # OLD APK (previous release) — most recent successful release.yml
+      # run's artifact. if_no_artifact_found=warn + the fallback check
+      # below let the job no-op cleanly on the very first run.
+      - name: Download OLD APK from previous release run
+        id: old-apk
+        uses: dawidd6/action-download-artifact@v6
+        continue-on-error: true
+        with:
+          workflow: release.yml
+          workflow_conclusion: success
+          name: app-prod-release
+          path: /tmp/old/
+          # Exclude this run; we want the *previous* successful release.
+          skip_unpack: false
+          if_no_artifact_found: warn
+          # search_artifacts picks the most recent across all matching runs.
+          search_artifacts: true
+
+      - name: Skip if no baseline available
+        id: gate
+        run: |
+          if [ ! -f /tmp/old/app-prod-release.apk ]; then
+            echo "No previous release APK found — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Enable KVM
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Upgrade test on emulator
+        if: steps.gate.outputs.run == 'true'
+        timeout-minutes: 20
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            APP=meditofoundation.medito
+            mkdir -p /tmp/maestro-debug/seed /tmp/maestro-debug/upgrade
+
+            # 1. Install OLD (previously-shipped) version.
+            adb install /tmp/old/app-prod-release.apk
+            adb shell pm grant $APP android.permission.POST_NOTIFICATIONS || true
+            adb shell am force-stop com.google.android.apps.nexuslauncher || true
+
+            # 2. Seed state by running full onboarding in the old version.
+            #    smoke.yaml uses clearState:true on first launch, which is
+            #    correct here — we want a clean user completing onboarding.
+            $HOME/.maestro/bin/maestro test \
+              -e APP_ID=$APP .maestro/smoke.yaml \
+              --no-ansi --debug-output /tmp/maestro-debug/seed
+
+            # 3. In-place upgrade. -r replaces while preserving app data.
+            #    Fails if signing keys differ — intentional guardrail.
+            adb install -r /tmp/new/app-prod-release.apk
+
+            # 4. Verify upgraded app lands on home with state intact.
+            $HOME/.maestro/bin/maestro test \
+              -e APP_ID=$APP .maestro/upgrade.yaml \
+              --no-ansi --debug-output /tmp/maestro-debug/upgrade
+
+      - name: Upload upgrade-test debug output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-debug-android-upgrade
+          path: /tmp/maestro-debug/
+          retention-days: 30
+          include-hidden-files: true
+
+      - name: Embed failure screenshots in job summary
+        if: failure()
+        run: |
+          echo "## Android Upgrade Test Failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Screenshots are in the **maestro-debug-android-upgrade** artifact." >> "$GITHUB_STEP_SUMMARY"
+          find /tmp/maestro-debug -name '*.png' 2>/dev/null | sort | while read -r img; do
+            echo "- \`${img#/tmp/maestro-debug/}\`" >> "$GITHUB_STEP_SUMMARY"
+          done
+
   android-deploy:
     name: Android – Deploy
-    needs: [android-smoke-test]
+    needs: [android-smoke-test, android-upgrade-test]
     runs-on: ubuntu-latest
     environment: prod
 
@@ -416,6 +528,21 @@ jobs:
             --dart-define=PAYWALL_ENV=live \
             --dart-define=IS_SIMULATOR=true
 
+      # Preserve the built .app so the upgrade-test job (next release) can
+      # install it as the "old version" baseline. Tar to preserve the app
+      # bundle's internal symlinks/permissions through the artifact upload.
+      - name: Package simulator .app
+        run: |
+          mkdir -p /tmp/sim-app
+          tar -C build/ios/iphonesimulator -cf /tmp/sim-app/medito-sim.tar "Medito Dev.app"
+
+      - name: Upload simulator .app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: medito-sim-app
+          path: /tmp/sim-app/medito-sim.tar
+          retention-days: 90
+
       - name: Boot iOS simulator
         run: |
           DEVICE=$(xcrun simctl list devices available -j | python3 -c "
@@ -469,9 +596,120 @@ jobs:
             echo "- \`$(basename "$img")\`" >> "$GITHUB_STEP_SUMMARY"
           done
 
+  ios-upgrade-test:
+    name: iOS – Upgrade Test
+    needs: [ios-smoke-test]
+    runs-on: macos-latest
+    if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # NEW .app (this release) — uploaded by ios-smoke-test.
+      - name: Download NEW simulator .app
+        uses: actions/download-artifact@v4
+        with:
+          name: medito-sim-app
+          path: /tmp/new/
+
+      - name: Unpack NEW .app
+        run: |
+          mkdir -p /tmp/new/app
+          tar -C /tmp/new/app -xf /tmp/new/medito-sim.tar
+
+      # OLD .app — most recent successful release.yml run's artifact.
+      - name: Download OLD simulator .app from previous release run
+        id: old-app
+        uses: dawidd6/action-download-artifact@v6
+        continue-on-error: true
+        with:
+          workflow: release.yml
+          workflow_conclusion: success
+          name: medito-sim-app
+          path: /tmp/old/
+          if_no_artifact_found: warn
+          search_artifacts: true
+
+      - name: Skip if no baseline available
+        id: gate
+        run: |
+          if [ ! -f /tmp/old/medito-sim.tar ]; then
+            echo "No previous release .app found — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            mkdir -p /tmp/old/app
+            tar -C /tmp/old/app -xf /tmp/old/medito-sim.tar
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Boot iOS simulator
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          for runtime, devices in data['devices'].items():
+            for d in devices:
+              if 'iPhone' in d['name'] and d['isAvailable']:
+                print(d['udid'])
+                sys.exit(0)
+          sys.exit(1)
+          ")
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
+          echo "Booted simulator: $DEVICE"
+
+      - name: Install Maestro
+        if: steps.gate.outputs.run == 'true'
+        run: curl -Ls "https://get.maestro.mobile.dev" | bash
+
+      - name: Upgrade test on simulator
+        if: steps.gate.outputs.run == 'true'
+        timeout-minutes: 20
+        run: |
+          mkdir -p /tmp/maestro-debug/seed /tmp/maestro-debug/upgrade
+
+          # 1. Install OLD version onto the booted simulator.
+          xcrun simctl install booted "/tmp/old/app/Medito Dev.app"
+          sleep 5
+
+          # 2. Seed state via full onboarding in the old version.
+          $HOME/.maestro/bin/maestro test \
+            -e APP_ID=org.meditofoundation .maestro/smoke.yaml \
+            --no-ansi --debug-output /tmp/maestro-debug/seed
+
+          # 3. In-place upgrade. simctl install over an existing bundle ID
+          #    keeps the app's container (NSUserDefaults, Hive, Documents).
+          xcrun simctl install booted "/tmp/new/app/Medito Dev.app"
+          sleep 5
+
+          # 4. Verify upgraded app lands on home with state intact.
+          $HOME/.maestro/bin/maestro test \
+            -e APP_ID=org.meditofoundation .maestro/upgrade.yaml \
+            --no-ansi --debug-output /tmp/maestro-debug/upgrade
+
+      - name: Upload upgrade-test debug output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-debug-ios-upgrade
+          path: /tmp/maestro-debug/
+          retention-days: 30
+          include-hidden-files: true
+
+      - name: Embed failure screenshots in job summary
+        if: failure()
+        run: |
+          echo "## iOS Upgrade Test Failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Screenshots are in the **maestro-debug-ios-upgrade** artifact." >> "$GITHUB_STEP_SUMMARY"
+          find /tmp/maestro-debug -name '*.png' 2>/dev/null | sort | while read -r img; do
+            echo "- \`${img#/tmp/maestro-debug/}\`" >> "$GITHUB_STEP_SUMMARY"
+          done
+
   ios-deploy:
     name: iOS – Build & Deploy
-    needs: [ios-smoke-test]
+    needs: [ios-smoke-test, ios-upgrade-test]
     runs-on: macos-latest
     environment: prod
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
