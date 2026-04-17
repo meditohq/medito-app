@@ -34,16 +34,8 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   int? _intentIndex;
 
   bool _showBatteryScreen = false;
-  bool _questionFlowStartedLogged = false;
 
-  int get _firstQuestionPageIndex {
-    var index = 0; // questions come first (after optional system screens only)
-    if (Platform.isIOS) index++; // tracking permission
-    if (_showBatteryScreen) index++; // battery optimization
-    return index;
-  }
-
-  final List<String> _images = [
+final List<String> _images = [
     AssetConstants.onboardingImage1,
     AssetConstants.onboardingImage2,
     AssetConstants.onboardingImage3,
@@ -130,8 +122,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     );
 
     return [
-      if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),
-      if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
       OnboardingQuestionScreen(
         question: l10n.onboardingExperienceQuestion,
         subtext: l10n.onboardingExperienceSubtext,
@@ -173,6 +163,8 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
       ),
       NotificationsScreen(onNext: _nextPage, intentIndex: _intentIndex),
       OnboardingDonationScreen(onNext: _nextPage),
+      if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
+      if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),
       OnboardingResultScreen(
         state: resultState,
         onGetStarted: _onGetStarted,
@@ -196,6 +188,11 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   @override
   void initState() {
     super.initState();
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
+      ),
+    );
     shouldShowBatteryOptimizationScreen().then((show) {
       if (mounted) setState(() => _showBatteryScreen = show);
     });
@@ -264,14 +261,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
                 itemCount: pages.length,
                 onPageChanged: (index) {
                   setState(() => _currentPage = index);
-                  if (index == _firstQuestionPageIndex && !_questionFlowStartedLogged) {
-                    _questionFlowStartedLogged = true;
-                    unawaited(
-                      ref.read(analyticsServiceProvider).logEvent(
-                        name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
-                      ),
-                    );
-                  }
                 },
                 itemBuilder: (context, index) => pages[index],
               ),

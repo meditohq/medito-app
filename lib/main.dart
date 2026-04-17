@@ -100,11 +100,15 @@ void main() async {
   }
 
   if (!isMockMode) {
-    // Initialize Firebase (non-blocking when offline)
+    // Initialize Firebase (non-blocking when offline).
+    // On iOS, FirebaseApp.configure() may have already been called natively
+    // from AppDelegate, so guard against the duplicate-app error.
     try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
 
       final analyticsEnabled =
           prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
