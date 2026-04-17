@@ -239,7 +239,11 @@ jobs:
     # skips gracefully rather than failing the release.
 
     steps:
+      # fetch-depth: 0 so we can resolve previous tags and `git show` the
+      # smoke.yaml that matches the previously-shipped binary.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # NEW APK (this release) — already built and uploaded upstream.
       - name: Download NEW APK
@@ -248,29 +252,55 @@ jobs:
           name: app-prod-release
           path: /tmp/new/
 
-      # OLD APK (previous release) — most recent successful release.yml
-      # run's artifact. if_no_artifact_found=warn + the fallback check
-      # below let the job no-op cleanly on the very first run.
-      - name: Download OLD APK from previous release run
+      # Resolve the *previous* release tag. On tag pushes GITHUB_REF_NAME is
+      # the current tag, so we filter it out. On workflow_dispatch (ref is a
+      # branch like "develop"), the grep -v is a no-op and we get the latest
+      # v* tag as the baseline.
+      - name: Resolve previous release tag
+        id: prev
+        run: |
+          PREV=$(git tag --list 'v*' --sort=-v:refname \
+                 | grep -v "^${GITHUB_REF_NAME}$" \
+                 | head -1)
+          if [ -z "$PREV" ]; then
+            echo "No previous v* tag found." >> "$GITHUB_STEP_SUMMARY"
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            echo "sha=" >> "$GITHUB_OUTPUT"
+          else
+            SHA=$(git rev-list -n 1 "$PREV")
+            echo "Previous release: **$PREV** ($SHA)" >> "$GITHUB_STEP_SUMMARY"
+            echo "tag=$PREV" >> "$GITHUB_OUTPUT"
+            echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          fi
+
+      # OLD APK — pinned to the previous tag's exact commit, so the
+      # downloaded APK matches the seed flow we'll extract from git below.
+      - name: Download OLD APK (pinned to previous tag's commit)
         id: old-apk
+        if: steps.prev.outputs.sha != ''
         uses: dawidd6/action-download-artifact@v6
         continue-on-error: true
         with:
           workflow: release.yml
           workflow_conclusion: success
           name: app-prod-release
+          commit: ${{ steps.prev.outputs.sha }}
           path: /tmp/old/
-          # Exclude this run; we want the *previous* successful release.
-          skip_unpack: false
           if_no_artifact_found: warn
-          # search_artifacts picks the most recent across all matching runs.
-          search_artifacts: true
+
+      # OLD seed flow — checked out from the previous tag's tree, so it
+      # describes that binary's onboarding UI (not HEAD's).
+      - name: Extract OLD seed flow from previous tag
+        if: steps.prev.outputs.sha != ''
+        run: |
+          git show "${{ steps.prev.outputs.sha }}:.maestro/smoke.yaml" \
+            > /tmp/old-seed.yaml || echo "Previous tag had no smoke.yaml"
 
       - name: Skip if no baseline available
         id: gate
         run: |
-          if [ ! -f /tmp/old/app-prod-release.apk ]; then
-            echo "No previous release APK found — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
+          if [ ! -f /tmp/old/app-prod-release.apk ] || [ ! -s /tmp/old-seed.yaml ]; then
+            echo "No usable baseline (APK or seed flow missing) — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
@@ -305,11 +335,11 @@ jobs:
             adb shell pm grant $APP android.permission.POST_NOTIFICATIONS || true
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
 
-            # 2. Seed state by running full onboarding in the old version.
-            #    smoke.yaml uses clearState:true on first launch, which is
-            #    correct here — we want a clean user completing onboarding.
+            # 2. Seed state using the OLD tag's smoke.yaml — matches that
+            #    binary's onboarding UI, so strings/tap targets are correct
+            #    even if onboarding copy changed in HEAD.
             $HOME/.maestro/bin/maestro test \
-              -e APP_ID=$APP .maestro/smoke.yaml \
+              -e APP_ID=$APP /tmp/old-seed.yaml \
               --no-ansi --debug-output /tmp/maestro-debug/seed
 
             # 3. In-place upgrade. -r replaces while preserving app data.
@@ -317,6 +347,7 @@ jobs:
             adb install -r /tmp/new/app-prod-release.apk
 
             # 4. Verify upgraded app lands on home with state intact.
+            #    Uses HEAD's upgrade.yaml — it validates the NEW binary.
             $HOME/.maestro/bin/maestro test \
               -e APP_ID=$APP .maestro/upgrade.yaml \
               --no-ansi --debug-output /tmp/maestro-debug/upgrade
@@ -604,6 +635,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # NEW .app (this release) — uploaded by ios-smoke-test.
       - name: Download NEW simulator .app
@@ -617,24 +650,48 @@ jobs:
           mkdir -p /tmp/new/app
           tar -C /tmp/new/app -xf /tmp/new/medito-sim.tar
 
-      # OLD .app — most recent successful release.yml run's artifact.
-      - name: Download OLD simulator .app from previous release run
+      - name: Resolve previous release tag
+        id: prev
+        run: |
+          PREV=$(git tag --list 'v*' --sort=-v:refname \
+                 | grep -v "^${GITHUB_REF_NAME}$" \
+                 | head -1)
+          if [ -z "$PREV" ]; then
+            echo "No previous v* tag found." >> "$GITHUB_STEP_SUMMARY"
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            echo "sha=" >> "$GITHUB_OUTPUT"
+          else
+            SHA=$(git rev-list -n 1 "$PREV")
+            echo "Previous release: **$PREV** ($SHA)" >> "$GITHUB_STEP_SUMMARY"
+            echo "tag=$PREV" >> "$GITHUB_OUTPUT"
+            echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          fi
+
+      # OLD .app — pinned to the previous tag's exact commit.
+      - name: Download OLD .app (pinned to previous tag's commit)
         id: old-app
+        if: steps.prev.outputs.sha != ''
         uses: dawidd6/action-download-artifact@v6
         continue-on-error: true
         with:
           workflow: release.yml
           workflow_conclusion: success
           name: medito-sim-app
+          commit: ${{ steps.prev.outputs.sha }}
           path: /tmp/old/
           if_no_artifact_found: warn
-          search_artifacts: true
+
+      - name: Extract OLD seed flow from previous tag
+        if: steps.prev.outputs.sha != ''
+        run: |
+          git show "${{ steps.prev.outputs.sha }}:.maestro/smoke.yaml" \
+            > /tmp/old-seed.yaml || echo "Previous tag had no smoke.yaml"
 
       - name: Skip if no baseline available
         id: gate
         run: |
-          if [ ! -f /tmp/old/medito-sim.tar ]; then
-            echo "No previous release .app found — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
+          if [ ! -f /tmp/old/medito-sim.tar ] || [ ! -s /tmp/old-seed.yaml ]; then
+            echo "No usable baseline (.app or seed flow missing) — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
             mkdir -p /tmp/old/app
@@ -673,9 +730,10 @@ jobs:
           xcrun simctl install booted "/tmp/old/app/Medito Dev.app"
           sleep 5
 
-          # 2. Seed state via full onboarding in the old version.
+          # 2. Seed state using the OLD tag's smoke.yaml — matches that
+          #    binary's onboarding UI even if HEAD has renamed strings.
           $HOME/.maestro/bin/maestro test \
-            -e APP_ID=org.meditofoundation .maestro/smoke.yaml \
+            -e APP_ID=org.meditofoundation /tmp/old-seed.yaml \
             --no-ansi --debug-output /tmp/maestro-debug/seed
 
           # 3. In-place upgrade. simctl install over an existing bundle ID
@@ -684,6 +742,7 @@ jobs:
           sleep 5
 
           # 4. Verify upgraded app lands on home with state intact.
+          #    Uses HEAD's upgrade.yaml — it validates the NEW binary.
           $HOME/.maestro/bin/maestro test \
             -e APP_ID=org.meditofoundation .maestro/upgrade.yaml \
             --no-ansi --debug-output /tmp/maestro-debug/upgrade
