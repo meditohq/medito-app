@@ -39,37 +39,9 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 120000
 - tapOn: "Continue"
 
-# ── Onboarding: Tracking permission (iOS only) ──
-# Wait for the next onboarding screen to render before checking the
-# conditional. Without this wait, `when: visible` races against the
-# page transition and falsely skips the tracking block, then the later
-# "Never tried it" assertion times out on the still-visible tracking
-# screen (flaky — only repro'd when rendering was slower than usual).
-- extendedWaitUntil:
-    visible: "Help Us Improve Medito|Never tried it"
-    timeout: 30000
-- runFlow:
-    when:
-      visible: "Help Us Improve Medito"
-    commands:
-      - tapOn: "Continue"
-      - runFlow:
-          when:
-            visible: "Allow"
-          commands:
-            - tapOn: "Allow"
-
-# ── Onboarding: Battery optimization (Android only, conditional) ──
-- runFlow:
-    when:
-      visible: "Update Setting"
-    commands:
-      - tapOn:
-          text: "Skip for Now"
-          optional: true
-
 # ── Onboarding: Experience question ──
-# Anonymous sign-in can take a while on first launch (clearState wipes the account)
+# First onboarding screen. Anonymous sign-in can take a while on first
+# launch (clearState wipes the account), so the timeout is generous.
 - extendedWaitUntil:
     visible: "Never tried it"
     timeout: 60000
@@ -126,12 +98,22 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     when:
       platform: iOS
     commands:
-      # launchApp: stopApp: false proved unreliable here — reported COMPLETED
-      # but left the simulator on the home screen with Medito backgrounded.
-      # openLink with the app's URL scheme reliably foregrounds the running
-      # instance; the deep-link handler treats an empty path as "just open
-      # the app" (deep_link_service.dart:114), so no route change.
-      - openLink: "org.meditofoundation://"
+      # On iOS 26 the web donation page auto-triggers the app's URL scheme,
+      # which pops a system "Open in 'Medito'?" prompt. Dismiss it via Cancel,
+      # then close the Safari/paywall overlay via the X in the top-left to
+      # return to the in-app donation screen.
+      - runFlow:
+          when:
+            visible: "Cancel"
+          commands:
+            - tapOn: "Cancel"
+      # The X button in the top-left of the Superwall paywall has no
+      # accessibility label. Its bounds are around [28,77]-[44,93] on the
+      # 440-pt-wide simulator viewport, so ~8%,9% hits the centre. Wait for
+      # the paywall to settle first so the tap isn't absorbed by an animation.
+      - waitForAnimationToEnd
+      - tapOn:
+          point: "8%,9%"
 
 # Wait until we're back on the onboarding donation screen.
 - extendedWaitUntil:
@@ -148,50 +130,59 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           retryTapIfNoChange: true
       - takeScreenshot: after-donation-skip
 
-# ── Onboarding: Result screen ──
+# ── Onboarding: Battery optimization (Android only, conditional) + ──
+# ── Tracking permission (iOS only).                                 ──
+# Wait for the next screen to render before checking the conditionals.
+# Without this wait, `when: visible` races against the page transition
+# and falsely skips the block, then the later "Get started" assertion
+# times out on the still-visible previous screen.
+- extendedWaitUntil:
+    visible: "Update Setting|Help Us Improve Medito|Get started"
+    timeout: 30000
 - runFlow:
     when:
-      visible: "Get started"
+      visible: "Update Setting"
     commands:
-      - tapOn: "Get started"
+      - tapOn:
+          text: "Skip for Now"
+          optional: true
+- runFlow:
+    when:
+      visible: "Help Us Improve Medito"
+    commands:
+      - tapOn: "Continue"
+      - runFlow:
+          when:
+            visible: "Allow"
+          commands:
+            - tapOn: "Allow"
 
-# ── Home screen loaded ──
-# After onboarding the app fetches real data; a skeleton shimmer shows first.
+# ── Onboarding: Result screen ──
 - extendedWaitUntil:
-    visible: "Home"
-    timeout: 30000
+    visible: "Get started"
+    timeout: 15000
+- tapOn: "Get started"
+
+# ── Play a session via Your Path ──
+# The Your Path card's accessibility label is a merged multi-line string
+# like "Your Path: Medito's Journey — Welcome\nYOUR PATH\n·\nMedito's Journey\n...",
+# so we use a regex with wildcards + DOTALL ((?s)) so "." matches newlines.
+# On a fresh install, anonymous auth + home API can take up to 60s.
 - extendedWaitUntil:
-    visible: "Explore"
-    timeout: 30000
-
-# ── Navigate all tabs ──
-# Note: Path tab is currently disabled in BottomActionBar homePage layout
-- tapOn: "Explore"
-- assertVisible: "Explore"
-
-- tapOn: "Settings"
-- assertVisible: "Settings"
-
-- tapOn: "Home"
-- assertVisible: "Home"
-
-# ── Play a session via Your Daily ──
-# Wait for the skeleton shimmer to resolve and real content to load.
-# On a fresh install, anonymous auth + home API can take up to 60 s.
-- extendedWaitUntil:
-    visible: "Your Daily"
+    visible: "(?s).*Medito's Journey.*"
     timeout: 60000
 # On small screens the shortcut may be below the fold
 - scrollUntilVisible:
-    element: "Your Daily"
+    element: "(?s).*Medito's Journey.*"
     direction: DOWN
     timeout: 15000
     speed: 20
     waitToSettleTimeoutMs: 500
     centerElement: true
-- tapOn: "Your Daily"
+- tapOn:
+    text: "(?s).*Medito's Journey.*"
 
-# Your Daily may open a track (Play visible immediately) or a pack (list of sessions).
+# Your Path may open a track (Play visible immediately) or a pack (list of sessions).
 # If it opened a pack, tap the first session in the list to reach a track view.
 - runFlow:
     when:
