@@ -1,6 +1,9 @@
 Unreleased
 -
 
+3.6.18
+- Bug fixes and improvements
+
 3.6.17
 - Long-press a session in the calendar to delete it
 - Tap the Consistency Score in stats to learn what it means
