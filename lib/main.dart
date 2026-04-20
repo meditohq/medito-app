@@ -28,6 +28,8 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:medito/services/history/app_history_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
@@ -85,6 +87,17 @@ void main() async {
   }
 
   var prefs = await initializeSharedPreferences();
+
+  try {
+    final packageInfo = await PackageInfo.fromPlatform();
+    await AppHistoryService.recordCurrentVersion(
+      prefs,
+      version: packageInfo.version,
+      buildNumber: packageInfo.buildNumber,
+    );
+  } catch (e) {
+    AppLogger.w('MAIN', 'Failed to record version history: $e');
+  }
 
   // ATT denial and consent flows previously wrote to 'analytics_enabled'
   // while the settings screen wrote to 'analytics_firebase_enabled'.

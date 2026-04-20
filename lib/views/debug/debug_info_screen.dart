@@ -18,6 +18,8 @@ import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/services/history/app_history_service.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 
 class _ReminderWithDate {
   final PendingNotificationRequest? reminder;
@@ -140,6 +142,28 @@ class DebugInfoScreen extends ConsumerWidget {
                   ),
             ),
           ],
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 8),
+          _buildHistorySection(
+            context,
+            title: 'Installed Versions',
+            body: _formatVersionHistory(ref),
+            base64: AppHistoryService.getVersionHistoryBase64(
+                ref.read(sharedPreferencesProvider)),
+            emptyText: 'No versions recorded yet',
+          ),
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 8),
+          _buildHistorySection(
+            context,
+            title: 'Sign-In History',
+            body: _formatSignInHistory(ref),
+            base64: AppHistoryService.getSignInHistoryBase64(
+                ref.read(sharedPreferencesProvider)),
+            emptyText: 'No sign-ins recorded yet',
+          ),
           if (kDebugMode) ...[
             const SizedBox(height: 24),
             const Divider(),
@@ -368,6 +392,78 @@ class DebugInfoScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildHistorySection(
+    BuildContext context, {
+    required String title,
+    required String body,
+    required String base64,
+    required String emptyText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        SelectableText(
+          body.isEmpty ? emptyText : body,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        if (base64.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          SelectableText(
+            base64,
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(fontFamily: 'monospace'),
+          ),
+        ],
+      ],
+    );
+  }
+
+  String _formatVersionHistory(WidgetRef ref) {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final history = AppHistoryService.getVersionHistory(prefs);
+    if (history.isEmpty) return '';
+    final df = DateFormat('yyyy-MM-dd HH:mm');
+    return history.map((e) {
+      final version = e['version'] ?? '';
+      final build = e['buildNumber'] ?? '';
+      final seen = _parseDateOrEmpty(e['firstSeenAt'], df);
+      return '• $version ($build) — $seen';
+    }).join('\n');
+  }
+
+  String _formatSignInHistory(WidgetRef ref) {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final history = AppHistoryService.getSignInHistory(prefs);
+    if (history.isEmpty) return '';
+    final df = DateFormat('yyyy-MM-dd HH:mm');
+    return history.map((e) {
+      final userId = e['userId'] ?? '';
+      final email = (e['email'] as String?) ?? '';
+      final at = _parseDateOrEmpty(e['signedInAt'], df);
+      final emailPart = email.isEmpty ? '' : ' — $email';
+      return '• $at\n  id: $userId$emailPart';
+    }).join('\n');
+  }
+
+  String _parseDateOrEmpty(dynamic iso, DateFormat df) {
+    if (iso is! String || iso.isEmpty) return '';
+    try {
+      return df.format(DateTime.parse(iso).toLocal());
+    } catch (_) {
+      return iso;
+    }
+  }
+
   void _copyDebugInfo(BuildContext context, WidgetRef ref) async {
     final infoString = await ref.read(deviceAppAndUserInfoProvider.future);
     final paywallManager = ref.read(paywallManagerServiceProvider);
@@ -413,6 +509,17 @@ class DebugInfoScreen extends ConsumerWidget {
       AppLogger.d('DEBUG_INFO_SCREEN', 'Added scheduled events to copy text');
     } else {
       AppLogger.d('DEBUG_INFO_SCREEN', 'No scheduled events to add');
+    }
+
+    final prefs = ref.read(sharedPreferencesProvider);
+    final versionHistoryB64 = AppHistoryService.getVersionHistoryBase64(prefs);
+    if (versionHistoryB64.isNotEmpty) {
+      fullInfo = '$fullInfo\n\nversion_history_b64: $versionHistoryB64';
+    }
+
+    final signInHistoryB64 = AppHistoryService.getSignInHistoryBase64(prefs);
+    if (signInHistoryB64.isNotEmpty) {
+      fullInfo = '$fullInfo\n\nsignin_history_b64: $signInHistoryB64';
     }
 
     final statsBase64 = _buildStatsBase64(ref);

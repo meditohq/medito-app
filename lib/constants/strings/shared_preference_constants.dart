@@ -74,4 +74,10 @@ class SharedPreferenceConstants {
 
   // Last selected main tab (home=0, explore=1)
   static const String lastMainTabIndex = 'last_main_tab_index';
+
+  // History of installed app versions seen on this device (JSON list)
+  static const String installedVersionHistory = 'installed_version_history';
+
+  // History of sign-in events on this device (JSON list)
+  static const String signedInUserHistory = 'signed_in_user_history';
 }
