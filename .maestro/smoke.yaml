@@ -123,6 +123,10 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       - pressKey: home
       - launchApp:
           stopApp: false
+      - waitForAnimationToEnd
+      - extendedWaitUntil:
+          visible: "See how to help"
+          timeout: 15000
 
 # After dismissing the paywall, "Skip for Now" appears below the button.
 - runFlow:
