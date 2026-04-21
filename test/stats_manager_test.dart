@@ -132,8 +132,8 @@ void main() {
       var result = statsManager.calculateStreak(stats);
 
       // Assert
-      expect(result.streakCurrent, 2);
-      expect(result.streakLongest, 2);
+      expect(result.streakCurrent, 3);
+      expect(result.streakLongest, 3);
     });
 
     test(
@@ -276,8 +276,8 @@ void main() {
       var result = statsManager.calculateStreak(stats);
 
       // Assert
-      expect(result.streakCurrent, 2);
-      expect(result.streakLongest, 2);
+      expect(result.streakCurrent, 4);
+      expect(result.streakLongest, 4);
     });
 
     test(
@@ -633,8 +633,8 @@ void main() {
       );
       expect(
         result?.streakCurrent,
-        3,
-        reason: 'Should have the correct streak current value (freeze bridges gap but doesn\'t count)',
+        4,
+        reason: 'Should have the correct streak current value',
       );
       expect(
         result?.streakLongest,
@@ -947,8 +947,8 @@ void main() {
 
           var result = statsManager.calculateStreak(mockStats);
 
-          // Streak should be 6 (Mar 1-7 with Mar 6 being a freeze; freeze bridges gap but doesn't count)
-          expect(result.streakCurrent, 6);
+          // Streak should be 7 (Mar 1-7 with Mar 6 being a freeze day, which counts)
+          expect(result.streakCurrent, 7);
           expect(result.streakLongest, 10);
         },
       );
@@ -1005,9 +1005,8 @@ void main() {
 
           var result = statsManager.calculateStreak(mockStats);
 
-          // Streak should be 2 (Mar 5 and 7 with Mar 6 being a freeze; freeze doesn't count)
-          // The gap on Mar 4 breaks the earlier streak
-          expect(result.streakCurrent, 2);
+          // Streak should be 3 (Mar 5, Mar 6 freeze, Mar 7). Gap on Mar 4 breaks earlier run.
+          expect(result.streakCurrent, 3);
           expect(result.streakLongest, 10);
         },
       );
@@ -1067,8 +1066,8 @@ void main() {
 
           var result = statsManager.calculateStreak(mockStats);
 
-          // Streak should be 5 (Mar 1-7 with Mar 4 and Mar 6 being freezes; freezes don't count)
-          expect(result.streakCurrent, 5);
+          // Streak should be 7 (Mar 1-7; freeze days count as full days)
+          expect(result.streakCurrent, 7);
           expect(result.streakLongest, 10);
         },
       );
@@ -1171,10 +1170,9 @@ void main() {
         var result = statsManager.calculateStreak(stats);
 
         // Assert
-        // Should have a streak of 6 real meditation days (Feb 22-25, 27, 28) because freeze covers the gap on Feb 26
-        // The streak breaks at Feb 21 (between Feb 20 and Feb 22)
-        expect(result.streakCurrent, 6);
-        expect(result.streakLongest, 6);
+        // Feb 22-28 contiguous (freeze on Feb 26 counts as a day). Streak breaks at Feb 21.
+        expect(result.streakCurrent, 7);
+        expect(result.streakLongest, 7);
       });
 
       test('calculateStreak - with freezes on both Feb 21 and Feb 26', () {
@@ -1219,9 +1217,9 @@ void main() {
         var result = statsManager.calculateStreak(stats);
 
         // Assert
-        // Should have a streak of 7 real meditation days (Feb 20, 22-25, 27, 28) because freezes cover both gaps
-        expect(result.streakCurrent, 7);
-        expect(result.streakLongest, 7);
+        // Feb 20-28 fully bridged by freezes on Feb 21 and Feb 26.
+        expect(result.streakCurrent, 9);
+        expect(result.streakLongest, 9);
       });
 
     });
