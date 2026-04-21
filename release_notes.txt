@@ -1,6 +1,9 @@
 Unreleased
 -
 
+3.6.20
+- Bug fixes and improvements
+
 3.6.19
 - Fixed an issue where your streak could drop after signing in
 
