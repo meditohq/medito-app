@@ -4,6 +4,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/utils/logger.dart';
 
 class CrashlyticsService {
   static final CrashlyticsService _instance = CrashlyticsService._internal();
@@ -297,6 +298,23 @@ class CrashlyticsService {
   Future<void> setCustomKey(String key, dynamic value) async {
     if (!_analyticsEnabled) return;
     await FirebaseCrashlytics.instance.setCustomKey(key, value);
+  }
+
+  /// Enable or disable Crashlytics collection at runtime.
+  /// Call this when the user toggles the Firebase analytics setting.
+  Future<void> setCollectionEnabled(bool enabled) async {
+    _analyticsEnabled = enabled;
+    try {
+      await FirebaseCrashlytics.instance
+          .setCrashlyticsCollectionEnabled(enabled && !kDebugMode);
+      if (kDebugMode) {
+        AppLogger.d('CRASHLYTICS', 'Collection enabled: $enabled');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.d('CRASHLYTICS', 'Error setting collection enabled: $e');
+      }
+    }
   }
 
   void recordAppError(AppError error) {

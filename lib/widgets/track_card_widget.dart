@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -19,36 +20,37 @@ class TrackCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: InkWell(
-        onTap: onTap,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: subTitle != null
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.center,
-                children: [
-                  _title(textTheme, title: title),
-                  if (subTitle != null) height4,
-                  _description(
-                    textTheme,
-                    subtitle: subTitle,
-                  ),
-                ],
+    return HomeGradientBorder(
+      backgroundColor: Theme.of(context).cardColor,
+      borderRadius: 14,
+      borderWidth: 0.5,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: InkWell(
+          onTap: onTap,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: subTitle != null
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.center,
+                  children: [
+                    _title(textTheme, title: title),
+                    if (subTitle != null) height4,
+                    _description(
+                      textTheme,
+                      subtitle: subTitle,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            width12,
-            _getCoverUrl(),
-          ],
+              width12,
+              _getCoverUrl(),
+            ],
+          ),
         ),
       ),
     );

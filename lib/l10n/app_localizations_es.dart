@@ -476,7 +476,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get loginWarningExplanation =>
-      'Si ya tienes una cuenta de Medito:\\n• Tus datos de meditación anteriores se descargarán\\n• Tu progreso actual no guardado se perderá\\n\\nSi eres nuevo en Medito:\\n• Se creará una nueva cuenta\\n• Tu progreso actual se guardará en esta cuenta';
+      'Si ya tienes una cuenta de Medito:\n• Tus datos de meditación anteriores se descargarán\n• Tu progreso actual no guardado se perderá\n\nSi eres nuevo en Medito:\n• Se creará una nueva cuenta\n• Tu progreso actual se guardará en esta cuenta';
 
   @override
   String get createNewAccount => 'Crear Nueva Cuenta';
@@ -1344,11 +1344,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noResultsFound => 'No se encontraron resultados para tu búsqueda';
 
   @override
-  String get statsWelcomeTitle => '¡Presentamos la Puntuación de Consistencia!';
+  String get consistencyScoreInfoTitle => 'Puntuación de Consistencia';
 
   @override
-  String get statsWelcomeMessage =>
-      'Hemos agregado una puntuación de consistencia para ayudarte a sentirte más realizado. A diferencia de las rachas, no se reinicia en días perdidos, reflejando tu dedicación general. Tu pantalla de inicio mostrará tu mejor puntuación para mantenerte motivado.';
+  String get consistencyScoreInfoMessage =>
+      'Tu puntuación de consistencia refleja con qué regularidad has meditado en los últimos 30 días. A diferencia de las rachas, no se reinicia en días perdidos.';
 
   @override
   String get accountDeletionInitiated =>
@@ -1789,6 +1789,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get addSession => 'Agregar sesión';
+
+  @override
+  String get deleteSessionTitle => 'Eliminar sesión';
+
+  @override
+  String get deleteSessionConfirmation =>
+      '¿Estás seguro de que quieres eliminar esta sesión? Esto actualizará tu racha y estadísticas.';
+
+  @override
+  String get deleteSessionError => 'Error al eliminar la sesión.';
 
   @override
   String get date => 'Fecha';

@@ -5,6 +5,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../services/analytics/firebase_analytics_service.dart';
+import '../../../widgets/dialogs/dialogs.dart';
 import '../../../widgets/medito_icon.dart';
 import '../../../widgets/snackbar_widget.dart';
 
@@ -14,6 +15,7 @@ import '../../../providers/donation/donation_snooze_provider.dart';
 import '../../../routes/routes.dart';
 import '../../../utils/utils.dart';
 import '../../../widgets/errors/medito_error_widget.dart';
+import '../../home/widgets/home_gradient_border.dart';
 import 'feedback_widget.dart';
 
 class DonationWidget extends ConsumerStatefulWidget {
@@ -83,20 +85,17 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
     DonationPageModel donationPageModel, {
     required bool isSnoozed,
   }) {
-    final textColor = donationPageModel.cardTextColor != null
+    final footerColor = donationPageModel.cardTextColor != null
         ? parseColor(donationPageModel.cardTextColor!)
-        : ColorConstants.lightPurple;
+        : Colors.white.withValues(alpha: 0.85);
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: ColorConstants.lightPurple,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 15,
-      ),
-      child: Column(
+    return HomeGradientBorder(
+      backgroundColor: context.brandPurple,
+      borderRadius: 14,
+      borderWidth: 0.5,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 12, 20),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -104,14 +103,19 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(
-                  donationPageModel.title ?? 'Support Medito',
-                  textAlign: TextAlign.left,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontFamily: sourceSerif,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w400,
-                      ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    donationPageModel.title ?? 'Support Medito',
+                    textAlign: TextAlign.left,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontFamily: sourceSerif,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w400,
+                          height: 1.2,
+                          color: Colors.white,
+                        ),
+                  ),
                 ),
               ),
               IconButton(
@@ -128,48 +132,55 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             donationPageModel.text ??
                 AppLocalizations.of(context)!
                     .meditoReliesOnYourDonationsToSurvive,
             textAlign: TextAlign.left,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w400,
+                  height: 1.4,
+                  color: Colors.white.withValues(alpha: 0.9),
                 ),
           ),
-          height20,
-          _buildButtonRow(donationPageModel.buttons, context),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: _buildButtonRow(donationPageModel.buttons, context),
+          ),
           if (donationPageModel.footerText != null)
             Padding(
-              padding: const EdgeInsets.only(top: 16.0),
+              padding: const EdgeInsets.only(top: 14.0, right: 8),
               child: Text(
                 donationPageModel.footerText!,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: textColor,
+                      height: 1.4,
+                      color: footerColor,
                     ),
               ),
             ),
         ],
+        ),
       ),
     );
   }
 
   Widget _buildCompactThankYouWidget(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: ColorConstants.lightPurple,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 12,
-      ),
-      child: Column(
+    return HomeGradientBorder(
+      backgroundColor: context.brandPurple,
+      borderRadius: 14,
+      borderWidth: 0.5,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
@@ -179,6 +190,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                   fontFamily: sourceSerif,
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
+                  color: Colors.white,
                 ),
           ),
           const SizedBox(height: 6),
@@ -188,6 +200,8 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
+                  height: 1.4,
+                  color: Colors.white.withValues(alpha: 0.9),
                 ),
           ),
           const SizedBox(height: 12),
@@ -217,6 +231,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -225,46 +240,24 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
     await showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-          title: Text(
-            AppLocalizations.of(context)!.donationInfoTitle,
-            style: Theme.of(context).dialogTheme.titleTextStyle,
-          ),
+        return MeditoDialog(
+          title: AppLocalizations.of(context)!.donationInfoTitle,
           content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.donationInfoMessage,
-                  style: Theme.of(context).dialogTheme.contentTextStyle,
-                ),
-              ],
+            child: MeditoDialogBody(
+              AppLocalizations.of(context)!.donationInfoMessage,
             ),
           ),
           actions: [
-            TextButton(
+            MeditoDialogSecondaryButton(
+              label: AppLocalizations.of(context)!.cancel,
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                AppLocalizations.of(context)!.cancel,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
             ),
-            TextButton(
+            MeditoDialogPrimaryButton(
+              label: AppLocalizations.of(context)!.hideForNow,
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
                 await _snoozeDonationAsk(context);
               },
-              child: Text(
-                AppLocalizations.of(context)!.hideForNow,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ),
           ],
         );
@@ -315,7 +308,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorConstants.white,
-                foregroundColor: ColorConstants.lightPurple,
+                foregroundColor: context.brandPurple,
                 padding: const EdgeInsets.symmetric(vertical: 8),
               ),
               child: Text(
@@ -345,7 +338,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                     FirebaseAnalyticsService.paywallSourceEndScreen,
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorConstants.lightPurple,
+                backgroundColor: context.brandPurple,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 8),
               ),

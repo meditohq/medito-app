@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/theme_provider.dart';
+import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class ThemeSelectionDialog extends ConsumerWidget {
@@ -11,17 +13,19 @@ class ThemeSelectionDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTheme = ref.watch(themeProvider);
+    final l10n = AppLocalizations.of(context)!;
 
-    return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.selectTheme),
+    return MeditoDialog(
+      title: l10n.selectTheme,
       content: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildThemeOption(
             context,
             ref,
             ThemeMode.system,
-            AppLocalizations.of(context)!.systemTheme,
+            l10n.systemTheme,
             MeditoIcons.settings,
             currentTheme,
           ),
@@ -30,7 +34,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
             context,
             ref,
             ThemeMode.light,
-            AppLocalizations.of(context)!.lightTheme,
+            l10n.lightTheme,
             MeditoIcons.sun,
             currentTheme,
           ),
@@ -39,12 +43,18 @@ class ThemeSelectionDialog extends ConsumerWidget {
             context,
             ref,
             ThemeMode.dark,
-            AppLocalizations.of(context)!.darkTheme,
+            l10n.darkTheme,
             MeditoIcons.moon,
             currentTheme,
           ),
         ],
       ),
+      actions: [
+        MeditoDialogSecondaryButton(
+          label: l10n.cancel,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
     );
   }
 
@@ -56,6 +66,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
     String iconAsset,
     ThemeMode currentTheme,
   ) {
+    final theme = Theme.of(context);
     final isSelected = currentTheme == themeMode;
 
     return InkWell(
@@ -63,14 +74,20 @@ class ThemeSelectionDialog extends ConsumerWidget {
         ref.read(themeProvider.notifier).setTheme(themeMode);
         Navigator.of(context).pop();
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           color: isSelected
-              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-              : Colors.transparent,
+              ? theme.colorScheme.primary.withOpacityValue(0.1)
+              : theme.cardColor,
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary.withOpacityValue(0.4)
+                : theme.colorScheme.outline.withOpacityValue(0.3),
+            width: 0.5,
+          ),
         ),
         child: Row(
           children: [
@@ -78,17 +95,17 @@ class ThemeSelectionDialog extends ConsumerWidget {
               assetName: iconAsset,
               size: 20,
               color: isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurface,
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: theme.textTheme.bodyMedium?.copyWith(
                       color: isSelected
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.onSurface,
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.w400,
                     ),
@@ -98,7 +115,7 @@ class ThemeSelectionDialog extends ConsumerWidget {
               Icon(
                 Icons.check,
                 size: 20,
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.colorScheme.primary,
               ),
           ],
         ),

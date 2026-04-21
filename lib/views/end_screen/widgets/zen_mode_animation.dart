@@ -76,33 +76,31 @@ class _ZenModeAnimationState extends State<ZenModeAnimation>
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return ImageFiltered(
-              imageFilter: ImageFilter.blur(
-                sigmaX: _blurAnimation.value,
-                sigmaY: _blurAnimation.value,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: _blurAnimation.value,
+              sigmaY: _blurAnimation.value,
+            ),
+            child: Opacity(
+              opacity: _opacityAnimation.value,
+              child: Text(
+                _selectedMessage,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontFamily: teachers,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w400,
+                      height: 1.25,
+                    ),
+                textAlign: TextAlign.center,
               ),
-              child: Opacity(
-                opacity: _opacityAnimation.value,
-                child: Text(
-                  _selectedMessage,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontFamily: teachers,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w400,
-                        height: 1.2,
-                      ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

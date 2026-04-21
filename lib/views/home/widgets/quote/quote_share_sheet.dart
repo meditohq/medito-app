@@ -74,7 +74,7 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
                 child: FilledButton(
                   onPressed: _sharing ? null : _share,
                   style: FilledButton.styleFrom(
-                    backgroundColor: ColorConstants.lightPurple,
+                    backgroundColor: context.brandPurple,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: padding16),
                     shape: RoundedRectangleBorder(
@@ -246,7 +246,9 @@ class _FlowLinesPainter extends CustomPainter {
         path.lineTo(x, y);
 
         if (x < -40 || x > size.width + 40 ||
-            y < -40 || y > size.height + 40) break;
+            y < -40 || y > size.height + 40) {
+          break;
+        }
       }
 
       canvas.drawPath(path, paint);

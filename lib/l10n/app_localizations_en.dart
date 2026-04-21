@@ -469,7 +469,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginWarningExplanation =>
-      'If you already have a Medito account:\\n• Your previous meditation data will be downloaded\\n• Your current unsaved progress will be lost\\n\\nIf you\'re new to Medito:\\n• A new account will be created\\n• Your current progress will be saved to this account';
+      'If you already have a Medito account:\n• Your previous meditation data will be downloaded\n• Your current unsaved progress will be lost\n\nIf you\'re new to Medito:\n• A new account will be created\n• Your current progress will be saved to this account';
 
   @override
   String get createNewAccount => 'Create New Account';
@@ -1317,11 +1317,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noResultsFound => 'No results found for your search';
 
   @override
-  String get statsWelcomeTitle => 'Introducing Consistency Score!';
+  String get consistencyScoreInfoTitle => 'Consistency Score';
 
   @override
-  String get statsWelcomeMessage =>
-      'We\'ve added a consistency score to help you feel more accomplished. Unlike streaks, it doesn\'t reset on missed days, reflecting your overall dedication. Your home screen will show your best score to keep you motivated.';
+  String get consistencyScoreInfoMessage =>
+      'Your consistency score reflects how regularly you\'ve meditated over the last 30 days. Unlike streaks, it doesn\'t reset on missed days.';
 
   @override
   String get accountDeletionInitiated =>
@@ -1762,6 +1762,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addSession => 'Add Session';
+
+  @override
+  String get deleteSessionTitle => 'Delete Session';
+
+  @override
+  String get deleteSessionConfirmation =>
+      'Are you sure you want to delete this session? This will update your streak and stats.';
+
+  @override
+  String get deleteSessionError => 'Failed to delete session.';
 
   @override
   String get date => 'Date';

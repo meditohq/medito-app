@@ -203,7 +203,7 @@ class ManageDefaultsScreen extends ConsumerWidget {
                                 min: 1,
                                 max: 60,
                                 divisions: 59,
-                                activeColor: ColorConstants.lightPurple,
+                                activeColor: context.brandPurple,
                                 inactiveColor: ColorConstants.greyIsTheNewGrey,
                                 onChanged: (double newValue) {
                                   ref

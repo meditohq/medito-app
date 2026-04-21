@@ -10,6 +10,7 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/track/track_view.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -171,6 +172,45 @@ class _MeditationCalendarWidgetState
     });
   }
 
+  Future<void> _confirmDeleteSession(LocalAudioCompleted session) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => MeditoDialog(
+        title: l10n.deleteSessionTitle,
+        content: MeditoDialogBody(l10n.deleteSessionConfirmation),
+        actions: [
+          MeditoDialogSecondaryButton(
+            label: l10n.cancel,
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+          ),
+          MeditoDialogDestructiveButton(
+            label: l10n.delete,
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final errorMessage = l10n.deleteSessionError;
+
+    final success = await deleteSession(session: session);
+
+    if (!mounted) return;
+
+    if (success) {
+      await ref.read(statsProvider.notifier).refreshFromLocal();
+    } else {
+      messenger.showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    }
+  }
+
   Future<void> _showAddSessionDialog(BuildContext context) async {
     final selectedDate = _selectedDayForSessions;
 
@@ -286,7 +326,7 @@ class _MeditationCalendarWidgetState
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
               selectedDecoration: BoxDecoration(
-                color: ColorConstants.lightPurple,
+                color: context.brandPurple,
                 shape: BoxShape.circle,
               ),
               todayTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -303,7 +343,7 @@ class _MeditationCalendarWidgetState
                 color: Theme.of(context).colorScheme.surface,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: ColorConstants.lightPurple,
+                  color: context.brandPurple,
                   width: 2,
                 ),
               ),
@@ -318,7 +358,7 @@ class _MeditationCalendarWidgetState
                   return Container(
                     margin: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: ColorConstants.lightPurple.withOpacityValue(0.15),
+                      color: context.brandPurple.withOpacityValue(0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -363,7 +403,7 @@ class _MeditationCalendarWidgetState
 
                 Color backgroundColor;
                 if (hasMeditation) {
-                  backgroundColor = ColorConstants.lightPurple.withOpacityValue(0.25);
+                  backgroundColor = context.brandPurple.withOpacityValue(0.25);
                 } else if (hasFreeze) {
                   backgroundColor = ColorConstants.lightBlue.withOpacityValue(0.25);
                 } else {
@@ -376,7 +416,7 @@ class _MeditationCalendarWidgetState
                     color: backgroundColor,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: ColorConstants.lightPurple,
+                      color: context.brandPurple,
                       width: 2,
                     ),
                   ),
@@ -399,7 +439,7 @@ class _MeditationCalendarWidgetState
                 return Container(
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: hasFreeze ? ColorConstants.lightBlue : ColorConstants.lightPurple,
+                    color: hasFreeze ? ColorConstants.lightBlue : context.brandPurple,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -525,7 +565,7 @@ class _MeditationCalendarWidgetState
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Center(
                       child: CircularProgressIndicator(
-                        color: ColorConstants.lightPurple,
+                        color: context.brandPurple,
                       ),
                     ),
                   )
@@ -540,6 +580,7 @@ class _MeditationCalendarWidgetState
                         key:
                             ValueKey(session.id + session.timestamp.toString()),
                         session: session,
+                        onLongPress: () => _confirmDeleteSession(session),
                       ),
                     );
                   }),
@@ -587,10 +628,12 @@ class _MeditationCalendarWidgetState
 
 class _SessionItemWidget extends ConsumerWidget {
   final LocalAudioCompleted session;
+  final VoidCallback? onLongPress;
 
   const _SessionItemWidget({
     super.key,
     required this.session,
+    this.onLongPress,
   });
 
   @override
@@ -636,7 +679,7 @@ class _SessionItemWidget extends ConsumerWidget {
             decoration: BoxDecoration(
               color: isManual
                   ? ColorConstants.graphite
-                  : ColorConstants.lightPurple,
+                  : context.brandPurple,
               shape: BoxShape.circle,
             ),
           ),
@@ -691,7 +734,11 @@ class _SessionItemWidget extends ConsumerWidget {
     );
 
     if (isManual) {
-      return content;
+      return InkWell(
+        onLongPress: onLongPress,
+        borderRadius: BorderRadius.circular(8),
+        child: content,
+      );
     }
 
     return InkWell(
@@ -705,6 +752,7 @@ class _SessionItemWidget extends ConsumerWidget {
           ),
         );
       },
+      onLongPress: onLongPress,
       borderRadius: BorderRadius.circular(8),
       child: content,
     );

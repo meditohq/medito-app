@@ -1,4 +1,5 @@
 export 'buttons/loading_button_widget.dart';
+export 'dialogs/dialogs.dart';
 export 'drop_down_widget.dart';
 export 'errors/medito_error_widget.dart';
 export 'handle_bar_widget.dart';
@@ -12,7 +13,6 @@ export 'shimmers/explore_initial_page_shimmer_widget.dart';
 export 'shimmers/explore_result_shimmer_widget.dart';
 export 'shimmers/folder_shimmer_widget.dart';
 export 'shimmers/home/header_and_announcement_shimmer_widget.dart';
-export 'shimmers/home/home_shimmer_widget.dart';
 export 'shimmers/home/quote_shimmer_widget.dart';
 export 'shimmers/home/shortcuts_shimmer_widget.dart';
 export 'shimmers/home/tiles_shimmer_widget.dart';

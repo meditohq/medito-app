@@ -5,6 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final _firebaseEnabledProvider = FutureProvider<bool>((ref) async {
@@ -52,6 +56,10 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
                     SharedPreferenceConstants.analyticsFirebaseEnabled,
                     value,
                   );
+                  // Disable/enable the SDKs at the native level
+                  await FirebaseAnalyticsService()
+                      .setCollectionEnabled(value);
+                  await CrashlyticsService().setCollectionEnabled(value);
                   ref.invalidate(_firebaseEnabledProvider);
                 },
               ),
@@ -67,6 +75,8 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
                     SharedPreferenceConstants.analyticsMetaEnabled,
                     value,
                   );
+                  // Disable/enable the Meta SDK at runtime
+                  await MetaSdkService.instance.setEnabled(value);
                   ref.invalidate(_metaEnabledProvider);
                 },
               ),
@@ -130,21 +140,22 @@ class _SwitchTile extends ConsumerWidget {
           if (!value) {
             final confirm = await showDialog<bool>(
               context: context,
-              builder: (ctx) => AlertDialog(
-                title: Text(AppLocalizations.of(context)!.areYouSure),
-                content: Text(Platform.isIOS
-                    ? AppLocalizations.of(context)!.iosTrackingDialogContent
-                    : AppLocalizations.of(context)!.analyticsTrackingContent),
+              builder: (ctx) => MeditoDialog(
+                title: AppLocalizations.of(context)!.areYouSure,
+                content: MeditoDialogBody(
+                  Platform.isIOS
+                      ? AppLocalizations.of(context)!.iosTrackingDialogContent
+                      : AppLocalizations.of(context)!.analyticsTrackingContent,
+                ),
                 actions: [
-                  TextButton(
+                  MeditoDialogSecondaryButton(
+                    label: AppLocalizations.of(context)!.iosTrackingDialogCancel,
                     onPressed: () => Navigator.pop(ctx, false),
-                    child: Text(
-                        AppLocalizations.of(context)!.iosTrackingDialogCancel),
                   ),
-                  TextButton(
+                  MeditoDialogDestructiveButton(
+                    label:
+                        AppLocalizations.of(context)!.iosTrackingDialogDisable,
                     onPressed: () => Navigator.pop(ctx, true),
-                    child: Text(
-                        AppLocalizations.of(context)!.iosTrackingDialogDisable),
                   ),
                 ],
               ),

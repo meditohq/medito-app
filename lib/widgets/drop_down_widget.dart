@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:flutter/material.dart';
 
 class DropdownWidget<T> extends StatelessWidget {
@@ -44,15 +45,19 @@ class DropdownWidget<T> extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface,
         );
 
-    return Container(
-      height: isLandscape ? 56 : 48, // Set height to 48 in portrait mode
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        color: Theme.of(context).brightness == Brightness.dark
+    final backgroundColor =
+        Theme.of(context).brightness == Brightness.dark
             ? Theme.of(context).cardColor
-            : Theme.of(context).colorScheme.surface,
+            : Theme.of(context).colorScheme.surface;
+
+    return SizedBox(
+      height: isLandscape ? 56 : 48, // Set height to 48 in portrait mode
+      child: HomeGradientBorder(
+        backgroundColor: backgroundColor,
+        borderRadius: topLeft,
+        borderWidth: 0.5,
+        child: _buildContent(context, radius, textStyle),
       ),
-      child: _buildContent(context, radius, textStyle),
     );
   }
 

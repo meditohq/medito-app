@@ -151,7 +151,7 @@ class TrackViewBottomBar extends ConsumerWidget {
     bool isDailyMeditation,
   ) {
     var colour = isFavorite
-        ? ColorConstants.lightPurple
+        ? context.brandPurple
         : Theme.of(context).colorScheme.onSurface;
 
     final l10n = AppLocalizations.of(context)!;

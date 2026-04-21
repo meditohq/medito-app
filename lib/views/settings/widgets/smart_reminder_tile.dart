@@ -10,6 +10,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class SmartReminderTile extends ConsumerWidget {
@@ -55,23 +56,29 @@ class SmartReminderTile extends ConsumerWidget {
       }
     }
 
-    return Card(
-      borderOnForeground: true,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      color: Theme.of(context).cardColor,
-      child: RowItemWidget(
-        icon: MeditoIcon(
-          assetName: MeditoIcons.bell,
-          size: 24,
-          color: Theme.of(context).colorScheme.onSurface,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: HomeGradientBorder(
+        backgroundColor: Theme.of(context).cardColor,
+        borderRadius: 14,
+        borderWidth: 0.5,
+        child: Material(
+          type: MaterialType.transparency,
+          child: RowItemWidget(
+            icon: MeditoIcon(
+              assetName: MeditoIcons.bell,
+              size: 24,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            title: AppLocalizations.of(context)!.smartReminders,
+            subTitle: null,
+            hasUnderline: false,
+            isSwitch: true,
+            switchValue: isEnabled,
+            onTap: () => handleToggle(!isEnabled),
+            onSwitchChanged: handleToggle,
+          ),
         ),
-        title: AppLocalizations.of(context)!.smartReminders,
-        subTitle: null,
-        hasUnderline: false,
-        isSwitch: true,
-        switchValue: isEnabled,
-        onTap: () => handleToggle(!isEnabled),
-        onSwitchChanged: handleToggle,
       ),
     );
   }

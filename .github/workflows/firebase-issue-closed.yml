@@ -1,0 +1,18 @@
+name: Firebase Issue Closed Reminder
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  remind:
+    if: contains(github.event.issue.labels.*.name, 'firebase-alert')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post reminder comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" \
+            --repo "${{ github.repository }}" \
+            --body "This issue was created from a Firebase Crashlytics alert. Remember to close it in the [Firebase Console](https://console.firebase.google.com/project/medito-9165c/crashlytics) too."

@@ -21,8 +21,10 @@ class HomeGradientBorder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final effectiveLightBlend = isDark ? lightBlend : lightBlend * 0.4;
-    final effectiveDarkBlend = isDark ? darkBlend : darkBlend * 0.25;
+    // Tone the bezel down in light mode — the same blends that read as a soft
+    // inner glow on dark surfaces look like a heavy 3D edge on white.
+    final effectiveLightBlend = isDark ? lightBlend : lightBlend * 0.55;
+    final effectiveDarkBlend = isDark ? darkBlend : darkBlend * 0.18;
     final lightColor =
         Color.lerp(backgroundColor, Colors.white, effectiveLightBlend) ??
         backgroundColor;
@@ -31,15 +33,20 @@ class HomeGradientBorder extends StatelessWidget {
         backgroundColor;
     final innerRadius = (borderRadius - borderWidth).clamp(0.0, borderRadius);
 
+    // Vertical gradient (top → bottom) rather than diagonal: diagonals only
+    // land the light/dark at opposite corners, so on wide-short cards the
+    // top and bottom edges end up flat mid-tone. A pure vertical gradient
+    // highlights the top rim and shadows the bottom rim consistently for
+    // any aspect ratio.
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [lightColor, darkColor],
-            stops: const [0.35, 0.75],
+            stops: const [0.0, 1.0],
           ),
         ),
         child: Padding(

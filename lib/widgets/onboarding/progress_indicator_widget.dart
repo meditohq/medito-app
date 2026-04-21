@@ -27,7 +27,7 @@ class OnboardingProgressIndicator extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: index == currentIndex
-                  ? ColorConstants.lightPurple
+                  ? context.brandPurple
                   : isDark
                       ? Colors.white24
                       : ColorConstants.lightGrey,

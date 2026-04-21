@@ -11,7 +11,6 @@ import '../providers/stats_provider.dart';
 import '../providers/home/up_next_provider.dart';
 import '../providers/settings/settings_providers.dart';
 import '../routes/routes.dart';
-import '../widgets/snackbar_widget.dart';
 import '../l10n/app_localizations.dart';
 import 'completed_tracks_storage.dart';
 import 'health_kit_manager.dart';
@@ -365,6 +364,38 @@ String _getManualSessionId(DateTime dateTime) {
     return TypeConstants.manual3; // Evening
   } else {
     return TypeConstants.manual4; // Night
+  }
+}
+
+/// Removes a previously recorded session from stats.
+///
+/// Matches on id + timestamp so that duplicate ids on different days are
+/// unaffected. Recalculates streak + consistency, refreshes providers, and
+/// updates the home widget.
+Future<bool> deleteSession({
+  required LocalAudioCompleted session,
+  StatsManager? statsManager,
+}) async {
+  try {
+    statsManager ??= StatsManager()..initialize();
+    await statsManager.removeAudioCompleted(session);
+
+    await _refreshStatsAndUpNext();
+
+    try {
+      final updatedStats = await statsManager.localAllStats;
+      HomeWidgetService.updateWidgetFromStats(updatedStats).catchError((e) {
+        AppLogger.e('STATS', 'Failed to update home widget', e);
+      });
+    } catch (widgetError) {
+      AppLogger.e(
+          'STATS', 'Failed to get stats for widget update', widgetError);
+    }
+
+    return true;
+  } catch (e) {
+    AppLogger.e('STATS', 'Failed to delete session', e);
+    return false;
   }
 }
 

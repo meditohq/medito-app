@@ -380,61 +380,42 @@ class StatsManager {
     var today = DateTime(now.year, now.month, now.day);
     var longestStreak = allStats.streakLongest;
 
-    // Build a map of calendar day → hasRealSession.
-    // true  = at least one real meditation that day
-    // false = only freeze entries that day (bridges gap, doesn't count)
-    final activityByDate = <DateTime, bool>{};
+    // Any day with an entry (real session, freeze audio entry, or legacy
+    // freeze date) counts toward the streak. The freeze feature is retired, so
+    // we no longer distinguish freeze vs real — preserving legacy streaks for
+    // users who accrued them under the old "freeze = +1" rule.
+    final activityDates = <DateTime>{};
 
     for (final entry in allStats.audioCompleted ?? []) {
       final date = DateTime.fromMillisecondsSinceEpoch(entry.timestamp);
       final day = DateTime(date.year, date.month, date.day);
       if (day.isAfter(today)) continue;
-      final isReal = !isFreezeSession(entry);
-      // Once a day is marked real, keep it real even if a freeze also exists
-      activityByDate[day] = (activityByDate[day] ?? false) || isReal;
+      activityDates.add(day);
     }
 
-    // Legacy freeze dates (local-only field, kept for backwards compatibility)
     for (final ts in allStats.freezeUsageDates) {
       final date = DateTime.fromMillisecondsSinceEpoch(ts);
       final day = DateTime(date.year, date.month, date.day);
-      if (!day.isAfter(today)) {
-        activityByDate[day] ??= false;
-      }
+      if (!day.isAfter(today)) activityDates.add(day);
     }
 
-    // No real sessions at all → streak is 0
-    if (!activityByDate.values.any((isReal) => isReal)) {
+    if (activityDates.isEmpty) {
       return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
     }
 
-    // DST-safe yesterday
     final yesterday = DateTime(today.year, today.month, today.day - 1);
+    final hasActivityToday = activityDates.contains(today);
+    final hasActivityYesterday = activityDates.contains(yesterday);
 
-    final hasActivityToday = activityByDate.containsKey(today);
-    final hasActivityYesterday = activityByDate.containsKey(yesterday);
-
-    // Streak is 0 if neither today nor yesterday has any activity
     if (!hasActivityToday && !hasActivityYesterday) {
       return allStats.copyWith(streakCurrent: 0, streakLongest: longestStreak);
     }
 
-    // Activity today but not yesterday → fresh streak of 1 (or 0 if freeze-only today)
-    if (hasActivityToday && !hasActivityYesterday) {
-      final streak = (activityByDate[today]!) ? 1 : 0;
-      return allStats.copyWith(
-        streakCurrent: streak,
-        streakLongest: longestStreak > streak ? longestStreak : streak,
-      );
-    }
-
-    // Walk backwards counting consecutive days.
-    // Real days increment the counter; freeze-only days bridge the gap without incrementing.
-    var streak = (activityByDate[today] ?? false) ? 1 : 0;
+    var streak = hasActivityToday ? 1 : 0;
     var checkDate = yesterday;
 
-    while (activityByDate.containsKey(checkDate)) {
-      if (activityByDate[checkDate]!) streak++;
+    while (activityDates.contains(checkDate)) {
+      streak++;
       checkDate = DateTime(checkDate.year, checkDate.month, checkDate.day - 1);
     }
 
@@ -523,6 +504,48 @@ class StatsManager {
         // Silently fail - widget updates are not critical
       });
     }
+  }
+
+  Future<void> removeAudioCompleted(LocalAudioCompleted session) async {
+    if (_allStats == null) {
+      await sync();
+    }
+    if (_allStats == null) return;
+
+    final currentList = _allStats!.audioCompleted ?? [];
+    final updatedList = currentList
+        .where((a) =>
+            !(a.id == session.id && a.timestamp == session.timestamp))
+        .toList();
+
+    if (updatedList.length == currentList.length) {
+      // Nothing matched — don't write an update
+      return;
+    }
+
+    _dirty = true;
+
+    final newTotalTracks = (_allStats!.totalTracksCompleted - 1).clamp(0, 1 << 31);
+
+    _allStats = _allStats!.copyWith(
+      audioCompleted: updatedList,
+      totalTracksCompleted: newTotalTracks,
+      updated: _getCurrentDate().millisecondsSinceEpoch,
+    );
+
+    _allStats = calculateStreak(_allStats!);
+    final newConsistencyScore = calculateConsistencyScore(_allStats!);
+    _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
+    await saveConsistencyScoreHistory(newConsistencyScore);
+    await _saveLocalAllStatsToSharedPrefs();
+    await _statsService.postStats(_allStats!);
+    _lastSyncedAt = _getCurrentDate();
+    await _saveLastSyncedAt();
+    _dirty = false;
+
+    HomeWidgetService.updateWidgetFromStats(_allStats!).catchError((e) {
+      // Silently fail - widget updates are not critical
+    });
   }
 
   Future<void> addTrackChecked(String? id) async {

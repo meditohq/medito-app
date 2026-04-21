@@ -121,7 +121,7 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
   Widget build(BuildContext context) {
     final isCompleted = widget.item.isCompleted ?? false;
     final backgroundColor = isCompleted
-        ? ColorConstants.lightPurple
+        ? context.brandPurple
         : widget.isFirstUncompleted
             ? ColorConstants.amber
             : Colors.grey[800];

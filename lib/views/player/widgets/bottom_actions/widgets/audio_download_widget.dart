@@ -8,6 +8,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
@@ -178,26 +179,19 @@ class AudioDownloadWidget extends ConsumerWidget {
     var confirmDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-              AppLocalizations.of(context)!.confirmDeletionFromPlayerTitle),
-          content: Text(
+        return MeditoDialog(
+          title: AppLocalizations.of(context)!.confirmDeletionFromPlayerTitle,
+          content: MeditoDialogBody(
             '${AppLocalizations.of(context)!.confirmDeletionFromPlayerMessage} "${trackModel.title}"?',
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                // User pressed the cancel button
-                Navigator.of(context).pop(false);
-              },
-              child: Text(AppLocalizations.of(context)!.cancel),
+          actions: [
+            MeditoDialogSecondaryButton(
+              label: AppLocalizations.of(context)!.cancel,
+              onPressed: () => Navigator.of(context).pop(false),
             ),
-            TextButton(
-              onPressed: () {
-                // User pressed the delete button
-                Navigator.of(context).pop(true);
-              },
-              child: Text(AppLocalizations.of(context)!.delete),
+            MeditoDialogDestructiveButton(
+              label: AppLocalizations.of(context)!.delete,
+              onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
         );

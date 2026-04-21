@@ -27,7 +27,6 @@ import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
-import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -433,24 +432,19 @@ class SplashViewState extends ConsumerState<SplashView>
       final shouldUseExistingAccount = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.emailExistsDialogTitle),
-          content: Text(AppLocalizations.of(context)!.emailExistsDialogMessage),
+        builder: (context) => MeditoDialog(
+          title: AppLocalizations.of(context)!.emailExistsDialogTitle,
+          content: MeditoDialogBody(
+            AppLocalizations.of(context)!.emailExistsDialogMessage,
+          ),
           actions: [
-            TextButton(
+            MeditoDialogSecondaryButton(
+              label: AppLocalizations.of(context)!.emailExistsContinueNewAccount,
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(
-                AppLocalizations.of(context)!.emailExistsContinueNewAccount,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: ColorConstants.brightSky,
-                ),
-              ),
             ),
-            TextButton(
+            MeditoDialogPrimaryButton(
+              label: AppLocalizations.of(context)!.emailExistsSignInWithEmail,
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(
-                AppLocalizations.of(context)!.emailExistsSignInWithEmail,
-              ),
             ),
           ],
         ),

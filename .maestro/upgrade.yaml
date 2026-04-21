@@ -1,0 +1,58 @@
+appId: ${APP_ID}
+name: Upgrade Verification – Lands on Home After In-Place Update
+---
+
+# Launch WITHOUT clearState. The old version completed onboarding during the
+# seed phase, so if migrations work correctly we should skip straight to the
+# home screen — no splash-Continue, no onboarding, no re-auth.
+- launchApp:
+    stopApp: true
+
+# Home should appear quickly. If state was wiped by the upgrade, the splash
+# screen renders with a "Continue" CTA followed by the onboarding flow, so
+# home never appears and this times out — the failure screenshot will show
+# exactly the splash/onboarding screen a real user would be stuck on.
+#
+# Anonymous auth is already done (no network round-trip), but keep a
+# generous timeout for CI emulator cold-start variability.
+- extendedWaitUntil:
+    visible: "(?s).*Medito's Journey.*"
+    timeout: 30000
+- takeScreenshot: post-upgrade-home
+
+# Confirm audio/pigeon layer still works after an in-place update.
+- scrollUntilVisible:
+    element: "(?s).*Medito's Journey.*"
+    direction: DOWN
+    timeout: 15000
+    speed: 20
+    waitToSettleTimeoutMs: 500
+    centerElement: true
+- tapOn:
+    text: "(?s).*Medito's Journey.*"
+
+- runFlow:
+    when:
+      notVisible: "Play"
+    commands:
+      - extendedWaitUntil:
+          visible: "(?i)\\d+ - \\d+ min"
+          timeout: 10000
+      - scrollUntilVisible:
+          element: "(?i)\\d+ - \\d+ min"
+          direction: DOWN
+          timeout: 10000
+          visibilityPercentage: 50
+      - tapOn:
+          text: "(?i)\\d+ - \\d+ min"
+          index: 0
+
+- extendedWaitUntil:
+    visible: "Play"
+    timeout: 15000
+- tapOn: "Play"
+
+- extendedWaitUntil:
+    visible: "00:[0-5][1-9]"
+    timeout: 20000
+- takeScreenshot: post-upgrade-playing

@@ -60,7 +60,6 @@ widgetbook/build/
 **/ios/**/Icon?
 **/ios/**/Pods/
 **/ios/**/.symlinks/
-**/ios/Podfile.lock
 **/ios/**/profile
 **/ios/**/xcuserdata
 **/ios/.generated/
@@ -86,7 +85,6 @@ widgetbook/build/
 /lib/network/auth.dart
 /ios/Flutter/flutter_export_environment.sh
 gen/
-/pubspec.lock
 /android/keystore.properties
 /.vscode
 android/app/meditokey.jks
@@ -138,3 +136,5 @@ firebase/functions/node_modules/
 after-donation-next.png
 player-playing.png
 superwall-paywall.png
+/maestro-debug-ios/.maestro/tests
+*.lock

@@ -4,6 +4,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/theme_provider.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class ThemeInlineSelector extends ConsumerWidget {
@@ -14,10 +15,14 @@ class ThemeInlineSelector extends ConsumerWidget {
     final currentTheme = ref.watch(themeProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: HomeGradientBorder(
+        backgroundColor: Theme.of(context).cardColor,
+        borderRadius: 14,
+        borderWidth: 0.5,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -68,6 +73,7 @@ class ThemeInlineSelector extends ConsumerWidget {
               ],
             ),
           ],
+          ),
         ),
       ),
     );
@@ -89,9 +95,9 @@ class _ThemeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.onSurface;
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final color = isSelected ? primary : onSurface.withValues(alpha: 0.6);
 
     return Expanded(
       child: Semantics(
@@ -107,15 +113,12 @@ class _ThemeButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             color: isSelected
-                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
-                : Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.06),
+                ? primary.withValues(alpha: 0.15)
+                : Colors.transparent,
             border: Border.all(
               color: isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.transparent,
+                  ? primary
+                  : onSurface.withValues(alpha: 0.18),
               width: 1.5,
             ),
           ),

@@ -15,6 +15,7 @@ import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/player/widgets/bottom_actions/track_view_bottom_bar.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -220,8 +221,10 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   Widget _buildImageWithData(String url) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+    return HomeGradientBorder(
+      backgroundColor: Theme.of(context).cardColor,
+      borderRadius: 20,
+      borderWidth: 0.5,
       child: NetworkImageWidget(
         url: url,
         shouldCache: true,
@@ -318,6 +321,11 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackFilesModel activeFile, {
     required bool isFullWidth,
   }) {
+    // In dark mode a white fill pops against the ebony scaffold (~18:1).
+    // In light mode the same white fill sits on #F8F9FA at ~1.07:1 and the
+    // button disappears into the page — so switch to the themed primary
+    // (WCAG-AA dark purple) with a white icon for light mode.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 56,
       width: isFullWidth ? double.infinity : null,
@@ -326,8 +334,12 @@ class _TrackViewState extends ConsumerState<TrackView>
           _handlePlay(ref, trackModel, activeFile);
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: ColorConstants.white,
-          foregroundColor: ColorConstants.black,
+          backgroundColor: isDark
+              ? ColorConstants.white
+              : Theme.of(context).colorScheme.primary,
+          foregroundColor: isDark
+              ? ColorConstants.black
+              : Theme.of(context).colorScheme.onPrimary,
         ),
         child: Icon(
           Icons.play_arrow_rounded,

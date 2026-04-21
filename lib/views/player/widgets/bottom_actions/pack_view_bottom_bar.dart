@@ -168,10 +168,10 @@ class PackViewBottomBar extends ConsumerWidget {
     bool isDefaultPack,
   ) {
     var favouriteColour = isFavorite
-        ? ColorConstants.lightPurple
+        ? context.brandPurple
         : Theme.of(context).colorScheme.onSurface;
     var pinColour = isUpNext
-        ? ColorConstants.lightPurple
+        ? context.brandPurple
         : Theme.of(context).colorScheme.onSurface;
 
     final l10n = AppLocalizations.of(context)!;

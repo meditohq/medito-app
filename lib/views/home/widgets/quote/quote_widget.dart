@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
-import 'package:medito/utils/utils.dart';
 import 'package:medito/views/home/widgets/quote/quote_share_sheet.dart';
 
 class QuoteWidget extends ConsumerStatefulWidget {

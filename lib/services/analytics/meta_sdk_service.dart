@@ -32,11 +32,37 @@ class MetaSdkService {
       return;
     }
 
-    // facebook_app_events initialises using platform configs.
-    // If consent gating is required, handle it before enabling tracking.
-    _events = FacebookAppEvents();
+    // Check user preference — skip SDK construction entirely when disabled.
+    // This prevents the SDK from making automatic network requests on startup.
+    final prefs = await SharedPreferences.getInstance();
+    final isEnabled =
+        prefs.getBool(SharedPreferenceConstants.analyticsMetaEnabled) ?? true;
 
+    if (!isEnabled) {
+      AppLogger.d('META', 'Meta analytics disabled by user, skipping SDK init');
+      _initialised = true;
+      return;
+    }
+
+    _events = FacebookAppEvents();
     _initialised = true;
+  }
+
+  /// Enable or disable the Meta SDK at runtime.
+  /// When enabling, constructs the SDK if it hasn't been yet.
+  /// When disabling, drops the reference so no further events are sent.
+  /// Note: the native Facebook SDK may still hold a singleton — a full
+  /// disable requires a process restart, but dropping _events prevents
+  /// all Dart-side event logging immediately.
+  Future<void> setEnabled(bool enabled) async {
+    if (enabled && _events == null && facebookAppId.isNotEmpty) {
+      _events = FacebookAppEvents();
+      _initialised = true;
+      AppLogger.d('META', 'Meta SDK enabled at runtime');
+    } else if (!enabled) {
+      _events = null;
+      AppLogger.d('META', 'Meta SDK disabled at runtime');
+    }
   }
 
   /// Update Facebook SDK advertiser tracking enabled flag based on ATT status

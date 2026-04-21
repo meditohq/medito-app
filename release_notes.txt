@@ -1,6 +1,22 @@
 Unreleased
 -
 
+3.6.19
+- Fixed an issue where your streak could drop after signing in
+
+3.6.18
+- Bug fixes and improvements
+
+3.6.17
+- Long-press a session in the calendar to delete it
+- Tap the Consistency Score in stats to learn what it means
+- Refreshed the Explore filter tabs
+- Cleaner dialogs and visual polish across the app
+- Analytics are now fully disabled when you opt out
+
+3.6.16
+- Bug fixes and improvements
+
 3.6.15
 - Share daily quotes as beautiful images
 - Fixed deleting downloaded meditations

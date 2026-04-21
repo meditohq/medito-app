@@ -227,11 +227,11 @@ class StreakCircleState extends ConsumerState<StreakCircle>
           ? BoxDecoration(
               gradient: SweepGradient(
                 colors: [
-                  ColorConstants.lightPurple.withOpacityValue(0.2),
-                  ColorConstants.lightPurple.withOpacityValue(0.35),
-                  ColorConstants.lightPurple.withOpacityValue(1),
-                  ColorConstants.lightPurple.withOpacityValue(0.3),
-                  ColorConstants.lightPurple.withOpacityValue(0.25),
+                  context.brandPurple.withOpacityValue(0.2),
+                  context.brandPurple.withOpacityValue(0.35),
+                  context.brandPurple.withOpacityValue(1),
+                  context.brandPurple.withOpacityValue(0.3),
+                  context.brandPurple.withOpacityValue(0.25),
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
                 transform: GradientRotation(
@@ -277,7 +277,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                                   .withOpacityValue(0.2),
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 isStreakDoneToday
-                                    ? ColorConstants.lightPurple
+                                    ? context.brandPurple
                                     : Theme.of(context).colorScheme.onSurface,
                               ),
                               strokeWidth: 2,
@@ -298,7 +298,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                               MeditoIcon(
                                 assetName: MeditoIcons.fire,
                                 color: isStreakDoneToday
-                                    ? ColorConstants.lightPurple
+                                    ? context.brandPurple
                                     : Theme.of(context).colorScheme.onSurface,
                                 size: StreakCircleConstants.innerIconSize,
                               ),
@@ -311,9 +311,13 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: StreakCircleConstants.fontSize,
                             fontWeight: isStreakDoneToday
-                                ? FontWeight.bold
-                                : FontWeight.w400,
-                            fontFamily: dmMono,
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            fontFamily: dmSans,
+                            fontFeatures: const [
+                              FontFeature.tabularFigures(),
+                            ],
+                            letterSpacing: -0.2,
                             height: StreakCircleConstants.lineHeight,
                           ),
                         ),
@@ -361,11 +365,11 @@ class StreakCircleState extends ConsumerState<StreakCircle>
           ? BoxDecoration(
               gradient: SweepGradient(
                 colors: [
-                  ColorConstants.lightPurple.withOpacityValue(0.2),
-                  ColorConstants.lightPurple.withOpacityValue(0.35),
-                  ColorConstants.lightPurple.withOpacityValue(1),
-                  ColorConstants.lightPurple.withOpacityValue(0.3),
-                  ColorConstants.lightPurple.withOpacityValue(0.25),
+                  context.brandPurple.withOpacityValue(0.2),
+                  context.brandPurple.withOpacityValue(0.35),
+                  context.brandPurple.withOpacityValue(1),
+                  context.brandPurple.withOpacityValue(0.3),
+                  context.brandPurple.withOpacityValue(0.25),
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
                 transform: GradientRotation(
@@ -401,7 +405,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                           : MeditoIcons.sun,
                       size: StreakCircleConstants.iconSize,
                       color: isStreakDoneToday
-                          ? ColorConstants.lightPurple
+                          ? context.brandPurple
                           : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),

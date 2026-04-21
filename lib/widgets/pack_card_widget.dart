@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/widgets/network_image_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -30,11 +31,10 @@ class _PackCardWidgetState extends State<PackCardWidget> {
     final titleColor = theme.colorScheme.onSurface;
     final subtitleColor = theme.colorScheme.onSurface;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
+    return HomeGradientBorder(
+      backgroundColor: backgroundColor,
+      borderRadius: 14,
+      borderWidth: 0.5,
       child: InkWell(
         onTap: widget.onTap,
         child: Column(

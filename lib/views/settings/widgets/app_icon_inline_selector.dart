@@ -8,6 +8,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/settings/widgets/app_icon_selection_dialog.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
@@ -89,11 +90,15 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: HomeGradientBorder(
+        backgroundColor: Theme.of(context).cardColor,
+        borderRadius: 14,
+        borderWidth: 0.5,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -173,6 +178,7 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );

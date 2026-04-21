@@ -15,6 +15,7 @@ import 'dart:io';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:medito/services/history/app_history_service.dart';
 import 'package:medito/utils/logger.dart';
 
 class User {
@@ -555,6 +556,17 @@ class AuthRepositoryImpl extends AuthRepository {
       // Mark user as logged in
       await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
 
+      // Record sign-in event in local history (for debug info)
+      try {
+        await AppHistoryService.recordSignIn(
+          _preferences,
+          userId: _tokens!.clientId,
+          email: _tokens!.email ?? email,
+        );
+      } catch (e) {
+        dev.log('[AUTH_REPO] Failed to record sign-in history: $e', level: 800);
+      }
+
       // Store email in secure storage for persistence
       if (_tokens!.email != null) {
         dev.log(
@@ -649,6 +661,16 @@ class AuthRepositoryImpl extends AuthRepository {
       // Mark user as logged in
       await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
 
+      try {
+        await AppHistoryService.recordSignIn(
+          _preferences,
+          userId: _tokens!.clientId,
+          email: null,
+        );
+      } catch (e) {
+        dev.log('[AUTH_REPO] Failed to record sign-in history: $e', level: 800);
+      }
+
       dev.log('[AUTH_REPO] Anonymous sign in successful');
     } on EmailExistsError {
       dev.log(
@@ -680,6 +702,17 @@ class AuthRepositoryImpl extends AuthRepository {
 
         // Mark user as logged in
         await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
+
+        try {
+          await AppHistoryService.recordSignIn(
+            _preferences,
+            userId: _tokens!.clientId,
+            email: null,
+          );
+        } catch (e) {
+          dev.log('[AUTH_REPO] Failed to record sign-in history: $e',
+              level: 800);
+        }
 
         dev.log('[AUTH_REPO] Anonymous sign in successful with new client ID');
       } catch (retryError) {

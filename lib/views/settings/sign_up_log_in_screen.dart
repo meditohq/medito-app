@@ -18,6 +18,7 @@ import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/routes/routes.dart' as routes;
@@ -63,7 +64,7 @@ class SignUpLogInPage extends ConsumerWidget {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
             child:
-                CircularProgressIndicator(color: ColorConstants.lightPurple)),
+                CircularProgressIndicator(color: context.brandPurple)),
       ); // Show loading while popping
     } else {
       dev.log('[SIGN_UP] User has no email, showing sign-up form', level: 1000);
@@ -165,40 +166,20 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     if (hasLocalStats) {
       final proceed = await showDialog<bool>(
             context: context,
-            builder: (context) => AlertDialog(
-              backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-              title: Text(
-                AppLocalizations.of(context)!.accountTransitionWarningTitle,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              content: Text(
+            builder: (context) => MeditoDialog(
+              title:
+                  AppLocalizations.of(context)!.accountTransitionWarningTitle,
+              content: MeditoDialogBody(
                 AppLocalizations.of(context)!.loginWarningExplanation,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.color
-                          ?.withOpacityValue(0.7),
-                    ),
               ),
               actions: [
-                TextButton(
+                MeditoDialogSecondaryButton(
+                  label: AppLocalizations.of(context)!.cancelAction,
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(
-                    AppLocalizations.of(context)!.cancelAction,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: ColorConstants.brightSky,
-                        ),
-                  ),
                 ),
-                TextButton(
+                MeditoDialogDestructiveButton(
+                  label: AppLocalizations.of(context)!.continueLogin,
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(
-                    AppLocalizations.of(context)!.continueLogin,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.red,
-                        ),
-                  ),
                 ),
               ],
             ),
@@ -655,9 +636,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   ButtonStyle _getButtonStyle() {
     return ElevatedButton.styleFrom(
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      backgroundColor: ColorConstants.lightPurple,
+      backgroundColor: context.brandPurple,
       disabledForegroundColor: Colors.white60,
-      disabledBackgroundColor: ColorConstants.lightPurple.withOpacityValue(0.5),
+      disabledBackgroundColor: context.brandPurple.withOpacityValue(0.5),
       minimumSize: const Size(double.infinity, 48),
     );
   }
@@ -676,9 +657,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         borderRadius: borderRadius,
         borderSide: BorderSide(color: ColorConstants.softGrey),
       ),
-      focusedBorder: const OutlineInputBorder(
+      focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: BorderSide(color: ColorConstants.lightPurple),
+        borderSide: BorderSide(color: context.brandPurple),
       ),
       disabledBorder: const OutlineInputBorder(
         borderRadius: borderRadius,

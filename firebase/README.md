@@ -1,6 +1,6 @@
-# Firebase → GitHub Issue + PR
+# Firebase → GitHub Issues
 
-Automatically create GitHub Issues **and** linked Pull Requests from Firebase Crashlytics alerts, Firestore events, or any custom webhook trigger. Copilot is assigned as reviewer and assignee on every PR.
+Automatically create GitHub Issues from Firebase Crashlytics alerts, Firestore events, or any custom webhook trigger.
 
 ## Architecture
 
@@ -9,14 +9,7 @@ Crashlytics alert (fatal, ANR, regression, velocity, digest)
   ↓
 Cloud Function (native alert trigger)
   ↓
-1. Creates GitHub Issue (with labels + details)
-2. Triggers repository_dispatch with issue number
-  ↓
-GitHub Action workflow
-  ↓
-Creates PR linked to the issue (Closes #N)
-  ↓
-Assigns Copilot as reviewer + assignee
+Creates GitHub Issue (with labels + details)
 ```
 
 ## Crashlytics Triggers
@@ -45,7 +38,7 @@ These fire **automatically** after deployment — no manual wiring needed:
 ### 2. Store secrets in Firebase
 
 ```bash
-# GitHub PAT (required — used to create issues and trigger PRs)
+# GitHub PAT (required — used to create issues)
 firebase functions:secrets:set GITHUB_TOKEN --project medito-9165c
 
 # Shared secret for HTTP webhook (only needed for webhookToGitHubPR)
@@ -104,21 +97,14 @@ Add a document to the `firebase_issues` collection in Firestore:
 
 ## What gets created
 
-For each Firebase alert, you get:
-
-1. **GitHub Issue** with:
-   - Title matching the alert
-   - Labels: `firebase-alert` + severity (`critical`, `high`, etc.)
-   - Full alert details in the body
-
-2. **GitHub PR** with:
-   - Title prefixed with severity emoji
-   - Body containing `Closes #<issue>` to auto-close the issue on merge
-   - Copilot assigned as reviewer and assignee
+For each Firebase alert, you get a **GitHub Issue** with:
+- Title matching the alert
+- Labels: `firebase-alert` + severity (`critical`, `high`, etc.)
+- Full alert details in the body
+- Link to Firebase Console
 
 ## Files
 
-- `.github/workflows/firebase-webhook-pr.yml` — GitHub Action that creates the PR
 - `firebase/functions/index.js` — Cloud Functions (Crashlytics triggers + Firestore trigger + HTTP endpoint)
 - `firebase/functions/package.json` — Node.js dependencies
 - `firebase.json` — Firebase project config pointing to functions source

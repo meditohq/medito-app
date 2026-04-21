@@ -59,7 +59,9 @@ class _HomeViewState extends ConsumerState<HomeView>
     final home = ref.watch(fetchHomeProvider);
 
     return home.when(
-      loading: () => const HomeShimmerWidget(),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
       error: (err, stack) {
         final error = err is AppError ? err : const UnknownError();
 
@@ -73,7 +75,8 @@ class _HomeViewState extends ConsumerState<HomeView>
         final widgetOrder = ref.watch(homeWidgetOrderProvider);
 
         return Scaffold(
-          body: RefreshIndicator(
+          body: SafeArea(
+            child: RefreshIndicator(
             onRefresh: _onRefresh,
             edgeOffset: 150,
             child: CustomScrollView(
@@ -103,7 +106,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                     thickness: 0.5,
                     indent: padding16,
                     endIndent: padding16,
-                    color: ColorConstants.lightPurple.withValues(alpha: 0.2),
+                    color: context.brandPurple.withValues(alpha: 0.2),
                   ),
                   itemBuilder: (context, index) {
                     var type = widgetOrder[index];
@@ -147,6 +150,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                 const SliverToBoxAdapter(child: SizedBox(height: 20)),
               ],
             ),
+          ),
           ),
         );
       },

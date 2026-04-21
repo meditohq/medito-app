@@ -25,8 +25,11 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:medito/services/history/app_history_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
@@ -85,18 +88,51 @@ void main() async {
 
   var prefs = await initializeSharedPreferences();
 
+  try {
+    final packageInfo = await PackageInfo.fromPlatform();
+    await AppHistoryService.recordCurrentVersion(
+      prefs,
+      version: packageInfo.version,
+      buildNumber: packageInfo.buildNumber,
+    );
+  } catch (e) {
+    AppLogger.w('MAIN', 'Failed to record version history: $e');
+  }
+
+  // ATT denial and consent flows previously wrote to 'analytics_enabled'
+  // while the settings screen wrote to 'analytics_firebase_enabled'.
+  // Consolidate: if the old key was set to false, honour that opt-out.
+  const legacyKey = 'analytics_enabled';
+  if (prefs.containsKey(legacyKey)) {
+    final legacyValue = prefs.getBool(legacyKey)!;
+    if (!legacyValue) {
+      await prefs.setBool(
+          SharedPreferenceConstants.analyticsFirebaseEnabled, false);
+    }
+    await prefs.remove(legacyKey);
+  }
+
   if (!isMockMode) {
-    // Initialize Firebase (non-blocking when offline)
+    // Initialize Firebase (non-blocking when offline).
+    // On iOS, FirebaseApp.configure() may have already been called natively
+    // from AppDelegate, so guard against the duplicate-app error.
     try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      }
 
       final analyticsEnabled =
           prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
               true;
       if (analyticsEnabled) {
         await CrashlyticsService().initialize();
+      } else {
+        // Explicitly disable Crashlytics collection so the SDK doesn't
+        // phone home even though Firebase core is initialised.
+        await FirebaseCrashlytics.instance
+            .setCrashlyticsCollectionEnabled(false);
       }
     } catch (e) {
       AppLogger.e('MAIN', 'Firebase initialization failed: $e');
@@ -107,6 +143,8 @@ void main() async {
     await _configureStripe();
 
     // Initialize Meta (Facebook) App Events
+    // init() now checks the analyticsMetaEnabled preference internally
+    // and skips SDK construction when disabled.
     await MetaSdkService.instance.init();
     AppLogger.d('MAIN', 'Meta SDK init complete');
   }

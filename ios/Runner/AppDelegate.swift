@@ -22,52 +22,7 @@ class AppDelegate: FlutterAppDelegate {
             application,
             didFinishLaunchingWithOptions: launchOptions
         )
-        
-        let controller = window?.rootViewController as! FlutterViewController
-        
-        // Siri channel
-        let siriChannel = FlutterMethodChannel(
-            name: "com.medito.app/siri",
-            binaryMessenger: controller.binaryMessenger
-        )
-        
-        siriChannel.setMethodCallHandler { [weak self] call, result in
-            guard call.method == "donateShortcut" else {
-                result(FlutterMethodNotImplemented)
-                return
-            }
-            
-            guard let args = call.arguments as? [String: Any],
-                  let title = args["title"] as? String,
-                  let id = args["id"] as? String,
-                  let url = args["url"] as? String else {
-                result(false)
-                return
-            }
-            
-            self?.presentAddVoiceShortcutUI(title: title, id: id, url: url)
-            result(true)
-        }
-        
-        // Facebook SDK channel for iOS 14+ advertiser tracking
-        let facebookChannel = FlutterMethodChannel(
-            name: "com.medito.app/facebook",
-            binaryMessenger: controller.binaryMessenger
-        )
-        
-        facebookChannel.setMethodCallHandler { call, result in
-            if call.method == "setAdvertiserTrackingEnabled" {
-                if let enabled = call.arguments as? Bool {
-                    Settings.shared.isAdvertiserTrackingEnabled = enabled
-                    result(true)
-                } else {
-                    result(FlutterError(code: "INVALID_ARGUMENT", message: "Expected Bool argument", details: nil))
-                }
-            } else {
-                result(FlutterMethodNotImplemented)
-            }
-        }
-        
+
         // Register Flutter plugins
         GeneratedPluginRegistrant.register(with: self)
         
@@ -112,6 +67,54 @@ class AppDelegate: FlutterAppDelegate {
         return super.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
     
+    /// Registers method channels against a FlutterViewController's binary messenger.
+    /// Called from SceneDelegate once the scene (and its FlutterViewController) is attached,
+    /// because `self.window` is nil on the AppDelegate when using a UIScene lifecycle.
+    func registerMethodChannels(with controller: FlutterViewController) {
+        // Siri channel
+        let siriChannel = FlutterMethodChannel(
+            name: "com.medito.app/siri",
+            binaryMessenger: controller.binaryMessenger
+        )
+
+        siriChannel.setMethodCallHandler { [weak self] call, result in
+            guard call.method == "donateShortcut" else {
+                result(FlutterMethodNotImplemented)
+                return
+            }
+
+            guard let args = call.arguments as? [String: Any],
+                  let title = args["title"] as? String,
+                  let id = args["id"] as? String,
+                  let url = args["url"] as? String else {
+                result(false)
+                return
+            }
+
+            self?.presentAddVoiceShortcutUI(title: title, id: id, url: url)
+            result(true)
+        }
+
+        // Facebook SDK channel for iOS 14+ advertiser tracking
+        let facebookChannel = FlutterMethodChannel(
+            name: "com.medito.app/facebook",
+            binaryMessenger: controller.binaryMessenger
+        )
+
+        facebookChannel.setMethodCallHandler { call, result in
+            if call.method == "setAdvertiserTrackingEnabled" {
+                if let enabled = call.arguments as? Bool {
+                    Settings.shared.isAdvertiserTrackingEnabled = enabled
+                    result(true)
+                } else {
+                    result(FlutterError(code: "INVALID_ARGUMENT", message: "Expected Bool argument", details: nil))
+                }
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        }
+    }
+
     private func presentAddVoiceShortcutUI(title: String, id: String, url: String) {
         let activity = NSUserActivity(activityType: "org.meditofoundation")
         activity.title = title
@@ -126,11 +129,19 @@ class AppDelegate: FlutterAppDelegate {
             let shortcut = INShortcut(userActivity: activity)
             let viewController = INUIAddVoiceShortcutViewController(shortcut: shortcut)
             viewController.delegate = self
-            
-            if let controller = window?.rootViewController {
+
+            if let controller = keyWindow()?.rootViewController {
                 controller.present(viewController, animated: true, completion: nil)
             }
         }
+    }
+
+    private func keyWindow() -> UIWindow? {
+        if let window = window { return window }
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first(where: { $0.isKeyWindow })
     }
 }
 

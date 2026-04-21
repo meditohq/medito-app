@@ -42,8 +42,6 @@ class FirebaseAnalyticsService {
       _analytics; // FirebaseAnalytics or _NoopAnalytics - not late final anymore
   bool _initialized = false;
 
-  // Keys and constants
-  static const String analyticsEnabledKey = 'analytics_enabled';
 
   // Analytics event names - These reference shared constants for consistency across all analytics platforms
   // For new code, prefer using AnalyticsEventConstants directly
@@ -147,14 +145,30 @@ class FirebaseAnalyticsService {
         // If the user denied tracking, also disable Firebase Analytics
         if (status != TrackingStatus.authorized) {
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool(analyticsEnabledKey, false);
+          await prefs.setBool(SharedPreferenceConstants.analyticsFirebaseEnabled, false);
         }
+      }
+
+      // Check if the user disabled Firebase analytics via the settings toggle
+      final prefs = await SharedPreferences.getInstance();
+      final firebaseEnabled =
+          prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+              true;
+
+      // Disable collection at the SDK level when the toggle is off.
+      // This prevents the SDK from sending any automatic events or
+      // making network requests.
+      if (_analytics is FirebaseAnalytics) {
+        await (_analytics as FirebaseAnalytics)
+            .setAnalyticsCollectionEnabled(firebaseEnabled);
       }
 
       // Check if user has previously set a preference
       bool consentGranted = await _getConsentPreference();
 
-      // Set consent based on user preference
+      // Set consent based on user preference.
+      // Collection is already gated by setAnalyticsCollectionEnabled above,
+      // so consent flags only need to reflect the actual consent state.
       await setConsent(
         analyticsStorageConsentGranted: consentGranted,
         adStorageConsentGranted: consentGranted,
@@ -164,7 +178,7 @@ class FirebaseAnalyticsService {
 
       if (kDebugMode) {
         AppLogger.d('FIREBASE_ANALYTICS',
-            'Firebase Analytics initialized with consent: $consentGranted');
+            'Firebase Analytics initialized with consent: $consentGranted, collection enabled: $firebaseEnabled');
       }
 
       _initialized = true;
@@ -195,7 +209,7 @@ class FirebaseAnalyticsService {
       // If the user denied tracking, also disable Firebase Analytics
       if (status != TrackingStatus.authorized) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(analyticsEnabledKey, false);
+        await prefs.setBool(SharedPreferenceConstants.analyticsFirebaseEnabled, false);
       }
     } catch (e) {
       if (kDebugMode) {
@@ -210,7 +224,7 @@ class FirebaseAnalyticsService {
     try {
       final prefs = await SharedPreferences.getInstance();
       // Default to true if not set - analytics is enabled by default
-      return prefs.getBool(analyticsEnabledKey) ?? true;
+      return prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ?? true;
     } catch (e) {
       // If there's an error, default to true
       return true;
@@ -220,6 +234,32 @@ class FirebaseAnalyticsService {
   /// Get the user's analytics consent preference
   Future<bool> isAnalyticsEnabled() async {
     return await _getConsentPreference();
+  }
+
+  /// Enable or disable Firebase Analytics collection at the SDK level.
+  /// Call this when the user toggles the Firebase analytics setting.
+  Future<void> setCollectionEnabled(bool enabled) async {
+    try {
+      if (_analytics is FirebaseAnalytics) {
+        await (_analytics as FirebaseAnalytics)
+            .setAnalyticsCollectionEnabled(enabled);
+      }
+      await setConsent(
+        analyticsStorageConsentGranted: enabled,
+        adStorageConsentGranted: enabled,
+        adUserDataConsentGranted: enabled,
+        adPersonalizationSignalsConsentGranted: enabled,
+      );
+      if (kDebugMode) {
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Analytics collection enabled: $enabled');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.d('FIREBASE_ANALYTICS',
+            'Error setting analytics collection enabled: $e');
+      }
+    }
   }
 
   /// Set all consent flags to true using consent mode v2
@@ -236,7 +276,7 @@ class FirebaseAnalyticsService {
 
       // Save preference
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(analyticsEnabledKey, true);
+      await prefs.setBool(SharedPreferenceConstants.analyticsFirebaseEnabled, true);
 
       if (kDebugMode) {
         AppLogger.d('FIREBASE_ANALYTICS',
@@ -276,7 +316,7 @@ class FirebaseAnalyticsService {
               analyticsStorageConsentGranted) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(
-            analyticsEnabledKey, analyticsStorageConsentGranted);
+            SharedPreferenceConstants.analyticsFirebaseEnabled, analyticsStorageConsentGranted);
       }
 
       if (kDebugMode) {

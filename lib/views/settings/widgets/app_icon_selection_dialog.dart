@@ -2,6 +2,8 @@ import 'package:dynamic_app_icon_flutter_plus/dynamic_app_icon_flutter_plus.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 
 enum AppIconOption {
   defaultIcon(null, 'assets/images/app_icons/default.png'),
@@ -82,43 +84,62 @@ class AppIconSelectionDialogState extends State<AppIconSelectionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_isLoading) {
-      return const AlertDialog(
-        content: Center(
+      return const MeditoDialog(
+        child: Center(
           heightFactor: 1,
-          child: CircularProgressIndicator(),
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: CircularProgressIndicator(),
+          ),
         ),
       );
     }
 
-    return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.appIconTitle),
+    return MeditoDialog(
+      title: l10n.appIconTitle,
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: AppIconOption.availableOptions
               .map((option) => _buildIconOption(context, option))
               .toList(),
         ),
       ),
+      actions: [
+        MeditoDialogSecondaryButton(
+          label: l10n.cancel,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
     );
   }
 
   Widget _buildIconOption(BuildContext context, AppIconOption option) {
+    final theme = Theme.of(context);
     final isSelected = _currentIconName == option.iconName;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: () => _setIcon(option),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             color: isSelected
-                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-                : Colors.transparent,
+                ? theme.colorScheme.primary.withOpacityValue(0.1)
+                : theme.cardColor,
+            border: Border.all(
+              color: isSelected
+                  ? theme.colorScheme.primary.withOpacityValue(0.4)
+                  : theme.colorScheme.outline.withOpacityValue(0.3),
+              width: 0.5,
+            ),
           ),
           child: Row(
             children: [
@@ -134,10 +155,10 @@ class AppIconSelectionDialogState extends State<AppIconSelectionDialog> {
               Expanded(
                 child: Text(
                   option.displayName(context),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: theme.textTheme.bodyMedium?.copyWith(
                         color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onSurface,
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurface,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.w400,
                       ),
@@ -147,7 +168,7 @@ class AppIconSelectionDialogState extends State<AppIconSelectionDialog> {
                 Icon(
                   Icons.check,
                   size: 20,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: theme.colorScheme.primary,
                 ),
             ],
           ),

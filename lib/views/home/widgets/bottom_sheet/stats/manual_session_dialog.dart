@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 
 class ManualSessionDialog extends StatefulWidget {
   final DateTime selectedDate;
@@ -47,22 +48,14 @@ class _ManualSessionDialogState extends State<ManualSessionDialog> {
   }
 
   Future<void> _selectTime(BuildContext context) async {
+    // No Theme override here — showTimePicker inherits the app theme, which
+    // already routes a WCAG-AA primary through ColorScheme in both modes.
+    // The previous override hardcoded ColorScheme.light(...) which produced
+    // white-on-white text inside the picker when the app was in dark mode,
+    // and a sub-AA lightPurple primary in light mode.
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime ?? TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: ColorConstants.lightPurple,
-              onPrimary: Theme.of(context).colorScheme.onPrimary,
-              surface: Theme.of(context).colorScheme.surface,
-              onSurface: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
 
     if (picked != null) {
@@ -75,177 +68,69 @@ class _ManualSessionDialogState extends State<ManualSessionDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
-    return Dialog(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.85,
-        constraints: const BoxConstraints(
-          maxWidth: 400,
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.addSession,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontFamily: dmSans,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+    return MeditoDialog(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MeditoDialogTitle(l10n.addSession),
+          const SizedBox(height: 12),
+          MeditoDialogBody(l10n.addSessionExplanation),
+          const SizedBox(height: 20),
+          _buildTimePickerTile(context, l10n),
+          const SizedBox(height: 12),
+          MeditoDialogTextField(
+            controller: _durationController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onChanged: (_) => setState(() {}),
+            labelText:
+                '${l10n.duration} (in ${l10n.minutes.toLowerCase()}, ${l10n.optional.toLowerCase()})',
+            hintText: l10n.minutes,
+            prefixIcon: Icon(
+              Icons.timer,
+              color: theme.colorScheme.onSurface,
             ),
+            suffixIcon: _durationController.text.isNotEmpty
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      size: 20,
+                      color:
+                          theme.colorScheme.onSurface.withOpacityValue(0.6),
+                    ),
+                    onPressed: () {
+                      _durationController.clear();
+                      setState(() {});
+                    },
+                  )
+                : null,
+          ),
+          if (_isFutureSession()) ...[
             const SizedBox(height: 12),
             Text(
-              l10n.addSessionExplanation,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              l10n.cannotAddFutureSession,
+              style: theme.textTheme.bodySmall?.copyWith(
                     fontFamily: dmSans,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacityValue(0.7),
+                    color: theme.colorScheme.error,
                   ),
             ),
-            const SizedBox(height: 24),
-            InkWell(
-              onTap: () => _selectTime(context),
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.08),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.time,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontFamily: dmSans,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withOpacityValue(0.6),
-                                    ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _selectedTime != null
-                                ? _selectedTime!.format(context)
-                                : l10n.selectTime,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  fontFamily: dmSans,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacityValue(0.6),
-                      size: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _durationController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                labelText:
-                    '${l10n.duration} (in ${l10n.minutes.toLowerCase()}, ${l10n.optional.toLowerCase()})',
-                hintText: l10n.minutes,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                prefixIcon: Icon(
-                  Icons.timer,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                suffixIcon: _durationController.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          size: 20,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacityValue(0.6),
-                        ),
-                        onPressed: () {
-                          _durationController.clear();
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontFamily: dmSans,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-            ),
-            if (_isFutureSession()) ...[
-              const SizedBox(height: 12),
-              Text(
-                l10n.cannotAddFutureSession,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontFamily: dmSans,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-              ),
-            ],
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
+          ],
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: MeditoDialogSecondaryButton(
+                  label: l10n.cancel,
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                    l10n.cancel,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontFamily: dmSans,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                  ),
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: MeditoDialogPrimaryButton(
+                  label: l10n.add,
                   onPressed: _isFutureSession()
                       ? null
                       : () {
@@ -266,15 +151,71 @@ class _ManualSessionDialogState extends State<ManualSessionDialog> {
                             'duration': duration,
                           });
                         },
-                  child: Text(
-                    l10n.add,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimePickerTile(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: () => _selectTime(context),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: theme.colorScheme.outline.withOpacityValue(0.3),
+            width: 0.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.access_time,
+              size: 20,
+              color: theme.colorScheme.onSurface,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.time,
+                    style: theme.textTheme.bodySmall?.copyWith(
                           fontFamily: dmSans,
-                          color: Theme.of(context).colorScheme.onPrimary,
+                          // Bumped 0.6 → 0.75 so this caption
+                          // clears WCAG AA 4.5:1 over the card
+                          // surface in light mode (blended text
+                          // was ~4.2:1 at 0.6).
+                          color: theme.colorScheme.onSurface
+                              .withOpacityValue(0.75),
                         ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    _selectedTime != null
+                        ? _selectedTime!.format(context)
+                        : l10n.selectTime,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                          fontFamily: dmSans,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurface.withOpacityValue(0.6),
+              size: 20,
             ),
           ],
         ),

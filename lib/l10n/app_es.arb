@@ -144,7 +144,7 @@
   "loginBenefits": "• Descarga tus datos guardados previamente\\n• Continúa tu viaje de meditación desde donde lo dejaste",
   "accountTransitionWarningTitle": "¡Espera!",
   "loginWarningQuestion": "¿Quieres continuar con este correo electrónico?",
-  "loginWarningExplanation": "Si ya tienes una cuenta de Medito:\\n• Tus datos de meditación anteriores se descargarán\\n• Tu progreso actual no guardado se perderá\\n\\nSi eres nuevo en Medito:\\n• Se creará una nueva cuenta\\n• Tu progreso actual se guardará en esta cuenta",
+  "loginWarningExplanation": "Si ya tienes una cuenta de Medito:\n• Tus datos de meditación anteriores se descargarán\n• Tu progreso actual no guardado se perderá\n\nSi eres nuevo en Medito:\n• Se creará una nueva cuenta\n• Tu progreso actual se guardará en esta cuenta",
   "createNewAccount": "Crear Nueva Cuenta",
   "continueLogin": "Sí, continuar",
   "cancelAction": "Cancelar",
@@ -424,8 +424,8 @@
   "packsSectionHeader": "Paquetes",
   "tracksSectionHeader": "Pistas",
   "noResultsFound": "No se encontraron resultados para tu búsqueda",
-  "statsWelcomeTitle": "¡Presentamos la Puntuación de Consistencia!",
-  "statsWelcomeMessage": "Hemos agregado una puntuación de consistencia para ayudarte a sentirte más realizado. A diferencia de las rachas, no se reinicia en días perdidos, reflejando tu dedicación general. Tu pantalla de inicio mostrará tu mejor puntuación para mantenerte motivado.",
+  "consistencyScoreInfoTitle": "Puntuación de Consistencia",
+  "consistencyScoreInfoMessage": "Tu puntuación de consistencia refleja con qué regularidad has meditado en los últimos 30 días. A diferencia de las rachas, no se reinicia en días perdidos.",
   "accountDeletionInitiated": "Proceso de eliminación de cuenta iniciado. Por favor completa los pasos en tu navegador.",
   "reportError": "Reportar Error",
   "errorReportedMessage": "Gracias, tu reporte ha sido enviado.",
@@ -930,6 +930,18 @@
   "addSession": "Agregar sesión",
   "@addSession": {
     "description": "Title for adding a manual meditation session"
+  },
+  "deleteSessionTitle": "Eliminar sesión",
+  "@deleteSessionTitle": {
+    "description": "Title for the dialog confirming deletion of a tracked session"
+  },
+  "deleteSessionConfirmation": "¿Estás seguro de que quieres eliminar esta sesión? Esto actualizará tu racha y estadísticas.",
+  "@deleteSessionConfirmation": {
+    "description": "Confirmation message shown when the user long-presses a session to delete it"
+  },
+  "deleteSessionError": "Error al eliminar la sesión.",
+  "@deleteSessionError": {
+    "description": "Error snackbar shown when deleting a session fails"
   },
   "date": "Fecha",
   "@date": {

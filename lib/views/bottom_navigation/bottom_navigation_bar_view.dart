@@ -1,16 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/path/path_view.dart';
-import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
@@ -25,7 +24,10 @@ class BottomNavigationBarView extends ConsumerStatefulWidget {
 
 class _BottomNavigationBarViewState
     extends ConsumerState<BottomNavigationBarView> {
-  late var _currentPageIndex;
+  // Maps NavigationBar destination index -> page index in _pages.
+  static const _pageIndexForDestination = [0, 1, 3];
+
+  late int _currentPageIndex;
   final _searchFocusNode = FocusNode();
   final _exploreViewKey = GlobalKey<ExploreViewState>();
 
@@ -59,99 +61,106 @@ class _BottomNavigationBarViewState
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: _currentPageIndex == 0,
-      onPopInvokedWithResult: (didPop, _) {
-        if (didPop) return;
-        _onDestinationSelected(0);
-      },
-      child: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        bottomNavigationBar: BottomActionBar(
-          layout: BottomActionBarLayout.homePage,
-          leftItem: _buildHomeNavigationItem(),
-          leftCenterItem: _buildSearchNavigationItem(),
-          rightCenterItem: _buildJourneyNavigationItem(),
-          rightItem: _buildSettingsNavigationItem(),
-        ),
-        body: IndexedStack(
-          index: _currentPageIndex,
-          children: _pages,
-        ),
-      ),
-    );
-  }
-
-  BottomActionBarItem _buildHomeNavigationItem() {
     final l10n = AppLocalizations.of(context)!;
-
-    return BottomActionBarItem(
-      child: MeditoIcon(
-        assetName: MeditoIcons.home,
-        color: _currentPageIndex == 0
-            ? ColorConstants.lightPurple
-            : Theme.of(context).colorScheme.onSurface,
-      ),
-      onTap: () => _onDestinationSelected(0),
-      semanticLabel: l10n.home,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final unselectedColor = colorScheme.onSurfaceVariant;
+    final selectedColor = context.brandPurple;
+    final selectedDestination = _pageIndexForDestination.indexOf(
+      _currentPageIndex,
     );
-  }
 
-  BottomActionBarItem _buildSearchNavigationItem() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return BottomActionBarItem(
-      child: GestureDetector(
-        onDoubleTap: () {
-          if (_currentPageIndex == 1) {
-            _searchFocusNode.requestFocus();
-          } else {
-            _onDestinationSelected(1);
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _searchFocusNode.requestFocus();
-            });
-          }
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: isDark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      child: PopScope(
+        canPop: _currentPageIndex == 0,
+        onPopInvokedWithResult: (didPop, _) {
+          if (didPop) return;
+          _onDestinationSelected(0);
         },
-        child: MeditoIcon(
-          assetName: MeditoIcons.book,
-          color: _currentPageIndex == 1
-              ? ColorConstants.lightPurple
-              : Theme.of(context).colorScheme.onSurface,
+        child: Scaffold(
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: selectedDestination >= 0 ? selectedDestination : 0,
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            indicatorColor: Colors.transparent,
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              final baseStyle = Theme.of(context).textTheme.labelMedium;
+              final color = states.contains(WidgetState.selected)
+                  ? selectedColor
+                  : unselectedColor;
+              return baseStyle?.copyWith(color: color);
+            }),
+            onDestinationSelected: (index) =>
+                _onDestinationSelected(_pageIndexForDestination[index]),
+            destinations: [
+              NavigationDestination(
+                icon: MeditoIcon(
+                  assetName: MeditoIcons.home,
+                  color: unselectedColor,
+                ),
+                selectedIcon: MeditoIcon(
+                  assetName: MeditoIcons.home,
+                  color: selectedColor,
+                ),
+                label: l10n.home,
+              ),
+              NavigationDestination(
+                icon: GestureDetector(
+                  onDoubleTap: _onExploreDoubleTap,
+                  child: MeditoIcon(
+                    assetName: MeditoIcons.book,
+                    color: unselectedColor,
+                  ),
+                ),
+                selectedIcon: GestureDetector(
+                  onDoubleTap: _onExploreDoubleTap,
+                  child: MeditoIcon(
+                    assetName: MeditoIcons.book,
+                    color: selectedColor,
+                  ),
+                ),
+                label: l10n.explore,
+              ),
+              NavigationDestination(
+                icon: MeditoIcon(
+                  assetName: MeditoIcons.settings,
+                  color: unselectedColor,
+                ),
+                selectedIcon: MeditoIcon(
+                  assetName: MeditoIcons.settings,
+                  color: selectedColor,
+                ),
+                label: l10n.settings,
+              ),
+            ],
+          ),
+          body: IndexedStack(index: _currentPageIndex, children: _pages),
         ),
       ),
-      onTap: () => _onDestinationSelected(1),
-      semanticLabel: l10n.explore,
     );
   }
 
-  BottomActionBarItem _buildJourneyNavigationItem() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return BottomActionBarItem(
-      child: MeditoIcon(
-        assetName: MeditoIcons.road,
-        color: _currentPageIndex == 2
-            ? ColorConstants.lightPurple
-            : Theme.of(context).colorScheme.onSurface,
-      ),
-      onTap: () => _onDestinationSelected(2),
-      semanticLabel: l10n.path,
-    );
-  }
-
-  BottomActionBarItem _buildSettingsNavigationItem() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return BottomActionBarItem(
-      child: MeditoIcon(
-        assetName: MeditoIcons.settings,
-        color: _currentPageIndex == 3
-            ? ColorConstants.lightPurple
-            : Theme.of(context).colorScheme.onSurface,
-      ),
-      onTap: () => _onDestinationSelected(3),
-      semanticLabel: l10n.settings,
-    );
+  void _onExploreDoubleTap() {
+    if (_currentPageIndex == 1) {
+      _searchFocusNode.requestFocus();
+    } else {
+      _onDestinationSelected(1);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _searchFocusNode.requestFocus();
+      });
+    }
   }
 
   void _onDestinationSelected(int index) {
@@ -164,7 +173,8 @@ class _BottomNavigationBarViewState
     });
 
     if (index <= 1) {
-      ref.read(sharedPreferencesProvider)
+      ref
+          .read(sharedPreferencesProvider)
           .setInt(SharedPreferenceConstants.lastMainTabIndex, index);
     }
 
@@ -173,5 +183,4 @@ class _BottomNavigationBarViewState
       _exploreViewKey.currentState?.loadData();
     }
   }
-
 }
