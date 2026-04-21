@@ -109,11 +109,18 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
             visible: "Open"
           commands:
             - tapOn: "Open"
+      # Safari → app resume leaves the iOS accessibility tree stale for a few
+      # seconds; a second launchApp forces a rebuild so Maestro can see the
+      # donation primer text after the handoff.
+      - launchApp:
+          appId: ${APP_ID}
+          stopApp: false
+      - waitForAnimationToEnd
 
 # Wait until we're back on the onboarding donation screen.
 - extendedWaitUntil:
     visible: "See how to help"
-    timeout: 15000
+    timeout: 30000
 
 # After dismissing the paywall, "Skip for Now" appears below the button.
 - runFlow:
