@@ -109,6 +109,11 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
             visible: "Open"
           commands:
             - tapOn: "Open"
+      # openLink is flaky on CI — sometimes Safari stays foregrounded
+      # instead of switching to the app. Force foreground as a fallback.
+      - launchApp:
+          appId: ${APP_ID}
+          stopApp: false
       - waitForAnimationToEnd
 
 # Post-paywall state is flaky on iOS CI — sometimes the app resumes on the
