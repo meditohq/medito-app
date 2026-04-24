@@ -1,5 +1,5 @@
 Unreleased
--
+- Fixed streamed meditations restarting in the background on some Android devices
 
 3.6.21
 - Bug fixes and improvements
