@@ -1,6 +1,15 @@
 Unreleased
 -
 
+26.4.24
+- Fixed streamed meditations restarting in the background on some Android devices
+
+3.6.21
+- Bug fixes and improvements
+
+3.6.20
+- Bug fixes and improvements
+
 3.6.19
 - Fixed an issue where your streak could drop after signing in
 

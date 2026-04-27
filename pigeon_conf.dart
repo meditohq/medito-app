@@ -161,6 +161,12 @@ abstract class MeditoAudioServiceCallbackApi {
   void updatePlaybackState(PlaybackState state);
   @async
   bool handleCompletedTrack(CompletionData completionData);
+  void reportPlayerError(
+    String errorCode,
+    String message,
+    int positionMs,
+    int durationMs,
+  );
 }
 
 // #enddocregion flutter-definitions

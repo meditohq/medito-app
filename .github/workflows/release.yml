@@ -259,11 +259,11 @@ jobs:
       - name: Resolve previous release tag
         id: prev
         run: |
-          PREV=$(git tag --list 'v*' --sort=-v:refname \
+          PREV=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname \
                  | grep -v "^${GITHUB_REF_NAME}$" \
                  | head -1)
           if [ -z "$PREV" ]; then
-            echo "No previous v* tag found." >> "$GITHUB_STEP_SUMMARY"
+            echo "No previous release tag found." >> "$GITHUB_STEP_SUMMARY"
             echo "tag=" >> "$GITHUB_OUTPUT"
             echo "sha=" >> "$GITHUB_OUTPUT"
           else
@@ -653,11 +653,11 @@ jobs:
       - name: Resolve previous release tag
         id: prev
         run: |
-          PREV=$(git tag --list 'v*' --sort=-v:refname \
+          PREV=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname \
                  | grep -v "^${GITHUB_REF_NAME}$" \
                  | head -1)
           if [ -z "$PREV" ]; then
-            echo "No previous v* tag found." >> "$GITHUB_STEP_SUMMARY"
+            echo "No previous release tag found." >> "$GITHUB_STEP_SUMMARY"
             echo "tag=" >> "$GITHUB_OUTPUT"
             echo "sha=" >> "$GITHUB_OUTPUT"
           else

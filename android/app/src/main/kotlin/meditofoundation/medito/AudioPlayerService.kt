@@ -15,11 +15,15 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.session.MediaStyleNotificationHelper
@@ -257,6 +261,16 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 .setPrioritizeTimeOverSizeThresholds(true)
                 .build()
 
+            // Explicit HTTP stack with timeouts + UA so background-throttled streams
+            // get a clean error (routed to onPlayerError below) rather than a silent hang.
+            val httpDataSourceFactory = DefaultHttpDataSource.Factory()
+                .setUserAgent("Medito-Android")
+                .setConnectTimeoutMs(15_000)
+                .setReadTimeoutMs(30_000)
+                .setAllowCrossProtocolRedirects(true)
+            val primaryMediaSourceFactory = DefaultMediaSourceFactory(this)
+                .setDataSourceFactory(DefaultDataSource.Factory(this, httpDataSourceFactory))
+
             primaryPlayer = ExoPlayer.Builder(this)
                 .setAudioAttributes(
                     primaryAudioAttributes,
@@ -265,6 +279,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 .setHandleAudioBecomingNoisy(true)
                 .setWakeMode(C.WAKE_MODE_NETWORK)
                 .setLoadControl(primaryLoadControl)
+                .setMediaSourceFactory(primaryMediaSourceFactory)
                 .build().apply {
                     addListener(object : Player.Listener {
                         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
@@ -401,6 +416,26 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
         // Update notification to reflect current state
         updateNotification()
+    }
+
+    override fun onPlayerError(error: PlaybackException) {
+        Log.e(TAG, "❌ Player error: ${error.errorCodeName} — ${error.message}", error)
+        if (!::primaryPlayer.isInitialized) return
+        val resumePos = primaryPlayer.currentPosition.takeIf { it > 0 } ?: 0L
+        val duration = primaryPlayer.duration.takeIf { it != C.TIME_UNSET } ?: -1L
+        val api = meditoAudioApi
+        if (api != null) {
+            handler.post {
+                api.reportPlayerError(
+                    error.errorCodeName,
+                    error.message ?: "unknown",
+                    resumePos,
+                    duration,
+                ) { /* fire-and-forget */ }
+            }
+        }
+        primaryPlayer.prepare()
+        if (resumePos > 0) primaryPlayer.seekTo(resumePos)
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {

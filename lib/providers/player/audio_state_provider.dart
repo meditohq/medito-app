@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../constants/types/type_constants.dart';
+import '../../services/analytics/crashlytics_service.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/stats_updater.dart';
 
@@ -15,6 +16,25 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   @override
   void updatePlaybackState(PlaybackState state) {
     notifier.updatePlaybackState(state);
+  }
+
+  @override
+  void reportPlayerError(
+    String errorCode,
+    String message,
+    int positionMs,
+    int durationMs,
+  ) {
+    CrashlyticsService().recordError(
+      Exception('ExoPlayer $errorCode: $message'),
+      StackTrace.current,
+      reason: 'ExoPlayer onPlayerError',
+      information: [
+        'errorCode=$errorCode',
+        'positionMs=$positionMs',
+        'durationMs=$durationMs',
+      ],
+    );
   }
 
   // only used on Android

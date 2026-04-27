@@ -8,12 +8,14 @@ Cut a new release of the Medito app. Follow the steps below in order — each st
 
 ## 1. Decide the new version
 
-Read the current version from `pubspec.yaml` (the `version:` line, format `MAJOR.MINOR.PATCH+BUILD`).
+Read the current version from `pubspec.yaml` (the `version:` line, format `YY.M.D[.N]+BUILD`).
 
-- If `$ARGUMENTS` contains an explicit version (e.g. `3.6.16`, `3.7.0`, `4.0.0`), use that.
-- Otherwise, bump the **patch** number by one. E.g. current `3.6.15+302390` → new `3.6.16`.
+Version names are **date-based**: `YY.M.D` (two-digit year, unpadded month, unpadded day — e.g. today's release would be `26.4.22`). If a release already exists for today, append `.N` starting at `.1` (e.g. `26.4.22.1`, then `.2`, etc.).
 
-Only the semver part (`MAJOR.MINOR.PATCH`) is your concern — `prepare_release.sh` preserves the build number. Validate the version matches `^\d+\.\d+\.\d+$` before continuing; if the user passed something that isn't a valid semver, stop and ask them to clarify.
+- If `$ARGUMENTS` contains an explicit version, use that. Validate it matches `^\d+\.\d+\.\d+(\.\d+)?$`.
+- Otherwise, derive from today's date (`date +%y.%-m.%-d`). If `git tag -l <date>` already exists, try `<date>.1`, `<date>.2`, … until you find an unused one.
+
+Only the version-name part is your concern — `prepare_release.sh` preserves the build number.
 
 Tell the user which version you're cutting before doing anything destructive.
 
