@@ -14,7 +14,7 @@ PODS:
     - Flutter
   - dynamic_app_icon_flutter_plus (0.0.1):
     - Flutter
-  - facebook_app_events (0.25.0):
+  - facebook_app_events (0.27.2):
     - FBSDKCoreKit (~> 18.0)
     - Flutter
   - FBAEMKit (18.0.3):
@@ -403,7 +403,7 @@ SPEC CHECKSUMS:
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   do_not_disturb: 7b70fa69b7a8f30b5310bf20ac7a2a6ccff143f4
   dynamic_app_icon_flutter_plus: 9235d8a780d99c6c53af52930567e33b42875395
-  facebook_app_events: 2a211105c14a3eee34242ee19a918d9259d9dcc6
+  facebook_app_events: f5a6c6a367fb041f78d14a12e6f0dce0ba96a8ab
   FBAEMKit: 2a6b529993713c185b02bc36f8c91129bf78dfb0
   FBSDKCoreKit: 65d7f7a7d6fcc3aa6eb6e093ec737a4184fc6049
   FBSDKCoreKit_Basics: 7bc9d8fde8f70985fba2ed7c1d07e319f969a991
