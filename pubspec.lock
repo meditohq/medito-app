@@ -281,6 +281,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  core_haptics:
+    dependency: "direct main"
+    description:
+      name: core_haptics
+      sha256: d1a0de4abd72ed5ccd6924c1d1874f3cd724067f4dee472d7f3d56c9ad3b7fe8
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.8"
   coverage:
     dependency: transitive
     description:
@@ -735,14 +743,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  haptic_feedback:
-    dependency: "direct main"
-    description:
-      name: haptic_feedback
-      sha256: dcc2494994c41428823f8f2082fd17a4e89e372bd142e07681420cbfaf99dcad
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.4+3"
   health:
     dependency: "direct main"
     description:

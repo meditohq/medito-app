@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:haptic_feedback/haptic_feedback.dart';
+import 'package:core_haptics/core_haptics.dart';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -62,6 +62,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     super.initState();
     _loadStats();
     _logScreenView();
+    _triggerHapticFeedback();
 
     _statsAnimationController = AnimationController(
       vsync: this,
@@ -159,10 +160,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     if (_hasFiredHapticFeedback) return;
 
     _hasFiredHapticFeedback = true;
-    final canVibrate = await Haptics.canVibrate();
-    if (canVibrate) {
-      await Haptics.vibrate(HapticsType.success, usage: HapticsUsage.media);
-    }
+    try {
+      await HapticEngine.success();
+    } catch (_) {}
   }
 
   void _loadStats() async {

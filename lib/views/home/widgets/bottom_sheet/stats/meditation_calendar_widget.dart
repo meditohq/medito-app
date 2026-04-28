@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:core_haptics/core_haptics.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -242,10 +243,23 @@ class _MeditationCalendarWidgetState
     if (dayStart.isAfter(todayStart)) return;
 
     final next = expandRange(RangeBounds(_rangeStart, _rangeEnd), dayStart);
+    if (next.start == _rangeStart && next.end == _rangeEnd) {
+      // No-op press (e.g. inside a complete range) — skip the buzz.
+      return;
+    }
+    _fireSelectionHaptic();
     setState(() {
       _rangeStart = next.start;
       _rangeEnd = next.end;
     });
+  }
+
+  Future<void> _fireSelectionHaptic() async {
+    try {
+      await HapticEngine.selection();
+    } catch (_) {
+      // Haptics are non-essential; ignore platform errors.
+    }
   }
 
   void _clearRange() {
