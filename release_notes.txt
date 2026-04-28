@@ -1,6 +1,10 @@
 Unreleased
 -
 
+26.4.28
+- Long-press two days in the stats calendar to backfill a whole range of past sessions at once
+- Restore an earlier stats snapshot from Settings → Advanced if you've signed into another account
+
 26.4.24
 - Fixed streamed meditations restarting in the background on some Android devices
 
