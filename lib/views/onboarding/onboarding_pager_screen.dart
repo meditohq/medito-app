@@ -7,7 +7,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/services/superwall_service.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
@@ -196,22 +195,6 @@ final List<String> _images = [
     shouldShowBatteryOptimizationScreen().then((show) {
       if (mounted) setState(() => _showBatteryScreen = show);
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _preloadSuperwallConfig();
-    });
-  }
-
-  void _preloadSuperwallConfig() {
-    unawaited(
-      () async {
-        try {
-          final superwallService = ref.read(superwallServiceProvider);
-          await superwallService.loadPaymentConfig();
-        } catch (error) {
-          // Silently fail - the donation screen will handle errors
-        }
-      }(),
-    );
   }
 
   @override

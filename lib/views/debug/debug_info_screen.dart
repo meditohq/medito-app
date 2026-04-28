@@ -12,7 +12,6 @@ import 'package:medito/providers/device_and_app_info/device_and_app_info_provide
 import 'package:medito/providers/notification/reminder_provider.dart'
     show reminderProvider, smartBaseId;
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/services/paywall_manager_service.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
@@ -110,9 +109,7 @@ class DebugInfoScreen extends ConsumerWidget {
 
   Widget _buildInfoView(
       BuildContext context, WidgetRef ref, String infoString) {
-    final paywallManager = ref.read(paywallManagerServiceProvider);
-    final donationPlacementId = paywallManager.getDonationPlacementId();
-    final fullInfo = '$infoString\nDPI: $donationPlacementId';
+    final fullInfo = infoString;
     final statsBase64 = _buildStatsBase64(ref);
 
     return SingleChildScrollView(
@@ -466,9 +463,7 @@ class DebugInfoScreen extends ConsumerWidget {
 
   void _copyDebugInfo(BuildContext context, WidgetRef ref) async {
     final infoString = await ref.read(deviceAppAndUserInfoProvider.future);
-    final paywallManager = ref.read(paywallManagerServiceProvider);
-    final donationPlacementId = paywallManager.getDonationPlacementId();
-    var fullInfo = '$infoString\n\nDonation Placement ID: $donationPlacementId';
+    var fullInfo = infoString;
 
     final reminders = await _getPendingRemindersWithDates(ref);
     final calculatedDates = await _getCalculatedScheduledDates();

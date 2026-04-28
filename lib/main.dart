@@ -14,7 +14,6 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/theme/app_theme.dart';
 import 'package:medito/firebase_options.dart';
-import 'package:medito/config/superwall_config.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/locale_provider.dart';
@@ -74,16 +73,8 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!isMockMode) {
-    try {
-      // Make Superwall configuration non-blocking with shorter timeout when offline
-      await SuperwallConfig.configure().timeout(const Duration(seconds: 5));
-    } catch (e) {
-      AppLogger.w('MAIN', 'Superwall configuration failed/timed out: $e');
-      // Don't re-throw - let the app continue without Superwall
-    }
-  } else {
-    AppLogger.d('MAIN', 'Mock mode: skipping Superwall, Firebase, Stripe, Meta SDK');
+  if (isMockMode) {
+    AppLogger.d('MAIN', 'Mock mode: skipping Firebase, Stripe, Meta SDK');
   }
 
   var prefs = await initializeSharedPreferences();

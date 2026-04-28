@@ -5,6 +5,14 @@ class ConfigConstants {
   // URL constants
   static const String meditoUrl = 'https://meditofoundation.org/';
   static const String donationFormUrl = 'https://donate.meditofoundation.org';
+  // In-app paywall (loaded inside a webview). Override at build time with
+  // --dart-define=PAYWALL_URL=http://10.0.2.2:4321/paywall  (Android emulator)
+  // --dart-define=PAYWALL_URL=http://localhost:4321/paywall  (iOS simulator)
+  // to point at a local Astro dev server.
+  static const String paywallFormUrl = String.fromEnvironment(
+    'PAYWALL_URL',
+    defaultValue: 'https://paywall.meditofoundation.org/',
+  );
   static const String donationPortalUrl = 'https://bit.ly/3yFqVbM';
   static const String contactFormBaseUrl = 'https://tally.so/r/wLGBaO';
   static const String dontKillMyAppUrl = 'https://dontkillmyapp.com';
