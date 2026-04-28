@@ -238,6 +238,41 @@
   "supportCommunity": "Apoyo y Comunidad",
   "helpLegal": "Ayuda y Legal",
   "advanced": "Avanzado",
+  "restorePreviousStats": "Restaurar estadísticas anteriores",
+  "restorePreviousStatsExplainer": "Elige una copia para restaurar. Las copias se guardan automáticamente cuando se sincronizan tus estadísticas, y las 20 más recientes se conservan en este dispositivo, incluidas las de otras cuentas que hayas usado aquí.",
+  "noBackupsAvailable": "Aún no hay copias de estadísticas en este dispositivo.",
+  "backupSummary": "Racha {streak} · {sessions, plural, =1{1 sesión} other{{sessions} sesiones}} · {minutes} min",
+  "@backupSummary": {
+    "placeholders": {
+      "streak": {"type": "int"},
+      "sessions": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "restoreStatsConfirmTitle": "¿Restaurar estas estadísticas?",
+  "restoreStatsConfirmBody": "Tus estadísticas actuales en este dispositivo se sustituirán por la copia seleccionada, y la copia se subirá a la cuenta actualmente conectada. Esta acción no se puede deshacer.",
+  "restore": "Restaurar",
+  "restoreStatsSuccess": "Estadísticas restauradas",
+  "restoreStatsFailed": "No se pudieron restaurar las estadísticas. Inténtalo de nuevo.",
+  "daysSelected": "{count, plural, =1{1 día seleccionado} other{{count} días seleccionados}}",
+  "@daysSelected": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "newStreak": "Nueva racha",
+  "newSessions": "Nuevas sesiones",
+  "addSessionsToSelectedDays": "Añadir sesiones a los días seleccionados",
+  "addSessionsTitle": "{count, plural, =1{Añadir 1 sesión} other{Añadir {count} sesiones}}",
+  "@addSessionsTitle": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "daysAlreadyHaveSession": "{filled, plural, =1{1 de {total} días ya tiene una sesión y se omitirá.} other{{filled} de {total} días ya tienen una sesión y se omitirán.}}",
+  "@daysAlreadyHaveSession": {
+    "placeholders": {
+      "filled": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "minutesPerDayOptional": "Minutos por día (opcional)",
   "onboarding": "Incorporación",
   "@onboarding": {
     "description": "Título para la sección de incorporación en configuración"

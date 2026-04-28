@@ -461,8 +461,9 @@ class StatsManager {
 
   Future<void> addAudioCompleted(
     LocalAudioCompleted audioCompleted,
-    int duration,
-  ) async {
+    int duration, {
+    bool skipPost = false,
+  }) async {
     if (_allStats == null) {
       await sync();
     }
@@ -493,6 +494,14 @@ class StatsManager {
       _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
       await saveConsistencyScoreHistory(newConsistencyScore);
       await _saveLocalAllStatsToSharedPrefs();
+
+      if (skipPost) {
+        // Caller is batching multiple inserts and will post + update the
+        // widget once at the end. Leave _dirty=true so flushPendingPost()
+        // knows there's unsynced state.
+        return;
+      }
+
       await _statsService.postStats(_allStats!);
       // Mark as synced and clear dirty flag after successful POST
       _lastSyncedAt = _getCurrentDate();
@@ -504,6 +513,60 @@ class StatsManager {
         // Silently fail - widget updates are not critical
       });
     }
+  }
+
+  /// Posts the current stats once, after a batch of [addAudioCompleted] calls
+  /// made with `skipPost: true`. No-op if there's nothing to flush.
+  Future<void> flushPendingPost() async {
+    if (!_dirty || _allStats == null) return;
+    await _statsService.postStats(_allStats!);
+    _lastSyncedAt = _getCurrentDate();
+    await _saveLastSyncedAt();
+    _dirty = false;
+  }
+
+  /// Replaces the current stats with the given snapshot, recalculates
+  /// derived fields, persists locally, and syncs to the server.
+  ///
+  /// Used by the Settings → Advanced → Restore previous stats flow so a
+  /// user who logged into a different account can recover an earlier
+  /// snapshot taken from any account on this device.
+  Future<void> restoreFromBackup(LocalAllStats snapshot) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+
+    // Mark dirty *before* persisting so that, if the network post fails,
+    // flushPendingPost / the next sync still knows there's unsynced state
+    // to push.
+    _dirty = true;
+
+    _allStats = snapshot.copyWith(
+      updated: _getCurrentDate().millisecondsSinceEpoch,
+    );
+
+    _allStats = calculateStreak(_allStats!);
+    final newConsistencyScore = calculateConsistencyScore(_allStats!);
+    _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
+    await saveConsistencyScoreHistory(newConsistencyScore);
+    await _saveLocalAllStatsToSharedPrefs();
+
+    // Local restore is the user-visible operation — don't fail it just
+    // because the server sync hiccupped. _dirty stays true so the next
+    // sync retries automatically.
+    try {
+      await _statsService.postStats(_allStats!);
+      _lastSyncedAt = _getCurrentDate();
+      await _saveLastSyncedAt();
+      _dirty = false;
+    } catch (e) {
+      AppLogger.e('STATS_MANAGER',
+          'restoreFromBackup: post failed, will retry on next sync', e);
+    }
+
+    HomeWidgetService.updateWidgetFromStats(_allStats!).catchError((e) {
+      // Silently fail - widget updates are not critical
+    });
   }
 
   Future<void> removeAudioCompleted(LocalAudioCompleted session) async {

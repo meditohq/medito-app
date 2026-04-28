@@ -783,6 +783,91 @@ class AppLocalizationsEs extends AppLocalizations {
   String get advanced => 'Avanzado';
 
   @override
+  String get restorePreviousStats => 'Restaurar estadísticas anteriores';
+
+  @override
+  String get restorePreviousStatsExplainer =>
+      'Elige una copia para restaurar. Las copias se guardan automáticamente cuando se sincronizan tus estadísticas, y las 20 más recientes se conservan en este dispositivo, incluidas las de otras cuentas que hayas usado aquí.';
+
+  @override
+  String get noBackupsAvailable =>
+      'Aún no hay copias de estadísticas en este dispositivo.';
+
+  @override
+  String backupSummary(int streak, int sessions, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      sessions,
+      locale: localeName,
+      other: '$sessions sesiones',
+      one: '1 sesión',
+    );
+    return 'Racha $streak · $_temp0 · $minutes min';
+  }
+
+  @override
+  String get restoreStatsConfirmTitle => '¿Restaurar estas estadísticas?';
+
+  @override
+  String get restoreStatsConfirmBody =>
+      'Tus estadísticas actuales en este dispositivo se sustituirán por la copia seleccionada, y la copia se subirá a la cuenta actualmente conectada. Esta acción no se puede deshacer.';
+
+  @override
+  String get restore => 'Restaurar';
+
+  @override
+  String get restoreStatsSuccess => 'Estadísticas restauradas';
+
+  @override
+  String get restoreStatsFailed =>
+      'No se pudieron restaurar las estadísticas. Inténtalo de nuevo.';
+
+  @override
+  String daysSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días seleccionados',
+      one: '1 día seleccionado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newStreak => 'Nueva racha';
+
+  @override
+  String get newSessions => 'Nuevas sesiones';
+
+  @override
+  String get addSessionsToSelectedDays =>
+      'Añadir sesiones a los días seleccionados';
+
+  @override
+  String addSessionsTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Añadir $count sesiones',
+      one: 'Añadir 1 sesión',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysAlreadyHaveSession(int filled, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      filled,
+      locale: localeName,
+      other: '$filled de $total días ya tienen una sesión y se omitirán.',
+      one: '1 de $total días ya tiene una sesión y se omitirá.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get minutesPerDayOptional => 'Minutos por día (opcional)';
+
+  @override
   String get onboarding => 'Incorporación';
 
   @override
