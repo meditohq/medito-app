@@ -11,10 +11,10 @@ enum AppIconOption {
   defaultIcon(null, iosOnly: true),
   purple('purple', androidOnly: true),
   nearblack('nearblack'),
+  goldenHour('goldenhour', androidIconName: 'pink'),
   ocean('ocean'),
   forest('forest'),
-  blush('blush'),
-  goldenHour('goldenhour', androidIconName: 'pink');
+  blush('blush');
 
   final String? iconName;
   final String? androidIconName;
