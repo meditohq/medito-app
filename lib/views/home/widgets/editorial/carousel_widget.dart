@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:core_haptics/core_haptics.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
@@ -29,6 +30,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   final CarouselController _controller = CarouselController();
   bool _showLeftGradient = false;
   bool _showRightGradient = true;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -55,6 +57,29 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         _showRightGradient = showRight;
       });
     }
+
+    _checkIndexChange();
+  }
+
+  void _checkIndexChange() {
+    if (!_controller.hasClients) return;
+
+    final itemCount = widget.carouselItems.length + 2;
+    final maxExtent = _controller.position.maxScrollExtent;
+    final pixels = _controller.position.pixels;
+    final itemWidth = maxExtent / (itemCount - 1);
+    final newIndex = (pixels / itemWidth).round().clamp(0, itemCount - 1);
+
+    if (newIndex != _currentIndex && newIndex < widget.carouselItems.length) {
+      _currentIndex = newIndex;
+      _fireHaptic();
+    }
+  }
+
+  Future<void> _fireHaptic() async {
+    try {
+      await HapticEngine.selection();
+    } catch (_) {}
   }
 
   @override
