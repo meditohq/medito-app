@@ -168,8 +168,6 @@ PODS:
   - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - haptic_feedback (0.5.1):
-    - Flutter
   - health (13.3.1):
     - Flutter
   - home_widget (0.0.1):
@@ -286,7 +284,6 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_secure_storage_darwin (from `.symlinks/plugins/flutter_secure_storage_darwin/darwin`)
-  - haptic_feedback (from `.symlinks/plugins/haptic_feedback/ios`)
   - health (from `.symlinks/plugins/health/ios`)
   - home_widget (from `.symlinks/plugins/home_widget/ios`)
   - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
@@ -366,8 +363,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_secure_storage_darwin:
     :path: ".symlinks/plugins/flutter_secure_storage_darwin/darwin"
-  haptic_feedback:
-    :path: ".symlinks/plugins/haptic_feedback/ios"
   health:
     :path: ".symlinks/plugins/health/ios"
   home_widget:
@@ -428,7 +423,6 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: 3b4687de50ab25ee2d4d541849f10ca8df862a12
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
-  haptic_feedback: 1f22d7ad3abb43bb814aa42fdf548dc6d9e8245a
   health: 4decf5d74e8f54c58a8c07a385fc72f629a831d9
   home_widget: 54b4f6b36ed8d64cfee594a476225c35c3e45091
   in_app_review: 7dd1ea365263f834b8464673f9df72c80c17c937

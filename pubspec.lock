@@ -285,10 +285,10 @@ packages:
     dependency: "direct main"
     description:
       name: core_haptics
-      sha256: d1a0de4abd72ed5ccd6924c1d1874f3cd724067f4dee472d7f3d56c9ad3b7fe8
+      sha256: "8c410a65b3a0108aab40ffb805acdc84ce119fc1c2dc02cf82fa937349671986"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.8"
+    version: "0.0.7"
   coverage:
     dependency: transitive
     description:
