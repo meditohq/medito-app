@@ -2861,7 +2861,7 @@ abstract class AppLocalizations {
   /// Label for the pink-to-gold sunset gradient app icon option
   ///
   /// In en, this message translates to:
-  /// **'Golden Hour'**
+  /// **'Golden'**
   String get appIconPink;
 
   /// Snackbar message shown on Android after changing the app icon

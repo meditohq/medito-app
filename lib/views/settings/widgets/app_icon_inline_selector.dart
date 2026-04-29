@@ -133,7 +133,7 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 110,
+              height: 92,
               child: Stack(
                 children: [
                   ListView.separated(
@@ -210,7 +210,7 @@ class _AppIconItem extends StatelessWidget {
         child: SizedBox(
         width: 72,
         child: Column(
-          mainAxisSize: MainAxisSize.max,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Stack(
               clipBehavior: Clip.none,
@@ -241,26 +241,21 @@ class _AppIconItem extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            Expanded(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  option.displayName(context),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                ),
-              ),
+            Text(
+              option.displayName(context),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
             ),
           ],
         ),

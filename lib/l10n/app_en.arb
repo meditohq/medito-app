@@ -648,7 +648,7 @@
   "@appIconForest": {
     "description": "Label for the forest green gradient app icon option"
   },
-  "appIconPink": "Golden Hour",
+  "appIconPink": "Golden",
   "@appIconPink": {
     "description": "Label for the pink-to-gold sunset gradient app icon option"
   },

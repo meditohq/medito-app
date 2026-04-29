@@ -1536,7 +1536,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appIconForest => 'Forest';
 
   @override
-  String get appIconPink => 'Golden Hour';
+  String get appIconPink => 'Golden';
 
   @override
   String get appIconChanged => 'Icon updated. Restarting…';
