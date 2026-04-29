@@ -1,4 +1,7 @@
 Unreleased
+-
+
+26.4.29
 - Refreshed carousel on the home screen with a new sliding design
 - Subtle haptic feedback when scrolling the carousel and completing a meditation
 - Refreshed app icons on iOS
