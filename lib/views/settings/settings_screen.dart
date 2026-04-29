@@ -17,7 +17,7 @@ import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
 import 'package:medito/views/settings/widgets/expandable_section_widget.dart';
 import 'package:medito/views/settings/widgets/smart_reminder_tile.dart';
-import 'package:medito/views/settings/widgets/app_icon_inline_selector.dart';
+import 'package:medito/views/settings/app_icon_screen.dart';
 import 'package:medito/views/settings/widgets/theme_inline_selector.dart';
 import 'package:medito/views/settings/widgets/widget_option_tile.dart';
 import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
@@ -295,7 +295,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     if (item.type == TypeConstants.appIcon) {
-      return const AppIconInlineSelector();
+      return RowItemWidget(
+        icon: item.icon,
+        title: item.title,
+        hasUnderline: !isLast,
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const AppIconScreen()),
+        ),
+      );
     }
 
     if (isThemeItem) {
@@ -368,7 +376,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         .firstOrNull;
 
     // Items that render as their own inline cards
-    final inlineCardTypes = {TypeConstants.theme, TypeConstants.appIcon};
+    final inlineCardTypes = {TypeConstants.theme};
 
     // Items to group in the "other customization" card
     final otherCustomizationItems = allCustomizationItems
