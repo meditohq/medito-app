@@ -1405,7 +1405,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get consistencyScoreInfoMessage =>
-      'Your consistency score reflects how regularly you\'ve meditated over the last 30 days. Unlike streaks, it doesn\'t reset on missed days.';
+      'Your consistency score reflects how regularly you\'ve meditated since you started. Recent days carry more weight, but earlier missed days still gently affect the score. Unlike streaks, it doesn\'t reset on a missed day.';
 
   @override
   String get accountDeletionInitiated =>

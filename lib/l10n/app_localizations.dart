@@ -2615,7 +2615,7 @@ abstract class AppLocalizations {
   /// No description provided for @consistencyScoreInfoMessage.
   ///
   /// In en, this message translates to:
-  /// **'Your consistency score reflects how regularly you\'ve meditated over the last 30 days. Unlike streaks, it doesn\'t reset on missed days.'**
+  /// **'Your consistency score reflects how regularly you\'ve meditated since you started. Recent days carry more weight, but earlier missed days still gently affect the score. Unlike streaks, it doesn\'t reset on a missed day.'**
   String get consistencyScoreInfoMessage;
 
   /// No description provided for @accountDeletionInitiated.

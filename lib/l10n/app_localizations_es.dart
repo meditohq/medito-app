@@ -1433,7 +1433,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get consistencyScoreInfoMessage =>
-      'Tu puntuación de consistencia refleja con qué regularidad has meditado en los últimos 30 días. A diferencia de las rachas, no se reinicia en días perdidos.';
+      'Tu puntuación de consistencia refleja con qué regularidad has meditado desde que empezaste. Los días recientes pesan más, pero los días que faltaste antes siguen afectando ligeramente la puntuación. A diferencia de las rachas, no se reinicia cuando faltas un día.';
 
   @override
   String get accountDeletionInitiated =>
