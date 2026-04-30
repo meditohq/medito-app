@@ -119,6 +119,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                 flexWeights: flexWeights,
                 consumeMaxWeight: false,
                 padding: const EdgeInsets.only(left: padding16),
+                elevation: 8,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 ),
