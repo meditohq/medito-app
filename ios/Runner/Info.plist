@@ -46,6 +46,15 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
+			<key>classic</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>classic</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
 			<key>blush</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
@@ -101,6 +110,16 @@
 				<array>
 					<string>nearblack</string>
 					<string>nearblack-83.5</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>classic</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>classic</string>
+					<string>classic-83.5</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>

@@ -2837,8 +2837,14 @@ abstract class AppLocalizations {
   /// Label for the original purple app icon option
   ///
   /// In en, this message translates to:
-  /// **'Classic'**
+  /// **'Purple'**
   String get appIconPurple;
+
+  /// Label for the classic app icon option (purple M on white)
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get appIconClassic;
 
   /// Label for the blush pink gradient app icon option
   ///

@@ -632,9 +632,13 @@
   "@appIconDusk": {
     "description": "Label for the dusk gradient app icon option (now the default)"
   },
-  "appIconPurple": "Classic",
+  "appIconPurple": "Purple",
   "@appIconPurple": {
     "description": "Label for the original purple app icon option"
+  },
+  "appIconClassic": "Classic",
+  "@appIconClassic": {
+    "description": "Label for the classic app icon option (purple M on white)"
   },
   "appIconBlush": "Blush",
   "@appIconBlush": {

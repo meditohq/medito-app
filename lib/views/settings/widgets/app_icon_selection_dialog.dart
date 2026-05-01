@@ -10,6 +10,7 @@ import 'package:medito/widgets/dialogs/dialogs.dart';
 enum AppIconOption {
   defaultIcon(null, iosOnly: true),
   purple('purple', androidOnly: true),
+  classic('classic'),
   nearblack('nearblack'),
   goldenHour('goldenhour', androidIconName: 'pink'),
   ocean('ocean'),
@@ -41,6 +42,7 @@ enum AppIconOption {
   List<Color> get gradientColors => switch (this) {
     AppIconOption.defaultIcon => [const Color(0xFFC86D8D), const Color(0xFFE9AEB6)],
     AppIconOption.purple => [const Color(0xFF917CF0), const Color(0xFF917CF0)],
+    AppIconOption.classic => [const Color(0xFFFFFFFF), const Color(0xFFFFFFFF)],
     AppIconOption.nearblack => [const Color(0xFF140116), const Color(0xFF2A1A2C)],
     AppIconOption.ocean => [const Color(0xFF305A88), const Color(0xFF4A7CAE)],
     AppIconOption.forest => [const Color(0xFF67897B), const Color(0xFF3A6051)],
@@ -54,6 +56,7 @@ enum AppIconOption {
     return switch (this) {
       AppIconOption.defaultIcon => l10n.appIconDefault,
       AppIconOption.purple => l10n.appIconPurple,
+      AppIconOption.classic => l10n.appIconClassic,
       AppIconOption.nearblack => l10n.appIconNearBlack,
       AppIconOption.ocean => l10n.appIconOcean,
       AppIconOption.forest => l10n.appIconForest,
@@ -71,6 +74,8 @@ class AppIconPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isClassic = option == AppIconOption.classic;
+
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(size * 0.22),
@@ -99,7 +104,9 @@ class AppIconPreview extends StatelessWidget {
           width: size * 0.75,
           height: size * 0.75,
           colorFilter: ColorFilter.mode(
-            Colors.white.withValues(alpha: 0.9),
+            isClassic
+                ? const Color(0xFF8E7DE9)
+                : Colors.white.withValues(alpha: 0.9),
             BlendMode.srcIn,
           ),
         ),
