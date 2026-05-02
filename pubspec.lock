@@ -281,14 +281,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
-  core_haptics:
-    dependency: "direct main"
-    description:
-      name: core_haptics
-      sha256: "8c410a65b3a0108aab40ffb805acdc84ce119fc1c2dc02cf82fa937349671986"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.7"
   coverage:
     dependency: transitive
     description:

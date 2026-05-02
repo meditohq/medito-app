@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core_haptics/core_haptics.dart';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -43,7 +42,6 @@ class EndScreenView extends ConsumerStatefulWidget {
 class _EndScreenViewState extends ConsumerState<EndScreenView>
     with TickerProviderStateMixin {
   final _animatedSwitcherKey = GlobalKey();
-  bool _hasFiredHapticFeedback = false;
   final _analytics = FirebaseAnalyticsService();
 
   late AnimationController _statsAnimationController;
@@ -62,7 +60,6 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     super.initState();
     _loadStats();
     _logScreenView();
-    _triggerHapticFeedback();
 
     _statsAnimationController = AnimationController(
       vsync: this,
@@ -154,15 +151,6 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
   Future<void> _logScreenView() async {
     await _analytics.logScreenView(screenName: 'EndScreenView');
-  }
-
-  Future<void> _triggerHapticFeedback() async {
-    if (_hasFiredHapticFeedback) return;
-
-    _hasFiredHapticFeedback = true;
-    try {
-      await HapticEngine.success();
-    } catch (_) {}
   }
 
   void _loadStats() async {
@@ -272,7 +260,6 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         child: Center(child: Text('Error: $err')),
       ),
       data: (localAllStats) {
-        _hasFiredHapticFeedback = false;
         var streak = localAllStats.streakCurrent;
         var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
         var lastFiveDays = List.generate(
@@ -288,11 +275,6 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               key: _animatedSwitcherKey,
               duration: const Duration(milliseconds: 500),
               transitionBuilder: (Widget child, Animation<double> animation) {
-                if (animation.status == AnimationStatus.forward &&
-                    !_hasFiredHapticFeedback) {
-                  _triggerHapticFeedback();
-                }
-
                 return FadeTransition(
                   opacity: animation,
                   child: ScaleTransition(
