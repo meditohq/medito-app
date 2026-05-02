@@ -456,3 +456,62 @@ Future<bool> addManualSession({
     return false;
   }
 }
+
+/// Adds a manual session to each date in [dates] at noon, with the same
+/// [durationMinutes] applied to every day. Stats are recalculated after every
+/// insert (StatsManager requires it for streak math), but provider refresh and
+/// home-widget update happen once at the end so the UI doesn't thrash.
+///
+/// Returns the count of dates successfully added. Future-dated entries are
+/// silently skipped.
+Future<int> addManualSessions({
+  required List<DateTime> dates,
+  required int durationMinutes,
+  StatsManager? statsManager,
+}) async {
+  statsManager ??= StatsManager()..initialize();
+  final durationMs = durationMinutes * 60 * 1000;
+  final now = DateTime.now();
+  var added = 0;
+
+  for (final date in dates) {
+    // Anchor to noon so the manual-session bucket is "afternoon" and the
+    // entry is unambiguously inside the calendar day.
+    final dateTime = DateTime(date.year, date.month, date.day, 12);
+    if (dateTime.isAfter(now)) continue;
+
+    try {
+      final manualId = _getManualSessionId(dateTime);
+      final entry = LocalAudioCompleted(
+        id: manualId,
+        timestamp: dateTime.millisecondsSinceEpoch,
+      );
+      await statsManager.addAudioCompleted(entry, durationMs,
+          skipPost: true);
+      added++;
+    } catch (e) {
+      AppLogger.e('STATS', 'Failed to add manual session in bulk for $date', e);
+    }
+  }
+
+  if (added > 0) {
+    // Post the batched result once, instead of once per day.
+    try {
+      await statsManager.flushPendingPost();
+    } catch (e) {
+      AppLogger.e('STATS', 'Failed to post batched manual sessions', e);
+    }
+    await _refreshStatsAndUpNext();
+    try {
+      final updatedStats = await statsManager.localAllStats;
+      HomeWidgetService.updateWidgetFromStats(updatedStats).catchError((e) {
+        AppLogger.e('STATS', 'Failed to update home widget', e);
+      });
+    } catch (widgetError) {
+      AppLogger.e(
+          'STATS', 'Failed to get stats for widget update', widgetError);
+    }
+  }
+
+  return added;
+}

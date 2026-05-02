@@ -15,6 +15,7 @@ import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/stats/meditation_calendar_widget.dart';
+import 'package:medito/views/settings/restore_stats_screen.dart';
 
 class StatsScreen extends ConsumerStatefulWidget {
   final int initialTabIndex;
@@ -368,6 +369,33 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
           ),
         ),
         _buildStreakCircleDisplayPreference(context, ref),
+        Align(
+          alignment: Alignment.center,
+          child: TextButton.icon(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const RestoreStatsScreen(),
+              ),
+            ),
+            icon: Icon(
+              Icons.restore_outlined,
+              size: 18,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withOpacityValue(0.7),
+            ),
+            label: Text(
+              AppLocalizations.of(context)!.restorePreviousStats,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacityValue(0.7),
+                  ),
+            ),
+          ),
+        ),
       ],
     );
   }

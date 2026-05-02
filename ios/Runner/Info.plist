@@ -46,6 +46,15 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
+			<key>classic</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>classic</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
 			<key>blush</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
@@ -73,11 +82,11 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>pink</key>
+			<key>goldenhour</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
-					<string>pink</string>
+					<string>goldenhour</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -101,6 +110,16 @@
 				<array>
 					<string>nearblack</string>
 					<string>nearblack-83.5</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>classic</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>classic</string>
+					<string>classic-83.5</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -135,12 +154,12 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>pink</key>
+			<key>goldenhour</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
-					<string>pink</string>
-					<string>pink-83.5</string>
+					<string>goldenhour</string>
+					<string>goldenhour-83.5</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>

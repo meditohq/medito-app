@@ -165,10 +165,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_runner
-      sha256: "521daf8d189deb79ba474e43a696b41c49fb3987818dbacf3308f1e03673a75e"
+      sha256: "22fdcc3cfeb9d974d7408718c4be15ec5e9b1b350088f3a6c88f154e74dd700d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.13.1"
+    version: "2.14.1"
   built_collection:
     dependency: transitive
     description:
@@ -281,6 +281,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  core_haptics:
+    dependency: "direct main"
+    description:
+      name: core_haptics
+      sha256: "8c410a65b3a0108aab40ffb805acdc84ce119fc1c2dc02cf82fa937349671986"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.7"
   coverage:
     dependency: transitive
     description:
@@ -397,10 +405,10 @@ packages:
     dependency: "direct main"
     description:
       name: facebook_app_events
-      sha256: "0e183947c222e153ab70b9d93c08da18800c73019b9455f86bf2a0bfff30d51e"
+      sha256: "87191e0020999e8a0e6034e5a1c3f5317bf689f6f4a7032304088e9810e0ec81"
       url: "https://pub.dev"
     source: hosted
-    version: "0.26.0"
+    version: "0.27.2"
   fake_async:
     dependency: transitive
     description:
@@ -735,14 +743,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  haptic_feedback:
-    dependency: "direct main"
-    description:
-      name: haptic_feedback
-      sha256: dcc2494994c41428823f8f2082fd17a4e89e372bd142e07681420cbfaf99dcad
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.4+3"
   health:
     dependency: "direct main"
     description:
@@ -755,10 +755,10 @@ packages:
     dependency: "direct main"
     description:
       name: home_widget
-      sha256: d794a73894012459a4c63b94a6dc2cb3ccaa6eb08fb15b974aa7ac642594aed5
+      sha256: b04f99438ad6c5aad80fc9fca1e2e3471bf2a15028f614e4814d2552e13bc2a3
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.0"
+    version: "0.9.1"
   hooks:
     dependency: transitive
     description:
@@ -976,10 +976,10 @@ packages:
     dependency: "direct dev"
     description:
       name: mocktail
-      sha256: "890df3f9688106f25755f26b1c60589a92b3ab91a22b8b224947ad041bf172d8"
+      sha256: "5e1bf53cc7baa8062a33b84424deb61513858ea05c601b8509e683815b5914aa"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.4"
+    version: "1.0.5"
   native_toolchain_c:
     dependency: transitive
     description:

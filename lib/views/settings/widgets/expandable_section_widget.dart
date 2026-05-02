@@ -11,6 +11,7 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/settings/manage_defaults_screen.dart';
+import 'package:medito/views/settings/restore_stats_screen.dart';
 import 'package:medito/widgets/medito_icon.dart';
 // removed unused snackbar import
 
@@ -139,6 +140,59 @@ class _ExpandableSectionWidgetState
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.manageDefaults,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              size: 24.0,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Restore previous stats item
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const RestoreStatsScreen(),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              width: 0.7,
+                              color: ColorConstants.onyx,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.restore_outlined,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              size: 24.0,
+                            ),
+                            width16,
+                            Expanded(
+                              child: Text(
+                                AppLocalizations.of(context)!
+                                    .restorePreviousStats,
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelMedium

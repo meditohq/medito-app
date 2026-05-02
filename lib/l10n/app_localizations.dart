@@ -1526,6 +1526,102 @@ abstract class AppLocalizations {
   /// **'Advanced'**
   String get advanced;
 
+  /// No description provided for @restorePreviousStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore previous stats'**
+  String get restorePreviousStats;
+
+  /// No description provided for @restorePreviousStatsExplainer.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a snapshot to restore. Snapshots are saved automatically when your stats sync, and the most recent 20 are kept on this device — including snapshots taken from other accounts you\'ve signed into here.'**
+  String get restorePreviousStatsExplainer;
+
+  /// No description provided for @noBackupsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No stats snapshots are stored on this device yet.'**
+  String get noBackupsAvailable;
+
+  /// No description provided for @backupSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak {streak} · {sessions, plural, =1{1 session} other{{sessions} sessions}} · {minutes} min'**
+  String backupSummary(int streak, int sessions, int minutes);
+
+  /// No description provided for @restoreStatsConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore these stats?'**
+  String get restoreStatsConfirmTitle;
+
+  /// No description provided for @restoreStatsConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current stats on this device will be replaced with the selected snapshot, and the snapshot will be uploaded for the currently signed-in account. This can\'t be undone.'**
+  String get restoreStatsConfirmBody;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @restoreStatsSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats restored'**
+  String get restoreStatsSuccess;
+
+  /// No description provided for @restoreStatsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t restore stats. Please try again.'**
+  String get restoreStatsFailed;
+
+  /// No description provided for @daysSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day selected} other{{count} days selected}}'**
+  String daysSelected(int count);
+
+  /// No description provided for @newStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'New streak'**
+  String get newStreak;
+
+  /// No description provided for @newSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'New sessions'**
+  String get newSessions;
+
+  /// No description provided for @addSessionsToSelectedDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Add sessions to selected days'**
+  String get addSessionsToSelectedDays;
+
+  /// No description provided for @addSessionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Add 1 session} other{Add {count} sessions}}'**
+  String addSessionsTitle(int count);
+
+  /// No description provided for @daysAlreadyHaveSession.
+  ///
+  /// In en, this message translates to:
+  /// **'{filled, plural, =1{1 of {total} days already has a session and will be skipped.} other{{filled} of {total} days already have a session and will be skipped.}}'**
+  String daysAlreadyHaveSession(int filled, int total);
+
+  /// No description provided for @minutesPerDayOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes per day (optional)'**
+  String get minutesPerDayOptional;
+
   /// Title for the onboarding section in settings
   ///
   /// In en, this message translates to:
@@ -2519,7 +2615,7 @@ abstract class AppLocalizations {
   /// No description provided for @consistencyScoreInfoMessage.
   ///
   /// In en, this message translates to:
-  /// **'Your consistency score reflects how regularly you\'ve meditated over the last 30 days. Unlike streaks, it doesn\'t reset on missed days.'**
+  /// **'Your consistency score reflects how regularly you\'ve meditated since you started. Recent days carry more weight, but earlier missed days still gently affect the score. Unlike streaks, it doesn\'t reset on a missed day.'**
   String get consistencyScoreInfoMessage;
 
   /// No description provided for @accountDeletionInitiated.
@@ -2741,8 +2837,14 @@ abstract class AppLocalizations {
   /// Label for the original purple app icon option
   ///
   /// In en, this message translates to:
-  /// **'Classic'**
+  /// **'Purple'**
   String get appIconPurple;
+
+  /// Label for the classic app icon option (purple M on white)
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get appIconClassic;
 
   /// Label for the blush pink gradient app icon option
   ///
@@ -2765,7 +2867,7 @@ abstract class AppLocalizations {
   /// Label for the pink-to-gold sunset gradient app icon option
   ///
   /// In en, this message translates to:
-  /// **'Golden Hour'**
+  /// **'Golden'**
   String get appIconPink;
 
   /// Snackbar message shown on Android after changing the app icon

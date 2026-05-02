@@ -15,7 +15,7 @@ publish_to: none
 # Just build Android APK (used by the script above):
 # ./build_apk.sh
 
-version: 26.4.24+302397
+version: 26.4.29+302399
 
 environment:
   sdk: "^3.8.0"
@@ -48,9 +48,9 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0
   flutter_stripe: 12.5.0
   flutter_svg: ^2.2.4
-  facebook_app_events: ^0.26.0
+  facebook_app_events: ^0.27.1
   freezed_annotation: ^3.1.0
-  haptic_feedback: ^0.6.4+3
+  core_haptics: 0.0.7
   health: ^13.3.1
   http: ^1.6.0
   image: ^4.8.0
@@ -74,19 +74,19 @@ dependencies:
   webview_flutter: ^4.10.0
   xml: ^6.6.1
   xml2json: ^6.2.7
-  home_widget: ^0.9.0
+  home_widget: ^0.9.1
   dynamic_app_icon_flutter_plus: ^0.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.13.1
+  build_runner: ^2.14.1
   device_preview: ^1.3.1
   flutter_lints: ^6.0.0
   freezed: ^3.2.5
-  json_serializable: ^6.8.0
+  json_serializable: ^6.13.0
   firebase_core_platform_interface: any
-  mocktail: ^1.0.4
+  mocktail: ^1.0.5
   mockito: ^5.6.4
   plugin_platform_interface: any
   pigeon: ^26.3.2
@@ -99,7 +99,8 @@ flutter:
   assets:
     - assets/
     - assets/images/
-    - assets/images/app_icons/
+    - assets/images/app_icons/ios/
+    - assets/images/app_icons/android/
   fonts:
     - family: Source Serif
       fonts:

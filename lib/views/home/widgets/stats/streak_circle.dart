@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/providers/streak_circle_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -46,7 +45,6 @@ class StreakCircleState extends ConsumerState<StreakCircle>
     return Consumer(
       builder: (context, ref, child) {
         final statsAsync = ref.watch(statsProvider);
-        final hasSeenStreakCircle = ref.watch(streakCircleProvider);
         final displayTypeAsync = ref.watch(streakCircleDisplayProvider);
         final isZenModeEnabled = ref.watch(zenModeProvider);
 
@@ -60,13 +58,10 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
               if (isZenModeEnabled) {
                 _controller.updateAnimation(isStreakDoneToday);
-                return _buildWithBadge(
-                  hasSeenStreakCircle,
-                  AnimatedBuilder(
-                    animation: _controller.animationController,
-                    builder: (context, child) =>
-                        _buildZenModeCircle(isStreakDoneToday),
-                  ),
+                return AnimatedBuilder(
+                  animation: _controller.animationController,
+                  builder: (context, child) =>
+                      _buildZenModeCircle(isStreakDoneToday),
                 );
               }
 
@@ -81,16 +76,13 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
                   _controller.updateAnimation(isStreakDoneToday);
 
-                  return _buildWithBadge(
-                    hasSeenStreakCircle,
-                    AnimatedBuilder(
-                      animation: _controller.animationController,
-                      builder: (context, child) => _buildStreakCircle(
-                          isStreakDoneToday,
-                          displayValue,
-                          progressValue,
-                          showConsistencyScore),
-                    ),
+                  return AnimatedBuilder(
+                    animation: _controller.animationController,
+                    builder: (context, child) => _buildStreakCircle(
+                        isStreakDoneToday,
+                        displayValue,
+                        progressValue,
+                        showConsistencyScore),
                   );
                 },
                 data: (displayType) {
@@ -103,16 +95,13 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
                   _controller.updateAnimation(isStreakDoneToday);
 
-                  return _buildWithBadge(
-                    hasSeenStreakCircle,
-                    AnimatedBuilder(
-                      animation: _controller.animationController,
-                      builder: (context, child) => _buildStreakCircle(
-                          isStreakDoneToday,
-                          displayValue,
-                          progressValue,
-                          showConsistencyScore),
-                    ),
+                  return AnimatedBuilder(
+                    animation: _controller.animationController,
+                    builder: (context, child) => _buildStreakCircle(
+                        isStreakDoneToday,
+                        displayValue,
+                        progressValue,
+                        showConsistencyScore),
                   );
                 },
               );
@@ -126,13 +115,10 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
             if (isZenModeEnabled) {
               _controller.updateAnimation(isStreakDoneToday);
-              return _buildWithBadge(
-                hasSeenStreakCircle,
-                AnimatedBuilder(
-                  animation: _controller.animationController,
-                  builder: (context, child) =>
-                      _buildZenModeCircle(isStreakDoneToday),
-                ),
+              return AnimatedBuilder(
+                animation: _controller.animationController,
+                builder: (context, child) =>
+                    _buildZenModeCircle(isStreakDoneToday),
               );
             }
 
@@ -147,16 +133,13 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
                 _controller.updateAnimation(isStreakDoneToday);
 
-                return _buildWithBadge(
-                  hasSeenStreakCircle,
-                  AnimatedBuilder(
-                    animation: _controller.animationController,
-                    builder: (context, child) => _buildStreakCircle(
-                        isStreakDoneToday,
-                        displayValue,
-                        progressValue,
-                        showConsistencyScore),
-                  ),
+                return AnimatedBuilder(
+                  animation: _controller.animationController,
+                  builder: (context, child) => _buildStreakCircle(
+                      isStreakDoneToday,
+                      displayValue,
+                      progressValue,
+                      showConsistencyScore),
                 );
               },
               data: (displayType) {
@@ -169,43 +152,17 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
                 _controller.updateAnimation(isStreakDoneToday);
 
-                return _buildWithBadge(
-                  hasSeenStreakCircle,
-                  AnimatedBuilder(
-                    animation: _controller.animationController,
-                    builder: (context, child) => _buildStreakCircle(
-                        isStreakDoneToday,
-                        displayValue,
-                        progressValue,
-                        showConsistencyScore),
-                  ),
+                return AnimatedBuilder(
+                  animation: _controller.animationController,
+                  builder: (context, child) => _buildStreakCircle(
+                      isStreakDoneToday,
+                      displayValue,
+                      progressValue,
+                      showConsistencyScore),
                 );
               },
             );
           },
-        );
-      },
-    );
-  }
-
-  Widget _buildWithBadge(AsyncValue<bool> hasSeenStreakCircle, Widget child) {
-    return hasSeenStreakCircle.when(
-      loading: () => child,
-      error: (_, _) => child,
-      data: (seen) {
-        if (seen) return child;
-
-        return Badge(
-          backgroundColor: ColorConstants.amber,
-          smallSize: 8,
-          alignment: Alignment.topLeft,
-          child: GestureDetector(
-            onTap: () {
-              ref.read(streakCircleProvider.notifier).markAsSeen();
-              widget.onTap();
-            },
-            child: child,
-          ),
         );
       },
     );

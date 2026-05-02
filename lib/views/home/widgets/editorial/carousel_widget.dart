@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:core_haptics/core_haptics.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
@@ -10,10 +11,11 @@ import 'package:medito/utils/utils.dart';
 
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/network_image_widget.dart';
+import '../home_gradient_border.dart';
 
-const _kCardBorderRadius = 24.0;
-const _kCardAspectRatio = 2 / 3;
+const _kCardBorderRadius = 20.0;
 const _kBannerFontSize = 16.0;
+const _kCarouselHeight = 180.0;
 
 class CarouselWidget extends ConsumerStatefulWidget {
   final List<HomeCarouselModel> carouselItems;
@@ -25,27 +27,69 @@ class CarouselWidget extends ConsumerStatefulWidget {
 }
 
 class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
-  final ScrollController _scrollController = ScrollController();
+  final CarouselController _controller = CarouselController();
+  bool _showLeftGradient = false;
+  bool _showRightGradient = true;
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _controller.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _controller.removeListener(_onScroll);
+    _controller.dispose();
     super.dispose();
   }
 
-  double _cardWidth(Size screenSize) {
-    final isWide = screenSize.width > screenSize.height ||
-        screenSize.shortestSide >= 600;
-    return isWide ? screenSize.width / 5.0 : screenSize.width / 3.2;
+  void _onScroll() {
+    final showLeft =
+        _controller.hasClients && _controller.position.pixels > 10;
+    final showRight = _controller.hasClients &&
+        _controller.position.pixels <
+            _controller.position.maxScrollExtent - 10;
+    if (showLeft != _showLeftGradient || showRight != _showRightGradient) {
+      setState(() {
+        _showLeftGradient = showLeft;
+        _showRightGradient = showRight;
+      });
+    }
+
+    _checkIndexChange();
+  }
+
+  void _checkIndexChange() {
+    if (!_controller.hasClients) return;
+
+    final itemCount = widget.carouselItems.length + 2;
+    final maxExtent = _controller.position.maxScrollExtent;
+    final pixels = _controller.position.pixels;
+    final itemWidth = maxExtent / (itemCount - 1);
+    final newIndex = (pixels / itemWidth).round().clamp(0, itemCount - 1);
+
+    if (newIndex != _currentIndex && newIndex < widget.carouselItems.length) {
+      _currentIndex = newIndex;
+      _fireHaptic();
+    }
+  }
+
+  Future<void> _fireHaptic() async {
+    try {
+      await HapticEngine.selection();
+    } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width >
+            MediaQuery.of(context).size.height ||
+        MediaQuery.of(context).size.shortestSide >= 600;
+
+    final flexWeights = isWide ? [4, 3, 3, 3] : [4, 3, 2];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -54,116 +98,158 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
           child: Text(
             AppLocalizations.of(context)!.carouselTitle,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              fontFamily: teachers,
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              height: 28 / 24,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+                  fontFamily: teachers,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  height: 28 / 24,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
           ),
         ),
         height8,
-        SingleChildScrollView(
-          controller: _scrollController,
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.only(right: padding16 / 2),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: widget.carouselItems.asMap().entries.map((entry) {
-              return _buildCarouselItem(context, ref, entry.key, entry.value);
-            }).toList(),
-          ),
+        Stack(
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: _kCarouselHeight,
+              ),
+              child: CarouselView.weighted(
+                controller: _controller,
+                itemSnapping: true,
+                flexWeights: flexWeights,
+                consumeMaxWeight: false,
+                padding: const EdgeInsets.only(left: padding16),
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(_kCardBorderRadius),
+                ),
+                onTap: (index) => _onItemTap(index),
+                children: [
+                  ...widget.carouselItems.map((item) {
+                    return _buildCarouselItem(context, item);
+                  }),
+                  const SizedBox.shrink(),
+                  const SizedBox.shrink(),
+                ],
+              ),
+            ),
+            if (_showLeftGradient)
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 32,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Theme.of(context).scaffoldBackgroundColor,
+                          Theme.of(context)
+                              .scaffoldBackgroundColor
+                              .withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            if (_showRightGradient)
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: 32,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                        colors: [
+                          Theme.of(context).scaffoldBackgroundColor,
+                          Theme.of(context)
+                              .scaffoldBackgroundColor
+                              .withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildCarouselItem(
-    BuildContext context,
-    WidgetRef ref,
-    int index,
-    HomeCarouselModel item,
-  ) {
-    final cardWidth = _cardWidth(MediaQuery.of(context).size);
-
-    return Padding(
-      padding: EdgeInsets.only(
-        left: index == 0 ? padding16 : padding16 / 2,
-        right: padding16 / 2,
-      ),
-      child: SizedBox(
-        width: cardWidth,
-        child: _buildBanner(item, _buildCard(context, item, ref)),
-      ),
+  void _onItemTap(int index) {
+    final item = widget.carouselItems[index];
+    handleNavigation(
+      item.type,
+      [item.path.toString().getIdFromPath(), item.path],
+      context,
+      ref: ref,
     );
   }
 
-  Widget _buildCard(
-    BuildContext context,
-    HomeCarouselModel item,
-    WidgetRef ref,
-  ) {
+  Widget _buildCarouselItem(BuildContext context, HomeCarouselModel item) {
     final cardColor = Theme.of(context).cardColor;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final imageWidth = screenWidth * 0.55;
 
     return Semantics(
       label: item.title,
       button: true,
-      child: GestureDetector(
-        onTap: () {
-          handleNavigation(
-            item.type,
-            [item.path.toString().getIdFromPath(), item.path],
-            context,
-            ref: ref,
-          );
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(_kCardBorderRadius),
-            border: Border.all(
-              color: Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
-              width: 0.5,
-            ),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(_kCardBorderRadius),
-            child: AspectRatio(
-              aspectRatio: _kCardAspectRatio,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  NetworkImageWidget(url: item.coverUrl, shouldCache: true),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(10, 36, 10, 12),
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [Color(0xCC000000), Colors.transparent],
-                        ),
-                      ),
-                      child: Text(
-                        item.title,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+      child: _buildBanner(
+        item,
+        HomeGradientBorder(
+          backgroundColor: cardColor,
+          borderRadius: _kCardBorderRadius,
+          borderWidth: 0.5,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              OverflowBox(
+                maxWidth: imageWidth,
+                minWidth: imageWidth,
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  width: imageWidth,
+                  child:
+                      NetworkImageWidget(url: item.coverUrl, shouldCache: true),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 36, 10, 12),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Color(0xCC000000), Colors.transparent],
+                    ),
+                  ),
+                  child: Text(
+                    item.title,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontFamily: dmSans,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                           height: 1.2,
                           color: Colors.white,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -177,19 +263,16 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         ? parseColor(item.bannerColor!)
         : context.brandPurple;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(_kCardBorderRadius),
-      child: Banner(
-        message: item.bannerLabel ?? AppLocalizations.of(context)!.neww,
-        location: BannerLocation.topStart,
-        color: bannerColor,
-        textStyle: TextStyle(
-          color: parseColor(item.bannerLabelColor),
-          fontSize: _kBannerFontSize,
-          fontWeight: FontWeight.bold,
-        ),
-        child: child,
+    return Banner(
+      message: item.bannerLabel ?? AppLocalizations.of(context)!.neww,
+      location: BannerLocation.topStart,
+      color: bannerColor,
+      textStyle: TextStyle(
+        color: parseColor(item.bannerLabelColor),
+        fontSize: _kBannerFontSize,
+        fontWeight: FontWeight.bold,
       ),
+      child: child,
     );
   }
 }

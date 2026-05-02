@@ -325,32 +325,18 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
+          # NOTE: android-emulator-runner executes each line in its own shell,
+          # so env vars don't persist across lines and `\` continuations break.
+          # Keep each command on a single line and inline the app id.
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
-            APP=meditofoundation.medito
             mkdir -p /tmp/maestro-debug/seed /tmp/maestro-debug/upgrade
-
-            # 1. Install OLD (previously-shipped) version.
             adb install /tmp/old/app-prod-release.apk
-            adb shell pm grant $APP android.permission.POST_NOTIFICATIONS || true
+            adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
-
-            # 2. Seed state using the OLD tag's smoke.yaml — matches that
-            #    binary's onboarding UI, so strings/tap targets are correct
-            #    even if onboarding copy changed in HEAD.
-            $HOME/.maestro/bin/maestro test \
-              -e APP_ID=$APP /tmp/old-seed.yaml \
-              --no-ansi --debug-output /tmp/maestro-debug/seed
-
-            # 3. In-place upgrade. -r replaces while preserving app data.
-            #    Fails if signing keys differ — intentional guardrail.
+            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-seed.yaml --no-ansi --debug-output /tmp/maestro-debug/seed
             adb install -r /tmp/new/app-prod-release.apk
-
-            # 4. Verify upgraded app lands on home with state intact.
-            #    Uses HEAD's upgrade.yaml — it validates the NEW binary.
-            $HOME/.maestro/bin/maestro test \
-              -e APP_ID=$APP .maestro/upgrade.yaml \
-              --no-ansi --debug-output /tmp/maestro-debug/upgrade
+            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/upgrade.yaml --no-ansi --debug-output /tmp/maestro-debug/upgrade
 
       - name: Upload upgrade-test debug output
         if: failure()

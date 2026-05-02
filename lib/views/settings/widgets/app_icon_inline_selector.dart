@@ -66,23 +66,23 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
 
   Future<void> _setIcon(AppIconOption option) async {
     try {
+      final name = option.effectiveIconName;
       if (Platform.isAndroid) {
-        await MeditoAppIconManager().setAlternateIconName(option.iconName);
+        await MeditoAppIconManager().setAlternateIconName(name);
         if (mounted) {
+          setState(() => _currentIconName = name);
           showSnackBar(context, AppLocalizations.of(context)!.appIconChanged);
         }
         await Future.delayed(const Duration(seconds: 1));
         await SystemNavigator.pop();
       } else {
-        await DynamicAppIconFlutterPlus.setAlternateIconName(
-          option.iconName,
-        );
+        await DynamicAppIconFlutterPlus.setAlternateIconName(name);
         if (mounted) {
-          setState(() => _currentIconName = option.iconName);
+          setState(() => _currentIconName = name);
         }
       }
     } catch (e, st) {
-      AppLogger.e('AppIcon', 'Failed to set icon: ${option.iconName}', e, st);
+      AppLogger.e('AppIcon', 'Failed to set icon: ${option.effectiveIconName}', e, st);
     }
   }
 
@@ -133,7 +133,7 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 110,
+              height: 92,
               child: Stack(
                 children: [
                   ListView.separated(
@@ -143,7 +143,7 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
                     separatorBuilder: (_, _) => const SizedBox(width: 12),
                     itemBuilder: (context, index) {
                       final option = AppIconOption.availableOptions[index];
-                      final isSelected = _currentIconName == option.iconName;
+                      final isSelected = _currentIconName == option.effectiveIconName;
 
                       return _AppIconItem(
                         option: option,
@@ -152,11 +152,13 @@ class AppIconInlineSelectorState extends State<AppIconInlineSelector> {
                       );
                     },
                   ),
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: _showFade ? 1.0 : 0.0,
-                    child: Align(
-                      alignment: Alignment.centerRight,
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    right: -2,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 300),
+                      opacity: _showFade ? 1.0 : 0.0,
                       child: IgnorePointer(
                         child: Container(
                           width: 72,
@@ -208,49 +210,52 @@ class _AppIconItem extends StatelessWidget {
         child: SizedBox(
         width: 72,
         child: Column(
-          mainAxisSize: MainAxisSize.max,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: isSelected
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.transparent,
-                  width: 2.5,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(11),
-                child: Image.asset(
-                  option.previewAsset,
-                  width: 56,
-                  height: 56,
-                ),
-              ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AppIconPreview(option: option, size: 56),
+                if (isSelected)
+                  Positioned(
+                    right: -4,
+                    bottom: -4,
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).cardColor,
+                          width: 2,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        size: 12,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 6),
-            Expanded(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  option.displayName(context),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                ),
-              ),
+            Text(
+              option.displayName(context),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
             ),
           ],
         ),

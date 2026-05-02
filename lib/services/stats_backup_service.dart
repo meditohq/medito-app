@@ -6,13 +6,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 class StatsBackup {
   final int timestamp;
   final LocalAllStats stats;
+  final String userId;
+  final int slotIndex;
 
-  StatsBackup({required this.timestamp, required this.stats});
+  StatsBackup({
+    required this.timestamp,
+    required this.stats,
+    this.userId = '',
+    this.slotIndex = -1,
+  });
 }
 
 class StatsBackupService {
   final SharedPreferences _prefs;
-  static const int _maxBackups = 5;
+  static const int _maxBackups = 20;
   static const String _backupKeyPrefix = 'stats_backup_';
   static const String _backupIndexKey = 'stats_backup_index';
 
@@ -94,11 +101,51 @@ class StatsBackupService {
             final migratedStatsJson = _migrateStatsIfNeeded(statsJson, version);
             final stats = LocalAllStats.fromJson(migratedStatsJson);
 
-            result.add(StatsBackup(timestamp: timestamp, stats: stats));
+            result.add(StatsBackup(
+              timestamp: timestamp,
+              stats: stats,
+              userId: backupUserId,
+              slotIndex: i,
+            ));
           }
         } catch (e) {
           // Skip invalid entries
         }
+      }
+    }
+
+    return result;
+  }
+
+  /// Returns every backup currently stored, regardless of which user
+  /// produced it. Used by the "restore previous stats" UI so a user who
+  /// has logged into a different account can still recover snapshots
+  /// taken on the previous account.
+  Future<List<StatsBackup>> getAllBackupsAcrossUsers() async {
+    final result = <StatsBackup>[];
+
+    for (var i = 0; i < _maxBackups; i++) {
+      final backupKey = _getBackupKey(i);
+      final backupJson = _prefs.getString(backupKey);
+      if (backupJson == null) continue;
+
+      try {
+        final backupData = jsonDecode(backupJson) as Map<String, dynamic>;
+        final timestamp = backupData['timestamp'] as int;
+        final version = backupData['version'] as int? ?? 1;
+        final backupUserId = backupData['userId'] as String? ?? '';
+        final statsJson = backupData['stats'] as Map<String, dynamic>;
+        final migratedStatsJson = _migrateStatsIfNeeded(statsJson, version);
+        final stats = LocalAllStats.fromJson(migratedStatsJson);
+
+        result.add(StatsBackup(
+          timestamp: timestamp,
+          stats: stats,
+          userId: backupUserId,
+          slotIndex: i,
+        ));
+      } catch (_) {
+        // Skip invalid entries.
       }
     }
 

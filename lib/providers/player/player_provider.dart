@@ -16,7 +16,7 @@ import '../../utils/logger.dart';
 
 final _api = MeditoAudioServiceApi();
 final _androidServiceApi = MeditoAndroidAudioServiceManager();
-final iosAudioHandler = IosAudioHandler();
+late IosAudioHandler iosAudioHandler;
 
 final playerProvider =
     NotifierProvider<PlayerProvider, TrackModel?>(() {

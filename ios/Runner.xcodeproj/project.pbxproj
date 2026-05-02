@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		0D4562B77FF4244FD7A0BF1F /* blush@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11B39ECC271C6439638C9ACA /* blush@2x.png */; };
 		0E56EAD091A3D2694CF3FA38 /* blush@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F696C23AC21F365306D45A /* blush@3x.png */; };
+		9956A5D296C34F048C5E16B1 /* classic@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BBFDA482A614471ACEB6AA2 /* classic@2x.png */; };
+		EA038FA9FDD44FFC876BD637 /* classic@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 92533D48FC1445F8A9835B38 /* classic@3x.png */; };
+		B09C70E0D2A642E886AE9FA9 /* classic@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C7AAB90810A445B83AC1E36 /* classic@2x~ipad.png */; };
+		D73C3F41BAB3461BB99C5D25 /* classic-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 58C716697FBE49889455C64E /* classic-83.5@2x~ipad.png */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		A0B1C2D3000000000000000A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3000000000000000F /* SceneDelegate.swift */; };
@@ -17,6 +21,8 @@
 		27250CA42E843752008B6308 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		27250CA52E843752008B6308 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BD257942AC4B7C80012213D /* GoogleService-Info.plist */; };
 		27250CA62E843752008B6308 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
+		E1C0E1C0E1C0E1C0E1C0E1C1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */; };
+		E1C0E1C0E1C0E1C0E1C0E1C2 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */; };
 		27250CA72E843752008B6308 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		286F501132BCE08B5ED702C1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
 		2AB55F368BB0C48A3099C502 /* forest@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 101421EE97843C1D2CD49583 /* forest@3x.png */; };
@@ -26,10 +32,10 @@
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		A0B1C2D3000000000000000B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3000000000000000F /* SceneDelegate.swift */; };
 		75FFF940D93AA63726585B1C /* ocean@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1642F495F0BF67E432218A44 /* ocean@3x.png */; };
-		7F3A591E80D70D658C77967D /* pink@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AC169176E7723242F1D76211 /* pink@2x.png */; };
+		7F3A591E80D70D658C77967D /* goldenhour@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AC169176E7723242F1D76211 /* goldenhour@2x.png */; };
 		8779BC35DF1AAC24F2EB5EC0 /* forest@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6E4B2292C6E7C1E5F56AFA5 /* forest@2x.png */; };
 		8BD257952AC4B7C80012213D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BD257942AC4B7C80012213D /* GoogleService-Info.plist */; };
-		8EECB3F8D0C2591655DDD85E /* pink@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8EA0F658C4F29C790453417C /* pink@3x.png */; };
+		8EECB3F8D0C2591655DDD85E /* goldenhour@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8EA0F658C4F29C790453417C /* goldenhour@3x.png */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -42,8 +48,8 @@
 		BBBB00001111222233334446 /* ocean-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334446 /* ocean-83.5@2x~ipad.png */; };
 		BBBB00001111222233334447 /* forest@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334447 /* forest@2x~ipad.png */; };
 		BBBB00001111222233334448 /* forest-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334448 /* forest-83.5@2x~ipad.png */; };
-		BBBB00001111222233334449 /* pink@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334449 /* pink@2x~ipad.png */; };
-		BBBB0000111122223333444A /* pink-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA0000111122223333444A /* pink-83.5@2x~ipad.png */; };
+		BBBB00001111222233334449 /* goldenhour@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334449 /* goldenhour@2x~ipad.png */; };
+		BBBB0000111122223333444A /* goldenhour-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA0000111122223333444A /* goldenhour-83.5@2x~ipad.png */; };
 		CC934284185658B1ADA4785C /* nearblack@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD285FFF1378316BD5FCFEC6 /* nearblack@2x.png */; };
 		CC9F9E6509D2EF1445F7D052 /* ocean@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8569F526DAB5AAE67011AF21 /* ocean@2x.png */; };
 		EDFD4D0B2C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0A2C9359BF0066E874 /* MeditoWidgetBundle.swift */; };
@@ -92,6 +98,10 @@
 		0FFC4805F01806064CC598A5 /* Pods-RunnerTests.release-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release-prod.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release-prod.xcconfig"; sourceTree = "<group>"; };
 		101421EE97843C1D2CD49583 /* forest@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "forest@3x.png"; sourceTree = "<group>"; };
 		11B39ECC271C6439638C9ACA /* blush@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "blush@2x.png"; sourceTree = "<group>"; };
+		0BBFDA482A614471ACEB6AA2 /* classic@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@2x.png"; sourceTree = "<group>"; };
+		92533D48FC1445F8A9835B38 /* classic@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@3x.png"; sourceTree = "<group>"; };
+		1C7AAB90810A445B83AC1E36 /* classic@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@2x~ipad.png"; sourceTree = "<group>"; };
+		58C716697FBE49889455C64E /* classic-83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic-83.5@2x~ipad.png"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		1642F495F0BF67E432218A44 /* ocean@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "ocean@3x.png"; sourceTree = "<group>"; };
@@ -118,7 +128,7 @@
 		8B72EB2FA75CFF73922EBDE7 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		8B7AADD52A559F5C004A5611 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		8BD257942AC4B7C80012213D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		8EA0F658C4F29C790453417C /* pink@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "pink@3x.png"; sourceTree = "<group>"; };
+		8EA0F658C4F29C790453417C /* goldenhour@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "goldenhour@3x.png"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Medito Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Medito Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -138,9 +148,9 @@
 		AAAA00001111222233334446 /* ocean-83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "ocean-83.5@2x~ipad.png"; sourceTree = "<group>"; };
 		AAAA00001111222233334447 /* forest@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "forest@2x~ipad.png"; sourceTree = "<group>"; };
 		AAAA00001111222233334448 /* forest-83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "forest-83.5@2x~ipad.png"; sourceTree = "<group>"; };
-		AAAA00001111222233334449 /* pink@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "pink@2x~ipad.png"; sourceTree = "<group>"; };
-		AAAA0000111122223333444A /* pink-83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "pink-83.5@2x~ipad.png"; sourceTree = "<group>"; };
-		AC169176E7723242F1D76211 /* pink@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "pink@2x.png"; sourceTree = "<group>"; };
+		AAAA00001111222233334449 /* goldenhour@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "goldenhour@2x~ipad.png"; sourceTree = "<group>"; };
+		AAAA0000111122223333444A /* goldenhour-83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "goldenhour-83.5@2x~ipad.png"; sourceTree = "<group>"; };
+		AC169176E7723242F1D76211 /* goldenhour@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "goldenhour@2x.png"; sourceTree = "<group>"; };
 		B0005ABE56C0BD68C1811D4A /* Pods-RunnerTests.profile-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile-dev.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile-dev.xcconfig"; sourceTree = "<group>"; };
 		BB0B0E732488A1D670FFA76D /* Pods-Runner.debug-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-prod.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-prod.xcconfig"; sourceTree = "<group>"; };
 		BC957D59D1CBF4ED522FE216 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
@@ -161,6 +171,7 @@
 		EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsistencyWidget.swift; sourceTree = "<group>"; };
 		EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpNextWidget.swift; sourceTree = "<group>"; };
 		F5F696C23AC21F365306D45A /* blush@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "blush@3x.png"; sourceTree = "<group>"; };
+		E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposericon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -294,6 +305,7 @@
 				8B7AADD52A559F5C004A5611 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
+				E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
 				97C147021CF9000F007C117D /* Info.plist */,
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
@@ -306,12 +318,16 @@
 				3695491DE3C75B6C6589CADB /* nearblack@3x.png */,
 				11B39ECC271C6439638C9ACA /* blush@2x.png */,
 				F5F696C23AC21F365306D45A /* blush@3x.png */,
+				0BBFDA482A614471ACEB6AA2 /* classic@2x.png */,
+				92533D48FC1445F8A9835B38 /* classic@3x.png */,
+				1C7AAB90810A445B83AC1E36 /* classic@2x~ipad.png */,
+				58C716697FBE49889455C64E /* classic-83.5@2x~ipad.png */,
 				8569F526DAB5AAE67011AF21 /* ocean@2x.png */,
 				1642F495F0BF67E432218A44 /* ocean@3x.png */,
 				A6E4B2292C6E7C1E5F56AFA5 /* forest@2x.png */,
 				101421EE97843C1D2CD49583 /* forest@3x.png */,
-				AC169176E7723242F1D76211 /* pink@2x.png */,
-				8EA0F658C4F29C790453417C /* pink@3x.png */,
+				AC169176E7723242F1D76211 /* goldenhour@2x.png */,
+				8EA0F658C4F29C790453417C /* goldenhour@3x.png */,
 				AAAA00001111222233334441 /* nearblack@2x~ipad.png */,
 				AAAA00001111222233334442 /* nearblack-83.5@2x~ipad.png */,
 				AAAA00001111222233334443 /* blush@2x~ipad.png */,
@@ -320,8 +336,8 @@
 				AAAA00001111222233334446 /* ocean-83.5@2x~ipad.png */,
 				AAAA00001111222233334447 /* forest@2x~ipad.png */,
 				AAAA00001111222233334448 /* forest-83.5@2x~ipad.png */,
-				AAAA00001111222233334449 /* pink@2x~ipad.png */,
-				AAAA0000111122223333444A /* pink-83.5@2x~ipad.png */,
+				AAAA00001111222233334449 /* goldenhour@2x~ipad.png */,
+				AAAA0000111122223333444A /* goldenhour-83.5@2x~ipad.png */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -592,6 +608,7 @@
 				27250CA42E843752008B6308 /* AppFrameworkInfo.plist in Resources */,
 				27250CA52E843752008B6308 /* GoogleService-Info.plist in Resources */,
 				27250CA62E843752008B6308 /* Assets.xcassets in Resources */,
+				E1C0E1C0E1C0E1C0E1C0E1C2 /* AppIcon.icon in Resources */,
 				27250CA72E843752008B6308 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -611,17 +628,22 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				8BD257952AC4B7C80012213D /* GoogleService-Info.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
+				E1C0E1C0E1C0E1C0E1C0E1C1 /* AppIcon.icon in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				CC934284185658B1ADA4785C /* nearblack@2x.png in Resources */,
 				B94EBB14C84430DEFDEAABA1 /* nearblack@3x.png in Resources */,
 				0D4562B77FF4244FD7A0BF1F /* blush@2x.png in Resources */,
 				0E56EAD091A3D2694CF3FA38 /* blush@3x.png in Resources */,
+				9956A5D296C34F048C5E16B1 /* classic@2x.png in Resources */,
+				EA038FA9FDD44FFC876BD637 /* classic@3x.png in Resources */,
+				B09C70E0D2A642E886AE9FA9 /* classic@2x~ipad.png in Resources */,
+				D73C3F41BAB3461BB99C5D25 /* classic-83.5@2x~ipad.png in Resources */,
 				CC9F9E6509D2EF1445F7D052 /* ocean@2x.png in Resources */,
 				75FFF940D93AA63726585B1C /* ocean@3x.png in Resources */,
 				8779BC35DF1AAC24F2EB5EC0 /* forest@2x.png in Resources */,
 				2AB55F368BB0C48A3099C502 /* forest@3x.png in Resources */,
-				7F3A591E80D70D658C77967D /* pink@2x.png in Resources */,
-				8EECB3F8D0C2591655DDD85E /* pink@3x.png in Resources */,
+				7F3A591E80D70D658C77967D /* goldenhour@2x.png in Resources */,
+				8EECB3F8D0C2591655DDD85E /* goldenhour@3x.png in Resources */,
 				BBBB00001111222233334441 /* nearblack@2x~ipad.png in Resources */,
 				BBBB00001111222233334442 /* nearblack-83.5@2x~ipad.png in Resources */,
 				BBBB00001111222233334443 /* blush@2x~ipad.png in Resources */,
@@ -630,8 +652,8 @@
 				BBBB00001111222233334446 /* ocean-83.5@2x~ipad.png in Resources */,
 				BBBB00001111222233334447 /* forest@2x~ipad.png in Resources */,
 				BBBB00001111222233334448 /* forest-83.5@2x~ipad.png in Resources */,
-				BBBB00001111222233334449 /* pink@2x~ipad.png in Resources */,
-				BBBB0000111122223333444A /* pink-83.5@2x~ipad.png in Resources */,
+				BBBB00001111222233334449 /* goldenhour@2x~ipad.png in Resources */,
+				BBBB0000111122223333444A /* goldenhour-83.5@2x~ipad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,6 +1,16 @@
 Unreleased
 -
 
+26.4.29
+- Refreshed carousel on the home screen with a new sliding design
+- Subtle haptic feedback when scrolling the carousel and completing a meditation
+- Refreshed app icons on iOS
+- Fixed Control Center and AirPlay not working properly on iOS
+
+26.4.28
+- Long-press two days in the stats calendar to backfill a whole range of past sessions at once
+- Restore an earlier stats snapshot from Settings → Advanced if you've signed into another account
+
 26.4.24
 - Fixed streamed meditations restarting in the background on some Android devices
 

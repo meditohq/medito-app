@@ -163,7 +163,7 @@ void main() {
 
     test('should limit number of backups', () async {
       // Arrange - Create more than _maxBackups stats
-      for (var i = 0; i < 10; i++) {
+      for (var i = 0; i < 25; i++) {
         final stats = LocalAllStats(
           streakCurrent: i,
           streakLongest: 10,
@@ -190,7 +190,7 @@ void main() {
       final allBackups = await backupService.getAllBackups('test-user');
 
       // Assert
-      expect(allBackups.length, lessThanOrEqualTo(5)); // _maxBackups is 5
+      expect(allBackups.length, lessThanOrEqualTo(20)); // _maxBackups is 20
     });
 
     test('should clear backups for specific user', () async {

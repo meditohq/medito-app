@@ -30,6 +30,8 @@ import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/history/app_history_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:medito/providers/player/ios_audio_handler.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
@@ -140,7 +142,7 @@ void main() async {
     AppLogger.d('MAIN', 'Meta SDK init complete');
   }
 
-  initializeAudioService();
+  await initializeAudioService();
 
   usePathUrlStrategy();
 
@@ -177,11 +179,17 @@ void setupAudioCallback() {
   MeditoAudioServiceCallbackApi.setUp(AudioStateProvider(audioStateNotifier));
 }
 
-void initializeAudioService() {
-  // iOS uses iosAudioHandler directly - AudioService.init is not needed and hangs.
-  // Android uses the pigeon callback setup.
+Future<void> initializeAudioService() async {
   if (Platform.isAndroid) {
     setupAudioCallback();
+  } else if (Platform.isIOS) {
+    iosAudioHandler = await AudioService.init(
+      builder: () => IosAudioHandler(),
+      config: const AudioServiceConfig(
+        fastForwardInterval: Duration(seconds: 15),
+        rewindInterval: Duration(seconds: 15),
+      ),
+    );
   }
 }
 

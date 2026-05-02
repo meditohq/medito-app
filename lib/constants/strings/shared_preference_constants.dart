@@ -19,7 +19,6 @@ class SharedPreferenceConstants {
   // New constants for stats
   static const String localAllStatsKey = 'local_all_stats';
   static const String statsLastSyncedAt = 'stats_last_synced_at';
-  static const String hasSeenStreakCircle = 'has_seen_streak_circle';
   static const String streakCircleDisplayPreference =
       'streak_circle_display_preference';
 

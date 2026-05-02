@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
@@ -78,21 +80,25 @@ class AudioStateNotifier extends Notifier<PlaybackState> {
       ),
     );
 
-    iosAudioHandler.iosStateStream.listen(
-      (event) {
-        var playerState = event.playerState;
-        state = state.copyWith(
-          speed: Speed(speed: event.speed),
-          track: iosAudioHandler.trackState,
-          isPlaying: event.playerState.playing,
-          isBuffering: playerState.processingState == ProcessingState.buffering,
-          isSeeking: false,
-          isCompleted: playerState.processingState == ProcessingState.completed,
-          position: event.position.inMilliseconds,
-          duration: event.duration.inMilliseconds,
-        );
-      },
-    );
+    if (Platform.isIOS) {
+      iosAudioHandler.iosStateStream.listen(
+        (event) {
+          var playerState = event.playerState;
+          state = state.copyWith(
+            speed: Speed(speed: event.speed),
+            track: iosAudioHandler.trackState,
+            isPlaying: event.playerState.playing,
+            isBuffering:
+                playerState.processingState == ProcessingState.buffering,
+            isSeeking: false,
+            isCompleted:
+                playerState.processingState == ProcessingState.completed,
+            position: event.position.inMilliseconds,
+            duration: event.duration.inMilliseconds,
+          );
+        },
+      );
+    }
 
     return initialState;
   }

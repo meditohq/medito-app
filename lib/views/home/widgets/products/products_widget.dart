@@ -27,7 +27,8 @@ class ProductsWidget extends ConsumerStatefulWidget {
 
 class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
   final ScrollController _scrollController = ScrollController();
-  bool _showScrollIndicator = true;
+  bool _showLeftGradient = false;
+  bool _showRightGradient = true;
 
   @override
   void initState() {
@@ -41,10 +42,13 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
   void _checkScrollIndicator() {
     if (!_scrollController.hasClients) return;
     final maxScroll = _scrollController.position.maxScrollExtent;
-    final shouldShow = maxScroll > 0;
-    if (shouldShow != _showScrollIndicator) {
+    final currentScroll = _scrollController.position.pixels;
+    final showLeft = currentScroll > 10;
+    final showRight = maxScroll > 0 && currentScroll < maxScroll - 10;
+    if (showLeft != _showLeftGradient || showRight != _showRightGradient) {
       setState(() {
-        _showScrollIndicator = shouldShow;
+        _showLeftGradient = showLeft;
+        _showRightGradient = showRight;
       });
     }
   }
@@ -71,25 +75,17 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
 
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
-    final shouldShow = currentScroll < maxScroll - 10;
+    final showLeft = currentScroll > 10;
+    final showRight = currentScroll < maxScroll - 10;
 
-    if (shouldShow != _showScrollIndicator) {
+    if (showLeft != _showLeftGradient || showRight != _showRightGradient) {
       setState(() {
-        _showScrollIndicator = shouldShow;
+        _showLeftGradient = showLeft;
+        _showRightGradient = showRight;
       });
     }
   }
 
-  void _scrollRight() {
-    if (!_scrollController.hasClients) return;
-    final currentPosition = _scrollController.position.pixels;
-    final scrollAmount = 180.0;
-    _scrollController.animateTo(
-      currentPosition + scrollAmount,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,43 +210,47 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                     return ProductGroupCard(productGroup: productGroup);
                   },
                 ),
-                if (_showScrollIndicator)
+                if (_showLeftGradient)
                   Positioned(
-                    right: 8,
+                    left: 0,
                     top: 0,
                     bottom: 0,
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: _scrollRight,
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? ColorConstants.greyIsTheNewGrey.withValues(
-                                    alpha: 0.9,
-                                  )
-                                : ColorConstants.lightCard.withValues(
-                                    alpha: 0.95,
-                                  ),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.black.withValues(alpha: 0.3)
-                                    : Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
+                    width: 32,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Theme.of(context).scaffoldBackgroundColor,
+                              Theme.of(context)
+                                  .scaffoldBackgroundColor
+                                  .withValues(alpha: 0),
                             ],
                           ),
-                          child: Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (_showRightGradient)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 32,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerRight,
+                            end: Alignment.centerLeft,
+                            colors: [
+                              Theme.of(context).scaffoldBackgroundColor,
+                              Theme.of(context)
+                                  .scaffoldBackgroundColor
+                                  .withValues(alpha: 0),
+                            ],
                           ),
                         ),
                       ),

@@ -238,6 +238,41 @@
   "supportCommunity": "Support & Community",
   "helpLegal": "Help & Legal",
   "advanced": "Advanced",
+  "restorePreviousStats": "Restore previous stats",
+  "restorePreviousStatsExplainer": "Pick a snapshot to restore. Snapshots are saved automatically when your stats sync, and the most recent 20 are kept on this device — including snapshots taken from other accounts you've signed into here.",
+  "noBackupsAvailable": "No stats snapshots are stored on this device yet.",
+  "backupSummary": "Streak {streak} · {sessions, plural, =1{1 session} other{{sessions} sessions}} · {minutes} min",
+  "@backupSummary": {
+    "placeholders": {
+      "streak": {"type": "int"},
+      "sessions": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "restoreStatsConfirmTitle": "Restore these stats?",
+  "restoreStatsConfirmBody": "Your current stats on this device will be replaced with the selected snapshot, and the snapshot will be uploaded for the currently signed-in account. This can't be undone.",
+  "restore": "Restore",
+  "restoreStatsSuccess": "Stats restored",
+  "restoreStatsFailed": "Couldn't restore stats. Please try again.",
+  "daysSelected": "{count, plural, =1{1 day selected} other{{count} days selected}}",
+  "@daysSelected": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "newStreak": "New streak",
+  "newSessions": "New sessions",
+  "addSessionsToSelectedDays": "Add sessions to selected days",
+  "addSessionsTitle": "{count, plural, =1{Add 1 session} other{Add {count} sessions}}",
+  "@addSessionsTitle": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "daysAlreadyHaveSession": "{filled, plural, =1{1 of {total} days already has a session and will be skipped.} other{{filled} of {total} days already have a session and will be skipped.}}",
+  "@daysAlreadyHaveSession": {
+    "placeholders": {
+      "filled": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "minutesPerDayOptional": "Minutes per day (optional)",
   "onboarding": "Onboarding",
   "@onboarding": {
     "description": "Title for the onboarding section in settings"
@@ -457,7 +492,7 @@
   "tracksSectionHeader": "Tracks",
   "noResultsFound": "No results found for your search",
   "consistencyScoreInfoTitle": "Consistency Score",
-  "consistencyScoreInfoMessage": "Your consistency score reflects how regularly you've meditated over the last 30 days. Unlike streaks, it doesn't reset on missed days.",
+  "consistencyScoreInfoMessage": "Your consistency score reflects how regularly you've meditated since you started. Recent days carry more weight, but earlier missed days still gently affect the score. Unlike streaks, it doesn't reset on a missed day.",
   "accountDeletionInitiated": "Account deletion process initiated. Please complete the steps in your browser.",
   "reportError": "Report Error",
   "errorReportedMessage": "Thank you, your report has been sent.",
@@ -597,9 +632,13 @@
   "@appIconDusk": {
     "description": "Label for the dusk gradient app icon option (now the default)"
   },
-  "appIconPurple": "Classic",
+  "appIconPurple": "Purple",
   "@appIconPurple": {
     "description": "Label for the original purple app icon option"
+  },
+  "appIconClassic": "Classic",
+  "@appIconClassic": {
+    "description": "Label for the classic app icon option (purple M on white)"
   },
   "appIconBlush": "Blush",
   "@appIconBlush": {
@@ -613,7 +652,7 @@
   "@appIconForest": {
     "description": "Label for the forest green gradient app icon option"
   },
-  "appIconPink": "Golden Hour",
+  "appIconPink": "Golden",
   "@appIconPink": {
     "description": "Label for the pink-to-gold sunset gradient app icon option"
   },
