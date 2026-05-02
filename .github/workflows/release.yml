@@ -1,9 +1,6 @@
 name: Build & Deploy
 
 on:
-  push:
-    tags:
-      - '**'
   workflow_dispatch:
     inputs:
       android_internal:

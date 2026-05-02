@@ -112,12 +112,38 @@ git push
 git push origin <new-version>
 ```
 
-## 9. Report back
+## 9. Choose deploy tracks and dispatch the workflow
+
+The `Build & Deploy` workflow (`.github/workflows/release.yml`) is **`workflow_dispatch`-only** — pushing the tag does not auto-deploy. After the tag is pushed, ask the user which tracks to ship to using `AskUserQuestion`:
+
+- **Android**: `internal`, `production`, `both`, or `none`
+- **iOS**: `testflight`, `appstore`, `both`, or `none`
+
+Then trigger the workflow against the new tag with the chosen inputs:
+
+```bash
+gh workflow run release.yml \
+  --ref <new-version> \
+  -f android_internal=<true|false> \
+  -f android_production=<true|false> \
+  -f ios_testflight=<true|false> \
+  -f ios_appstore=<true|false> \
+  -f paywall_env=live \
+  -f match_readonly=true
+```
+
+If the user chooses `none` for both platforms, skip the dispatch entirely and just report the tag was pushed without a build.
+
+After dispatching, surface the run URL with `gh run list --workflow=release.yml --limit 1 --json url,databaseId` so the user can click through.
+
+## 10. Report back
 
 Tell the user concisely:
 - The version that was released
 - The commit SHA that was tagged
 - That the tag has been pushed
+- Which tracks were dispatched (or that no build was kicked off)
+- The Actions run URL if a build was dispatched
 
 Mention any deviations (e.g. "no unreleased notes, proceeded anyway because you said so"). Keep it short — the user can see the commit and tag themselves.
 
