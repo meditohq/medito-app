@@ -66,10 +66,34 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Donation ──
-# Skip the paywall on CI. Tapping "See how to help" now opens an in-app
-# webview (paywall.meditofoundation.org) which can't reliably render under
-# emulators / simulators with no Apple Pay / Google Pay. "Skip for Now"
-# advances onboarding without exercising the webview.
+# "Skip for Now" only appears on the donation primer after the user has
+# attempted donation once (onboarding_donation_screen.dart:103). So tap
+# "See how to help" to open the in-app webview, dismiss it, then tap
+# the now-revealed "Skip for Now".
+- extendedWaitUntil:
+    visible: "See how to help"
+    timeout: 20000
+- tapOn: "See how to help"
+- waitForAnimationToEnd
+- takeScreenshot: paywall-webview
+
+# Dismiss the webview to return to the donation primer. PopScope on the
+# webview screen handles back navigation on both platforms.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      # Edge-swipe from the left to trigger interactive pop. Coords are
+      # percentages so they work across devices.
+      - swipe:
+          start: "2%, 50%"
+          end: "80%, 50%"
+
 - extendedWaitUntil:
     visible: "Skip for Now"
     timeout: 20000
