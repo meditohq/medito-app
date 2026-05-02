@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
@@ -17,6 +18,7 @@ class OnboardingQuestionScreen extends StatefulWidget {
     required this.stepLabel,
     required this.onOptionSelected,
     this.selectionDelay = const Duration(milliseconds: 200),
+    this.pinnedTrailingCount = 0,
   });
 
   final String question;
@@ -26,9 +28,14 @@ class OnboardingQuestionScreen extends StatefulWidget {
   /// E.g. "1 of 2"
   final String stepLabel;
 
-  /// Called with the index of the selected option after [selectionDelay].
+  /// Called with the original (canonical) index of the selected option after
+  /// [selectionDelay], regardless of the displayed (shuffled) position.
   final void Function(int index) onOptionSelected;
   final Duration selectionDelay;
+
+  /// Number of trailing options to keep pinned at the end (excluded from the
+  /// shuffle). Useful for items like "Other" that should always read last.
+  final int pinnedTrailingCount;
 
   @override
   State<OnboardingQuestionScreen> createState() =>
@@ -37,6 +44,21 @@ class OnboardingQuestionScreen extends StatefulWidget {
 
 class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
   int? _selectedIndex;
+  late final List<int> _displayOrder;
+
+  @override
+  void initState() {
+    super.initState();
+    final total = widget.options.length;
+    final pinned = widget.pinnedTrailingCount.clamp(0, total);
+    final shuffleCount = total - pinned;
+    final shuffled = List<int>.generate(shuffleCount, (i) => i);
+    if (shuffleCount > 1) {
+      shuffled.shuffle(Random());
+    }
+    final tail = List<int>.generate(pinned, (i) => shuffleCount + i);
+    _displayOrder = [...shuffled, ...tail];
+  }
 
   Future<void> _onTap(int index) async {
     if (_selectedIndex != null) return; // already selected
@@ -78,13 +100,14 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
             ),
           ),
           const SizedBox(height: 32),
-          ...List.generate(widget.options.length, (i) {
+          ...List.generate(_displayOrder.length, (i) {
+            final originalIndex = _displayOrder[i];
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: OnboardingOptionButton(
-                label: widget.options[i],
-                selected: _selectedIndex == i,
-                onTap: () => _onTap(i),
+                label: widget.options[originalIndex],
+                selected: _selectedIndex == originalIndex,
+                onTap: () => _onTap(originalIndex),
               ),
             );
           }),

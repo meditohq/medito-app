@@ -160,6 +160,7 @@ final List<String> _images = [
         ],
         stepLabel: l10n.onboardingStep3of3,
         onOptionSelected: _onAttributionSelected,
+        pinnedTrailingCount: 1,
       ),
       NotificationsScreen(onNext: _nextPage, intentIndex: _intentIndex),
       OnboardingDonationScreen(onNext: _nextPage),
