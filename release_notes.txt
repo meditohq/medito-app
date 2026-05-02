@@ -1,6 +1,13 @@
 Unreleased
 -
 
+26.5.2
+- Smoother in-app donation flow, with a retry option if it's slow to load
+- Onboarding question answers now appear in a random order
+- Classic app icon is now available on iOS
+- App icon picker is now built into Settings — no more separate screen
+- Clearer wording for the Consistency Score
+
 26.4.29
 - Refreshed carousel on the home screen with a new sliding design
 - Subtle haptic feedback when scrolling the carousel and completing a meditation
