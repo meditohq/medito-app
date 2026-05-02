@@ -7,7 +7,6 @@
   "EDIT_STATS_URL": "https://mock-stats.medito.invalid/",
   "DONATION_BASE_URL": "https://mock-donation.medito.invalid/",
   "DONATION_TOKEN": "mock-donation-token",
-  "SUPERWALL_API_KEY": "",
   "PAYWALL_ENV": "dev",
   "FACEBOOK_APP_ID": "",
   "FACEBOOK_CLIENT_TOKEN": ""

@@ -5,14 +5,8 @@ class ConfigConstants {
   // URL constants
   static const String meditoUrl = 'https://meditofoundation.org/';
   static const String donationFormUrl = 'https://donate.meditofoundation.org';
-  // In-app paywall (loaded inside a webview). Override at build time with
-  // --dart-define=PAYWALL_URL=http://10.0.2.2:4321/paywall  (Android emulator)
-  // --dart-define=PAYWALL_URL=http://localhost:4321/paywall  (iOS simulator)
-  // to point at a local Astro dev server.
-  static const String paywallFormUrl = String.fromEnvironment(
-    'PAYWALL_URL',
-    defaultValue: 'https://paywall.meditofoundation.org/',
-  );
+  // The in-app paywall webview URL is environment-specific and lives on
+  // EnvConfig — see `paywallFormUrl` getter in lib/constants/http/http_constants.dart.
   static const String donationPortalUrl = 'https://bit.ly/3yFqVbM';
   static const String contactFormBaseUrl = 'https://tally.so/r/wLGBaO';
   static const String dontKillMyAppUrl = 'https://dontkillmyapp.com';
@@ -30,7 +24,6 @@ class ConfigConstants {
 
   // Donation service related strings
   static const String donationInitiatedEvent = 'donation_initiated';
-  static const String donationSourceSuperwall = 'superwall';
 
   // Paywall action names for monthly donations
   static const String monthly1 = 'monthly_1';
@@ -56,7 +49,7 @@ class ConfigConstants {
   static const String yearly5 = 'yearly_5';
   static const String yearlySuggested = 'yearly_suggested';
 
-  // User attribute keys for Superwall
+  // Pricing attribute keys (passed to the paywall webview as query params).
   static const String currency = 'currency';
   static const String currencySymbol = 'currency_symbol';
   static const String pricingCountry = 'pricing_country';

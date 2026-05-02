@@ -5,9 +5,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/config_constants.dart';
+import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart' as payment_models;
 import 'package:medito/providers/locale_provider.dart';
@@ -20,7 +22,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /// In-app paywall hosted in a webview, loading the paywall site at
-/// [ConfigConstants.paywallFormUrl]. The page renders all UI (amount /
+/// [paywallFormUrl] (env-specific — `paywall.*` for prod, `test.*` for
+/// staging). The page renders all UI (amount /
 /// frequency / success / close button); Flutter just bridges the JS channel
 /// to the native Stripe sheet.
 class WebViewDonationScreen extends ConsumerStatefulWidget {
@@ -36,12 +39,15 @@ class WebViewDonationScreen extends ConsumerStatefulWidget {
 class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   static const _logTag = 'WEBVIEW_DONATION';
   static const _channelName = 'MeditoPaywall';
+  static const _loadTimeout = Duration(seconds: 15);
 
   late final WebViewController _controller;
   bool _isLoading = true;
+  bool _hasLoadError = false;
   bool _isProcessingPayment = false;
   bool _didDonate = false;
   String _variantId = 'control';
+  Timer? _loadTimer;
 
   @override
   void initState() {
@@ -53,15 +59,55 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (_) {
-            if (mounted) setState(() => _isLoading = false);
+            _loadTimer?.cancel();
+            if (mounted) {
+              setState(() {
+                _isLoading = false;
+                _hasLoadError = false;
+              });
+            }
           },
           onWebResourceError: (error) {
-            AppLogger.e(_logTag, 'Web resource error: ${error.description}');
-            if (mounted) setState(() => _isLoading = false);
+            AppLogger.e(_logTag,
+                'Web resource error: ${error.description} (main=${error.isForMainFrame})');
+            // Only fail closed for the main frame; subresource errors (icons,
+            // analytics beacons, etc.) shouldn't tear down the whole paywall.
+            if (error.isForMainFrame == true && _isLoading) {
+              _showLoadError();
+            }
           },
         ),
       );
+    _startLoad();
+  }
+
+  @override
+  void dispose() {
+    _loadTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startLoad() {
+    _loadTimer?.cancel();
+    setState(() {
+      _isLoading = true;
+      _hasLoadError = false;
+    });
+    _loadTimer = Timer(_loadTimeout, () {
+      if (!mounted || !_isLoading) return;
+      AppLogger.w(_logTag, 'Paywall load timed out after ${_loadTimeout.inSeconds}s');
+      _showLoadError();
+    });
     unawaited(_loadPaywall());
+  }
+
+  void _showLoadError() {
+    _loadTimer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+      _hasLoadError = true;
+    });
   }
 
   Future<void> _loadPaywall() async {
@@ -92,11 +138,15 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
     if (kDebugMode) query['debug'] = 'true';
 
-    final uri = Uri.parse(
-      ConfigConstants.paywallFormUrl,
-    ).replace(queryParameters: query);
+    final uri = Uri.parse(paywallFormUrl).replace(queryParameters: query);
     AppLogger.d(_logTag, 'Loading paywall: $uri');
-    if (mounted) await _controller.loadRequest(uri);
+    if (!mounted) return;
+    try {
+      await _controller.loadRequest(uri);
+    } catch (e, st) {
+      AppLogger.e(_logTag, 'loadRequest threw: $e\n$st');
+      _showLoadError();
+    }
   }
 
   void _onChannelMessage(JavaScriptMessage message) {
@@ -118,6 +168,16 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         _handleClose();
       case 'open_url':
         _handleOpenUrl(data);
+      case 'log':
+        final level = data['level'] as String? ?? 'info';
+        final msg = data['message'] as String? ?? '';
+        if (level == 'error') {
+          AppLogger.e(_logTag, 'js: $msg');
+        } else if (level == 'warn') {
+          AppLogger.w(_logTag, 'js: $msg');
+        } else {
+          AppLogger.d(_logTag, 'js: $msg');
+        }
       default:
         AppLogger.w(_logTag, 'Unknown message type: $type');
     }
@@ -234,6 +294,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userId: userId,
           userEmail: userEmail,
           paywallSource: widget.source,
+          variantId: _variantId,
           onSuccess: () {},
         );
       case 'yearly':
@@ -246,6 +307,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userId: userId,
           userEmail: userEmail,
           paywallSource: widget.source,
+          variantId: _variantId,
           onSuccess: () {},
         );
       case 'one_time':
@@ -259,6 +321,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userId: userId,
           userEmail: userEmail,
           paywallSource: widget.source,
+          variantId: _variantId,
           onSuccess: () {},
         );
     }
@@ -272,6 +335,55 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       case PaymentCancelled():
         _notifyJsResult(status: 'cancelled');
     }
+  }
+
+  Widget _buildErrorOverlay() {
+    final loc = AppLocalizations.of(context);
+    final title = loc?.connectionErrorTitle ?? "Couldn't load paywall";
+    final body = loc?.connectionErrorMessage ??
+        'Please check your connection and try again.';
+    final retry = loc?.tryAgainButton ?? 'Try again';
+    final close = loc?.closeButton ?? 'Close';
+    return Container(
+      color: const Color(0xFFFAF8F5),
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.wifi_off, size: 48, color: Color(0xFF6C5CE7)),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: const TextStyle(
+                fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF1A1A17)),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            body,
+            style: const TextStyle(fontSize: 14, color: Color(0xFFA8A49B)),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF6C5CE7),
+              minimumSize: const Size(200, 48),
+              shape: const RoundedRectangleBorder(),
+            ),
+            onPressed: _startLoad,
+            child: Text(retry),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(_didDonate),
+            child: Text(close,
+                style: const TextStyle(color: Color(0xFFA8A49B))),
+          ),
+        ],
+      ),
+    );
   }
 
   void _notifyJsResult({required String status, String? message}) {
@@ -292,21 +404,35 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) {
-        if (didPop) return;
-        Navigator.of(context).pop(_didDonate);
-      },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFFAF8F5),
-        body: SafeArea(
-          child: Stack(
-            children: [
-              WebViewWidget(controller: _controller),
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator()),
-            ],
+    // Paywall page uses the warm-50 background — force dark status-bar icons
+    // (and dark Android nav-bar icons) while this screen is on top, then let
+    // the rest of the app revert to its own style after pop.
+    const overlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark, // Android
+      statusBarBrightness: Brightness.light, // iOS
+      systemNavigationBarColor: Color(0xFFFAF8F5),
+      systemNavigationBarIconBrightness: Brightness.dark,
+    );
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: overlayStyle,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (didPop) return;
+          Navigator.of(context).pop(_didDonate);
+        },
+        child: Scaffold(
+          backgroundColor: const Color(0xFFFAF8F5),
+          body: SafeArea(
+            child: Stack(
+              children: [
+                WebViewWidget(controller: _controller),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator()),
+                if (_hasLoadError) _buildErrorOverlay(),
+              ],
+            ),
           ),
         ),
       ),

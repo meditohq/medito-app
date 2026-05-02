@@ -54,7 +54,7 @@ Contributors can run the app without any API keys or Firebase setup using mock m
    flutter run --flavor dev --dart-define=MOCK_MODE=true -d <device-id>
    ```
 
-In mock mode, Firebase, Superwall, Stripe, and Meta SDK are all skipped. The app runs with sample content so you can work on UI and logic without real credentials.
+In mock mode, Firebase, the paywall webview, Stripe, and Meta SDK are all skipped. The app runs with sample content so you can work on UI and logic without real credentials.
 
 ### Setup (with real keys)
 

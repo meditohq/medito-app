@@ -578,34 +578,6 @@
   "@selectTheme": {
     "description": "Dialog title for theme selection"
   },
-  "connectionIssue": "Problema de Conexión",
-  "@connectionIssue": {
-    "description": "Title for connection issue dialog in Superwall donation screen"
-  },
-  "unableToLoadDonationOptions": "No se pueden cargar las opciones de donación. ¿Te gustaría intentar de nuevo o usar nuestro método de donación estándar?",
-  "@unableToLoadDonationOptions": {
-    "description": "Message shown when Superwall paywall fails to load"
-  },
-  "useStandardMethod": "Usar Método Estándar",
-  "@useStandardMethod": {
-    "description": "Button text to use standard donation method instead of Superwall"
-  },
-  "tryAgain": "Intentar de Nuevo",
-  "@tryAgain": {
-    "description": "Button text to retry Superwall paywall"
-  },
-  "paywallNotConfigured": "Paywall No Configurado",
-  "@paywallNotConfigured": {
-    "description": "Title for dialog when Superwall paywall is not configured"
-  },
-  "paywallNotConfiguredMessage": "El paywall de donación aún no está configurado en Superwall. Por favor configura el evento \"donation_flow\" en tu panel de Superwall, o usa nuestro método de donación estándar.",
-  "@paywallNotConfiguredMessage": {
-    "description": "Message explaining that Superwall paywall needs to be configured"
-  },
-  "unableToLoadDonationOptionsAtThisTime": "No se pueden cargar las opciones de donación en este momento.",
-  "@unableToLoadDonationOptionsAtThisTime": {
-    "description": "Error message when Superwall paywall fails to load"
-  },
   "processing": "Procesando...",
   "@processing": {
     "description": "Loading text shown while processing donation"
@@ -617,10 +589,6 @@
   "paymentCancelled": "Pago cancelado",
   "@paymentCancelled": {
     "description": "Message shown when payment is cancelled"
-  },
-  "loadingDonationOptions": "Cargando opciones de donación...",
-  "@loadingDonationOptions": {
-    "description": "Loading text while Superwall paywall is loading"
   },
   "processingPayment": "Procesando pago...",
   "@processingPayment": {
@@ -1098,5 +1066,9 @@
   "addToFavorites": "Agregar a favoritos",
   "removeFromFavorites": "Quitar de favoritos",
   "pinToUpNext": "Fijar en Tu Camino",
-  "unpinFromUpNext": "Desfijar de Tu Camino"
+  "unpinFromUpNext": "Desfijar de Tu Camino",
+  "connectionErrorTitle": "No se pudo cargar el paywall",
+  "connectionErrorMessage": "Por favor revisa tu conexión e inténtalo de nuevo.",
+  "tryAgainButton": "Reintentar",
+  "closeButton": "Cerrar"
 }

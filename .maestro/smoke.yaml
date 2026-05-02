@@ -66,9 +66,9 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Donation ──
-# Tap "See how to help". On simulators this opens donate.meditofoundation.org
-# in the external browser (Apple Pay / Google Pay isn't available, so the app
-# falls back from the Superwall paywall to the web donation page).
+# Tap "See how to help". On simulators this opens the paywall webview
+# (paywall.meditofoundation.org), which renders Stripe Elements directly when
+# Apple Pay / Google Pay isn't available.
 - extendedWaitUntil:
     visible: "See how to help"
     timeout: 20000

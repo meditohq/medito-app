@@ -676,34 +676,6 @@
   "@selectTheme": {
     "description": "Dialog title for theme selection"
   },
-  "connectionIssue": "Connection Issue",
-  "@connectionIssue": {
-    "description": "Title for connection issue dialog in Superwall donation screen"
-  },
-  "unableToLoadDonationOptions": "Unable to load donation options. Would you like to try again or use our standard donation method?",
-  "@unableToLoadDonationOptions": {
-    "description": "Message shown when Superwall paywall fails to load"
-  },
-  "useStandardMethod": "Use Standard Method",
-  "@useStandardMethod": {
-    "description": "Button text to use standard donation method instead of Superwall"
-  },
-  "tryAgain": "Try Again",
-  "@tryAgain": {
-    "description": "Button text to retry Superwall paywall"
-  },
-  "paywallNotConfigured": "Paywall Not Configured",
-  "@paywallNotConfigured": {
-    "description": "Title for dialog when Superwall paywall is not configured"
-  },
-  "paywallNotConfiguredMessage": "The donation paywall is not yet configured in Superwall. Please configure the \"donation_flow\" event in your Superwall dashboard, or use our standard donation method.",
-  "@paywallNotConfiguredMessage": {
-    "description": "Message explaining that Superwall paywall needs to be configured"
-  },
-  "unableToLoadDonationOptionsAtThisTime": "Unable to load donation options at this time.",
-  "@unableToLoadDonationOptionsAtThisTime": {
-    "description": "Error message when Superwall paywall fails to load"
-  },
   "processing": "Processing...",
   "@processing": {
     "description": "Loading text shown while processing donation"
@@ -715,10 +687,6 @@
   "paymentCancelled": "Payment cancelled",
   "@paymentCancelled": {
     "description": "Message shown when payment is cancelled"
-  },
-  "loadingDonationOptions": "Loading donation options...",
-  "@loadingDonationOptions": {
-    "description": "Loading text while Superwall paywall is loading"
   },
   "processingPayment": "Processing payment...",
   "@processingPayment": {
@@ -1429,5 +1397,21 @@
   "unpinFromUpNext": "Unpin from Your Path",
   "@unpinFromUpNext": {
     "description": "Accessibility label for the pin button when the pack is already pinned"
+  },
+  "connectionErrorTitle": "Couldn't load paywall",
+  "@connectionErrorTitle": {
+    "description": "Title shown when the donation paywall webview fails to load"
+  },
+  "connectionErrorMessage": "Please check your connection and try again.",
+  "@connectionErrorMessage": {
+    "description": "Body text shown when the donation paywall webview fails to load"
+  },
+  "tryAgainButton": "Try again",
+  "@tryAgainButton": {
+    "description": "Retry button on the paywall load-error screen"
+  },
+  "closeButton": "Close",
+  "@closeButton": {
+    "description": "Close button on the paywall load-error screen"
   }
 }

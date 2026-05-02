@@ -62,7 +62,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retrying => 'Retrying...';
 
   @override
-  String get tryAgain => 'Try Again';
+  String get tryAgain => 'Try again';
 
   @override
   String get retry => 'Retry';
@@ -1557,27 +1557,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectTheme => 'Select Theme';
 
   @override
-  String get connectionIssue => 'Connection Issue';
-
-  @override
-  String get unableToLoadDonationOptions =>
-      'Unable to load donation options. Would you like to try again or use our standard donation method?';
-
-  @override
-  String get useStandardMethod => 'Use Standard Method';
-
-  @override
-  String get paywallNotConfigured => 'Paywall Not Configured';
-
-  @override
-  String get paywallNotConfiguredMessage =>
-      'The donation paywall is not yet configured in Superwall. Please configure the \"donation_flow\" event in your Superwall dashboard, or use our standard donation method.';
-
-  @override
-  String get unableToLoadDonationOptionsAtThisTime =>
-      'Unable to load donation options at this time.';
-
-  @override
   String get processing => 'Processing...';
 
   @override
@@ -1586,9 +1565,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paymentCancelled => 'Payment cancelled';
-
-  @override
-  String get loadingDonationOptions => 'Loading donation options...';
 
   @override
   String get processingPayment => 'Processing payment...';
@@ -2124,4 +2100,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unpinFromUpNext => 'Unpin from Your Path';
+
+  @override
+  String get connectionErrorTitle => 'Couldn\'t load paywall';
+
+  @override
+  String get connectionErrorMessage =>
+      'Please check your connection and try again.';
+
+  @override
+  String get tryAgainButton => 'Try again';
+
+  @override
+  String get closeButton => 'Close';
 }

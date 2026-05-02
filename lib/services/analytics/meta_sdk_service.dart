@@ -182,13 +182,15 @@ class MetaSdkService {
     required int revenueCents,
     required String currency,
     required String frequency,
+    String? variantId,
   }) async {
     // Get stored UTM parameters to include in donation events for attribution
     final utmParams = await _getStoredUtmParameters();
 
-    final props = {
+    final props = <String, Object?>{
       AnalyticsEventConstants.paramRevenue: revenueCents,
       AnalyticsEventConstants.paramCurrency: currency,
+      AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
       ...utmParams,
     };
 
