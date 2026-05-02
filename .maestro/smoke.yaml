@@ -66,73 +66,14 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Donation ──
-# Tap "See how to help". On simulators this opens the paywall webview
-# (paywall.meditofoundation.org), which renders Stripe Elements directly when
-# Apple Pay / Google Pay isn't available.
+# Skip the paywall on CI. Tapping "See how to help" now opens an in-app
+# webview (paywall.meditofoundation.org) which can't reliably render under
+# emulators / simulators with no Apple Pay / Google Pay. "Skip for Now"
+# advances onboarding without exercising the webview.
 - extendedWaitUntil:
-    visible: "See how to help"
+    visible: "Skip for Now"
     timeout: 20000
-- tapOn: "See how to help"
-- waitForAnimationToEnd
-- takeScreenshot: after-donation-tap
-
-# The external browser opens (Chrome on Android, Safari on iOS). We don't
-# assert on the paywall contents — CI emulators often have a fresh Chrome
-# with a "Welcome to Chrome" first-run overlay that blocks the donation page
-# from rendering. Instead we wait for the animation, screenshot what we got,
-# then return to the app.
-- waitForAnimationToEnd
-- takeScreenshot: donation-paywall
-- runFlow:
-    when:
-      platform: Android
-    commands:
-      # Press Home to leave Chrome, then relaunch the app (without clearState)
-      # to foreground the backgrounded Medito process. pressKey: back is
-      # unreliable on CI emulators where Chrome's first-run intercepts it.
-      - pressKey: home
-      - launchApp:
-          appId: ${APP_ID}
-          stopApp: false
-- runFlow:
-    when:
-      platform: iOS
-    commands:
-      # openLink with the app's URL scheme foregrounds the running instance
-      # from external Safari. On some iOS versions (26+) this pops a system
-      # "Open in 'Medito'?" prompt first — tap Open if it appears. The
-      # deep-link handler treats an empty path as "just open the app"
-      # (deep_link_service.dart), so no route change.
-      - openLink: "org.meditofoundation://"
-      - runFlow:
-          when:
-            visible: "Open"
-          commands:
-            - tapOn: "Open"
-      # openLink is flaky on CI — sometimes Safari stays foregrounded
-      # instead of switching to the app. Force foreground as a fallback.
-      - launchApp:
-          appId: ${APP_ID}
-          stopApp: false
-      - waitForAnimationToEnd
-
-# Post-paywall state is flaky on iOS CI — sometimes the app resumes on the
-# donation primer (where "Skip for Now" now appears), sometimes it has
-# advanced to the result screen or all the way to Home. Accept any of them
-# and let the conditional blocks below route to the next step.
-- extendedWaitUntil:
-    visible: "Skip for Now|Get started|Home|Update Setting|Help Us Improve Medito"
-    timeout: 30000
-
-# Dismiss the donation primer if we're still on it.
-- runFlow:
-    when:
-      visible: "See how to help"
-    commands:
-      - tapOn:
-          text: "Skip for Now"
-          retryTapIfNoChange: true
-      - takeScreenshot: after-donation-skip
+- tapOn: "Skip for Now"
 
 # ── Onboarding: Battery optimization (Android only, conditional) + ──
 # ── Tracking permission (iOS only).                                 ──
