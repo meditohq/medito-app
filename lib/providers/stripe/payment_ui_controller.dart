@@ -36,6 +36,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userId,
     String? userEmail,
     String? paywallSource,
+    String? variantId,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -53,7 +54,7 @@ class PaymentUIController extends _$PaymentUIController {
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'onetime',
-            userId, paywallSource, onSuccess);
+            userId, paywallSource, variantId, onSuccess);
       }
 
       return result;
@@ -75,6 +76,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userId,
     String? userEmail,
     String? paywallSource,
+    String? variantId,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -92,7 +94,7 @@ class PaymentUIController extends _$PaymentUIController {
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'monthly',
-            userId, paywallSource, onSuccess);
+            userId, paywallSource, variantId, onSuccess);
       }
 
       return result;
@@ -116,6 +118,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userId,
     String? userEmail,
     String? paywallSource,
+    String? variantId,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -133,7 +136,7 @@ class PaymentUIController extends _$PaymentUIController {
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'yearly',
-            userId, paywallSource, onSuccess);
+            userId, paywallSource, variantId, onSuccess);
       }
 
       return result;
@@ -186,6 +189,7 @@ class PaymentUIController extends _$PaymentUIController {
     String frequency,
     String? userId,
     String? paywallSource,
+    String? variantId,
     VoidCallback? onSuccess,
   ) async {
     result.when(
@@ -206,6 +210,7 @@ class PaymentUIController extends _$PaymentUIController {
             AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
             AnalyticsEventConstants.paramPaywallSource:
                 paywallSource ?? 'unknown',
+            AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
           },
         );
 
@@ -214,6 +219,7 @@ class PaymentUIController extends _$PaymentUIController {
           revenueCents: amount,
           currency: currency,
           frequency: frequency,
+          variantId: variantId,
         );
 
         // Record donation success for snooze tracking (fire-and-forget)
@@ -245,6 +251,7 @@ class PaymentUIController extends _$PaymentUIController {
           AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
           AnalyticsEventConstants.paramPaywallSource:
               paywallSource ?? 'unknown',
+          AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
           AnalyticsEventConstants.paramPaymentIntentId:
               paymentIntentId ?? 'unknown',
         };
@@ -278,6 +285,7 @@ class PaymentUIController extends _$PaymentUIController {
           AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
           AnalyticsEventConstants.paramPaywallSource:
               paywallSource ?? 'unknown',
+          AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
         };
 
         // Firebase Analytics

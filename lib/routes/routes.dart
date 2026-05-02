@@ -7,7 +7,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:medito/utils/utils.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/path/journal_entry_view.dart';
@@ -19,7 +18,7 @@ import 'package:medito/views/home/customise_home_layout_screen.dart';
 
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
-import 'package:medito/views/donation/superwall_donation_screen.dart';
+import 'package:medito/views/donation/webview_donation_screen.dart';
 import 'package:medito/views/favorites/favorites_view.dart';
 import 'package:medito/views/stats/stats_screen.dart';
 import 'package:medito/views/settings/analytics_settings_screen.dart';
@@ -166,45 +165,24 @@ Future<bool?> handleDonationNavigation(
   }
 
   // Stripe's publishable key is set lazily when paymentConfigProvider resolves.
-  // Without this, isPlatformPaySupported() throws StripeConfigException.
-  // Timeout guards against the API hanging indefinitely (e.g. on emulators).
+  // Preload so the webview can pass currency/country and the in-page Stripe
+  // Elements fallback (used when no native pay method is available) works.
   try {
     await ref
         .read(paymentConfigProvider.future)
         .timeout(const Duration(seconds: 5));
   } on TimeoutException {
-    AppLogger.w('ROUTES', 'Payment config load timed out — proceeding without Stripe init');
+    AppLogger.w('ROUTES', 'Payment config load timed out — proceeding anyway');
   } catch (e) {
     AppLogger.w('ROUTES', 'Could not preload payment config: $e');
   }
 
-  // Check if we should use Superwall or web donation
-  bool useSuperwall;
-  try {
-    useSuperwall = await shouldUseSuperwallForDonation();
-  } catch (e) {
-    AppLogger.w('ROUTES', 'shouldUseSuperwallForDonation threw: $e — falling back to web');
-    useSuperwall = false;
-  }
-
-  if (!useSuperwall) {
-    final uri = Uri.parse('https://donate.meditofoundation.org');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      AppLogger.w('ROUTES', 'Unable to launch web donation URL');
-    }
-
-    return false;
-  }
-
-  // Use Superwall donation screen
   final nav = navigator ?? navigatorKey.currentState;
   if (nav == null) return false;
 
   return await nav.push<bool>(
     MaterialPageRoute(
-      builder: (context) => SuperwallDonationScreen(source: sourceRouteName),
+      builder: (context) => WebViewDonationScreen(source: sourceRouteName),
     ),
   );
 }

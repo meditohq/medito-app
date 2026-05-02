@@ -200,10 +200,10 @@ abstract class AppLocalizations {
   /// **'Retrying...'**
   String get retrying;
 
-  /// Button text to retry Superwall paywall
+  /// No description provided for @tryAgain.
   ///
   /// In en, this message translates to:
-  /// **'Try Again'**
+  /// **'Try again'**
   String get tryAgain;
 
   /// No description provided for @retry.
@@ -2900,42 +2900,6 @@ abstract class AppLocalizations {
   /// **'Select Theme'**
   String get selectTheme;
 
-  /// Title for connection issue dialog in Superwall donation screen
-  ///
-  /// In en, this message translates to:
-  /// **'Connection Issue'**
-  String get connectionIssue;
-
-  /// Message shown when Superwall paywall fails to load
-  ///
-  /// In en, this message translates to:
-  /// **'Unable to load donation options. Would you like to try again or use our standard donation method?'**
-  String get unableToLoadDonationOptions;
-
-  /// Button text to use standard donation method instead of Superwall
-  ///
-  /// In en, this message translates to:
-  /// **'Use Standard Method'**
-  String get useStandardMethod;
-
-  /// Title for dialog when Superwall paywall is not configured
-  ///
-  /// In en, this message translates to:
-  /// **'Paywall Not Configured'**
-  String get paywallNotConfigured;
-
-  /// Message explaining that Superwall paywall needs to be configured
-  ///
-  /// In en, this message translates to:
-  /// **'The donation paywall is not yet configured in Superwall. Please configure the \"donation_flow\" event in your Superwall dashboard, or use our standard donation method.'**
-  String get paywallNotConfiguredMessage;
-
-  /// Error message when Superwall paywall fails to load
-  ///
-  /// In en, this message translates to:
-  /// **'Unable to load donation options at this time.'**
-  String get unableToLoadDonationOptionsAtThisTime;
-
   /// Loading text shown while processing donation
   ///
   /// In en, this message translates to:
@@ -2953,12 +2917,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Payment cancelled'**
   String get paymentCancelled;
-
-  /// Loading text while Superwall paywall is loading
-  ///
-  /// In en, this message translates to:
-  /// **'Loading donation options...'**
-  String get loadingDonationOptions;
 
   /// Loading text while payment is being processed
   ///
@@ -3937,6 +3895,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unpin from Your Path'**
   String get unpinFromUpNext;
+
+  /// Title shown when the donation paywall webview fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load paywall'**
+  String get connectionErrorTitle;
+
+  /// Body text shown when the donation paywall webview fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your connection and try again.'**
+  String get connectionErrorMessage;
+
+  /// Retry button on the paywall load-error screen
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgainButton;
+
+  /// Close button on the paywall load-error screen
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get closeButton;
 }
 
 class _AppLocalizationsDelegate

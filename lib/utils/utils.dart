@@ -3,9 +3,7 @@ import 'dart:ui';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 Color parseColor(String? color) {
   if (color == null || color.isEmpty) return ColorConstants.ebony;
@@ -114,47 +112,4 @@ extension ColorExtensions on Color {
 bool isInUS() {
   final countryCode = PlatformDispatcher.instance.locale.countryCode;
   return countryCode != null && countryCode.toUpperCase() == 'US';
-}
-
-
-Future<bool> shouldUseSuperwallForDonation() async {
-  // Apple Pay is never available on simulator builds, and calling
-  // isPlatformPaySupported() on a simulator triggers the OS-level
-  // "Sign in with Apple ID" dialog that blocks the UI. Skip it entirely.
-  const kIsSimulatorBuild = bool.fromEnvironment('IS_SIMULATOR');
-  if (kIsSimulatorBuild) {
-    AppLogger.d('DONATION_UTILS',
-        'Simulator build — skipping Apple Pay check, using web donation');
-    return false;
-  }
-
-  final isPlatformPaySupported =
-      await Stripe.instance.isPlatformPaySupported();
-  if (!isPlatformPaySupported) {
-    AppLogger.d('DONATION_UTILS',
-        'Apple Pay / Google Pay not supported - using web donation');
-
-    return false;
-  }
-
-  try {
-    final configStatus = await Superwall.shared.getConfigurationStatus();
-    AppLogger.d('DONATION_UTILS', 'Superwall config status: $configStatus');
-
-    if (configStatus == ConfigurationStatus.configured) {
-      AppLogger.d('DONATION_UTILS', 'Superwall configured - using Superwall');
-
-      return true;
-    } else {
-      AppLogger.w('DONATION_UTILS',
-          'Superwall not configured (status: $configStatus) - using web donation');
-
-      return false;
-    }
-  } catch (error) {
-    AppLogger.e('DONATION_UTILS',
-        'Error checking Superwall status - using web donation', error);
-
-    return false;
-  }
 }

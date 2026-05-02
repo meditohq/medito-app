@@ -12,7 +12,7 @@ class EnvConfig {
   final String deleteAccountBaseUrl;
   final String donationBaseUrl;
   final String donationToken;
-  final String superwallApiKey;
+  final String paywallFormUrl;
   final String paywallEnvironment;
   final String facebookAppId;
   final String facebookClientToken;
@@ -26,7 +26,7 @@ class EnvConfig {
     required this.deleteAccountBaseUrl,
     required this.donationBaseUrl,
     required this.donationToken,
-    required this.superwallApiKey,
+    required this.paywallFormUrl,
     required this.paywallEnvironment,
     required this.facebookAppId,
     required this.facebookClientToken,
@@ -43,7 +43,7 @@ class ProdEnv extends EnvConfig {
     required super.deleteAccountBaseUrl,
     required super.donationBaseUrl,
     required super.donationToken,
-    required super.superwallApiKey,
+    required super.paywallFormUrl,
     required super.paywallEnvironment,
     required super.facebookAppId,
     required super.facebookClientToken,
@@ -60,7 +60,7 @@ class StagingEnv extends EnvConfig {
     required super.deleteAccountBaseUrl,
     required super.donationBaseUrl,
     required super.donationToken,
-    required super.superwallApiKey,
+    required super.paywallFormUrl,
     required super.paywallEnvironment,
     required super.facebookAppId,
     required super.facebookClientToken,
@@ -76,7 +76,13 @@ const _prodEnv = ProdEnv(
   deleteAccountBaseUrl: 'https://accounts.medito.app/delete',
   donationBaseUrl: String.fromEnvironment('DONATION_BASE_URL'),
   donationToken: String.fromEnvironment('DONATION_TOKEN'),
-  superwallApiKey: String.fromEnvironment('SUPERWALL_API_KEY'),
+  // In-app paywall webview. Override at build time with --dart-define=PAYWALL_URL=...
+  // (e.g. http://10.0.2.2:4321/paywall on the Android emulator) to point at a
+  // local Astro dev server.
+  paywallFormUrl: String.fromEnvironment(
+    'PAYWALL_URL',
+    defaultValue: 'https://paywall.meditofoundation.org/',
+  ),
   paywallEnvironment:
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'live'),
   facebookAppId: String.fromEnvironment('FACEBOOK_APP_ID'),
@@ -92,14 +98,29 @@ const _stagingEnv = StagingEnv(
   deleteAccountBaseUrl: 'https://accounts.medito.dev/delete',
   donationBaseUrl: String.fromEnvironment('DONATION_BASE_URL'),
   donationToken: String.fromEnvironment('DONATION_TOKEN'),
-  superwallApiKey: String.fromEnvironment('SUPERWALL_API_KEY'),
+  paywallFormUrl: String.fromEnvironment(
+    'PAYWALL_URL',
+    defaultValue: 'https://test.meditofoundation.org/',
+  ),
   paywallEnvironment:
       String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
   facebookAppId: String.fromEnvironment('FACEBOOK_APP_ID'),
   facebookClientToken: String.fromEnvironment('FACEBOOK_CLIENT_TOKEN'),
 );
 
-EnvConfig get _currentEnv => kReleaseMode ? _prodEnv : _stagingEnv;
+// Resolve the active env config from the loaded `.prod.json` / `.staging.json`
+// rather than the Flutter build mode, so that "debug build with .prod.json"
+// (used for local-on-device testing of the prod backend) actually hits prod.
+// Falls back to release-mode = prod, debug-mode = staging when ENVIRONMENT is
+// unset (e.g. tests, mock mode).
+const _envName = String.fromEnvironment('ENVIRONMENT');
+EnvConfig get _currentEnv {
+  if (_envName == 'production') return _prodEnv;
+  if (_envName == 'debug' || _envName == 'staging' || _envName == 'mock') {
+    return _stagingEnv;
+  }
+  return kReleaseMode ? _prodEnv : _stagingEnv;
+}
 
 String get apiKey => _currentEnv.apiKey;
 String get environment => _currentEnv.environment;
@@ -109,7 +130,7 @@ String get editStatsUrl => _currentEnv.editStatsUrl;
 String get deleteAccountUrl => _currentEnv.deleteAccountBaseUrl;
 String get donationBaseUrl => _currentEnv.donationBaseUrl;
 String get donationToken => _currentEnv.donationToken;
-String get superwallApiKey => _currentEnv.superwallApiKey;
+String get paywallFormUrl => _currentEnv.paywallFormUrl;
 String get paywallEnvironment => _currentEnv.paywallEnvironment;
 String get facebookAppId => _currentEnv.facebookAppId;
 String get facebookClientToken => _currentEnv.facebookClientToken;

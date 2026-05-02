@@ -147,32 +147,6 @@ android {
         exclude 'META-INF/*.kotlin_module'
     }
 
-    // Exclude FlutterError from superwallkit_flutter plugin
-    configurations.all {
-        exclude group: 'com.superwall.superwallkit_flutter', module: 'FlutterError'
-    }
-
-
-    // Exclude FlutterError from superwallkit_flutter at the dependency level
-    configurations.all {
-        resolutionStrategy {
-            eachDependency { details ->
-                if (details.requested.group == 'com.superwall.superwallkit_flutter' && 
-                    details.requested.name.contains('FlutterError')) {
-                    details.useTarget group: details.requested.group, name: details.requested.name, version: details.requested.version
-                    details.because 'Exclude FlutterError from superwallkit_flutter to prevent duplication'
-                }
-            }
-        }
-    }
-
-    // Additional exclusion for FlutterError at the DEX level
-    configurations.all {
-        exclude group: 'com.superwall.superwallkit_flutter', module: 'FlutterError'
-        exclude group: 'com.superwall.superwallkit_flutter', module: 'flutter'
-    }
-
-
     lintOptions {
         disable 'VitalAnalyzeRelease'
         checkReleaseBuilds false

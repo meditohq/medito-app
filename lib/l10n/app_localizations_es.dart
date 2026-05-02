@@ -63,7 +63,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get retrying => 'Reintentando...';
 
   @override
-  String get tryAgain => 'Intentar de Nuevo';
+  String get tryAgain => 'Intentar de nuevo';
 
   @override
   String get retry => 'Reintentar';
@@ -1584,27 +1584,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get selectTheme => 'Seleccionar Tema';
 
   @override
-  String get connectionIssue => 'Problema de Conexión';
-
-  @override
-  String get unableToLoadDonationOptions =>
-      'No se pueden cargar las opciones de donación. ¿Te gustaría intentar de nuevo o usar nuestro método de donación estándar?';
-
-  @override
-  String get useStandardMethod => 'Usar Método Estándar';
-
-  @override
-  String get paywallNotConfigured => 'Paywall No Configurado';
-
-  @override
-  String get paywallNotConfiguredMessage =>
-      'El paywall de donación aún no está configurado en Superwall. Por favor configura el evento \"donation_flow\" en tu panel de Superwall, o usa nuestro método de donación estándar.';
-
-  @override
-  String get unableToLoadDonationOptionsAtThisTime =>
-      'No se pueden cargar las opciones de donación en este momento.';
-
-  @override
   String get processing => 'Procesando...';
 
   @override
@@ -1613,9 +1592,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get paymentCancelled => 'Pago cancelado';
-
-  @override
-  String get loadingDonationOptions => 'Cargando opciones de donación...';
 
   @override
   String get processingPayment => 'Procesando pago...';
@@ -2153,4 +2129,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get unpinFromUpNext => 'Desfijar de Tu Camino';
+
+  @override
+  String get connectionErrorTitle => 'No se pudo cargar el paywall';
+
+  @override
+  String get connectionErrorMessage =>
+      'Por favor revisa tu conexión e inténtalo de nuevo.';
+
+  @override
+  String get tryAgainButton => 'Reintentar';
+
+  @override
+  String get closeButton => 'Cerrar';
 }

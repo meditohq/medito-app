@@ -49,12 +49,6 @@
 # Keep Stripe classes
 -keep class com.stripe.** { *; }
 
-# Superwall rules
--dontwarn com.superwall.**
--keep class com.superwall.** { *; }
--keep class com.superwall.sdk.** { *; }
--keep class com.superwall.superwallkit_flutter.** { *; }
-
 # Keep Flutter core error class
 -keep class io.flutter.plugin.common.FlutterError { *; }
 

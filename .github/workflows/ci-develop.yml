@@ -55,7 +55,6 @@ jobs:
             "EDIT_STATS_URL": "https://example.invalid/",
             "DONATION_BASE_URL": "https://example.invalid/",
             "DONATION_TOKEN": "test",
-            "SUPERWALL_API_KEY": "test",
             "STRIPE_TEST_PUBLISHABLE_KEY": "test",
             "STRIPE_LIVE_PUBLISHABLE_KEY": "test",
             "FACEBOOK_APP_ID": "test",

@@ -205,6 +205,9 @@ class AnalyticsEventConstants {
   /// Parameter name for donation page A/B test variant
   static const String paramVariantId = 'variant_id';
 
+  /// Event logged once when the donation/paywall page is viewed in the in-app webview
+  static const String donationPageViewed = 'donation_page_viewed';
+
   /// Parameter name for revenue (used by Meta)
   static const String paramRevenue = 'revenue';
 
