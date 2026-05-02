@@ -1,7 +1,7 @@
 Unreleased
 -
 
-26.5.2
+26.5.2.1
 - Smoother in-app donation flow, with a retry option if it's slow to load
 - Onboarding question answers now appear in a random order
 - Classic app icon is now available on iOS
