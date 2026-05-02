@@ -86,6 +86,61 @@ class PaymentState extends _$PaymentState {
 }
 
 // =============================================================================
+// HELPERS
+// =============================================================================
+
+/// Wire-format strings expected by the donation backend's Zod schema.
+/// We map by hand because `enum.name` returns the Dart identifier
+/// (`oneTime`), not the @JsonValue ('one_time') the API requires.
+String _paymentTypeWire(PaymentType t) {
+  switch (t) {
+    case PaymentType.oneTime:
+      return 'one_time';
+    case PaymentType.subscription:
+      return 'subscription';
+  }
+}
+
+String _subscriptionIntervalWire(SubscriptionInterval i) {
+  switch (i) {
+    case SubscriptionInterval.month:
+      return 'month';
+    case SubscriptionInterval.year:
+      return 'year';
+  }
+}
+
+Map<String, dynamic> _buildPaymentIntentRequestBody(
+    PaymentIntentRequest request) {
+  return {
+    'amount': request.amount,
+    'currency': request.currency,
+    'paymentMethod': request.paymentMethod,
+    'paymentType': _paymentTypeWire(request.paymentType),
+    if (request.subscriptionInterval != null)
+      'subscriptionInterval':
+          _subscriptionIntervalWire(request.subscriptionInterval!),
+    'metadata': request.metadata ?? {},
+  };
+}
+
+/// True when [e] looks like a user-initiated cancellation of the Stripe sheet.
+///
+/// We accept several shapes because the platform layer is inconsistent:
+///  * `StripeException` with `FailureCode.Canceled` is the documented case.
+///  * Native `PlatformException` from Android can wrap a cancel as `code:
+///    "Canceled"` (US spelling).
+///  * Some SDK versions surface the cancel as a string-only error containing
+///    "canceled" / "cancelled".
+bool _isCancellation(Object e) {
+  if (e is StripeException && e.error.code == FailureCode.Canceled) {
+    return true;
+  }
+  final s = e.toString().toLowerCase();
+  return s.contains('canceled') || s.contains('cancelled');
+}
+
+// =============================================================================
 // PAYMENT METHOD AVAILABILITY CHECKERS
 // =============================================================================
 
@@ -204,30 +259,27 @@ class CardPaymentService implements PaymentMethodService {
 
       return result;
     } catch (e) {
-      if (e is StripeException && e.error.code == FailureCode.Canceled) {
+      if (_isCancellation(e)) {
         AppLogger.d('PAYMENT', 'PaymentSheet cancelled by user');
         paymentState.setStatus(PaymentStatus.cancelled);
         return const PaymentResult.cancelled();
       }
 
-      AppLogger.e('PAYMENT', '❌ PaymentSheet failed', e);
+      AppLogger.e(
+        'PAYMENT',
+        '❌ PaymentSheet failed: type=${e.runtimeType} '
+        'code=${e is StripeException ? e.error.code : 'n/a'} '
+        'message=${e is StripeException ? e.error.message : e}',
+        e,
+      );
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
       return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
     }
   }
 
-  Map<String, dynamic> _buildPaymentIntentBody(PaymentIntentRequest request) {
-    return {
-      'amount': request.amount,
-      'currency': request.currency,
-      'paymentMethod': request.paymentMethod,
-      'paymentType': request.paymentType.name,
-      if (request.subscriptionInterval != null)
-        'subscriptionInterval': request.subscriptionInterval!.name,
-      'metadata': request.metadata ?? {},
-    };
-  }
+  Map<String, dynamic> _buildPaymentIntentBody(PaymentIntentRequest request) =>
+      _buildPaymentIntentRequestBody(request);
 }
 
 @Riverpod(keepAlive: true)
@@ -323,30 +375,27 @@ class ApplePayService implements PaymentMethodService {
 
       return result;
     } catch (e) {
-      if (e is StripeException && e.error.code == FailureCode.Canceled) {
+      if (_isCancellation(e)) {
         AppLogger.d('PAYMENT', 'Apple Pay payment cancelled by user');
         paymentState.setStatus(PaymentStatus.cancelled);
         return const PaymentResult.cancelled();
       }
 
-      AppLogger.e('PAYMENT', '❌ Apple Pay payment failed', e);
+      AppLogger.e(
+        'PAYMENT',
+        '❌ Apple Pay payment failed: type=${e.runtimeType} '
+        'code=${e is StripeException ? e.error.code : 'n/a'} '
+        'message=${e is StripeException ? e.error.message : e}',
+        e,
+      );
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
       return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
     }
   }
 
-  Map<String, dynamic> _buildPaymentIntentBody(PaymentIntentRequest request) {
-    return {
-      'amount': request.amount,
-      'currency': request.currency,
-      'paymentMethod': request.paymentMethod,
-      'paymentType': request.paymentType.name,
-      if (request.subscriptionInterval != null)
-        'subscriptionInterval': request.subscriptionInterval!.name,
-      'metadata': request.metadata ?? {},
-    };
-  }
+  Map<String, dynamic> _buildPaymentIntentBody(PaymentIntentRequest request) =>
+      _buildPaymentIntentRequestBody(request);
 }
 
 // =============================================================================

@@ -102,7 +102,8 @@ class PaymentErrorHandler {
       );
     }
 
-    if (errorString.contains('cancelled')) {
+    // Stripe SDK uses American spelling ("canceled"); allow both for safety.
+    if (errorString.contains('cancelled') || errorString.contains('canceled')) {
       return const PaymentError(
         type: PaymentErrorType.paymentCancelled,
         message: 'Payment cancelled',
