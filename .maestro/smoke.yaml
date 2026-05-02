@@ -77,22 +77,13 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - waitForAnimationToEnd
 - takeScreenshot: paywall-webview
 
-# Dismiss the webview to return to the donation primer. PopScope on the
-# webview screen handles back navigation on both platforms.
-- runFlow:
-    when:
-      platform: Android
-    commands:
-      - pressKey: back
-- runFlow:
-    when:
-      platform: iOS
-    commands:
-      # Edge-swipe from the left to trigger interactive pop. Coords are
-      # percentages so they work across devices.
-      - swipe:
-          start: "2%, 50%"
-          end: "80%, 50%"
+# Dismiss the webview. The screen overlays a Flutter close button (X) at
+# the top-right with semantic label "Close" — present even before the
+# webpage finishes loading.
+- extendedWaitUntil:
+    visible: "Close"
+    timeout: 10000
+- tapOn: "Close"
 
 - extendedWaitUntil:
     visible: "Skip for Now"

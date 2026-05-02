@@ -82,6 +82,7 @@ platform :android do
   lane :upload_apk do |options|
     apk_path = options[:apk_path] || '../build/app/outputs/apk/prod/release/app-prod-release.apk'
     track = options[:track] || 'internal'
+    promote_to = options[:promote_to]
 
     notes = ENV['RELEASE_NOTES'] || ''
     unless notes.empty?
@@ -96,6 +97,7 @@ platform :android do
     json_key_data = ENV['PLAY_STORE_CONFIG_JSON']
     json_key_path = options[:json_key]
 
+    final_track = promote_to || track
     upload_params = {
       track: track,
       apk: apk_path,
@@ -103,8 +105,9 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
       skip_upload_changelogs: notes.empty?,
-      release_status: track == 'production' ? 'draft' : 'completed',
+      release_status: final_track == 'production' ? 'draft' : 'completed',
     }
+    upload_params[:track_promote_to] = promote_to if promote_to
 
     if json_key_data && !json_key_data.empty?
       upload_params[:json_key_data] = json_key_data

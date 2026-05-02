@@ -396,15 +396,23 @@ jobs:
               apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
               track:"production"
           else
-            if [ "${{ inputs.android_internal }}" = "true" ]; then
+            # An APK can't be uploaded to two tracks in separate edits — Google
+            # rejects the second with "Cannot update a published APK". When
+            # both internal and production are requested, upload to internal
+            # and promote to production in the same edit.
+            if [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_production }}" = "true" ]; then
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
-                track:"internal"
-            fi
-            if [ "${{ inputs.android_production }}" = "true" ]; then
+                track:"internal" \
+                promote_to:"production"
+            elif [ "${{ inputs.android_production }}" = "true" ]; then
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
                 track:"production"
+            elif [ "${{ inputs.android_internal }}" = "true" ]; then
+              bundle exec fastlane android upload_apk \
+                apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+                track:"internal"
             fi
           fi
 
