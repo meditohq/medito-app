@@ -42,6 +42,9 @@ class AnalyticsEventConstants {
   /// Event logged for yearly subscription donations (used by Meta)
   static const String yearlyDonation = 'yearly_donation';
 
+  /// Event logged when the paywall is presented to the user
+  static const String paywallPresented = 'paywall_presented';
+
   /// Event logged when paywall is dismissed without completing a payment
   static const String paywallDismissedNoPayment =
       'paywall_dismissed_no_payment';

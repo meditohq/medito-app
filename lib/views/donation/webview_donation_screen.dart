@@ -40,13 +40,15 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   static const _logTag = 'WEBVIEW_DONATION';
   static const _channelName = 'MeditoPaywall';
   static const _loadTimeout = Duration(seconds: 15);
+  static const _paywallId = 'paywall_webview';
 
   late final WebViewController _controller;
   bool _isLoading = true;
   bool _hasLoadError = false;
   bool _isProcessingPayment = false;
   bool _didDonate = false;
-  String _variantId = 'control';
+  bool _presentedLogged = false;
+  String _variantId = 'unknown';
   Timer? _loadTimer;
 
   @override
@@ -84,7 +86,44 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   @override
   void dispose() {
     _loadTimer?.cancel();
+    if (!_didDonate) {
+      _logPaywallDismissedNoPayment();
+    }
     super.dispose();
+  }
+
+  void _logPaywallPresented() {
+    if (_presentedLogged) return;
+    _presentedLogged = true;
+    try {
+      final userId =
+          ref.read(authRepositorySyncProvider).currentUser?.id ?? 'unknown';
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.paywallPresented,
+        parameters: {
+          AnalyticsEventConstants.paramPaywallId: _paywallId,
+          AnalyticsEventConstants.paramMeditoUserId: userId,
+          AnalyticsEventConstants.paramPaywallSource:
+              widget.source ?? 'unknown',
+          AnalyticsEventConstants.paramVariantId: _variantId,
+        },
+      );
+    } catch (e) {
+      AppLogger.w(_logTag, 'Failed to log paywall presented: $e');
+    }
+  }
+
+  void _logPaywallDismissedNoPayment() {
+    try {
+      FirebaseAnalyticsService().logPaywallDismissedNoPayment(
+        paywallId: _paywallId,
+        userId: ref.read(authRepositorySyncProvider).currentUser?.id,
+        paywallSource: widget.source,
+        variantId: _variantId,
+      );
+    } catch (e) {
+      AppLogger.w(_logTag, 'Failed to log paywall dismissal: $e');
+    }
   }
 
   void _startLoad() {
@@ -184,7 +223,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   }
 
   void _handlePageView(Map<String, dynamic> data) {
-    _variantId = (data['experiment_variant'] as String?) ?? 'control';
+    _variantId = (data['experiment_variant'] as String?) ?? 'unknown';
     final experimentId = data['experiment_id'] as String? ?? '';
     AppLogger.d(_logTag, 'page_view variant=$_variantId experiment=$experimentId');
     FirebaseAnalyticsService().logEvent(
@@ -194,6 +233,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         AnalyticsEventConstants.paramPaywallSource: widget.source ?? 'unknown',
       },
     );
+    _logPaywallPresented();
   }
 
   Future<void> _handleOpenUrl(Map<String, dynamic> data) async {
@@ -280,7 +320,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     }
 
     final currency = paymentConfig.pricing.currency;
-    const paywallId = 'paywall_webview';
+    const paywallId = _paywallId;
 
     PaymentResult result;
     switch (frequency) {

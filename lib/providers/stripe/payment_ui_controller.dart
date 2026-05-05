@@ -300,19 +300,6 @@ class PaymentUIController extends _$PaymentUIController {
           eventParams,
         );
 
-        // Also track as paywall dismissed without payment
-        // Firebase Analytics
-        FirebaseAnalyticsService().logEvent(
-          name: AnalyticsEventConstants.paywallDismissedNoPayment,
-          parameters: eventParams,
-        );
-
-        // Meta Analytics
-        MetaSdkService.instance.logEvent(
-          AnalyticsEventConstants.paywallDismissedNoPayment,
-          eventParams,
-        );
-
         _showInfoSnackbar(
             context, AppLocalizations.of(context)!.paymentCancelledMessage);
       },

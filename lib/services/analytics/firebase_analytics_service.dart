@@ -9,6 +9,7 @@ import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:medito/services/app_tracking_transparency_service.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/services/analytics/meta_sdk_service.dart';
 
 // Lightweight stand-in so unit tests don't depend on firebase_core.
 class _NoopAnalytics {
@@ -345,6 +346,27 @@ class FirebaseAnalyticsService {
             'Error setting Firebase Analytics consent: $e');
       }
     }
+  }
+
+  /// Log a paywall-dismissed-without-payment event to Firebase + Meta.
+  /// Each underlying [logEvent] gates on its own user opt-out preference.
+  Future<void> logPaywallDismissedNoPayment({
+    String? paywallId,
+    String? userId,
+    String? paywallSource,
+    String? variantId,
+  }) async {
+    const event = AnalyticsEventConstants.paywallDismissedNoPayment;
+    final params = <String, Object>{
+      AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
+      AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
+      AnalyticsEventConstants.paramPaywallSource: paywallSource ?? 'unknown',
+      AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
+    };
+    await Future.wait([
+      logEvent(name: event, parameters: params),
+      MetaSdkService.instance.logEvent(event, params),
+    ]);
   }
 
   /// Log an event to Firebase Analytics
