@@ -54,7 +54,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.4'
+          flutter-version: '3.41.9'
           cache: true
 
       - name: Cache pub packages
@@ -430,20 +430,9 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
-      - name: Diagnose Xcode + SDKs
-        run: |
-          echo "Active Xcode: $(xcode-select -p)"
-          echo "xcodebuild: $(xcodebuild -version)"
-          echo "Installed Xcodes:"
-          ls /Applications | grep -i Xcode
-          echo "iPhoneOS SDKs in active Xcode:"
-          ls "$(xcode-select -p)/Platforms/iPhoneOS.platform/Developer/SDKs/" || true
-          echo "showsdks:"
-          xcodebuild -showsdks | head -30
-
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.4'
+          flutter-version: '3.41.9'
           cache: true
 
       - name: Cache pub packages
@@ -788,20 +777,9 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
-      - name: Diagnose Xcode + SDKs
-        run: |
-          echo "Active Xcode: $(xcode-select -p)"
-          echo "xcodebuild: $(xcodebuild -version)"
-          echo "Installed Xcodes:"
-          ls /Applications | grep -i Xcode
-          echo "iPhoneOS SDKs in active Xcode:"
-          ls "$(xcode-select -p)/Platforms/iPhoneOS.platform/Developer/SDKs/" || true
-          echo "showsdks:"
-          xcodebuild -showsdks | head -30
-
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.4'
+          flutter-version: '3.41.9'
           cache: true
 
       - name: Cache pub packages
