@@ -416,13 +416,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     );
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayStyle,
-      child: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, _) {
-          if (didPop) return;
-          Navigator.of(context).pop(_didDonate);
-        },
-        child: Scaffold(
+      child: Scaffold(
           backgroundColor: const Color(0xFFFAF8F5),
           body: SafeArea(
             child: Stack(
@@ -451,7 +445,6 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
