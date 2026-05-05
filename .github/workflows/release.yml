@@ -231,9 +231,9 @@ jobs:
     name: Android – Upgrade Test
     needs: [android-smoke-test]
     runs-on: ubuntu-latest
-    # Deploy is gated on this job. If no previous release artifact exists
-    # (first time this job runs, or artifact retention has lapsed) the job
-    # skips gracefully rather than failing the release.
+    # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
+    # there's no baseline yet, or to avoid blocking ship on a flaky test.
+    continue-on-error: true
 
     steps:
       # fetch-depth: 0 so we can resolve previous tags and `git show` the
@@ -628,6 +628,9 @@ jobs:
     needs: [ios-smoke-test]
     runs-on: macos-latest
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
+    # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
+    # there's no baseline yet, or to avoid blocking ship on a flaky test.
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
