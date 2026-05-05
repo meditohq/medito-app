@@ -4,16 +4,129 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PUBSPEC="$SCRIPT_DIR/pubspec.yaml"
 
-# If a version argument is provided, update pubspec.yaml
-if [ -n "$1" ]; then
-    NEW_VERSION="$1"
-    BUILD_NUMBER=$(grep "^version:" "$PUBSPEC" | sed 's/version: //' | cut -d'+' -f2)
-    sed -i '' "s/^version: .*/version: $NEW_VERSION+$BUILD_NUMBER/" "$PUBSPEC"
-    echo "✓ pubspec.yaml updated to $NEW_VERSION+$BUILD_NUMBER"
+FORCE=0
+for arg in "$@"; do
+    case "$arg" in
+        --force)
+            FORCE=1
+            ;;
+        -*)
+            echo "✗ Unknown flag: $arg" >&2
+            exit 1
+            ;;
+        *)
+            echo "✗ Unexpected positional argument: $arg" >&2
+            echo "  prepare_release.sh now derives the version itself from today's date." >&2
+            echo "  Drop the argument and rerun. Use --force to override drift detection." >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Compare two YY.M.D tuples. Echoes -1 / 0 / 1 for a<b / a==b / a>b.
+cmp_date() {
+    local a="$1" b="$2"
+    local IFS=.
+    local -a aa=($a) bb=($b)
+    for i in 0 1 2; do
+        if [ "${aa[$i]}" -lt "${bb[$i]}" ]; then echo -1; return; fi
+        if [ "${aa[$i]}" -gt "${bb[$i]}" ]; then echo 1; return; fi
+    done
+    echo 0
+}
+
+TODAY="$(date +%y.%-m.%-d)"
+
+# Find the latest date-shaped tag by numeric tuple — sort -V handles this for
+# tags whose components are pure integers (no .N suffix mixed in), but we walk
+# every tag manually to be safe across the YY.M.D and YY.M.D.N shapes.
+LATEST_TAG=""
+LATEST_KEY=""
+while IFS= read -r tag; do
+    [ -z "$tag" ] && continue
+    # Skip tags that don't match the strict YY.M.D[.N] shape (older tags
+    # sometimes carry +build or platform suffixes — we only care about clean
+    # date-shaped tags here).
+    [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || continue
+    # Build a zero-padded sort key: YYY MMM DDD NNN
+    IFS=. read -r ty tm td tn <<<"$tag"
+    [ -z "$tn" ] && tn=0
+    key=$(printf "%03d%03d%03d%03d" "$ty" "$tm" "$td" "$tn")
+    if [ -z "$LATEST_KEY" ] || [ "$key" \> "$LATEST_KEY" ]; then
+        LATEST_KEY="$key"
+        LATEST_TAG="$tag"
+    fi
+done < <(git tag --list '[0-9]*.[0-9]*.[0-9]*')
+
+if [ -n "$LATEST_TAG" ]; then
+    LATEST_DATE="$(echo "$LATEST_TAG" | cut -d. -f1-3)"
+else
+    LATEST_DATE=""
 fi
 
-# Get version from pubspec.yaml (strip build number)
-VERSION=$(grep "^version:" "$PUBSPEC" | sed 's/version: //' | cut -d'+' -f1)
+# Decide BASE date for the new version.
+if [ -z "$LATEST_DATE" ]; then
+    BASE="$TODAY"
+else
+    case "$(cmp_date "$LATEST_DATE" "$TODAY")" in
+        1)
+            if [ "$FORCE" -ne 1 ]; then
+                echo "✗ Latest tag $LATEST_TAG is ahead of today ($TODAY)." >&2
+                echo "  This usually means a previous release used the wrong date." >&2
+                echo "  Rerun with --force to add a same-day suffix on top of $LATEST_DATE." >&2
+                exit 1
+            fi
+            BASE="$LATEST_DATE"
+            ;;
+        0)
+            BASE="$LATEST_DATE"
+            ;;
+        -1)
+            BASE="$TODAY"
+            ;;
+    esac
+fi
+
+# Find the next .N suffix for BASE. No suffix counts as 0; first reissue is .1.
+MAX_SUFFIX=-1
+while IFS= read -r tag; do
+    [ -z "$tag" ] && continue
+    if [ "$tag" = "$BASE" ]; then
+        n=0
+    else
+        n="${tag#${BASE}.}"
+        case "$n" in
+            ''|*[!0-9]*) continue ;;
+        esac
+    fi
+    if [ "$n" -gt "$MAX_SUFFIX" ]; then
+        MAX_SUFFIX="$n"
+    fi
+done < <(git tag --list "${BASE}" "${BASE}.*")
+
+if [ "$MAX_SUFFIX" -lt 0 ]; then
+    NEW_VERSION="$BASE"
+else
+    NEW_VERSION="${BASE}.$((MAX_SUFFIX + 1))"
+fi
+
+if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+    echo "✗ Computed version $NEW_VERSION does not match expected shape" >&2
+    exit 1
+fi
+
+if [ -n "$(git tag -l "$NEW_VERSION")" ]; then
+    echo "✗ Tag $NEW_VERSION already exists — refusing to overwrite" >&2
+    exit 1
+fi
+
+echo "✓ Computed version: $NEW_VERSION"
+
+BUILD_NUMBER=$(grep "^version:" "$PUBSPEC" | sed 's/version: //' | cut -d'+' -f2)
+sed -i '' "s/^version: .*/version: $NEW_VERSION+$BUILD_NUMBER/" "$PUBSPEC"
+echo "✓ pubspec.yaml updated to $NEW_VERSION+$BUILD_NUMBER"
+
+VERSION="$NEW_VERSION"
 
 # Copy to clipboard
 echo -n "$VERSION" | pbcopy

@@ -8,16 +8,19 @@ Cut a new release of the Medito app. Follow the steps below in order — each st
 
 ## 1. Decide the new version
 
-Read the current version from `pubspec.yaml` (the `version:` line, format `YY.M.D[.N]+BUILD`).
+Version names are **date-based**: `YY.M.D` (two-digit year, unpadded month, unpadded day — e.g. today's release would be `26.4.22`). If a release already exists for today, the script appends `.N` starting at `.1` (e.g. `26.4.22.1`, then `.2`, etc.).
 
-Version names are **date-based**: `YY.M.D` (two-digit year, unpadded month, unpadded day — e.g. today's release would be `26.4.22`). If a release already exists for today, append `.N` starting at `.1` (e.g. `26.4.22.1`, then `.2`, etc.).
+You no longer compute the version yourself or pass `$ARGUMENTS` through — `prepare_release.sh` derives it from `date` and existing git tags in step 4. If the user passed an explicit version in `$ARGUMENTS`, tell them the script now auto-derives and ask whether they actually want to override; only proceed with `--force` if they confirm.
 
-- If `$ARGUMENTS` contains an explicit version, use that. Validate it matches `^\d+\.\d+\.\d+(\.\d+)?$`.
-- Otherwise, derive from today's date (`date +%y.%-m.%-d`). If `git tag -l <date>` already exists, try `<date>.1`, `<date>.2`, … until you find an unused one.
+Before continuing, fetch tags so the script sees what's already shipped:
 
-Only the version-name part is your concern — `prepare_release.sh` preserves the build number.
+```bash
+git fetch --tags
+```
 
-Tell the user which version you're cutting before doing anything destructive.
+If the latest existing tag is ahead of today's date (e.g. last tag is `26.5.6` but today is `26.5.2`), the script will refuse to run without `--force`. That's the drift detector — surface the message to the user verbatim and only re-run with `--force` after explicit approval. With `--force` the script keeps the latest tag's date as the base and bumps the `.N` suffix.
+
+Tell the user that the version will be derived in step 4 before doing anything destructive.
 
 ## 2. Pre-flight checks
 
@@ -52,13 +55,17 @@ If the user wants changes, either apply them yourself based on their feedback or
 From the project root:
 
 ```bash
-./prepare_release.sh <new-version>
+./prepare_release.sh
 ```
 
 This script:
+- Computes the new version from today's date and existing git tags (echoes `Computed version: <new-version>`)
+- Refuses to run if the latest tag is ahead of today's date — pass `--force` only after the user has acknowledged the drift
 - Rewrites the `version:` line in `pubspec.yaml` to `<new-version>+<existing-build>`
 - Copies the version to the clipboard
 - Moves the `Unreleased` entries in `release_notes.txt` under a new section headed with the version, leaving a fresh empty `Unreleased` at the top
+
+After it runs, read the new version back from `pubspec.yaml` (`grep "^version:" pubspec.yaml | sed 's/version: //' | cut -d'+' -f1`) so later steps can reference it.
 
 If the script prints `No unreleased notes found — nothing to do.`, stop and ask the user whether to proceed anyway — usually you want notes in a release.
 

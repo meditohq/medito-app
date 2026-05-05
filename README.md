@@ -2,7 +2,7 @@
 
 ## About
 
-Meditation can positively transform people's lives, and we believe no one should have to pay for it. We are the [Medito Foundation](https://meditofoundation.org), and we've built the Medito App for people who have never meditated before or want to deepen their meditation practice. 
+Meditation can positively transform people's lives, and we believe no one should have to pay for it. We are the [Medito Foundation](https://meditofoundation.org), and we've built the Medito App for people who have never meditated before or want to deepen their meditation practice.
 
 The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App is a Flutter project available on Android and iOS maintained by the Medito Foundation and its community.
 
@@ -10,7 +10,7 @@ The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App
 
 - Play Store: [Download on Google Play](https://play.google.com/store/apps/details?id=meditofoundation.medito)
 - App Store: [Download on the App Store](https://apps.apple.com/us/app/medito/id1500780518)
-- APK: <a href="https://github.com/meditohq/medito-app/releases/latest"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/meditohq/medito-app?color=success&label=APK"></a>
+- APK:
 
 **NOTE:** If you install the Medito app using the APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
 
@@ -25,17 +25,20 @@ Contributors can run the app without any API keys or Firebase setup using mock m
    flutter pub get
    ```
 
-2. Generate required code (Pigeon + Riverpod):
+1. Generate required code (Pigeon + Riverpod):
    ```
    flutter pub run pigeon --input pigeon_conf.dart
    dart run build_runner build --delete-conflicting-outputs
    ```
 
-3. Create `android/keystore.properties` using your own debug keystore. The Android SDK auto-creates one at `~/.android/debug.keystore` with default credentials:
+1. Create `android/keystore.properties` using your own debug keystore. The Android SDK auto-creates one at `~/.android/debug.keystore` with default credentials:
+
    ```
    cp android/keystore.properties.example android/keystore.properties
    ```
+
    Then edit `android/keystore.properties` with your keystore details:
+
    ```
    storePassword=<your-keystore-password>
    keyPassword=<your-key-password>
@@ -45,11 +48,11 @@ Contributors can run the app without any API keys or Firebase setup using mock m
    versionCode=1
    versionName=1.0.0
    ```
+
    For the default Android debug keystore the password, key password, and alias are `android`, `android`, and `androiddebugkey` respectively.
 
-4. Create a placeholder `android/app/google-services.json` (Firebase is skipped in mock mode, but Gradle requires the file)
-
-5. Run the app using the **"Flutter (Mock)"** run configuration in VS Code or Android Studio, or from the terminal:
+1. Create a placeholder `android/app/google-services.json` (Firebase is skipped in mock mode, but Gradle requires the file)
+2. Run the app using the **"Flutter (Mock)"** run configuration in VS Code or Android Studio, or from the terminal:
    ```
    flutter run --flavor dev --dart-define=MOCK_MODE=true -d <device-id>
    ```
@@ -64,16 +67,15 @@ In mock mode, Firebase, the paywall webview, Stripe, and Meta SDK are all skippe
    cd medito-app
    ```
 
-2. Install dependencies:
+1. Install dependencies:
    ```
    flutter pub get
    ```
 
-3. Set up environment files:
+1. Set up environment files:
    - Create `.env.staging` and `.env.production` files in the root directory.
    - Contact a team member for the contents of these files.
-
-4. Set up Firebase:
+1. Set up Firebase:
    - You need `google-services.json` (for Android) and `GoogleService-Info.plist` (for iOS) from the Firebase console.
    - You also need the `/lib/firebase_options.dart` file.
    - Contact a team member for the contents of these files.
@@ -81,11 +83,13 @@ In mock mode, Firebase, the paywall webview, Stripe, and Meta SDK are all skippe
 ### Generating Code
 
 To generate Pigeon code. This is required to communicate with native iOS and Android code.
+
 ```
 flutter pub run pigeon --input pigeon_conf.dart
 ```
 
 To generate API and state management code with Riverpod:
+
 ```
 dart run build_runner build --delete-conflicting-outputs
 ```
@@ -134,6 +138,6 @@ For Android APK signing, you need to create a `keystore.properties` file in the 
 
 - App: [GNU AFFERO GENERAL PUBLIC LICENSE](https://github.com/meditohq/medito-app/blob/master/LICENSE).
 - The content available within the Medito app is subject to a custom license. For more information, please refer to [meditofoundation.org/license](https://meditofoundation.org/license).
-- Sometimes we aggregate content from other sources that do not have the same license. This content is generally not published under "Medito." Make sure to respect the original copyright. 
+- Sometimes we aggregate content from other sources that do not have the same license. This content is generally not published under "Medito." Make sure to respect the original copyright.
 
-Medito Foundation: [https://meditofoundation.org/](https://meditofoundation.org/).
+Medito Foundation: https://meditofoundation.org/.
