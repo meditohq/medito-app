@@ -54,10 +54,13 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Build a regular habit"
 
 # ── Onboarding: Attribution question ──
+# Eight answer options shuffled randomly; on a small simulator any specific
+# option can land below the fold. Wait for the question, then tap whichever
+# answer is at the top.
 - extendedWaitUntil:
-    visible: "A friend told me"
+    visible: "How did you hear about Medito"
     timeout: 10000
-- tapOn: "A friend told me"
+- tapOn: "Google ad|Instagram or Facebook ad|A friend told me|Therapist or healthcare professional|App Store|Play Store|Other"
 
 # ── Onboarding: Notifications ──
 - extendedWaitUntil:
