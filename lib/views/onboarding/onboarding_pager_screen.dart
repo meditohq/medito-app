@@ -178,6 +178,12 @@ final List<String> _images = [
         name: AnalyticsEventConstants.onboardingCompleted,
       ),
     );
+    unawaited(
+      ref.read(sharedPreferencesProvider).setBool(
+            SharedPreferenceConstants.firstActionAfterOnboardingPending,
+            true,
+          ),
+    );
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => const BottomNavigationBarView(),

@@ -402,6 +402,32 @@ class FirebaseAnalyticsService {
     }
   }
 
+  /// If the user has just completed onboarding and not yet performed any
+  /// interactive action, logs a single firstActionAfterOnboarding event with
+  /// the given target. Subsequent calls are no-ops for this install.
+  Future<void> logFirstActionAfterOnboardingIfNeeded(String target) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final pending = prefs.getBool(
+            SharedPreferenceConstants.firstActionAfterOnboardingPending,
+          ) ??
+          false;
+      if (!pending) return;
+
+      await prefs.setBool(
+        SharedPreferenceConstants.firstActionAfterOnboardingPending,
+        false,
+      );
+
+      await logEvent(
+        name: AnalyticsEventConstants.firstActionAfterOnboarding,
+        parameters: {AnalyticsEventConstants.paramTarget: target},
+      );
+    } catch (_) {
+      // Best-effort logging — never throw from analytics.
+    }
+  }
+
   /// Set the user ID for Firebase Analytics
   Future<void> setUserId(String? userId) async {
     if (_runningInTest) return;

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
@@ -166,6 +167,22 @@ class _BottomNavigationBarViewState
   void _onDestinationSelected(int index) {
     if (_currentPageIndex == 1 && index != 1) {
       _searchFocusNode.unfocus();
+    }
+
+    if (index != _currentPageIndex) {
+      const tabTargets = {
+        0: 'tab_home',
+        1: 'tab_explore',
+        3: 'tab_settings',
+      };
+      final target = tabTargets[index];
+      if (target != null) {
+        unawaited(
+          ref
+              .read(analyticsServiceProvider)
+              .logFirstActionAfterOnboardingIfNeeded(target),
+        );
+      }
     }
 
     setState(() {

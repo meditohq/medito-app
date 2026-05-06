@@ -350,6 +350,7 @@ class ProductGroupCard extends ConsumerWidget {
                         'url': productGroup.url ?? '',
                       },
                     );
+                    analytics.logFirstActionAfterOnboardingIfNeeded('product');
 
                     _openProductUrl(productGroup.url);
                     for (final variant in productGroup.variants) {

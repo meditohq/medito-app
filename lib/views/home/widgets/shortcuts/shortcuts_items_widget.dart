@@ -1,9 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 
@@ -23,6 +26,11 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     WidgetRef ref,
     ShortcutsModel element,
   ) async {
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logFirstActionAfterOnboardingIfNeeded('shortcut'),
+    );
     await handleNavigation(
       element.type,
       [element.path.toString().getIdFromPath()],

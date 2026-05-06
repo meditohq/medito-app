@@ -92,6 +92,16 @@ class AnalyticsEventConstants {
   /// Event logged when user completes onboarding flow
   static const String onboardingCompleted = 'onboarding_completed';
 
+  /// Event logged on the user's very first interactive tap after completing
+  /// onboarding. Fires exactly once per install.
+  /// Parameter: paramTarget — describes what they tapped (e.g. 'up_next',
+  /// 'shortcut', 'carousel', 'tab_explore', 'tab_settings', 'stats', 'product')
+  static const String firstActionAfterOnboarding =
+      'first_action_after_onboarding';
+
+  /// Parameter for what the user tapped in firstActionAfterOnboarding
+  static const String paramTarget = 'target';
+
   /// Event logged when user grants tracking permission during onboarding
   static const String onboardingTrackingPermissionGranted =
       'onboarding_tracking_permission_granted';

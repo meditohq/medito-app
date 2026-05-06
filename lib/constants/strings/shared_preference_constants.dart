@@ -79,4 +79,9 @@ class SharedPreferenceConstants {
 
   // History of sign-in events on this device (JSON list)
   static const String signedInUserHistory = 'signed_in_user_history';
+
+  // True between onboarding completion and the user's first interactive tap.
+  // Used to log a single first_action_after_onboarding event.
+  static const String firstActionAfterOnboardingPending =
+      'first_action_after_onboarding_pending';
 }

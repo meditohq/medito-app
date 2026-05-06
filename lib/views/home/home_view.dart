@@ -23,6 +23,7 @@ import 'widgets/up_next/your_path_explainer_strip.dart';
 
 import '../../providers/home/announcement_provider.dart';
 import '../../providers/home/up_next_provider.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -171,6 +172,9 @@ class _HomeViewState extends ConsumerState<HomeView>
   }
 
   void _onStatsButtonTapped(BuildContext context) {
+    ref
+        .read(analyticsServiceProvider)
+        .logFirstActionAfterOnboardingIfNeeded('stats');
     handleNavigation(
       TypeConstants.route,
       [RouteConstants.stats],

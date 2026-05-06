@@ -264,6 +264,11 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
             },
           ),
     );
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logFirstActionAfterOnboardingIfNeeded('up_next_skip'),
+    );
 
     final statsManager = StatsManager();
     await statsManager.initialize();
@@ -292,6 +297,11 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
               AnalyticsEventConstants.paramPackId: widget.data.pack.id,
             },
           ),
+    );
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logFirstActionAfterOnboardingIfNeeded('up_next'),
     );
 
     final guideName = ref.read(guideNamePreferenceProvider);
