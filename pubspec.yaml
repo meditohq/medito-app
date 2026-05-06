@@ -15,7 +15,7 @@ publish_to: none
 # Just build Android APK (used by the script above):
 # ./build_apk.sh
 
-version: 26.5.8+302407
+version: 26.5.9+302408
 
 environment:
   sdk: "^3.8.0"
