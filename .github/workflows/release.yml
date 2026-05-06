@@ -54,7 +54,8 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.9'
+          flutter-version: '3.44.0-0.3.pre'
+          channel: beta
           cache: true
 
       - name: Cache pub packages
@@ -432,7 +433,8 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.9'
+          flutter-version: '3.44.0-0.3.pre'
+          channel: beta
           cache: true
 
       - name: Cache pub packages
@@ -782,7 +784,8 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.9'
+          flutter-version: '3.44.0-0.3.pre'
+          channel: beta
           cache: true
 
       - name: Cache pub packages
