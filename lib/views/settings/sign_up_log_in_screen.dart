@@ -12,6 +12,7 @@ import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/network/header_service.dart';
@@ -286,10 +287,14 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           name: FirebaseAnalyticsService.eventOnboardingSignupCompleted,
         );
 
-        await StatsManager().clearAllStats();
-        // Force sync after clearing stats to ensure we fetch from server
+        // Initialize first — clearAllStats touches SharedPreferences and
+        // will throw LateInitializationError if the singleton hasn't been
+        // initialized yet (e.g. user signs in straight from onboarding
+        // without ever loading the home screen).
         var statsManager = StatsManager();
         await statsManager.initialize();
+        await statsManager.clearAllStats();
+        // Force sync after clearing stats to ensure we fetch from server
         await statsManager.sync(force: true);
         ref.read(statsProvider.notifier).refresh();
         ref.invalidate(packProvider);
@@ -316,12 +321,14 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         showSnackBar(
             context, AppLocalizations.of(context)!.authenticationFailed);
       }
-    } catch (e) {
+    } catch (e, st) {
       dev.log('[SIGN_UP] Error during OTP verification', error: e, level: 1000);
       if (e.toString().contains('403')) {
         showSnackBar(
             context, AppLocalizations.of(context)!.invalidVerificationCode);
       } else {
+        CrashlyticsService().recordError(e, st,
+            reason: 'OTP verify post-success');
         showSnackBar(context,
             '${AppLocalizations.of(context)!.errorPrefix}${e.toString()}');
       }

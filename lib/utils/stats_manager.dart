@@ -464,6 +464,9 @@ class StatsManager {
     int duration, {
     bool skipPost = false,
   }) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
     if (_allStats == null) {
       await sync();
     }
@@ -570,6 +573,9 @@ class StatsManager {
   }
 
   Future<void> removeAudioCompleted(LocalAudioCompleted session) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
     if (_allStats == null) {
       await sync();
     }
@@ -613,6 +619,9 @@ class StatsManager {
 
   Future<void> addTrackChecked(String? id) async {
     assert(id != null, 'Track ID cannot be null');
+    if (!_isInitialized) {
+      await initialize();
+    }
     if (_allStats == null) {
       await sync();
     }
@@ -639,6 +648,9 @@ class StatsManager {
   }
 
   Future<void> removeTrackChecked(String trackId) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
     if (_allStats == null) {
       await sync();
     }
@@ -663,6 +675,9 @@ class StatsManager {
   }
 
   Future<void> clearAllStats() async {
+    if (!_isInitialized) {
+      await initialize();
+    }
     var prefs = _prefs;
     await prefs.remove(SharedPreferenceConstants.localAllStatsKey);
     _allStats = LocalAllStats.empty();
@@ -674,6 +689,9 @@ class StatsManager {
   bool get isInitialized => _isInitialized;
 
   Future<bool> hasLocalStats() async {
+    if (!_isInitialized) {
+      await initialize();
+    }
     _allStats ??= await _loadLocalAllStats();
 
     return _allStats?.audioCompleted?.isNotEmpty == true;
