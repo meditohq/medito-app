@@ -55,11 +55,10 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # ── Onboarding: Attribution question ──
 # Eight answer options shuffled randomly; on a small simulator any specific
-# option can land below the fold. Wait for the question, then tap whichever
-# answer is at the top.
-- extendedWaitUntil:
-    visible: "How did you hear about Medito"
-    timeout: 10000
+# option can land below the fold. Tap whichever answer is visible —
+# `tapOn` waits for the element to appear, so no separate visibility
+# assertion is needed (the title text "How did you hear about Medito?"
+# with its trailing ? is unreliable to match).
 - tapOn: "Google ad|Instagram or Facebook ad|A friend told me|Therapist or healthcare professional|App Store|Play Store|Other"
 
 # ── Onboarding: Notifications ──
