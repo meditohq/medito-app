@@ -163,12 +163,13 @@ class _GetStartedButtonState extends State<_GetStartedButton>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final bg = isDark ? ColorConstants.onyx : ColorConstants.lightOnSurface;
     return AnimatedBuilder(
       animation: Listenable.merge([_breathe, _press]),
       builder: (context, _) {
-        final breathe = Curves.easeInOut.transform(_breathe.value);
-        final scale = 1.0 + (breathe * 0.015) - _press.value;
-        final glow = 0.35 + (breathe * 0.25);
+        final scale = 1.0 - _press.value;
         return Transform.scale(
           scale: scale,
           child: GestureDetector(
@@ -178,50 +179,33 @@ class _GetStartedButtonState extends State<_GetStartedButton>
             onTap: _handleTap,
             child: Container(
               width: double.infinity,
-              height: 64,
+              height: 56,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    ColorConstants.lightPurple,
-                    ColorConstants.lightPrimary,
-                  ],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: ColorConstants.lightPurple.withValues(alpha: glow),
-                    blurRadius: 28,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+                color: bg,
+                borderRadius: BorderRadius.circular(12),
               ),
+              clipBehavior: Clip.antiAlias,
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Align(
-                        alignment: Alignment(
-                          -1.0 + (_breathe.value * 2.0),
-                          -1.0,
-                        ),
-                        child: FractionallySizedBox(
-                          widthFactor: 0.35,
-                          heightFactor: 1,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Colors.white.withValues(alpha: 0.0),
-                                  Colors.white.withValues(alpha: 0.18),
-                                  Colors.white.withValues(alpha: 0.0),
-                                ],
-                              ),
+                    child: Align(
+                      alignment: Alignment(
+                        -1.4 + (_breathe.value * 2.8),
+                        -1.0,
+                      ),
+                      child: FractionallySizedBox(
+                        widthFactor: 0.4,
+                        heightFactor: 1,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Colors.white.withValues(alpha: 0.0),
+                                Colors.white.withValues(alpha: 0.14),
+                                Colors.white.withValues(alpha: 0.0),
+                              ],
                             ),
                           ),
                         ),
@@ -229,28 +213,13 @@ class _GetStartedButtonState extends State<_GetStartedButton>
                     ),
                   ),
                   Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          widget.label,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Transform.translate(
-                          offset: Offset(breathe * 3, 0),
-                          child: const Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      widget.label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],
