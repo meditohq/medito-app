@@ -185,8 +185,22 @@ final List<String> _images = [
           ),
     );
     await Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const BottomNavigationBarView(),
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 700),
+        reverseTransitionDuration: const Duration(milliseconds: 400),
+        pageBuilder: (_, a, b) => const BottomNavigationBarView(),
+        transitionsBuilder: (_, animation, secondary, child) {
+          final eased = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          // Incoming home: gentle fade + small scale-up from 0.96.
+          final scale = Tween<double>(begin: 0.96, end: 1.0).animate(eased);
+          return FadeTransition(
+            opacity: eased,
+            child: ScaleTransition(scale: scale, child: child),
+          );
+        },
       ),
     );
   }
