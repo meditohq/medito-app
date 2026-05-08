@@ -3677,7 +3677,7 @@ abstract class AppLocalizations {
   /// Stage 1 text in the Your Path explainer strip shown below the card on the home screen
   ///
   /// In en, this message translates to:
-  /// **'Your path guides you through meditation from scratch. Starts at just 1 min and builds gradually.'**
+  /// **'Learn meditation one minute at a time. Sessions get longer as you learn.'**
   String get yourPathExplainerText;
 
   /// Stage 2 text in the Your Path explainer strip, shown after the user taps Got it

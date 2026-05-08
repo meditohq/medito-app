@@ -1983,7 +1983,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourPathExplainerText =>
-      'Your path guides you through meditation from scratch. Starts at just 1 min and builds gradually.';
+      'Learn meditation one minute at a time. Sessions get longer as you learn.';
 
   @override
   String get yourPathExplainerSwipeHint => 'Swipe left to skip.';
