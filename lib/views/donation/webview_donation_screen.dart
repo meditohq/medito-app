@@ -465,22 +465,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator()),
                 if (_hasLoadError) _buildErrorOverlay(),
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Semantics(
-                      label: 'Close',
-                      button: true,
-                      child: IconButton(
-                        tooltip: 'Close',
-                        icon: const Icon(Icons.close, color: Color(0xFF1A1A17)),
-                        onPressed: () => Navigator.of(context).pop(_didDonate),
-                      ),
-                    ),
-                  ),
-                ),
+                // Close affordance lives in the webpage itself (delayed fade-in
+                // so users don't dismiss before they've read the page). The JS
+                // bridge posts a `close` message which _handleClose() pops.
               ],
             ),
           ),
