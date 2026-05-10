@@ -79,12 +79,12 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - waitForAnimationToEnd
 - takeScreenshot: paywall-webview
 
-# Dismiss the webview. The screen overlays a Flutter close button (X) at
-# the top-right with semantic label "Close" — present even before the
-# webpage finishes loading.
+# Dismiss the webview. The webpage shows an × close glyph (aria-label
+# "Close") in the top-right that fades in 5s after the page loads, so
+# allow extra time before the assertion.
 - extendedWaitUntil:
     visible: "Close"
-    timeout: 10000
+    timeout: 20000
 - tapOn: "Close"
 
 - extendedWaitUntil:
