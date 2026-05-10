@@ -533,6 +533,13 @@ jobs:
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
         run: dart pub global activate flutterfire_cli
 
+      # Populate the Flutter engine artifacts (Flutter.xcframework) that the
+      # Podfile post-install hook expects. The master channel does not
+      # precache iOS engine artifacts automatically, unlike stable.
+      - name: Flutter precache iOS
+        if: steps.cache-ios-app.outputs.cache-hit != 'true'
+        run: flutter precache --ios
+
       - name: Install pods
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
         working-directory: ios
@@ -801,6 +808,12 @@ jobs:
 
       - name: Flutter pub get
         run: flutter pub get
+
+      # Populate the Flutter engine artifacts (Flutter.xcframework) that
+      # cocoapods' post-install hook needs. Master channel does not
+      # precache iOS engine artifacts automatically.
+      - name: Flutter precache iOS
+        run: flutter precache --ios
 
       - name: Install FlutterFire CLI
         run: dart pub global activate flutterfire_cli
