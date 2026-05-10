@@ -11,6 +11,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
@@ -258,8 +259,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           pinned: false,
           floating: false,
           elevation: 0.0,
-          title: HomeHeaderWidget(
-              greeting: AppLocalizations.of(context)!.settings),
+          title: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onLongPress: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const DebugInfoScreen(),
+              ),
+            ),
+            child: HomeHeaderWidget(
+                greeting: AppLocalizations.of(context)!.settings),
+          ),
         ),
         _buildSettingsListSlivers(context, ref, settingsItems),
       ],
