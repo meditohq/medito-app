@@ -1,7 +1,8 @@
 Unreleased
 -
 
-26.5.9
+26.5.10
+- Onboarding answer choices are easier to tap
 - Fixed an error that could appear right after entering your sign-in code
 
 26.5.8
