@@ -118,6 +118,11 @@ class AnalyticsEventConstants {
   static const String onboardingNotificationsPermissionDenied =
       'onboarding_notifications_permission_denied';
 
+  /// Impression event for the onboarding notifications screen copy A/B test.
+  /// Logged once per screen render with a `variant` parameter ('a' or 'b').
+  static const String onboardingNotificationsPreviewShown =
+      'onboarding_notifications_preview_shown';
+
   // Feedback events
   /// Event logged when user submits post-meditation feedback
   static const String postMeditationFeedback = 'post_meditation_feedback';

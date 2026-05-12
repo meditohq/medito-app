@@ -888,6 +888,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enableNotificationsCta => 'Enable Notifications';
 
   @override
+  String get notificationPreviewTimestamp => 'now';
+
+  @override
+  String get notificationPreviewTitle => 'Your daily reset is ready 🌿';
+
+  @override
+  String get notificationPreviewBody =>
+      'Five minutes to feel calmer, clearer, kinder.';
+
+  @override
+  String get notificationPreviewTitleB => 'A quieter mind starts here';
+
+  @override
+  String get notificationPreviewBodyB =>
+      'Your daily breath is waiting. Just tap to begin.';
+
+  @override
   String get onboardingBatteryTitle => 'One Setting, Smoother Meditations';
 
   @override
@@ -992,6 +1009,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setReminder => 'Set Reminder';
+
+  @override
+  String get setReminderB => 'Remind Me Daily';
 
   @override
   String get donationThankYouTitle => 'Thank You for Your Support!';

@@ -78,6 +78,8 @@ class FirebaseAnalyticsService {
       AnalyticsEventConstants.onboardingNotificationsPermissionGranted;
   static const String eventOnboardingNotificationsPermissionDenied =
       AnalyticsEventConstants.onboardingNotificationsPermissionDenied;
+  static const String eventOnboardingNotificationsPreviewShown =
+      AnalyticsEventConstants.onboardingNotificationsPreviewShown;
   static const String eventOnboardingSplashscreenSignupTap =
       AnalyticsEventConstants.onboardingSplashscreenSignupTap;
   static const String eventOnboardingSplashscreenContinueTap =

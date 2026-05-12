@@ -1682,6 +1682,36 @@ abstract class AppLocalizations {
   /// **'Enable Notifications'**
   String get enableNotificationsCta;
 
+  /// Timestamp shown on a fake iOS notification preview, mirroring iOS's 'now' label for a notification that just arrived
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get notificationPreviewTimestamp;
+
+  /// Title of the fake notification shown in the onboarding notifications screen preview
+  ///
+  /// In en, this message translates to:
+  /// **'Your daily reset is ready 🌿'**
+  String get notificationPreviewTitle;
+
+  /// Body of the fake notification shown in the onboarding notifications screen preview (variant A)
+  ///
+  /// In en, this message translates to:
+  /// **'Five minutes to feel calmer, clearer, kinder.'**
+  String get notificationPreviewBody;
+
+  /// Title of the fake notification preview, A/B test variant B
+  ///
+  /// In en, this message translates to:
+  /// **'A quieter mind starts here'**
+  String get notificationPreviewTitleB;
+
+  /// Body of the fake notification preview, A/B test variant B
+  ///
+  /// In en, this message translates to:
+  /// **'Your daily breath is waiting. Just tap to begin.'**
+  String get notificationPreviewBodyB;
+
   /// No description provided for @onboardingBatteryTitle.
   ///
   /// In en, this message translates to:
@@ -1873,6 +1903,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set Reminder'**
   String get setReminder;
+
+  /// CTA on the onboarding notifications screen, A/B test variant B (paired with notification preview variant B)
+  ///
+  /// In en, this message translates to:
+  /// **'Remind Me Daily'**
+  String get setReminderB;
 
   /// No description provided for @donationThankYouTitle.
   ///

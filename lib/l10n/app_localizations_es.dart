@@ -903,6 +903,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enableNotificationsCta => 'Habilitar Notificaciones';
 
   @override
+  String get notificationPreviewTimestamp => 'ahora';
+
+  @override
+  String get notificationPreviewTitle => 'Tu pausa diaria está lista 🌿';
+
+  @override
+  String get notificationPreviewBody =>
+      'Cinco minutos para sentirte más en calma, lúcido y amable.';
+
+  @override
+  String get notificationPreviewTitleB =>
+      'Una mente más tranquila empieza aquí';
+
+  @override
+  String get notificationPreviewBodyB =>
+      'Tu respiración diaria te espera. Solo toca para empezar.';
+
+  @override
   String get onboardingBatteryTitle =>
       'Mantén las Meditaciones Sin Interrupciones';
 
@@ -1008,6 +1026,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get setReminder => 'Configurar Recordatorio';
+
+  @override
+  String get setReminderB => 'Recuérdamelo Cada Día';
 
   @override
   String get donationThankYouTitle => '¡Gracias por Tu Apoyo!';

@@ -1,7 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
@@ -28,14 +31,40 @@ class NotificationsScreen extends ConsumerStatefulWidget {
       _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
+    with SingleTickerProviderStateMixin {
   bool _notificationsGranted = false;
   bool _isProcessing = false;
+
+  /// A/B test variant for the notification preview copy: 'a' or 'b'.
+  /// Picked once per screen render; logged with every interaction event so
+  /// the conversion funnel can be segmented in Firebase.
+  late final String _previewVariant;
+
+  late final AnimationController _previewAnimation;
 
   @override
   void initState() {
     super.initState();
+    _previewVariant = Random().nextBool() ? 'a' : 'b';
+    _previewAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    Future.delayed(const Duration(milliseconds: 250), () {
+      if (mounted) _previewAnimation.forward();
+    });
     _checkNotificationPermission();
+    FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventOnboardingNotificationsPreviewShown,
+      parameters: {'variant': _previewVariant},
+    );
+  }
+
+  @override
+  void dispose() {
+    _previewAnimation.dispose();
+    super.dispose();
   }
 
   Future<void> _checkNotificationPermission() async {
@@ -66,6 +95,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       await FirebaseAnalyticsService().logEvent(
         name: FirebaseAnalyticsService
             .eventOnboardingNotificationsPermissionGranted,
+        parameters: {'variant': _previewVariant},
       );
 
       if (mounted) {
@@ -85,6 +115,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           parameters: {
             'permission_status':
                 status.isPermanentlyDenied ? 'permanently_denied' : 'denied',
+            'variant': _previewVariant,
           },
         );
       }
@@ -106,6 +137,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
+      parameters: {'variant': _previewVariant},
     );
 
     final prefs = await SharedPreferences.getInstance();
@@ -179,12 +211,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
+        top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
+              physics: const ClampingScrollPhysics(),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 64),
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -209,7 +243,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
+                    _buildNotificationPreview(context),
+                    const SizedBox(height: 24),
                     Column(
                       children: [
                         if (reminderTime != null)
@@ -218,7 +254,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           _buildActionButton(
                             text: _notificationsGranted
                                 ? AppLocalizations.of(context)!.turnOnSmartReminders
-                                : AppLocalizations.of(context)!.setReminder,
+                                : (_previewVariant == 'b'
+                                    ? AppLocalizations.of(context)!.setReminderB
+                                    : AppLocalizations.of(context)!.setReminder),
                             onPressed:
                                 _isProcessing ? null : _handleNotificationsPermission,
                           ),
@@ -231,6 +269,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                               await FirebaseAnalyticsService().logEvent(
                                 name: FirebaseAnalyticsService
                                     .eventOnboardingReminderSkipTap,
+                                parameters: {'variant': _previewVariant},
                               );
                               _navigateNext();
                             },
@@ -251,6 +290,163 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
   }
 
+  Widget _buildNotificationPreview(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final phoneBorder =
+        isDark ? Colors.white.withValues(alpha: 0.18) : Colors.black87;
+    const phoneWidth = 280.0;
+    const cardOverhang = 36.0;
+
+    return SizedBox(
+      height: 170,
+      child: ClipRect(
+        clipper: _BottomOnlyClipper(),
+        child: OverflowBox(
+          maxHeight: 600,
+          maxWidth: double.infinity,
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: phoneWidth,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                Container(
+                  width: phoneWidth,
+                  height: 560,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(44)),
+                    border: Border.all(color: phoneBorder, width: 3),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.02)
+                        : Colors.white,
+                  ),
+                ),
+                Positioned(
+                  top: 56,
+                  left: -cardOverhang,
+                  right: -cardOverhang,
+                  child: FadeTransition(
+                    opacity: CurvedAnimation(
+                      parent: _previewAnimation,
+                      curve: Curves.easeOutCubic,
+                    ),
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, -0.04),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: _previewAnimation,
+                        curve: Curves.easeOutCubic,
+                      )),
+                      child: _buildNotificationCard(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationCard() {
+    final l10n = AppLocalizations.of(context)!;
+    final title = _previewVariant == 'b'
+        ? l10n.notificationPreviewTitleB
+        : l10n.notificationPreviewTitle;
+    final body = _previewVariant == 'b'
+        ? l10n.notificationPreviewBodyB
+        : l10n.notificationPreviewBody;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: ColorConstants.lightPurple,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            alignment: Alignment.center,
+            child: SvgPicture.asset(
+              'assets/images/ic_logo.svg',
+              width: 22,
+              height: 22,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'MEDITO',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      l10n.notificationPreviewTimestamp,
+                      style: const TextStyle(
+                        color: Colors.black45,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontSize: 12,
+                    height: 1.3,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSmartRemindersOnButton() {
     return SizedBox(
       width: double.infinity,
@@ -258,6 +454,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         onPressed: () async {
           await FirebaseAnalyticsService().logEvent(
             name: FirebaseAnalyticsService.eventOnboardingReminderConfirmTap,
+            parameters: {'variant': _previewVariant},
           );
           _navigateNext();
         },
@@ -284,4 +481,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       ),
     );
   }
+}
+
+/// Clips only the bottom of a widget, leaving horizontal overflow intact so
+/// the notification card can overhang the phone frame without being clipped.
+class _BottomOnlyClipper extends CustomClipper<Rect> {
+  @override
+  Rect getClip(Size size) =>
+      Rect.fromLTRB(-10000, 0, size.width + 10000, size.height);
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) => false;
 }

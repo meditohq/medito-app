@@ -58,6 +58,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
+        top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
