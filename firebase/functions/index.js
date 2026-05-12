@@ -1,13 +1,5 @@
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onRequest } = require("firebase-functions/v2/https");
-const {
-  onNewFatalIssuePublished,
-  onNewNonfatalIssuePublished,
-  onNewAnrIssuePublished,
-  onRegressionAlertPublished,
-  onStabilityDigestPublished,
-  onVelocityAlertPublished,
-} = require("firebase-functions/v2/alerts/crashlytics");
 const { defineSecret } = require("firebase-functions/params");
 const { logger } = require("firebase-functions");
 const crypto = require("crypto");
@@ -115,109 +107,6 @@ async function createGitHubIssue({ title, description, severity, source, eventTy
 
   logger.info("GitHub issue created", { number: issue.number, title });
 }
-
-// ─── Crashlytics Alert Triggers ──────────────────────────────────────────────
-
-// New fatal crash
-exports.onCrashlyticsFatalIssue = onNewFatalIssuePublished(
-  { secrets: [githubToken] },
-  async (event) => {
-    const issue = event.data.payload.issue;
-    await createGitHubIssue({
-      title: `Fatal crash: ${issue.title}`,
-      description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
-      severity: "critical",
-      source: "crashlytics",
-      eventType: "new_fatal_issue",
-      data: event.data.payload,
-    });
-  }
-);
-
-// New non-fatal issue
-exports.onCrashlyticsNonfatalIssue = onNewNonfatalIssuePublished(
-  { secrets: [githubToken] },
-  async (event) => {
-    const issue = event.data.payload.issue;
-    await createGitHubIssue({
-      title: `Non-fatal issue: ${issue.title}`,
-      description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
-      severity: "medium",
-      source: "crashlytics",
-      eventType: "new_nonfatal_issue",
-      data: event.data.payload,
-    });
-  }
-);
-
-// New ANR (Application Not Responding)
-exports.onCrashlyticsAnrIssue = onNewAnrIssuePublished(
-  { secrets: [githubToken] },
-  async (event) => {
-    const issue = event.data.payload.issue;
-    await createGitHubIssue({
-      title: `ANR: ${issue.title}`,
-      description: `${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
-      severity: "high",
-      source: "crashlytics",
-      eventType: "new_anr_issue",
-      data: event.data.payload,
-    });
-  }
-);
-
-// Regressed issue (was closed, came back)
-exports.onCrashlyticsRegression = onRegressionAlertPublished(
-  { secrets: [githubToken] },
-  async (event) => {
-    const issue = event.data.payload.issue;
-    await createGitHubIssue({
-      title: `Regression: ${issue.title}`,
-      description: `A previously closed issue has reappeared.\n\n${issue.subtitle}\n\nAffected version(s): ${issue.appVersion || "unknown"}`,
-      severity: "critical",
-      source: "crashlytics",
-      eventType: "regression",
-      data: event.data.payload,
-    });
-  }
-);
-
-// Stability digest (trending issues summary)
-exports.onCrashlyticsStabilityDigest = onStabilityDigestPublished(
-  { secrets: [githubToken] },
-  async (event) => {
-    const trendingIssues = event.data.payload.trendingIssues || [];
-    const issueList = trendingIssues
-      .map((i) => `- **${i.type}**: ${i.issue.title} (${i.eventCount} events, ${i.userCount} users)`)
-      .join("\n");
-
-    await createGitHubIssue({
-      title: `Stability digest: ${trendingIssues.length} trending issue(s)`,
-      description: `Emerging issues causing a significant number of crashes:\n\n${issueList}`,
-      severity: "high",
-      source: "crashlytics",
-      eventType: "stability_digest",
-      data: event.data.payload,
-    });
-  }
-);
-
-// Velocity alert (sudden spike in crashes)
-exports.onCrashlyticsVelocityAlert = onVelocityAlertPublished(
-  { secrets: [githubToken] },
-  async (event) => {
-    const issue = event.data.payload.issue;
-    const crashCount = event.data.payload.crashCount || "unknown";
-    await createGitHubIssue({
-      title: `Crash spike: ${issue.title}`,
-      description: `A sudden increase in crashes has been detected.\n\n${issue.subtitle}\n\nCrash count: ${crashCount}`,
-      severity: "critical",
-      source: "crashlytics",
-      eventType: "velocity_alert",
-      data: event.data.payload,
-    });
-  }
-);
 
 // ─── Firestore trigger ───────────────────────────────────────────────────────
 exports.onFirestoreIssueCreated = onDocumentCreated(
