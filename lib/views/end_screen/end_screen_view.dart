@@ -437,17 +437,28 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                     ),
               ),
               const SizedBox(height: 4),
-              Stack(
+              SizedBox(
+                width: 36,
+                height: 36,
+                child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  if (isConsecutive)
-                    _buildCircle(
-                      36,
-                      Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.12),
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isConsecutive
+                            ? Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.12)
+                            : Colors.transparent,
+                        width: 2,
+                      ),
                     ),
+                  ),
                   if (isFreeze)
                     MeditoIcon(
                       assetName: MeditoIcons.snow,
@@ -463,6 +474,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   else
                     _buildCircle(32, ColorConstants.moon),
                 ],
+                ),
               ),
             ],
           ),
