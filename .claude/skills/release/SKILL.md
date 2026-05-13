@@ -8,7 +8,7 @@ Cut a new release of the Medito app. Follow the steps below in order — each st
 
 ## 1. Decide the new version
 
-Version names are **date-based**: `YY.M.D` (two-digit year, unpadded month, unpadded day — e.g. today's release would be `26.4.22`). If a release already exists for today, the script appends `.N` starting at `.1` (e.g. `26.4.22.1`, then `.2`, etc.).
+Version names are **date-based**: `YY.M.D` (two-digit year, unpadded month, unpadded day — e.g. today's release would be `26.4.22`). The pubspec version is **always** the bare 3-part date — Flutter rejects 4-part versions. If a release already exists for today, the pubspec version stays unchanged and the new commit is tagged with a `-rN` suffix (e.g. `26.4.22-r2`, then `-r3`, etc.). App stores distinguish re-cuts by the build number, which the script bumps automatically.
 
 You no longer compute the version yourself or pass `$ARGUMENTS` through — `prepare_release.sh` derives it from `date` and existing git tags in step 4. If the user passed an explicit version in `$ARGUMENTS`, tell them the script now auto-derives and ask whether they actually want to override; only proceed with `--force` if they confirm.
 
@@ -18,7 +18,7 @@ Before continuing, fetch tags so the script sees what's already shipped:
 git fetch --tags
 ```
 
-If the latest existing tag is ahead of today's date (e.g. last tag is `26.5.6` but today is `26.5.2`), the script will refuse to run without `--force`. That's the drift detector — surface the message to the user verbatim and only re-run with `--force` after explicit approval. With `--force` the script keeps the latest tag's date as the base and bumps the `.N` suffix.
+If the latest existing tag is ahead of today's date (e.g. last tag is `26.5.6` but today is `26.5.2`), the script will refuse to run without `--force`. That's the drift detector — surface the message to the user verbatim and only re-run with `--force` after explicit approval. With `--force` the script keeps the latest tag's date as the base and adds a `-rN` re-cut suffix to the tag.
 
 Tell the user that the version will be derived in step 4 before doing anything destructive.
 
@@ -50,7 +50,7 @@ After that skill finishes, show the user the current `Unreleased` section (e.g. 
 
 If the user wants changes, either apply them yourself based on their feedback or let them edit the file directly and confirm when ready. Only continue once they've signed off on the notes.
 
-## 4. Run prepare_release.sh and bump the build number
+## 4. Run prepare_release.sh
 
 From the project root:
 
@@ -59,26 +59,17 @@ From the project root:
 ```
 
 This script:
-- Computes the new version from today's date and existing git tags (echoes `Computed version: <new-version>`)
+- Computes the pubspec version (always 3-part `YY.M.D`) and the git tag name (`YY.M.D` for the first cut, `YY.M.D-r2`, `-r3`, ... for same-day re-cuts) — both are echoed as `Pubspec version: <...>` and `Git tag: <...>`
 - Refuses to run if the latest tag is ahead of today's date — pass `--force` only after the user has acknowledged the drift
-- Rewrites the `version:` line in `pubspec.yaml` to `<new-version>+<existing-build>`
-- Copies the version to the clipboard
-- Moves the `Unreleased` entries in `release_notes.txt` under a new section headed with the version, leaving a fresh empty `Unreleased` at the top
+- Rewrites the `version:` line in `pubspec.yaml` to `<pubspec-version>+<bumped-build>`, incrementing the existing build integer by exactly 1
+- Copies the tag name to the clipboard
+- Moves the `Unreleased` entries in `release_notes.txt` under a new section headed with the tag name, leaving a fresh empty `Unreleased` at the top
 
-After it runs, read the new version back from `pubspec.yaml` (`grep "^version:" pubspec.yaml | sed 's/version: //' | cut -d'+' -f1`) so later steps can reference it.
+Capture both names from the script output for later steps — the **pubspec version** is what's in `pubspec.yaml` (`grep "^version:" pubspec.yaml | sed 's/version: //' | cut -d'+' -f1`), and the **tag name** is what step 7 will use. On first-of-the-day cuts they're identical; on re-cuts the tag has the `-rN` suffix.
+
+Also confirm the build number bumped (it should be exactly +1 from before — the script echoes `build <old> → <new>`).
 
 If the script prints `No unreleased notes found — nothing to do.`, stop and ask the user whether to proceed anyway — usually you want notes in a release.
-
-**Then bump the build number.** The build number (the integer after `+` in the `version:` line) must increment by exactly 1 on every release — `prepare_release.sh` preserves the existing build number, so you need to bump it yourself afterwards.
-
-```bash
-# Read current build, add 1, replace in pubspec.yaml
-OLD_BUILD=$(grep "^version:" pubspec.yaml | sed 's/version: //' | cut -d'+' -f2)
-NEW_BUILD=$((OLD_BUILD + 1))
-sed -i '' "s/^version: .*/version: <new-version>+$NEW_BUILD/" pubspec.yaml
-```
-
-Confirm the result with `grep "^version:" pubspec.yaml` before continuing. E.g. `3.6.15+302390` → `3.6.16+302391`.
 
 ## 5. Sanity-check the diff
 
@@ -93,21 +84,21 @@ Only `pubspec.yaml` and `release_notes.txt` should have changed. If anything els
 
 ## 6. Commit
 
-Stage only the two expected files and commit:
+Stage only the two expected files and commit. Use the **tag name** in the commit message so re-cuts are unambiguous:
 
 ```bash
 git add pubspec.yaml release_notes.txt
-git commit -m "chore: release <new-version>"
+git commit -m "chore: release <tag-name>"
 ```
 
 Do **not** use `git add -A` — if the pre-flight check missed something, we don't want to accidentally sweep it into the release commit.
 
 ## 7. Tag the commit
 
-Tags in this repo use bare semver (no `v` prefix — check recent tags with `git tag --sort=-creatordate | head` if unsure). Tag the commit you just made:
+Tags in this repo use bare semver / date format (no `v` prefix — check recent tags with `git tag --sort=-creatordate | head` if unsure). Tag the commit you just made with the **tag name** echoed by the script:
 
 ```bash
-git tag <new-version>
+git tag <tag-name>
 ```
 
 ## 8. Push
@@ -116,7 +107,7 @@ Push the branch and the tag to origin:
 
 ```bash
 git push
-git push origin <new-version>
+git push origin <tag-name>
 ```
 
 ## 9. Choose deploy tracks and dispatch the workflow
@@ -130,7 +121,7 @@ Then trigger the workflow against the new tag with the chosen inputs:
 
 ```bash
 gh workflow run release.yml \
-  --ref <new-version> \
+  --ref <tag-name> \
   -f android_internal=<true|false> \
   -f android_production=<true|false> \
   -f ios_testflight=<true|false> \
@@ -146,7 +137,7 @@ After dispatching, surface the run URL with `gh run list --workflow=release.yml 
 ## 10. Report back
 
 Tell the user concisely:
-- The version that was released
+- The pubspec version and tag name (mention the tag name only if it differs from the pubspec version, e.g. on a re-cut)
 - The commit SHA that was tagged
 - That the tag has been pushed
 - Which tracks were dispatched (or that no build was kicked off)

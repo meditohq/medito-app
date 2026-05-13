@@ -37,32 +37,24 @@ cmp_date() {
 
 TODAY="$(date +%y.%-m.%-d)"
 
-# Find the latest date-shaped tag by numeric tuple — sort -V handles this for
-# tags whose components are pure integers (no .N suffix mixed in), but we walk
-# every tag manually to be safe across the YY.M.D and YY.M.D.N shapes.
+# Find the most recent date-shaped tag. Only the YY.M.D portion drives the
+# drift detector — any re-cut suffix (legacy .N or current -rN) is stripped.
 LATEST_TAG=""
-LATEST_KEY=""
+LATEST_DATE=""
+LATEST_DATE_KEY=""
 while IFS= read -r tag; do
     [ -z "$tag" ] && continue
-    # Skip tags that don't match the strict YY.M.D[.N] shape (older tags
-    # sometimes carry +build or platform suffixes — we only care about clean
-    # date-shaped tags here).
-    [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || continue
-    # Build a zero-padded sort key: YYY MMM DDD NNN
-    IFS=. read -r ty tm td tn <<<"$tag"
-    [ -z "$tn" ] && tn=0
-    key=$(printf "%03d%03d%03d%03d" "$ty" "$tm" "$td" "$tn")
-    if [ -z "$LATEST_KEY" ] || [ "$key" \> "$LATEST_KEY" ]; then
-        LATEST_KEY="$key"
+    [[ "$tag" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(\.[0-9]+|-r[0-9]+)?$ ]] || continue
+    ty="${BASH_REMATCH[1]}"
+    tm="${BASH_REMATCH[2]}"
+    td="${BASH_REMATCH[3]}"
+    key=$(printf "%03d%03d%03d" "$ty" "$tm" "$td")
+    if [ -z "$LATEST_DATE_KEY" ] || [ "$key" \> "$LATEST_DATE_KEY" ]; then
+        LATEST_DATE_KEY="$key"
+        LATEST_DATE="${ty}.${tm}.${td}"
         LATEST_TAG="$tag"
     fi
 done < <(git tag --list '[0-9]*.[0-9]*.[0-9]*')
-
-if [ -n "$LATEST_TAG" ]; then
-    LATEST_DATE="$(echo "$LATEST_TAG" | cut -d. -f1-3)"
-else
-    LATEST_DATE=""
-fi
 
 # Decide BASE date for the new version.
 if [ -z "$LATEST_DATE" ]; then
@@ -73,7 +65,7 @@ else
             if [ "$FORCE" -ne 1 ]; then
                 echo "✗ Latest tag $LATEST_TAG is ahead of today ($TODAY)." >&2
                 echo "  This usually means a previous release used the wrong date." >&2
-                echo "  Rerun with --force to add a same-day suffix on top of $LATEST_DATE." >&2
+                echo "  Rerun with --force to add a re-cut suffix on top of $LATEST_DATE." >&2
                 exit 1
             fi
             BASE="$LATEST_DATE"
@@ -87,50 +79,62 @@ else
     esac
 fi
 
-# Find the next .N suffix for BASE. No suffix counts as 0; first reissue is .1.
-MAX_SUFFIX=-1
+# Count prior cuts for BASE so the new tag picks the next index:
+#   BASE itself      → cut #1
+#   BASE.N (legacy)  → cut #(N+1)   — e.g. 26.5.2.1 was the 2nd cut of 26.5.2
+#   BASE-rN          → cut #N
+# The pubspec version is always the 3-part BASE; the re-cut index lives on
+# the git tag only, since Flutter rejects 4-part pubspec versions.
+HIGHEST_CUT=0
+base_re="${BASE//./\\.}"
 while IFS= read -r tag; do
     [ -z "$tag" ] && continue
     if [ "$tag" = "$BASE" ]; then
-        n=0
+        idx=1
+    elif [[ "$tag" =~ ^${base_re}\.([0-9]+)$ ]]; then
+        idx=$(( ${BASH_REMATCH[1]} + 1 ))
+    elif [[ "$tag" =~ ^${base_re}-r([0-9]+)$ ]]; then
+        idx="${BASH_REMATCH[1]}"
     else
-        n="${tag#${BASE}.}"
-        case "$n" in
-            ''|*[!0-9]*) continue ;;
-        esac
+        continue
     fi
-    if [ "$n" -gt "$MAX_SUFFIX" ]; then
-        MAX_SUFFIX="$n"
+    if [ "$idx" -gt "$HIGHEST_CUT" ]; then
+        HIGHEST_CUT="$idx"
     fi
-done < <(git tag --list "${BASE}" "${BASE}.*")
+done < <(git tag --list "${BASE}" "${BASE}.*" "${BASE}-r*")
 
-if [ "$MAX_SUFFIX" -lt 0 ]; then
-    NEW_VERSION="$BASE"
+NEXT_CUT=$(( HIGHEST_CUT + 1 ))
+PUBSPEC_VERSION="$BASE"
+if [ "$NEXT_CUT" -eq 1 ]; then
+    TAG_NAME="$BASE"
 else
-    NEW_VERSION="${BASE}.$((MAX_SUFFIX + 1))"
+    TAG_NAME="${BASE}-r${NEXT_CUT}"
 fi
 
-if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
-    echo "✗ Computed version $NEW_VERSION does not match expected shape" >&2
+if ! [[ "$PUBSPEC_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "✗ Computed pubspec version $PUBSPEC_VERSION does not match expected shape" >&2
     exit 1
 fi
 
-if [ -n "$(git tag -l "$NEW_VERSION")" ]; then
-    echo "✗ Tag $NEW_VERSION already exists — refusing to overwrite" >&2
+if [ -n "$(git tag -l "$TAG_NAME")" ]; then
+    echo "✗ Tag $TAG_NAME already exists — refusing to overwrite" >&2
     exit 1
 fi
 
-echo "✓ Computed version: $NEW_VERSION"
+echo "✓ Pubspec version: $PUBSPEC_VERSION"
+echo "✓ Git tag:         $TAG_NAME"
 
-BUILD_NUMBER=$(grep "^version:" "$PUBSPEC" | sed 's/version: //' | cut -d'+' -f2)
-sed -i '' "s/^version: .*/version: $NEW_VERSION+$BUILD_NUMBER/" "$PUBSPEC"
-echo "✓ pubspec.yaml updated to $NEW_VERSION+$BUILD_NUMBER"
+# Bump the build number — app stores require a monotonic build integer.
+OLD_BUILD=$(grep "^version:" "$PUBSPEC" | sed 's/version: //' | cut -d'+' -f2)
+NEW_BUILD=$((OLD_BUILD + 1))
+sed -i '' "s/^version: .*/version: ${PUBSPEC_VERSION}+${NEW_BUILD}/" "$PUBSPEC"
+echo "✓ pubspec.yaml updated to ${PUBSPEC_VERSION}+${NEW_BUILD} (build ${OLD_BUILD} → ${NEW_BUILD})"
 
-VERSION="$NEW_VERSION"
+VERSION="$TAG_NAME"
 
-# Copy to clipboard
+# Copy the tag name to clipboard for use in commit messages, etc.
 echo -n "$VERSION" | pbcopy
-echo "✓ Version $VERSION copied to clipboard"
+echo "✓ Tag $VERSION copied to clipboard"
 
 # Reorganise release_notes.txt
 NOTES_FILE="$SCRIPT_DIR/release_notes.txt"
