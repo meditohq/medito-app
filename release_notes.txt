@@ -1,7 +1,7 @@
 Unreleased
 -
 
-26.5.13
+26.5.13.1
 - Onboarding notifications screen now shows a preview of what a reminder looks like
 - Fixed a small layout jump at the end of a meditation when the streak indicators appeared
 - Fixed a thin dead area at the top of some onboarding screens
