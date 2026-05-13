@@ -48,12 +48,17 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   bool _isProcessingPayment = false;
   bool _didDonate = false;
   bool _presentedLogged = false;
+  bool _dismissLogged = false;
   String _variantId = 'unknown';
+  // Captured at init/page-view so dispose() doesn't call ref.read after the
+  // widget has been torn down (Riverpod throws, the analytics event is lost).
+  String? _capturedUserId;
   Timer? _loadTimer;
 
   @override
   void initState() {
     super.initState();
+    _capturedUserId = ref.read(authRepositorySyncProvider).currentUser?.id;
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFFFAF8F5))
@@ -86,6 +91,8 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   @override
   void dispose() {
     _loadTimer?.cancel();
+    // Fallback in case the close paths didn't fire (e.g. parent route popped
+    // us programmatically). Uses captured user id — see [_capturedUserId].
     if (!_didDonate) {
       _logPaywallDismissedNoPayment();
     }
@@ -96,13 +103,15 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     if (_presentedLogged) return;
     _presentedLogged = true;
     try {
-      final userId =
-          ref.read(authRepositorySyncProvider).currentUser?.id ?? 'unknown';
+      // Anon sign-in may still be in flight at initState; refresh now that the
+      // webview has loaded a page and a couple of seconds have passed.
+      _capturedUserId ??=
+          ref.read(authRepositorySyncProvider).currentUser?.id;
       FirebaseAnalyticsService().logEvent(
         name: AnalyticsEventConstants.paywallPresented,
         parameters: {
           AnalyticsEventConstants.paramPaywallId: _paywallId,
-          AnalyticsEventConstants.paramMeditoUserId: userId,
+          AnalyticsEventConstants.paramMeditoUserId: _capturedUserId ?? 'unknown',
           AnalyticsEventConstants.paramPaywallSource:
               widget.source ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: _variantId,
@@ -114,10 +123,12 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   }
 
   void _logPaywallDismissedNoPayment() {
+    if (_dismissLogged) return;
+    _dismissLogged = true;
     try {
       FirebaseAnalyticsService().logPaywallDismissedNoPayment(
         paywallId: _paywallId,
-        userId: ref.read(authRepositorySyncProvider).currentUser?.id,
+        userId: _capturedUserId,
         paywallSource: widget.source,
         variantId: _variantId,
       );
@@ -250,6 +261,14 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
   void _handleClose() {
     AppLogger.d(_logTag, 'close requested by webpage');
+    _closePaywall();
+  }
+
+  /// Single exit path: log a dismiss (if applicable) then pop. Idempotent —
+  /// [_logPaywallDismissedNoPayment] guards against double-firing, so
+  /// [PopScope.onPopInvokedWithResult] firing after this is harmless.
+  void _closePaywall() {
+    if (!_didDonate) _logPaywallDismissedNoPayment();
     if (mounted) Navigator.of(context).pop(_didDonate);
   }
 
@@ -417,7 +436,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           ),
           const SizedBox(height: 8),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(_didDonate),
+            onPressed: _closePaywall,
             child: Text(close,
                 style: const TextStyle(color: Color(0xFFA8A49B))),
           ),
@@ -456,7 +475,14 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     );
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayStyle,
-      child: Scaffold(
+      child: PopScope<Object?>(
+        // Logs a dismiss for system-driven pops (back gesture, hardware back,
+        // parent route pop). [_closePaywall] is idempotent so app-driven exits
+        // that already logged don't double-fire.
+        onPopInvokedWithResult: (didPop, _) {
+          if (didPop && !_didDonate) _logPaywallDismissedNoPayment();
+        },
+        child: Scaffold(
           backgroundColor: const Color(0xFFFAF8F5),
           body: SafeArea(
             child: Stack(
@@ -472,6 +498,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
