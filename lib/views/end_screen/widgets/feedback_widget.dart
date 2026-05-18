@@ -129,7 +129,7 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventPostMeditationFeedback,
       parameters: {
-        'feedback_type': 'thumbs_down',
+        'type': 'thumbs_down',
       },
     );
   }

@@ -27,9 +27,6 @@
     "sessions",
     "yourPathExplainerText",
     "yourPathExplainerSwipeHint",
-    "onboardingStep1of3",
-    "onboardingStep2of3",
-    "onboardingStep3of3",
     "onboardingAttributionQuestion",
     "onboardingAttributionSubtext",
     "onboardingAttributionGoogleAd",
@@ -38,6 +35,8 @@
     "onboardingAttributionTherapist",
     "onboardingAttributionAppStore",
     "onboardingAttributionPlayStore",
-    "onboardingAttributionOther"
+    "onboardingAttributionOther",
+    "onboardingAttributionOtherLabel",
+    "onboardingAttributionOtherHint"
   ]
 }

@@ -9,7 +9,6 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
-import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/views/onboarding/onboarding_question_screen.dart';
 import 'package:medito/views/onboarding/onboarding_result_screen.dart';
 import 'package:medito/views/onboarding/battery_optimization_screen.dart';
@@ -72,33 +71,14 @@ final List<String> _images = [
       ),
     );
     setState(() => _intentIndex = index);
+    // Intent is now the final question in the onboarding flow — the previous
+    // attribution question was removed because its conversion cost outweighed
+    // the value of the data. Fire the flow-completed event here.
+    _logQuestionFlowCompleted();
     _nextPage();
   }
 
-  void _onAttributionSelected(int index) {
-    const answers = [
-      'google_ad',
-      'social_ad',
-      'friend',
-      'therapist',
-      'app_store',
-      'play_store',
-      'other',
-    ];
-    // On iOS the list omits 'play_store'; on Android it omits 'app_store'.
-    // The options list passed to the screen is platform-filtered, so the index
-    // aligns with the filtered answers list built in _buildPages.
-    final platformAnswers = Platform.isIOS
-        ? answers.where((a) => a != 'play_store').toList()
-        : answers.where((a) => a != 'app_store').toList();
-    unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.onboardingAttributionAnswered,
-        parameters: {
-          AnalyticsEventConstants.paramAnswer: platformAnswers[index],
-        },
-      ),
-    );
+  void _logQuestionFlowCompleted() {
     final state = deriveOnboardingState(
       experienceIndex: _experienceIndex ?? 0,
       intentIndex: _intentIndex ?? 0,
@@ -111,7 +91,6 @@ final List<String> _images = [
         },
       ),
     );
-    _nextPage();
   }
 
   List<Widget> _buildPages(AppLocalizations l10n) {
@@ -129,7 +108,7 @@ final List<String> _images = [
           l10n.onboardingExperienceALittle,
           l10n.onboardingExperienceRegular,
         ],
-        stepLabel: l10n.onboardingStep1of3,
+        stepLabel: l10n.onboardingStep1of2,
         onOptionSelected: _onExperienceSelected,
       ),
       OnboardingQuestionScreen(
@@ -140,28 +119,13 @@ final List<String> _images = [
           l10n.onboardingIntentHabit,
           l10n.onboardingIntentStress,
         ],
-        stepLabel: l10n.onboardingStep2of3,
+        stepLabel: l10n.onboardingStep2of2,
         onOptionSelected: _onIntentSelected,
       ),
-      OnboardingQuestionScreen(
-        question: l10n.onboardingAttributionQuestion,
-        subtext: l10n.onboardingAttributionSubtext,
-        options: [
-          l10n.onboardingAttributionGoogleAd,
-          l10n.onboardingAttributionSocialAd,
-          l10n.onboardingAttributionFriend,
-          l10n.onboardingAttributionTherapist,
-          if (Platform.isIOS)
-            l10n.onboardingAttributionAppStore
-          else
-            l10n.onboardingAttributionPlayStore,
-          l10n.onboardingAttributionOther,
-        ],
-        stepLabel: l10n.onboardingStep3of3,
-        onOptionSelected: _onAttributionSelected,
-        pinnedTrailingCount: 1,
-      ),
-      NotificationsScreen(onNext: _nextPage, intentIndex: _intentIndex),
+      // The standalone notifications screen was removed: it was skipped 73%
+      // of the time and not gated by a positive in-app experience. The
+      // post-session reminder prompt on EndScreenView covers this case after
+      // the user has actually meditated.
       OnboardingDonationScreen(onNext: _nextPage),
       if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
       if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),

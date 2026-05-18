@@ -1330,17 +1330,13 @@
   "@onboardingIntentStress": {
     "description": "Option 3 on onboarding screen 2 — user wants to manage stress, sleep, or emotions"
   },
-  "onboardingStep1of3": "1 of 3",
-  "@onboardingStep1of3": {
-    "description": "Step indicator label on onboarding question screen 1 (of 3)"
+  "onboardingStep1of2": "1 of 2",
+  "@onboardingStep1of2": {
+    "description": "Step indicator label on onboarding question screen 1 (of 2)"
   },
-  "onboardingStep2of3": "2 of 3",
-  "@onboardingStep2of3": {
-    "description": "Step indicator label on onboarding question screen 2 (of 3)"
-  },
-  "onboardingStep3of3": "3 of 3",
-  "@onboardingStep3of3": {
-    "description": "Step indicator label on onboarding attribution question screen (of 3)"
+  "onboardingStep2of2": "2 of 2",
+  "@onboardingStep2of2": {
+    "description": "Step indicator label on onboarding question screen 2 (of 2)"
   },
   "onboardingAttributionQuestion": "How did you hear about Medito?",
   "@onboardingAttributionQuestion": {
@@ -1377,6 +1373,14 @@
   "onboardingAttributionOther": "Other",
   "@onboardingAttributionOther": {
     "description": "Attribution option — user found Medito via some other means"
+  },
+  "onboardingAttributionOtherLabel": "Something else?",
+  "@onboardingAttributionOtherLabel": {
+    "description": "Label above the free-text field on the attribution question, prompting users to type their own answer"
+  },
+  "onboardingAttributionOtherHint": "Tell us where you heard about us",
+  "@onboardingAttributionOtherHint": {
+    "description": "Placeholder text inside the free-text attribution field"
   },
   "onboardingResultLearnHeading": "You're in the right place.",
   "@onboardingResultLearnHeading": {

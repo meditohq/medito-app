@@ -600,11 +600,33 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 ),
               ),
             ),
+            if (!isReminderEnabled)
+              TextButton(
+                onPressed: _snoozeReminderPrompt,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  minimumSize: const Size(0, 32),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.notNow,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6),
+                      ),
+                ),
+              ),
           ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _snoozeReminderPrompt() async {
+    await ref.read(reminderPromptDismissedProvider.notifier).snooze();
   }
 
   Future<void> _enableReminders() async {

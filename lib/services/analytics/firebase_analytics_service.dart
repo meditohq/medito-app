@@ -534,19 +534,11 @@ class FirebaseAnalyticsService {
         await _analytics.logScreenView(
           screenName: screenName,
           screenClass: screenClass ?? 'Flutter',
+          parameters: {
+            'screen_name': screenName,
+            if (parameters != null) ...parameters,
+          },
         );
-
-        // If custom parameters are provided, also log them as a custom event
-        if (parameters != null && parameters.isNotEmpty) {
-          await _analytics.logEvent(
-            name: 'screen_view_with_params',
-            parameters: {
-              'screen_name': screenName,
-              'screen_class': screenClass ?? 'Flutter',
-              ...parameters,
-            },
-          );
-        }
 
         if (kDebugMode) {
           AppLogger.d('FIREBASE_ANALYTICS',

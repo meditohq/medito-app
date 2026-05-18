@@ -2078,15 +2078,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Gestionar el estrés, el sueño o las emociones';
 
   @override
-  String get onboardingStep1of3 => '1 of 3';
-
-  @override
-  String get onboardingStep2of3 => '2 of 3';
-
-  @override
-  String get onboardingStep3of3 => '3 of 3';
-
-  @override
   String get onboardingAttributionQuestion => 'How did you hear about Medito?';
 
   @override
@@ -2114,6 +2105,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingAttributionOther => 'Other';
+
+  @override
+  String get onboardingAttributionOtherLabel => 'Something else?';
+
+  @override
+  String get onboardingAttributionOtherHint =>
+      'Tell us where you heard about us';
 
   @override
   String get onboardingResultLearnHeading => 'Estás en el lugar correcto.';

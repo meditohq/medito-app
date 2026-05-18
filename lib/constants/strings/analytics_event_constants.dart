@@ -110,13 +110,17 @@ class AnalyticsEventConstants {
   static const String onboardingTrackingPermissionDenied =
       'onboarding_tracking_permission_denied';
 
-  /// Event logged when user grants notifications permission during onboarding
+  /// Event logged when user grants notifications permission during onboarding.
+  /// Name is abbreviated ("notif" not "notifications") to stay within Firebase
+  /// Analytics' 40-character event-name limit — the longer form was silently
+  /// dropped and produced zero events in BigQuery.
   static const String onboardingNotificationsPermissionGranted =
-      'onboarding_notifications_permission_granted';
+      'onboarding_notif_permission_granted';
 
-  /// Event logged when user denies notifications permission during onboarding
+  /// Event logged when user denies notifications permission during onboarding.
+  /// See note on [onboardingNotificationsPermissionGranted].
   static const String onboardingNotificationsPermissionDenied =
-      'onboarding_notifications_permission_denied';
+      'onboarding_notif_permission_denied';
 
   /// Impression event for the onboarding notifications screen copy A/B test.
   /// Logged once per screen render with a `variant` parameter ('a' or 'b').
@@ -171,9 +175,10 @@ class AnalyticsEventConstants {
   static const String refreshTokenRetrievalFailed =
       'refresh_token_retrieval_failed';
 
-  /// Event logged when refresh token read error occurs in SharedPreferences
+  /// Event logged when refresh token read error occurs in SharedPreferences.
+  /// Name is abbreviated to stay within Firebase Analytics' 40-character limit.
   static const String refreshTokenReadErrorSharedPreferences =
-      'refresh_token_read_error_shared_preferences';
+      'refresh_token_read_err_shared_prefs';
 
   /// Event logged when refresh token read error occurs in SecureStorage
   static const String refreshTokenReadErrorSecureStorage =
@@ -231,6 +236,30 @@ class AnalyticsEventConstants {
   /// Event logged once when the donation/paywall page is viewed in the in-app webview
   static const String donationPageViewed = 'donation_page_viewed';
 
+  /// Event logged when the in-app paywall webview begins loading. Paired with
+  /// [paywallWebviewLoadFinished] / [paywallWebviewLoadFailed] so the funnel
+  /// between paywall_presented and donation_page_viewed can be split into
+  /// "loaded successfully but bounced" vs "never loaded".
+  static const String paywallWebviewLoadStarted =
+      'paywall_webview_load_started';
+
+  /// Event logged when the in-app paywall webview finishes loading. Includes
+  /// a `duration_ms` parameter measured from load start.
+  static const String paywallWebviewLoadFinished =
+      'paywall_webview_load_finished';
+
+  /// Event logged when the in-app paywall webview fails to load (main-frame
+  /// error or load timeout). Includes `duration_ms` and `reason`.
+  static const String paywallWebviewLoadFailed =
+      'paywall_webview_load_failed';
+
+  /// Parameter for elapsed load time in milliseconds (paywall webview events)
+  static const String paramDurationMs = 'duration_ms';
+
+  /// Parameter for the reason a paywall webview load failed
+  /// ('timeout' or 'main_frame_error').
+  static const String paramReason = 'reason';
+
   /// Parameter name for revenue (used by Meta)
   static const String paramRevenue = 'revenue';
 
@@ -286,6 +315,10 @@ class AnalyticsEventConstants {
   /// Parameter for the selected answer in onboarding question events
   static const String paramAnswer = 'answer';
 
+  /// Parameter carrying the free-text response from the onboarding attribution
+  /// question when the user picks the "other" path and types their own answer.
+  static const String paramOtherText = 'other_text';
+
   /// Event logged when the new onboarding question flow is completed
   /// Parameter: paramResultState — 'state_a', 'state_b', or 'state_c'
   static const String onboardingQuestionFlowCompleted =
@@ -315,6 +348,20 @@ class AnalyticsEventConstants {
 
   /// Source value for notifications enabled from the settings screen
   static const String sourceSettings = 'settings';
+
+  // Shortcut events
+  /// Event logged when the user taps a shortcut chip on the home screen.
+  /// Parameters: paramShortcutId, paramShortcutTitle, paramShortcutType
+  static const String shortcutTapped = 'shortcut_tapped';
+
+  /// Parameter name for the shortcut id in shortcut_tapped events
+  static const String paramShortcutId = 'shortcut_id';
+
+  /// Parameter name for the shortcut human-readable title
+  static const String paramShortcutTitle = 'shortcut_title';
+
+  /// Parameter name for the shortcut destination type (e.g. pack, track, link)
+  static const String paramShortcutType = 'shortcut_type';
 
   // Favourite events
   /// Event logged when user adds a track to favourites from the track screen

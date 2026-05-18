@@ -64,7 +64,7 @@ PODS:
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
-  - FirebaseCore (12.12.0):
+  - FirebaseCore (12.12.1):
     - FirebaseCoreInternal (~> 12.12.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Logger (~> 8.1)
@@ -72,7 +72,7 @@ PODS:
     - FirebaseCore (~> 12.12.0)
   - FirebaseCoreInternal (12.12.0):
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
-  - FirebaseCrashlytics (12.12.0):
+  - FirebaseCrashlytics (12.12.1):
     - FirebaseCore (~> 12.12.0)
     - FirebaseInstallations (~> 12.12.0)
     - FirebaseRemoteConfigInterop (~> 12.12.0)
@@ -403,10 +403,10 @@ SPEC CHECKSUMS:
   firebase_crashlytics: 95e8d8dbbb109bd002d423d250b95088204365f8
   firebase_messaging: 15a0e132bcef6c0e19052222d9401174903bed42
   FirebaseAnalytics: db0dca7e35a503ddf6869e457f4926dc35afe216
-  FirebaseCore: f28af0427998cd53f8d4826bce17260e33224053
+  FirebaseCore: 86241206e656f5c80c995e370e6c975913b9b284
   FirebaseCoreExtension: ff6fd42eb5287e71d3e160450de6509733d9ead7
   FirebaseCoreInternal: 7c12fc3011d889085e765e317d7b9fd1cef97af9
-  FirebaseCrashlytics: 2a38be892de8417a06e929a13fec0971afcb4dfc
+  FirebaseCrashlytics: 03f4e20d0c9b7fd6338cb9066f4bfb69d3f42fd0
   FirebaseInstallations: 4e6e162aa4abaaeeeb01dd00179dfc5ad9c2194e
   FirebaseMessaging: 341004946fa7ffc741344b20f1b667514fc93e31
   FirebaseRemoteConfigInterop: 23996ab7397494722df4fdd1fd398024389d5da8

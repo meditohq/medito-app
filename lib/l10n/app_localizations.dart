@@ -3722,13 +3722,13 @@ abstract class AppLocalizations {
   /// **'Swipe left to skip.'**
   String get yourPathExplainerSwipeHint;
 
-  /// Step indicator label on onboarding question screen 1
+  /// Step indicator label on onboarding question screen 1 (of 2)
   ///
   /// In en, this message translates to:
   /// **'1 of 2'**
   String get onboardingStep1of2;
 
-  /// Step indicator label on onboarding question screen 2
+  /// Step indicator label on onboarding question screen 2 (of 2)
   ///
   /// In en, this message translates to:
   /// **'2 of 2'**
@@ -3794,24 +3794,6 @@ abstract class AppLocalizations {
   /// **'Manage stress, sleep, or emotions'**
   String get onboardingIntentStress;
 
-  /// Step indicator label on onboarding question screen 1 (of 3)
-  ///
-  /// In en, this message translates to:
-  /// **'1 of 3'**
-  String get onboardingStep1of3;
-
-  /// Step indicator label on onboarding question screen 2 (of 3)
-  ///
-  /// In en, this message translates to:
-  /// **'2 of 3'**
-  String get onboardingStep2of3;
-
-  /// Step indicator label on onboarding attribution question screen (of 3)
-  ///
-  /// In en, this message translates to:
-  /// **'3 of 3'**
-  String get onboardingStep3of3;
-
   /// Question on onboarding attribution screen — asking how the user discovered Medito
   ///
   /// In en, this message translates to:
@@ -3865,6 +3847,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get onboardingAttributionOther;
+
+  /// Label above the free-text field on the attribution question, prompting users to type their own answer
+  ///
+  /// In en, this message translates to:
+  /// **'Something else?'**
+  String get onboardingAttributionOtherLabel;
+
+  /// Placeholder text inside the free-text attribution field
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us where you heard about us'**
+  String get onboardingAttributionOtherHint;
 
   /// Heading on the onboarding result screen for users who are new or want to learn (State A)
   ///

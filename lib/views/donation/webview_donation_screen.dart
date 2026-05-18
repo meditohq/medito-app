@@ -49,12 +49,14 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   bool _didDonate = false;
   bool _presentedLogged = false;
   bool _dismissLogged = false;
+  bool _loadOutcomeLogged = false;
   String _variantId = 'unknown';
   String _experimentName = 'unknown';
   // Captured at init/page-view so dispose() doesn't call ref.read after the
   // widget has been torn down (Riverpod throws, the analytics event is lost).
   String? _capturedUserId;
   Timer? _loadTimer;
+  DateTime? _loadStartedAt;
 
   @override
   void initState() {
@@ -68,6 +70,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         NavigationDelegate(
           onPageFinished: (_) {
             _loadTimer?.cancel();
+            _logWebviewLoadFinished();
             if (mounted) {
               setState(() {
                 _isLoading = false;
@@ -81,6 +84,10 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
             // Only fail closed for the main frame; subresource errors (icons,
             // analytics beacons, etc.) shouldn't tear down the whole paywall.
             if (error.isForMainFrame == true && _isLoading) {
+              _logWebviewLoadFailed(
+                'main_frame_error',
+                detail: error.description,
+              );
               _showLoadError();
             }
           },
@@ -142,6 +149,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
   void _startLoad() {
     _loadTimer?.cancel();
+    _loadOutcomeLogged = false;
+    _loadStartedAt = DateTime.now();
+    _logWebviewLoadStarted();
     setState(() {
       _isLoading = true;
       _hasLoadError = false;
@@ -149,9 +159,69 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     _loadTimer = Timer(_loadTimeout, () {
       if (!mounted || !_isLoading) return;
       AppLogger.w(_logTag, 'Paywall load timed out after ${_loadTimeout.inSeconds}s');
+      _logWebviewLoadFailed('timeout');
       _showLoadError();
     });
     unawaited(_loadPaywall());
+  }
+
+  Map<String, Object> _baseLoadParams({int? durationMs}) {
+    return <String, Object>{
+      AnalyticsEventConstants.paramPaywallId: _paywallId,
+      AnalyticsEventConstants.paramPaywallSource: widget.source ?? 'unknown',
+      AnalyticsEventConstants.paramMeditoUserId: _capturedUserId ?? 'unknown',
+      AnalyticsEventConstants.paramDurationMs: ?durationMs,
+    };
+  }
+
+  void _logWebviewLoadStarted() {
+    try {
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.paywallWebviewLoadStarted,
+        parameters: _baseLoadParams(),
+      );
+    } catch (e) {
+      AppLogger.w(_logTag, 'Failed to log webview load started: $e');
+    }
+  }
+
+  void _logWebviewLoadFinished() {
+    if (_loadOutcomeLogged) return;
+    _loadOutcomeLogged = true;
+    final duration = _loadStartedAt == null
+        ? 0
+        : DateTime.now().difference(_loadStartedAt!).inMilliseconds;
+    try {
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.paywallWebviewLoadFinished,
+        parameters: _baseLoadParams(durationMs: duration),
+      );
+    } catch (e) {
+      AppLogger.w(_logTag, 'Failed to log webview load finished: $e');
+    }
+  }
+
+  void _logWebviewLoadFailed(String reason, {String? detail}) {
+    if (_loadOutcomeLogged) return;
+    _loadOutcomeLogged = true;
+    final duration = _loadStartedAt == null
+        ? 0
+        : DateTime.now().difference(_loadStartedAt!).inMilliseconds;
+    final params = _baseLoadParams(durationMs: duration);
+    params[AnalyticsEventConstants.paramReason] = reason;
+    if (detail != null && detail.isNotEmpty) {
+      // Truncated so we stay well under Firebase Analytics' 100-char param
+      // value limit — short enough to fit alongside the other params too.
+      params['detail'] = detail.length > 80 ? detail.substring(0, 80) : detail;
+    }
+    try {
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.paywallWebviewLoadFailed,
+        parameters: params,
+      );
+    } catch (e) {
+      AppLogger.w(_logTag, 'Failed to log webview load failed: $e');
+    }
   }
 
   void _showLoadError() {
@@ -502,14 +572,133 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
             child: Stack(
               children: [
                 WebViewWidget(controller: _controller),
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator()),
+                // Flutter-rendered skeleton shown over the cream webview
+                // background until onPageFinished fires. Fades out once the
+                // real HTML is ready so users never see a blank screen.
+                IgnorePointer(
+                  ignoring: !_isLoading,
+                  child: AnimatedOpacity(
+                    opacity: _isLoading ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    child: const _PaywallSkeleton(),
+                  ),
+                ),
                 if (_hasLoadError) _buildErrorOverlay(),
                 // Close affordance lives in the webpage itself (delayed fade-in
                 // so users don't dismiss before they've read the page). The JS
                 // bridge posts a `close` message which _handleClose() pops.
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Static Flutter-rendered preview of the paywall page shown while the
+/// webview HTML is still loading. Mirrors the rough layout of paywall/index.astro
+/// so the transition from skeleton → real page is smooth. Once the page is
+/// rendered, this widget fades out and the webview's own in-page shimmer
+/// (on the price ladder) takes over until config arrives.
+class _PaywallSkeleton extends StatefulWidget {
+  const _PaywallSkeleton();
+
+  @override
+  State<_PaywallSkeleton> createState() => _PaywallSkeletonState();
+}
+
+class _PaywallSkeletonState extends State<_PaywallSkeleton>
+    with SingleTickerProviderStateMixin {
+  static const _bg = Color(0xFFFAF8F5);
+  static const _block = Color(0xFFF0ECE5);
+  static const _blockHighlight = Color(0xFFE7E1D6);
+
+  late final AnimationController _shimmer;
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmer = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _shimmer.dispose();
+    super.dispose();
+  }
+
+  Widget _bar({required double width, required double height}) {
+    return AnimatedBuilder(
+      animation: _shimmer,
+      builder: (_, _) {
+        final t = _shimmer.value;
+        return Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment(-1 + 2 * t, 0),
+              end: Alignment(-0.4 + 2 * t, 0),
+              colors: const [_block, _blockHighlight, _block],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: _bg,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 24),
+              _bar(width: 140, height: 14),
+              const SizedBox(height: 28),
+              _bar(width: double.infinity, height: 32),
+              const SizedBox(height: 12),
+              _bar(width: 240, height: 32),
+              const SizedBox(height: 24),
+              _bar(width: 280, height: 12),
+              const SizedBox(height: 8),
+              _bar(width: 220, height: 12),
+              const SizedBox(height: 32),
+              _bar(width: double.infinity, height: 44),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(child: _bar(width: 0, height: 52)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _bar(width: 0, height: 52)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _bar(width: 0, height: 52)),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: _bar(width: 0, height: 52)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _bar(width: 0, height: 52)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _bar(width: 0, height: 52)),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _bar(width: double.infinity, height: 48),
+              const SizedBox(height: 32),
+              _bar(width: double.infinity, height: 56),
+            ],
           ),
         ),
       ),

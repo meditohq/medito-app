@@ -19,6 +19,9 @@ class OnboardingQuestionScreen extends StatefulWidget {
     required this.onOptionSelected,
     this.selectionDelay = const Duration(milliseconds: 200),
     this.pinnedTrailingCount = 0,
+    this.freeTextHint,
+    this.freeTextLabel,
+    this.onFreeTextSubmitted,
   });
 
   final String question;
@@ -37,6 +40,18 @@ class OnboardingQuestionScreen extends StatefulWidget {
   /// shuffle). Useful for items like "Other" that should always read last.
   final int pinnedTrailingCount;
 
+  /// Optional placeholder for a free-text input rendered below the chip
+  /// options. When non-null together with [onFreeTextSubmitted], the input is
+  /// shown as a final answer path — users either tap a chip or type their own
+  /// response.
+  final String? freeTextHint;
+
+  /// Optional label rendered above the free-text input (e.g. "Something else?").
+  final String? freeTextLabel;
+
+  /// Called with the trimmed free-text value when the user submits the field.
+  final void Function(String text)? onFreeTextSubmitted;
+
   @override
   State<OnboardingQuestionScreen> createState() =>
       _OnboardingQuestionScreenState();
@@ -44,7 +59,10 @@ class OnboardingQuestionScreen extends StatefulWidget {
 
 class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
   int? _selectedIndex;
+  bool _submittedFreeText = false;
   late final List<int> _displayOrder;
+  late final TextEditingController _freeTextController;
+  late final FocusNode _freeTextFocusNode;
 
   @override
   void initState() {
@@ -58,13 +76,34 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
     }
     final tail = List<int>.generate(pinned, (i) => shuffleCount + i);
     _displayOrder = [...shuffled, ...tail];
+    _freeTextController = TextEditingController();
+    _freeTextFocusNode = FocusNode();
+    _freeTextController.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _freeTextController.dispose();
+    _freeTextFocusNode.dispose();
+    super.dispose();
   }
 
   Future<void> _onTap(int index) async {
-    if (_selectedIndex != null) return; // already selected
+    if (_selectedIndex != null || _submittedFreeText) return;
     setState(() => _selectedIndex = index);
     await Future<void>.delayed(widget.selectionDelay);
     widget.onOptionSelected(index);
+  }
+
+  void _onFreeTextSubmit() {
+    if (_selectedIndex != null || _submittedFreeText) return;
+    final text = _freeTextController.text.trim();
+    if (text.isEmpty) return;
+    setState(() => _submittedFreeText = true);
+    _freeTextFocusNode.unfocus();
+    widget.onFreeTextSubmitted?.call(text);
   }
 
   @override
@@ -111,6 +150,49 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
               ),
             );
           }),
+          if (widget.freeTextHint != null && widget.onFreeTextSubmitted != null)
+            _buildFreeTextField(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFreeTextField(ThemeData theme) {
+    final disabled = _selectedIndex != null || _submittedFreeText;
+    final hasText = _freeTextController.text.trim().isNotEmpty;
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.freeTextLabel != null) ...[
+            Text(
+              widget.freeTextLabel!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(160),
+                letterSpacing: 0.4,
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+          TextField(
+            controller: _freeTextController,
+            focusNode: _freeTextFocusNode,
+            enabled: !disabled,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _onFreeTextSubmit(),
+            maxLength: 80,
+            decoration: InputDecoration(
+              hintText: widget.freeTextHint,
+              counterText: '',
+              suffixIcon: hasText && !disabled
+                  ? IconButton(
+                      icon: const Icon(Icons.arrow_forward_rounded),
+                      onPressed: _onFreeTextSubmit,
+                    )
+                  : null,
+            ),
+          ),
         ],
       ),
     );

@@ -43,6 +43,9 @@ class SharedPreferenceConstants {
   // Smart Reminders
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
   static const String reminderPromptDismissedForever = 'reminder_prompt_dismissed_forever';
+  /// Epoch millis until which the post-session reminder prompt is suppressed.
+  /// Set by a soft dismiss ("Not now") instead of the permanent dismiss.
+  static const String reminderPromptSnoozeUntil = 'reminder_prompt_snooze_until';
 
   // Zen Mode
   static const String zenModeEnabled = 'zen_mode_enabled';
