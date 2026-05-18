@@ -23,43 +23,39 @@ for arg in "$@"; do
     esac
 done
 
-# Compare two YY.M.D tuples. Echoes -1 / 0 / 1 for a<b / a==b / a>b.
+# Compare two YYMM.D tuples. Echoes -1 / 0 / 1 for a<b / a==b / a>b.
 cmp_date() {
     local a="$1" b="$2"
     local IFS=.
     local -a aa=($a) bb=($b)
-    for i in 0 1 2; do
+    for i in 0 1; do
         if [ "${aa[$i]}" -lt "${bb[$i]}" ]; then echo -1; return; fi
         if [ "${aa[$i]}" -gt "${bb[$i]}" ]; then echo 1; return; fi
     done
     echo 0
 }
 
-TODAY="$(date +%y.%-m.%-d)"
+TODAY="$(date +%y%m.%-d)"
 
-# Find the latest date-shaped tag by numeric tuple — sort -V handles this for
-# tags whose components are pure integers (no .N suffix mixed in), but we walk
-# every tag manually to be safe across the YY.M.D and YY.M.D.N shapes.
+# Find the latest date-shaped tag by numeric tuple. Tags use the YYMM.D[.N]
+# shape; older YY.M.D tags from before the format change are ignored.
 LATEST_TAG=""
 LATEST_KEY=""
 while IFS= read -r tag; do
     [ -z "$tag" ] && continue
-    # Skip tags that don't match the strict YY.M.D[.N] shape (older tags
-    # sometimes carry +build or platform suffixes — we only care about clean
-    # date-shaped tags here).
-    [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || continue
-    # Build a zero-padded sort key: YYY MMM DDD NNN
-    IFS=. read -r ty tm td tn <<<"$tag"
+    [[ "$tag" =~ ^[0-9]{4}\.[0-9]+(\.[0-9]+)?$ ]] || continue
+    # Build a zero-padded sort key: YYYY DDD NNN
+    IFS=. read -r tym td tn <<<"$tag"
     [ -z "$tn" ] && tn=0
-    key=$(printf "%03d%03d%03d%03d" "$ty" "$tm" "$td" "$tn")
+    key=$(printf "%04d%03d%03d" "$tym" "$td" "$tn")
     if [ -z "$LATEST_KEY" ] || [ "$key" \> "$LATEST_KEY" ]; then
         LATEST_KEY="$key"
         LATEST_TAG="$tag"
     fi
-done < <(git tag --list '[0-9]*.[0-9]*.[0-9]*')
+done < <(git tag --list '[0-9][0-9][0-9][0-9].[0-9]*')
 
 if [ -n "$LATEST_TAG" ]; then
-    LATEST_DATE="$(echo "$LATEST_TAG" | cut -d. -f1-3)"
+    LATEST_DATE="$(echo "$LATEST_TAG" | cut -d. -f1-2)"
 else
     LATEST_DATE=""
 fi
@@ -110,7 +106,7 @@ else
     NEW_VERSION="${BASE}.$((MAX_SUFFIX + 1))"
 fi
 
-if ! [[ "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+if ! [[ "$NEW_VERSION" =~ ^[0-9]{4}\.[0-9]+(\.[0-9]+)?$ ]]; then
     echo "✗ Computed version $NEW_VERSION does not match expected shape" >&2
     exit 1
 fi

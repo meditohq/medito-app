@@ -8,7 +8,7 @@ Cut a new release of the Medito app. Follow the steps below in order — each st
 
 ## 1. Decide the new version
 
-Version names are **date-based**: `YY.M.D` (two-digit year, unpadded month, unpadded day — e.g. today's release would be `26.4.22`). If a release already exists for today, the script appends `.N` starting at `.1` (e.g. `26.4.22.1`, then `.2`, etc.).
+Version names are **date-based**: `YYMM.D` (two-digit year + zero-padded month as one component, then unpadded day — e.g. today's release would be `2604.22`). If a release already exists for today, the script appends `.N` starting at `.1` (e.g. `2604.22.1`, then `.2`, etc.). The three-component cap matters: app stores reject 4+ part versions.
 
 You no longer compute the version yourself or pass `$ARGUMENTS` through — `prepare_release.sh` derives it from `date` and existing git tags in step 4. If the user passed an explicit version in `$ARGUMENTS`, tell them the script now auto-derives and ask whether they actually want to override; only proceed with `--force` if they confirm.
 
@@ -18,7 +18,7 @@ Before continuing, fetch tags so the script sees what's already shipped:
 git fetch --tags
 ```
 
-If the latest existing tag is ahead of today's date (e.g. last tag is `26.5.6` but today is `26.5.2`), the script will refuse to run without `--force`. That's the drift detector — surface the message to the user verbatim and only re-run with `--force` after explicit approval. With `--force` the script keeps the latest tag's date as the base and bumps the `.N` suffix.
+If the latest existing tag is ahead of today's date (e.g. last tag is `2605.6` but today is `2605.2`), the script will refuse to run without `--force`. That's the drift detector — surface the message to the user verbatim and only re-run with `--force` after explicit approval. With `--force` the script keeps the latest tag's date as the base and bumps the `.N` suffix.
 
 Tell the user that the version will be derived in step 4 before doing anything destructive.
 
