@@ -88,7 +88,7 @@ platform :android do
     unless notes.empty?
       require 'fileutils'
       ['en-US', 'en-GB', 'es-ES'].each do |locale|
-        dir = "metadata/android/#{locale}/changelogs"
+        dir = "fastlane/metadata/android/#{locale}/changelogs"
         FileUtils.mkdir_p(dir)
         File.write("#{dir}/default.txt", notes)
       end
