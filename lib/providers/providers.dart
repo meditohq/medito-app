@@ -10,6 +10,7 @@ export 'shared_preference/shared_preference_provider.dart';
 export 'error_widget/medito_error_widget_provider.dart';
 export 'explore/search_provider.dart';
 export 'explore/track_search_provider.dart';
+export 'day_boundary_offset_provider.dart';
 export 'dnd_provider.dart';
 export 'settings/reminder_prompt_provider.dart';
 export 'settings/settings_providers.dart';

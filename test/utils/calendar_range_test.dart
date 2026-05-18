@@ -284,6 +284,96 @@ void main() {
     });
   });
 
+  group('projectStreak with dayBoundaryOffset', () {
+    // +4h offset: a session at 02:00 belongs to the previous calendar day.
+    const offset = Duration(hours: 4);
+
+    test('+4h offset: "now" at 02:00 means today is still yesterday', () {
+      // It's 02:00 on April 28; the user's day-clock still says April 27.
+      // The previous session was at 21:00 on April 26 (= user-day April 26).
+      // Expected streak: today (Apr 27) covered by the 21:00 session on
+      // Apr 26? No — 21:00 Apr 26 with +4h offset is Apr 26 user-day.
+      // Apr 27 user-day has no activity yet, but Apr 26 (yesterday from the
+      // +4h-shifted today=Apr 27) does → streak = 1.
+      final now = DateTime(2026, 4, 28, 2, 0);
+      final activity = [DateTime(2026, 4, 26, 21, 0)];
+      expect(
+        projectStreak(activity, now, dayBoundaryOffset: offset),
+        1,
+      );
+    });
+
+    test('+4h offset: late-night session bridges into today\'s streak', () {
+      // "Now" is Apr 28 at 14:00 → user-day Apr 28.
+      // Activity: Apr 28 01:30 (user-day Apr 27) and Apr 27 23:00 (user-day
+      // Apr 27 — same user-day as above, dedup) and Apr 26 22:00 (user-day
+      // Apr 26). No real Apr 28 session yet, but Apr 27 + Apr 26 form a
+      // 2-day streak ending yesterday → streak = 2.
+      final now = DateTime(2026, 4, 28, 14, 0);
+      final activity = [
+        DateTime(2026, 4, 28, 1, 30),
+        DateTime(2026, 4, 27, 23, 0),
+        DateTime(2026, 4, 26, 22, 0),
+      ];
+      expect(
+        projectStreak(activity, now, dayBoundaryOffset: offset),
+        2,
+      );
+    });
+
+    test('+4h offset: three-day streak counting today', () {
+      // "Now" is Apr 28 14:00 → user-day Apr 28.
+      // Activity at 02:00 on each of Apr 28, 27, 26 → user-days Apr 27, 26, 25.
+      // Plus a session at 10:00 today (Apr 28 user-day) → 4-day streak.
+      final now = DateTime(2026, 4, 28, 14, 0);
+      final activity = [
+        DateTime(2026, 4, 28, 10, 0),
+        DateTime(2026, 4, 28, 2, 0),
+        DateTime(2026, 4, 27, 2, 0),
+        DateTime(2026, 4, 26, 2, 0),
+      ];
+      expect(
+        projectStreak(activity, now, dayBoundaryOffset: offset),
+        4,
+      );
+    });
+
+    test('default offset preserves existing behaviour', () {
+      // With offset=0 a 02:00 session falls on its own calendar day,
+      // so today's streak from that session alone is 1.
+      final today = DateTime(2026, 4, 28);
+      final activity = [DateTime(2026, 4, 28, 2, 0)];
+      expect(projectStreak(activity, today), 1);
+      expect(
+        projectStreak(activity, today, dayBoundaryOffset: Duration.zero),
+        1,
+      );
+    });
+
+    test('-2h offset: late-evening session counts as next day', () {
+      // -2h offset means user-day starts at 22:00 the prior evening.
+      // "Now" is Apr 28 09:00 → user-day Apr 28.
+      // Activity at Apr 27 23:00 → user-day Apr 28 (same as now).
+      // Activity at Apr 27 21:00 → user-day Apr 27.
+      // Activity at Apr 26 23:00 → user-day Apr 27 (dedup with above).
+      // So user-days hit: Apr 28, Apr 27 → streak = 2.
+      final now = DateTime(2026, 4, 28, 9, 0);
+      final activity = [
+        DateTime(2026, 4, 27, 23, 0),
+        DateTime(2026, 4, 27, 21, 0),
+        DateTime(2026, 4, 26, 23, 0),
+      ];
+      expect(
+        projectStreak(
+          activity,
+          now,
+          dayBoundaryOffset: const Duration(hours: -2),
+        ),
+        2,
+      );
+    });
+  });
+
   group('expandRange', () {
     final apr1 = DateTime(2026, 4, 1);
     final apr5 = DateTime(2026, 4, 5);

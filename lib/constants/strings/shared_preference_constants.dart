@@ -21,6 +21,10 @@ class SharedPreferenceConstants {
   static const String statsLastSyncedAt = 'stats_last_synced_at';
   static const String streakCircleDisplayPreference =
       'streak_circle_display_preference';
+  // Whole-hour offset (0..6) controlling when a new "day" begins for streak
+  // calculation. Default 0 = midnight; e.g. 4 means a session at 02:00 still
+  // counts toward the previous day. Stored as int; absent → default.
+  static const String dayBoundaryOffsetHours = 'day_boundary_offset_hours';
 
   static const String homeWidgetOrder = 'homeWidgetOrder';
 

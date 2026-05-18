@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/utils/audio_completion_tracker.dart';
 import 'package:medito/services/home_widget_service.dart';
+import 'package:medito/utils/day_boundary.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 
@@ -45,6 +46,7 @@ class StatsManager {
   DateTime? _testDate;
   DateTime? _lastSyncedAt;
   bool _dirty = false;
+  Duration _dayBoundaryOffset = Duration.zero;
 
   StatsManager._internal();
 
@@ -81,6 +83,7 @@ class StatsManager {
         prefs: _prefs,
       );
       await _loadLastSyncedAt(_prefs);
+      _loadDayBoundaryOffset(_prefs);
       _isInitialized = true;
       _initCompleter!.complete();
     } catch (e) {
@@ -376,8 +379,9 @@ class StatsManager {
   }
 
   LocalAllStats calculateStreak(LocalAllStats allStats) {
-    var now = _getCurrentDate();
-    var today = DateTime(now.year, now.month, now.day);
+    final offset = _dayBoundaryOffset;
+    final now = _getCurrentDate();
+    final today = dayOf(now, offset);
     var longestStreak = allStats.streakLongest;
 
     // Any day with an entry (real session, freeze audio entry, or legacy
@@ -388,14 +392,14 @@ class StatsManager {
 
     for (final entry in allStats.audioCompleted ?? []) {
       final date = DateTime.fromMillisecondsSinceEpoch(entry.timestamp);
-      final day = DateTime(date.year, date.month, date.day);
+      final day = dayOf(date, offset);
       if (day.isAfter(today)) continue;
       activityDates.add(day);
     }
 
     for (final ts in allStats.freezeUsageDates) {
       final date = DateTime.fromMillisecondsSinceEpoch(ts);
-      final day = DateTime(date.year, date.month, date.day);
+      final day = dayOf(date, offset);
       if (!day.isAfter(today)) activityDates.add(day);
     }
 
@@ -817,6 +821,37 @@ class StatsManager {
     _testDate = date;
   }
 
+  /// Sets the day-boundary offset used by `calculateStreak` and persists it.
+  /// `Duration.zero` (default) preserves legacy midnight behaviour.
+  Future<void> setDayBoundaryOffset(Duration offset) async {
+    _dayBoundaryOffset = offset;
+    try {
+      await _prefs.setInt(
+        SharedPreferenceConstants.dayBoundaryOffsetHours,
+        offset.inHours,
+      );
+    } catch (e) {
+      AppLogger.e('STATS_MANAGER', 'Failed to persist day boundary offset', e);
+    }
+  }
+
+  void _loadDayBoundaryOffset(SharedPreferences prefs) {
+    try {
+      final hours =
+          prefs.getInt(SharedPreferenceConstants.dayBoundaryOffsetHours);
+      if (hours != null) _dayBoundaryOffset = Duration(hours: hours);
+    } catch (e) {
+      _dayBoundaryOffset = Duration.zero;
+    }
+  }
+
+  Duration get dayBoundaryOffset => _dayBoundaryOffset;
+
+  @visibleForTesting
+  void setDayBoundaryOffsetForTesting(Duration offset) {
+    _dayBoundaryOffset = offset;
+  }
+
   @visibleForTesting
   void resetForTesting() {
     _allStats = null;
@@ -825,6 +860,7 @@ class StatsManager {
     _testDate = null;
     _lastSyncedAt = null;
     _dirty = false;
+    _dayBoundaryOffset = Duration.zero;
   }
 
   @visibleForTesting
@@ -853,6 +889,7 @@ class StatsManager {
           statsService ??
           StatsService(httpApiService: HttpApiService(), prefs: _prefs);
       await _loadLastSyncedAt(_prefs);
+      _loadDayBoundaryOffset(_prefs);
       _isInitialized = true;
     }
   }

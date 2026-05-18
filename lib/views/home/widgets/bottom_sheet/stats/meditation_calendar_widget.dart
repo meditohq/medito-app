@@ -5,6 +5,7 @@ import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
+import 'package:medito/providers/day_boundary_offset_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/calendar_range.dart';
@@ -258,8 +259,43 @@ class _MeditationCalendarWidgetState
     });
   }
 
-  int _projectedStreak(Set<DateTime> activityDates) =>
-      projectStreak(activityDates, DateTime.now());
+  /// Raw session timestamps (not midnight-flattened) so the streak
+  /// projection buckets them under the active day-boundary offset the same
+  /// way [StatsManager.calculateStreak] will.
+  List<DateTime> _getMeditationTimestamps(LocalAllStats stats) {
+    final out = <DateTime>[];
+    for (final audio in stats.audioCompleted ?? const <LocalAudioCompleted>[]) {
+      if (isFreezeSession(audio)) continue;
+      out.add(DateTime.fromMillisecondsSinceEpoch(audio.timestamp));
+    }
+    return out;
+  }
+
+  List<DateTime> _getFreezeTimestamps(LocalAllStats stats) {
+    final out = <DateTime>[];
+    for (final ts in stats.freezeUsageDates) {
+      out.add(DateTime.fromMillisecondsSinceEpoch(ts));
+    }
+    for (final audio in stats.audioCompleted ?? const <LocalAudioCompleted>[]) {
+      if (!isFreezeSession(audio)) continue;
+      out.add(DateTime.fromMillisecondsSinceEpoch(audio.timestamp));
+    }
+    return out;
+  }
+
+  /// Shifts a calendar-picked midnight to the same hour the bulk-add helper
+  /// will actually save it at, so the offset bucketing agrees.
+  DateTime _anchorBulkAddDate(DateTime d) =>
+      DateTime(d.year, d.month, d.day, manualSessionAnchorHour);
+
+  int _projectedStreak(Iterable<DateTime> activityDates) {
+    final hours = ref.read(dayBoundaryOffsetProvider).value ?? 0;
+    return projectStreak(
+      activityDates,
+      DateTime.now(),
+      dayBoundaryOffset: Duration(hours: hours),
+    );
+  }
 
   Future<void> _showBulkAddDialog(BuildContext context) async {
     if (!_hasCompleteRange) return;
@@ -273,7 +309,11 @@ class _MeditationCalendarWidgetState
       final start = DateTime(d.year, d.month, d.day);
       return !existing.contains(start);
     }).toList();
-    final projected = _projectedStreak({...existing, ...dates});
+    final projected = _projectedStreak([
+      ..._getMeditationTimestamps(widget.stats),
+      ..._getFreezeTimestamps(widget.stats),
+      ...dates.map(_anchorBulkAddDate),
+    ]);
 
     final minutes = await showDialog<int>(
       context: context,
@@ -367,11 +407,11 @@ class _MeditationCalendarWidgetState
           }).length
         : 0;
     final rangeProjectedStreak = _hasCompleteRange
-        ? _projectedStreak({
-            ...meditationDates,
-            ...freezeDates,
-            ...rangeDays,
-          })
+        ? _projectedStreak([
+            ..._getMeditationTimestamps(widget.stats),
+            ..._getFreezeTimestamps(widget.stats),
+            ...rangeDays.map(_anchorBulkAddDate),
+          ])
         : widget.stats.streakCurrent;
 
     return Column(

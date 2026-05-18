@@ -1,19 +1,24 @@
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/utils/day_boundary.dart';
 
 class AudioCompletionTracker {
-  /// Checks if a track was started before midnight but completed after midnight
-  /// Returns true if the track crossed midnight
+  /// Checks if a track crossed the user-perceived day boundary.
+  ///
+  /// With `dayBoundaryOffset = Duration.zero` (default) this is the legacy
+  /// midnight check. A positive offset (e.g. +4h) shifts the boundary later,
+  /// so a late-night session no longer counts as "crossing".
   static bool checkTrackCrossedMidnight({
     required int endTimestamp,
     required int duration,
+    Duration dayBoundaryOffset = Duration.zero,
   }) {
     var endTime = DateTime.fromMillisecondsSinceEpoch(endTimestamp);
     var startTime =
         DateTime.fromMillisecondsSinceEpoch(endTimestamp - duration);
 
-    var startDay = DateTime(startTime.year, startTime.month, startTime.day);
-    var endDay = DateTime(endTime.year, endTime.month, endTime.day);
+    final startDay = dayOf(startTime, dayBoundaryOffset);
+    final endDay = dayOf(endTime, dayBoundaryOffset);
 
     return startDay.isBefore(endDay);
   }

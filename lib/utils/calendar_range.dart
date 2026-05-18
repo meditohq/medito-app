@@ -5,6 +5,8 @@
 /// expansion) can be unit-tested directly.
 library;
 
+import 'package:medito/utils/day_boundary.dart';
+
 /// Returns midnight in the local timezone for the given day.
 ///
 /// Hand-constructing `DateTime(y, m, d)` rather than calling
@@ -39,15 +41,19 @@ List<DateTime> enumerateDays(DateTime start, DateTime end) {
 /// `activityDates` may contain any `DateTime` values; only the date portion
 /// (year/month/day) is consulted, so callers can pass either pre-normalised
 /// midnights or raw timestamps interchangeably.
-int projectStreak(Iterable<DateTime> activityDates, DateTime today) {
+int projectStreak(
+  Iterable<DateTime> activityDates,
+  DateTime today, {
+  Duration dayBoundaryOffset = Duration.zero,
+}) {
   if (activityDates.isEmpty) return 0;
 
   // Normalise into a set of date-only entries. Done here so callers are
   // free to mix timestamps and midnights.
   final normalised = <DateTime>{};
-  final todayStart = startOfDay(today);
+  final todayStart = dayOf(today, dayBoundaryOffset);
   for (final d in activityDates) {
-    final s = startOfDay(d);
+    final s = dayOf(d, dayBoundaryOffset);
     if (s.isAfter(todayStart)) continue; // future activity is ignored
     normalised.add(s);
   }

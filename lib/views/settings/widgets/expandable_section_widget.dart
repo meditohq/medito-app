@@ -8,10 +8,12 @@ import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/utils/utils.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/settings/manage_defaults_screen.dart';
 import 'package:medito/views/settings/restore_stats_screen.dart';
+import 'package:medito/views/settings/widgets/day_boundary_offset_dialog.dart';
 import 'package:medito/widgets/medito_icon.dart';
 // removed unused snackbar import
 
@@ -35,6 +37,20 @@ class _ExpandableSectionWidgetState
         builder: (context) => const DebugInfoScreen(),
       ),
     );
+  }
+
+  Future<void> _showDayBoundaryOffsetDialog(BuildContext context) async {
+    final current =
+        _ref.read(dayBoundaryOffsetProvider).value ?? 0;
+    final picked = await showDialog<int>(
+      context: context,
+      builder: (_) => DayBoundaryOffsetDialog(currentHours: current),
+    );
+    if (picked != null && picked != current) {
+      await _ref
+          .read(dayBoundaryOffsetProvider.notifier)
+          .setOffsetHours(picked);
+    }
   }
 
   void _showOnboardingScreen(BuildContext context) {
@@ -212,6 +228,10 @@ class _ExpandableSectionWidgetState
                         ),
                       ),
                     ),
+                  ),
+                  // Day-boundary offset Item
+                  _DayBoundaryOffsetRow(
+                    onTap: () => _showDayBoundaryOffsetDialog(context),
                   ),
                   // Debug Info Item
                   InkWell(
@@ -403,6 +423,70 @@ class _ExpandableSectionWidgetState
             },
           ),
       ],
+    );
+  }
+}
+
+class _DayBoundaryOffsetRow extends ConsumerWidget {
+  final VoidCallback onTap;
+
+  const _DayBoundaryOffsetRow({required this.onTap});
+
+  String _subtitleFor(int hours) {
+    if (hours == 0) return 'Midnight (default)';
+    return '$hours:00 AM';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hours = ref.watch(dayBoundaryOffsetProvider).value ?? 0;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(width: 0.7, color: ColorConstants.onyx),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.bedtime_outlined, color: onSurface, size: 24.0),
+              width16,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'When my day starts',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelMedium
+                          ?.copyWith(color: onSurface),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _subtitleFor(hours),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: onSurface.withOpacityValue(0.6),
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: onSurface,
+                size: 24.0,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

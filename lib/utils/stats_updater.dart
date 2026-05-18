@@ -24,6 +24,11 @@ import '../constants/strings/analytics_event_constants.dart';
 // Export the key for backward compatibility if needed
 const String completedTracksKey = CompletedTracksStorage.completedTracksKey;
 
+/// Local hour-of-day at which manual sessions are anchored. Noon keeps the
+/// entry unambiguously inside its calendar day regardless of the user's
+/// day-boundary offset. Public so the calendar's streak preview matches.
+const int manualSessionAnchorHour = 12;
+
 // Static flag to prevent concurrent processing
 bool _isProcessingPendingTracks = false;
 
@@ -475,9 +480,14 @@ Future<int> addManualSessions({
   var added = 0;
 
   for (final date in dates) {
-    // Anchor to noon so the manual-session bucket is "afternoon" and the
-    // entry is unambiguously inside the calendar day.
-    final dateTime = DateTime(date.year, date.month, date.day, 12);
+    // Anchor at the shared manual-session hour so the calendar's streak
+    // preview agrees with how this entry will actually be bucketed.
+    final dateTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      manualSessionAnchorHour,
+    );
     if (dateTime.isAfter(now)) continue;
 
     try {
