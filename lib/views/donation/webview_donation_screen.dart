@@ -50,6 +50,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   bool _presentedLogged = false;
   bool _dismissLogged = false;
   String _variantId = 'unknown';
+  String _experimentName = 'unknown';
   // Captured at init/page-view so dispose() doesn't call ref.read after the
   // widget has been torn down (Riverpod throws, the analytics event is lost).
   String? _capturedUserId;
@@ -115,6 +116,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           AnalyticsEventConstants.paramPaywallSource:
               widget.source ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: _variantId,
+          AnalyticsEventConstants.paramExperimentName: _experimentName,
         },
       );
     } catch (e) {
@@ -131,6 +133,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         userId: _capturedUserId,
         paywallSource: widget.source,
         variantId: _variantId,
+        experimentName: _experimentName,
       );
     } catch (e) {
       AppLogger.w(_logTag, 'Failed to log paywall dismissal: $e');
@@ -235,13 +238,17 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
   void _handlePageView(Map<String, dynamic> data) {
     _variantId = (data['experiment_variant'] as String?) ?? 'unknown';
-    final experimentId = data['experiment_id'] as String? ?? '';
-    AppLogger.d(_logTag, 'page_view variant=$_variantId experiment=$experimentId');
+    _experimentName = (data['experiment_id'] as String?)?.trim().isNotEmpty == true
+        ? data['experiment_id'] as String
+        : 'unknown';
+    AppLogger.d(_logTag,
+        'page_view variant=$_variantId experiment=$_experimentName');
     FirebaseAnalyticsService().logEvent(
       name: AnalyticsEventConstants.donationPageViewed,
       parameters: {
         AnalyticsEventConstants.paramVariantId: _variantId,
         AnalyticsEventConstants.paramPaywallSource: widget.source ?? 'unknown',
+        AnalyticsEventConstants.paramExperimentName: _experimentName,
       },
     );
     _logPaywallPresented();
@@ -283,6 +290,10 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     final email = data['email'] as String?;
     final variantFromMessage = data['experiment_variant'] as String?;
     if (variantFromMessage != null) _variantId = variantFromMessage;
+    final experimentFromMessage = data['experiment_id'] as String?;
+    if (experimentFromMessage != null && experimentFromMessage.isNotEmpty) {
+      _experimentName = experimentFromMessage;
+    }
 
     if (amount == null || amount <= 0) {
       AppLogger.w(_logTag, 'invalid amount in payment request: $amount');
@@ -354,6 +365,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userEmail: userEmail,
           paywallSource: widget.source,
           variantId: _variantId,
+          experimentName: _experimentName,
           onSuccess: () {},
         );
       case 'yearly':
@@ -367,6 +379,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userEmail: userEmail,
           paywallSource: widget.source,
           variantId: _variantId,
+          experimentName: _experimentName,
           onSuccess: () {},
         );
       case 'one_time':
@@ -381,6 +394,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userEmail: userEmail,
           paywallSource: widget.source,
           variantId: _variantId,
+          experimentName: _experimentName,
           onSuccess: () {},
         );
     }

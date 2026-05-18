@@ -413,6 +413,8 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     required local_models.PaymentMethodType paymentMethod,
     String? userId,
     String? userEmail,
+    String? experimentId,
+    String? experimentVariant,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -424,6 +426,8 @@ class OneTimePaymentController extends _$OneTimePaymentController {
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,
+        'experiment_id': ?experimentId,
+        'experiment_variant': ?experimentVariant,
         ...utmParams,
       };
 
@@ -478,6 +482,8 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     required local_models.PaymentMethodType paymentMethod,
     String? userId,
     String? userEmail,
+    String? experimentId,
+    String? experimentVariant,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -489,6 +495,8 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,
+        'experiment_id': ?experimentId,
+        'experiment_variant': ?experimentVariant,
         ...utmParams,
       };
 
@@ -545,6 +553,8 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     required local_models.PaymentMethodType paymentMethod,
     String? userId,
     String? userEmail,
+    String? experimentId,
+    String? experimentVariant,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -556,6 +566,8 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,
+        'experiment_id': ?experimentId,
+        'experiment_variant': ?experimentVariant,
         ...utmParams,
       };
 

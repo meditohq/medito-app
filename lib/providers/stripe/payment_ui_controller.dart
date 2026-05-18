@@ -37,6 +37,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userEmail,
     String? paywallSource,
     String? variantId,
+    String? experimentName,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -50,11 +51,13 @@ class PaymentUIController extends _$PaymentUIController {
         paymentMethod: paymentMethod,
         userId: me.id,
         userEmail: userEmail ?? me.email,
+        experimentId: experimentName,
+        experimentVariant: variantId,
       );
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'onetime',
-            userId, paywallSource, variantId, onSuccess);
+            userId, paywallSource, variantId, experimentName, onSuccess);
       }
 
       return result;
@@ -77,6 +80,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userEmail,
     String? paywallSource,
     String? variantId,
+    String? experimentName,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -90,11 +94,13 @@ class PaymentUIController extends _$PaymentUIController {
         paymentMethod: paymentMethod,
         userId: me.id,
         userEmail: userEmail ?? me.email,
+        experimentId: experimentName,
+        experimentVariant: variantId,
       );
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'monthly',
-            userId, paywallSource, variantId, onSuccess);
+            userId, paywallSource, variantId, experimentName, onSuccess);
       }
 
       return result;
@@ -119,6 +125,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userEmail,
     String? paywallSource,
     String? variantId,
+    String? experimentName,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -132,11 +139,13 @@ class PaymentUIController extends _$PaymentUIController {
         paymentMethod: paymentMethod,
         userId: me.id,
         userEmail: userEmail ?? me.email,
+        experimentId: experimentName,
+        experimentVariant: variantId,
       );
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'yearly',
-            userId, paywallSource, variantId, onSuccess);
+            userId, paywallSource, variantId, experimentName, onSuccess);
       }
 
       return result;
@@ -190,6 +199,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userId,
     String? paywallSource,
     String? variantId,
+    String? experimentName,
     VoidCallback? onSuccess,
   ) async {
     result.when(
@@ -211,6 +221,8 @@ class PaymentUIController extends _$PaymentUIController {
             AnalyticsEventConstants.paramPaywallSource:
                 paywallSource ?? 'unknown',
             AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
+            AnalyticsEventConstants.paramExperimentName:
+                experimentName ?? 'unknown',
           },
         );
 
@@ -252,6 +264,8 @@ class PaymentUIController extends _$PaymentUIController {
           AnalyticsEventConstants.paramPaywallSource:
               paywallSource ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
+          AnalyticsEventConstants.paramExperimentName:
+              experimentName ?? 'unknown',
           AnalyticsEventConstants.paramPaymentIntentId:
               paymentIntentId ?? 'unknown',
         };
@@ -286,6 +300,8 @@ class PaymentUIController extends _$PaymentUIController {
           AnalyticsEventConstants.paramPaywallSource:
               paywallSource ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
+          AnalyticsEventConstants.paramExperimentName:
+              experimentName ?? 'unknown',
         };
 
         // Firebase Analytics
