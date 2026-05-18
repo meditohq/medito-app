@@ -1,6 +1,11 @@
 Unreleased
 -
 
+26.5.18.1
+- Shorter onboarding — fewer questions before you get started
+- We no longer ask for notification permission during onboarding; reminders are suggested after your first session instead
+- Added a "Not now" option on the reminders prompt so you can dismiss it without losing it forever
+
 26.5.18
 - Late-night meditations no longer break your streak — set when your day starts in Settings → Advanced
 - Fixed sharing a quote on iPad
