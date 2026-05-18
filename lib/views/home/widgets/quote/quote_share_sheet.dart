@@ -24,6 +24,7 @@ class QuoteShareScreen extends StatefulWidget {
 
 class _QuoteShareScreenState extends State<QuoteShareScreen> {
   final _repaintKey = GlobalKey();
+  final _shareButtonKey = GlobalKey();
   bool _sharing = false;
 
   Future<void> _share() async {
@@ -31,7 +32,13 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
     try {
       final boundary = _repaintKey.currentContext!.findRenderObject()!
           as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 3.0);
+      // Target ~1080px output regardless of how large the card is rendered,
+      // so iPads don't produce huge multi-MB PNGs.
+      final logicalWidth = boundary.size.width;
+      final pixelRatio = logicalWidth > 0
+          ? (1080 / logicalWidth).clamp(1.0, 3.0)
+          : 3.0;
+      final image = await boundary.toImage(pixelRatio: pixelRatio);
       final byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       final bytes = byteData!.buffer.asUint8List();
@@ -40,8 +47,19 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
       final file = File('${dir.path}/medito_quote.png');
       await file.writeAsBytes(bytes);
 
+      // iPad requires a popover anchor — without it the share sheet
+      // silently no-ops.
+      final buttonBox =
+          _shareButtonKey.currentContext?.findRenderObject() as RenderBox?;
+      final origin = buttonBox != null
+          ? buttonBox.localToGlobal(Offset.zero) & buttonBox.size
+          : null;
+
       await SharePlus.instance.share(
-        ShareParams(files: [XFile(file.path, mimeType: 'image/png')]),
+        ShareParams(
+          files: [XFile(file.path, mimeType: 'image/png')],
+          sharePositionOrigin: origin,
+        ),
       );
     } finally {
       if (mounted) setState(() => _sharing = false);
@@ -62,9 +80,12 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
             children: [
               Expanded(
                 child: Center(
-                  child: RepaintBoundary(
-                    key: _repaintKey,
-                    child: _ShareCard(data: widget.data),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    child: RepaintBoundary(
+                      key: _repaintKey,
+                      child: _ShareCard(data: widget.data),
+                    ),
                   ),
                 ),
               ),
@@ -72,6 +93,7 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
+                  key: _shareButtonKey,
                   onPressed: _sharing ? null : _share,
                   style: FilledButton.styleFrom(
                     backgroundColor: context.brandPurple,
