@@ -1,7 +1,7 @@
 Unreleased
 -
 
-26.5.18.1
+26.5.19
 - Shorter onboarding — fewer questions before you get started
 - We no longer ask for notification permission during onboarding; reminders are suggested after your first session instead
 - Added a "Not now" option on the reminders prompt so you can dismiss it without losing it forever
