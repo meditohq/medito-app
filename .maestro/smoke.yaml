@@ -47,25 +47,15 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 60000
 - tapOn: "Never tried it"
 
-# ── Onboarding: Intent question ──
+# ── Onboarding: Intent question (now the final question — the attribution
+# question was removed in 26.5.19, and the standalone notifications screen
+# was removed too; the post-session reminder prompt on EndScreenView now
+# covers that path). After tapping intent, the flow goes straight to the
+# donation primer.
 - extendedWaitUntil:
     visible: "Build a regular habit"
     timeout: 10000
 - tapOn: "Build a regular habit"
-
-# ── Onboarding: Attribution question ──
-# Eight answer options shuffled randomly; on a small simulator any specific
-# option can land below the fold. Tap whichever answer is visible —
-# `tapOn` waits for the element to appear, so no separate visibility
-# assertion is needed (the title text "How did you hear about Medito?"
-# with its trailing ? is unreliable to match).
-- tapOn: "Google ad|Instagram or Facebook ad|A friend told me|Therapist or healthcare professional|App Store|Play Store|Other"
-
-# ── Onboarding: Notifications ──
-- extendedWaitUntil:
-    visible: "Skip for Now"
-    timeout: 20000
-- tapOn: "Skip for Now"
 
 # ── Onboarding: Donation ──
 # "Skip for Now" only appears on the donation primer after the user has
