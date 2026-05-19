@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/providers/providers.dart';
@@ -40,10 +41,15 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   bool _endScreenOpened = false;
   bool _isClosing = false;
   final _analytics = FirebaseAnalyticsService();
+  // Snapshot of stats taken when the player opens, before the session can
+  // affect them. EndScreenView uses this as the "before" value so its
+  // AnimatedSwitcher actually animates from old streak -> new streak.
+  LocalAllStats? _statsAtSessionStart;
 
   @override
   void initState() {
     super.initState();
+    _statsAtSessionStart = ref.read(statsProvider).value;
     _logScreenView();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializePlayer();
@@ -317,25 +323,26 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         _resetState();
         _stopAudio();
         final currentlyPlayingTrack = ref.read(playerProvider);
-        if (currentlyPlayingTrack != null) {
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (!mounted) return;
+        if (currentlyPlayingTrack == null) return;
 
-            ref.read(statsProvider.notifier).refresh();
-            unawaited(ref.read(dndProvider.notifier).setDndMode(false));
+        // handleStats (run from the platform on completion) has already
+        // written the new completion to local stats and pushed it through
+        // statsProvider via refreshFromLocal — so no refresh() is needed
+        // here. We pass the pre-session snapshot so EndScreenView can
+        // animate from the old streak to the current one.
+        unawaited(ref.read(dndProvider.notifier).setDndMode(false));
 
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EndScreenView(
-                  request: currentlyPlayingTrack,
-                ),
-              ),
-            );
-          });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EndScreenView(
+              request: currentlyPlayingTrack,
+              priorStats: _statsAtSessionStart,
+            ),
+          ),
+        );
 
-          _endScreenOpened = true;
-        }
+        _endScreenOpened = true;
       }
     });
   }

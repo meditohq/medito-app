@@ -30,9 +30,15 @@ import 'widgets/zen_mode_animation.dart';
 class EndScreenView extends ConsumerStatefulWidget {
   final PlaybackRequest request;
 
+  /// Snapshot of stats taken in PlayerView before this session affected them.
+  /// Displayed on entry so the streak number animates from old -> current
+  /// once the entrance slide completes. Null on first-ever session.
+  final LocalAllStats? priorStats;
+
   const EndScreenView({
     super.key,
     required this.request,
+    this.priorStats,
   });
 
   @override
@@ -43,6 +49,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     with TickerProviderStateMixin {
   final _animatedSwitcherKey = GlobalKey();
   final _analytics = FirebaseAnalyticsService();
+
+  // While true, render stats from widget.priorStats. Flipped to false after
+  // the entrance slide finishes — that frame change is what triggers the
+  // AnimatedSwitcher transition from old streak -> new streak.
+  bool _showPriorStats = true;
 
   late AnimationController _statsAnimationController;
   late AnimationController _reminderAnimationController;
@@ -139,6 +150,22 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         _cardAnimationController.forward();
       }
     });
+
+    // Skip the prior->current transition if we never got a snapshot (e.g.
+    // first-ever session) — there's nothing to animate from.
+    if (widget.priorStats == null) {
+      _showPriorStats = false;
+      return;
+    }
+
+    // Once the entrance slide settles, swap the displayed stats to the
+    // current values. The streak AnimatedSwitcher picks up the value change
+    // and animates from the old number to the new one.
+    Future.delayed(const Duration(milliseconds: 700), () {
+      if (mounted) {
+        setState(() => _showPriorStats = false);
+      }
+    });
   }
 
   @override
@@ -153,13 +180,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     await _analytics.logScreenView(screenName: 'EndScreenView');
   }
 
-  void _loadStats() async {
-    // Load stats immediately
-    await ref.read(statsProvider.notifier).refresh();
-
-    if (!mounted) return;
-
-    // Once stats are loaded, check for app review request
+  void _loadStats() {
+    // handleStats already wrote this session's completion to local stats
+    // and pushed it through statsProvider before we got here, so there's
+    // no refresh() needed. Just gate the review prompt on the current
+    // stats being available.
     final reviewService = ref.read(reviewServiceProvider);
     reviewService.checkAndRequestReview();
   }
@@ -248,9 +273,14 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   }
 
   Widget _buildStatsArea() {
-    var statsAsyncValue = ref.watch(statsProvider);
+    final statsAsyncValue = ref.watch(statsProvider);
+    // Use the pre-session snapshot for the first beat after the entrance
+    // slide, then fall back to the live stats so AnimatedSwitcher animates.
+    final displayedStats = _showPriorStats && widget.priorStats != null
+        ? AsyncValue<LocalAllStats>.data(widget.priorStats!)
+        : statsAsyncValue;
 
-    return statsAsyncValue.when(
+    return displayedStats.when(
       loading: () => const SizedBox(
         height: 200,
         child: Center(child: CircularProgressIndicator()),
@@ -365,7 +395,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       {Key? key}) {
     lastFiveDays = lastFiveDays.reversed.toList();
 
-    var statsData = ref.watch(statsProvider).value;
+    final statsData = _showPriorStats && widget.priorStats != null
+        ? widget.priorStats
+        : ref.watch(statsProvider).value;
     var daysWithFreeze =
         statsData != null ? _getDaysWithStreakFreeze(statsData) : <String>[];
 
