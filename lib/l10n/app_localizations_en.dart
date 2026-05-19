@@ -1869,6 +1869,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectDate => 'Select date';
 
   @override
+  String get singleDay => 'Single day';
+
+  @override
+  String get dateRange => 'Date range';
+
+  @override
+  String get startDate => 'Start date';
+
+  @override
+  String get endDate => 'End date';
+
+  @override
+  String get endDateBeforeStartError =>
+      'End date must be on or after the start date';
+
+  @override
   String get selectTime => 'Select time';
 
   @override

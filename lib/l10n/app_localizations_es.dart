@@ -1898,6 +1898,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get selectDate => 'Seleccionar fecha';
 
   @override
+  String get singleDay => 'Un día';
+
+  @override
+  String get dateRange => 'Rango de fechas';
+
+  @override
+  String get startDate => 'Fecha de inicio';
+
+  @override
+  String get endDate => 'Fecha de fin';
+
+  @override
+  String get endDateBeforeStartError =>
+      'La fecha de fin debe ser igual o posterior a la fecha de inicio';
+
+  @override
   String get selectTime => 'Seleccionar hora';
 
   @override

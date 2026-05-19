@@ -3452,6 +3452,36 @@ abstract class AppLocalizations {
   /// **'Select date'**
   String get selectDate;
 
+  /// Tab label for adding a session on a single day
+  ///
+  /// In en, this message translates to:
+  /// **'Single day'**
+  String get singleDay;
+
+  /// Tab label for adding sessions across a range of days
+  ///
+  /// In en, this message translates to:
+  /// **'Date range'**
+  String get dateRange;
+
+  /// Label for the start date in a range picker
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get startDate;
+
+  /// Label for the end date in a range picker
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get endDate;
+
+  /// Validation error when the end date precedes the start date
+  ///
+  /// In en, this message translates to:
+  /// **'End date must be on or after the start date'**
+  String get endDateBeforeStartError;
+
   /// Placeholder text for time selection
   ///
   /// In en, this message translates to:

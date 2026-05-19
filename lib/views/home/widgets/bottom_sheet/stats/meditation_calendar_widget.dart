@@ -354,42 +354,102 @@ class _MeditationCalendarWidgetState
     _animationController.forward();
   }
 
+  BulkSessionPreview _computeBulkPreview(DateTime start, DateTime end) {
+    final dates = enumerateDays(start, end);
+    final existing = <DateTime>{
+      ..._getMeditationDates(widget.stats),
+      ..._getFreezeDates(widget.stats),
+    };
+    final newSessions = dates.where((d) => !existing.contains(d)).length;
+    final projected = _projectedStreak([
+      ..._getMeditationTimestamps(widget.stats),
+      ..._getFreezeTimestamps(widget.stats),
+      ...dates.map(_anchorBulkAddDate),
+    ]);
+    return BulkSessionPreview(
+      dayCount: dates.length,
+      newSessionsCount: newSessions,
+      currentStreak: widget.stats.streakCurrent,
+      projectedStreak: projected,
+    );
+  }
+
   Future<void> _showAddSessionDialog(BuildContext context) async {
     final selectedDate = _selectedDayForSessions;
 
-    final result = await showDialog<Map<String, dynamic>>(
+    final result = await showDialog<ManualSessionResult>(
       context: context,
-      builder: (context) => ManualSessionDialog(selectedDate: selectedDate),
+      builder: (context) => ManualSessionDialog(
+        selectedDate: selectedDate,
+        bulkPreviewBuilder: _computeBulkPreview,
+      ),
     );
 
-    if (result != null && mounted) {
-      final dateTime = result['dateTime'] as DateTime;
-      final duration = result['duration'] as int;
+    if (result == null || !mounted) return;
 
-      setState(() {
-        _isAddingSession = true;
-        final dayStart = DateTime(dateTime.year, dateTime.month, dateTime.day);
-        _selectedDayForSessions = dayStart;
-        _selectedDay = dayStart;
-        _focusedDay = dayStart;
-      });
-      _animationController.forward();
+    switch (result) {
+      case ManualSessionSingleResult(:final dateTime, :final duration):
+        setState(() {
+          _isAddingSession = true;
+          final dayStart =
+              DateTime(dateTime.year, dateTime.month, dateTime.day);
+          _selectedDayForSessions = dayStart;
+          _selectedDay = dayStart;
+          _focusedDay = dayStart;
+        });
+        _animationController.forward();
 
-      final success = await addManualSession(
-        dateTime: dateTime,
-        durationMinutes: duration,
-      );
+        final success = await addManualSession(
+          dateTime: dateTime,
+          durationMinutes: duration,
+        );
 
-      if (success && mounted) {
-        // Refresh stats to update the calendar
+        if (success && mounted) {
+          await ref.read(statsProvider.notifier).refreshFromLocal();
+        }
+
+        if (mounted) {
+          setState(() {
+            _isAddingSession = false;
+          });
+        }
+      case ManualSessionBulkResult(
+          :final rangeStart,
+          :final rangeEnd,
+          :final duration,
+        ):
+        final dates = enumerateDays(rangeStart, rangeEnd);
+        final existing = <DateTime>{
+          ..._getMeditationDates(widget.stats),
+          ..._getFreezeDates(widget.stats),
+        };
+        final newSessionDays =
+            dates.where((d) => !existing.contains(d)).toList();
+
+        setState(() {
+          _isAddingSession = true;
+        });
+
+        await addManualSessions(
+          dates: newSessionDays,
+          durationMinutes: duration,
+        );
+
+        if (!mounted) return;
+
         await ref.read(statsProvider.notifier).refreshFromLocal();
-      }
 
-      if (mounted) {
+        if (!mounted) return;
+
         setState(() {
           _isAddingSession = false;
+          final last = dates.isNotEmpty ? dates.last : rangeEnd;
+          _selectedDay = last;
+          _selectedDayForSessions =
+              DateTime(last.year, last.month, last.day);
+          _focusedDay = last;
         });
-      }
+        _animationController.forward();
     }
   }
 

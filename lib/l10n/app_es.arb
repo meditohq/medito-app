@@ -965,6 +965,26 @@
   "@selectDate": {
     "description": "Placeholder text for date selection"
   },
+  "singleDay": "Un día",
+  "@singleDay": {
+    "description": "Tab label for adding a session on a single day"
+  },
+  "dateRange": "Rango de fechas",
+  "@dateRange": {
+    "description": "Tab label for adding sessions across a range of days"
+  },
+  "startDate": "Fecha de inicio",
+  "@startDate": {
+    "description": "Label for the start date in a range picker"
+  },
+  "endDate": "Fecha de fin",
+  "@endDate": {
+    "description": "Label for the end date in a range picker"
+  },
+  "endDateBeforeStartError": "La fecha de fin debe ser igual o posterior a la fecha de inicio",
+  "@endDateBeforeStartError": {
+    "description": "Validation error when the end date precedes the start date"
+  },
   "selectTime": "Seleccionar hora",
   "@selectTime": {
     "description": "Placeholder text for time selection"
