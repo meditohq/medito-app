@@ -1,34 +1,143 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/asset_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-class QuoteShareScreen extends StatefulWidget {
+/// A selectable background palette for the quote share card.
+///
+/// Each palette ships its own gradient and matching foreground/secondary
+/// colors so we don't have to compute contrast on the fly — the curated set
+/// guarantees the quote stays readable on every background.
+class _Palette {
+  const _Palette({
+    required this.name,
+    required this.gradient,
+    required this.foreground,
+    required this.secondary,
+    required this.lineColor,
+  });
+
+  final String name;
+  final List<Color> gradient;
+  final Color foreground;
+  final Color secondary;
+  final Color lineColor;
+
+  /// All palettes share the same three-stop curve so the visual weight of
+  /// the gradient feels consistent across choices.
+  static const stops = <double>[0.0, 0.55, 1.0];
+
+  /// The swatch shown in the picker — a small preview of the top-left
+  /// gradient stop, which is the most visually distinctive color.
+  Color get swatch => gradient.first;
+}
+
+const _palettes = <_Palette>[
+  // Original — deep violet → navy → black.
+  _Palette(
+    name: 'Midnight',
+    gradient: [Color(0xFF1E1040), Color(0xFF0E1028), Color(0xFF080810)],
+    foreground: Colors.white,
+    secondary: Color(0xCCFFFFFF),
+    lineColor: Colors.white,
+  ),
+  _Palette(
+    name: 'Indigo',
+    gradient: [Color(0xFF1B2A6B), Color(0xFF111A45), Color(0xFF06091F)],
+    foreground: Colors.white,
+    secondary: Color(0xCCFFFFFF),
+    lineColor: Colors.white,
+  ),
+  _Palette(
+    name: 'Ocean',
+    gradient: [Color(0xFF0F5C6E), Color(0xFF0A3A52), Color(0xFF06192C)],
+    foreground: Colors.white,
+    secondary: Color(0xCCFFFFFF),
+    lineColor: Colors.white,
+  ),
+  _Palette(
+    name: 'Forest',
+    gradient: [Color(0xFF1F4D3A), Color(0xFF143226), Color(0xFF07150F)],
+    foreground: Colors.white,
+    secondary: Color(0xCCFFFFFF),
+    lineColor: Colors.white,
+  ),
+  _Palette(
+    name: 'Sunset',
+    gradient: [Color(0xFFE76A5C), Color(0xFFB04A6E), Color(0xFF5B2A57)],
+    foreground: Colors.white,
+    secondary: Color(0xE6FFFFFF),
+    lineColor: Colors.white,
+  ),
+  _Palette(
+    name: 'Rose',
+    gradient: [Color(0xFFF6CFD8), Color(0xFFE4A9B8), Color(0xFFB87592)],
+    // Deep plum reads well on the soft rose without feeling harsh.
+    foreground: Color(0xFF3A1E2A),
+    secondary: Color(0xCC3A1E2A),
+    lineColor: Color(0xFF3A1E2A),
+  ),
+  _Palette(
+    name: 'Cream',
+    gradient: [Color(0xFFFBF3E4), Color(0xFFEFE0C4), Color(0xFFD9C29A)],
+    foreground: Color(0xFF2C2418),
+    secondary: Color(0xCC2C2418),
+    lineColor: Color(0xFF2C2418),
+  ),
+  _Palette(
+    name: 'Slate',
+    gradient: [Color(0xFF3A3A42), Color(0xFF24242B), Color(0xFF0F0F14)],
+    foreground: Colors.white,
+    secondary: Color(0xCCFFFFFF),
+    lineColor: Colors.white,
+  ),
+];
+
+class QuoteShareScreen extends ConsumerStatefulWidget {
   const QuoteShareScreen({super.key, required this.data});
 
   final HomeQuoteModel data;
 
   @override
-  State<QuoteShareScreen> createState() => _QuoteShareScreenState();
+  ConsumerState<QuoteShareScreen> createState() => _QuoteShareScreenState();
 }
 
-class _QuoteShareScreenState extends State<QuoteShareScreen> {
+class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
   final _repaintKey = GlobalKey();
   final _shareButtonKey = GlobalKey();
   bool _sharing = false;
+  int _paletteIndex = 0;
 
   Future<void> _share() async {
     setState(() => _sharing = true);
+    // Log the share intent before the OS sheet appears — we can't observe
+    // whether the user completes the share, so this captures the moment they
+    // committed to it. Fire-and-forget so analytics never blocks the share.
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.quoteShared,
+        parameters: {
+          AnalyticsEventConstants.paramQuoteId: widget.data.id,
+          AnalyticsEventConstants.paramQuoteAuthor: widget.data.author,
+          AnalyticsEventConstants.paramQuoteSharePalette:
+              _palettes[_paletteIndex].name,
+        },
+      ),
+    );
     try {
       final boundary = _repaintKey.currentContext!.findRenderObject()!
           as RenderRepaintBoundary;
@@ -68,8 +177,12 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = _palettes[_paletteIndex];
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E16),
+      // Use the theme surface so light mode no longer renders on a near-black
+      // scaffold (the old hardcoded #0E0E16).
+      backgroundColor: scheme.surface,
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.of(context).pop(),
       ),
@@ -84,10 +197,19 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
                     constraints: const BoxConstraints(maxWidth: 440),
                     child: RepaintBoundary(
                       key: _repaintKey,
-                      child: _ShareCard(data: widget.data),
+                      child: _ShareCard(
+                        data: widget.data,
+                        palette: palette,
+                      ),
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(height: 20),
+              _PalettePicker(
+                palettes: _palettes,
+                selectedIndex: _paletteIndex,
+                onSelected: (i) => setState(() => _paletteIndex = i),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -129,10 +251,102 @@ class _QuoteShareScreenState extends State<QuoteShareScreen> {
   }
 }
 
+class _PalettePicker extends StatelessWidget {
+  const _PalettePicker({
+    required this.palettes,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final List<_Palette> palettes;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        itemCount: palettes.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 14),
+        itemBuilder: (context, i) {
+          final palette = palettes[i];
+          final isSelected = i == selectedIndex;
+          return _PaletteSwatch(
+            palette: palette,
+            selected: isSelected,
+            ringColor: onSurface,
+            onTap: () => onSelected(i),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PaletteSwatch extends StatelessWidget {
+  const _PaletteSwatch({
+    required this.palette,
+    required this.selected,
+    required this.ringColor,
+    required this.onTap,
+  });
+
+  final _Palette palette;
+  final bool selected;
+  final Color ringColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '${palette.name} background',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: palette.gradient,
+              stops: _Palette.stops,
+            ),
+            border: Border.all(
+              color: selected ? ringColor : ringColor.withValues(alpha: 0.15),
+              width: selected ? 2.5 : 1,
+            ),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: ringColor.withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      spreadRadius: 0,
+                    ),
+                  ]
+                : null,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ShareCard extends StatelessWidget {
-  const _ShareCard({required this.data});
+  const _ShareCard({required this.data, required this.palette});
 
   final HomeQuoteModel data;
+  final _Palette palette;
 
   @override
   Widget build(BuildContext context) {
@@ -142,20 +356,16 @@ class _ShareCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF1E1040),
-                Color(0xFF0E1028),
-                Color(0xFF080810),
-              ],
-              stops: [0.0, 0.55, 1.0],
+              colors: palette.gradient,
+              stops: _Palette.stops,
             ),
           ),
           child: CustomPaint(
-            painter: _FlowLinesPainter(seed),
+            painter: _FlowLinesPainter(seed: seed, color: palette.lineColor),
             child: Padding(
               padding: const EdgeInsets.all(32),
               child: Column(
@@ -166,17 +376,17 @@ class _ShareCard extends StatelessWidget {
                       SvgPicture.asset(
                         AssetConstants.icLogo,
                         height: 36,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.white,
+                        colorFilter: ColorFilter.mode(
+                          palette.foreground,
                           BlendMode.srcIn,
                         ),
                       ),
                       const SizedBox(width: 10),
-                      const Text(
+                      Text(
                         'medito.app',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color(0x99FFFFFF),
+                          color: palette.secondary,
                           letterSpacing: 0.5,
                           fontFamily: dmSans,
                         ),
@@ -187,10 +397,10 @@ class _ShareCard extends StatelessWidget {
                   Text(
                     data.quote,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       height: 1.55,
-                      color: Colors.white,
+                      color: palette.foreground,
                       fontWeight: FontWeight.w300,
                       fontStyle: FontStyle.italic,
                       fontFamily: sourceSerif,
@@ -198,11 +408,11 @@ class _ShareCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    '\u2014 ${data.author}',
+                    '— ${data.author}',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xCCFFFFFF),
+                      color: palette.secondary,
                       fontWeight: FontWeight.w400,
                       fontFamily: dmSans,
                     ),
@@ -219,9 +429,10 @@ class _ShareCard extends StatelessWidget {
 }
 
 class _FlowLinesPainter extends CustomPainter {
-  final int seed;
+  const _FlowLinesPainter({required this.seed, required this.color});
 
-  const _FlowLinesPainter(this.seed);
+  final int seed;
+  final Color color;
 
   double _fieldAngle(double x, double y, double freq, double baseAngle) {
     return baseAngle +
@@ -256,7 +467,7 @@ class _FlowLinesPainter extends CustomPainter {
       final strokeWidth = 0.4 + rng.nextDouble() * 0.9;
 
       paint
-        ..color = Colors.white.withValues(alpha: opacity)
+        ..color = color.withValues(alpha: opacity)
         ..strokeWidth = strokeWidth;
 
       final path = Path()..moveTo(x, y);
@@ -278,5 +489,6 @@ class _FlowLinesPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _FlowLinesPainter old) => old.seed != seed;
+  bool shouldRepaint(covariant _FlowLinesPainter old) =>
+      old.seed != seed || old.color != color;
 }

@@ -272,6 +272,12 @@ abstract class AppLocalizations {
   /// **'Share'**
   String get share;
 
+  /// No description provided for @tapToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to share'**
+  String get tapToShare;
+
   /// No description provided for @id.
   ///
   /// In en, this message translates to:

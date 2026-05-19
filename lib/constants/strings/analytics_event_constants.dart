@@ -375,4 +375,26 @@ class AnalyticsEventConstants {
 
   /// Event logged when user removes a pack from favourites on the pack screen
   static const String packUnfavourited = 'pack_unfavourited';
+
+  // Quote share events
+  /// Event logged when the user opens the quote share screen by tapping the
+  /// daily quote widget on the home screen.
+  /// Parameters: paramQuoteId, paramQuoteAuthor
+  static const String quoteShareOpened = 'quote_share_opened';
+
+  /// Event logged when the user actually triggers the OS share sheet from the
+  /// quote share screen.
+  /// Parameters: paramQuoteId, paramQuoteAuthor, paramQuoteSharePalette
+  static const String quoteShared = 'quote_shared';
+
+  /// Parameter name for the daily quote's id.
+  static const String paramQuoteId = 'quote_id';
+
+  /// Parameter name for the daily quote's author.
+  static const String paramQuoteAuthor = 'quote_author';
+
+  /// Parameter name for the background palette selected on the quote share
+  /// screen (e.g. 'Midnight', 'Cream'). Lets us see which backgrounds people
+  /// actually pick.
+  static const String paramQuoteSharePalette = 'palette';
 }

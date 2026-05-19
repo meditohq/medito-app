@@ -99,6 +99,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share => 'Share';
 
   @override
+  String get tapToShare => 'Tap to share';
+
+  @override
   String get id => 'id';
 
   @override
