@@ -68,6 +68,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
 
     final itemCount = widget.carouselItems.length + 2;
     final maxExtent = _controller.position.maxScrollExtent;
+    if (maxExtent <= 0 || itemCount <= 1) return;
+
     final pixels = _controller.position.pixels;
     final itemWidth = maxExtent / (itemCount - 1);
     final newIndex = (pixels / itemWidth).round().clamp(0, itemCount - 1);
@@ -114,7 +116,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                 flexWeights: flexWeights,
                 consumeMaxWeight: false,
                 padding: const EdgeInsets.only(left: padding16),
-                elevation: 8,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 ),
@@ -128,13 +131,16 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                 ],
               ),
             ),
-            if (_showLeftGradient)
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: 32,
-                child: IgnorePointer(
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 32,
+              child: IgnorePointer(
+                child: AnimatedOpacity(
+                  opacity: _showLeftGradient ? 1 : 0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -151,13 +157,17 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   ),
                 ),
               ),
-            if (_showRightGradient)
-              Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: 32,
-                child: IgnorePointer(
+            ),
+            Positioned(
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: 32,
+              child: IgnorePointer(
+                child: AnimatedOpacity(
+                  opacity: _showRightGradient ? 1 : 0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -174,6 +184,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ],
