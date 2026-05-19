@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
+/// Direction of the in-flight favourite toggle. The icon animation differs
+/// per direction so the user can read which way the toggle is going.
+enum FavoriteToggleDirection { add, remove }
+
 /// Owns the "is a favourite-toggle save in flight?" state for a single
 /// [AnimatedFavouriteIcon]. Created in the parent widget's `initState` and
 /// disposed in its `dispose`. Call [trigger] from the tap handler with the
@@ -22,12 +26,21 @@ class FavoriteIconController extends ChangeNotifier {
   bool _isPending = false;
   bool get isPending => _isPending;
 
+  FavoriteToggleDirection _direction = FavoriteToggleDirection.add;
+  FavoriteToggleDirection get direction => _direction;
+
   /// Runs [work] (the actual save) while the icon spins. The spin holds
   /// for at least [minSpinDuration] regardless of how fast [work] resolves.
-  /// Ignored if a previous trigger is still in flight.
-  Future<void> trigger(Future<void> Function() work) async {
+  /// [direction] determines the visual flavour — clockwise + overshoot for
+  /// `add`, counter-clockwise + clean ease-out for `remove`. Ignored if a
+  /// previous trigger is still in flight.
+  Future<void> trigger(
+    Future<void> Function() work, {
+    required FavoriteToggleDirection direction,
+  }) async {
     if (_isPending) return;
     _isPending = true;
+    _direction = direction;
     notifyListeners();
 
     final minSpin = Future<void>.delayed(minSpinDuration);
@@ -86,6 +99,10 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
   double _releaseFromTurns = 0;
   bool _isReleasing = false;
   bool _wasPending = false;
+  // Captured at the moment pending became true so the in-flight direction
+  // stays stable through both the spin and the release phases even if the
+  // controller's direction changes mid-flight.
+  FavoriteToggleDirection _activeDirection = FavoriteToggleDirection.add;
 
   @override
   void initState() {
@@ -145,10 +162,13 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
   }
 
   void _onPendingChanged() {
-    final pending = widget.controller?.isPending ?? false;
+    final controller = widget.controller;
+    final pending = controller?.isPending ?? false;
     if (pending == _wasPending) return;
     _wasPending = pending;
     if (pending) {
+      _activeDirection =
+          controller?.direction ?? FavoriteToggleDirection.add;
       _startSpin();
     } else {
       _startRelease();
@@ -186,14 +206,19 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
     super.dispose();
   }
 
-  /// Current rotation in turns. Active source: the continuous spin while
-  /// pending, the easeOutBack deceleration during release, 0 at rest.
+  /// Current rotation in turns (always a positive magnitude — the direction
+  /// sign is applied in [build]). Active source: the continuous spin while
+  /// pending, the directional release curve during release, 0 at rest.
+  ///
+  /// Release curve:
+  ///   add    -> easeOutBack: clockwise spin + small overshoot (celebratory)
+  ///   remove -> easeOutCubic: counter-clockwise spin + clean settle (deflate)
   double _currentTurns() {
     if (_isReleasing) {
-      final t = Curves.easeOutBack.transform(_releaseController.value);
-      // Carry from the captured spin angle to one full turn past it.
-      // (Visually equivalent to upright for a rotationally-symmetric icon,
-      // but the easeOutBack overshoot makes the settle readable regardless.)
+      final curve = _activeDirection == FavoriteToggleDirection.add
+          ? Curves.easeOutBack
+          : Curves.easeOutCubic;
+      final t = curve.transform(_releaseController.value);
       return _releaseFromTurns + (1.0 - _releaseFromTurns) * t;
     }
     if (_wasPending) {
@@ -201,6 +226,10 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
     }
     return 0;
   }
+
+  /// Spin direction. +1 = clockwise (add), -1 = counter-clockwise (remove).
+  double _directionSign() =>
+      _activeDirection == FavoriteToggleDirection.add ? 1.0 : -1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +279,7 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
             animation: Listenable.merge([_spinController, _releaseController]),
             builder: (context, child) {
               return Transform.rotate(
-                angle: _currentTurns() * 2 * math.pi,
+                angle: _directionSign() * _currentTurns() * 2 * math.pi,
                 child: child,
               );
             },

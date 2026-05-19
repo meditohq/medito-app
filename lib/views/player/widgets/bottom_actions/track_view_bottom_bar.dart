@@ -114,18 +114,23 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
 
   void _toggleFavorite(bool isFavorite, Track track) {
     final notifier = ref.read(favoritesNotifierProvider.notifier);
-    _favoriteController.trigger(() => isFavorite
-        ? notifier.removeFromFavorites(widget.trackId)
-        : notifier.addToFavorites(
-            FavoriteItem(
-              id: widget.trackId,
-              title: widget.trackTitle,
-              coverUrl: widget.coverUrl ?? track.coverUrl,
-              subtitle: track.subtitle,
-              type: FavoriteItemType.track,
-              timestamp: DateTime.now().millisecondsSinceEpoch,
+    _favoriteController.trigger(
+      () => isFavorite
+          ? notifier.removeFromFavorites(widget.trackId)
+          : notifier.addToFavorites(
+              FavoriteItem(
+                id: widget.trackId,
+                title: widget.trackTitle,
+                coverUrl: widget.coverUrl ?? track.coverUrl,
+                subtitle: track.subtitle,
+                type: FavoriteItemType.track,
+                timestamp: DateTime.now().millisecondsSinceEpoch,
+              ),
             ),
-          ));
+      direction: isFavorite
+          ? FavoriteToggleDirection.remove
+          : FavoriteToggleDirection.add,
+    );
   }
 
   @override

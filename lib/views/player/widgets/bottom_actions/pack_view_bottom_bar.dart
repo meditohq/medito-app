@@ -117,18 +117,23 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
 
   void _toggleFavorite(bool isFavorite, PackModel pack) {
     final notifier = ref.read(favoritesNotifierProvider.notifier);
-    _favoriteController.trigger(() => isFavorite
-        ? notifier.removeFromFavorites(widget.packId)
-        : notifier.addToFavorites(
-            FavoriteItem(
-              id: widget.packId,
-              title: widget.packName,
-              coverUrl: pack.coverUrl,
-              subtitle: pack.subtitle,
-              type: FavoriteItemType.pack,
-              timestamp: DateTime.now().millisecondsSinceEpoch,
+    _favoriteController.trigger(
+      () => isFavorite
+          ? notifier.removeFromFavorites(widget.packId)
+          : notifier.addToFavorites(
+              FavoriteItem(
+                id: widget.packId,
+                title: widget.packName,
+                coverUrl: pack.coverUrl,
+                subtitle: pack.subtitle,
+                type: FavoriteItemType.pack,
+                timestamp: DateTime.now().millisecondsSinceEpoch,
+              ),
             ),
-          ));
+      direction: isFavorite
+          ? FavoriteToggleDirection.remove
+          : FavoriteToggleDirection.add,
+    );
   }
 
   @override
