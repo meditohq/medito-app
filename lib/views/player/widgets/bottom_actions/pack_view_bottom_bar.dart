@@ -21,11 +21,6 @@ import '../../../../widgets/snackbar_widget.dart';
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 
-/// Minimum time the spin animation stays visible after tapping the favourite
-/// star, even if the underlying save completes instantly. Keeps the
-/// micro-interaction readable instead of flickering for the local-only path.
-const _kFavoriteSpinMinDuration = Duration(milliseconds: 500);
-
 class PackViewBottomBar extends ConsumerStatefulWidget {
   final String packId;
   final String packName;
@@ -43,7 +38,13 @@ class PackViewBottomBar extends ConsumerStatefulWidget {
 }
 
 class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
-  bool _favoritePending = false;
+  final _favoriteController = FavoriteIconController();
+
+  @override
+  void dispose() {
+    _favoriteController.dispose();
+    super.dispose();
+  }
 
   void _sharePack(BuildContext context) {
     final deepLink = 'https://medito.app/packs/${widget.packId}';
@@ -114,13 +115,9 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
     );
   }
 
-  Future<void> _toggleFavorite(bool isFavorite, PackModel pack) async {
-    if (_favoritePending) return;
-    setState(() => _favoritePending = true);
-
+  void _toggleFavorite(bool isFavorite, PackModel pack) {
     final notifier = ref.read(favoritesNotifierProvider.notifier);
-    final minSpin = Future<void>.delayed(_kFavoriteSpinMinDuration);
-    final save = isFavorite
+    _favoriteController.trigger(() => isFavorite
         ? notifier.removeFromFavorites(widget.packId)
         : notifier.addToFavorites(
             FavoriteItem(
@@ -131,10 +128,7 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
               type: FavoriteItemType.pack,
               timestamp: DateTime.now().millisecondsSinceEpoch,
             ),
-          );
-
-    await Future.wait([save, minSpin]);
-    if (mounted) setState(() => _favoritePending = false);
+          ));
   }
 
   @override
@@ -245,7 +239,7 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
         child: AnimatedFavouriteIcon(
           isFavorite: isFavorite,
           color: favouriteColour,
-          isPending: _favoritePending,
+          controller: _favoriteController,
         ),
         semanticLabel:
             isFavorite ? l10n.removeFromFavorites : l10n.addToFavorites,

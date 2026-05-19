@@ -15,11 +15,6 @@ import '../../../../widgets/medito_icon.dart';
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 
-/// Minimum time the spin animation stays visible after tapping the favourite
-/// star, even if the underlying save completes instantly. Keeps the
-/// micro-interaction readable instead of flickering for the local-only path.
-const _kFavoriteSpinMinDuration = Duration(milliseconds: 500);
-
 class TrackViewBottomBar extends ConsumerStatefulWidget {
   final String trackId;
   final String trackTitle;
@@ -40,7 +35,13 @@ class TrackViewBottomBar extends ConsumerStatefulWidget {
 }
 
 class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
-  bool _favoritePending = false;
+  final _favoriteController = FavoriteIconController();
+
+  @override
+  void dispose() {
+    _favoriteController.dispose();
+    super.dispose();
+  }
 
   void _shareTrack(BuildContext context) {
     final deepLink = 'https://medito.app/tracks/${widget.trackId}';
@@ -111,13 +112,9 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
     );
   }
 
-  Future<void> _toggleFavorite(bool isFavorite, Track track) async {
-    if (_favoritePending) return;
-    setState(() => _favoritePending = true);
-
+  void _toggleFavorite(bool isFavorite, Track track) {
     final notifier = ref.read(favoritesNotifierProvider.notifier);
-    final minSpin = Future<void>.delayed(_kFavoriteSpinMinDuration);
-    final save = isFavorite
+    _favoriteController.trigger(() => isFavorite
         ? notifier.removeFromFavorites(widget.trackId)
         : notifier.addToFavorites(
             FavoriteItem(
@@ -128,10 +125,7 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
               type: FavoriteItemType.track,
               timestamp: DateTime.now().millisecondsSinceEpoch,
             ),
-          );
-
-    await Future.wait([save, minSpin]);
-    if (mounted) setState(() => _favoritePending = false);
+          ));
   }
 
   @override
@@ -205,7 +199,7 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
               child: AnimatedFavouriteIcon(
                 isFavorite: isFavorite,
                 color: colour,
-                isPending: _favoritePending,
+                controller: _favoriteController,
               ),
               semanticLabel: isFavorite
                   ? l10n.removeFromFavorites

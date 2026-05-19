@@ -4,26 +4,68 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
+/// Owns the "is a favourite-toggle save in flight?" state for a single
+/// [AnimatedFavouriteIcon]. Created in the parent widget's `initState` and
+/// disposed in its `dispose`. Call [trigger] from the tap handler with the
+/// actual save work; the controller handles the pending flag, the
+/// minimum-visible-spin delay, and error swallowing so the parent doesn't
+/// have to.
+class FavoriteIconController extends ChangeNotifier {
+  FavoriteIconController({
+    this.minSpinDuration = const Duration(milliseconds: 500),
+  });
+
+  /// Minimum time the spin stays visible after a tap, even if the underlying
+  /// save completes faster. Keeps the micro-interaction readable.
+  final Duration minSpinDuration;
+
+  bool _isPending = false;
+  bool get isPending => _isPending;
+
+  /// Runs [work] (the actual save) while the icon spins. The spin holds
+  /// for at least [minSpinDuration] regardless of how fast [work] resolves.
+  /// Ignored if a previous trigger is still in flight.
+  Future<void> trigger(Future<void> Function() work) async {
+    if (_isPending) return;
+    _isPending = true;
+    notifyListeners();
+
+    final minSpin = Future<void>.delayed(minSpinDuration);
+    try {
+      await work();
+    } catch (_) {
+      // Swallow: the caller decides whether to surface errors; the icon
+      // just shows the spin. Errors will already have been logged inside
+      // the notifier.
+    }
+    await minSpin;
+
+    _isPending = false;
+    notifyListeners();
+  }
+}
+
 class AnimatedFavouriteIcon extends StatefulWidget {
   const AnimatedFavouriteIcon({
     super.key,
     required this.isFavorite,
     required this.color,
-    this.isPending = false,
+    this.controller,
   });
 
   final bool isFavorite;
   final Color color;
 
-  /// While true, the icon spins. When the caller clears it, the spin
-  /// decelerates with an overshoot back to upright.
-  final bool isPending;
+  /// Optional. When provided, the icon spins while the controller reports
+  /// pending and decelerates with an overshoot on release. When null, the
+  /// icon is static (entrance + swap animations still play).
+  final FavoriteIconController? controller;
 
   @override
-  State<AnimatedFavouriteIcon> createState() => AnimatedFavouriteIconState();
+  State<AnimatedFavouriteIcon> createState() => _AnimatedFavouriteIconState();
 }
 
-class AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
+class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
     with TickerProviderStateMixin {
   // Entrance: fade in + scale-up + small initial rotation when the icon
   // first appears in the bar.
@@ -32,20 +74,18 @@ class AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
   late final Animation<double> _entranceScale;
   late final Animation<double> _entranceRotationTurns;
 
-  // While the favourite save is in flight, this controller drives a
-  // tight 320ms-per-revolution spin via repeat().
+  // While the controller reports pending, this drives a tight
+  // 320ms-per-revolution spin via repeat().
   late final AnimationController _spinController;
 
-  // When pending clears, this controller plays a one-shot deceleration
-  // from the spin's current angle past upright (overshoot) and settling
-  // back. Curve = easeOutBack for the snap-and-settle feel.
+  // When the controller clears pending, this plays a one-shot deceleration
+  // from the spin's current angle past upright (easeOutBack overshoot) and
+  // settles. Both controllers feed the same Transform.rotate.
   late final AnimationController _releaseController;
 
-  // The accumulated spin angle (in turns) at the moment pending cleared.
-  // Held during the release animation so the curve carries from this
-  // value to the next integer turn.
   double _releaseFromTurns = 0;
   bool _isReleasing = false;
+  bool _wasPending = false;
 
   @override
   void initState() {
@@ -87,7 +127,9 @@ class AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
       duration: const Duration(milliseconds: 520),
     );
 
-    if (widget.isPending) {
+    widget.controller?.addListener(_onPendingChanged);
+    _wasPending = widget.controller?.isPending ?? false;
+    if (_wasPending) {
       _spinController.repeat();
     }
   }
@@ -95,9 +137,20 @@ class AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
   @override
   void didUpdateWidget(AnimatedFavouriteIcon oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.isPending && !oldWidget.isPending) {
+    if (widget.controller != oldWidget.controller) {
+      oldWidget.controller?.removeListener(_onPendingChanged);
+      widget.controller?.addListener(_onPendingChanged);
+      _wasPending = widget.controller?.isPending ?? false;
+    }
+  }
+
+  void _onPendingChanged() {
+    final pending = widget.controller?.isPending ?? false;
+    if (pending == _wasPending) return;
+    _wasPending = pending;
+    if (pending) {
       _startSpin();
-    } else if (!widget.isPending && oldWidget.isPending) {
+    } else {
       _startRelease();
     }
   }
@@ -126,24 +179,24 @@ class AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
 
   @override
   void dispose() {
+    widget.controller?.removeListener(_onPendingChanged);
     _entranceController.dispose();
     _spinController.dispose();
     _releaseController.dispose();
     super.dispose();
   }
 
-  /// Current rotation in turns (0..1+). Driven by whichever animation is
-  /// active: the continuous spin while pending, the easeOutBack deceleration
-  /// during release, or 0 at rest.
+  /// Current rotation in turns. Active source: the continuous spin while
+  /// pending, the easeOutBack deceleration during release, 0 at rest.
   double _currentTurns() {
     if (_isReleasing) {
       final t = Curves.easeOutBack.transform(_releaseController.value);
-      // Carry from the captured spin angle to one full turn past it (which
-      // is visually upright again for a rotationally-symmetric icon, but
-      // the easeOutBack overshoot makes the settle visible regardless).
+      // Carry from the captured spin angle to one full turn past it.
+      // (Visually equivalent to upright for a rotationally-symmetric icon,
+      // but the easeOutBack overshoot makes the settle readable regardless.)
       return _releaseFromTurns + (1.0 - _releaseFromTurns) * t;
     }
-    if (widget.isPending) {
+    if (_wasPending) {
       return _spinController.value;
     }
     return 0;
