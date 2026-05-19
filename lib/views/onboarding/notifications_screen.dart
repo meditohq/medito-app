@@ -13,7 +13,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
@@ -140,7 +140,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       parameters: {'variant': _previewVariant},
     );
 
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = ref.read(sharedPreferencesProvider);
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
 
     final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);

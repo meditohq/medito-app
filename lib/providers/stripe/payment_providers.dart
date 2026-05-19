@@ -9,6 +9,7 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 
 import '../../constants/stripe/stripe_constants.dart';
 import '../../models/stripe/payment_error_model.dart';
@@ -422,7 +423,8 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     try {
       state = const AsyncValue.loading();
 
-      final utmParams = await _getStoredUtmParameters();
+      final utmParams =
+          _getStoredUtmParameters(ref.read(sharedPreferencesProvider));
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,
@@ -491,7 +493,8 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     try {
       state = const AsyncValue.loading();
 
-      final utmParams = await _getStoredUtmParameters();
+      final utmParams =
+          _getStoredUtmParameters(ref.read(sharedPreferencesProvider));
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,
@@ -562,7 +565,8 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     try {
       state = const AsyncValue.loading();
 
-      final utmParams = await _getStoredUtmParameters();
+      final utmParams =
+          _getStoredUtmParameters(ref.read(sharedPreferencesProvider));
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,
@@ -622,9 +626,8 @@ IDonationApiService donationService(Ref ref) {
 }
 
 // Helper function to get stored UTM parameters from SharedPreferences
-Future<Map<String, String>> _getStoredUtmParameters() async {
+Map<String, String> _getStoredUtmParameters(SharedPreferences prefs) {
   try {
-    final prefs = await SharedPreferences.getInstance();
     final utmParams = <String, String>{};
 
     final utmParamKeys = [

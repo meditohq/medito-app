@@ -3,9 +3,9 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/error_widget/report_cooldown_provider.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
@@ -148,12 +148,10 @@ class MeditoErrorWidget extends ConsumerWidget {
                       btnText: AppLocalizations.of(context)!.signInAgain,
                       onPressed: () async {
                         final authRepository =
-                            ProviderScope.containerOf(context)
-                                .read(authRepositorySyncProvider);
+                            ref.read(authRepositorySyncProvider);
                         await authRepository.signOut();
-                        await StatsManager().clearAllStats();
+                        await ref.read(statsManagerProvider).clearAllStats();
                         if (context.mounted) {
-                          final ref = ProviderScope.containerOf(context);
                           ref.read(meRefreshProvider)();
 
                           // Add a small delay to let the me provider refresh before navigation

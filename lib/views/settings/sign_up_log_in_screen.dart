@@ -17,7 +17,6 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
@@ -162,7 +161,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   Future<void> _requestOtp() async {
     if (_isLoading || _isRateLimited) return;
 
-    final hasLocalStats = await StatsManager().hasLocalStats();
+    final hasLocalStats =
+        await ref.read(statsManagerProvider).hasLocalStats();
 
     if (hasLocalStats) {
       final proceed = await showDialog<bool>(
@@ -270,7 +270,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         // Set user ID for analytics immediately after successful sign-in
         // This ensures user ID is set before any events are logged
         try {
-          final userId = await ref.read(userIdProvider.future);
+          final userId = ref.read(userIdProvider);
           if (userId != null && userId.isNotEmpty) {
             await FirebaseAnalyticsService().setUserId(userId);
             await MetaSdkService.instance.setUserId(userId);
@@ -291,7 +291,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         // will throw LateInitializationError if the singleton hasn't been
         // initialized yet (e.g. user signs in straight from onboarding
         // without ever loading the home screen).
-        var statsManager = StatsManager();
+        final statsManager = ref.read(statsManagerProvider);
         await statsManager.initialize();
         await statsManager.clearAllStats();
         // Force sync after clearing stats to ensure we fetch from server

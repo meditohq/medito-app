@@ -6,7 +6,6 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/account/account_service.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/splash_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
@@ -72,7 +71,7 @@ class AccountSectionWidget extends ConsumerWidget {
             onTap: () async {
               try {
                 await authRepository.signOut();
-                await StatsManager().clearAllStats();
+                await ref.read(statsManagerProvider).clearAllStats();
                 ref.read(meRefreshProvider)();
                 ref.read(statsProvider.notifier).refresh();
                 ref.invalidate(packProvider);
@@ -139,7 +138,7 @@ class AccountSectionWidget extends ConsumerWidget {
                   // Assuming deletion page handles the rest and user might manually sign out or be signed out.
                   // Forcing local sign out for consistency.
                   await authRepository.signOut();
-                  await StatsManager().clearAllStats();
+                  await ref.read(statsManagerProvider).clearAllStats();
                   ref.read(meRefreshProvider)();
                   ref.read(statsProvider.notifier).refresh();
                   ref.invalidate(packProvider);

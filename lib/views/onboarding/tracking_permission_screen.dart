@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/services/app_tracking_transparency_service.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -12,12 +13,12 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/utils/utils.dart';
 
-class TrackingPermissionScreen extends StatelessWidget {
+class TrackingPermissionScreen extends ConsumerWidget {
   const TrackingPermissionScreen({super.key, this.onNext});
 
   final VoidCallback? onNext;
 
-  Future<void> _handleContinue(BuildContext context) async {
+  Future<void> _handleContinue(BuildContext context, WidgetRef ref) async {
     if (Platform.isIOS) {
       try {
         // Request ATT permission using the shared service
@@ -25,9 +26,8 @@ class TrackingPermissionScreen extends StatelessWidget {
             .requestTrackingPermission();
 
         // Update Firebase Analytics based on ATT result (handles disabling if denied)
-        final prefs = await SharedPreferences.getInstance();
         if (status != TrackingStatus.authorized) {
-          await prefs.setBool(
+          await ref.read(sharedPreferencesProvider).setBool(
               SharedPreferenceConstants.analyticsFirebaseEnabled, false);
         }
 
@@ -56,7 +56,7 @@ class TrackingPermissionScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
@@ -108,7 +108,8 @@ class TrackingPermissionScreen extends StatelessWidget {
                     const SizedBox(height: 32),
                     _buildActionButton(
                       text: l10n.trackingPermissionAllow,
-                      onPressed: () async => await _handleContinue(context),
+                      onPressed: () async =>
+                          await _handleContinue(context, ref),
                     ),
                   ],
                 ),

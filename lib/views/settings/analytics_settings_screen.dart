@@ -4,22 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-final _firebaseEnabledProvider = FutureProvider<bool>((ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
+final _firebaseEnabledProvider = Provider<bool>((ref) {
+  return ref
+          .watch(sharedPreferencesProvider)
+          .getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
       true;
 });
 
-final _metaEnabledProvider = FutureProvider<bool>((ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool(SharedPreferenceConstants.analyticsMetaEnabled) ?? true;
+final _metaEnabledProvider = Provider<bool>((ref) {
+  return ref
+          .watch(sharedPreferencesProvider)
+          .getBool(SharedPreferenceConstants.analyticsMetaEnabled) ??
+      true;
 });
 
 class AnalyticsSettingsScreen extends ConsumerWidget {
@@ -27,8 +30,6 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final l10n = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.analyticsTrackingTitle),
@@ -51,11 +52,10 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
                     ? AppLocalizations.of(context)!.iosTrackingDialogContent
                     : AppLocalizations.of(context)!.analyticsTrackingContent,
                 onChanged: (value) async {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool(
-                    SharedPreferenceConstants.analyticsFirebaseEnabled,
-                    value,
-                  );
+                  await ref.read(sharedPreferencesProvider).setBool(
+                        SharedPreferenceConstants.analyticsFirebaseEnabled,
+                        value,
+                      );
                   // Disable/enable the SDKs at the native level
                   await FirebaseAnalyticsService()
                       .setCollectionEnabled(value);
@@ -70,11 +70,10 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
                     ? AppLocalizations.of(context)!.iosTrackingDialogContent
                     : AppLocalizations.of(context)!.analyticsTrackingContent,
                 onChanged: (value) async {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool(
-                    SharedPreferenceConstants.analyticsMetaEnabled,
-                    value,
-                  );
+                  await ref.read(sharedPreferencesProvider).setBool(
+                        SharedPreferenceConstants.analyticsMetaEnabled,
+                        value,
+                      );
                   // Disable/enable the Meta SDK at runtime
                   await MetaSdkService.instance.setEnabled(value);
                   ref.invalidate(_metaEnabledProvider);
@@ -107,7 +106,7 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
 
 class _SwitchTile extends ConsumerWidget {
   final String label;
-  final FutureProvider<bool> provider;
+  final Provider<bool> provider;
   final String onConfirmDisableMessage;
   final ValueChanged<bool> onChanged;
 
@@ -120,53 +119,40 @@ class _SwitchTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(provider);
+    final enabled = ref.watch(provider);
 
-    return state.when(
-      loading: () => SwitchListTile(
-        title: Text(label),
-        value: true,
-        onChanged: null,
-      ),
-      error: (_, _) => SwitchListTile(
-        title: Text(label),
-        value: true,
-        onChanged: null,
-      ),
-      data: (enabled) => SwitchListTile(
-        title: Text(label),
-        value: enabled,
-        onChanged: (value) async {
-          if (!value) {
-            final confirm = await showDialog<bool>(
-              context: context,
-              builder: (ctx) => MeditoDialog(
-                title: AppLocalizations.of(context)!.areYouSure,
-                content: MeditoDialogBody(
-                  Platform.isIOS
-                      ? AppLocalizations.of(context)!.iosTrackingDialogContent
-                      : AppLocalizations.of(context)!.analyticsTrackingContent,
-                ),
-                actions: [
-                  MeditoDialogSecondaryButton(
-                    label: AppLocalizations.of(context)!.iosTrackingDialogCancel,
-                    onPressed: () => Navigator.pop(ctx, false),
-                  ),
-                  MeditoDialogDestructiveButton(
-                    label:
-                        AppLocalizations.of(context)!.iosTrackingDialogDisable,
-                    onPressed: () => Navigator.pop(ctx, true),
-                  ),
-                ],
+    return SwitchListTile(
+      title: Text(label),
+      value: enabled,
+      onChanged: (value) async {
+        if (!value) {
+          final confirm = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => MeditoDialog(
+              title: AppLocalizations.of(context)!.areYouSure,
+              content: MeditoDialogBody(
+                Platform.isIOS
+                    ? AppLocalizations.of(context)!.iosTrackingDialogContent
+                    : AppLocalizations.of(context)!.analyticsTrackingContent,
               ),
-            );
+              actions: [
+                MeditoDialogSecondaryButton(
+                  label: AppLocalizations.of(context)!.iosTrackingDialogCancel,
+                  onPressed: () => Navigator.pop(ctx, false),
+                ),
+                MeditoDialogDestructiveButton(
+                  label: AppLocalizations.of(context)!.iosTrackingDialogDisable,
+                  onPressed: () => Navigator.pop(ctx, true),
+                ),
+              ],
+            ),
+          );
 
-            if (confirm != true) return;
-          }
+          if (confirm != true) return;
+        }
 
-          onChanged(value);
-        },
-      ),
+        onChanged(value);
+      },
     );
   }
 }

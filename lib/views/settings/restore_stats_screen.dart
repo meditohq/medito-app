@@ -7,7 +7,7 @@ import 'package:medito/services/stats_backup_service.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/snackbar_widget.dart' show showSnackBar;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 
 /// Lists every stats snapshot stored on the device (across users) and lets
 /// the user restore one. Snapshots are written automatically by
@@ -30,7 +30,7 @@ class _RestoreStatsScreenState extends ConsumerState<RestoreStatsScreen> {
   }
 
   Future<List<StatsBackup>> _loadBackups() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = ref.read(sharedPreferencesProvider);
     final service = StatsBackupService(prefs: prefs);
     final backups = await service.getAllBackupsAcrossUsers();
     backups.sort((a, b) => b.timestamp.compareTo(a.timestamp));

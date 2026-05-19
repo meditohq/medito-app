@@ -9,7 +9,6 @@ import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
@@ -271,7 +270,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
           .logFirstActionAfterOnboardingIfNeeded('up_next_skip'),
     );
 
-    final statsManager = StatsManager();
+    final statsManager = ref.read(statsManagerProvider);
     await statsManager.initialize();
     await statsManager.addTrackChecked(nextSession.id);
 

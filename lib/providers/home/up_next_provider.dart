@@ -3,8 +3,8 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/repositories.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/home_widget_service.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'up_next_provider.g.dart';
@@ -43,7 +43,7 @@ class UpNext extends _$UpNext {
   Future<UpNextData> _load() async {
     final packRepository = ref.read(packRepositoryProvider);
     final prefs = ref.read(sharedPreferencesProvider);
-    final statsManager = StatsManager();
+    final statsManager = ref.read(statsManagerProvider);
     if (!statsManager.isInitialized) {
       await statsManager.initialize();
     }

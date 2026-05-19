@@ -6,8 +6,8 @@ import 'package:medito/utils/stats_manager.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/home_widget_service.dart';
 
@@ -16,24 +16,26 @@ part 'stats_provider.g.dart';
 final statsManagerProvider = Provider<StatsManager>((ref) => StatsManager());
 
 /// Provides the best-available user ID (auth first, then SharedPreferences)
-final userIdProvider = FutureProvider<String?>((ref) async {
+final userIdProvider = Provider<String?>((ref) {
   final authRepository = ref.watch(authRepositorySyncProvider);
   final idFromAuth = authRepository.currentUser?.id;
   if (idFromAuth != null && idFromAuth.isNotEmpty) {
     return idFromAuth;
   }
-
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString(SharedPreferenceConstants.userId);
+  return ref
+      .watch(sharedPreferencesProvider)
+      .getString(SharedPreferenceConstants.userId);
 });
 
 final editStatsUrlProvider = FutureProvider<String>((ref) async {
-  var clientId = ref.watch(userIdProvider).value ?? '';
+  var clientId = ref.watch(userIdProvider) ?? '';
 
   // If clientId is empty, try to get it directly from SharedPreferences
   if (clientId.isEmpty) {
-    final prefs = await SharedPreferences.getInstance();
-    clientId = prefs.getString(SharedPreferenceConstants.userId) ?? '';
+    clientId = ref
+            .read(sharedPreferencesProvider)
+            .getString(SharedPreferenceConstants.userId) ??
+        '';
     AppLogger.d(
       'STATS_PROVIDER',
       'Using fallback clientId from SharedPreferences: $clientId',

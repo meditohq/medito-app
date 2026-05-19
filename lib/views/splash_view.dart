@@ -268,7 +268,7 @@ class SplashViewState extends ConsumerState<SplashView>
       // Set user ID for analytics immediately after user initialization
       // This ensures user ID is set before any events are logged
       try {
-        final userId = await ref.read(userIdProvider.future);
+        final userId = ref.read(userIdProvider);
         if (userId != null && userId.isNotEmpty) {
           await FirebaseAnalyticsService().setUserId(userId);
           await MetaSdkService.instance.setUserId(userId);
@@ -400,7 +400,7 @@ class SplashViewState extends ConsumerState<SplashView>
 
       // Set user ID for analytics immediately after anonymous sign in
       try {
-        final userId = await ref.read(userIdProvider.future);
+        final userId = ref.read(userIdProvider);
         if (userId != null && userId.isNotEmpty) {
           await FirebaseAnalyticsService().setUserId(userId);
           await MetaSdkService.instance.setUserId(userId);

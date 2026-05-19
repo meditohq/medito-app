@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart'
@@ -278,7 +277,7 @@ class DebugInfoScreen extends ConsumerWidget {
         await ref.read(reminderProvider).getPendingNotifications();
     AppLogger.d(
         'XXXX', 'Got ${reminders.length} pending notifications from system');
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = ref.read(sharedPreferencesProvider);
     final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
     final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
     final isReminderEnabled =
@@ -327,7 +326,7 @@ class DebugInfoScreen extends ConsumerWidget {
         savedMinute != null) {
       AppLogger.d('XXXX',
           'Debug mode: No pending notifications but reminders enabled, adding calculated dates for UI');
-      final calculatedDates = await _getCalculatedScheduledDates();
+      final calculatedDates = await _getCalculatedScheduledDates(ref);
       for (final entry in calculatedDates) {
         result.add(_ReminderWithDate.calculated(
             id: entry.key, scheduledDate: entry.value));
@@ -337,8 +336,9 @@ class DebugInfoScreen extends ConsumerWidget {
     return result;
   }
 
-  Future<List<MapEntry<int, DateTime>>> _getCalculatedScheduledDates() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<List<MapEntry<int, DateTime>>> _getCalculatedScheduledDates(
+      WidgetRef ref) async {
+    final prefs = ref.read(sharedPreferencesProvider);
     final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
     final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
     final isReminderEnabled =
@@ -466,7 +466,7 @@ class DebugInfoScreen extends ConsumerWidget {
     var fullInfo = infoString;
 
     final reminders = await _getPendingRemindersWithDates(ref);
-    final calculatedDates = await _getCalculatedScheduledDates();
+    final calculatedDates = await _getCalculatedScheduledDates(ref);
 
     AppLogger.d('DEBUG_INFO_SCREEN',
         'Copy debug info: ${reminders.length} pending reminders, ${calculatedDates.length} calculated dates');
