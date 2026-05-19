@@ -5,19 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
-import '../../../../../models/track/track_model.dart';
 import '../../../../background_sound/background_sound_view.dart';
 
 class BgSoundWidget extends ConsumerStatefulWidget {
   const BgSoundWidget({
     super.key,
-    required this.trackModel,
-    required this.file,
     required this.isBackgroundSoundSelected,
   });
 
-  final TrackModel trackModel;
-  final TrackFilesModel file;
   final bool isBackgroundSoundSelected;
 
   @override

@@ -7,7 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../models/favorites/favorite_item.dart';
-import '../../../../models/track/track_model.dart';
+import '../../../../models/track/track.dart';
 import '../../../../providers/favorites/favorites_provider.dart';
 import '../../../../providers/meditation/track_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
@@ -146,7 +146,7 @@ class TrackViewBottomBar extends ConsumerWidget {
   Widget _buildBottomBar(
     BuildContext context,
     WidgetRef ref,
-    TrackModel track,
+    Track track,
     bool isFavorite,
     bool isDailyMeditation,
   ) {

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants/constants.dart';
 import '../l10n/app_localizations.dart';
-import '../models/track/track_model.dart';
+import '../models/models.dart';
 import '../providers/device_and_app_info/device_and_app_info_provider.dart';
 import '../services/report_service.dart';
 import '../utils/duration_extensions.dart';
@@ -14,13 +14,13 @@ import 'snackbar_widget.dart';
 
 /// Dialog widget for reporting track issues
 class ReportDialogWidget extends ConsumerWidget {
-  final TrackModel track;
+  final PlaybackRequest request;
   final int timestampAtOpen;
   final String formattedPosition;
 
   ReportDialogWidget({
     super.key,
-    required this.track,
+    required this.request,
     required this.timestampAtOpen,
   }) : formattedPosition =
             Duration(milliseconds: timestampAtOpen).toMinutesSeconds();
@@ -43,7 +43,7 @@ class ReportDialogWidget extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MeditoDialogBody(l10n.reportTrackDescription(track.title)),
+                MeditoDialogBody(l10n.reportTrackDescription(request.title)),
                 const SizedBox(height: 16),
                 Text(
                   l10n.reportDialogQuestion,
@@ -102,10 +102,10 @@ class ReportDialogWidget extends ConsumerWidget {
 
       await ReportService.launchReportForm(
         locale: locale,
-        trackId: track.id,
+        trackId: request.trackId,
         timestamp: timestamp,
-        trackName: track.title,
-        guideName: track.audio.isNotEmpty ? track.audio.first.guideName : null,
+        trackName: request.title,
+        guideName: request.guideName,
       );
 
       if (context.mounted) {

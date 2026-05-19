@@ -6,7 +6,7 @@ import 'package:medito/models/home/home_model.dart';
 import 'package:medito/models/home/shortcuts/shortcuts_model.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/models/pack/pack_model.dart';
-import 'package:medito/models/track/track_model.dart';
+import 'package:medito/models/track/track.dart';
 import 'package:medito/models/me/me_model.dart';
 import 'package:medito/models/stats/all_stats_model.dart';
 import 'package:medito/models/favorites/favorite_item.dart';
@@ -146,8 +146,8 @@ final mockPacks = [
 // Tracks
 // ---------------------------------------------------------------------------
 
-final mockTracks = <String, TrackModel>{
-  'track-1': TrackModel(
+final mockTracks = <String, Track>{
+  'track-1': Track(
     id: 'track-1',
     title: 'Introduction to Meditation',
     subtitle: 'A gentle start to your practice',
@@ -156,17 +156,17 @@ final mockTracks = <String, TrackModel>{
     coverUrl: 'https://picsum.photos/seed/track1/400/400',
     isPublished: true,
     hasBackgroundSound: true,
-    artist: TrackArtistModel(name: 'Medito Team', path: ''),
-    audio: [
-      TrackAudioModel(
+    artist: TrackArtist(name: 'Medito Team', path: ''),
+    voices: [
+      TrackVoice(
         guideName: 'Default',
-        files: [
-          TrackFilesModel(id: 'file-1', path: _trackAudioUrl, duration: 600),
+        audioFiles: [
+          TrackAudioFile(id: 'file-1', path: _trackAudioUrl, duration: 600),
         ],
       ),
     ],
   ),
-  'track-2': TrackModel(
+  'track-2': Track(
     id: 'track-2',
     title: 'Breath Awareness',
     subtitle: 'Focus on your natural breath',
@@ -175,17 +175,17 @@ final mockTracks = <String, TrackModel>{
     coverUrl: 'https://picsum.photos/seed/track2/400/400',
     isPublished: true,
     hasBackgroundSound: true,
-    artist: TrackArtistModel(name: 'Medito Team', path: ''),
-    audio: [
-      TrackAudioModel(
+    artist: TrackArtist(name: 'Medito Team', path: ''),
+    voices: [
+      TrackVoice(
         guideName: 'Default',
-        files: [
-          TrackFilesModel(id: 'file-2', path: _trackAudioUrl, duration: 720),
+        audioFiles: [
+          TrackAudioFile(id: 'file-2', path: _trackAudioUrl, duration: 720),
         ],
       ),
     ],
   ),
-  'track-3': TrackModel(
+  'track-3': Track(
     id: 'track-3',
     title: 'Body Scan',
     subtitle: 'Relax from head to toe',
@@ -194,17 +194,17 @@ final mockTracks = <String, TrackModel>{
     coverUrl: 'https://picsum.photos/seed/track3/400/400',
     isPublished: true,
     hasBackgroundSound: true,
-    artist: TrackArtistModel(name: 'Medito Team', path: ''),
-    audio: [
-      TrackAudioModel(
+    artist: TrackArtist(name: 'Medito Team', path: ''),
+    voices: [
+      TrackVoice(
         guideName: 'Default',
-        files: [
-          TrackFilesModel(id: 'file-3', path: _trackAudioUrl, duration: 900),
+        audioFiles: [
+          TrackAudioFile(id: 'file-3', path: _trackAudioUrl, duration: 900),
         ],
       ),
     ],
   ),
-  'track-4': TrackModel(
+  'track-4': Track(
     id: 'track-4',
     title: 'Rainy Night',
     subtitle: 'A calming sleep story',
@@ -213,17 +213,17 @@ final mockTracks = <String, TrackModel>{
     coverUrl: 'https://picsum.photos/seed/track4/400/400',
     isPublished: true,
     hasBackgroundSound: false,
-    artist: TrackArtistModel(name: 'Medito Team', path: ''),
-    audio: [
-      TrackAudioModel(
+    artist: TrackArtist(name: 'Medito Team', path: ''),
+    voices: [
+      TrackVoice(
         guideName: 'Default',
-        files: [
-          TrackFilesModel(id: 'file-4', path: _trackAudioUrl, duration: 1200),
+        audioFiles: [
+          TrackAudioFile(id: 'file-4', path: _trackAudioUrl, duration: 1200),
         ],
       ),
     ],
   ),
-  'track-5': TrackModel(
+  'track-5': Track(
     id: 'track-5',
     title: 'Ocean Waves',
     subtitle: 'Let the waves carry you to sleep',
@@ -232,12 +232,12 @@ final mockTracks = <String, TrackModel>{
     coverUrl: 'https://picsum.photos/seed/track5/400/400',
     isPublished: true,
     hasBackgroundSound: false,
-    artist: TrackArtistModel(name: 'Medito Team', path: ''),
-    audio: [
-      TrackAudioModel(
+    artist: TrackArtist(name: 'Medito Team', path: ''),
+    voices: [
+      TrackVoice(
         guideName: 'Default',
-        files: [
-          TrackFilesModel(id: 'file-5', path: _trackAudioUrl, duration: 1500),
+        audioFiles: [
+          TrackAudioFile(id: 'file-5', path: _trackAudioUrl, duration: 1500),
         ],
       ),
     ],

@@ -38,7 +38,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final key = GlobalKey<AnimatedListState>();
   var scaffoldKey = GlobalKey<ScaffoldState>();
-  List<TrackModel> downloadedTracks = [];
+  List<Track> downloadedTracks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +93,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  ReorderableListView _getDownloadList(List<TrackModel> tracks) {
-    // In order for the Dismissible action still to work on the list items,
-    // the default ReorderableListView is used (instead of the .builder one)
+  ReorderableListView _getDownloadList(List<Track> tracks) {
     return ReorderableListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
       onReorder: (int oldIndex, int newIndex) {
@@ -105,7 +103,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           }
           var reorderedItem = tracks.removeAt(oldIndex);
           tracks.insert(newIndex, reorderedItem);
-          // To ensure, that the new list order is saved
           ref.read(
             addTrackListInPreferenceProvider(tracks: tracks),
           );
@@ -119,10 +116,10 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         message: AppLocalizations.of(context)!.emptyDownloadsMessage,
       );
 
-  Widget _getSlidingItem(TrackModel item) {
+  Widget _getSlidingItem(Track item) {
+    final firstFile = item.voices.first.audioFiles.first;
     return InkWell(
-      // This (additional) key is required in order for the ReorderableListView to distinguish between the different list items
-      key: ValueKey('${item.id}-${item.audio.first.files.first.id}'),
+      key: ValueKey('${item.id}-${firstFile.id}'),
       onTap: () {
         _openPlayer(ref, item);
       },
@@ -154,12 +151,12 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         ),
       );
 
-  DownloadListItemWidget _getListItemWidget(TrackModel item) {
+  DownloadListItemWidget _getListItemWidget(Track item) {
+    final firstVoice = item.voices.first;
+    final firstFile = firstVoice.audioFiles.first;
     var audioLength =
-        Duration(milliseconds: item.audio.first.files.first.duration)
-            .inMinutes
-            .toString();
-    var guideName = item.audio.first.guideName;
+        Duration(milliseconds: firstFile.duration).inMinutes.toString();
+    var guideName = firstVoice.guideName;
     var duration = _getDuration(audioLength);
     var subTitle = guideName != null ? '$guideName — $duration' : duration;
     var imageUrl = item.coverUrl;
@@ -176,16 +173,13 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   String _getDuration(String? length) => formatTrackLength(length);
 
-  void _openPlayer(
-    WidgetRef ref,
-    TrackModel trackModel,
-  ) async {
+  void _openPlayer(WidgetRef ref, Track track) async {
     await PermissionHandler.requestMediaPlaybackPermission(context);
 
-    await ref.read(playerProvider.notifier).loadSelectedTrack(
-          trackModel: trackModel,
-          file: trackModel.audio.first.files.first,
-        );
+    final voice = track.voices.first;
+    final file = voice.audioFiles.first;
+    final request = PlaybackRequest.fromTrack(track, voice, file);
+    await ref.read(playerProvider.notifier).play(request);
     unawaited(Navigator.push(
       context,
       MaterialPageRoute(
@@ -194,7 +188,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     ));
   }
 
-  void _handleDismissible(DismissDirection _, TrackModel item) async {
+  void _handleDismissible(DismissDirection _, Track item) async {
     bool? confirmDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -227,15 +221,14 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         backgroundColor: ColorConstants.white,
       );
     } else {
-      // If the user cancels, refresh the list to ensure all items are visible again.
       ref.invalidate(downloadedTracksProvider);
     }
   }
 
-  Future<void> _deleteDownload(TrackModel item) async {
-    final firstItem = item.audio.first.files.first;
+  Future<void> _deleteDownload(Track item) async {
+    final firstFile = item.voices.first.audioFiles.first;
     final fileName =
-        '${item.id}-${firstItem.id}${getAudioFileExtension(firstItem.path)}';
+        '${item.id}-${firstFile.id}${getAudioFileExtension(firstFile.path)}';
 
     final isDownloaded =
         await ref.read(downloaderRepositoryProvider).isFileDownloaded(fileName);
@@ -247,8 +240,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
     final trackList =
         await ref.read(trackRepositoryProvider).fetchTrackFromPreference();
-    trackList.removeWhere((t) =>
-        t.audio.first.files.any((f) => f.id == firstItem.id));
+    trackList.removeWhere((t) => t.voices
+        .first.audioFiles.any((f) => f.id == firstFile.id));
     await ref.read(trackRepositoryProvider).addTrackInPreference(trackList);
 
     ref.invalidate(downloadedTracksProvider);

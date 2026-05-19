@@ -28,11 +28,11 @@ import 'widgets/donation_widget.dart';
 import 'widgets/zen_mode_animation.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
-  final TrackModel trackModel;
+  final PlaybackRequest request;
 
   const EndScreenView({
     super.key,
-    required this.trackModel,
+    required this.request,
   });
 
   @override

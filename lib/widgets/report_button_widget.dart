@@ -5,17 +5,17 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 import '../constants/colors/color_constants.dart';
-import '../models/track/track_model.dart';
+import '../models/models.dart';
 import '../providers/player/audio_state_provider.dart';
 import 'report_dialog_widget.dart';
 
 /// Button widget for reporting track issues
 class ReportButtonWidget extends ConsumerWidget {
-  final TrackModel track;
+  final PlaybackRequest request;
 
   const ReportButtonWidget({
     super.key,
-    required this.track,
+    required this.request,
   });
 
   @override
@@ -37,14 +37,13 @@ class ReportButtonWidget extends ConsumerWidget {
   }
 
   void _showReportDialog(BuildContext context, WidgetRef ref) {
-    // Capture the current position when the dialog is opened
     final playbackState = ref.read(audioStateProvider);
     final currentPosition = playbackState.position;
 
     showDialog(
       context: context,
       builder: (context) => ReportDialogWidget(
-        track: track,
+        request: request,
         timestampAtOpen: currentPosition,
       ),
     );

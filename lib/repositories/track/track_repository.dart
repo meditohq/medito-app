@@ -9,19 +9,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'track_repository.g.dart';
 
 abstract class TrackRepository {
-  Future<TrackModel> fetchTrack(String trackId);
+  Future<Track> fetchTrack(String trackId);
 
-  Future<List<TrackModel>> fetchTrackFromPreference();
+  Future<List<Track>> fetchTrackFromPreference();
 
-  Future<void> addTrackInPreference(List<TrackModel> trackList);
+  Future<void> addTrackInPreference(List<Track> trackList);
 
   Future<void> addCurrentlyPlayingTrackInPreference(
-    TrackModel trackModel,
+    Track track,
   );
 
   Future<void> removeCurrentlyPlayingTrackInPreference();
 
-  Future<TrackModel?> fetchCurrentlyPlayingTrackFromPreference();
+  Future<Track?> fetchCurrentlyPlayingTrackFromPreference();
 }
 
 class TrackRepositoryImpl extends TrackRepository {
@@ -31,19 +31,19 @@ class TrackRepositoryImpl extends TrackRepository {
   TrackRepositoryImpl({required this.ref, required this.client});
 
   @override
-  Future<TrackModel> fetchTrack(String trackId) async {
+  Future<Track> fetchTrack(String trackId) async {
     try {
       var response =
           await client.getRequest('${HTTPConstants.tracks}/$trackId');
-      return TrackModel.fromJson(response);
+      return Track.fromJson(response);
     } catch (e) {
       rethrow;
     }
   }
 
   @override
-  Future<List<TrackModel>> fetchTrackFromPreference() async {
-    var downloadedTrackList = <TrackModel>[];
+  Future<List<Track>> fetchTrackFromPreference() async {
+    var downloadedTrackList = <Track>[];
     var downloadedTrackFromPref = ref
         .read(sharedPreferencesProvider)
         .getString(SharedPreferenceConstants.downloads);
@@ -51,7 +51,7 @@ class TrackRepositoryImpl extends TrackRepository {
       var tempList = [];
       tempList = json.decode(downloadedTrackFromPref);
       for (var element in tempList) {
-        downloadedTrackList.add(TrackModel.fromJson(element));
+        downloadedTrackList.add(Track.fromJson(element));
       }
     }
 
@@ -59,7 +59,7 @@ class TrackRepositoryImpl extends TrackRepository {
   }
 
   @override
-  Future<void> addTrackInPreference(List<TrackModel> trackList) async {
+  Future<void> addTrackInPreference(List<Track> trackList) async {
     await ref.read(sharedPreferencesProvider).setString(
           SharedPreferenceConstants.downloads,
           json.encode(trackList),
@@ -68,11 +68,11 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<void> addCurrentlyPlayingTrackInPreference(
-    TrackModel trackModel,
+    Track track,
   ) async {
     await ref.read(sharedPreferencesProvider).setString(
           SharedPreferenceConstants.currentPlayingTrack,
-          json.encode(trackModel),
+          json.encode(track),
         );
   }
 
@@ -84,12 +84,12 @@ class TrackRepositoryImpl extends TrackRepository {
   }
 
   @override
-  Future<TrackModel?> fetchCurrentlyPlayingTrackFromPreference() async {
+  Future<Track?> fetchCurrentlyPlayingTrackFromPreference() async {
     var track = ref.read(sharedPreferencesProvider).getString(
           SharedPreferenceConstants.currentPlayingTrack,
         );
     if (track != null) {
-      return TrackModel.fromJson(json.decode(track));
+      return Track.fromJson(json.decode(track));
     }
 
     return null;

@@ -7,128 +7,105 @@ import 'package:flutter/foundation.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../models/player/repeat_mode.dart' as app_repeat;
-import '../../src/audio_pigeon.g.dart';
+import '../../src/audio_pigeon.g.dart' as pigeon;
 import '../../utils/utils.dart';
 import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
 import 'ios_audio_handler.dart';
 import '../../utils/logger.dart';
 
-final _api = MeditoAudioServiceApi();
-final _androidServiceApi = MeditoAndroidAudioServiceManager();
+final _api = pigeon.MeditoAudioServiceApi();
+final _androidServiceApi = pigeon.MeditoAndroidAudioServiceManager();
 late IosAudioHandler iosAudioHandler;
 
 final playerProvider =
-    NotifierProvider<PlayerProvider, TrackModel?>(() {
+    NotifierProvider<PlayerProvider, PlaybackRequest?>(() {
   return PlayerProvider();
 });
 
-class PlayerProvider extends Notifier<TrackModel?> {
-
+class PlayerProvider extends Notifier<PlaybackRequest?> {
   @override
-  TrackModel? build() => null;
+  PlaybackRequest? build() => null;
 
-  Future<void> loadSelectedTrack({
-    required TrackModel trackModel,
-    required TrackFilesModel file,
-  }) async {
+  /// Starts (or restarts) playback for [request]. The provider's state holds
+  /// the same [PlaybackRequest] for the lifetime of the session so the player
+  /// UI never has to inspect a nested track graph to know what is playing.
+  Future<void> play(PlaybackRequest request) async {
     AppLogger.d('PLAYER',
-        '🔊 Loading track: \\${trackModel.title}, fileId: \\${file.id}');
-    var track = trackModel.customCopyWith();
-    var audios = [...track.audio];
+        '🔊 Loading track: ${request.title}, fileId: ${request.fileId}');
 
-    for (var audioModel in audios) {
-      var fileIndex = audioModel.files.indexWhere((it) => it.id == file.id);
-      if (fileIndex != -1) {
-        track.audio.removeWhere((e) => e.guideName != audioModel.guideName);
-        track.audio.first.files
-            .removeWhere((e) => e.id != audioModel.files[fileIndex].id);
-      }
-    }
-
-    AppLogger.d('PLAYER',
-        '🔊 Selected track: \\${track.title}, audio count: \\${track.audio.length}');
-
-    await _playTrack(
-      ref,
-      track,
-      file,
-    );
-
-    state = track;
+    await _playTrack(request);
+    state = request;
   }
 
-  Future<void> _playTrack(
-    Ref ref,
-    TrackModel track,
-    TrackFilesModel file,
-  ) async {
-    debugPrint(
-        '🔊 _playTrack called for track: \\${track.id}, file: \\${file.id}');
-    var downloadPath = await ref.read(audioDownloaderProvider.notifier).getTrackPath(
-          _constructFileName(track, file),
-        );
+  /// Warm-prepares the state without actually starting playback. Used for
+  /// preloading next-up tracks so the player screen has data immediately when
+  /// the user taps play.
+  void prepare(PlaybackRequest request) {
+    if (state?.trackId == request.trackId) return;
+    state = request;
+  }
 
-    debugPrint(
-        '🔊 Download path: \\${downloadPath ?? 'null'}, file path: \\${file.path}');
-    AppLogger.d('PLAYER', '🔊 Will use path: \\${downloadPath ?? file.path}');
+  Future<void> _playTrack(PlaybackRequest request) async {
+    debugPrint('🔊 _playTrack called for track: ${request.trackId}, '
+        'file: ${request.fileId}');
 
-    var imageUrl = track.coverUrl;
+    final downloadPath = await ref
+        .read(audioDownloaderProvider.notifier)
+        .getTrackPath(_constructFileName(request));
 
-    var trackData = Track(
-      id: track.id,
-      title: track.title,
-      fileId: file.id,
-      artist: track.audio.first.guideName ?? '',
-      artistUrl: track.artist?.path,
-      description: track.description,
-      imageUrl: imageUrl,
+    final url = downloadPath ?? request.remoteUrl;
+    AppLogger.d('PLAYER', '🔊 Will use path: $url');
+
+    final trackData = pigeon.Track(
+      id: request.trackId,
+      title: request.title,
+      fileId: request.fileId,
+      artist: request.guideName ?? '',
+      artistUrl: request.artist?.path,
+      description: request.description,
+      imageUrl: request.coverUrl,
     );
 
     if (Platform.isAndroid) {
       AppLogger.d(
           'PLAYER', '🔊 On Android - starting service and checking readiness');
       try {
-        // Start service and wait for readiness
         await _androidServiceApi.startService();
         debugPrint(
             '🔊 Service start requested, now waiting briefly before checking readiness');
-        // Add a small delay to allow the service to initialize
         await Future.delayed(const Duration(milliseconds: 500));
 
-        // Wait for service to be ready with timeout
         final isReady = await _waitForServiceReadiness();
 
         if (isReady) {
           AppLogger.d(
               'PLAYER', '🔊 Service is ready, proceeding with playback');
-          await _playAudioWithRetry(downloadPath ?? file.path, trackData);
+          await _playAudioWithRetry(url, trackData);
         } else {
           debugPrint(
               '❌ Service failed to become ready, attempting playback anyway');
-          // Proceed with playback attempt even if service readiness times out
           await Future.delayed(const Duration(seconds: 1));
-          await _playAudioWithRetry(downloadPath ?? file.path, trackData);
+          await _playAudioWithRetry(url, trackData);
         }
       } catch (e) {
         debugPrint(
-            '❌ Fatal error starting service or playing audio: \\${e.toString()}');
+            '❌ Fatal error starting service or playing audio: ${e.toString()}');
       }
     } else {
       AppLogger.d('PLAYER', '🔊 On iOS - setting up audio');
       try {
-        await iosAudioHandler.setUrl(downloadPath, file, trackData);
+        await iosAudioHandler.setUrl(downloadPath, request, trackData);
         AppLogger.d('PLAYER', '🔊 iOS setUrl succeeded');
         await iosAudioHandler.play();
         AppLogger.d('PLAYER', '🔊 iOS play() called');
       } catch (e) {
         AppLogger.e(
-            'PLAYER', '❌ Error playing audio on iOS: \\${e.toString()}');
+            'PLAYER', '❌ Error playing audio on iOS: ${e.toString()}');
       }
     }
   }
 
-  // Wait for the service to become ready with timeout
   Future<bool> _waitForServiceReadiness() async {
     const maxAttempts = 10;
     const initialDelayMs = 500;
@@ -161,8 +138,7 @@ class PlayerProvider extends Notifier<TrackModel?> {
     return false;
   }
 
-  // Retry playing audio with exponential backoff
-  Future<void> _playAudioWithRetry(String url, Track trackData) async {
+  Future<void> _playAudioWithRetry(String url, pigeon.Track trackData) async {
     const maxAttempts = 3;
     const initialDelayMs = 300;
 
@@ -172,25 +148,24 @@ class PlayerProvider extends Notifier<TrackModel?> {
             '🔊 Calling playAudio with url: $url (attempt ${attempt + 1})');
 
         await _api.playAudio(
-          AudioData(
+          pigeon.AudioData(
             url: url,
             track: trackData,
           ),
         );
 
         AppLogger.d('PLAYER', '🔊 playAudio call succeeded');
-        return; // Success
+        return;
       } catch (e) {
         AppLogger.e(
             'PLAYER', '❌ Error playing audio (attempt ${attempt + 1}): $e');
 
         if (attempt < maxAttempts - 1) {
-          // Calculate backoff delay
           final delayMs = initialDelayMs * (1 << attempt);
           AppLogger.d('PLAYER', '🔊 Retrying playAudio in ${delayMs}ms...');
           await Future.delayed(Duration(milliseconds: delayMs));
         } else {
-          rethrow; // Rethrow on final attempt
+          rethrow;
         }
       }
     }
@@ -202,8 +177,8 @@ class PlayerProvider extends Notifier<TrackModel?> {
         .getString(SharedPreferenceConstants.userToken);
   }
 
-  String _constructFileName(TrackModel trackModel, TrackFilesModel file) =>
-      '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
+  String _constructFileName(PlaybackRequest request) =>
+      '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}';
 
   Future<void> seekToPosition(int position) async {
     if (Platform.isAndroid) {
@@ -231,9 +206,9 @@ class PlayerProvider extends Notifier<TrackModel?> {
 
   void setRepeatMode(app_repeat.RepeatMode mode) {
     final pigeonMode = switch (mode) {
-      app_repeat.RepeatMode.none => RepeatMode.none,
-      app_repeat.RepeatMode.once => RepeatMode.once,
-      app_repeat.RepeatMode.infinite => RepeatMode.infinite,
+      app_repeat.RepeatMode.none => pigeon.RepeatMode.none,
+      app_repeat.RepeatMode.once => pigeon.RepeatMode.once,
+      app_repeat.RepeatMode.infinite => pigeon.RepeatMode.infinite,
     };
     if (Platform.isAndroid) {
       _api.setRepeatMode(pigeonMode);
@@ -272,12 +247,6 @@ class PlayerProvider extends Notifier<TrackModel?> {
         iosAudioHandler.play();
       }
     }
-  }
-
-  void cacheTrackData(
-      {required TrackModel track, required TrackFilesModel file}) {
-    if (state?.id == track.id) return;
-    state = track.customCopyWith()..audio = [track.audio.first];
   }
 }
 

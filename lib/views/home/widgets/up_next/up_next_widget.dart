@@ -16,6 +16,7 @@ import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/utils/permission_handler.dart';
+import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
 import 'dart:async';
@@ -310,40 +311,17 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     if (guideName != null && preferredDuration != null) {
       await PermissionHandler.requestMediaPlaybackPermission(context);
 
-      final trackId = nextSession.id;
-      final cachedTrack = ref.read(playerProvider);
-
-      TrackModel? trackState;
-
-      if (cachedTrack?.id == trackId) {
-        trackState = cachedTrack?.copyWith(title: nextSession.title);
-      } else {
-        trackState = await ref.read(tracksProvider(trackId: trackId).future);
-      }
-
-      final selectedAudio = _selectBestAudioMatch(
-        trackState?.audio ?? [],
+      final track = await ref.read(tracksProvider(trackId: nextSession.id).future);
+      final selection = TrackVariantSelector.resolve(
+        track,
         guideName: guideName,
-        preferredDuration: preferredDuration,
+        durationMs: preferredDuration,
       );
 
-      if (selectedAudio != null && trackState != null) {
-        final bestFile = _findClosestDurationFile(
-          selectedAudio.files,
-          preferredDuration,
-        );
-        await ref
-            .read(playerProvider.notifier)
-            .loadSelectedTrack(trackModel: trackState, file: bestFile);
-        _navigateToPlayer(context);
-      } else {
-        handleNavigation(
-          TypeConstants.track,
-          [nextSession.id, nextSession.path],
-          context,
-          ref: ref,
-        );
-      }
+      final request =
+          PlaybackRequest.fromTrack(track, selection.voice, selection.file);
+      await ref.read(playerProvider.notifier).play(request);
+      _navigateToPlayer(context);
     } else {
       handleNavigation(
         TypeConstants.track,
@@ -358,48 +336,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const PlayerView()),
-    ).then((value) => ref.invalidate(packProvider));
-  }
-
-  TrackAudioModel? _selectBestAudioMatch(
-    List<TrackAudioModel> audioList, {
-    String? guideName,
-    int? preferredDuration,
-  }) {
-    if (audioList.isEmpty) return null;
-
-    List<TrackAudioModel> filtered = guideName != null
-        ? audioList.where((a) => a.guideName == guideName).toList()
-        : audioList;
-
-    if (filtered.isEmpty) filtered = audioList;
-
-    TrackAudioModel? closest;
-    int? closestDiff;
-
-    for (final audio in filtered) {
-      final duration = audio.files.first.duration;
-      final diff = (preferredDuration ?? duration) - duration;
-
-      if (closest == null || diff.abs() < closestDiff!) {
-        closest = audio;
-        closestDiff = diff.abs();
-      }
-    }
-
-    return closest ?? audioList.first;
-  }
-
-  static TrackFilesModel _findClosestDurationFile(
-    List<TrackFilesModel> files,
-    int? targetDuration,
-  ) {
-    if (targetDuration == null) return files.first;
-    return files.reduce((a, b) {
-      final aDiff = (a.duration - targetDuration).abs();
-      final bDiff = (b.duration - targetDuration).abs();
-      return aDiff < bDiff ? a : b;
-    });
+    );
   }
 }
 

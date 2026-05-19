@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:medito/models/track/track_model.dart';
+import 'package:medito/models/models.dart' show PlaybackRequest;
 import 'package:medito/providers/background_sounds/background_sounds_notifier.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:audio_service/audio_service.dart';
@@ -330,7 +330,7 @@ class IosAudioHandler extends BaseAudioHandler {
   }
 
   Future<void> setUrl(
-      String? downloadPath, TrackFilesModel file, Track trackData) async {
+      String? downloadPath, PlaybackRequest request, Track trackData) async {
     await ensureInitialized();
 
     _hasReplayedOnce = false;
@@ -339,7 +339,7 @@ class IosAudioHandler extends BaseAudioHandler {
       await _player.setAudioSource(
         AudioSource.uri(
           Uri.parse(
-            file.path,
+            request.remoteUrl,
           ),
         ),
       );

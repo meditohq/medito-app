@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/scaffold_messenger_key.dart';
-import 'package:medito/models/track/track_model.dart';
+import 'package:medito/models/models.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/bg_sound_widget.dart';
@@ -12,16 +12,14 @@ import 'bottom_action_bar.dart';
 class PlayerActionBar extends StatelessWidget {
   const PlayerActionBar({
     super.key,
-    required this.trackModel,
-    required this.file,
+    required this.request,
     required this.isBackgroundSoundSelected,
     required this.onSpeedChanged,
     required this.onClosePressed,
   });
 
   final bool isBackgroundSoundSelected;
-  final TrackModel trackModel;
-  final TrackFilesModel file;
+  final PlaybackRequest request;
   final Function(double) onSpeedChanged;
   final VoidCallback onClosePressed;
 
@@ -40,15 +38,12 @@ class PlayerActionBar extends StatelessWidget {
         semanticLabel: l10n.close,
       ),
       leftCenterItem: BottomActionBarItem(
-        child: AudioDownloadWidget(
-          trackModel: trackModel,
-          file: file,
-        ),
+        child: AudioDownloadWidget(request: request),
         onTap: () {}, // The AudioDownloadWidget handles its own tap
       ),
       rightCenterItem: BottomActionBarItem(
         child: _buildBackgroundSoundWidget(),
-        onTap: trackModel.hasBackgroundSound
+        onTap: request.hasBackgroundSound
             ? () {}
             : () => _showBackgroundSoundDisabledMessage(context),
         semanticLabel: l10n.backgroundSounds,
@@ -62,11 +57,9 @@ class PlayerActionBar extends StatelessWidget {
   }
 
   Widget _buildBackgroundSoundWidget() {
-    return trackModel.hasBackgroundSound
+    return request.hasBackgroundSound
         ? BgSoundWidget(
             isBackgroundSoundSelected: isBackgroundSoundSelected,
-            trackModel: trackModel,
-            file: file,
           )
         : const Icon(
             Icons.music_off,

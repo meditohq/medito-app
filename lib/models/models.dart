@@ -7,5 +7,6 @@ export 'notification/notification_payload_model.dart';
 export 'pack/pack_model.dart';
 export 'stats/all_stats/all_stats_model.dart';
 export 'stats/tiles/tiles_model.dart';
-export 'track/track_model.dart';
+export 'player/playback_request.dart';
+export 'track/track.dart';
 export 'user/user_token_model.dart';

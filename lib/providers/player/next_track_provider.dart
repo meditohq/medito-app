@@ -4,6 +4,7 @@ import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
+import 'package:medito/utils/track_variant_selector.dart';
 
 class NextTrackNotifier extends AsyncNotifier<void> {
   @override
@@ -13,70 +14,21 @@ class NextTrackNotifier extends AsyncNotifier<void> {
     state = const AsyncValue.loading();
     try {
       final track = await ref.read(tracksProvider(trackId: trackId).future);
-      final selectedAudio = _selectBestAudioMatch(
-        track.audio,
+      final selection = TrackVariantSelector.resolve(
+        track,
         guideName: ref.read(guideNamePreferenceProvider),
-        preferredDuration: ref.read(durationPreferenceProvider),
+        durationMs: ref.read(durationPreferenceProvider),
       );
-
-      if (selectedAudio != null) {
-        final bestFile = _findClosestDurationFile(
-          selectedAudio.files,
-          ref.read(durationPreferenceProvider),
-        );
-        ref.read(playerProvider.notifier).cacheTrackData(
-              track: track,
-              file: bestFile,
-            );
-      }
-      state = AsyncValue.data(null);
+      ref.read(playerProvider.notifier).prepare(
+            PlaybackRequest.fromTrack(track, selection.voice, selection.file),
+          );
+      state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
-  }
-
-  TrackAudioModel? _selectBestAudioMatch(
-    List<TrackAudioModel> audioList, {
-    String? guideName,
-    int? preferredDuration,
-  }) {
-    if (audioList.isEmpty) return null;
-
-    List<TrackAudioModel> filtered = guideName != null
-        ? audioList.where((a) => a.guideName == guideName).toList()
-        : audioList;
-
-    if (filtered.isEmpty) filtered = audioList;
-
-    TrackAudioModel? closest;
-    int? closestDiff;
-
-    for (final audio in filtered) {
-      final duration = audio.files.first.duration;
-      final diff = (preferredDuration ?? duration) - duration;
-
-      if (closest == null || diff.abs() < closestDiff!) {
-        closest = audio;
-        closestDiff = diff.abs();
-      }
-    }
-
-    return closest ?? audioList.first;
-  }
-
-  static TrackFilesModel _findClosestDurationFile(
-    List<TrackFilesModel> files,
-    int? targetDuration,
-  ) {
-    if (targetDuration == null) return files.first;
-    return files.reduce((a, b) {
-      final aDiff = (a.duration - targetDuration).abs();
-      final bDiff = (b.duration - targetDuration).abs();
-      return aDiff < bDiff ? a : b;
-    });
   }
 }
 
 final nextTrackProvider = AsyncNotifierProvider<NextTrackNotifier, void>(
   NextTrackNotifier.new,
-); 
+);

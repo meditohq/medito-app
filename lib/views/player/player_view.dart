@@ -12,7 +12,7 @@ import 'package:medito/utils/utils.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/src/audio_pigeon.g.dart';
+import 'package:medito/src/audio_pigeon.g.dart' as pigeon;
 import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/player_action_bar.dart';
@@ -85,7 +85,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   Future<void> _logScreenView() async {
     final currentlyPlayingTrack = ref.read(playerProvider);
     final parameters = currentlyPlayingTrack != null
-        ? {'trackid': currentlyPlayingTrack.id}
+        ? {'trackid': currentlyPlayingTrack.trackId}
         : null;
 
     await _analytics.logScreenView(
@@ -162,7 +162,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       );
     }
 
-    final file = currentlyPlayingTrack.audio.first.files.first;
     final track = ref.watch(audioStateProvider.select((s) => s.track));
     final isPlaying = ref.watch(audioStateProvider.select((s) => s.isPlaying));
     final imageUrl = track.imageUrl;
@@ -227,7 +226,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                           top: 16,
                           right: 16,
                           child:
-                              ReportButtonWidget(track: currentlyPlayingTrack),
+                              ReportButtonWidget(request: currentlyPlayingTrack),
                         ),
                       ],
                     ),
@@ -239,8 +238,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         bottomNavigationBar: PlayerActionBar(
-          trackModel: currentlyPlayingTrack,
-          file: file,
+          request: currentlyPlayingTrack,
           isBackgroundSoundSelected: _isBackgroundSoundSelected(),
           onSpeedChanged: (speed) =>
               ref.read(playerProvider.notifier).setSpeed(speed),
@@ -324,7 +322,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
               context,
               MaterialPageRoute(
                 builder: (context) => EndScreenView(
-                  trackModel: currentlyPlayingTrack,
+                  request: currentlyPlayingTrack,
                 ),
               ),
             );
@@ -344,7 +342,7 @@ class _PortraitPlayerLayout extends ConsumerWidget {
     required this.onPlayPause,
   });
 
-  final Track track;
+  final pigeon.Track track;
   final bool isPlaying;
   final VoidCallback onPlayPause;
 
@@ -393,7 +391,7 @@ class _LandscapePlayerLayout extends ConsumerWidget {
     required this.onPlayPause,
   });
 
-  final Track track;
+  final pigeon.Track track;
   final bool isPlaying;
   final VoidCallback onPlayPause;
 

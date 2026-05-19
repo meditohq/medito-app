@@ -12,6 +12,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/permission_handler.dart';
+import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
@@ -59,10 +60,8 @@ class _TrackViewState extends ConsumerState<TrackView>
 
     void popContext() => Navigator.pop(context);
 
-    // Create a reusable back button widget
     final backButton = SingleBackButtonActionBar(onBackPressed: popContext);
 
-    // Determine layout mode based on screen height heuristic
     // Using 700 as a threshold for "cramped" vertical space where compact layout is preferred
     final useCompactLayout = MediaQuery.of(context).size.height < 700;
 
@@ -84,32 +83,24 @@ class _TrackViewState extends ConsumerState<TrackView>
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: trackAsyncValue.when(
-                  data: (trackModel) {
-                    // Derive active state from providers and model
-                    final activeAudio = (guideName != null)
-                        ? trackModel.audio.firstWhere(
-                            (audio) =>
-                                audio.guideName == guideName,
-                            orElse: () => trackModel.audio.first,
-                          )
-                        : trackModel.audio.first;
-
-                    final activeFile = (lastSelectedDuration != null)
-                        ? _findClosestDurationFile(
-                            activeAudio.files, lastSelectedDuration)
-                        : activeAudio.files.first;
+                  data: (track) {
+                    final selection = TrackVariantSelector.resolve(
+                      track,
+                      guideName: guideName,
+                      durationMs: lastSelectedDuration,
+                    );
 
                     return orientation == Orientation.portrait
                         ? _buildPortraitLayout(
-                            trackModel,
-                            activeAudio,
-                            activeFile,
+                            track,
+                            selection.voice,
+                            selection.file,
                             useCompactLayout,
                           )
                         : _buildLandscapeLayout(
-                            trackModel,
-                            activeAudio,
-                            activeFile,
+                            track,
+                            selection.voice,
+                            selection.file,
                           );
                   },
                   loading: () => const TrackShimmerWidget(),
@@ -132,9 +123,9 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   Widget _buildPortraitLayout(
-    TrackModel trackModel,
-    TrackAudioModel activeAudio,
-    TrackFilesModel activeFile,
+    Track track,
+    TrackVoice activeVoice,
+    TrackAudioFile activeFile,
     bool useCompactLayout,
   ) {
     return Column(
@@ -142,12 +133,12 @@ class _TrackViewState extends ConsumerState<TrackView>
       children: [
         AspectRatio(
           aspectRatio: 16 / 9,
-          child: _buildCoverImage(trackModel),
+          child: _buildCoverImage(track),
         ),
         const SizedBox(height: 24),
         _buildTrackContent(
-          trackModel,
-          activeAudio,
+          track,
+          activeVoice,
           activeFile,
           isLandscape: false,
           useCompactLayout: useCompactLayout,
@@ -157,9 +148,9 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   Widget _buildLandscapeLayout(
-    TrackModel trackModel,
-    TrackAudioModel activeAudio,
-    TrackFilesModel activeFile,
+    Track track,
+    TrackVoice activeVoice,
+    TrackAudioFile activeFile,
   ) {
     var size = MediaQuery.of(context).size;
     var maxWidth = size.width * 0.25;
@@ -178,7 +169,7 @@ class _TrackViewState extends ConsumerState<TrackView>
               ),
               child: AspectRatio(
                 aspectRatio: 1,
-                child: _buildCoverImage(trackModel),
+                child: _buildCoverImage(track),
               ),
             ),
             const SizedBox(width: 24),
@@ -191,11 +182,11 @@ class _TrackViewState extends ConsumerState<TrackView>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _title(context, trackModel.title),
+                      _title(context, track.title),
                       const SizedBox(height: 8),
                       _getSubTitle(
                         context,
-                        trackModel.description,
+                        track.description,
                       ),
                     ],
                   ),
@@ -206,8 +197,8 @@ class _TrackViewState extends ConsumerState<TrackView>
         ),
         const SizedBox(height: 24),
         _buildTrackContent(
-          trackModel,
-          activeAudio,
+          track,
+          activeVoice,
           activeFile,
           isLandscape: true,
           useCompactLayout: false,
@@ -216,8 +207,8 @@ class _TrackViewState extends ConsumerState<TrackView>
     );
   }
 
-  Widget _buildCoverImage(TrackModel trackModel) {
-    return _buildImageWithData(trackModel.coverUrl);
+  Widget _buildCoverImage(Track track) {
+    return _buildImageWithData(track.coverUrl);
   }
 
   Widget _buildImageWithData(String url) {
@@ -233,14 +224,14 @@ class _TrackViewState extends ConsumerState<TrackView>
   }
 
   Widget _buildTrackContent(
-    TrackModel trackModel,
-    TrackAudioModel activeAudio,
-    TrackFilesModel activeFile, {
+    Track track,
+    TrackVoice activeVoice,
+    TrackAudioFile activeFile, {
     required bool isLandscape,
     required bool useCompactLayout,
   }) {
-    var showGuideNameDropdown =
-        trackModel.audio.first.guideName.isNotNullAndNotEmpty();
+    final showGuideNameDropdown =
+        track.voices.first.guideName.isNotNullAndNotEmpty();
     final guideName = ref.watch(guideNamePreferenceProvider);
 
     if (isLandscape) {
@@ -248,68 +239,65 @@ class _TrackViewState extends ConsumerState<TrackView>
         if (showGuideNameDropdown)
           Expanded(
               child: _guideNameDropdown(
-            trackModel,
-            activeAudio,
-            activeFile,
+            track,
+            activeVoice,
             isLandscape: true,
             guideNameState: guideName,
           )),
         const SizedBox(width: 12),
         Expanded(
-            child: _durationDropdown(activeAudio, activeFile,
+            child: _durationDropdown(activeVoice, activeFile,
                 isLandscape: true)),
         const SizedBox(width: 12),
         Expanded(
-            child: _playBtn(ref, trackModel, activeFile, isFullWidth: false)),
+            child: _playBtn(ref, track, activeVoice, activeFile,
+                isFullWidth: false)),
       ]);
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _title(context, trackModel.title),
+      _title(context, track.title),
       const SizedBox(height: 8),
-      _getSubTitle(context, trackModel.description),
+      _getSubTitle(context, track.description),
       const SizedBox(height: 24),
       if (useCompactLayout && showGuideNameDropdown)
-        _buildCompactPickers(
-            trackModel, activeAudio, activeFile, guideName)
+        _buildCompactPickers(track, activeVoice, activeFile, guideName)
       else ...[
         if (showGuideNameDropdown) ...[
           _guideNameDropdown(
-            trackModel,
-            activeAudio,
-            activeFile,
+            track,
+            activeVoice,
             isLandscape: false,
             guideNameState: guideName,
           ),
           const SizedBox(height: 12),
         ],
-        _durationDropdown(activeAudio, activeFile, isLandscape: false),
+        _durationDropdown(activeVoice, activeFile, isLandscape: false),
       ],
       const SizedBox(height: 12),
-      _playBtn(ref, trackModel, activeFile, isFullWidth: true),
+      _playBtn(ref, track, activeVoice, activeFile, isFullWidth: true),
     ]);
   }
 
   Widget _buildCompactPickers(
-    TrackModel trackModel,
-    TrackAudioModel activeAudio,
-    TrackFilesModel activeFile,
+    Track track,
+    TrackVoice activeVoice,
+    TrackAudioFile activeFile,
     String? guideNameState,
   ) {
     return Row(
       children: [
         Expanded(
           child: _guideNameDropdown(
-            trackModel,
-            activeAudio,
-            activeFile,
+            track,
+            activeVoice,
             isLandscape: false,
             guideNameState: guideNameState,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _durationDropdown(activeAudio, activeFile, isLandscape: false),
+          child: _durationDropdown(activeVoice, activeFile, isLandscape: false),
         ),
       ],
     );
@@ -317,8 +305,9 @@ class _TrackViewState extends ConsumerState<TrackView>
 
   Widget _playBtn(
     WidgetRef ref,
-    TrackModel trackModel,
-    TrackFilesModel activeFile, {
+    Track track,
+    TrackVoice activeVoice,
+    TrackAudioFile activeFile, {
     required bool isFullWidth,
   }) {
     // In dark mode a white fill pops against the ebony scaffold (~18:1).
@@ -331,7 +320,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       width: isFullWidth ? double.infinity : null,
       child: ElevatedButton(
         onPressed: () {
-          _handlePlay(ref, trackModel, activeFile);
+          _handlePlay(ref, track, activeVoice, activeFile);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: isDark
@@ -395,35 +384,27 @@ class _TrackViewState extends ConsumerState<TrackView>
     return const SizedBox();
   }
 
-  void _handleOnGuideNameChange(TrackAudioModel? newAudio) {
-    if (newAudio != null) {
-      // Update guide name preference
+  void _handleOnGuideNameChange(TrackVoice? newVoice) {
+    if (newVoice == null) return;
+
+    ref
+        .read(guideNamePreferenceProvider.notifier)
+        .setGuideName(newVoice.guideName);
+
+    // Keep the duration preference in step with what the new voice offers
+    final currentDuration = ref.read(durationPreferenceProvider);
+    if (currentDuration != null) {
+      final bestFile = TrackVariantSelector.closestDuration(
+        newVoice.audioFiles,
+        currentDuration,
+      );
       ref
-          .read(guideNamePreferenceProvider.notifier)
-          .setGuideName(newAudio.guideName);
-      
-      // Update duration preference to closest available in new audio
-      // to maintain consistency
-      final currentDuration = ref.read(durationPreferenceProvider);
-      if (currentDuration != null) {
-        final bestFile = _findClosestDurationFile(newAudio.files, currentDuration);
-         ref.read(durationPreferenceProvider.notifier).setDuration(bestFile.duration);
-      }
+          .read(durationPreferenceProvider.notifier)
+          .setDuration(bestFile.duration);
     }
   }
 
-  static TrackFilesModel _findClosestDurationFile(
-    List<TrackFilesModel> files,
-    int targetDuration,
-  ) {
-    return files.reduce((a, b) {
-      final aDiff = (a.duration - targetDuration).abs();
-      final bDiff = (b.duration - targetDuration).abs();
-      return aDiff < bDiff ? a : b;
-    });
-  }
-
-  void handleOnDurationChange(TrackFilesModel? value) {
+  void _handleOnDurationChange(TrackAudioFile? value) {
     if (value != null) {
       ref.read(durationPreferenceProvider.notifier).setDuration(value.duration);
     }
@@ -431,35 +412,32 @@ class _TrackViewState extends ConsumerState<TrackView>
 
   void _handlePlay(
     WidgetRef ref,
-    TrackModel trackModel,
-    TrackFilesModel file,
+    Track track,
+    TrackVoice voice,
+    TrackAudioFile file,
   ) async {
     try {
       await PermissionHandler.requestMediaPlaybackPermission(context);
 
-      await ref.read(playerProvider.notifier).loadSelectedTrack(
-            trackModel: trackModel,
-            file: file,
-          );
+      final request = PlaybackRequest.fromTrack(track, voice, file);
+      await ref.read(playerProvider.notifier).play(request);
       await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const PlayerView(),
         ),
-      ).then((value) => {
-            ref.invalidate(packProvider),
-          });
+      );
     } catch (e) {
       AppLogger.d('TRACK', e.toString());
     }
   }
 
-  List<TrackFilesModel> files(List<TrackFilesModel> files) => files;
-
-  Widget _durationDropdown(TrackAudioModel activeAudio,
-      TrackFilesModel activeFile, {required bool isLandscape}) {
-    
-    return DropdownWidget<TrackFilesModel>(
+  Widget _durationDropdown(
+    TrackVoice activeVoice,
+    TrackAudioFile activeFile, {
+    required bool isLandscape,
+  }) {
+    return DropdownWidget<TrackAudioFile>(
       value: activeFile,
       iconData: Icons.timer_sharp,
       topLeft: 7,
@@ -468,9 +446,9 @@ class _TrackViewState extends ConsumerState<TrackView>
       bottomLeft: 7,
       disabledLabelText:
           '${convertDurationToMinutes(milliseconds: activeFile.duration)} ${AppLocalizations.of(context)!.min}',
-      items: activeAudio.files.map<DropdownMenuItem<TrackFilesModel>>(
-        (TrackFilesModel value) {
-          return DropdownMenuItem<TrackFilesModel>(
+      items: activeVoice.audioFiles.map<DropdownMenuItem<TrackAudioFile>>(
+        (TrackAudioFile value) {
+          return DropdownMenuItem<TrackAudioFile>(
             value: value,
             child: Text(
               '${convertDurationToMinutes(milliseconds: value.duration)} ${AppLocalizations.of(context)!.min}',
@@ -478,31 +456,29 @@ class _TrackViewState extends ConsumerState<TrackView>
           );
         },
       ).toList(),
-      onChanged: handleOnDurationChange,
+      onChanged: _handleOnDurationChange,
       isLandscape: isLandscape,
     );
   }
 
   Widget _guideNameDropdown(
-    TrackModel trackModel,
-    TrackAudioModel activeAudio,
-    TrackFilesModel activeFile, {
+    Track track,
+    TrackVoice activeVoice, {
     required bool isLandscape,
     required String? guideNameState,
   }) {
-    // We already checked logic in parent, but double check
-    if (activeAudio.guideName.isNotNullAndNotEmpty()) {
-      return DropdownWidget<TrackAudioModel>(
-        value: activeAudio,
+    if (activeVoice.guideName.isNotNullAndNotEmpty()) {
+      return DropdownWidget<TrackVoice>(
+        value: activeVoice,
         iconData: Icons.face,
         bottomRight: 7,
         topLeft: 7,
         topRight: 7,
         bottomLeft: 7,
-        disabledLabelText: '${activeAudio.guideName}',
-        items: trackModel.audio.map<DropdownMenuItem<TrackAudioModel>>(
-          (TrackAudioModel value) {
-            return DropdownMenuItem<TrackAudioModel>(
+        disabledLabelText: '${activeVoice.guideName}',
+        items: track.voices.map<DropdownMenuItem<TrackVoice>>(
+          (TrackVoice value) {
+            return DropdownMenuItem<TrackVoice>(
               value: value,
               child: Text(value.guideName ?? ''),
             );

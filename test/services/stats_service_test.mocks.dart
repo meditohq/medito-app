@@ -153,6 +153,16 @@ class MockStatsBackupService extends _i1.Mock
           as _i3.Future<List<_i4.StatsBackup>>);
 
   @override
+  _i3.Future<List<_i4.StatsBackup>> getAllBackupsAcrossUsers() =>
+      (super.noSuchMethod(
+            Invocation.method(#getAllBackupsAcrossUsers, []),
+            returnValue: _i3.Future<List<_i4.StatsBackup>>.value(
+              <_i4.StatsBackup>[],
+            ),
+          )
+          as _i3.Future<List<_i4.StatsBackup>>);
+
+  @override
   _i3.Future<void> clearBackups(String? userId) =>
       (super.noSuchMethod(
             Invocation.method(#clearBackups, [userId]),

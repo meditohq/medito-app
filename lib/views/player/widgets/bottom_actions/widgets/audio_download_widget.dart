@@ -14,19 +14,17 @@ import 'package:medito/widgets/snackbar_widget.dart';
 
 class AudioDownloadWidget extends ConsumerWidget {
   const AudioDownloadWidget({
-    required this.trackModel,
-    required this.file,
+    required this.request,
     super.key,
   });
 
-  final TrackModel trackModel;
-  final TrackFilesModel file;
+  final PlaybackRequest request;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final downloadAudioState = ref.watch(audioDownloaderProvider);
-    var downloadFileKey =
-        '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
+    final downloadFileKey =
+        '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}';
 
     return SizedBox(
       width: 48,
@@ -109,7 +107,6 @@ class AudioDownloadWidget extends ConsumerWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Background container
         Container(
           width: 48,
           height: 48,
@@ -118,7 +115,6 @@ class AudioDownloadWidget extends ConsumerWidget {
             color: ColorConstants.graphite.withAlpha(100),
           ),
         ),
-        // Progress fill from bottom to top
         Positioned(
           bottom: 0,
           child: Container(
@@ -130,7 +126,6 @@ class AudioDownloadWidget extends ConsumerWidget {
             ),
           ),
         ),
-        // Loading spinner icon
         const SizedBox(
           width: 16,
           height: 16,
@@ -160,9 +155,8 @@ class AudioDownloadWidget extends ConsumerWidget {
   ) async {
     try {
       await ref.read(audioDownloaderProvider.notifier).downloadTrackAudio(
-        trackModel,
-        file,
-      );
+            request,
+          );
     } catch (e) {
       showSnackBar(
         context,
@@ -182,7 +176,7 @@ class AudioDownloadWidget extends ConsumerWidget {
         return MeditoDialog(
           title: AppLocalizations.of(context)!.confirmDeletionFromPlayerTitle,
           content: MeditoDialogBody(
-            '${AppLocalizations.of(context)!.confirmDeletionFromPlayerMessage} "${trackModel.title}"?',
+            '${AppLocalizations.of(context)!.confirmDeletionFromPlayerMessage} "${request.title}"?',
           ),
           actions: [
             MeditoDialogSecondaryButton(
@@ -201,10 +195,10 @@ class AudioDownloadWidget extends ConsumerWidget {
     if (confirmDelete == true) {
       try {
         await ref.read(audioDownloaderProvider.notifier).deleteTrackAudio(
-          '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}',
-        );
-        ref.read(deleteTrackFromPreferenceProvider(
-          file: file,
+              '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}',
+            );
+        ref.read(deleteDownloadedTrackByIdProvider(
+          fileId: request.fileId,
         ));
       } catch (e) {
         showSnackBar(

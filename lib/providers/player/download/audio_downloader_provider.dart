@@ -35,54 +35,52 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
     return const AudioDownloaderState();
   }
 
-  Future<void> downloadTrackAudio(
-    TrackModel trackModel,
-    TrackFilesModel file,
-  ) async {
-    var fileName =
-        '${trackModel.id}-${file.id}${getAudioFileExtension(file.path)}';
+  Future<void> downloadTrackAudio(PlaybackRequest request) async {
+    final fileName =
+        '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
-      var newDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+      var newDownloadState =
+          Map<String, AudioDownloadState>.from(state.audioDownloadState);
       newDownloadState[fileName] = AudioDownloadState.downloading;
       state = state.copyWith(audioDownloadState: newDownloadState);
-      
+
       await downloadAudio.downloadFile(
-        file.path,
+        request.remoteUrl,
         fileName: fileName,
         onReceiveProgress: (received, total) {
           if (total != -1 && ref.mounted) {
-            var newProgress = Map<String, double>.from(state.downloadingProgress);
+            var newProgress =
+                Map<String, double>.from(state.downloadingProgress);
             newProgress[fileName] = (received / total * 100);
             state = state.copyWith(downloadingProgress: newProgress);
           }
         },
       );
-      
+
       if (!ref.mounted) return;
-      
+
       var finalProgress = Map<String, double>.from(state.downloadingProgress);
       finalProgress.remove(fileName);
-      var finalDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+      var finalDownloadState =
+          Map<String, AudioDownloadState>.from(state.audioDownloadState);
       finalDownloadState[fileName] = AudioDownloadState.downloaded;
       state = state.copyWith(
         downloadingProgress: finalProgress,
         audioDownloadState: finalDownloadState,
       );
-      
-      await ref.read(deleteTrackFromPreferenceProvider(
-        file: file,
-      ).future);
-      
+
+      await ref
+          .read(deleteDownloadedTrackByIdProvider(fileId: request.fileId).future);
+
       if (!ref.mounted) return;
-      
-      await ref.read(addSingleTrackInPreferenceProvider(
-        trackModel: trackModel,
-        file: file,
-      ).future);
+
+      await ref
+          .read(addDownloadedTrackProvider(request: request).future);
     } catch (e) {
       if (ref.mounted) {
-        var errorDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+        var errorDownloadState =
+            Map<String, AudioDownloadState>.from(state.audioDownloadState);
         errorDownloadState[fileName] = AudioDownloadState.download;
         state = state.copyWith(audioDownloadState: errorDownloadState);
       }
@@ -93,10 +91,11 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
   Future<void> deleteTrackAudio(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     await downloadAudio.deleteDownloadedFile(fileName);
-    
+
     if (!ref.mounted) return;
-    
-    var newDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+
+    var newDownloadState =
+        Map<String, AudioDownloadState>.from(state.audioDownloadState);
     newDownloadState[fileName] = AudioDownloadState.download;
     state = state.copyWith(audioDownloadState: newDownloadState);
   }
@@ -104,10 +103,11 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
   Future<String?> getTrackPath(String fileName) async {
     final downloadAudio = ref.read(downloaderRepositoryProvider);
     var audioPath = await downloadAudio.getDownloadedFile(fileName);
-    
+
     if (!ref.mounted) return audioPath;
-    
-    var newDownloadState = Map<String, AudioDownloadState>.from(state.audioDownloadState);
+
+    var newDownloadState =
+        Map<String, AudioDownloadState>.from(state.audioDownloadState);
     newDownloadState[fileName] = audioPath != null
         ? AudioDownloadState.downloaded
         : AudioDownloadState.download;
