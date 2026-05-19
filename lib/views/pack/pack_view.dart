@@ -77,7 +77,7 @@ class _PackViewState extends ConsumerState<PackView>
           final error = err is AppError ? err : const UnknownError();
           return MeditoErrorWidget(
             error: error,
-            onTap: () => ref.refresh(packProvider(packId: widget.id)),
+            onTap: () => ref.refresh(packDataProvider(packId: widget.id)),
             isLoading: packAsyncValue.isLoading,
           );
         },
@@ -100,7 +100,7 @@ class _PackViewState extends ConsumerState<PackView>
           // If this is the favorites screen, refresh the favorites list from the server
           await ref.read(favoritesNotifierProvider.notifier).syncWithServer();
         }
-        return ref.refresh(packProvider(packId: widget.id));
+        return ref.refresh(packDataProvider(packId: widget.id));
       },
       child: CustomScrollView(
         controller: _scrollController,

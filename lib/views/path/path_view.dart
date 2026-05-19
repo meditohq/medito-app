@@ -68,7 +68,7 @@ class _JourneyViewState extends ConsumerState<JourneyView>
           final error = err is AppError ? err : const UnknownError();
           return MeditoErrorWidget(
             error: error,
-            onTap: () => ref.refresh(packProvider(packId: pathId)),
+            onTap: () => ref.refresh(packDataProvider(packId: pathId)),
           );
         },
         data: (pack) {
@@ -102,7 +102,7 @@ class _JourneyViewState extends ConsumerState<JourneyView>
 
   Widget _buildContent(PackModel pack) {
     return RefreshIndicator(
-      onRefresh: () async => ref.refresh(packProvider(packId: pathId)),
+      onRefresh: () async => ref.refresh(packDataProvider(packId: pathId)),
       child: CustomScrollView(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
