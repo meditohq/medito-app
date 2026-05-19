@@ -187,14 +187,20 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                     children: [
                       if (imageUrl.isNotEmpty &&
                           !HTTPConstants.isDeadDomain(imageUrl))
-                        _FadingNetworkImage(
-                          imageUrl: imageUrl,
+                        // ImageFiltered (not BackdropFilter) — blurs only the
+                        // cover image itself, never the screen behind. Using
+                        // BackdropFilter here leaks the underlying route
+                        // during pop animations, blurring the previous screen
+                        // for a frame.
+                        ImageFiltered(
+                          imageFilter:
+                              ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: _FadingNetworkImage(
+                            imageUrl: imageUrl,
+                          ),
                         ),
-                      BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          color: ColorConstants.black.withOpacityValue(0.3),
-                        ),
+                      Container(
+                        color: ColorConstants.black.withOpacityValue(0.3),
                       ),
                     ],
                   ),
