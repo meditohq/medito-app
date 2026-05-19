@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../models/home/announcement/announcement_model.dart';
-import '../shared_preferences_provider.dart';
+import '../shared_preference/shared_preference_provider.dart';
 import '../../repositories/home/home_repository.dart';
 
 part 'announcement_provider.g.dart';
@@ -10,7 +10,7 @@ const _dismissedAnnouncementKey = 'dismissed_announcement_id';
 
 @riverpod
 Future<List<String>> getDismissedAnnouncementIds(Ref ref) async {
-  final prefs = await ref.watch(sharedPreferencesProvider.future);
+  final prefs = ref.watch(sharedPreferencesProvider);
   final ids = prefs.getStringList(_dismissedAnnouncementKey) ?? [];
 
   return ids;
@@ -21,7 +21,7 @@ class DismissedAnnouncement extends Notifier<void> {
   void build() {}
 
   Future<void> dismissAnnouncement(String id) async {
-    final prefs = await ref.read(sharedPreferencesProvider.future);
+    final prefs = ref.read(sharedPreferencesProvider);
     final ids = prefs.getStringList(_dismissedAnnouncementKey) ?? [];
 
     if (!ids.contains(id)) {

@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
-import '../shared_preferences_provider.dart';
+import '../shared_preference/shared_preference_provider.dart';
 
 part 'donation_snooze_provider.g.dart';
 
@@ -22,8 +22,8 @@ class DonationSnoozeState {
 @riverpod
 class DonationSnooze extends _$DonationSnooze {
   @override
-  Future<DonationSnoozeState> build() async {
-    final prefs = await ref.read(sharedPreferencesProvider.future);
+  DonationSnoozeState build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
 
     final snoozedUntilMs = prefs.getInt(
       SharedPreferenceConstants.donationAskSnoozedUntilMs,
@@ -52,7 +52,7 @@ class DonationSnooze extends _$DonationSnooze {
   }
 
   Future<void> snoozeForDays(int days) async {
-    final prefs = await ref.read(sharedPreferencesProvider.future);
+    final prefs = ref.read(sharedPreferencesProvider);
     final now = DateTime.now();
     final snoozedUntil = now.add(Duration(days: days));
 
@@ -65,7 +65,7 @@ class DonationSnooze extends _$DonationSnooze {
   }
 
   Future<void> recordDonationSuccess(String frequency) async {
-    final prefs = await ref.read(sharedPreferencesProvider.future);
+    final prefs = ref.read(sharedPreferencesProvider);
     final now = DateTime.now();
 
     final snoozeDays = frequency == 'onetime'

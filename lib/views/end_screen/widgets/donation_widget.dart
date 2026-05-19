@@ -46,23 +46,13 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
         data: (DonationPageModel donationPageModel) {
           return Column(
             children: [
-              snoozeState.when(
-                loading: () => const SizedBox(
-                  height: 100,
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (_, _) => AnimatedOpacity(
-                  opacity: 1.0,
-                  duration: const Duration(milliseconds: 500),
-                  child: _buildDonationWidget(context, donationPageModel, isSnoozed: false),
-                ),
-                data: (snoozeData) => AnimatedOpacity(
-                  opacity: 1.0,
-                  duration: const Duration(milliseconds: 500),
-                  child: snoozeData.isSnoozed
-                      ? _buildCompactThankYouWidget(context)
-                      : _buildDonationWidget(context, donationPageModel, isSnoozed: false),
-                ),
+              AnimatedOpacity(
+                opacity: 1.0,
+                duration: const Duration(milliseconds: 500),
+                child: snoozeState.isSnoozed
+                    ? _buildCompactThankYouWidget(context)
+                    : _buildDonationWidget(context, donationPageModel,
+                        isSnoozed: false),
               ),
               height20,
               const FeedbackWidget(),
