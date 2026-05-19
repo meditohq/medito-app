@@ -12,7 +12,7 @@ import 'package:medito/widgets/medito_icon.dart';
 /// have to.
 class FavoriteIconController extends ChangeNotifier {
   FavoriteIconController({
-    this.minSpinDuration = const Duration(milliseconds: 500),
+    this.minSpinDuration = const Duration(milliseconds: 200),
   });
 
   /// Minimum time the spin stays visible after a tap, even if the underlying
@@ -120,11 +120,11 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
 
     _spinController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 320),
+      duration: const Duration(milliseconds: 280),
     );
     _releaseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 520),
+      duration: const Duration(milliseconds: 360),
     );
 
     widget.controller?.addListener(_onPendingChanged);
