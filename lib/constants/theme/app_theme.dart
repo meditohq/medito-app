@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:medito/constants/theme/text_theme.dart';
@@ -102,6 +101,9 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
       style: TextButton.styleFrom(
         foregroundColor:
             isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
         textStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,

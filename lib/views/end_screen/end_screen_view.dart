@@ -555,13 +555,15 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         borderRadius: 14,
         borderWidth: 0.5,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 15,
+          padding: const EdgeInsets.only(
+            top: 16,
+            left: 16,
+            right: 16,
+            bottom: 4,
           ),
           child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
               children: [
@@ -574,8 +576,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 Expanded(
                   child: Text(
                     AppLocalizations.of(context)!.smartReminders,
+                    textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontFamily: teachers,
                           fontWeight: FontWeight.w600,
                         ),
                   ),
@@ -598,6 +600,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               const SizedBox(height: 8),
               Text(
                 AppLocalizations.of(context)!.enableNotificationsBody,
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
@@ -610,44 +613,27 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               child: ElevatedButton(
                 onPressed: isReminderEnabled ? null : () => _enableReminders(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isReminderEnabled
-                      ? Theme.of(context).colorScheme.surface
-                      : Theme.of(context).colorScheme.primary,
-                  foregroundColor: isReminderEnabled
-                      ? Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.6)
-                      : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                 ),
                 child: Text(
                   isReminderEnabled
                       ? AppLocalizations.of(context)!.smartRemindersOn
                       : AppLocalizations.of(context)!.turnOnSmartReminders,
+                  textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
                 ),
               ),
             ),
             if (!isReminderEnabled)
-              TextButton(
-                onPressed: _snoozeReminderPrompt,
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  minimumSize: const Size(0, 32),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.notNow,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.6),
-                      ),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: _snoozeReminderPrompt,
+                  child: Text(AppLocalizations.of(context)!.notNow),
                 ),
               ),
           ],
