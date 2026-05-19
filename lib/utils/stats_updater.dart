@@ -8,7 +8,6 @@ import '../constants/strings/shared_preference_constants.dart';
 import '../providers/notification/reminder_provider.dart';
 import '../services/reminders/smart_reminders_service.dart';
 import '../providers/stats_provider.dart';
-import '../providers/home/up_next_provider.dart';
 import '../providers/settings/settings_providers.dart';
 import '../routes/routes.dart';
 import '../l10n/app_localizations.dart';
@@ -32,8 +31,10 @@ const int manualSessionAnchorHour = 12;
 // Static flag to prevent concurrent processing
 bool _isProcessingPendingTracks = false;
 
-/// Refreshes the stats provider and invalidates the upNextProvider
-/// This ensures the UI shows updated stats immediately after a session is completed
+/// Refreshes the stats provider from local storage so the UI picks up the
+/// just-completed session. The up-next surface rebuilds reactively from
+/// statsProvider via packProvider, so no explicit upNext invalidation is
+/// needed here.
 Future<void> _refreshStatsAndUpNext() async {
   final context = navigatorKey.currentContext;
   if (context == null) {
@@ -49,14 +50,6 @@ Future<void> _refreshStatsAndUpNext() async {
       AppLogger.d('STATS', 'Stats provider refreshed from local');
     } catch (refreshError) {
       AppLogger.e('STATS', 'Failed to refresh stats provider', refreshError);
-    }
-
-    try {
-      container.invalidate(upNextProvider);
-      AppLogger.d('STATS', 'UpNext provider invalidated');
-    } catch (invalidateError) {
-      AppLogger.e(
-          'STATS', 'Failed to invalidate upNext provider', invalidateError);
     }
   } catch (_) {
     AppLogger.w(
@@ -107,7 +100,7 @@ Future<bool> handleStats(
       AppLogger.e('STATS', 'Failed to log analytics event', analyticsError);
     }
 
-    // Refresh the stats provider and invalidate upNextProvider
+    // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
 
     // Update home widget with latest stats (fire-and-forget to avoid blocking)
@@ -439,7 +432,7 @@ Future<bool> addManualSession({
     AppLogger.d('STATS',
         'Manual session added successfully for ${dateTime.toString()}');
 
-    // Refresh the stats provider and invalidate upNextProvider
+    // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
 
     // Update home widget with latest stats (fire-and-forget to avoid blocking)

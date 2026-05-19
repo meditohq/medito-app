@@ -279,8 +279,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     } catch (_) {
       // Silently fail if refresh fails
     }
-
-    await ref.read(upNextProvider.notifier).refresh();
+    // upNextProvider rebuilds reactively via packProvider <- statsProvider.
   }
 
   Future<void> _onTap(BuildContext context) async {

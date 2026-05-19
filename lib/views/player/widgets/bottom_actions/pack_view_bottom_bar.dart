@@ -250,13 +250,11 @@ class PackViewBottomBar extends ConsumerWidget {
       // Unpin: set back to default pack
       await prefs.remove(SharedPreferenceConstants.upNextPackId);
       ref.invalidate(upNextPackIdProvider);
-      ref.invalidate(upNextProvider);
       if (context.mounted) showSnackBar(context, l10n.packUnpinnedFromUpNext);
     } else if (!isUpNext) {
       // Pin: set this pack as up next
       await prefs.setString(SharedPreferenceConstants.upNextPackId, packId);
       ref.invalidate(upNextPackIdProvider);
-      ref.invalidate(upNextProvider);
       if (context.mounted) showSnackBar(context, l10n.packSetAsUpNext);
     }
     // If isUpNext && isDefaultPack, do nothing (can't unpin default)

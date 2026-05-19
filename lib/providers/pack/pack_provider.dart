@@ -1,5 +1,4 @@
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -69,12 +68,7 @@ class Pack extends _$Pack {
     } catch (_) {
       // Best-effort: even if stats refresh fails, the local toggle stuck.
     }
-    if (!ref.mounted) return;
-
-    try {
-      await ref.read(upNextProvider.notifier).refresh();
-    } catch (_) {
-      // Best-effort: up-next is non-critical.
-    }
+    // upNextProvider rebuilds reactively via packProvider <- statsProvider,
+    // so no explicit refresh is needed here.
   }
 }

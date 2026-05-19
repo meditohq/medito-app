@@ -21,7 +21,6 @@ import 'widgets/up_next/up_next_widget.dart';
 import 'widgets/up_next/your_path_explainer_strip.dart';
 
 import '../../providers/home/announcement_provider.dart';
-import '../../providers/home/up_next_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
@@ -161,7 +160,8 @@ class _HomeViewState extends ConsumerState<HomeView>
     ref.invalidate(fetchLatestAnnouncementProvider);
     ref.invalidate(refreshHomeAPIsProvider);
     ref.invalidate(refreshProductsProvider);
-    ref.invalidate(upNextProvider);
+    // Refetch all pack data; upNext is derived and will re-derive automatically.
+    ref.invalidate(packDataProvider);
     await Future.wait([
       ref.read(statsProvider.notifier).refresh(),
       ref.read(fetchLatestAnnouncementProvider.future),

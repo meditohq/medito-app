@@ -2,16 +2,17 @@ import 'package:medito/constants/config_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/repositories/repositories.dart';
-import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/home_widget_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'up_next_provider.g.dart';
 
+/// The pack the home screen treats as the user's current "up next" course.
+/// Persisted under [SharedPreferenceConstants.upNextPackId]; null falls back
+/// to the configured basics pack.
 @riverpod
 String upNextPackId(Ref ref) {
-  final prefs = ref.read(sharedPreferencesProvider);
+  final prefs = ref.watch(sharedPreferencesProvider);
   return prefs.getString(SharedPreferenceConstants.upNextPackId) ??
       ConfigConstants.basicsPackId;
 }
@@ -35,83 +36,59 @@ class UpNextData {
   bool get isCompleted => completedCount >= totalCount;
 }
 
+/// Derives the home-screen "up next" surface from [packProvider], which
+/// already merges per-item completion against [statsProvider]. Watching it
+/// means up-next reacts automatically when a track completes — no manual
+/// invalidation needed at the play sites.
+///
+/// When the pinned non-default pack finishes, we clear the pin so the
+/// default pack takes over on the next derivation cycle.
 @Riverpod(keepAlive: true)
-class UpNext extends _$UpNext {
-  @override
-  Future<UpNextData> build() => _load();
+AsyncValue<UpNextData> upNext(Ref ref) {
+  final packId = ref.watch(upNextPackIdProvider);
+  final packAsync = ref.watch(packProvider(packId: packId));
 
-  Future<UpNextData> _load() async {
-    final packRepository = ref.read(packRepositoryProvider);
-    final prefs = ref.read(sharedPreferencesProvider);
-    final statsManager = ref.read(statsManagerProvider);
-    if (!statsManager.isInitialized) {
-      await statsManager.initialize();
-    }
-
-    var packId = ref.read(upNextPackIdProvider);
+  return packAsync.whenData((pack) {
+    final completedCount =
+        pack.items.where((item) => item.isCompleted == true).length;
+    final isCompleted = completedCount >= pack.items.length;
     final isDefaultPack = packId == ConfigConstants.basicsPackId;
-    var pack = await packRepository.fetchPacks(packId);
-    var localStats = await statsManager.localAllStats;
-    var tracksChecked = localStats.tracksChecked ?? [];
 
-    var updatedItems = pack.items.map((item) {
-      return item.copyWith(isCompleted: tracksChecked.contains(item.id));
-    }).toList();
-
-    var updatedPack = pack.copyWith(items: updatedItems);
-    var completedCount =
-        updatedItems.where((item) => item.isCompleted == true).length;
-    final isCompleted = completedCount >= updatedItems.length;
-
-    // If pack is completed and not default, switch back to default
+    // A non-default pack just got fully completed — drop the pin so the
+    // basics pack takes over. Deferred to a microtask because we're inside
+    // a provider derivation; the invalidate triggers an upNext rebuild.
     if (isCompleted && !isDefaultPack) {
-      await prefs.remove(SharedPreferenceConstants.upNextPackId);
-      packId = ConfigConstants.basicsPackId;
-      pack = await packRepository.fetchPacks(packId);
-      localStats = await statsManager.localAllStats;
-      tracksChecked = localStats.tracksChecked ?? [];
-      updatedItems = pack.items.map((item) {
-        return item.copyWith(isCompleted: tracksChecked.contains(item.id));
-      }).toList();
-      updatedPack = pack.copyWith(items: updatedItems);
-      completedCount =
-          updatedItems.where((item) => item.isCompleted == true).length;
+      Future.microtask(() async {
+        await ref
+            .read(sharedPreferencesProvider)
+            .remove(SharedPreferenceConstants.upNextPackId);
+        ref.invalidate(upNextPackIdProvider);
+      });
     }
 
-    final currentPackCompleted = completedCount >= updatedItems.length;
-
-    PackItemsModel? nextSession;
-    if (currentPackCompleted && packId == ConfigConstants.basicsPackId) {
-      nextSession = null;
-    } else {
-      nextSession = updatedItems.firstWhere(
-        (item) => item.isCompleted != true,
-        orElse: () => updatedItems.first,
-      );
-    }
-
-    final upNextData = UpNextData(
-      pack: updatedPack,
-      nextSession: nextSession,
-      completedCount: completedCount,
-      totalCount: updatedItems.length,
-    );
+    final nextSession = isCompleted
+        ? null
+        : pack.items.firstWhere(
+            (item) => item.isCompleted != true,
+            orElse: () => pack.items.first,
+          );
 
     if (nextSession != null) {
       HomeWidgetService.updateUpNextWidget(
         title: nextSession.title,
-        packTitle: updatedPack.title,
+        packTitle: pack.title,
         trackId: nextSession.id,
         subtitle: nextSession.subtitle,
         completed: completedCount,
-        total: updatedItems.length,
+        total: pack.items.length,
       ).ignore();
     }
 
-    return upNextData;
-  }
-
-  Future<void> refresh() async {
-    state = await AsyncValue.guard(_load);
-  }
+    return UpNextData(
+      pack: pack,
+      nextSession: nextSession,
+      completedCount: completedCount,
+      totalCount: pack.items.length,
+    );
+  });
 }
