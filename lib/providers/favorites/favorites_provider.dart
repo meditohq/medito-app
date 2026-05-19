@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/favorites/favorite_item.dart';
 import 'package:medito/repositories/favorites/favorites_repository.dart';
@@ -5,36 +7,21 @@ import 'package:flutter/foundation.dart';
 import 'package:medito/utils/favorites_merger.dart';
 import '../../utils/logger.dart';
 
-class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
+class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
   late final FavoritesRepository _repository;
 
   @override
-  AsyncValue<List<FavoriteItem>> build() {
+  Future<List<FavoriteItem>> build() async {
     _repository = ref.read(favoritesRepositoryProvider);
-    // Load initial local data synchronously if possible or show loading.
-    // Start async fetch/merge immediately but don't block build.
-    _loadInitialAndFetch();
-    return const AsyncValue.loading();
+    final local = await _repository.loadFavorites();
+    // Kick off the server merge in the background — by the time it
+    // resolves, build() has already returned, so writing to `state` is
+    // a normal post-build update that re-renders watchers if the merged
+    // list differs from the local list.
+    unawaited(_fetchAndMergeFromServer());
+    return local;
   }
 
-  // Renamed and adjusted initial loading logic
-  void _loadInitialAndFetch() {
-    Future.microtask(() async {
-      try {
-        final localFavorites = await _repository.loadFavorites();
-        // Set initial state with local data first
-        state = AsyncValue.data(localFavorites);
-        // Then attempt to fetch from server and merge
-        await _fetchAndMergeFromServer();
-      } catch (e, stackTrace) {
-        // Only report error if initial local load fails
-        state = AsyncValue.error(e, stackTrace);
-        AppLogger.e('FAVORITES', 'Error loading initial favorites: $e');
-      }
-    });
-  }
-
-  // New function to handle fetching and merging
   Future<void> _fetchAndMergeFromServer() async {
     try {
       final serverFavorites = await _repository.loadFavoritesFromServer();
@@ -58,15 +45,12 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
     }
   }
 
-  // Renamed for clarity, now primarily for pull-to-refresh
-  Future<void> refreshFromServer() async {
-    // Re-use the fetch and merge logic
-    await _fetchAndMergeFromServer();
-  }
+  /// Pull-to-refresh entry point.
+  Future<void> refreshFromServer() => _fetchAndMergeFromServer();
 
-  // Sync logic remains similar, but ensures it sends the current state
+  /// Pushes the current local list up to the server. Best-effort; merge logic
+  /// on next launch will reconcile if this fails.
   Future<void> syncWithServer() async {
-    // Ensure we only sync if there's data available
     if (state.hasValue && state.value!.isNotEmpty) {
       final currentFavorites = state.value!;
       try {
@@ -78,51 +62,62 @@ class FavoritesNotifier extends Notifier<AsyncValue<List<FavoriteItem>>> {
     }
   }
 
-  // Updated Add logic
-  void addToFavorites(FavoriteItem item) async {
-    final currentFavorites = List<FavoriteItem>.from(state.value ?? []);
-    // Avoid adding duplicates based on ID
-    if (currentFavorites.any((fav) => fav.id == item.id)) return;
+  /// Adds [item] optimistically. If the local persist fails, the optimistic
+  /// state is reverted so the UI doesn't claim a save that never happened.
+  /// Server sync is best-effort; its failure does not roll back local state.
+  Future<void> addToFavorites(FavoriteItem item) async {
+    final previousFavorites = state.value ?? [];
+    if (previousFavorites.any((fav) => fav.id == item.id)) return;
 
-    final updatedFavorites = [...currentFavorites, item];
-    // Update state immediately for responsiveness
+    final updatedFavorites = [...previousFavorites, item];
     state = AsyncValue.data(updatedFavorites);
-    // Save locally then attempt sync
+
     try {
       await _repository.saveFavorites(updatedFavorites);
+    } catch (e) {
+      AppLogger.e(
+          'FAVORITES', 'Failed to save after adding favorite, reverting: $e');
+      state = AsyncValue.data(previousFavorites);
+      return;
+    }
+
+    try {
       await syncWithServer();
     } catch (e) {
-      // Log save error, but state remains optimistically updated
-      AppLogger.e(
-          'FAVORITES', 'Failed to save or sync after adding favorite: $e');
-      // Do not revert state here.
+      // syncWithServer already logs; this catch is defensive in case it
+      // ever starts rethrowing.
+      AppLogger.e('FAVORITES', 'Sync after add failed: $e');
     }
   }
 
-  // Updated Remove logic
-  void removeFromFavorites(String id) async {
-    final currentFavorites = state.value ?? [];
+  /// Removes the favorite with [id] optimistically. Same revert-on-local-
+  /// save-failure semantics as [addToFavorites].
+  Future<void> removeFromFavorites(String id) async {
+    final previousFavorites = state.value ?? [];
     final updatedFavorites =
-        currentFavorites.where((item) => item.id != id).toList();
+        previousFavorites.where((item) => item.id != id).toList();
 
-    // Check if the list actually changed
-    if (updatedFavorites.length == currentFavorites.length) return;
+    if (updatedFavorites.length == previousFavorites.length) return;
 
-    // Update state immediately
     state = AsyncValue.data(updatedFavorites);
-    // Save locally then attempt sync
+
     try {
       await _repository.saveFavorites(updatedFavorites);
-      await syncWithServer(); // Sync after saving
     } catch (e) {
-      // Log save error, but state remains optimistically updated
       AppLogger.e(
-          'FAVORITES', 'Failed to save or sync after removing favorite: $e');
-      // Do not revert state here.
+          'FAVORITES', 'Failed to save after removing favorite, reverting: $e');
+      state = AsyncValue.data(previousFavorites);
+      return;
+    }
+
+    try {
+      await syncWithServer();
+    } catch (e) {
+      AppLogger.e('FAVORITES', 'Sync after remove failed: $e');
     }
   }
 }
 
 final favoritesNotifierProvider =
-    NotifierProvider<FavoritesNotifier, AsyncValue<List<FavoriteItem>>>(
+    AsyncNotifierProvider<FavoritesNotifier, List<FavoriteItem>>(
         FavoritesNotifier.new);
