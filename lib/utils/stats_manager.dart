@@ -880,6 +880,12 @@ class StatsManager {
     return _testDate ?? DateTime.now();
   }
 
+  /// Honours [setCurrentDateForTesting]. Callers outside of StatsManager
+  /// should prefer this over `DateTime.now()` for any logic that interacts
+  /// with stats (streak math, manual-session backfills, etc.) so tests can
+  /// pin the clock.
+  DateTime get currentDate => _getCurrentDate();
+
   // Test helpers
   @visibleForTesting
   Future<void> initializeForTesting({StatsService? statsService}) async {

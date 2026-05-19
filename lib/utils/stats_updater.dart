@@ -476,7 +476,9 @@ Future<int> addManualSessions({
 }) async {
   statsManager ??= StatsManager()..initialize();
   final durationMs = durationMinutes * 60 * 1000;
-  final now = DateTime.now();
+  // Read "now" from the manager so test clock injection
+  // (setCurrentDateForTesting) flows through here too.
+  final now = statsManager.currentDate;
   var added = 0;
 
   for (final date in dates) {
