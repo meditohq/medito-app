@@ -21,7 +21,12 @@ import '../../../../widgets/snackbar_widget.dart';
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 
-class PackViewBottomBar extends ConsumerWidget {
+/// Minimum time the spin animation stays visible after tapping the favourite
+/// star, even if the underlying save completes instantly. Keeps the
+/// micro-interaction readable instead of flickering for the local-only path.
+const _kFavoriteSpinMinDuration = Duration(milliseconds: 500);
+
+class PackViewBottomBar extends ConsumerStatefulWidget {
   final String packId;
   final String packName;
   final VoidCallback onBackPressed;
@@ -33,10 +38,17 @@ class PackViewBottomBar extends ConsumerWidget {
     required this.onBackPressed,
   });
 
+  @override
+  ConsumerState<PackViewBottomBar> createState() => _PackViewBottomBarState();
+}
+
+class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
+  bool _favoritePending = false;
+
   void _sharePack(BuildContext context) {
-    final deepLink = 'https://medito.app/packs/$packId';
-    final shareText =
-        AppLocalizations.of(context)!.sharePackText(packName, deepLink);
+    final deepLink = 'https://medito.app/packs/${widget.packId}';
+    final shareText = AppLocalizations.of(context)!
+        .sharePackText(widget.packName, deepLink);
     SharePlus.instance.share(ShareParams(text: shareText));
   }
 
@@ -56,9 +68,10 @@ class PackViewBottomBar extends ConsumerWidget {
                 title: AppLocalizations.of(context)!.addToSiri,
                 onTap: () {
                   addToSiri(
-                    title: '${AppLocalizations.of(context)!.open} $packName',
-                    id: packId,
-                    url: 'org.meditofoundation://packs/$packId',
+                    title:
+                        '${AppLocalizations.of(context)!.open} ${widget.packName}',
+                    id: widget.packId,
+                    url: 'org.meditofoundation://packs/${widget.packId}',
                   );
                   Navigator.pop(context);
                 },
@@ -101,12 +114,35 @@ class PackViewBottomBar extends ConsumerWidget {
     );
   }
 
+  Future<void> _toggleFavorite(bool isFavorite, PackModel pack) async {
+    if (_favoritePending) return;
+    setState(() => _favoritePending = true);
+
+    final notifier = ref.read(favoritesNotifierProvider.notifier);
+    final minSpin = Future<void>.delayed(_kFavoriteSpinMinDuration);
+    final save = isFavorite
+        ? notifier.removeFromFavorites(widget.packId)
+        : notifier.addToFavorites(
+            FavoriteItem(
+              id: widget.packId,
+              title: widget.packName,
+              coverUrl: pack.coverUrl,
+              subtitle: pack.subtitle,
+              type: FavoriteItemType.pack,
+              timestamp: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+
+    await Future.wait([save, minSpin]);
+    if (mounted) setState(() => _favoritePending = false);
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final packData = ref.watch(packProvider(packId: packId));
+  Widget build(BuildContext context) {
+    final packData = ref.watch(packProvider(packId: widget.packId));
     final favoritesState = ref.watch(favoritesNotifierProvider);
     final currentUpNextPackId = ref.watch(upNextPackIdProvider);
-    final isDefaultPack = packId == ConfigConstants.basicsPackId;
+    final isDefaultPack = widget.packId == ConfigConstants.basicsPackId;
 
     return packData.when(
       data: (pack) {
@@ -115,11 +151,11 @@ class PackViewBottomBar extends ConsumerWidget {
         );
         return favoritesState.when(
           data: (favorites) {
-            final isFavorite = favorites.any((item) => item.id == packId);
-            final isUpNext = currentUpNextPackId == packId;
+            final isFavorite =
+                favorites.any((item) => item.id == widget.packId);
+            final isUpNext = currentUpNextPackId == widget.packId;
             return _buildBottomBar(
               context,
-              ref,
               pack,
               isFavorite,
               isUpNext,
@@ -128,10 +164,9 @@ class PackViewBottomBar extends ConsumerWidget {
             );
           },
           loading: () {
-            final isUpNext = currentUpNextPackId == packId;
+            final isUpNext = currentUpNextPackId == widget.packId;
             return _buildBottomBar(
               context,
-              ref,
               pack,
               false,
               isUpNext,
@@ -140,10 +175,9 @@ class PackViewBottomBar extends ConsumerWidget {
             );
           },
           error: (error, stack) {
-            final isUpNext = currentUpNextPackId == packId;
+            final isUpNext = currentUpNextPackId == widget.packId;
             return _buildBottomBar(
               context,
-              ref,
               pack,
               false,
               isUpNext,
@@ -160,17 +194,16 @@ class PackViewBottomBar extends ConsumerWidget {
 
   Widget _buildBottomBar(
     BuildContext context,
-    WidgetRef ref,
     PackModel pack,
     bool isFavorite,
     bool isUpNext,
     bool containsOnlyTracks,
     bool isDefaultPack,
   ) {
-    var favouriteColour = isFavorite
+    final favouriteColour = isFavorite
         ? context.brandPurple
         : Theme.of(context).colorScheme.onSurface;
-    var pinColour = isUpNext
+    final pinColour = isUpNext
         ? context.brandPurple
         : Theme.of(context).colorScheme.onSurface;
 
@@ -183,7 +216,7 @@ class PackViewBottomBar extends ConsumerWidget {
           assetName: MeditoIcons.arrowLeft,
           color: Theme.of(context).colorScheme.onSurface,
         ),
-        onTap: onBackPressed,
+        onTap: widget.onBackPressed,
         semanticLabel: l10n.goBack,
       ),
       rightCenterItem: BottomActionBarItem(
@@ -203,7 +236,7 @@ class PackViewBottomBar extends ConsumerWidget {
                 assetName: isUpNext ? MeditoIcons.pinSolid : MeditoIcons.pin,
                 color: pinColour,
               ),
-              onTap: () => _onPinTap(context, ref, isUpNext, isDefaultPack),
+              onTap: () => _onPinTap(context, isUpNext, isDefaultPack),
               semanticLabel:
                   isUpNext ? l10n.unpinFromUpNext : l10n.pinToUpNext,
             )
@@ -212,34 +245,17 @@ class PackViewBottomBar extends ConsumerWidget {
         child: AnimatedFavouriteIcon(
           isFavorite: isFavorite,
           color: favouriteColour,
+          isPending: _favoritePending,
         ),
         semanticLabel:
             isFavorite ? l10n.removeFromFavorites : l10n.addToFavorites,
-        onTap: () {
-          if (isFavorite) {
-            ref
-                .read(favoritesNotifierProvider.notifier)
-                .removeFromFavorites(packId);
-          } else {
-            ref.read(favoritesNotifierProvider.notifier).addToFavorites(
-                  FavoriteItem(
-                    id: packId,
-                    title: packName,
-                    coverUrl: pack.coverUrl,
-                    subtitle: pack.subtitle,
-                    type: FavoriteItemType.pack,
-                    timestamp: DateTime.now().millisecondsSinceEpoch,
-                  ),
-                );
-          }
-        },
+        onTap: () => _toggleFavorite(isFavorite, pack),
       ),
     );
   }
 
   Future<void> _onPinTap(
     BuildContext context,
-    WidgetRef ref,
     bool isUpNext,
     bool isDefaultPack,
   ) async {
@@ -253,7 +269,8 @@ class PackViewBottomBar extends ConsumerWidget {
       if (context.mounted) showSnackBar(context, l10n.packUnpinnedFromUpNext);
     } else if (!isUpNext) {
       // Pin: set this pack as up next
-      await prefs.setString(SharedPreferenceConstants.upNextPackId, packId);
+      await prefs.setString(
+          SharedPreferenceConstants.upNextPackId, widget.packId);
       ref.invalidate(upNextPackIdProvider);
       if (context.mounted) showSnackBar(context, l10n.packSetAsUpNext);
     }

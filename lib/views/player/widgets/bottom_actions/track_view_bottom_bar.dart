@@ -15,7 +15,12 @@ import '../../../../widgets/medito_icon.dart';
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 
-class TrackViewBottomBar extends ConsumerWidget {
+/// Minimum time the spin animation stays visible after tapping the favourite
+/// star, even if the underlying save completes instantly. Keeps the
+/// micro-interaction readable instead of flickering for the local-only path.
+const _kFavoriteSpinMinDuration = Duration(milliseconds: 500);
+
+class TrackViewBottomBar extends ConsumerStatefulWidget {
   final String trackId;
   final String trackTitle;
   final String? coverUrl;
@@ -29,10 +34,18 @@ class TrackViewBottomBar extends ConsumerWidget {
     required this.onBackPressed,
   });
 
+  @override
+  ConsumerState<TrackViewBottomBar> createState() =>
+      _TrackViewBottomBarState();
+}
+
+class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
+  bool _favoritePending = false;
+
   void _shareTrack(BuildContext context) {
-    final deepLink = 'https://medito.app/tracks/$trackId';
+    final deepLink = 'https://medito.app/tracks/${widget.trackId}';
     final shareText =
-        AppLocalizations.of(context)!.shareTrackText(trackTitle, deepLink);
+        AppLocalizations.of(context)!.shareTrackText(widget.trackTitle, deepLink);
     SharePlus.instance.share(ShareParams(text: shareText));
   }
 
@@ -52,9 +65,10 @@ class TrackViewBottomBar extends ConsumerWidget {
                 title: AppLocalizations.of(context)!.addToSiri,
                 onTap: () {
                   addToSiri(
-                    title: '${AppLocalizations.of(context)!.open} $trackTitle',
-                    id: trackId,
-                    url: 'org.meditofoundation://tracks/$trackId',
+                    title:
+                        '${AppLocalizations.of(context)!.open} ${widget.trackTitle}',
+                    id: widget.trackId,
+                    url: 'org.meditofoundation://tracks/${widget.trackId}',
                   );
                   Navigator.pop(context);
                 },
@@ -97,45 +111,54 @@ class TrackViewBottomBar extends ConsumerWidget {
     );
   }
 
+  Future<void> _toggleFavorite(bool isFavorite, Track track) async {
+    if (_favoritePending) return;
+    setState(() => _favoritePending = true);
+
+    final notifier = ref.read(favoritesNotifierProvider.notifier);
+    final minSpin = Future<void>.delayed(_kFavoriteSpinMinDuration);
+    final save = isFavorite
+        ? notifier.removeFromFavorites(widget.trackId)
+        : notifier.addToFavorites(
+            FavoriteItem(
+              id: widget.trackId,
+              title: widget.trackTitle,
+              coverUrl: widget.coverUrl ?? track.coverUrl,
+              subtitle: track.subtitle,
+              type: FavoriteItemType.track,
+              timestamp: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+
+    await Future.wait([save, minSpin]);
+    if (mounted) setState(() => _favoritePending = false);
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final trackState = ref.watch(tracksProvider(trackId: trackId));
+  Widget build(BuildContext context) {
+    final trackState = ref.watch(tracksProvider(trackId: widget.trackId));
     final favoritesState = ref.watch(favoritesNotifierProvider);
 
     const dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
-    var isDailyMeditation = trackId == dailyMeditationId;
+    final isDailyMeditation = widget.trackId == dailyMeditationId;
 
     return trackState.when(
       data: (track) {
         return favoritesState.when(
           data: (favorites) {
-            final isFavorite = favorites.any((item) => item.id == trackId);
+            final isFavorite =
+                favorites.any((item) => item.id == widget.trackId);
             return _buildBottomBar(
               context,
-              ref,
               track,
               isFavorite,
               isDailyMeditation,
             );
           },
-          loading: () {
-            return _buildBottomBar(
-              context,
-              ref,
-              track,
-              false,
-              isDailyMeditation,
-            );
-          },
-          error: (error, stack) {
-            return _buildBottomBar(
-              context,
-              ref,
-              track,
-              false,
-              isDailyMeditation,
-            );
-          },
+          loading: () =>
+              _buildBottomBar(context, track, false, isDailyMeditation),
+          error: (error, stack) =>
+              _buildBottomBar(context, track, false, isDailyMeditation),
         );
       },
       loading: () => const SizedBox.shrink(),
@@ -145,12 +168,11 @@ class TrackViewBottomBar extends ConsumerWidget {
 
   Widget _buildBottomBar(
     BuildContext context,
-    WidgetRef ref,
     Track track,
     bool isFavorite,
     bool isDailyMeditation,
   ) {
-    var colour = isFavorite
+    final colour = isFavorite
         ? context.brandPurple
         : Theme.of(context).colorScheme.onSurface;
 
@@ -163,7 +185,7 @@ class TrackViewBottomBar extends ConsumerWidget {
           assetName: MeditoIcons.arrowLeft,
           color: Theme.of(context).colorScheme.onSurface,
         ),
-        onTap: onBackPressed,
+        onTap: widget.onBackPressed,
         semanticLabel: l10n.goBack,
       ),
       rightCenterItem: BottomActionBarItem(
@@ -183,28 +205,12 @@ class TrackViewBottomBar extends ConsumerWidget {
               child: AnimatedFavouriteIcon(
                 isFavorite: isFavorite,
                 color: colour,
+                isPending: _favoritePending,
               ),
               semanticLabel: isFavorite
                   ? l10n.removeFromFavorites
                   : l10n.addToFavorites,
-              onTap: () {
-                if (isFavorite) {
-                  ref
-                      .read(favoritesNotifierProvider.notifier)
-                      .removeFromFavorites(trackId);
-                } else {
-                  ref.read(favoritesNotifierProvider.notifier).addToFavorites(
-                        FavoriteItem(
-                          id: trackId,
-                          title: trackTitle,
-                          coverUrl: coverUrl ?? track.coverUrl,
-                          subtitle: track.subtitle,
-                          type: FavoriteItemType.track,
-                          timestamp: DateTime.now().millisecondsSinceEpoch,
-                        ),
-                      );
-                }
-              },
+              onTap: () => _toggleFavorite(isFavorite, track),
             ),
     );
   }
