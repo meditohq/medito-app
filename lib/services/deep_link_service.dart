@@ -17,6 +17,13 @@ class DeepLinkService {
   final WidgetRef ref;
   final BuildContext context;
 
+  // Guards against the same URI being delivered twice in quick succession —
+  // happens on Android when both `getInitialLink()` and `uriLinkStream` fire
+  // for a cold-start intent, or on rapid double-taps of a home-screen widget.
+  Uri? _lastHandledUri;
+  DateTime? _lastHandledAt;
+  static const _dedupeWindow = Duration(milliseconds: 1500);
+
   // Completes once the initial link check finishes (hit or miss).
   // SplashView awaits this before applying stored UTM parameters to ensure
   // deferred deep links from Apple Search Ads are stored first.
@@ -83,6 +90,16 @@ class DeepLinkService {
     AppLogger.d('DEEPLINK', 'Scheme: ${uri.scheme}');
     AppLogger.d('DEEPLINK', 'Host: ${uri.host}');
     AppLogger.d('DEEPLINK', 'Path: ${uri.path}');
+
+    final now = DateTime.now();
+    if (_lastHandledUri == uri &&
+        _lastHandledAt != null &&
+        now.difference(_lastHandledAt!) < _dedupeWindow) {
+      AppLogger.d('DEEPLINK', 'Ignoring duplicate deep link within dedupe window: $uri');
+      return;
+    }
+    _lastHandledUri = uri;
+    _lastHandledAt = now;
 
     try {
       // Extract and store UTM parameters before navigation

@@ -13,6 +13,12 @@ class HomeWidgetService {
   static const String _appGroupId = 'group.org.medito.widget';
   static const String _widgetName = 'MeditationWidgetReceiver';
   static const String _consistencyWidgetName = 'ConsistencyWidgetReceiver';
+
+  // Coalesces rapid back-to-back broadcast requests into a single platform
+  // round trip. Multiple sources (stats refresh, up-next change, theme change)
+  // can update SharedPreferences within the same frame.
+  static Timer? _broadcastDebounce;
+  static const Duration _broadcastCoalesceWindow = Duration(milliseconds: 100);
   static const String _streakCurrentKey = 'streak_current';
   static const String _meditationDatesKey = 'meditation_dates';
   static const String _freezeDatesKey = 'freeze_dates';
@@ -76,16 +82,17 @@ class HomeWidgetService {
       final meditationDates = _extractMeditationDates(stats);
       final freezeDates = stats.freezeUsageDates.toList();
 
-      await HomeWidget.saveWidgetData<int>(_streakCurrentKey, stats.streakCurrent);
-      await HomeWidget.saveWidgetData<String>(_meditationDatesKey, jsonEncode(meditationDates));
-      await HomeWidget.saveWidgetData<String>(_freezeDatesKey, jsonEncode(freezeDates));
-      await HomeWidget.saveWidgetData<String>(_dayLabelKey, dayLabel);
-      await HomeWidget.saveWidgetData<String>(_daysLabelKey, daysLabel);
-      await HomeWidget.saveWidgetData<int>(_lastUpdatedKey, DateTime.now().millisecondsSinceEpoch);
-      await HomeWidget.saveWidgetData<int>(_totalTracksCompletedKey, stats.totalTracksCompleted);
-
       final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
-      await HomeWidget.saveWidgetData<int>(_consistencyScoreKey, consistencyPercentage);
+      await Future.wait([
+        HomeWidget.saveWidgetData<int>(_streakCurrentKey, stats.streakCurrent),
+        HomeWidget.saveWidgetData<String>(_meditationDatesKey, jsonEncode(meditationDates)),
+        HomeWidget.saveWidgetData<String>(_freezeDatesKey, jsonEncode(freezeDates)),
+        HomeWidget.saveWidgetData<String>(_dayLabelKey, dayLabel),
+        HomeWidget.saveWidgetData<String>(_daysLabelKey, daysLabel),
+        HomeWidget.saveWidgetData<int>(_lastUpdatedKey, DateTime.now().millisecondsSinceEpoch),
+        HomeWidget.saveWidgetData<int>(_totalTracksCompletedKey, stats.totalTracksCompleted),
+        HomeWidget.saveWidgetData<int>(_consistencyScoreKey, consistencyPercentage),
+      ]);
 
       await _triggerWidgetRefresh();
     } catch (e) {
@@ -106,14 +113,16 @@ class HomeWidgetService {
       final freezeDates = stats.freezeUsageDates.toList();
       final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
 
-      await _saveWithTimeout(_streakCurrentKey, stats.streakCurrent);
-      await _saveWithTimeout(_meditationDatesKey, jsonEncode(meditationDates));
-      await _saveWithTimeout(_freezeDatesKey, jsonEncode(freezeDates));
-      await _saveWithTimeout(_dayLabelKey, 'day');
-      await _saveWithTimeout(_daysLabelKey, 'days');
-      await _saveWithTimeout(_lastUpdatedKey, DateTime.now().millisecondsSinceEpoch);
-      await _saveWithTimeout(_totalTracksCompletedKey, stats.totalTracksCompleted);
-      await _saveWithTimeout(_consistencyScoreKey, consistencyPercentage);
+      await Future.wait([
+        _saveWithTimeout(_streakCurrentKey, stats.streakCurrent),
+        _saveWithTimeout(_meditationDatesKey, jsonEncode(meditationDates)),
+        _saveWithTimeout(_freezeDatesKey, jsonEncode(freezeDates)),
+        _saveWithTimeout(_dayLabelKey, 'day'),
+        _saveWithTimeout(_daysLabelKey, 'days'),
+        _saveWithTimeout(_lastUpdatedKey, DateTime.now().millisecondsSinceEpoch),
+        _saveWithTimeout(_totalTracksCompletedKey, stats.totalTracksCompleted),
+        _saveWithTimeout(_consistencyScoreKey, consistencyPercentage),
+      ]);
 
       await _triggerWidgetRefresh();
     } catch (e) {
@@ -173,17 +182,21 @@ class HomeWidgetService {
       return;
     }
 
-    try {
-      const platform = MethodChannel('medito.app/widget');
-      await platform.invokeMethod('updateWidget').timeout(
-            const Duration(seconds: 2),
-          );
-      AppLogger.d('WIDGET', 'Manual widget update broadcast sent');
-    } on TimeoutException {
-      AppLogger.w('WIDGET', 'Widget update broadcast timeout');
-    } catch (e) {
-      AppLogger.e('WIDGET', 'Failed to send manual widget update broadcast', e);
-    }
+    _broadcastDebounce?.cancel();
+    _broadcastDebounce = Timer(_broadcastCoalesceWindow, () async {
+      try {
+        const platform = MethodChannel('medito.app/widget');
+        await platform.invokeMethod('updateWidget').timeout(
+              const Duration(seconds: 2),
+            );
+        AppLogger.d('WIDGET', 'Manual widget update broadcast sent');
+      } on TimeoutException {
+        AppLogger.w('WIDGET', 'Widget update broadcast timeout');
+      } catch (e) {
+        AppLogger.e(
+            'WIDGET', 'Failed to send manual widget update broadcast', e);
+      }
+    });
   }
 
   /// Updates the Up Next widget with the current session info
@@ -201,12 +214,14 @@ class HomeWidgetService {
 
     try {
       await _configure();
-      await HomeWidget.saveWidgetData<String>(_upNextTitleKey, title);
-      await HomeWidget.saveWidgetData<String>(_upNextPackTitleKey, packTitle);
-      await HomeWidget.saveWidgetData<String>(_upNextSubtitleKey, subtitle ?? '');
-      await HomeWidget.saveWidgetData<String>(_upNextTrackIdKey, trackId);
-      await HomeWidget.saveWidgetData<int>(_upNextCompletedKey, completed);
-      await HomeWidget.saveWidgetData<int>(_upNextTotalKey, total);
+      await Future.wait([
+        HomeWidget.saveWidgetData<String>(_upNextTitleKey, title),
+        HomeWidget.saveWidgetData<String>(_upNextPackTitleKey, packTitle),
+        HomeWidget.saveWidgetData<String>(_upNextSubtitleKey, subtitle ?? ''),
+        HomeWidget.saveWidgetData<String>(_upNextTrackIdKey, trackId),
+        HomeWidget.saveWidgetData<int>(_upNextCompletedKey, completed),
+        HomeWidget.saveWidgetData<int>(_upNextTotalKey, total),
+      ]);
 
       await _triggerWidgetRefresh();
       if (Platform.isIOS) {

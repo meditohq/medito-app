@@ -7,6 +7,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'up_next_provider.g.dart';
 
+// De-duplicates widget pushes — the provider re-derives on every stats refresh
+// even when the surfaced session hasn't actually changed.
+String? _lastPushedWidgetSignature;
+
 /// The pack the home screen treats as the user's current "up next" course.
 /// Persisted under [SharedPreferenceConstants.upNextPackId]; null falls back
 /// to the configured basics pack.
@@ -73,15 +77,33 @@ AsyncValue<UpNextData> upNext(Ref ref) {
             orElse: () => pack.items.first,
           );
 
-    if (nextSession != null) {
-      HomeWidgetService.updateUpNextWidget(
-        title: nextSession.title,
-        packTitle: pack.title,
-        trackId: nextSession.id,
-        subtitle: nextSession.subtitle,
-        completed: completedCount,
-        total: pack.items.length,
-      ).ignore();
+    final signature = nextSession != null
+        ? '${nextSession.id}|${pack.title}|$completedCount/${pack.items.length}'
+        : '|${pack.title}|$completedCount/${pack.items.length}';
+
+    if (signature != _lastPushedWidgetSignature) {
+      _lastPushedWidgetSignature = signature;
+      if (nextSession != null) {
+        HomeWidgetService.updateUpNextWidget(
+          title: nextSession.title,
+          packTitle: pack.title,
+          trackId: nextSession.id,
+          subtitle: nextSession.subtitle,
+          completed: completedCount,
+          total: pack.items.length,
+        ).ignore();
+      } else {
+        // Pack finished — clear the widget so it stops showing a stale track.
+        // Tapping the empty-state widget just opens the app.
+        HomeWidgetService.updateUpNextWidget(
+          title: '',
+          packTitle: '',
+          trackId: '',
+          subtitle: '',
+          completed: completedCount,
+          total: pack.items.length,
+        ).ignore();
+      }
     }
 
     return UpNextData(

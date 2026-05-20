@@ -7,7 +7,7 @@
     android:targetCellWidth="2"
     android:targetCellHeight="1"
     android:resizeMode="horizontal|vertical"
-    android:updatePeriodMillis="300000"
+    android:updatePeriodMillis="0"
     android:previewImage="@drawable/widget_streak_preview"
     android:description="@string/widget_description">
 </appwidget-provider>

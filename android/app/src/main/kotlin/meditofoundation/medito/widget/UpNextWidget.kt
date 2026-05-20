@@ -98,7 +98,10 @@ class UpNextWidget : GlanceAppWidget() {
         val tapAction = if (trackId.isNotEmpty()) {
             actionStartActivity(
                 Intent(Intent.ACTION_VIEW, Uri.parse("org.meditofoundation://medito/tracks/$trackId"))
-                    .apply { setPackage(context.packageName) },
+                    .apply {
+                        setPackage(context.packageName)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    },
             )
         } else {
             actionStartActivity(Intent(context, MainActivity::class.java))
@@ -131,18 +134,16 @@ class UpNextWidget : GlanceAppWidget() {
                 contentDescription = "Play",
                 modifier = GlanceModifier.width(44.dp).height(44.dp),
             )
-            if (title.isNotEmpty()) {
-                Spacer(modifier = GlanceModifier.height(6.dp))
-                Text(
-                    text = title,
-                    style = TextStyle(
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = ColorProvider(colors.textColor),
-                    ),
-                    maxLines = 1,
-                )
-            }
+            Spacer(modifier = GlanceModifier.height(6.dp))
+            Text(
+                text = if (title.isEmpty()) "Up next" else title,
+                style = TextStyle(
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = ColorProvider(colors.textColor),
+                ),
+                maxLines = 1,
+            )
         }
     }
 
