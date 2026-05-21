@@ -51,7 +51,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   bool _dismissLogged = false;
   bool _loadOutcomeLogged = false;
   String _variantId = 'unknown';
-  String _experimentName = 'unknown';
+  // Slug from the JS bridge `experiment_id` field, e.g. "donate3". Stable id
+  // used for joins (matches Stripe metadata key).
+  String _experimentId = 'unknown';
   // Captured at init/page-view so dispose() doesn't call ref.read after the
   // widget has been torn down (Riverpod throws, the analytics event is lost).
   String? _capturedUserId;
@@ -123,7 +125,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           AnalyticsEventConstants.paramPaywallSource:
               widget.source ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: _variantId,
-          AnalyticsEventConstants.paramExperimentName: _experimentName,
+          AnalyticsEventConstants.paramExperimentId: _experimentId,
         },
       );
     } catch (e) {
@@ -140,7 +142,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         userId: _capturedUserId,
         paywallSource: widget.source,
         variantId: _variantId,
-        experimentName: _experimentName,
+        experimentId: _experimentId,
       );
     } catch (e) {
       AppLogger.w(_logTag, 'Failed to log paywall dismissal: $e');
@@ -308,17 +310,16 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
   void _handlePageView(Map<String, dynamic> data) {
     _variantId = (data['experiment_variant'] as String?) ?? 'unknown';
-    _experimentName = (data['experiment_id'] as String?)?.trim().isNotEmpty == true
-        ? data['experiment_id'] as String
-        : 'unknown';
+    final id = (data['experiment_id'] as String?)?.trim();
+    if (id != null && id.isNotEmpty) _experimentId = id;
     AppLogger.d(_logTag,
-        'page_view variant=$_variantId experiment=$_experimentName');
+        'page_view variant=$_variantId experiment_id=$_experimentId');
     FirebaseAnalyticsService().logEvent(
       name: AnalyticsEventConstants.donationPageViewed,
       parameters: {
         AnalyticsEventConstants.paramVariantId: _variantId,
         AnalyticsEventConstants.paramPaywallSource: widget.source ?? 'unknown',
-        AnalyticsEventConstants.paramExperimentName: _experimentName,
+        AnalyticsEventConstants.paramExperimentId: _experimentId,
       },
     );
     _logPaywallPresented();
@@ -360,9 +361,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     final email = data['email'] as String?;
     final variantFromMessage = data['experiment_variant'] as String?;
     if (variantFromMessage != null) _variantId = variantFromMessage;
-    final experimentFromMessage = data['experiment_id'] as String?;
-    if (experimentFromMessage != null && experimentFromMessage.isNotEmpty) {
-      _experimentName = experimentFromMessage;
+    final idFromMessage = data['experiment_id'] as String?;
+    if (idFromMessage != null && idFromMessage.isNotEmpty) {
+      _experimentId = idFromMessage;
     }
 
     if (amount == null || amount <= 0) {
@@ -435,7 +436,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userEmail: userEmail,
           paywallSource: widget.source,
           variantId: _variantId,
-          experimentName: _experimentName,
+          experimentId: _experimentId,
           onSuccess: () {},
         );
       case 'yearly':
@@ -449,7 +450,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userEmail: userEmail,
           paywallSource: widget.source,
           variantId: _variantId,
-          experimentName: _experimentName,
+          experimentId: _experimentId,
           onSuccess: () {},
         );
       case 'one_time':
@@ -464,7 +465,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userEmail: userEmail,
           paywallSource: widget.source,
           variantId: _variantId,
-          experimentName: _experimentName,
+          experimentId: _experimentId,
           onSuccess: () {},
         );
     }

@@ -228,10 +228,10 @@ class AnalyticsEventConstants {
   /// Parameter name for donation page A/B test variant
   static const String paramVariantId = 'variant_id';
 
-  /// Parameter name for the active experiment (e.g. "donate4"). Comes from
-  /// the paywall webview's `experiment_id` JS bridge field so analytics can
-  /// be joined to the admin Experiment Results page.
-  static const String paramExperimentName = 'experiment_name';
+  /// Parameter name for the active experiment slug/ID (e.g. "donate3"). This
+  /// is the stable identifier and matches what's attached to Stripe payment
+  /// metadata under the same key. Source: JS bridge `experiment_id` field.
+  static const String paramExperimentId = 'experiment_id';
 
   /// Event logged once when the donation/paywall page is viewed in the in-app webview
   static const String donationPageViewed = 'donation_page_viewed';

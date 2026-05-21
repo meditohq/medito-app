@@ -357,7 +357,7 @@ class FirebaseAnalyticsService {
     String? userId,
     String? paywallSource,
     String? variantId,
-    String? experimentName,
+    String? experimentId,
   }) async {
     const event = AnalyticsEventConstants.paywallDismissedNoPayment;
     final params = <String, Object>{
@@ -365,7 +365,7 @@ class FirebaseAnalyticsService {
       AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
       AnalyticsEventConstants.paramPaywallSource: paywallSource ?? 'unknown',
       AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
-      AnalyticsEventConstants.paramExperimentName: experimentName ?? 'unknown',
+      AnalyticsEventConstants.paramExperimentId: experimentId ?? 'unknown',
     };
     await Future.wait([
       logEvent(name: event, parameters: params),

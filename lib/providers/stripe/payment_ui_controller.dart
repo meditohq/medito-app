@@ -37,7 +37,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userEmail,
     String? paywallSource,
     String? variantId,
-    String? experimentName,
+    String? experimentId,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -51,13 +51,13 @@ class PaymentUIController extends _$PaymentUIController {
         paymentMethod: paymentMethod,
         userId: me.id,
         userEmail: userEmail ?? me.email,
-        experimentId: experimentName,
+        experimentId: experimentId,
         experimentVariant: variantId,
       );
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'onetime',
-            userId, paywallSource, variantId, experimentName, onSuccess);
+            userId, paywallSource, variantId, experimentId, onSuccess);
       }
 
       return result;
@@ -80,7 +80,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userEmail,
     String? paywallSource,
     String? variantId,
-    String? experimentName,
+    String? experimentId,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -94,13 +94,13 @@ class PaymentUIController extends _$PaymentUIController {
         paymentMethod: paymentMethod,
         userId: me.id,
         userEmail: userEmail ?? me.email,
-        experimentId: experimentName,
+        experimentId: experimentId,
         experimentVariant: variantId,
       );
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'monthly',
-            userId, paywallSource, variantId, experimentName, onSuccess);
+            userId, paywallSource, variantId, experimentId, onSuccess);
       }
 
       return result;
@@ -125,7 +125,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userEmail,
     String? paywallSource,
     String? variantId,
-    String? experimentName,
+    String? experimentId,
     VoidCallback? onSuccess,
   }) async {
     try {
@@ -139,13 +139,13 @@ class PaymentUIController extends _$PaymentUIController {
         paymentMethod: paymentMethod,
         userId: me.id,
         userEmail: userEmail ?? me.email,
-        experimentId: experimentName,
+        experimentId: experimentId,
         experimentVariant: variantId,
       );
 
       if (context.mounted) {
         await _handlePaymentResult(context, result, paywallId, 'yearly',
-            userId, paywallSource, variantId, experimentName, onSuccess);
+            userId, paywallSource, variantId, experimentId, onSuccess);
       }
 
       return result;
@@ -199,7 +199,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? userId,
     String? paywallSource,
     String? variantId,
-    String? experimentName,
+    String? experimentId,
     VoidCallback? onSuccess,
   ) async {
     result.when(
@@ -221,8 +221,8 @@ class PaymentUIController extends _$PaymentUIController {
             AnalyticsEventConstants.paramPaywallSource:
                 paywallSource ?? 'unknown',
             AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
-            AnalyticsEventConstants.paramExperimentName:
-                experimentName ?? 'unknown',
+            AnalyticsEventConstants.paramExperimentId:
+                experimentId ?? 'unknown',
           },
         );
 
@@ -264,8 +264,8 @@ class PaymentUIController extends _$PaymentUIController {
           AnalyticsEventConstants.paramPaywallSource:
               paywallSource ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
-          AnalyticsEventConstants.paramExperimentName:
-              experimentName ?? 'unknown',
+          AnalyticsEventConstants.paramExperimentId:
+              experimentId ?? 'unknown',
           AnalyticsEventConstants.paramPaymentIntentId:
               paymentIntentId ?? 'unknown',
         };
@@ -300,8 +300,8 @@ class PaymentUIController extends _$PaymentUIController {
           AnalyticsEventConstants.paramPaywallSource:
               paywallSource ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
-          AnalyticsEventConstants.paramExperimentName:
-              experimentName ?? 'unknown',
+          AnalyticsEventConstants.paramExperimentId:
+              experimentId ?? 'unknown',
         };
 
         // Firebase Analytics
