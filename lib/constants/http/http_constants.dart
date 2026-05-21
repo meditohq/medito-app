@@ -1,5 +1,16 @@
 import 'package:flutter/foundation.dart';
 
+/// Toggles "mock mode": a fully self-contained demo environment that runs
+/// the app against hardcoded fake data instead of the real backend. This
+/// lets contributors (and anyone curious) run the app locally without
+/// needing API keys or access to the production/staging services.
+///
+/// Enabled by building/running with `--dart-define=MOCK_MODE=true`.
+///
+/// When true, the [HttpApiService] factory returns a [MockHttpApiService]
+/// (see lib/mock/), Firebase / Stripe / Meta SDK initialisation is skipped
+/// in main.dart, and various services short-circuit to no-ops. See
+/// lib/mock/README.md for the full picture.
 bool get isMockMode =>
     const String.fromEnvironment('MOCK_MODE', defaultValue: 'false') == 'true';
 

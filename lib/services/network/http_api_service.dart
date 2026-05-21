@@ -38,6 +38,14 @@ class HttpApiService {
   // List of callbacks to notify on auth events
   final List<AuthStateCallback> _authCallbacks = [];
 
+  // NOTE: The dependency on `package:medito/mock/...` above is INTENTIONAL.
+  // `lib/mock/` is not test code — it's a shipped demo environment that lets
+  // contributors run the app without real API keys (see lib/mock/README.md
+  // and the doc comment on `isMockMode`). The mock service extends this one
+  // and is swapped in here at construction time, so production code does
+  // import from `lib/mock/` by design. Do not "fix" this by deleting the
+  // import or moving the mock folder out of lib/ without first replacing
+  // the wiring (e.g. with a flavor or a Riverpod override).
   factory HttpApiService() {
     if (isMockMode) {
       _instance ??= MockHttpApiService();
