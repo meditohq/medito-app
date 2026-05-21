@@ -29,6 +29,12 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
   /// Starts (or restarts) playback for [request]. The provider's state holds
   /// the same [PlaybackRequest] for the lifetime of the session so the player
   /// UI never has to inspect a nested track graph to know what is playing.
+  ///
+  /// Throws on failure to start playback (e.g. native audio service didn't
+  /// start, ExoPlayer threw, iOS audio session couldn't be configured).
+  /// Callers MUST wrap in try/catch and surface the failure to the user —
+  /// otherwise we end up navigating to a player screen with no audio (silent
+  /// failure that looks like a broken app).
   Future<void> play(PlaybackRequest request) async {
     AppLogger.d('PLAYER',
         'Loading track: ${request.title}, fileId: ${request.fileId}');
@@ -69,42 +75,35 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     if (Platform.isAndroid) {
       AppLogger.d(
           'PLAYER', 'On Android - starting service and checking readiness');
-      try {
-        await _androidServiceApi.startService();
-        AppLogger.d('PLAYER',
-            'Service start requested, now waiting briefly before checking readiness');
-        await Future.delayed(const Duration(milliseconds: 500));
+      // NOTE: errors here intentionally propagate to play() and onwards to the
+      // caller. Previously this was a swallow ('catch (e) { log; }') which
+      // resolved play() successfully despite playback never starting, leading
+      // to a silent-fail player screen. See P0-4 in the audit.
+      await _androidServiceApi.startService();
+      AppLogger.d('PLAYER',
+          'Service start requested, now waiting briefly before checking readiness');
+      await Future.delayed(const Duration(milliseconds: 500));
 
-        final isReady = await _waitForServiceReadiness();
+      final isReady = await _waitForServiceReadiness();
 
-        if (isReady) {
-          AppLogger.d(
-              'PLAYER', 'Service is ready, proceeding with playback');
-          await _playAudioWithRetry(url, trackData);
-        } else {
-          AppLogger.w('PLAYER',
-              'Service failed to become ready, attempting playback anyway');
-          await Future.delayed(const Duration(seconds: 1));
-          await _playAudioWithRetry(url, trackData);
-        }
-      } catch (e) {
-        // TODO(audit P0): this is currently swallowed — the user's play()
-        // future resolves successfully despite playback never starting.
-        // Surface this via the audio state notifier so UI can react.
-        AppLogger.e(
-            'PLAYER', 'Fatal error starting service or playing audio', e);
+      if (isReady) {
+        AppLogger.d('PLAYER', 'Service is ready, proceeding with playback');
+      } else {
+        AppLogger.w('PLAYER',
+            'Service failed to become ready, attempting playback anyway');
+        await Future.delayed(const Duration(seconds: 1));
       }
+      await _playAudioWithRetry(url, trackData);
     } else {
       AppLogger.d('PLAYER', 'On iOS - setting up audio');
-      try {
-        await iosAudioHandler.setUrl(downloadPath, request, trackData);
-        AppLogger.d('PLAYER', 'iOS setUrl succeeded');
-        await iosAudioHandler.play();
-        AppLogger.d('PLAYER', 'iOS play() called');
-      } catch (e) {
-        AppLogger.e(
-            'PLAYER', 'Error playing audio on iOS: ${e.toString()}');
-      }
+      // NOTE: errors here intentionally propagate (see comment above for the
+      // Android path). _playAudioWithRetry on Android already rethrows after
+      // its retry budget — iOS has no such retry layer, so a single failure
+      // here propagates immediately. That's intentional: callers need to know.
+      await iosAudioHandler.setUrl(downloadPath, request, trackData);
+      AppLogger.d('PLAYER', 'iOS setUrl succeeded');
+      await iosAudioHandler.play();
+      AppLogger.d('PLAYER', 'iOS play() called');
     }
   }
 

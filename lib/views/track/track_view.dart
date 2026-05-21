@@ -427,8 +427,17 @@ class _TrackViewState extends ConsumerState<TrackView>
           builder: (context) => const PlayerView(),
         ),
       );
-    } catch (e) {
-      AppLogger.d('TRACK', e.toString());
+    } catch (e, st) {
+      AppLogger.e('TRACK', 'Failed to start playback', e, st);
+      // Previously this swallowed the error AND navigated to PlayerView,
+      // giving users a silent broken-looking player. Now play() rethrows
+      // and navigation is skipped — show a snackbar so the failure is visible.
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.unableToLoadAudio),
+        ),
+      );
     }
   }
 

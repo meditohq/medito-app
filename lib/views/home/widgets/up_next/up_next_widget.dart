@@ -7,6 +7,7 @@ import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/utils/logger.dart';
 import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -318,7 +319,21 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
 
       final request =
           PlaybackRequest.fromTrack(track, selection.voice, selection.file);
-      await ref.read(playerProvider.notifier).play(request);
+      try {
+        await ref.read(playerProvider.notifier).play(request);
+      } catch (e, st) {
+        // play() now propagates native playback failures (see P0-4 in the
+        // audit). Before this change, errors were swallowed and we'd
+        // navigate to a silent player. Show a snackbar instead.
+        AppLogger.e('UP_NEXT', 'Failed to start playback from Up Next', e, st);
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.unableToLoadAudio),
+          ),
+        );
+        return;
+      }
       _navigateToPlayer(context);
     } else {
       handleNavigation(
