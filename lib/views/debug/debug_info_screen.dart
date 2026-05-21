@@ -272,11 +272,11 @@ class DebugInfoScreen extends ConsumerWidget {
 
   Future<List<_ReminderWithDate>> _getPendingRemindersWithDates(
       WidgetRef ref) async {
-    AppLogger.d('XXXX', '_getPendingRemindersWithDates called');
+    AppLogger.d('REMINDERS', '_getPendingRemindersWithDates called');
     final reminders =
         await ref.read(reminderProvider).getPendingNotifications();
     AppLogger.d(
-        'XXXX', 'Got ${reminders.length} pending notifications from system');
+        'REMINDERS', 'Got ${reminders.length} pending notifications from system');
     final prefs = ref.read(sharedPreferencesProvider);
     final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
     final savedMinute = prefs.getInt(SharedPreferenceConstants.savedMinutes);
@@ -284,11 +284,11 @@ class DebugInfoScreen extends ConsumerWidget {
         prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
             (savedHour != null && savedMinute != null);
 
-    AppLogger.d('XXXX',
+    AppLogger.d('REMINDERS',
         'Reminder state: enabled=$isReminderEnabled, savedHour=$savedHour, savedMinute=$savedMinute');
 
     for (final reminder in reminders) {
-      AppLogger.d('XXXX',
+      AppLogger.d('REMINDERS',
           'Pending reminder: ID=${reminder.id}, payload=${reminder.payload}, title=${reminder.title}');
     }
 
@@ -324,7 +324,7 @@ class DebugInfoScreen extends ConsumerWidget {
         isReminderEnabled &&
         savedHour != null &&
         savedMinute != null) {
-      AppLogger.d('XXXX',
+      AppLogger.d('REMINDERS',
           'Debug mode: No pending notifications but reminders enabled, adding calculated dates for UI');
       final calculatedDates = await _getCalculatedScheduledDates(ref);
       for (final entry in calculatedDates) {

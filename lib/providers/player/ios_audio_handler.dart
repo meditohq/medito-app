@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:medito/models/models.dart' show PlaybackRequest;
 import 'package:medito/providers/background_sounds/background_sounds_notifier.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
@@ -263,8 +262,8 @@ class IosAudioHandler extends BaseAudioHandler {
 
   /// Store track completion data for later processing
   Future<void> _storeForLaterProcessing(Map<String, dynamic> payload) async {
-    debugPrint(
-        'Storing track completion for later processing: ${trackState.id}');
+    AppLogger.d(
+        'IOS', 'Storing track completion for later processing: ${trackState.id}');
     final prefs = await SharedPreferences.getInstance();
     await storeTrackCompletion(prefs, payload);
   }

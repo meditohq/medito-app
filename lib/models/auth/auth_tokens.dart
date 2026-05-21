@@ -21,15 +21,13 @@ class AuthTokens {
     this.email,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now() {
-    dev.log('[AUTH_TOKENS] Created new tokens object', level: 1000);
+    // One-line debug log (already kDebugMode-gated by AppLogger). Use
+    // `toString()` for the detailed dump when needed at a callsite.
     dev.log(
-        '[AUTH_TOKENS] Access token prefix: ${_safeSubstring(accessToken, 0, 10)}...',
-        level: 1000);
-    dev.log('[AUTH_TOKENS] Has refresh token: ${refreshToken.isNotEmpty}',
-        level: 1000);
-    dev.log('[AUTH_TOKENS] Expires in: $expiresIn seconds', level: 1000);
-    dev.log('[AUTH_TOKENS] Client ID: $clientId', level: 1000);
-    dev.log('[AUTH_TOKENS] Email: $email', level: 1000);
+      'Created tokens (accessToken: ${_safeSubstring(accessToken, 0, 10)}…, '
+      'expiresIn: ${expiresIn}s, clientId: $clientId, email: $email)',
+      level: 1000,
+    );
   }
 
   // Helper method to safely get a substring

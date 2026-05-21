@@ -452,10 +452,7 @@ class HttpApiService {
 
       // We don't need to log that we added a log entry using the same mechanism
     } catch (e, stackTrace) {
-      debugPrint('[HTTP] 🛑 ERROR: Error saving debug log: $e');
-      if (kDebugMode) {
-        debugPrintStack(stackTrace: stackTrace);
-      }
+      AppLogger.e('HTTP', 'Error saving debug log', e, stackTrace);
     }
   }
 

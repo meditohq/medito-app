@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/models.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../../models/player/repeat_mode.dart' as app_repeat;
@@ -32,7 +31,7 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
   /// UI never has to inspect a nested track graph to know what is playing.
   Future<void> play(PlaybackRequest request) async {
     AppLogger.d('PLAYER',
-        '🔊 Loading track: ${request.title}, fileId: ${request.fileId}');
+        'Loading track: ${request.title}, fileId: ${request.fileId}');
 
     await _playTrack(request);
     state = request;
@@ -47,15 +46,15 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
   }
 
   Future<void> _playTrack(PlaybackRequest request) async {
-    debugPrint('🔊 _playTrack called for track: ${request.trackId}, '
-        'file: ${request.fileId}');
+    AppLogger.d('PLAYER',
+        '_playTrack called for track: ${request.trackId}, file: ${request.fileId}');
 
     final downloadPath = await ref
         .read(audioDownloaderProvider.notifier)
         .getTrackPath(_constructFileName(request));
 
     final url = downloadPath ?? request.remoteUrl;
-    AppLogger.d('PLAYER', '🔊 Will use path: $url');
+    AppLogger.d('PLAYER', 'Will use path: $url');
 
     final trackData = pigeon.Track(
       id: request.trackId,
@@ -69,39 +68,42 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
 
     if (Platform.isAndroid) {
       AppLogger.d(
-          'PLAYER', '🔊 On Android - starting service and checking readiness');
+          'PLAYER', 'On Android - starting service and checking readiness');
       try {
         await _androidServiceApi.startService();
-        debugPrint(
-            '🔊 Service start requested, now waiting briefly before checking readiness');
+        AppLogger.d('PLAYER',
+            'Service start requested, now waiting briefly before checking readiness');
         await Future.delayed(const Duration(milliseconds: 500));
 
         final isReady = await _waitForServiceReadiness();
 
         if (isReady) {
           AppLogger.d(
-              'PLAYER', '🔊 Service is ready, proceeding with playback');
+              'PLAYER', 'Service is ready, proceeding with playback');
           await _playAudioWithRetry(url, trackData);
         } else {
-          debugPrint(
-              '❌ Service failed to become ready, attempting playback anyway');
+          AppLogger.w('PLAYER',
+              'Service failed to become ready, attempting playback anyway');
           await Future.delayed(const Duration(seconds: 1));
           await _playAudioWithRetry(url, trackData);
         }
       } catch (e) {
-        debugPrint(
-            '❌ Fatal error starting service or playing audio: ${e.toString()}');
+        // TODO(audit P0): this is currently swallowed — the user's play()
+        // future resolves successfully despite playback never starting.
+        // Surface this via the audio state notifier so UI can react.
+        AppLogger.e(
+            'PLAYER', 'Fatal error starting service or playing audio', e);
       }
     } else {
-      AppLogger.d('PLAYER', '🔊 On iOS - setting up audio');
+      AppLogger.d('PLAYER', 'On iOS - setting up audio');
       try {
         await iosAudioHandler.setUrl(downloadPath, request, trackData);
-        AppLogger.d('PLAYER', '🔊 iOS setUrl succeeded');
+        AppLogger.d('PLAYER', 'iOS setUrl succeeded');
         await iosAudioHandler.play();
-        AppLogger.d('PLAYER', '🔊 iOS play() called');
+        AppLogger.d('PLAYER', 'iOS play() called');
       } catch (e) {
         AppLogger.e(
-            'PLAYER', '❌ Error playing audio on iOS: ${e.toString()}');
+            'PLAYER', 'Error playing audio on iOS: ${e.toString()}');
       }
     }
   }
@@ -113,28 +115,28 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         AppLogger.d('PLAYER',
-            '🔊 Checking if service is ready (attempt ${attempt + 1})');
+            'Checking if service is ready (attempt ${attempt + 1})');
         final isReady = await _androidServiceApi.isServiceReady();
-        debugPrint(
-            '🔊 Service readiness check returned: $isReady (attempt ${attempt + 1})');
+        AppLogger.d('PLAYER',
+            'Service readiness check returned: $isReady (attempt ${attempt + 1})');
 
         if (isReady) {
-          AppLogger.d('PLAYER', '🔊 Service is ready');
+          AppLogger.d('PLAYER', 'Service is ready');
           return true;
         } else {
-          AppLogger.d('PLAYER', '🔊 Service not ready yet, waiting...');
+          AppLogger.d('PLAYER', 'Service not ready yet, waiting...');
           final delayMs = initialDelayMs * (1 << attempt);
           await Future.delayed(Duration(milliseconds: delayMs));
         }
       } catch (e) {
-        debugPrint(
-            '❌ Error during service readiness check (attempt ${attempt + 1}): $e');
+        AppLogger.e('PLAYER',
+            'Error during service readiness check (attempt ${attempt + 1})', e);
         final delayMs = initialDelayMs * (1 << attempt);
         await Future.delayed(Duration(milliseconds: delayMs));
       }
     }
 
-    AppLogger.e('PLAYER', '❌ Service readiness check timed out');
+    AppLogger.e('PLAYER', 'Service readiness check timed out');
     return false;
   }
 
@@ -144,8 +146,8 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
-        debugPrint(
-            '🔊 Calling playAudio with url: $url (attempt ${attempt + 1})');
+        AppLogger.d('PLAYER',
+            'Calling playAudio with url: $url (attempt ${attempt + 1})');
 
         await _api.playAudio(
           pigeon.AudioData(
@@ -154,15 +156,15 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
           ),
         );
 
-        AppLogger.d('PLAYER', '🔊 playAudio call succeeded');
+        AppLogger.d('PLAYER', 'playAudio call succeeded');
         return;
       } catch (e) {
         AppLogger.e(
-            'PLAYER', '❌ Error playing audio (attempt ${attempt + 1}): $e');
+            'PLAYER', 'Error playing audio (attempt ${attempt + 1}): $e');
 
         if (attempt < maxAttempts - 1) {
           final delayMs = initialDelayMs * (1 << attempt);
-          AppLogger.d('PLAYER', '🔊 Retrying playAudio in ${delayMs}ms...');
+          AppLogger.d('PLAYER', 'Retrying playAudio in ${delayMs}ms...');
           await Future.delayed(Duration(milliseconds: delayMs));
         } else {
           rethrow;

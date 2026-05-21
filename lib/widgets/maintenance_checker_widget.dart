@@ -87,15 +87,15 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
   void _showMaintenanceOverlay(MaintenanceModel maintenanceModel) {
     final navigator = navigatorKey.currentState;
     if (navigator == null) {
-      debugPrint(
-          '[MAINTENANCE_ERROR] Navigator is null, cannot show maintenance view');
+      AppLogger.e(
+          'MAINTENANCE', 'Navigator is null, cannot show maintenance view');
       return;
     }
 
     final overlay = navigator.overlay;
     if (overlay == null) {
-      debugPrint(
-          '[MAINTENANCE_ERROR] Overlay is null, cannot show maintenance view');
+      AppLogger.e(
+          'MAINTENANCE', 'Overlay is null, cannot show maintenance view');
       return;
     }
 
@@ -117,6 +117,6 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
     );
 
     overlay.insert(_maintenanceOverlay!);
-    debugPrint('[MAINTENANCE] Maintenance overlay inserted');
+    AppLogger.d('MAINTENANCE', 'Maintenance overlay inserted');
   }
 }

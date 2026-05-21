@@ -7,6 +7,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/utils.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/path/journal_entry_view.dart';
@@ -185,15 +186,6 @@ Future<bool?> handleDonationNavigation(
       builder: (context) => WebViewDonationScreen(source: sourceRouteName),
     ),
   );
-}
-
-Future<void> launchEmailSubmission(String email, {String? body}) async {
-  final uri = Uri(scheme: 'mailto', path: email, query: 'body=$body');
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
-  } else {
-    throw 'Could not launch $uri';
-  }
 }
 
 // This allows running a callback onPop
