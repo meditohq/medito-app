@@ -25,21 +25,22 @@ final authStateListenerProvider = Provider<void>((ref) {
   // (which defaults to `HttpApiService()`) so tests can override.
   final httpService = ref.read(httpApiServiceProvider);
 
-  // Add callback for force logout events
-  httpService.addAuthCallback((event) {
+  // IMPORTANT: store the registered closure in a named variable so we can
+  // pass the EXACT same reference to removeAuthCallback on dispose. Dart
+  // closures are compared by identity in `List.remove`, and a previous
+  // version of this code passed a fresh `(event) {}` to removeAuthCallback
+  // — a different object that would never match, so callbacks leaked on
+  // every provider invalidation (every ref.watch rebuild added one more,
+  // and a single forceLogout fired all of them). See audit P0-3.
+  void onAuthEvent(AuthEvent event) {
     if (event == AuthEvent.forceLogout) {
-      // Reset auth state in repository
       authRepository.resetAuthState();
-
-      // Emit event to stream for UI to handle
       _authStateController.add(AuthStateEvent.forceLogout);
     }
-  });
+  }
 
-  // Clean up when provider is disposed
-  ref.onDispose(() {
-    httpService.removeAuthCallback((event) {});
-  });
+  httpService.addAuthCallback(onAuthEvent);
+  ref.onDispose(() => httpService.removeAuthCallback(onAuthEvent));
 });
 
 // Helper to dispose the controller (call in app shutdown)

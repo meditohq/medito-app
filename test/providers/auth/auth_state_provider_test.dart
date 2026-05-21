@@ -1,14 +1,15 @@
 // Tests for [authStateListenerProvider] in lib/providers/auth/auth_state_provider.dart
 //
-// These tests pin down the current (buggy) callback-registration behaviour
-// described in audit P0-3: the provider's `ref.onDispose` passes a fresh empty
-// closure to `removeAuthCallback`, which never matches the closure that was
-// originally registered, so callbacks leak on every provider invalidation.
+// These tests verify the fix for audit finding P0-3: previously the provider's
+// `ref.onDispose` passed a fresh empty closure to `removeAuthCallback`, which
+// never matched the closure that was originally registered, so callbacks
+// leaked on every provider invalidation (every ref.watch rebuild added one
+// more, and a single forceLogout fired all of them).
 //
-// Until P0-3 is fixed, the assertion below documents what the code does
-// today. When the fix lands, this test should be updated to assert
-// `callbackCount == 0` after dispose — at which point the test will fail
-// until the fix is applied (tripwire).
+// The fix stores the registered closure in a named variable and passes that
+// same reference to removeAuthCallback. The tests below assert the
+// post-fix invariants (callback removed cleanly, no duplicate callbacks
+// after rebuild).
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
@@ -141,41 +142,31 @@ void main() {
       },
     );
 
-    test(
-      'CHARACTERISATION (audit P0-3): callback is NOT removed on dispose due '
-      'to wrong-closure-identity in ref.onDispose. When this fix lands, '
-      'update the expectation below to `equals(0)`.',
-      () {
-        final container = ProviderContainer(
-          overrides: [
-            httpApiServiceProvider.overrideWithValue(fakeHttp),
-            authRepositorySyncProvider.overrideWithValue(fakeAuth),
-          ],
-        );
+    test('removes the registered callback when the container is disposed', () {
+      final container = ProviderContainer(
+        overrides: [
+          httpApiServiceProvider.overrideWithValue(fakeHttp),
+          authRepositorySyncProvider.overrideWithValue(fakeAuth),
+        ],
+      );
 
-        container.read(authStateListenerProvider);
-        expect(fakeHttp.callbackCount, 1);
+      container.read(authStateListenerProvider);
+      expect(fakeHttp.callbackCount, 1);
 
-        // Disposing the container triggers ref.onDispose in the provider,
-        // which currently calls removeAuthCallback with a FRESH empty closure
-        // — a different identity from the one registered, so List.remove
-        // finds nothing and the original callback stays in the list.
-        container.dispose();
+      // Disposing the container triggers ref.onDispose, which passes the
+      // EXACT closure that was registered (stored in a named variable) to
+      // removeAuthCallback — so List.remove finds it and the callback list
+      // ends up empty. Regression check for audit P0-3.
+      container.dispose();
 
-        // BUG: should be 0, currently 1. Flip this expectation when P0-3 is
-        // fixed (and the dependent test below).
-        expect(
-          fakeHttp.callbackCount,
-          equals(1),
-          reason: 'Documents the leak. Update to 0 when audit P0-3 is fixed.',
-        );
-      },
-    );
+      expect(fakeHttp.callbackCount, 0,
+          reason: 'Callback should be removed cleanly on dispose');
+    });
 
     test(
-      'CHARACTERISATION (audit P0-3): re-reading the provider after a '
-      'rebuild duplicates callbacks instead of replacing. Every '
-      "ref.watch(authRepositorySyncProvider) invalidation adds one more.",
+      'rebuilding the provider does not duplicate callbacks — disposed '
+      'instances cleanly release their registration. Regression check for '
+      'audit P0-3.',
       () {
         // First container: register callback #1.
         final c1 = ProviderContainer(
@@ -187,10 +178,11 @@ void main() {
         c1.read(authStateListenerProvider);
         expect(fakeHttp.callbackCount, 1);
         c1.dispose();
+        // After dispose, callback should be gone.
+        expect(fakeHttp.callbackCount, 0);
 
-        // After dispose the callback was *not* removed (see test above), so
-        // a new container reading the provider stacks another callback on
-        // top of the leaked one.
+        // A fresh container should register exactly one — not stack on top
+        // of a leaked predecessor.
         final c2 = ProviderContainer(
           overrides: [
             httpApiServiceProvider.overrideWithValue(fakeHttp),
@@ -199,20 +191,16 @@ void main() {
         );
         addTearDown(c2.dispose);
         c2.read(authStateListenerProvider);
+        expect(fakeHttp.callbackCount, 1);
 
-        // BUG: with the leak, both callbacks are still registered. Firing
-        // forceLogout once will invoke BOTH (the dead one from c1 and the
-        // live one from c2), so resetAuthState gets called twice for a
-        // single event.
+        // Firing once should reset auth state exactly once (not N times for
+        // N leaked callbacks).
         fakeHttp.fireAuthEvent(AuthEvent.forceLogout);
 
-        expect(
-          fakeAuth.resetAuthStateCallCount,
-          equals(2),
-          reason:
-              'Documents the duplicate-callback leak. Update to 1 when P0-3 '
-              'is fixed.',
-        );
+        expect(fakeAuth.resetAuthStateCallCount, 1,
+            reason:
+                'A single forceLogout must produce a single resetAuthState '
+                'call — duplicates indicate the P0-3 leak has regressed');
       },
     );
   });
