@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/network/http_api_service_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/network/http_api_service.dart';
 
@@ -20,8 +21,9 @@ final authStateStreamProvider = StreamProvider<AuthStateEvent>((ref) {
 final authStateListenerProvider = Provider<void>((ref) {
   final authRepository = ref.watch(authRepositorySyncProvider);
 
-  // Subscribe to auth events from the HTTP service
-  final httpService = HttpApiService();
+  // Subscribe to auth events from the HTTP service. Read via the provider
+  // (which defaults to `HttpApiService()`) so tests can override.
+  final httpService = ref.read(httpApiServiceProvider);
 
   // Add callback for force logout events
   httpService.addAuthCallback((event) {
