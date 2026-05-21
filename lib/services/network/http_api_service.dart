@@ -26,8 +26,30 @@ class HttpApiService {
   static HttpApiService? _instance;
   final _client = HttpClient();
   final _headers = <String, String>{};
+
+  // NOTE on `_retryCount` (audit P0-1):
+  //
+  // This is intentionally a singleton-scoped counter, NOT per-request. It
+  // tracks "successful refreshes followed by a failed retry, since the last
+  // successful retry" — the "be extra forgiving when the user might be
+  // coming back from background with expired tokens" behaviour referenced
+  // by [_handleUnauthorizedResponse]. The counter increments only after a
+  // refresh succeeded but the retried request itself failed, and resets on
+  // a successful retry.
+  //
+  // Because Dart is single-threaded and [_isRefreshingToken] serializes the
+  // actual refresh work, there's no classic data race here. The "shared
+  // state across requests" smell is real but the behaviour is intentional.
+  // If you want to change this, also revisit the comment at line ~258
+  // ("Much higher retry limit (up to 5) to be extra forgiving…") — that
+  // intent goes hand-in-hand with the cross-request accumulation.
+  //
+  // Production data (Firebase Analytics `unexpected_logout_refresh_token_missing`)
+  // shows ~15 users / 14 days hit the force-logout path. Tread carefully
+  // — a "fix" here could regress these users in unexpected ways.
   var _retryCount = 0;
-  final _authService = AuthApiService();
+
+  final AuthApiService _authService;
   static var _instanceCount = 0;
   final _instanceId = ++_instanceCount;
 
@@ -57,12 +79,16 @@ class HttpApiService {
     return _instance!;
   }
 
-  /// Public constructor intended for subclasses (e.g. MockHttpApiService).
-  /// Delegates to the private `_internal` constructor to ensure consistent
-  /// initialization logic.
-  HttpApiService.internal() : this._internal();
+  /// Public constructor intended for subclasses (e.g. MockHttpApiService)
+  /// and tests. Delegates to the private `_internal` constructor to ensure
+  /// consistent initialization logic. The optional [authService] parameter
+  /// lets tests inject a fake [AuthApiService] without going through the
+  /// singleton factory.
+  HttpApiService.internal({AuthApiService? authService})
+      : this._internal(authService: authService);
 
-  HttpApiService._internal() {
+  HttpApiService._internal({AuthApiService? authService})
+      : _authService = authService ?? AuthApiService() {
     AppLogger.d('HTTP', 'Creating new HttpApiService instance #$_instanceId');
     _client.connectionTimeout = kTimeoutDuration;
     _initializeHeaders();
@@ -101,6 +127,29 @@ class HttpApiService {
     AppLogger.d('HTTP', 'Clearing auth header on instance #$_instanceId');
     _headers.remove(kAuthorizationHeader);
   }
+
+  /// Test-only accessor for the singleton-scoped retry counter. See the
+  /// comment on [_retryCount] for design notes.
+  @visibleForTesting
+  int get retryCountForTesting => _retryCount;
+
+  /// Test-only setter to seed the retry counter so tests can exercise the
+  /// "max retries reached → force logout" branch without setting up the full
+  /// refresh + retry flow.
+  @visibleForTesting
+  set retryCountForTesting(int value) => _retryCount = value;
+
+  /// Test-only accessor for the in-progress refresh flag.
+  @visibleForTesting
+  bool get isRefreshingTokenForTesting => _isRefreshingToken;
+
+  /// Test-only wrapper for the private refresh implementation. The token
+  /// refresh logic is exercised by [_handleUnauthorizedResponse] in
+  /// production; this wrapper lets tests verify the underlying lock and
+  /// auth-service interactions in isolation, without standing up a full
+  /// HTTP transport mock.
+  @visibleForTesting
+  Future<void> refreshTokenForTesting() => _refreshTokenThroughAuthService();
 
   Future<Map<String, dynamic>> getRequest(
     String path, {
