@@ -198,9 +198,14 @@ struct UpNextWidgetEntryView: View {
     @Environment(\.widgetFamily) var family
     let entry: UpNextEntry
 
+    // Source params let DeepLinkService attribute the tap to the home-screen
+    // widget for analytics. Empty-state tap still gets a deep link so the
+    // open is attributable; no path segments → app just opens.
     private var deepLinkURL: URL? {
-        guard !entry.trackId.isEmpty else { return nil }
-        return URL(string: "org.meditofoundation://tracks/\(entry.trackId)")
+        if entry.trackId.isEmpty {
+            return URL(string: "org.meditofoundation://medito/?source=home_widget&widget=up_next")
+        }
+        return URL(string: "org.meditofoundation://tracks/\(entry.trackId)?source=home_widget&widget=up_next")
     }
 
     var body: some View {

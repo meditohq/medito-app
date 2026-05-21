@@ -36,10 +36,11 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import meditofoundation.medito.R
-import es.antonborri.home_widget.actionStartActivity
+import android.content.Intent
+import android.net.Uri
+import androidx.glance.appwidget.action.actionStartActivity
 import es.antonborri.home_widget.HomeWidgetGlanceState
 import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
-import meditofoundation.medito.MainActivity
 import org.json.JSONArray
 import java.util.Calendar
 
@@ -128,12 +129,24 @@ class ConsistencyWidget : GlanceAppWidget() {
 
         val fireIconColor = if (hasActivityToday) checkmarkColor else inactiveCircleColor
 
+        // Tap fires a deep link with source params so DeepLinkService can log
+        // the widget tap analytics. No path segments → app just opens.
+        val tapAction = actionStartActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("org.meditofoundation://medito/?source=home_widget&widget=consistency"),
+            ).apply {
+                setPackage(context.packageName)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
+
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(backgroundColor)
                 .padding(8.dp)
-                .clickable(onClick = actionStartActivity<MainActivity>(context))
+                .clickable(onClick = tapAction)
         ) {
             Column(
                 modifier = GlanceModifier.fillMaxSize(),

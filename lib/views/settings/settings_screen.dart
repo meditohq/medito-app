@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -229,7 +232,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (item.path == TypeConstants.addWidget) {
       try {
         final widgetManager = MeditoWidgetManager();
-        await widgetManager.pinWidget('consistency');
+        final dialogShown = await widgetManager.pinWidget('consistency');
+        unawaited(
+          ref.read(analyticsServiceProvider).logEvent(
+                name: AnalyticsEventConstants.homeWidgetPinRequested,
+                parameters: {
+                  AnalyticsEventConstants.paramWidgetType: 'consistency',
+                  'dialog_shown': dialogShown ? 'true' : 'false',
+                },
+              ),
+        );
       } catch (e) {
         // Silently fail - Android system dialog handles user interaction
       }

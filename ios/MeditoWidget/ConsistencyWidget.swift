@@ -73,6 +73,8 @@ struct ConsistencyWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: ConsistencyProvider()) { entry in
             ConsistencyWidgetView(entry: entry)
+                // Source params let DeepLinkService attribute the tap for analytics.
+                .widgetURL(URL(string: "org.meditofoundation://medito/?source=home_widget&widget=consistency"))
         }
         .configurationDisplayName("Consistency")
         .description("See your meditation consistency percentage.")

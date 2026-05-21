@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/app_globals.dart' show appReadyCompleter;
+import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
@@ -102,6 +105,11 @@ class DeepLinkService {
     _lastHandledAt = now;
 
     try {
+      // Detect home-screen widget taps via the `source` query param so we can
+      // attribute opens. Both iOS and Android widgets append
+      // `?source=home_widget&widget=<type>` to their tap URIs.
+      _logIfHomeWidgetTap(uri);
+
       // Extract and store UTM parameters before navigation
       await _storeUtmParameters(uri);
 
@@ -155,6 +163,43 @@ class DeepLinkService {
           showSnackBar(context, localizations.deepLinkError);
         }
       }
+    }
+  }
+
+  void _logIfHomeWidgetTap(Uri uri) {
+    try {
+      final source = uri.queryParameters['source'];
+      if (source != AnalyticsEventConstants.widgetDeepLinkSource) return;
+
+      final widgetType = uri.queryParameters['widget'] ?? 'unknown';
+      final params = <String, Object>{
+        AnalyticsEventConstants.paramWidgetType: widgetType,
+        'platform': Platform.isIOS ? 'ios' : 'android',
+      };
+
+      // Include the track id when present so we can correlate widget taps
+      // with content (Up Next widget only). Normalise across the two URI
+      // forms used by the widgets:
+      //   Android: org.meditofoundation://medito/tracks/{id}?…
+      //   iOS:     org.meditofoundation://tracks/{id}?…
+      final normalised = uri.host == 'medito'
+          ? uri.pathSegments
+          : <String>[uri.host, ...uri.pathSegments];
+      final tracksIdx = normalised.indexOf('tracks');
+      if (tracksIdx != -1 && tracksIdx + 1 < normalised.length) {
+        params[AnalyticsEventConstants.paramSessionId] =
+            normalised[tracksIdx + 1];
+      }
+
+      unawaited(
+        ref.read(analyticsServiceProvider).logEvent(
+              name: AnalyticsEventConstants.homeWidgetTapped,
+              parameters: params,
+            ),
+      );
+      AppLogger.d('DEEPLINK', 'Home widget tap logged: $widgetType');
+    } catch (e) {
+      AppLogger.w('DEEPLINK', 'Failed to log home widget tap: $e');
     }
   }
 

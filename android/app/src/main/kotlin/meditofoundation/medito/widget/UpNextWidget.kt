@@ -37,7 +37,6 @@ import androidx.glance.unit.ColorProvider
 import androidx.glance.appwidget.action.actionStartActivity
 import es.antonborri.home_widget.HomeWidgetGlanceState
 import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
-import meditofoundation.medito.MainActivity
 import meditofoundation.medito.R
 
 // Size thresholds — one per layout tier
@@ -95,17 +94,22 @@ class UpNextWidget : GlanceAppWidget() {
             else                  -> Layout.TINY
         }
 
-        val tapAction = if (trackId.isNotEmpty()) {
-            actionStartActivity(
-                Intent(Intent.ACTION_VIEW, Uri.parse("org.meditofoundation://medito/tracks/$trackId"))
-                    .apply {
-                        setPackage(context.packageName)
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    },
-            )
+        // Append source params so DeepLinkService can attribute the tap to the
+        // home-screen widget for analytics. When trackId is empty we still fire
+        // a deep link (no path) instead of launching MainActivity directly so
+        // that the empty-state tap is also attributable.
+        val tapUri = if (trackId.isNotEmpty()) {
+            "org.meditofoundation://medito/tracks/$trackId?source=home_widget&widget=up_next"
         } else {
-            actionStartActivity(Intent(context, MainActivity::class.java))
+            "org.meditofoundation://medito/?source=home_widget&widget=up_next"
         }
+        val tapAction = actionStartActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse(tapUri))
+                .apply {
+                    setPackage(context.packageName)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                },
+        )
 
         Box(
             modifier = GlanceModifier

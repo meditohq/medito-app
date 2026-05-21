@@ -286,6 +286,22 @@ class AnalyticsEventConstants {
   /// Event logged when user unpins a pack from Up Next on the pack screen
   static const String packUnpinned = 'pack_unpinned';
 
+  // Home-screen widget events (iOS + Android)
+  /// Event logged when the user taps a home-screen widget. Detected via the
+  /// `source=home_widget` query param on the deep link the widget fires.
+  static const String homeWidgetTapped = 'home_widget_tapped';
+
+  /// Event logged when the user successfully pins a widget from in-app
+  /// (Android only — iOS doesn't expose a programmatic pin API).
+  static const String homeWidgetPinRequested = 'home_widget_pin_requested';
+
+  /// Parameter naming the widget kind: `up_next`, `streak`, `consistency`.
+  static const String paramWidgetType = 'widget_type';
+
+  /// Sentinel value for the `source` deep-link query param that identifies
+  /// the link as coming from a home-screen widget tap.
+  static const String widgetDeepLinkSource = 'home_widget';
+
   // Your Path explainer strip events
   /// Event logged when the Your Path explainer strip is shown to the user
   static const String yourPathExplainerShown = 'your_path_explainer_shown';

@@ -77,6 +77,8 @@ struct StreakWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: StreakProvider()) { entry in
             StreakWidgetView(entry: entry)
+                // Source params let DeepLinkService attribute the tap for analytics.
+                .widgetURL(URL(string: "org.meditofoundation://medito/?source=home_widget&widget=streak"))
         }
         .configurationDisplayName("Streak")
         .description("See your current meditation streak.")
