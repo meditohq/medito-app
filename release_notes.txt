@@ -1,6 +1,15 @@
 Unreleased
 -
 
+2605.21
+- Share daily quotes with eight new background palettes
+- Star icon now spins while saving a favourite, and reverts if the save fails
+- Smoother home screen carousel and player transitions
+- Refreshed end-of-session screen
+- Backfilling past meditation days in stats is easier
+- Widget improvements on Android and iOS
+- Playback errors now show a message instead of opening an empty player
+
 26.5.19
 - Shorter onboarding — fewer questions before you get started
 - We no longer ask for notification permission during onboarding; reminders are suggested after your first session instead
