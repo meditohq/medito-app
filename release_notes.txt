@@ -1,7 +1,7 @@
 Unreleased
 -
 
-2605.21
+2605.21.0
 - Share daily quotes with eight new background palettes
 - Star icon now spins while saving a favourite, and reverts if the save fails
 - Smoother home screen carousel and player transitions
