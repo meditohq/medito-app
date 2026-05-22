@@ -83,28 +83,21 @@ else
     esac
 fi
 
-# Find the next .N suffix for BASE. No suffix counts as 0; first reissue is .1.
+# Find the next .N suffix for BASE. First release of the day is .0; reissues bump to .1, .2, ...
+# Flutter's pubspec parser rejects 2-component versions, so the bare "$BASE" form is never emitted.
 MAX_SUFFIX=-1
 while IFS= read -r tag; do
     [ -z "$tag" ] && continue
-    if [ "$tag" = "$BASE" ]; then
-        n=0
-    else
-        n="${tag#${BASE}.}"
-        case "$n" in
-            ''|*[!0-9]*) continue ;;
-        esac
-    fi
+    n="${tag#${BASE}.}"
+    case "$n" in
+        ''|*[!0-9]*) continue ;;
+    esac
     if [ "$n" -gt "$MAX_SUFFIX" ]; then
         MAX_SUFFIX="$n"
     fi
-done < <(git tag --list "${BASE}" "${BASE}.*")
+done < <(git tag --list "${BASE}.*")
 
-if [ "$MAX_SUFFIX" -lt 0 ]; then
-    NEW_VERSION="$BASE"
-else
-    NEW_VERSION="${BASE}.$((MAX_SUFFIX + 1))"
-fi
+NEW_VERSION="${BASE}.$((MAX_SUFFIX + 1))"
 
 if ! [[ "$NEW_VERSION" =~ ^[0-9]{4}\.[0-9]+(\.[0-9]+)?$ ]]; then
     echo "✗ Computed version $NEW_VERSION does not match expected shape" >&2
