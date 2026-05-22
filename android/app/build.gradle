@@ -217,5 +217,10 @@ dependencies {
         resolutionStrategy {
             force "androidx.work:work-runtime:2.8.1"
             force "androidx.work:work-runtime-ktx:2.8.1"
+            // Pin Glance to 1.2.0-beta01. Without this, transitive resolution
+            // can pull 1.3.0-alpha01 which requires compileSdk 37 + AGP 9.1.
+            force "androidx.glance:glance:1.2.0-beta01"
+            force "androidx.glance:glance-appwidget:1.2.0-beta01"
+            force "androidx.glance:glance-material:1.2.0-beta01"
         }
     }
