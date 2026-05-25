@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/types/type_constants.dart';
@@ -54,6 +55,71 @@ Future<void> _refreshStatsAndUpNext() async {
   } catch (_) {
     AppLogger.w(
         'STATS', 'No ProviderScope available, skipping provider refresh');
+  }
+}
+
+/// Test seam: when set, [_rescheduleSmartReminders] delegates to this function
+/// instead of constructing a real [SmartRemindersScheduler] +
+/// [ReminderProvider]. Lets unit tests assert that the reschedule path is
+/// taken (and with which anchor) without touching platform notification
+/// channels.
+@visibleForTesting
+Future<void> Function({required int endMs, required int durationMs})?
+    smartReminderReschedulerOverride;
+
+/// Reschedules the Smart Reminder series so its anchor and the streak /
+/// consistency values baked into each day's copy reflect the latest session
+/// state. Safe to call from any stats-mutating path (real completions, manual
+/// adds, deletes); no-ops when Smart Reminders are disabled.
+Future<void> _rescheduleSmartReminders({
+  required int endMs,
+  required int durationMs,
+}) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final hasSaved =
+        prefs.getInt(SharedPreferenceConstants.savedHours) != null &&
+            prefs.getInt(SharedPreferenceConstants.savedMinutes) != null;
+    final enabled =
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
+            hasSaved;
+
+    if (!enabled) {
+      AppLogger.d('STATS', 'Smart Reminders disabled; skipping scheduling');
+      return;
+    }
+
+    final override = smartReminderReschedulerOverride;
+    if (override != null) {
+      await override(endMs: endMs, durationMs: durationMs);
+      AppLogger.d('STATS', 'Smart Reminder series scheduled (override)');
+      return;
+    }
+
+    final scheduler = SmartRemindersScheduler(
+      prefs: prefs,
+      reminders: ReminderProvider(),
+    );
+    final context = navigatorKey.currentContext;
+    await scheduler.rescheduleAfterSession(
+      endMs: endMs,
+      durationMs: durationMs,
+      l10n: context != null && context.mounted
+          ? AppLocalizations.of(context)
+          : null,
+    );
+    AppLogger.d('STATS', 'Smart Reminder series scheduled');
+
+    if (context != null && context.mounted) {
+      try {
+        final container = ProviderScope.containerOf(context);
+        container.read(reminderTimeProvider.notifier).refreshFromPrefs();
+      } catch (e) {
+        AppLogger.w('STATS', 'Failed to refresh reminder time provider: $e');
+      }
+    }
+  } catch (reminderError) {
+    AppLogger.e('STATS', 'Failed to schedule Smart Reminder', reminderError);
   }
 }
 
@@ -116,50 +182,10 @@ Future<bool> handleStats(
           'STATS', 'Failed to get stats for widget update', widgetError);
     }
 
-    // Schedule or reschedule Smart Reminders based on latest session time
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final hasSaved =
-          prefs.getInt(SharedPreferenceConstants.savedHours) != null &&
-              prefs.getInt(SharedPreferenceConstants.savedMinutes) != null;
-      final enabled =
-          prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
-              hasSaved;
-
-      if (enabled) {
-        final endMs = payload[TypeConstants.timestampIdKey] as int;
-        final durationMs = payload[TypeConstants.durationIdKey] as int;
-
-        final scheduler = SmartRemindersScheduler(
-          prefs: prefs,
-          reminders: ReminderProvider(),
-        );
-        final context = navigatorKey.currentContext;
-        await scheduler.rescheduleAfterSession(
-          endMs: endMs,
-          durationMs: durationMs,
-          l10n: context != null && context.mounted
-              ? AppLocalizations.of(context)
-              : null,
-        );
-        AppLogger.d('STATS', 'Smart Reminder series scheduled');
-
-        // Update the reminder time provider state to reflect the new time saved to SharedPreferences
-        if (context != null && context.mounted) {
-          try {
-            final container = ProviderScope.containerOf(context);
-            container.read(reminderTimeProvider.notifier).refreshFromPrefs();
-          } catch (e) {
-            AppLogger.w(
-                'STATS', 'Failed to refresh reminder time provider: $e');
-          }
-        }
-      } else {
-        AppLogger.d('STATS', 'Smart Reminders disabled; skipping scheduling');
-      }
-    } catch (reminderError) {
-      AppLogger.e('STATS', 'Failed to schedule Smart Reminder', reminderError);
-    }
+    await _rescheduleSmartReminders(
+      endMs: payload[TypeConstants.timestampIdKey] as int,
+      durationMs: payload[TypeConstants.durationIdKey] as int,
+    );
 
     return true;
   } catch (e) {
@@ -380,6 +406,9 @@ Future<bool> deleteSession({
 
     await _refreshStatsAndUpNext();
 
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    await _rescheduleSmartReminders(endMs: nowMs, durationMs: 0);
+
     try {
       final updatedStats = await statsManager.localAllStats;
       HomeWidgetService.updateWidgetFromStats(updatedStats).catchError((e) {
@@ -435,6 +464,8 @@ Future<bool> addManualSession({
     // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
 
+    await _rescheduleSmartReminders(endMs: timestamp, durationMs: durationMs);
+
     // Update home widget with latest stats (fire-and-forget to avoid blocking)
     try {
       final updatedStats = await statsManager.localAllStats;
@@ -473,6 +504,7 @@ Future<int> addManualSessions({
   // (setCurrentDateForTesting) flows through here too.
   final now = statsManager.currentDate;
   var added = 0;
+  int latestTimestamp = 0;
 
   for (final date in dates) {
     // Anchor at the shared manual-session hour so the calendar's streak
@@ -494,6 +526,9 @@ Future<int> addManualSessions({
       await statsManager.addAudioCompleted(entry, durationMs,
           skipPost: true);
       added++;
+      if (entry.timestamp > latestTimestamp) {
+        latestTimestamp = entry.timestamp;
+      }
     } catch (e) {
       AppLogger.e('STATS', 'Failed to add manual session in bulk for $date', e);
     }
@@ -516,6 +551,9 @@ Future<int> addManualSessions({
       AppLogger.e(
           'STATS', 'Failed to get stats for widget update', widgetError);
     }
+
+    await _rescheduleSmartReminders(
+        endMs: latestTimestamp, durationMs: durationMs);
   }
 
   return added;
