@@ -53,6 +53,16 @@ class SmartReminderTile extends ConsumerWidget {
         );
         await ref.read(reminderEnabledProvider.notifier).setEnabled(false);
         await service.disable();
+
+        unawaited(
+          ref.read(analyticsServiceProvider).logEvent(
+            name: AnalyticsEventConstants.notificationsDisabled,
+            parameters: {
+              AnalyticsEventConstants.paramSource:
+                  AnalyticsEventConstants.sourceSettings,
+            },
+          ),
+        );
       }
     }
 

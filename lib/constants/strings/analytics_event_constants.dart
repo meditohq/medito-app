@@ -356,7 +356,12 @@ class AnalyticsEventConstants {
   /// Parameter: paramSource ('end_screen', 'settings')
   static const String notificationsEnabled = 'notifications_enabled';
 
-  /// Parameter name for the source screen that triggered a notifications_enabled event
+  /// Event logged when the user disables smart reminders/notifications.
+  /// Parameter: paramSource ('settings')
+  static const String notificationsDisabled = 'notifications_disabled';
+
+  /// Parameter name for the source screen that triggered a notifications_enabled
+  /// or notifications_disabled event
   static const String paramSource = 'source';
 
   /// Source value for notifications enabled from the end screen
