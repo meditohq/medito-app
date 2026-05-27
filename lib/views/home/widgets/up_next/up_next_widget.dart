@@ -15,7 +15,6 @@ import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
@@ -308,8 +307,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     final preferredDuration = ref.read(durationPreferenceProvider);
 
     if (guideName != null && preferredDuration != null) {
-      await PermissionHandler.requestMediaPlaybackPermission(context);
-
       final track = await ref.read(tracksProvider(trackId: nextSession.id).future);
       final selection = TrackVariantSelector.resolve(
         track,

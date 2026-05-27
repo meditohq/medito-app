@@ -18,6 +18,7 @@ import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/player_action_bar.dart';
 import 'package:medito/views/player/widgets/duration_indicator_widget.dart';
+import 'package:medito/views/player/widgets/notification_permission_banner.dart';
 import 'package:medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
 import 'package:medito/widgets/report_button_widget.dart';
 import 'package:flutter/material.dart';
@@ -239,6 +240,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                           right: 16,
                           child:
                               ReportButtonWidget(request: currentlyPlayingTrack),
+                        ),
+                        const Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 64,
+                          child: NotificationPermissionBanner(),
                         ),
                       ],
                     ),

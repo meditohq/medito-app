@@ -602,29 +602,35 @@ abstract class AppLocalizations {
   /// **'Request Permission'**
   String get requestPermission;
 
-  /// No description provided for @mediaPlaybackPermissions.
-  ///
-  /// In en, this message translates to:
-  /// **'Media Playback Permissions'**
-  String get mediaPlaybackPermissions;
-
   /// No description provided for @reminderPermissions.
   ///
   /// In en, this message translates to:
   /// **'Reminder Permissions'**
   String get reminderPermissions;
 
-  /// No description provided for @weNeedYourPermissionMedia.
-  ///
-  /// In en, this message translates to:
-  /// **'We need permission to show media controls in your notifications. This allows you to control playback without opening the app.'**
-  String get weNeedYourPermissionMedia;
-
   /// No description provided for @weNeedYourPermissionReminder.
   ///
   /// In en, this message translates to:
   /// **'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.'**
   String get weNeedYourPermissionReminder;
+
+  /// No description provided for @playerNotificationBannerText.
+  ///
+  /// In en, this message translates to:
+  /// **'Show playback controls on your lock screen'**
+  String get playerNotificationBannerText;
+
+  /// No description provided for @playerNotificationBannerEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get playerNotificationBannerEnable;
+
+  /// No description provided for @playerNotificationBannerDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get playerNotificationBannerDismiss;
 
   /// No description provided for @syncWithHealth.
   ///

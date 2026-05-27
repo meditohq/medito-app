@@ -10,7 +10,6 @@ import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
-import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/views/player/player_view.dart';
 import 'package:medito/widgets/medito_icon.dart';
@@ -37,8 +36,6 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
   Future<void> handleItemTap(BuildContext context, WidgetRef ref) async {
     final guideName = ref.read(guideNamePreferenceProvider);
     final preferredDuration = ref.read(durationPreferenceProvider);
-
-    await PermissionHandler.requestMediaPlaybackPermission(context);
 
     final track =
         await ref.read(tracksProvider(trackId: widget.item.id).future);

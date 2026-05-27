@@ -21,7 +21,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
-import '../../utils/permission_handler.dart';
 import '../bottom_navigation/bottom_navigation_bar_view.dart';
 import '../player/player_view.dart';
 
@@ -174,8 +173,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   String _getDuration(String? length) => formatTrackLength(length);
 
   void _openPlayer(WidgetRef ref, Track track) async {
-    await PermissionHandler.requestMediaPlaybackPermission(context);
-
     final voice = track.voices.first;
     final file = voice.audioFiles.first;
     final request = PlaybackRequest.fromTrack(track, voice, file);

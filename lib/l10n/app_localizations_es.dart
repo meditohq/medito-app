@@ -276,18 +276,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get requestPermission => 'Solicitar Permiso';
 
   @override
-  String get mediaPlaybackPermissions => 'Permisos de Reproducción Multimedia';
-
-  @override
   String get reminderPermissions => 'Permisos de Recordatorio';
-
-  @override
-  String get weNeedYourPermissionMedia =>
-      'Necesitamos permiso para mostrar controles multimedia en tus notificaciones. Esto te permite controlar la reproducción sin abrir la aplicación.';
 
   @override
   String get weNeedYourPermissionReminder =>
       'Necesitamos permiso para enviarte recordatorios sobre el seguimiento de tu progreso de meditación. Esto te ayuda a mantener la consistencia en tu práctica.';
+
+  @override
+  String get playerNotificationBannerText =>
+      'Mostrar controles de reproducción en tu pantalla de bloqueo';
+
+  @override
+  String get playerNotificationBannerEnable => 'Activar';
+
+  @override
+  String get playerNotificationBannerDismiss => 'Descartar';
 
   @override
   String get syncWithHealth => 'Sincronizar con Apple Health';

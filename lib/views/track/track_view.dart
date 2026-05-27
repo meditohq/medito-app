@@ -11,7 +11,6 @@ import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/player_view.dart';
@@ -417,8 +416,6 @@ class _TrackViewState extends ConsumerState<TrackView>
     TrackAudioFile file,
   ) async {
     try {
-      await PermissionHandler.requestMediaPlaybackPermission(context);
-
       final request = PlaybackRequest.fromTrack(track, voice, file);
       await ref.read(playerProvider.notifier).play(request);
       await Navigator.push(
