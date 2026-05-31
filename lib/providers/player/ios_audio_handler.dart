@@ -138,6 +138,12 @@ class IosAudioHandler extends BaseAudioHandler {
         }
 
         await _storeTrackCompletion();
+
+        // Playback has finished and is not repeating. Release the audio
+        // session so iOS does not keep the app alive in the background,
+        // which otherwise drains battery for as long as the session stays
+        // active after the meditation ends.
+        await _deactivateSession();
       }
     });
 
@@ -326,6 +332,25 @@ class IosAudioHandler extends BaseAudioHandler {
     unawaited(_player.stop());
     unawaited(iosBackgroundPlayer.pause());
     unawaited(super.stop());
+    await _deactivateSession();
+  }
+
+  /// Deactivates the iOS audio session so the OS stops treating the app as an
+  /// active background-audio app. Without this, the session activated in
+  /// [play] stays active after playback stops/completes and keeps the app
+  /// running in the background, draining the battery. [notifyOthersOnDeactivation]
+  /// lets other apps (e.g. music) resume once we release the session.
+  Future<void> _deactivateSession() async {
+    try {
+      final session = await AudioSession.instance;
+      await session.setActive(
+        false,
+        avAudioSessionSetActiveOptions:
+            AVAudioSessionSetActiveOptions.notifyOthersOnDeactivation,
+      );
+    } catch (e) {
+      AppLogger.e('IOS', 'Failed to deactivate audio session: $e');
+    }
   }
 
   Future<void> setUrl(
