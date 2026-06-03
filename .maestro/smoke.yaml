@@ -48,10 +48,9 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn: "Never tried it"
 
 # ── Onboarding: Intent question (now the final question — the attribution
-# question was removed in 26.5.19, and the standalone notifications screen
-# was removed too; the post-session reminder prompt on EndScreenView now
-# covers that path). After tapping intent, the flow goes straight to the
-# donation primer.
+# question was removed in 26.5.19). After tapping intent, the flow goes
+# to the donation primer, then the notifications/reminder screen (re-added
+# in 26.6 in the post-donation position).
 - extendedWaitUntil:
     visible: "Build a regular habit"
     timeout: 10000
@@ -79,6 +78,15 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 - extendedWaitUntil:
     visible: "Skip for Now"
+    timeout: 20000
+- tapOn: "Skip for Now"
+
+# ── Onboarding: Notifications / smart reminders (re-added 26.6, sits
+# between the donation primer and battery/tracking). Skip it for the
+# smoke run — the system permission dialog is OS-driven and would
+# otherwise stall the flow.
+- extendedWaitUntil:
+    visible: "Remind Me Daily"
     timeout: 20000
 - tapOn: "Skip for Now"
 

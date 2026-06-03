@@ -1703,22 +1703,10 @@ abstract class AppLocalizations {
   /// Title of the fake notification shown in the onboarding notifications screen preview
   ///
   /// In en, this message translates to:
-  /// **'Your daily reset is ready 🌿'**
-  String get notificationPreviewTitle;
-
-  /// Body of the fake notification shown in the onboarding notifications screen preview (variant A)
-  ///
-  /// In en, this message translates to:
-  /// **'Five minutes to feel calmer, clearer, kinder.'**
-  String get notificationPreviewBody;
-
-  /// Title of the fake notification preview, A/B test variant B
-  ///
-  /// In en, this message translates to:
   /// **'A quieter mind starts here'**
   String get notificationPreviewTitleB;
 
-  /// Body of the fake notification preview, A/B test variant B
+  /// Body of the fake notification shown in the onboarding notifications screen preview
   ///
   /// In en, this message translates to:
   /// **'Your daily breath is waiting. Just tap to begin.'**
@@ -1910,13 +1898,7 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get continueText;
 
-  /// No description provided for @setReminder.
-  ///
-  /// In en, this message translates to:
-  /// **'Set Reminder'**
-  String get setReminder;
-
-  /// CTA on the onboarding notifications screen, A/B test variant B (paired with notification preview variant B)
+  /// CTA on the onboarding notifications screen
   ///
   /// In en, this message translates to:
   /// **'Remind Me Daily'**

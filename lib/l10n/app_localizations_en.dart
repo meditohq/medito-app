@@ -897,13 +897,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationPreviewTimestamp => 'now';
 
   @override
-  String get notificationPreviewTitle => 'Your daily reset is ready 🌿';
-
-  @override
-  String get notificationPreviewBody =>
-      'Five minutes to feel calmer, clearer, kinder.';
-
-  @override
   String get notificationPreviewTitleB => 'A quieter mind starts here';
 
   @override
@@ -1012,9 +1005,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueText => 'Continue';
-
-  @override
-  String get setReminder => 'Set Reminder';
 
   @override
   String get setReminderB => 'Remind Me Daily';

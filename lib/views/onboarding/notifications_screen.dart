@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -36,17 +34,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   bool _notificationsGranted = false;
   bool _isProcessing = false;
 
-  /// A/B test variant for the notification preview copy: 'a' or 'b'.
-  /// Picked once per screen render; logged with every interaction event so
-  /// the conversion funnel can be segmented in Firebase.
-  late final String _previewVariant;
-
   late final AnimationController _previewAnimation;
+
+  /// Tagged on every event fired from this screen so analytics can
+  /// distinguish the post-donation placement (re-introduced 26.6) from the
+  /// pre-donation placement (removed 26.5.19).
+  static const Map<String, Object> _placementParams = {
+    'placement': 'post_donation',
+  };
 
   @override
   void initState() {
     super.initState();
-    _previewVariant = Random().nextBool() ? 'a' : 'b';
     _previewAnimation = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -57,7 +56,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     _checkNotificationPermission();
     FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingNotificationsPreviewShown,
-      parameters: {'variant': _previewVariant},
+      parameters: _placementParams,
     );
   }
 
@@ -95,7 +94,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       await FirebaseAnalyticsService().logEvent(
         name: FirebaseAnalyticsService
             .eventOnboardingNotificationsPermissionGranted,
-        parameters: {'variant': _previewVariant},
+        parameters: _placementParams,
       );
 
       if (mounted) {
@@ -113,9 +112,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
           name: FirebaseAnalyticsService
               .eventOnboardingNotificationsPermissionDenied,
           parameters: {
+            ..._placementParams,
             'permission_status':
                 status.isPermanentlyDenied ? 'permanently_denied' : 'denied',
-            'variant': _previewVariant,
           },
         );
       }
@@ -137,7 +136,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
-      parameters: {'variant': _previewVariant},
+      parameters: _placementParams,
     );
 
     final prefs = ref.read(sharedPreferencesProvider);
@@ -254,9 +253,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                           _buildActionButton(
                             text: _notificationsGranted
                                 ? AppLocalizations.of(context)!.turnOnSmartReminders
-                                : (_previewVariant == 'b'
-                                    ? AppLocalizations.of(context)!.setReminderB
-                                    : AppLocalizations.of(context)!.setReminder),
+                                : AppLocalizations.of(context)!.setReminderB,
                             onPressed:
                                 _isProcessing ? null : _handleNotificationsPermission,
                           ),
@@ -269,7 +266,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                               await FirebaseAnalyticsService().logEvent(
                                 name: FirebaseAnalyticsService
                                     .eventOnboardingReminderSkipTap,
-                                parameters: {'variant': _previewVariant},
+                                parameters: _placementParams,
                               );
                               _navigateNext();
                             },
@@ -354,12 +351,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
   Widget _buildNotificationCard() {
     final l10n = AppLocalizations.of(context)!;
-    final title = _previewVariant == 'b'
-        ? l10n.notificationPreviewTitleB
-        : l10n.notificationPreviewTitle;
-    final body = _previewVariant == 'b'
-        ? l10n.notificationPreviewBodyB
-        : l10n.notificationPreviewBody;
+    final title = l10n.notificationPreviewTitleB;
+    final body = l10n.notificationPreviewBodyB;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -454,7 +447,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         onPressed: () async {
           await FirebaseAnalyticsService().logEvent(
             name: FirebaseAnalyticsService.eventOnboardingReminderConfirmTap,
-            parameters: {'variant': _previewVariant},
+            parameters: _placementParams,
           );
           _navigateNext();
         },

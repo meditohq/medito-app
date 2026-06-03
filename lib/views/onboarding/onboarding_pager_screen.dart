@@ -8,6 +8,7 @@ import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
+import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 import 'package:medito/views/onboarding/onboarding_question_screen.dart';
 import 'package:medito/views/onboarding/onboarding_result_screen.dart';
@@ -122,11 +123,8 @@ final List<String> _images = [
         stepLabel: l10n.onboardingStep2of2,
         onOptionSelected: _onIntentSelected,
       ),
-      // The standalone notifications screen was removed: it was skipped 73%
-      // of the time and not gated by a positive in-app experience. The
-      // post-session reminder prompt on EndScreenView covers this case after
-      // the user has actually meditated.
       OnboardingDonationScreen(onNext: _nextPage),
+      NotificationsScreen(onNext: _nextPage, intentIndex: _intentIndex),
       if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
       if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),
       OnboardingResultScreen(

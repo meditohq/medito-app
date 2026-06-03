@@ -310,21 +310,13 @@
   "@notificationPreviewTimestamp": {
     "description": "Timestamp shown on a fake iOS notification preview, mirroring iOS's 'now' label for a notification that just arrived"
   },
-  "notificationPreviewTitle": "Your daily reset is ready 🌿",
-  "@notificationPreviewTitle": {
-    "description": "Title of the fake notification shown in the onboarding notifications screen preview"
-  },
-  "notificationPreviewBody": "Five minutes to feel calmer, clearer, kinder.",
-  "@notificationPreviewBody": {
-    "description": "Body of the fake notification shown in the onboarding notifications screen preview (variant A)"
-  },
   "notificationPreviewTitleB": "A quieter mind starts here",
   "@notificationPreviewTitleB": {
-    "description": "Title of the fake notification preview, A/B test variant B"
+    "description": "Title of the fake notification shown in the onboarding notifications screen preview"
   },
   "notificationPreviewBodyB": "Your daily breath is waiting. Just tap to begin.",
   "@notificationPreviewBodyB": {
-    "description": "Body of the fake notification preview, A/B test variant B"
+    "description": "Body of the fake notification shown in the onboarding notifications screen preview"
   },
   "onboardingBatteryTitle": "One Setting, Smoother Meditations",
   "onboardingBatteryBody": "Your phone can pause Medito mid-session. One quick change prevents this.",
@@ -360,10 +352,9 @@
   "splashBenefit3Title": "Not-for-profit & Ad-Free",
   "splashBenefit3Subtitle": "Donations keep us going so everyone can access mindfulness—no ads needed.",
   "continueText": "Continue",
-  "setReminder": "Set Reminder",
   "setReminderB": "Remind Me Daily",
   "@setReminderB": {
-    "description": "CTA on the onboarding notifications screen, A/B test variant B (paired with notification preview variant B)"
+    "description": "CTA on the onboarding notifications screen"
   },
   "donationThankYouTitle": "Thank You for Your Support!",
   "donationThankYouBody": "Your generosity helps keep Medito free and accessible to everyone. We're deeply grateful for your contribution to spreading mindfulness worldwide.",

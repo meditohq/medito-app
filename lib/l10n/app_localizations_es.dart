@@ -912,13 +912,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notificationPreviewTimestamp => 'ahora';
 
   @override
-  String get notificationPreviewTitle => 'Tu pausa diaria está lista 🌿';
-
-  @override
-  String get notificationPreviewBody =>
-      'Cinco minutos para sentirte más en calma, lúcido y amable.';
-
-  @override
   String get notificationPreviewTitleB =>
       'Una mente más tranquila empieza aquí';
 
@@ -1029,9 +1022,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get continueText => 'Continuar';
-
-  @override
-  String get setReminder => 'Configurar Recordatorio';
 
   @override
   String get setReminderB => 'Recuérdamelo Cada Día';
