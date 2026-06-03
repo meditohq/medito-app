@@ -446,8 +446,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             if (backgroundSoundUri != null) {
                 playBackgroundSound()
             }
-            // Resume the 1s position-polling loop now that playback is active.
-            startPositionUpdates()
         } else if (playbackState == Player.STATE_IDLE ||
             (playbackState == Player.STATE_READY && !primaryPlayer.isPlaying)
         ) {
@@ -455,12 +453,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             if (backgroundMusicPlayer.isPlaying) {
                 backgroundMusicPlayer.pause()
             }
-            // Stop the 1s position-polling loop while paused/idle so we don't
-            // keep waking the CPU every second when nothing is playing. Push
-            // one final state first so the UI reflects the paused position.
-            // The loop restarts when playback resumes (STATE_READY && playing).
-            backgroundScope.launch { updatePlaybackState() }
-            stopPositionUpdates()
         }
 
         // Update notification to reflect current state
