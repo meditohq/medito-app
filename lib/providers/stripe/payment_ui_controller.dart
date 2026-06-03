@@ -53,6 +53,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
         experimentId: experimentId,
         experimentVariant: variantId,
+        paywallSource: paywallSource,
       );
 
       if (context.mounted) {
@@ -96,6 +97,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
         experimentId: experimentId,
         experimentVariant: variantId,
+        paywallSource: paywallSource,
       );
 
       if (context.mounted) {
@@ -141,6 +143,7 @@ class PaymentUIController extends _$PaymentUIController {
         userEmail: userEmail ?? me.email,
         experimentId: experimentId,
         experimentVariant: variantId,
+        paywallSource: paywallSource,
       );
 
       if (context.mounted) {

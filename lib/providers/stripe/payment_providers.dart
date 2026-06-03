@@ -416,6 +416,7 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     String? userEmail,
     String? experimentId,
     String? experimentVariant,
+    String? paywallSource,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -430,6 +431,7 @@ class OneTimePaymentController extends _$OneTimePaymentController {
         'email': ?userEmail,
         'experiment_id': ?experimentId,
         'experiment_variant': ?experimentVariant,
+        'paywall_source': ?paywallSource,
         ...utmParams,
       };
 
@@ -486,6 +488,7 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     String? userEmail,
     String? experimentId,
     String? experimentVariant,
+    String? paywallSource,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -500,6 +503,7 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
         'email': ?userEmail,
         'experiment_id': ?experimentId,
         'experiment_variant': ?experimentVariant,
+        'paywall_source': ?paywallSource,
         ...utmParams,
       };
 
@@ -558,6 +562,7 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     String? userEmail,
     String? experimentId,
     String? experimentVariant,
+    String? paywallSource,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -572,6 +577,7 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
         'email': ?userEmail,
         'experiment_id': ?experimentId,
         'experiment_variant': ?experimentVariant,
+        'paywall_source': ?paywallSource,
         ...utmParams,
       };
 
