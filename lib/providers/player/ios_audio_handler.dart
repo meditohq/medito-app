@@ -151,6 +151,10 @@ class IosAudioHandler extends BaseAudioHandler {
         // afterwards because it does network/I/O that can be slow and must
         // not delay session release.
         _cancelPauseDeactivationTimer();
+        // The ambient background player loops and keeps rendering audio after
+        // the narration ends; pause it first so the shared session is idle and
+        // iOS will actually let us deactivate it (a busy session is rejected).
+        await iosBackgroundPlayer.pause();
         await _deactivateSession();
 
         await _storeTrackCompletion();
@@ -346,8 +350,10 @@ class IosAudioHandler extends BaseAudioHandler {
   @override
   Future<void> stop() async {
     _cancelPauseDeactivationTimer();
-    unawaited(_player.stop());
-    unawaited(iosBackgroundPlayer.pause());
+    // Await the players so their audio I/O has actually stopped before we
+    // deactivate; iOS rejects deactivation while the shared session is busy.
+    await _player.stop();
+    await iosBackgroundPlayer.pause();
     unawaited(super.stop());
     await _deactivateSession();
   }
