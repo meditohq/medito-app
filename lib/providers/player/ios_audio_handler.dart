@@ -23,6 +23,13 @@ class IosAudioHandler extends BaseAudioHandler {
   RepeatMode _currentRepeatMode = RepeatMode.none;
   bool _hasReplayedOnce = false;
 
+  /// While the player is paused the audio session is kept active so a quick
+  /// resume stays seamless and the lock-screen controls remain. If the pause
+  /// lasts longer than this the user has likely walked away, so the session is
+  /// released to stop iOS keeping the app alive in the background.
+  static const _pauseGracePeriod = Duration(minutes: 3);
+  Timer? _pauseDeactivationTimer;
+
   IosAudioHandler();
 
   Future<void> ensureInitialized() async {
@@ -136,6 +143,19 @@ class IosAudioHandler extends BaseAudioHandler {
           await _player.play();
           return;
         }
+
+        // Playback has finished and is not repeating. Release the audio
+        // session first so iOS does not keep the app alive in the background,
+        // which otherwise drains battery for as long as the session stays
+        // active after the meditation ends. Reporting the completion runs
+        // afterwards because it does network/I/O that can be slow and must
+        // not delay session release.
+        _cancelPauseDeactivationTimer();
+        // The ambient background player loops and keeps rendering audio after
+        // the narration ends; pause it first so the shared session is idle and
+        // iOS will actually let us deactivate it (a busy session is rejected).
+        await iosBackgroundPlayer.pause();
+        await _deactivateSession();
 
         await _storeTrackCompletion();
       }
@@ -308,6 +328,8 @@ class IosAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> play() async {
+    _cancelPauseDeactivationTimer();
+
     final session = await AudioSession.instance;
     await session.setActive(true);
 
@@ -319,13 +341,57 @@ class IosAudioHandler extends BaseAudioHandler {
   Future<void> pause() async {
     unawaited(_player.pause());
     unawaited(iosBackgroundPlayer.pause());
+
+    // Keep the session active for a quick resume, but release it if the pause
+    // is prolonged so iOS stops keeping the app alive in the background.
+    _schedulePauseDeactivation();
   }
 
   @override
   Future<void> stop() async {
-    unawaited(_player.stop());
-    unawaited(iosBackgroundPlayer.pause());
+    _cancelPauseDeactivationTimer();
+    // Await the players so their audio I/O has actually stopped before we
+    // deactivate; iOS rejects deactivation while the shared session is busy.
+    await _player.stop();
+    await iosBackgroundPlayer.pause();
     unawaited(super.stop());
+    await _deactivateSession();
+  }
+
+  /// Schedules release of the audio session after [_pauseGracePeriod] if the
+  /// player is still paused, so an abandoned pause does not keep the app in
+  /// background-audio state indefinitely.
+  void _schedulePauseDeactivation() {
+    _pauseDeactivationTimer?.cancel();
+    _pauseDeactivationTimer = Timer(_pauseGracePeriod, () {
+      if (!_player.playing) {
+        unawaited(_deactivateSession());
+      }
+    });
+  }
+
+  void _cancelPauseDeactivationTimer() {
+    _pauseDeactivationTimer?.cancel();
+    _pauseDeactivationTimer = null;
+  }
+
+  /// Deactivates the iOS audio session so the OS stops treating the app as an
+  /// active background-audio app. Without this, the session activated in
+  /// [play] stays active after playback stops/completes and keeps the app
+  /// running in the background, draining the battery. The
+  /// `notifyOthersOnDeactivation` option lets other apps (e.g. music) resume
+  /// once we release the session.
+  Future<void> _deactivateSession() async {
+    try {
+      final session = await AudioSession.instance;
+      await session.setActive(
+        false,
+        avAudioSessionSetActiveOptions:
+            AVAudioSessionSetActiveOptions.notifyOthersOnDeactivation,
+      );
+    } catch (e) {
+      AppLogger.e('IOS', 'Failed to deactivate audio session: $e');
+    }
   }
 
   Future<void> setUrl(
