@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2606.3.0
+- Brought back the smart reminders setup during onboarding, now after the donation step
+- Fixed background battery drain on iOS after stopping a session
+- Notification permission ask in the player is now a quiet banner instead of a blocking dialog
+- Reminders now stay in sync when you backfill past meditation days
+
 2605.21.0
 - Share daily quotes with eight new background palettes
 - Star icon now spins while saving a favourite, and reverts if the save fails
