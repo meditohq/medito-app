@@ -276,7 +276,12 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
 
         var remainingTime = duration - currentPosition.inMilliseconds;
 
-        if (remainingTime <= durationFromEnd && remainingTime > 0) {
+        if (remainingTime <= 0) {
+          // At or past the end: stay silent. Without this the fade would snap
+          // back to full volume on the final position update, causing an
+          // audible blip right before playback completes.
+          iosBackgroundPlayer.setVolume(0);
+        } else if (remainingTime <= durationFromEnd) {
           var newVolume = state.volume * remainingTime / durationFromEnd;
           iosBackgroundPlayer.setVolume(scaledVolume(newVolume));
         } else {
