@@ -207,6 +207,18 @@ enum class RepeatMode(val raw: Int) {
   }
 }
 
+enum class HealthConnectStatus(val raw: Int) {
+  AVAILABLE(0),
+  NOT_INSTALLED(1),
+  NOT_SUPPORTED(2);
+
+  companion object {
+    fun ofRaw(raw: Int): HealthConnectStatus? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class AudioData (
   val url: String,
@@ -507,31 +519,36 @@ private open class AudioPigeonPigeonCodec : StandardMessageCodec() {
         }
       }
       130.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          AudioData.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          HealthConnectStatus.ofRaw(it.toInt())
         }
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PlaybackState.fromList(it)
+          AudioData.fromList(it)
         }
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          BackgroundSound.fromList(it)
+          PlaybackState.fromList(it)
         }
       }
       133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          Speed.fromList(it)
+          BackgroundSound.fromList(it)
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          Track.fromList(it)
+          Speed.fromList(it)
         }
       }
       135.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          Track.fromList(it)
+        }
+      }
+      136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           CompletionData.fromList(it)
         }
@@ -545,28 +562,32 @@ private open class AudioPigeonPigeonCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.raw.toLong())
       }
-      is AudioData -> {
+      is HealthConnectStatus -> {
         stream.write(130)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is PlaybackState -> {
+      is AudioData -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is BackgroundSound -> {
+      is PlaybackState -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is Speed -> {
+      is BackgroundSound -> {
         stream.write(133)
         writeValue(stream, value.toList())
       }
-      is Track -> {
+      is Speed -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is CompletionData -> {
+      is Track -> {
         stream.write(135)
+        writeValue(stream, value.toList())
+      }
+      is CompletionData -> {
+        stream.write(136)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -708,6 +729,117 @@ interface MeditoAppIconManager {
                 reply.reply(AudioPigeonPigeonUtils.wrapResult(null))
               }
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+    }
+  }
+}
+/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
+interface MeditoHealthConnectManager {
+  fun getStatus(callback: (Result<HealthConnectStatus>) -> Unit)
+  fun hasMindfulnessPermissions(callback: (Result<Boolean>) -> Unit)
+  fun requestMindfulnessPermissions(callback: (Result<Boolean>) -> Unit)
+  fun writeMindfulnessSession(startEpochMs: Long, endEpochMs: Long, callback: (Result<Boolean>) -> Unit)
+  fun openHealthConnectInstall()
+
+  companion object {
+    /** The codec used by MeditoHealthConnectManager. */
+    val codec: MessageCodec<Any?> by lazy {
+      AudioPigeonPigeonCodec()
+    }
+    /** Sets up an instance of `MeditoHealthConnectManager` to handle messages through the `binaryMessenger`. */
+    @JvmOverloads
+    fun setUp(binaryMessenger: BinaryMessenger, api: MeditoHealthConnectManager?, messageChannelSuffix: String = "") {
+      val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.medito.MeditoHealthConnectManager.getStatus$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.getStatus{ result: Result<HealthConnectStatus> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(AudioPigeonPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(AudioPigeonPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.medito.MeditoHealthConnectManager.hasMindfulnessPermissions$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.hasMindfulnessPermissions{ result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(AudioPigeonPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(AudioPigeonPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.medito.MeditoHealthConnectManager.requestMindfulnessPermissions$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.requestMindfulnessPermissions{ result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(AudioPigeonPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(AudioPigeonPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.medito.MeditoHealthConnectManager.writeMindfulnessSession$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val startEpochMsArg = args[0] as Long
+            val endEpochMsArg = args[1] as Long
+            api.writeMindfulnessSession(startEpochMsArg, endEpochMsArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(AudioPigeonPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(AudioPigeonPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.medito.MeditoHealthConnectManager.openHealthConnectInstall$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              api.openHealthConnectInstall()
+              listOf(null)
+            } catch (exception: Throwable) {
+              AudioPigeonPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

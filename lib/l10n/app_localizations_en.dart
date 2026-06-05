@@ -294,8 +294,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncWithHealth => 'Sync with Apple Health';
 
   @override
+  String get syncWithHealthConnect => 'Sync with Health Connect';
+
+  @override
   String get permissionExplanation =>
       'Permissions set. To change them, go to Settings > Privacy and Security > Health > Medito';
+
+  @override
+  String get permissionExplanationAndroid =>
+      'Permissions set. To change them, open Health Connect from your device settings.';
+
+  @override
+  String get healthConnectNotInstalled =>
+      'Health Connect is required to sync. Install it from the Play Store?';
 
   @override
   String get confirmDeletionTitle => 'Confirm Deletion';

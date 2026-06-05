@@ -210,6 +210,9 @@ dependencies {
     implementation "androidx.glance:glance-appwidget:1.2.0-beta01"
     implementation "androidx.glance:glance:1.2.0-beta01"
     implementation "androidx.glance:glance-material:1.2.0-beta01"
+
+    // Health Connect (MindfulnessSessionRecord added in 1.1.0, Oct 2025)
+    implementation "androidx.health.connect:connect-client:1.1.0"
 }
 
 

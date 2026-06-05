@@ -42,15 +42,26 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
     private val activityJob = SupervisorJob()
     private val activityScope = CoroutineScope(Dispatchers.Main + activityJob)
 
+    private val healthConnectBridge by lazy { HealthConnectBridge(this, activityScope) }
+    private val healthConnectPermissionLauncher = registerForActivityResult(
+        androidx.health.connect.client.PermissionController
+            .createRequestPermissionResultContract()
+    ) { granted ->
+        healthConnectBridge.onPermissionResult(granted)
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         FlutterEngineCache
             .getInstance()
             .put(ENGINE_ID, flutterEngine)
         super.configureFlutterEngine(flutterEngine)
-        
+
         MeditoAndroidAudioServiceManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
         MeditoWidgetManager.setUp(flutterEngine.dartExecutor.binaryMessenger, this)
         MeditoAppIconManager.setUp(flutterEngine.dartExecutor.binaryMessenger, AppIconManagerImpl(this))
+
+        healthConnectBridge.attachLauncher(healthConnectPermissionLauncher)
+        MeditoHealthConnectManager.setUp(flutterEngine.dartExecutor.binaryMessenger, healthConnectBridge)
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
         checkAndSendCompletionData()

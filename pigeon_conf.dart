@@ -47,6 +47,25 @@ abstract class MeditoAppIconManager {
   void setAlternateIconName(String? iconName);
 }
 
+enum HealthConnectStatus { available, notInstalled, notSupported }
+
+@HostApi()
+abstract class MeditoHealthConnectManager {
+  @async
+  HealthConnectStatus getStatus();
+
+  @async
+  bool hasMindfulnessPermissions();
+
+  @async
+  bool requestMindfulnessPermissions();
+
+  @async
+  bool writeMindfulnessSession(int startEpochMs, int endEpochMs);
+
+  void openHealthConnectInstall();
+}
+
 @HostApi()
 abstract class MeditoAudioServiceApi {
   bool playAudio(AudioData audioData);

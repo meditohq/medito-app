@@ -638,11 +638,29 @@ abstract class AppLocalizations {
   /// **'Sync with Apple Health'**
   String get syncWithHealth;
 
+  /// No description provided for @syncWithHealthConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync with Health Connect'**
+  String get syncWithHealthConnect;
+
   /// No description provided for @permissionExplanation.
   ///
   /// In en, this message translates to:
   /// **'Permissions set. To change them, go to Settings > Privacy and Security > Health > Medito'**
   String get permissionExplanation;
+
+  /// No description provided for @permissionExplanationAndroid.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions set. To change them, open Health Connect from your device settings.'**
+  String get permissionExplanationAndroid;
+
+  /// No description provided for @healthConnectNotInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Connect is required to sync. Install it from the Play Store?'**
+  String get healthConnectNotInstalled;
 
   /// No description provided for @confirmDeletionTitle.
   ///

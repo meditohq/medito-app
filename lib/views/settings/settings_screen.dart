@@ -63,7 +63,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  static final _isHealthSyncAvailable = Platform.isIOS;
+  static final _isHealthSyncAvailable = Platform.isIOS || Platform.isAndroid;
   static final _isDndSupported = Platform.isAndroid;
   final _analytics = FirebaseAnalyticsService();
 
