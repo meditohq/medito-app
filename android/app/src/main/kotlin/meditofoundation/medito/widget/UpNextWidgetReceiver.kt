@@ -13,24 +13,28 @@ import kotlinx.coroutines.launch
 class UpNextWidgetReceiver : HomeWidgetGlanceWidgetReceiver<UpNextWidget>() {
     override val glanceAppWidget = UpNextWidget()
 
-    private val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val tag = "UpNextWidget"
 
-    private fun updateWidget(context: Context) {
-        receiverScope.launch {
-            try {
-                glanceAppWidget.updateAll(context.applicationContext)
-                Log.d(tag, "Widget updateAll() completed")
-            } catch (e: Exception) {
-                Log.e(tag, "Error updating widget", e)
-            }
-        }
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
+        try {
+            super.onReceive(context, intent)
+        } catch (e: IllegalArgumentException) {
+            // Stale broadcast referencing a widget ID that no longer exists.
+            Log.w(tag, "Ignoring stale widget broadcast: ${e.message}")
+            return
+        }
         if (intent.action == "es.antonborri.home_widget.UPDATE_WIDGET") {
-            updateWidget(context)
+            val pending = goAsync()
+            receiverScope.launch {
+                try {
+                    glanceAppWidget.updateAll(context.applicationContext)
+                } catch (e: Exception) {
+                    Log.e(tag, "Error updating widget", e)
+                } finally {
+                    pending.finish()
+                }
+            }
         }
     }
 }

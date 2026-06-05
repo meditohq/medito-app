@@ -1,6 +1,5 @@
 package meditofoundation.medito.widget
 
-import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -13,39 +12,30 @@ import kotlinx.coroutines.launch
 
 class MeditationWidgetReceiver : HomeWidgetGlanceWidgetReceiver<MeditationWidget>() {
     override val glanceAppWidget = MeditationWidget()
-    
-    private val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    private val receiverScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val TAG = "MeditationWidget"
-    
-    private fun updateWidget(context: Context) {
-        // Use application context for Glance widget updates
-        val appContext = context.applicationContext
-        Log.d(TAG, "🔄 Updating widget via updateAll()")
-        receiverScope.launch {
-            try {
-                glanceAppWidget.updateAll(appContext)
-                Log.d(TAG, "✅ Widget updateAll() completed successfully")
-            } catch (e: Exception) {
-                Log.e(TAG, "❌ Error updating widget", e)
-            }
-        }
-    }
-    
+
     override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
-        
-        // Handle update requests from home_widget package
-        // When HomeWidget.updateWidget() is called, it sends a broadcast
-        // We need to explicitly update all widget instances for Glance widgets
-        val action = intent.action
-        Log.d(TAG, "📨 onReceive called with action: $action")
-        
-        // Handle home_widget specific updates
-        if (action == "es.antonborri.home_widget.UPDATE_WIDGET") {
-            Log.d(TAG, "✅ Received home_widget UPDATE_WIDGET broadcast, triggering update")
-            updateWidget(context)
-        } else {
-            Log.d(TAG, "ℹ️ Ignoring action: $action")
+        try {
+            super.onReceive(context, intent)
+        } catch (e: IllegalArgumentException) {
+            // Stale broadcast referencing a widget ID that no longer exists.
+            Log.w(TAG, "Ignoring stale widget broadcast: ${e.message}")
+            return
+        }
+
+        if (intent.action == "es.antonborri.home_widget.UPDATE_WIDGET") {
+            val pending = goAsync()
+            receiverScope.launch {
+                try {
+                    glanceAppWidget.updateAll(context.applicationContext)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error updating widget", e)
+                } finally {
+                    pending.finish()
+                }
+            }
         }
     }
 }
