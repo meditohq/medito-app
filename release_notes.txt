@@ -1,6 +1,18 @@
 Unreleased
 -
 
+2606.5.0
+- Tap the star to favourite a session and watch it spin while we save it
+- Share a beautiful quote card after your session — now theme-aware with a palette picker
+- Smoother end-of-session screen with cleaner stats and animations
+- Polished home carousel and player transitions
+- Android widget improvements, including better support for logging multiple days
+- Set your own day boundary for streaks if you meditate late at night
+- Fixed an iOS bug that could drain your battery in the background after a session
+- Replaced the media permission popup with a quieter banner so it's less in the way
+- Long-press the Settings title to open debug info if support asks for it
+- Lots of small fixes and reliability improvements
+
 2606.3.0
 - Brought back the smart reminders setup during onboarding, now after the donation step
 - Fixed background battery drain on iOS after stopping a session
