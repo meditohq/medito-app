@@ -24,7 +24,6 @@ class EnvConfig {
   final String donationBaseUrl;
   final String donationToken;
   final String paywallFormUrl;
-  final String paywallEnvironment;
   final String facebookAppId;
   final String facebookClientToken;
 
@@ -38,7 +37,6 @@ class EnvConfig {
     required this.donationBaseUrl,
     required this.donationToken,
     required this.paywallFormUrl,
-    required this.paywallEnvironment,
     required this.facebookAppId,
     required this.facebookClientToken,
   });
@@ -55,7 +53,6 @@ class ProdEnv extends EnvConfig {
     required super.donationBaseUrl,
     required super.donationToken,
     required super.paywallFormUrl,
-    required super.paywallEnvironment,
     required super.facebookAppId,
     required super.facebookClientToken,
   });
@@ -72,7 +69,6 @@ class StagingEnv extends EnvConfig {
     required super.donationBaseUrl,
     required super.donationToken,
     required super.paywallFormUrl,
-    required super.paywallEnvironment,
     required super.facebookAppId,
     required super.facebookClientToken,
   });
@@ -94,8 +90,6 @@ const _prodEnv = ProdEnv(
     'PAYWALL_URL',
     defaultValue: 'https://paywall.meditofoundation.org/',
   ),
-  paywallEnvironment:
-      String.fromEnvironment('PAYWALL_ENV', defaultValue: 'live'),
   facebookAppId: String.fromEnvironment('FACEBOOK_APP_ID'),
   facebookClientToken: String.fromEnvironment('FACEBOOK_CLIENT_TOKEN'),
 );
@@ -113,8 +107,6 @@ const _stagingEnv = StagingEnv(
     'PAYWALL_URL',
     defaultValue: 'https://test.meditofoundation.org/',
   ),
-  paywallEnvironment:
-      String.fromEnvironment('PAYWALL_ENV', defaultValue: 'dev'),
   facebookAppId: String.fromEnvironment('FACEBOOK_APP_ID'),
   facebookClientToken: String.fromEnvironment('FACEBOOK_CLIENT_TOKEN'),
 );
@@ -142,7 +134,6 @@ String get deleteAccountUrl => _currentEnv.deleteAccountBaseUrl;
 String get donationBaseUrl => _currentEnv.donationBaseUrl;
 String get donationToken => _currentEnv.donationToken;
 String get paywallFormUrl => _currentEnv.paywallFormUrl;
-String get paywallEnvironment => _currentEnv.paywallEnvironment;
 String get facebookAppId => _currentEnv.facebookAppId;
 String get facebookClientToken => _currentEnv.facebookClientToken;
 

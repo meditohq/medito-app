@@ -19,14 +19,6 @@ on:
         description: 'iOS – App Store draft'
         type: boolean
         default: false
-      paywall_env:
-        description: 'Paywall environment'
-        required: true
-        default: 'live'
-        type: choice
-        options:
-          - live
-          - dev
       match_readonly:
         description: 'Keep match in readonly mode (set false to refresh certs/profiles)'
         type: boolean
@@ -156,7 +148,6 @@ jobs:
           flutter build apk --flavor prod --release \
             --dart-define-from-file=.prod.json \
             --dart-define=MOCK_MODE=false \
-            --dart-define=PAYWALL_ENV=${{ inputs.paywall_env || 'live' }} \
             --obfuscate --split-debug-info=./symbols
 
       - name: Upload APK artifact
@@ -561,7 +552,6 @@ jobs:
           flutter build ios --simulator --no-codesign \
             --dart-define-from-file=.prod.json \
             --dart-define=MOCK_MODE=false \
-            --dart-define=PAYWALL_ENV=live \
             --dart-define=IS_SIMULATOR=true
 
       # Preserve the built .app so the upgrade-test job (next release) can
@@ -937,7 +927,6 @@ jobs:
       - name: Build & upload iOS release
         working-directory: ios
         env:
-          PAYWALL_ENV: ${{ inputs.paywall_env || 'live' }}
           MATCH_READONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.match_readonly || false }}
           FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: '120'
           FASTLANE_XCODEBUILD_SETTINGS_RETRIES: '8'
