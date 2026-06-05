@@ -242,6 +242,8 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     final locale = ref.read(localeProvider)?.languageCode ?? 'en';
 
     final query = <String, String>{'locale': locale};
+    final source = widget.source;
+    if (source != null && source.isNotEmpty) query['source'] = source;
     if (email != null && email.isNotEmpty) query['email'] = email;
     if (userId != null && userId.isNotEmpty) query['user_id'] = userId;
 
