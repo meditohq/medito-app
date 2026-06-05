@@ -25,8 +25,6 @@ platform :ios do
       in_house: false
     )
 
-    paywall_env = options[:paywall_env] || ENV["PAYWALL_ENV"] || "live"
-
     widget_bundle_id = fetch_profiles()
 
     Dir.chdir("..") do
@@ -35,7 +33,6 @@ platform :ios do
         "--dart-define-from-file=.prod.json " \
         "--dart-define=MOCK_MODE=false " \
         "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
-        "--dart-define=PAYWALL_ENV=#{paywall_env} " \
         "--no-codesign"
       )
     end
@@ -81,7 +78,6 @@ platform :ios do
         "--dart-define-from-file=.prod.json " \
         "--dart-define=MOCK_MODE=false " \
         "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
-        "--dart-define=PAYWALL_ENV=live " \
         "--no-codesign"
       )
     end

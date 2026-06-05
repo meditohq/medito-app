@@ -69,7 +69,6 @@ elif [ "$BUILD_IOS" = true ]; then
     print_colored $BLUE "This script will build iOS app only"
 fi
 
-print_colored $BLUE "You'll choose the paywall environment below"
 echo ""
 
 # Get the current version from pubspec.yaml
@@ -93,35 +92,6 @@ if [ "$CURRENT_VERSION" = "$LAST_COMMITTED_VERSION" ]; then
     fi
 fi
 
-# Paywall environment selection
-print_colored $BLUE "🎯 Paywall Environment Selection"
-print_colored $BLUE "================================"
-echo "1) Live paywalls (for production users)"
-echo "2) Dev paywalls (for testing)"
-echo ""
-echo -n "Select paywall environment (1-2, default: 1): "
-read paywall_choice
-
-case $paywall_choice in
-    2)
-        PAYWALL_ENV="dev"
-        print_colored $YELLOW "🧪 Selected: Dev paywalls"
-        print_colored $YELLOW "⚠️  WARNING: You are building with DEV paywalls!"
-        print_colored $YELLOW "   Make sure this is for testing only, not production deployment."
-        echo ""
-        print_colored $YELLOW "Are you sure you want to continue with DEV paywalls? (y/N): "
-        read dev_confirm
-        if [[ ! "$dev_confirm" =~ ^[Yy]$ ]]; then
-            print_colored $RED "❌ Build cancelled."
-            exit 1
-        fi
-        ;;
-    *)
-        PAYWALL_ENV="live"
-        print_colored $GREEN "✅ Selected: Live paywalls"
-        ;;
-esac
-
 # Play Console upload selection (before building)
 UPLOAD_TO_PLAY_STORE=false
 PLAY_STORE_TRACK=""
@@ -135,33 +105,27 @@ if [ "$BUILD_ANDROID" = true ]; then
 
     if [[ ! "$upload_choice" =~ ^[Nn]$ ]]; then
         UPLOAD_TO_PLAY_STORE=true
-        
-        # Determine track based on paywall environment
-        if [ "$PAYWALL_ENV" = "dev" ]; then
-            PLAY_STORE_TRACK="internal"
-            print_colored $YELLOW "Will upload to 'internal' track (dev paywalls)"
-        else
-            echo ""
-            print_colored $BLUE "Select Play Console track:"
-            echo "1) internal (for internal testing)"
-            echo "2) beta (for beta testing)"
-            echo "3) production (for production release)"
-            echo ""
-            echo -n "Select track (1-3, default: 3): "
-            read track_choice
-            
-            case $track_choice in
-                1)
-                    PLAY_STORE_TRACK="internal"
-                    ;;
-                2)
-                    PLAY_STORE_TRACK="beta"
-                    ;;
-                *)
-                    PLAY_STORE_TRACK="production"
-                    ;;
-            esac
-        fi
+
+        echo ""
+        print_colored $BLUE "Select Play Console track:"
+        echo "1) internal (for internal testing)"
+        echo "2) beta (for beta testing)"
+        echo "3) production (for production release)"
+        echo ""
+        echo -n "Select track (1-3, default: 3): "
+        read track_choice
+
+        case $track_choice in
+            1)
+                PLAY_STORE_TRACK="internal"
+                ;;
+            2)
+                PLAY_STORE_TRACK="beta"
+                ;;
+            *)
+                PLAY_STORE_TRACK="production"
+                ;;
+        esac
     fi
 fi
 
@@ -210,15 +174,10 @@ android_post_build() {
     mkdir -p "$DATED_APKS_DIR"
 
     SOURCE_APK="build/app/outputs/apk/prod/release/app-prod-release.apk"
-    DEST_APK="$DATED_APKS_DIR/medito-$CURRENT_VERSION-$PAYWALL_ENV-paywall-$DATE_STAMP.apk"
+    DEST_APK="$DATED_APKS_DIR/medito-$CURRENT_VERSION-$DATE_STAMP.apk"
 
     cp "$SOURCE_APK" "$DEST_APK"
     print_colored $GREEN "✅ APK copied to $DEST_APK"
-    if [ "$PAYWALL_ENV" = "dev" ]; then
-        print_colored $YELLOW "⚠️  This build has DEV paywalls - do NOT deploy to production!"
-    else
-        print_colored $GREEN "✅ This build has LIVE paywalls - safe for production deployment"
-    fi
 
     if [ "$UPLOAD_TO_PLAY_STORE" = true ] && [ -n "$PLAY_STORE_TRACK" ]; then
         echo ""
@@ -283,9 +242,8 @@ android_post_build() {
 
 if [ "$BUILD_ANDROID" = true ]; then
     print_colored $BLUE "🚀 Starting Android build..."
-    print_colored $BLUE "Paywall environment: $PAYWALL_ENV"
 
-    flutter build apk --flavor prod --release --dart-define-from-file=../.prod.json --dart-define=PAYWALL_ENV=$PAYWALL_ENV
+    flutter build apk --flavor prod --release --dart-define-from-file=../.prod.json
 
     if [ "$BUILD_IOS" = true ]; then
         # Run Android post-build in background while iOS builds
@@ -305,9 +263,8 @@ fi
 
 if [ "$BUILD_IOS" = true ]; then
     print_colored $BLUE "🚀 Starting iOS build and upload..."
-    print_colored $BLUE "Paywall environment: $PAYWALL_ENV"
 
-    flutter build ios --dart-define-from-file=../.prod.json --dart-define=ENABLE_DEVICE_PREVIEW=false --dart-define=PAYWALL_ENV=$PAYWALL_ENV --release
+    flutter build ios --dart-define-from-file=../.prod.json --dart-define=ENABLE_DEVICE_PREVIEW=false --release
 
     ARCHIVE_PATH="build/ios/archive/Runner.xcarchive"
     EXPORT_PATH="build/ios/ipa"
@@ -336,15 +293,10 @@ if [ "$BUILD_IOS" = true ]; then
     IPA_PATH="$EXPORT_PATH/Runner.ipa"
 
     if [ -f "$IPA_PATH" ]; then
-        NEW_IPA_PATH="$EXPORT_PATH/medito-${CURRENT_VERSION}-${PAYWALL_ENV}-paywall-${DATE_STAMP}.ipa"
+        NEW_IPA_PATH="$EXPORT_PATH/medito-${CURRENT_VERSION}-${DATE_STAMP}.ipa"
         cp "$IPA_PATH" "$NEW_IPA_PATH"
-        
+
         print_colored $GREEN "✅ iOS IPA built: $NEW_IPA_PATH"
-        if [ "$PAYWALL_ENV" = "dev" ]; then
-            print_colored $YELLOW "⚠️  This build has DEV paywalls - do NOT deploy to production!"
-        else
-            print_colored $GREEN "✅ This build has LIVE paywalls - safe for production deployment"
-        fi
     else
         print_colored $RED "❌ Failed to build iOS IPA"
         exit 1
@@ -404,7 +356,6 @@ echo ""
 print_colored $GREEN "🎉 Build and Deploy Complete!"
 print_colored $GREEN "============================="
 print_colored $BLUE "Version: $CURRENT_VERSION"
-print_colored $BLUE "Paywall Environment: $PAYWALL_ENV"
 
 if [ "$BUILD_ANDROID" = true ] && [ "$BUILD_IOS" = true ]; then
     print_colored $BLUE "Platforms: Android & iOS"
@@ -415,15 +366,6 @@ elif [ "$BUILD_IOS" = true ]; then
 fi
 
 echo ""
-if [ "$PAYWALL_ENV" = "dev" ]; then
-    print_colored $YELLOW "⚠️  REMINDER: This build has DEV paywalls"
-    print_colored $YELLOW "   Safe for: TestFlight, Play Store Internal Testing"
-    print_colored $YELLOW "   NOT safe for: Production deployment"
-else
-    print_colored $GREEN "✅ This build has LIVE paywalls"
-    print_colored $GREEN "   Safe for: Production deployment"
-fi
-
 if [ "$ANDROID_BG_FAILED" = true ]; then
     echo ""
     print_colored $RED "⚠️  Android post-processing had errors — check output above"
