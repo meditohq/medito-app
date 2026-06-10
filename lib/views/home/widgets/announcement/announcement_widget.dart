@@ -2,6 +2,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -180,11 +181,16 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
     BuildContext context,
   ) async {
     var path = widget.announcement.ctaPath;
+    var type = widget.announcement.ctaType;
+    var isDonation = type == 'donation' ||
+        (type == TypeConstants.route && path == RouteConstants.donation);
     await handleNavigation(
-      widget.announcement.ctaType,
+      type,
       [path.toString().getIdFromPath(), path],
       context,
       ref: ref,
+      sourceRouteName:
+          isDonation ? FirebaseAnalyticsService.paywallSourceAnnouncement : null,
     );
   }
 }
