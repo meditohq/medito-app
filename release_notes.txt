@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2606.11.0
+- Android: sync your completed meditations to Health Connect
+- Fixed a crash affecting the Android widget
+- Fixed Add Session discarding your notes on smaller screens
+- Cleaner product cards with edge-to-edge cover images
+
 2606.5.0
 - Tap the star to favourite a session and watch it spin while we save it
 - Share a beautiful quote card after your session — now theme-aware with a palette picker
