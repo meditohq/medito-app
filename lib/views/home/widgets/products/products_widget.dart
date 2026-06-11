@@ -365,46 +365,29 @@ class ProductGroupCard extends ConsumerWidget {
                       if (productGroup.allImageUrls.isNotEmpty)
                         AspectRatio(
                           aspectRatio: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ProductImageCarousel(
-                              productGroup: productGroup,
-                              cardWidth: cardWidth,
-                            ),
+                          child: ProductImageCarousel(
+                            productGroup: productGroup,
+                            cardWidth: cardWidth,
                           ),
                         )
                       else if (productGroup.imageUrl != null)
                         AspectRatio(
                           aspectRatio: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: CachedNetworkImage(
-                              imageUrl: productGroup.imageUrl!,
-                              fit: BoxFit.contain,
-                              width: cardWidth,
-                              key: ValueKey(
-                                'product_image_${productGroup.groupId}',
-                              ),
-                              placeholder: (context, url) => Container(
-                                color: Theme.of(context).colorScheme.surface,
-                                child: Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: Theme.of(context).colorScheme.surface,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.image_not_supported_outlined,
+                          child: CachedNetworkImage(
+                            imageUrl: productGroup.imageUrl!,
+                            fit: BoxFit.cover,
+                            width: cardWidth,
+                            key: ValueKey(
+                              'product_image_${productGroup.groupId}',
+                            ),
+                            placeholder: (context, url) => Container(
+                              color: Theme.of(context).colorScheme.surface,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurface,
@@ -412,14 +395,7 @@ class ProductGroupCard extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                          ),
-                        )
-                      else
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
+                            errorWidget: (context, url, error) => Container(
                               color: Theme.of(context).colorScheme.surface,
                               child: Center(
                                 child: Icon(
@@ -428,6 +404,21 @@ class ProductGroupCard extends ConsumerWidget {
                                     context,
                                   ).colorScheme.onSurface,
                                 ),
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        AspectRatio(
+                          aspectRatio: 1,
+                          child: Container(
+                            color: Theme.of(context).colorScheme.surface,
+                            child: Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface,
                               ),
                             ),
                           ),
@@ -693,18 +684,13 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
         key: ValueKey(
           'product_image_${widget.productGroup.groupId}_$_currentImageIndex',
         ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.0),
-          color: Theme.of(context).colorScheme.surface,
-        ),
-        clipBehavior: Clip.antiAlias,
+        color: Theme.of(context).colorScheme.surface,
         child: CachedNetworkImage(
           imageUrl: currentImageUrl,
-          fit: BoxFit.contain,
+          fit: BoxFit.cover,
           imageBuilder: (context, imageProvider) => Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
-              image: DecorationImage(image: imageProvider, fit: BoxFit.contain),
+              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
             ),
           ),
           placeholder: (context, url) => Container(
