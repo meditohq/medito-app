@@ -379,6 +379,9 @@ class _MeditationCalendarWidgetState
 
     final result = await showDialog<ManualSessionResult>(
       context: context,
+      // The dialog has an explicit Cancel button; a barrier tap silently
+      // discarding the user's input here looks like a successful add.
+      barrierDismissible: false,
       builder: (context) => ManualSessionDialog(
         selectedDate: selectedDate,
         bulkPreviewBuilder: _computeBulkPreview,

@@ -8,7 +8,11 @@ import 'package:medito/utils/utils.dart';
 /// 16px rounded corners, 24px padding, capped at 400px wide.
 ///
 /// Use [title] / [content] / [actions] for the common AlertDialog-like layout,
-/// or pass [child] for a fully custom body.
+/// or pass [child] for a fully custom body. A custom [child] is wrapped in a
+/// scroll view, so it must not contain vertically flexed widgets (Expanded/
+/// Flexible in a Column) and scrolls instead of overflowing when the keyboard
+/// shrinks the available height — overflowing buttons paint outside the
+/// dialog's bounds where taps land on the dismiss barrier.
 class MeditoDialog extends StatelessWidget {
   final String? title;
   final Widget? content;
@@ -45,7 +49,9 @@ class MeditoDialog extends StatelessWidget {
           maxHeight: maxHeight ?? double.infinity,
         ),
         padding: padding,
-        child: child ?? _buildStructured(context),
+        child: child != null
+            ? SingleChildScrollView(child: child)
+            : _buildStructured(context),
       ),
     );
   }

@@ -38,34 +38,31 @@ class ReportDialogWidget extends ConsumerWidget {
         children: [
           MeditoDialogTitle(l10n.reportTrack),
           const SizedBox(height: 12),
-          Flexible(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MeditoDialogBody(l10n.reportTrackDescription(request.title)),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.reportDialogQuestion,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              MeditoDialogBody(l10n.reportTrackDescription(request.title)),
+              const SizedBox(height: 16),
+              Text(
+                l10n.reportDialogQuestion,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacityValue(0.8),
+                ),
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () =>
+                    launchURLInBrowser('https://medito.support.site/'),
+                child: Text(
+                  l10n.reportDialogHelpLink,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withOpacityValue(0.8),
+                    color: context.brandPurple,
+                    decoration: TextDecoration.underline,
                   ),
                 ),
-                const SizedBox(height: 12),
-                GestureDetector(
-                  onTap: () =>
-                      launchURLInBrowser('https://medito.support.site/'),
-                  child: Text(
-                    l10n.reportDialogHelpLink,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: context.brandPurple,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           MeditoDialogPrimaryButton(
