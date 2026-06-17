@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../src/audio_pigeon.g.dart';
 
 class HealthKitManager {
+  static const _authRequestedKey = 'healthAuthRequested';
+
   static final HealthKitManager _instance = HealthKitManager._internal();
   final Health health = Health();
   final MeditoHealthConnectManager _androidBridge = MeditoHealthConnectManager();
@@ -58,9 +60,28 @@ class HealthKitManager {
     }
   }
 
+  /// Whether we've already shown the system permission prompt at least once.
+  /// Used to avoid nagging the user every session after they decline.
+  Future<bool> hasRequestedAuthorization() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_authRequestedKey) ?? false;
+  }
+
+  /// Requests authorization only if we've never prompted before. Returns the
+  /// resulting permission state (false if we'd already asked and won't re-ask).
+  /// Use this for automatic/background triggers (player open, session sync).
+  /// Explicit user actions (the Settings tile) should call
+  /// [requestAuthorization] directly so they can always re-prompt.
+  Future<bool> maybeRequestAuthorization() async {
+    if (await hasRequestedAuthorization()) return false;
+    return requestAuthorization();
+  }
+
   Future<bool> requestAuthorization() async {
     try {
       await _ensureConfigured();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_authRequestedKey, true);
       if (Platform.isAndroid) {
         if (!await isHealthConnectAvailable()) return false;
         return await _androidBridge.requestMindfulnessPermissions();
@@ -96,7 +117,7 @@ class HealthKitManager {
         if (!await isHealthConnectAvailable()) return false;
         var hasPermissions = await _androidBridge.hasMindfulnessPermissions();
         if (!hasPermissions) {
-          hasPermissions = await _androidBridge.requestMindfulnessPermissions();
+          hasPermissions = await maybeRequestAuthorization();
         }
         if (!hasPermissions) return false;
         return await _androidBridge.writeMindfulnessSession(
@@ -107,7 +128,7 @@ class HealthKitManager {
 
       var hasPermissions = await isHealthSyncPermitted();
       if (hasPermissions == null || !hasPermissions) {
-        hasPermissions = await requestAuthorization();
+        hasPermissions = await maybeRequestAuthorization();
       }
       if (!hasPermissions) return false;
 

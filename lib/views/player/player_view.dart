@@ -114,7 +114,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     var healthKitManager = HealthKitManager();
     if (await healthKitManager.isHealthSyncPermitted() != true) {
-      await healthKitManager.requestAuthorization();
+      // Only auto-prompt once; after that the user can opt in via Settings.
+      // Avoids re-asking every session when they've declined.
+      await healthKitManager.maybeRequestAuthorization();
     }
 
     // Only enable DND if permission is already granted and toggle is on
