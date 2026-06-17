@@ -1,6 +1,9 @@
 Unreleased
 -
 
+2606.17.0
+- Android: Health Connect no longer asks for permission every session if you've declined
+
 2606.11.0
 - Android: sync your completed meditations to Health Connect
 - Fixed a crash affecting the Android widget
