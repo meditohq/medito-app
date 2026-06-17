@@ -7,6 +7,17 @@ if [ -f "ios_credentials.sh" ]; then
   source ios_credentials.sh
 fi
 
+# Extract this release's notes (the first version block in release_notes.txt,
+# skipping the empty "Unreleased" header). altool cannot attach TestFlight
+# "What's New" text, so we surface these for a manual paste in App Store Connect.
+# (CI's `fastlane beta` lane attaches them automatically via upload_to_testflight.)
+RELEASE_NOTES=$(awk '
+  /^Unreleased/ { next }
+  /^[0-9]/ { if (in_v) exit; in_v=1; next }
+  in_v && /^-/ { sub(/^- */, ""); print }
+  in_v && NF && !/^-/ { exit }
+' release_notes.txt)
+
 # Build the iOS app for production
 
 echo "\n[1/3] Building iOS app for production..."
@@ -73,3 +84,20 @@ else
   echo "\n[ERROR] Upload failed."
   exit 1
 fi
+
+# altool ships only the binary — it can't set the TestFlight/App Store "What's
+# New" text. Surface this release's notes and save them so they can be pasted
+# into App Store Connect once the build finishes processing.
+NOTES_FILE="$EXPORT_PATH/whats_new.txt"
+printf '%s\n' "$RELEASE_NOTES" > "$NOTES_FILE"
+echo "\n============================================================"
+echo "ACTION REQUIRED: set 'What's New' in App Store Connect."
+echo "altool does not attach release notes — paste the text below."
+echo "Saved to: $NOTES_FILE"
+echo "------------------------------------------------------------"
+if [ -n "$RELEASE_NOTES" ]; then
+  echo "$RELEASE_NOTES"
+else
+  echo "(no notes found in release_notes.txt for this version)"
+fi
+echo "============================================================"

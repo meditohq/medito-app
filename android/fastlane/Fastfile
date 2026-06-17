@@ -87,10 +87,16 @@ platform :android do
     notes = ENV['RELEASE_NOTES'] || ''
     unless notes.empty?
       require 'fileutils'
+      # supply matches a changelog to a release by version-code filename
+      # (e.g. 302418.txt) and does NOT fall back to default.txt for a specific
+      # APK — so write the version-code file too, or the notes get dropped and
+      # the Play Console shows its placeholder. Derive the code from pubspec.
+      version_code = File.read('../pubspec.yaml')[/^version:\s*\S+\+(\d+)/, 1]
       ['en-US', 'en-GB', 'es-ES'].each do |locale|
         dir = "fastlane/metadata/android/#{locale}/changelogs"
         FileUtils.mkdir_p(dir)
         File.write("#{dir}/default.txt", notes)
+        File.write("#{dir}/#{version_code}.txt", notes) if version_code
       end
     end
 
