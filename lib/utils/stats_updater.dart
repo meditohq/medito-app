@@ -12,6 +12,7 @@ import '../providers/stats_provider.dart';
 import '../providers/settings/settings_providers.dart';
 import '../routes/routes.dart';
 import '../l10n/app_localizations.dart';
+import 'audio_session_tracker.dart';
 import 'completed_tracks_storage.dart';
 import 'health_kit_manager.dart';
 import 'stats_manager.dart';
@@ -165,6 +166,10 @@ Future<bool> handleStats(
     } catch (analyticsError) {
       AppLogger.e('STATS', 'Failed to log analytics event', analyticsError);
     }
+
+    // Tell the session tracker this session completed so it clears the
+    // in-progress record and does not also fire audio_session_abandoned.
+    await AudioSessionTracker.instance.onCompleted();
 
     // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();

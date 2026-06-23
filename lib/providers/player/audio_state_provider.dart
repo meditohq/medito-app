@@ -7,6 +7,7 @@ import 'package:just_audio/just_audio.dart';
 import '../../constants/types/type_constants.dart';
 import '../../services/analytics/crashlytics_service.dart';
 import '../../src/audio_pigeon.g.dart';
+import '../../utils/audio_session_tracker.dart';
 import '../../utils/stats_updater.dart';
 
 class AudioStateProvider implements MeditoAudioServiceCallbackApi {
@@ -18,6 +19,13 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   @override
   void updatePlaybackState(PlaybackState state) {
     notifier.updatePlaybackState(state);
+    // Android position feed for session analytics (the poll runs ~1/s).
+    AudioSessionTracker.instance.onPositionUpdate(
+      positionMs: state.position,
+      durationMs: state.duration,
+      isPlaying: state.isPlaying,
+      isCompleted: state.isCompleted,
+    );
   }
 
   @override
@@ -84,6 +92,8 @@ class AudioStateNotifier extends Notifier<PlaybackState> {
       iosAudioHandler.iosStateStream.listen(
         (event) {
           var playerState = event.playerState;
+          final isCompleted =
+              playerState.processingState == ProcessingState.completed;
           state = state.copyWith(
             speed: Speed(speed: event.speed),
             track: iosAudioHandler.trackState,
@@ -91,10 +101,16 @@ class AudioStateNotifier extends Notifier<PlaybackState> {
             isBuffering:
                 playerState.processingState == ProcessingState.buffering,
             isSeeking: false,
-            isCompleted:
-                playerState.processingState == ProcessingState.completed,
+            isCompleted: isCompleted,
             position: event.position.inMilliseconds,
             duration: event.duration.inMilliseconds,
+          );
+          // iOS position feed for session analytics.
+          AudioSessionTracker.instance.onPositionUpdate(
+            positionMs: event.position.inMilliseconds,
+            durationMs: event.duration.inMilliseconds,
+            isPlaying: event.playerState.playing,
+            isCompleted: isCompleted,
           );
         },
       );

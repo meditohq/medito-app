@@ -135,6 +135,17 @@ class AnalyticsEventConstants {
   /// Event logged when an audio session is completed and stats are updated
   static const String audioSessionCompleted = 'audio_session_completed';
 
+  /// Event logged once when playback of a track actually begins. Provides the
+  /// denominator for completion rate. Same params as [audioSessionCompleted].
+  static const String audioSessionStarted = 'audio_session_started';
+
+  /// Event logged once when a started session ends WITHOUT completing
+  /// (close, switch track, navigate-away-while-paused, background-while-paused,
+  /// or replayed on next launch after a force-quit). Carries
+  /// [paramPercentCompleted] and [paramElapsedSeconds] for drop-off analysis.
+  /// See ANALYTICS_SESSION_EVENTS.md for exact fire conditions.
+  static const String audioSessionAbandoned = 'audio_session_abandoned';
+
   /// Parameter name for audio file ID
   static const String paramAudioFileId = 'audioFileId';
 
@@ -143,6 +154,13 @@ class AnalyticsEventConstants {
 
   /// Parameter name for audio file duration in milliseconds
   static const String paramAudioFileDuration = 'audioFileDuration';
+
+  /// Parameter for how far into the track the user got when abandoning,
+  /// as an integer percent rounded to the nearest 10 and clamped to 0..90.
+  static const String paramPercentCompleted = 'percent_completed';
+
+  /// Parameter for elapsed playback time in whole seconds when abandoning.
+  static const String paramElapsedSeconds = 'elapsed_seconds';
 
   // Error and token events
   /// Event logged when unexpected logout occurs due to missing refresh token

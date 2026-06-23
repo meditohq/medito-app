@@ -177,22 +177,48 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         )
     }
 
+    private fun handleTrackCompletionFromPlayer() {
+        saveAndSendCompletionData(createCompletionDataFromPlayer())
+    }
+
+    // Builds completion data directly from the player. Used by the native
+    // STATE_ENDED handler, which must not depend on a Dart-provided PlaybackState.
+    private fun createCompletionDataFromPlayer(): CompletionData {
+        val mediaItem = primaryPlayer.currentMediaItem
+        val metadata = mediaItem?.mediaMetadata
+        return CompletionData(
+            trackId = mediaItem?.mediaId ?: "",
+            duration = primaryPlayer.duration.takeIf { it != C.TIME_UNSET } ?: 0L,
+            fileId = metadata?.extras?.getString(KEY_FILE_ID) ?: "",
+            guideId = metadata?.artist?.toString(),
+            timestamp = System.currentTimeMillis()
+        )
+    }
+
     private fun saveAndSendCompletionData(completionData: CompletionData) {
+        // Persist first: completion is replayed by MainActivity on next launch if
+        // the app is killed before Dart records it, so nothing is lost.
         SharedPreferencesManager.saveCompletionData(this@AudioPlayerService, completionData)
 
+        // Tear down the foreground service + notification immediately and natively.
+        // Teardown must NOT depend on the Dart reply below — on devices that freeze
+        // the app in the background (e.g. MIUI/Xiaomi) the reply may never arrive,
+        // which previously left the player notification stuck until reboot.
+        finishPlayback()
+
+        // Fire-and-forget the analytics callback. If it completes we can clear the
+        // persisted record; if it doesn't, the replay path handles it next launch.
         CoroutineScope(Dispatchers.Main).launch {
-            meditoAudioApi?.let { api ->
-                api.handleCompletedTrack(completionData) { result ->
-                    if (result.isSuccess) {
-                        SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
-                    }
-                    finishPlayback()
+            meditoAudioApi?.handleCompletedTrack(completionData) { result ->
+                if (result.isSuccess) {
+                    SharedPreferencesManager.clearCompletionData(this@AudioPlayerService)
                 }
-            } ?: finishPlayback()
+            }
         }
     }
 
     private fun finishPlayback() {
+        stopPositionUpdates()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
@@ -369,6 +395,16 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onDestroy() {
         Log.d(TAG, "🔊 Service onDestroy called")
 
+        // Always remove the foreground notification on teardown, even when the
+        // service dies via a path that didn't call finishPlayback()/stopAudio()
+        // (e.g. the OS killing a background-frozen service). Without this an
+        // orphaned, un-dismissable media notification could linger until reboot.
+        try {
+            clearNotification()
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Error clearing notification in onDestroy: ${e.message}")
+        }
+
         // First, ensure we've released audio focus
         if (hasAudioFocus) {
             Log.d(TAG, "🔊 Abandoning audio focus on destroy")
@@ -441,6 +477,18 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     override fun onPlaybackStateChanged(playbackState: Int) {
         Log.d(TAG, "🔊 Playback state changed: $playbackState")
 
+        if (playbackState == Player.STATE_ENDED) {
+            // Drive completion + notification teardown natively and immediately.
+            // This fires regardless of whether the Flutter engine is alive, unlike
+            // the Dart-reply-gated poll path in updatePlaybackState(). Skipping the
+            // updateNotification() below avoids re-posting the stuck "ended" card.
+            if (!isCompletionHandled) {
+                isCompletionHandled = true
+                handleTrackCompletionFromPlayer()
+            }
+            return
+        }
+
         if (playbackState == Player.STATE_READY && primaryPlayer.isPlaying) {
             // Similar to former onPlay - play background sound if it's set
             if (backgroundSoundUri != null) {
@@ -463,6 +511,21 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         // Only stop service if not playing
         if (!primaryPlayer.isPlaying) {
             serviceScope.launch {
+                // Session analytics: the user swiped the app away while the
+                // track was paused — i.e. abandoned it. Push one last position
+                // snapshot to Dart before teardown so AudioSessionTracker has
+                // the freshest position to attribute the audio_session_abandoned
+                // event (fired in Dart, or replayed on next launch from the
+                // persisted record). Skipped if the track already completed —
+                // that path reports its own event. Mirrors how completion is
+                // surfaced to Dart rather than firing Firebase from native code.
+                if (!isCompletionHandled) {
+                    try {
+                        updatePlaybackState()
+                    } catch (e: Exception) {
+                        Log.e(TAG, "❌ Error pushing final playback state on task removal: ${e.message}")
+                    }
+                }
                 stopPositionUpdates()
                 clearNotification()
                 primaryPlayer.stop()

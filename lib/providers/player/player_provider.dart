@@ -11,6 +11,7 @@ import '../../utils/utils.dart';
 import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
 import 'ios_audio_handler.dart';
+import '../../utils/audio_session_tracker.dart';
 import '../../utils/logger.dart';
 
 final _api = pigeon.MeditoAudioServiceApi();
@@ -41,6 +42,15 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
 
     await _playTrack(request);
     state = request;
+
+    // Analytics: playback actually started. Fired after _playTrack so a failed
+    // start (which rethrows above) does not count as a started session. Also
+    // abandons any prior session that never completed (track switch).
+    unawaited(AudioSessionTracker.instance.onStarted(
+      fileId: request.fileId,
+      guide: request.guideName,
+      durationMs: request.duration,
+    ));
   }
 
   /// Warm-prepares the state without actually starting playback. Used for
@@ -190,6 +200,9 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
   }
 
   void stop() {
+    // Analytics: closing the player ends the session. No-op if it already
+    // completed (the completion path also calls stop()).
+    unawaited(AudioSessionTracker.instance.onStopped());
     if (Platform.isAndroid) {
       _api.stopAudio();
     } else {

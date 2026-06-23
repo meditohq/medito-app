@@ -8,6 +8,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/providers/providers.dart';
@@ -61,6 +62,15 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _precacheCurrentTrackImage();
+  }
+
+  @override
+  void dispose() {
+    // Analytics: leaving the player (e.g. system back gesture) abandons a
+    // paused session. No-op if it's still playing (continues in background) or
+    // already completed/stopped.
+    unawaited(AudioSessionTracker.instance.onPlayerClosed());
+    super.dispose();
   }
 
   void _precacheCurrentTrackImage() {

@@ -32,6 +32,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:medito/providers/player/ios_audio_handler.dart';
+import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
@@ -211,6 +212,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     super.initState();
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
+    // If a previous run was force-quit mid-session and sent no event, recover
+    // it as an audio_session_abandoned now (before any new session starts).
+    unawaited(AudioSessionTracker.instance.replayIfAbandoned());
   }
 
   void _setUpSystemUi() {
@@ -335,6 +339,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       _onAppForegrounded();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      // Analytics: leaving the app abandons a paused session. A session that is
+      // actively playing keeps going in the background (screen-off mid-
+      // meditation is normal), so the tracker only fires when not playing.
+      unawaited(AudioSessionTracker.instance.onAppBackgrounded());
     }
   }
 

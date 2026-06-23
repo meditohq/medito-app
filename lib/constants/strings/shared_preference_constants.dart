@@ -91,4 +91,11 @@ class SharedPreferenceConstants {
   // Used to log a single first_action_after_onboarding event.
   static const String firstActionAfterOnboardingPending =
       'first_action_after_onboarding_pending';
+
+  // In-progress audio session, persisted by AudioSessionTracker as a JSON blob
+  // {fileId, guide, durationMs, lastPositionMs, startMs}. Present only while a
+  // session is playing/paused; cleared on completion or abandonment. Replayed
+  // as an audio_session_abandoned event on next launch if a force-quit left it
+  // behind. See ANALYTICS_SESSION_EVENTS.md.
+  static const String incompleteAudioSession = 'incompleteAudioSession';
 }
