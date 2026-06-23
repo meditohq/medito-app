@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/medito_icon.dart';
 
 /// The three possible outcome states for the onboarding result screen.
 enum OnboardingResultState {
@@ -388,13 +390,24 @@ class _OnboardingResultScreenState
           ),
           duration: const Duration(milliseconds: 900),
           curve: Curves.easeOutCubic,
-          builder: (context, value, _) => Text(
-            '🔥 ${value.round()}',
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w700,
-                  color: onSurface,
-                ),
+          builder: (context, value, _) => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              MeditoIcon(
+                assetName: MeditoIcons.fire,
+                size: 44,
+                color: context.brandPurple,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                '${value.round()}',
+                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w700,
+                      color: onSurface,
+                    ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 4),
