@@ -25,7 +25,14 @@ platform :ios do
     # working `build_ios.sh` path, which never overrides the toolchain.
     developer_dir = `xcode-select -p`.strip
     xcode_app = developer_dir.sub(%r{/Contents/Developer/?$}, "")
-    xcode_select(xcode_app) unless xcode_app.empty?
+    # `xcode-select -p` can legitimately point at the Command Line Tools
+    # (e.g. `/Library/Developer/CommandLineTools`) rather than an Xcode.app.
+    # Only honour it when it resolves to a real Xcode bundle; otherwise fall
+    # back to the previous default so local/CLT-only setups keep working.
+    unless xcode_app.end_with?(".app") && Dir.exist?(xcode_app)
+      xcode_app = "/Applications/Xcode.app"
+    end
+    xcode_select(xcode_app)
   end
 
   lane :beta do |options|
