@@ -15,7 +15,7 @@ class OnboardingQuestionScreen extends StatefulWidget {
     required this.question,
     required this.subtext,
     required this.options,
-    required this.stepLabel,
+    this.stepLabel,
     required this.onOptionSelected,
     this.selectionDelay = const Duration(milliseconds: 200),
     this.pinnedTrailingCount = 0,
@@ -28,8 +28,9 @@ class OnboardingQuestionScreen extends StatefulWidget {
   final String subtext;
   final List<String> options;
 
-  /// E.g. "1 of 2"
-  final String stepLabel;
+  /// E.g. "1 of 2". When null or empty, no step label is rendered — used for
+  /// single-question flows where a step counter would read oddly.
+  final String? stepLabel;
 
   /// Called with the original (canonical) index of the selected option after
   /// [selectionDelay], regardless of the displayed (shuffled) position.
@@ -115,14 +116,16 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.stepLabel,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(120),
-              letterSpacing: 0.8,
+          if (widget.stepLabel != null && widget.stepLabel!.isNotEmpty) ...[
+            Text(
+              widget.stepLabel!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha(120),
+                letterSpacing: 0.8,
+              ),
             ),
-          ),
-          const SizedBox(height: padding16),
+            const SizedBox(height: padding16),
+          ],
           Text(
             widget.question,
             style: theme.textTheme.headlineMedium?.copyWith(

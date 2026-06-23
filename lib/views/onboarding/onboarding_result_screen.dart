@@ -28,31 +28,29 @@ extension OnboardingResultStateLabel on OnboardingResultState {
   }
 }
 
-/// Derives the result state from the two question answers.
+/// Derives the result state from the experience answer.
+///
+/// The onboarding flow asks a single question — "Have you meditated before?".
+/// The earlier "intent" question was removed because its answer carried almost
+/// no predictive signal beyond the experience answer and added a screen of
+/// friction; experience alone maps cleanly onto the three result states.
 ///
 /// [experienceIndex] — answer to "Have you meditated before?"
-///   0 = Never tried it
-///   1 = A little, here and there
-///   2 = I have a regular practice
-///
-/// [intentIndex] — answer to "What are you hoping to get from meditation?"
-///   0 = Learn how to meditate properly
-///   1 = Build a regular habit
-///   2 = Manage stress, sleep, or emotions
+///   0 = Never tried it          → State A (learn from scratch)
+///   1 = A little, here and there → State B (ease back in)
+///   2 = I have a regular practice → State C (keep the practice going)
 OnboardingResultState deriveOnboardingState({
   required int experienceIndex,
-  required int intentIndex,
 }) {
-  // State A: never tried OR wants to learn properly
-  if (experienceIndex == 0 || intentIndex == 0) {
-    return OnboardingResultState.stateA;
+  switch (experienceIndex) {
+    case 2:
+      return OnboardingResultState.stateC;
+    case 1:
+      return OnboardingResultState.stateB;
+    case 0:
+    default:
+      return OnboardingResultState.stateA;
   }
-  // State C: regular practice (regardless of intent)
-  if (experienceIndex == 2) {
-    return OnboardingResultState.stateC;
-  }
-  // State B: some experience + habit or stress/sleep goal
-  return OnboardingResultState.stateB;
 }
 
 class OnboardingResultScreen extends StatelessWidget {
