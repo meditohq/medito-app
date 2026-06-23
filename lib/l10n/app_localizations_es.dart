@@ -1014,7 +1014,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get onboardingFirstMeditationHook => 'Your first moment of calm.';
 
   @override
-  String get onboardingFirstMeditationDuration => 'Less than 3 minutes';
+  String get onboardingFirstMeditationDuration => 'Just over 2 minutes';
 
   @override
   String get onboardingFirstMeditationSubtitle =>

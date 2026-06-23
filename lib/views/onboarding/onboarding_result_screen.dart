@@ -296,22 +296,26 @@ class _OnboardingResultScreenState
 
     return Column(
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.schedule,
-                size: 15, color: onSurface.withOpacityValue(0.7)),
-            const SizedBox(width: 5),
-            Text(
-              l10n.onboardingFirstMeditationDuration,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: onSurface.withOpacityValue(0.7),
-                  ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
+        // Duration cue only matters before they commit; once playing it's
+        // noise, so hide it (and the time readout below).
+        if (!_started) ...[
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.schedule,
+                  size: 15, color: onSurface.withOpacityValue(0.7)),
+              const SizedBox(width: 5),
+              Text(
+                l10n.onboardingFirstMeditationDuration,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: onSurface.withOpacityValue(0.7),
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
         Text(
           l10n.onboardingFirstMeditationSubtitle,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -329,13 +333,6 @@ class _OnboardingResultScreenState
               minHeight: 5,
               backgroundColor: onSurface.withOpacityValue(0.12),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            busy ? l10n.loading : '${_fmt(position)}  /  ${_fmt(duration)}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: onSurface.withOpacityValue(0.6),
-                ),
           ),
         ],
         const SizedBox(height: 16),
@@ -419,13 +416,6 @@ class _OnboardingResultScreenState
         ),
       ],
     );
-  }
-
-  String _fmt(int ms) {
-    final s = (ms / 1000).round();
-    final m = s ~/ 60;
-    final r = (s % 60).toString().padLeft(2, '0');
-    return '$m:$r';
   }
 }
 

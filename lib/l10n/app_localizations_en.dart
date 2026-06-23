@@ -997,7 +997,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingFirstMeditationHook => 'Your first moment of calm.';
 
   @override
-  String get onboardingFirstMeditationDuration => 'Less than 3 minutes';
+  String get onboardingFirstMeditationDuration => 'Just over 2 minutes';
 
   @override
   String get onboardingFirstMeditationSubtitle =>
@@ -2153,7 +2153,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingResultPracticeBody =>
-      'Your Path is a great place to deepen your practice. Or choose Your Daily for a fresh session every day.';
+      'Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.';
 
   @override
   String get onboardingResultCta => 'Get started';

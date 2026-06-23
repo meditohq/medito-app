@@ -1883,7 +1883,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingFirstMeditationDuration.
   ///
   /// In en, this message translates to:
-  /// **'Less than 3 minutes'**
+  /// **'Just over 2 minutes'**
   String get onboardingFirstMeditationDuration;
 
   /// No description provided for @onboardingFirstMeditationSubtitle.
