@@ -141,47 +141,44 @@ class FirebaseAnalyticsService {
         _analytics = FirebaseAnalytics.instance;
       }
 
-      // For iOS, request App Tracking Transparency authorization if requested
+      // For iOS, request App Tracking Transparency authorization if requested.
+      // IMPORTANT: ATT governs cross-app *advertising* tracking only (IDFA,
+      // ad attribution). First-party product analytics does NOT require ATT,
+      // so a denial must not disable analytics — it only revokes ad consent
+      // below. Previously we flipped analyticsFirebaseEnabled=false here, which
+      // blinded us to the ~80% of iOS users who decline tracking.
+      TrackingStatus attStatus = TrackingStatus.notSupported;
       if (Platform.isIOS && requestAttPermissionImmediately) {
-        final status = await AppTrackingTransparencyService.instance
+        attStatus = await AppTrackingTransparencyService.instance
             .requestTrackingPermission();
-        // If the user denied tracking, also disable Firebase Analytics
-        if (status != TrackingStatus.authorized) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool(SharedPreferenceConstants.analyticsFirebaseEnabled, false);
-        }
       }
 
-      // Check if the user disabled Firebase analytics via the settings toggle
-      final prefs = await SharedPreferences.getInstance();
-      final firebaseEnabled =
-          prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
-              true;
+      // Product-analytics consent follows the user's in-app setting only.
+      final analyticsConsent = await _getConsentPreference();
 
-      // Disable collection at the SDK level when the toggle is off.
-      // This prevents the SDK from sending any automatic events or
-      // making network requests.
+      // Ad signals additionally require ATT authorization on iOS.
+      final adConsent = analyticsConsent &&
+          (!Platform.isIOS || attStatus == TrackingStatus.authorized);
+
+      // Gate SDK collection on the analytics preference only (not ATT), so
+      // events keep flowing for users who decline tracking.
       if (_analytics is FirebaseAnalytics) {
         await (_analytics as FirebaseAnalytics)
-            .setAnalyticsCollectionEnabled(firebaseEnabled);
+            .setAnalyticsCollectionEnabled(analyticsConsent);
       }
 
-      // Check if user has previously set a preference
-      bool consentGranted = await _getConsentPreference();
-
-      // Set consent based on user preference.
-      // Collection is already gated by setAnalyticsCollectionEnabled above,
-      // so consent flags only need to reflect the actual consent state.
+      // Consent mode v2: analytics_storage tracks product-analytics consent;
+      // the ad_* signals are additionally gated by ATT.
       await setConsent(
-        analyticsStorageConsentGranted: consentGranted,
-        adStorageConsentGranted: consentGranted,
-        adUserDataConsentGranted: consentGranted,
-        adPersonalizationSignalsConsentGranted: consentGranted,
+        analyticsStorageConsentGranted: analyticsConsent,
+        adStorageConsentGranted: adConsent,
+        adUserDataConsentGranted: adConsent,
+        adPersonalizationSignalsConsentGranted: adConsent,
       );
 
       if (kDebugMode) {
         AppLogger.d('FIREBASE_ANALYTICS',
-            'Firebase Analytics initialized with consent: $consentGranted, collection enabled: $firebaseEnabled');
+            'Firebase Analytics initialized — analytics consent: $analyticsConsent, ad consent: $adConsent (ATT: $attStatus)');
       }
 
       _initialized = true;
@@ -209,17 +206,29 @@ class FirebaseAnalyticsService {
             'iOS App Tracking Transparency status: $status');
       }
 
-      // If the user denied tracking, also disable Firebase Analytics
-      if (status != TrackingStatus.authorized) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(SharedPreferenceConstants.analyticsFirebaseEnabled, false);
-      }
+      // ATT denial revokes only cross-app ad consent; product analytics
+      // (analytics_storage) stays on so we don't go blind to ATT-deniers.
+      await applyAdConsentFromAttStatus(status);
     } catch (e) {
       if (kDebugMode) {
         AppLogger.d('FIREBASE_ANALYTICS',
             'Error requesting iOS tracking authorization: $e');
       }
     }
+  }
+
+  /// Apply ad-related consent (ad_storage / ad_user_data / ad_personalization)
+  /// based on the iOS ATT result, WITHOUT touching product-analytics consent.
+  /// First-party analytics does not require ATT — only cross-app ad signals do.
+  Future<void> applyAdConsentFromAttStatus(TrackingStatus status) async {
+    final adGranted = status == TrackingStatus.authorized;
+    // analyticsStorageConsentGranted intentionally omitted (null) so the
+    // existing product-analytics consent is left unchanged.
+    await setConsent(
+      adStorageConsentGranted: adGranted,
+      adUserDataConsentGranted: adGranted,
+      adPersonalizationSignalsConsentGranted: adGranted,
+    );
   }
 
   /// Get the user's saved consent preference or default to true

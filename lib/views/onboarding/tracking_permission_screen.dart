@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/services/app_tracking_transparency_service.dart';
-import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/widgets/medito_icon.dart';
@@ -25,11 +23,11 @@ class TrackingPermissionScreen extends ConsumerWidget {
         final status = await AppTrackingTransparencyService.instance
             .requestTrackingPermission();
 
-        // Update Firebase Analytics based on ATT result (handles disabling if denied)
-        if (status != TrackingStatus.authorized) {
-          await ref.read(sharedPreferencesProvider).setBool(
-              SharedPreferenceConstants.analyticsFirebaseEnabled, false);
-        }
+        // ATT denial revokes only cross-app *ad* consent; first-party product
+        // analytics stays on so we keep visibility into users who decline
+        // tracking (the majority on iOS). Previously this disabled analytics
+        // entirely, blinding us to ~80% of iOS users.
+        await FirebaseAnalyticsService().applyAdConsentFromAttStatus(status);
 
         // Update Facebook SDK with ATT status for iOS 14+ SKAdNetwork support
         await MetaSdkService.instance.updateTrackingStatus();
