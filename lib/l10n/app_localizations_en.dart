@@ -2153,7 +2153,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingResultPracticeBody =>
-      'Your Daily is a great place to keep your practice going. A fresh session is waiting for you every day.';
+      'Your Path is a great place to deepen your practice. Or choose Your Daily for a fresh session every day.';
 
   @override
   String get onboardingResultCta => 'Get started';
