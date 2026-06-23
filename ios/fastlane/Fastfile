@@ -11,7 +11,21 @@ end
 platform :ios do
 
   before_all do
-    xcode_select "/Applications/Xcode.app"
+    # Honour the Xcode that the environment has already selected rather than
+    # forcing the runner's *default* `/Applications/Xcode.app` symlink.
+    #
+    # CI selects the required Xcode (26+, for Apple's now-mandatory iOS 26 SDK)
+    # in the workflow's "Select Xcode" step via `xcode-select -s`. Hard-coding
+    # `/Applications/Xcode.app` here overrode that and reset the toolchain to
+    # the runner's older default Xcode, so `build_app` archived against the
+    # iOS 18.5 SDK and App Store Connect rejected the upload:
+    #   "Validation failed (409) ... must be built with the iOS 26 SDK or
+    #    later, included in Xcode 26 or later."
+    # Locally this resolves to the developer's active Xcode — matching the
+    # working `build_ios.sh` path, which never overrides the toolchain.
+    developer_dir = `xcode-select -p`.strip
+    xcode_app = developer_dir.sub(%r{/Contents/Developer/?$}, "")
+    xcode_select(xcode_app) unless xcode_app.empty?
   end
 
   lane :beta do |options|
