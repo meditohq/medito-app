@@ -1874,10 +1874,16 @@ abstract class AppLocalizations {
   /// **'Your first meditation'**
   String get onboardingFirstMeditationTitle;
 
+  /// No description provided for @onboardingFirstMeditationHook.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first moment of calm.'**
+  String get onboardingFirstMeditationHook;
+
   /// No description provided for @onboardingFirstMeditationDuration.
   ///
   /// In en, this message translates to:
-  /// **'Just 3 minutes'**
+  /// **'Less than 3 minutes'**
   String get onboardingFirstMeditationDuration;
 
   /// No description provided for @onboardingFirstMeditationSubtitle.
@@ -1897,6 +1903,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Maybe later'**
   String get onboardingFirstMeditationSkip;
+
+  /// No description provided for @onboardingFirstMeditationSkipShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingFirstMeditationSkipShort;
 
   /// No description provided for @onboardingFirstMeditationDone.
   ///

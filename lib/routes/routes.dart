@@ -50,6 +50,7 @@ Future<void> handleNavigation(
         : type.contains('pack2')
         ? ids[1]!
         : ids.first!;
+    AppLogger.d('ROUTES', 'Opening pack: $packId');
     if (packId == 'favorites') {
       await _pushRoute(const FavoritesView(), ref);
     } else {

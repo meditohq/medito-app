@@ -9,9 +9,9 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
+import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/providers/onboarding/onboarding_meditation_experiment.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
-import 'package:medito/views/onboarding/onboarding_first_meditation_screen.dart';
 import 'package:medito/views/onboarding/onboarding_question_screen.dart';
 import 'package:medito/views/onboarding/onboarding_result_screen.dart';
 import 'package:medito/views/onboarding/battery_optimization_screen.dart';
@@ -90,6 +90,18 @@ final List<String> _images = [
             index,
           ),
     );
+    // Regular meditators (top experience level) start on a more advanced pack
+    // rather than the beginner-oriented default "Up Next".
+    if (index == 2) {
+      const experiencedPackId = 'J3DsFVgKjZdbDiif';
+      unawaited(
+        ref.read(sharedPreferencesProvider).setString(
+              SharedPreferenceConstants.upNextPackId,
+              experiencedPackId,
+            ),
+      );
+      ref.invalidate(upNextPackIdProvider);
+    }
     // Experience is now the only question in the onboarding flow — the
     // follow-up "intent" question was removed because its answer added a
     // screen of friction with almost no predictive value beyond this one.
@@ -135,9 +147,8 @@ final List<String> _images = [
       OnboardingResultScreen(
         state: resultState,
         onGetStarted: _onGetStarted,
+        showMeditation: _showMeditationStep,
       ),
-      if (_showMeditationStep)
-        OnboardingFirstMeditationScreen(onNext: _finishToHome),
     ];
   }
 
@@ -153,16 +164,12 @@ final List<String> _images = [
             true,
           ),
     );
-    // Meditation arm (eligible users only): insert the first-meditation step
-    // before home. Everyone else goes straight to home (unchanged behaviour).
-    if (_showMeditationStep) {
-      _nextPage();
-      return;
-    }
-    // Meditation arm but gated out (experienced meditator): log it explicitly
-    // so the funnel distinguishes "withheld by gating" from a missing event.
+    // The meditation now lives inline on the result screen (eligible arm), so
+    // there's no extra page to advance to. Log the gated case explicitly when
+    // a meditation-arm user was withheld the step (experienced meditator).
     if (_meditationVariant ==
-        OnboardingMeditationExperiment.variantMeditation) {
+            OnboardingMeditationExperiment.variantMeditation &&
+        !_showMeditationStep) {
       unawaited(
         ref.read(analyticsServiceProvider).logEvent(
           name: AnalyticsEventConstants.onboardingFirstMeditationGated,
