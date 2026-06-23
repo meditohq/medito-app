@@ -47,14 +47,9 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 60000
 - tapOn: "Never tried it"
 
-# ── Onboarding: Intent question (now the final question — the attribution
-# question was removed in 26.5.19). After tapping intent, the flow goes
-# to the donation primer, then the notifications/reminder screen (re-added
-# in 26.6 in the post-donation position).
-- extendedWaitUntil:
-    visible: "Build a regular habit"
-    timeout: 10000
-- tapOn: "Build a regular habit"
+# Experience is now the ONLY onboarding question (the intent + attribution
+# questions were removed). Selecting an option auto-advances straight to the
+# donation primer — no second question to answer.
 
 # ── Onboarding: Donation ──
 # "Skip for Now" only appears on the donation primer after the user has
@@ -100,7 +95,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # and falsely skips the block, then the later "Get started" assertion
 # times out on the still-visible previous screen.
 - extendedWaitUntil:
-    visible: "Update Setting|Help Us Improve Medito|Get started"
+    visible: "Update Setting|Help Us Improve Medito|Get started|Maybe later"
     timeout: 30000
 - runFlow:
     when:
@@ -119,13 +114,24 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
             visible: "Allow"
           commands:
             - tapOn: "Allow"
+- waitForAnimationToEnd
 
-# ── Onboarding: Result screen (skip if we already landed on Home) ──
+# ── Onboarding: Result screen — advance to Home. ──
+# Control arm shows a prominent "Get started". The first-meditation
+# experiment arm (beginners, 50/50) instead shows an inline meditation with a
+# quiet "Maybe later" skip — "Get started" there only appears AFTER the
+# session completes — so for the smoke run we skip the session via
+# "Maybe later". Tap whichever is present.
 - runFlow:
     when:
       visible: "Get started"
     commands:
       - tapOn: "Get started"
+- runFlow:
+    when:
+      visible: "Maybe later"
+    commands:
+      - tapOn: "Maybe later"
 
 # A donation prompt dialog ("Medito is a registered nonprofit") sometimes
 # appears on Home post-onboarding — dismiss if present.
