@@ -1868,6 +1868,48 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get trackingPermissionAllow;
 
+  /// No description provided for @onboardingFirstMeditationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first meditation'**
+  String get onboardingFirstMeditationTitle;
+
+  /// No description provided for @onboardingFirstMeditationDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Just 3 minutes'**
+  String get onboardingFirstMeditationDuration;
+
+  /// No description provided for @onboardingFirstMeditationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to get right. Just sit back and listen.'**
+  String get onboardingFirstMeditationSubtitle;
+
+  /// No description provided for @onboardingFirstMeditationBegin.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get onboardingFirstMeditationBegin;
+
+  /// No description provided for @onboardingFirstMeditationSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe later'**
+  String get onboardingFirstMeditationSkip;
+
+  /// No description provided for @onboardingFirstMeditationDone.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s it. You just meditated.'**
+  String get onboardingFirstMeditationDone;
+
+  /// No description provided for @onboardingFirstMeditationContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboardingFirstMeditationContinue;
+
   /// No description provided for @splashHeadline.
   ///
   /// In en, this message translates to:

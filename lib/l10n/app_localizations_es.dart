@@ -1008,6 +1008,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trackingPermissionAllow => 'Continue';
 
   @override
+  String get onboardingFirstMeditationTitle => 'Your first meditation';
+
+  @override
+  String get onboardingFirstMeditationDuration => 'Just 3 minutes';
+
+  @override
+  String get onboardingFirstMeditationSubtitle =>
+      'Nothing to get right. Just sit back and listen.';
+
+  @override
+  String get onboardingFirstMeditationBegin => 'Start';
+
+  @override
+  String get onboardingFirstMeditationSkip => 'Maybe later';
+
+  @override
+  String get onboardingFirstMeditationDone => 'That\'s it. You just meditated.';
+
+  @override
+  String get onboardingFirstMeditationContinue => 'Continue';
+
+  @override
   String get splashHeadline => 'Meditación Hecha Simple';
 
   @override

@@ -75,6 +75,10 @@ class SharedPreferenceConstants {
   // Up Next pack preference
   static const String upNextPackId = 'up_next_pack_id';
 
+  // Onboarding "first meditation" A/B test — sticky per-install variant.
+  static const String onboardingMeditationVariant =
+      'onboarding_meditation_variant';
+
   // Your Path explainer strip — set to true once the strip has been dismissed
   static const String hasSeenYourPathExplainer = 'has_seen_your_path_explainer';
 
@@ -98,4 +102,10 @@ class SharedPreferenceConstants {
   // as an audio_session_abandoned event on next launch if a force-quit left it
   // behind. See ANALYTICS_SESSION_EVENTS.md.
   static const String incompleteAudioSession = 'incompleteAudioSession';
+
+  // The onboarding "experience" answer, persisted as an int index:
+  // 0 = never tried, 1 = a little, 2 = regular practice. Absent if the user
+  // onboarded before this was captured or skipped the question. Used to
+  // segment the first-session experience and downstream personalisation.
+  static const String onboardingExperienceLevel = 'onboarding_experience_level';
 }

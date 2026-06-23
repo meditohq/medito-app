@@ -9,7 +9,9 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
+import 'package:medito/providers/onboarding/onboarding_meditation_experiment.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
+import 'package:medito/views/onboarding/onboarding_first_meditation_screen.dart';
 import 'package:medito/views/onboarding/onboarding_question_screen.dart';
 import 'package:medito/views/onboarding/onboarding_result_screen.dart';
 import 'package:medito/views/onboarding/battery_optimization_screen.dart';
@@ -28,11 +30,23 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  // Answers from the question screens (set before advancing to result).
+  // Answer from the question screen (set before advancing to result).
   int? _experienceIndex;
-  int? _intentIndex;
 
   bool _showBatteryScreen = false;
+
+  // Sticky A/B arm for the "end onboarding with a meditation" experiment.
+  String _meditationVariant = OnboardingMeditationExperiment.variantControl;
+
+  // The 3-min first-meditation step is gated to non-regular meditators.
+  // Data: never_tried/a_little retain best on a short first session (~63-68%
+  // at <=3min, falling with length), whereas regular_practice users retain
+  // best on 4-6min+ and the beginner framing is a mismatch — so regulars skip
+  // the step and go straight to home (control behaviour). experienceIndex:
+  // 0 = never_tried, 1 = a_little, 2 = regular_practice.
+  bool get _showMeditationStep =>
+      _meditationVariant == OnboardingMeditationExperiment.variantMeditation &&
+      (_experienceIndex == 0 || _experienceIndex == 1);
 
 final List<String> _images = [
     AssetConstants.onboardingImage1,
@@ -49,32 +63,37 @@ final List<String> _images = [
 
   void _onExperienceSelected(int index) {
     const answers = ['never_tried', 'a_little', 'regular_practice'];
+    final analytics = ref.read(analyticsServiceProvider);
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
+      analytics.logEvent(
         name: AnalyticsEventConstants.onboardingExperienceAnswered,
         parameters: {
           AnalyticsEventConstants.paramAnswer: answers[index],
         },
       ),
     );
-    setState(() => _experienceIndex = index);
-    _nextPage();
-  }
-
-  void _onIntentSelected(int index) {
-    const answers = ['learn_properly', 'build_habit', 'stress_sleep_emotions'];
+    // Set as a GA4 user property so every downstream event (incl. the
+    // first-session A/B test) can be segmented by experience level in
+    // BigQuery without a join back to the onboarding event.
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.onboardingIntentAnswered,
-        parameters: {
-          AnalyticsEventConstants.paramAnswer: answers[index],
-        },
+      analytics.setUserProperty(
+        name: AnalyticsEventConstants.userPropExperienceLevel,
+        value: answers[index],
       ),
     );
-    setState(() => _intentIndex = index);
-    // Intent is now the final question in the onboarding flow — the previous
-    // attribution question was removed because its conversion cost outweighed
-    // the value of the data. Fire the flow-completed event here.
+    setState(() => _experienceIndex = index);
+    // Persist the answer so it outlives onboarding — used to segment the
+    // first-session experience (and its A/B test) and later personalisation.
+    unawaited(
+      ref.read(sharedPreferencesProvider).setInt(
+            SharedPreferenceConstants.onboardingExperienceLevel,
+            index,
+          ),
+    );
+    // Experience is now the only question in the onboarding flow — the
+    // follow-up "intent" question was removed because its answer added a
+    // screen of friction with almost no predictive value beyond this one.
+    // Fire the flow-completed event here.
     _logQuestionFlowCompleted();
     _nextPage();
   }
@@ -82,7 +101,6 @@ final List<String> _images = [
   void _logQuestionFlowCompleted() {
     final state = deriveOnboardingState(
       experienceIndex: _experienceIndex ?? 0,
-      intentIndex: _intentIndex ?? 0,
     );
     unawaited(
       ref.read(analyticsServiceProvider).logEvent(
@@ -97,7 +115,6 @@ final List<String> _images = [
   List<Widget> _buildPages(AppLocalizations l10n) {
     final resultState = deriveOnboardingState(
       experienceIndex: _experienceIndex ?? 0,
-      intentIndex: _intentIndex ?? 0,
     );
 
     return [
@@ -109,28 +126,18 @@ final List<String> _images = [
           l10n.onboardingExperienceALittle,
           l10n.onboardingExperienceRegular,
         ],
-        stepLabel: l10n.onboardingStep1of2,
         onOptionSelected: _onExperienceSelected,
       ),
-      OnboardingQuestionScreen(
-        question: l10n.onboardingIntentQuestion,
-        subtext: l10n.onboardingIntentSubtext,
-        options: [
-          l10n.onboardingIntentLearn,
-          l10n.onboardingIntentHabit,
-          l10n.onboardingIntentStress,
-        ],
-        stepLabel: l10n.onboardingStep2of2,
-        onOptionSelected: _onIntentSelected,
-      ),
       OnboardingDonationScreen(onNext: _nextPage),
-      NotificationsScreen(onNext: _nextPage, intentIndex: _intentIndex),
+      NotificationsScreen(onNext: _nextPage),
       if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
       if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),
       OnboardingResultScreen(
         state: resultState,
         onGetStarted: _onGetStarted,
       ),
+      if (_showMeditationStep)
+        OnboardingFirstMeditationScreen(onNext: _finishToHome),
     ];
   }
 
@@ -146,6 +153,32 @@ final List<String> _images = [
             true,
           ),
     );
+    // Meditation arm (eligible users only): insert the first-meditation step
+    // before home. Everyone else goes straight to home (unchanged behaviour).
+    if (_showMeditationStep) {
+      _nextPage();
+      return;
+    }
+    // Meditation arm but gated out (experienced meditator): log it explicitly
+    // so the funnel distinguishes "withheld by gating" from a missing event.
+    if (_meditationVariant ==
+        OnboardingMeditationExperiment.variantMeditation) {
+      unawaited(
+        ref.read(analyticsServiceProvider).logEvent(
+          name: AnalyticsEventConstants.onboardingFirstMeditationGated,
+          parameters: {
+            AnalyticsEventConstants.paramExperimentName:
+                OnboardingMeditationExperiment.experimentName,
+            AnalyticsEventConstants.paramVariantId: _meditationVariant,
+          },
+        ),
+      );
+    }
+    await _finishToHome();
+  }
+
+  Future<void> _finishToHome() async {
+    if (!mounted) return;
     await Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 700),
@@ -173,6 +206,22 @@ final List<String> _images = [
     unawaited(
       ref.read(analyticsServiceProvider).logEvent(
         name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
+      ),
+    );
+    // Resolve the sticky experiment arm and log a one-time exposure so the test
+    // is segmentable in BigQuery (experiment_name + variant_id), matching the
+    // paywall-experiment convention.
+    _meditationVariant = OnboardingMeditationExperiment.resolveVariant(
+      ref.read(sharedPreferencesProvider),
+    );
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.onboardingExperimentExposure,
+        parameters: {
+          AnalyticsEventConstants.paramExperimentName:
+              OnboardingMeditationExperiment.experimentName,
+          AnalyticsEventConstants.paramVariantId: _meditationVariant,
+        },
       ),
     );
     shouldShowBatteryOptimizationScreen().then((show) {

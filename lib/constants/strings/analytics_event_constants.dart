@@ -92,6 +92,33 @@ class AnalyticsEventConstants {
   /// Event logged when user completes onboarding flow
   static const String onboardingCompleted = 'onboarding_completed';
 
+  // Onboarding "first meditation" experiment (onboarding_first_meditation).
+  /// Fired once per install when onboarding assigns the user to an experiment
+  /// arm. Carries paramExperimentName + paramVariantId so the test is queryable
+  /// with the same BigQuery convention as the paywall experiments.
+  static const String onboardingExperimentExposure =
+      'onboarding_experiment_exposure';
+
+  /// The first-meditation screen (variant arm) was shown.
+  static const String onboardingFirstMeditationShown =
+      'onboarding_first_meditation_shown';
+
+  /// User tapped "Begin" to start the first meditation from onboarding.
+  static const String onboardingFirstMeditationBeginTap =
+      'onboarding_first_meditation_begin_tap';
+
+  /// User skipped the first meditation ("Maybe later").
+  static const String onboardingFirstMeditationSkipTap =
+      'onboarding_first_meditation_skip_tap';
+
+  /// Meditation arm, but the step was withheld because the user is an
+  /// experienced meditator (regular_practice) — they go straight to home. Makes
+  /// the gating explicit (and verifiable in prod) rather than inferred from the
+  /// absence of a "shown" event. Carries paramExperimentName + paramVariantId;
+  /// the experience_level user property is attached automatically.
+  static const String onboardingFirstMeditationGated =
+      'onboarding_first_meditation_gated';
+
   /// Event logged on the user's very first interactive tap after completing
   /// onboarding. Fires exactly once per install.
   /// Parameter: paramTarget — describes what they tapped (e.g. 'up_next',
@@ -246,6 +273,11 @@ class AnalyticsEventConstants {
   /// Parameter name for donation page A/B test variant
   static const String paramVariantId = 'variant_id';
 
+  /// Parameter name for an experiment's human-readable name/slug (e.g.
+  /// "onboarding_first_meditation"). Matches the BigQuery convention used to
+  /// segment experiments alongside [paramVariantId].
+  static const String paramExperimentName = 'experiment_name';
+
   /// Parameter name for the active experiment slug/ID (e.g. "donate3"). This
   /// is the stable identifier and matches what's attached to Stripe payment
   /// metadata under the same key. Source: JS bridge `experiment_id` field.
@@ -348,6 +380,12 @@ class AnalyticsEventConstants {
 
   /// Parameter for the selected answer in onboarding question events
   static const String paramAnswer = 'answer';
+
+  /// GA4 user property holding the onboarding experience answer
+  /// ('never_tried', 'a_little', 'regular_practice'). Set once when the user
+  /// answers, so all downstream events — including the first-meditation A/B
+  /// test — can be segmented by experience level in BigQuery.
+  static const String userPropExperienceLevel = 'experience_level';
 
   /// Parameter carrying the free-text response from the onboarding attribution
   /// question when the user picks the "other" path and types their own answer.
