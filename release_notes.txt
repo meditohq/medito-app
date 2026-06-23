@@ -1,6 +1,9 @@
 Unreleased
 -
 
+2606.23.0
+- Bug fixes
+
 2606.17.0
 - Android: Health Connect no longer asks for permission every session if you've declined
 
