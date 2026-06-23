@@ -88,12 +88,20 @@ platform :android do
     unless notes.empty?
       require 'fileutils'
       # supply matches a changelog to a release by version-code filename
-      # (e.g. 302418.txt) and does NOT fall back to default.txt for a specific
+      # (e.g. 302419.txt) and does NOT fall back to default.txt for a specific
       # APK — so write the version-code file too, or the notes get dropped and
       # the Play Console shows its placeholder. Derive the code from pubspec.
-      version_code = File.read('../pubspec.yaml')[/^version:\s*\S+\+(\d+)/, 1]
+      #
+      # Resolve paths from __dir__ (this Fastfile's directory), NOT the process
+      # cwd: raw Ruby File ops run with cwd = android/fastlane, so cwd-relative
+      # paths like '../pubspec.yaml' break (they'd point at android/, not the
+      # repo root). __dir__ is android/fastlane regardless of how fastlane is
+      # invoked. Guard the read so a missing pubspec degrades to default.txt
+      # rather than crashing the whole deploy.
+      pubspec = File.expand_path('../../pubspec.yaml', __dir__)
+      version_code = File.exist?(pubspec) ? File.read(pubspec)[/^version:\s*\S+\+(\d+)/, 1] : nil
       ['en-US', 'en-GB', 'es-ES'].each do |locale|
-        dir = "fastlane/metadata/android/#{locale}/changelogs"
+        dir = File.expand_path("metadata/android/#{locale}/changelogs", __dir__)
         FileUtils.mkdir_p(dir)
         File.write("#{dir}/default.txt", notes)
         File.write("#{dir}/#{version_code}.txt", notes) if version_code
