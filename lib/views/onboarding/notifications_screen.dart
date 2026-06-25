@@ -128,7 +128,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   Future<void> _setupRemindersAndAdvance() async {
     if (!mounted) return;
 
-    final accepted = await PermissionHandler.requestAlarmPermission(context);
+    final accepted =
+        await PermissionHandler.requestNotificationPermission(context);
     if (!accepted || !mounted) {
       setState(() => _isProcessing = false);
       return;

@@ -23,7 +23,7 @@ class SmartReminderTile extends ConsumerWidget {
     Future<void> handleToggle(bool value) async {
       if (value) {
         var accepted =
-            await PermissionHandler.requestAlarmPermission(context);
+            await PermissionHandler.requestNotificationPermission(context);
         if (!accepted) return;
 
         final prefs = ref.read(sharedPreferencesProvider);

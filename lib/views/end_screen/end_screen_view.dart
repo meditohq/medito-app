@@ -673,7 +673,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
   Future<void> _enableReminders() async {
     try {
-      final accepted = await PermissionHandler.requestAlarmPermission(context);
+      final accepted =
+          await PermissionHandler.requestNotificationPermission(context);
       if (!accepted) {
         unawaited(
           ref.read(analyticsServiceProvider).logEvent(
