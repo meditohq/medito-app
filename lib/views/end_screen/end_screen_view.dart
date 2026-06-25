@@ -54,6 +54,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   // the entrance slide finishes — that frame change is what triggers the
   // AnimatedSwitcher transition from old streak -> new streak.
   bool _showPriorStats = true;
+  bool _reminderPromptImpressionLogged = false;
 
   late AnimationController _statsAnimationController;
   late AnimationController _reminderAnimationController;
@@ -528,6 +529,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
   Future<void> _dismissReminderPromptForever() async {
     await ref.read(reminderPromptDismissedProvider.notifier).dismissForever();
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.endScreenReminderPromptDismissed,
+      ),
+    );
     if (mounted) {
       showSnackBar(
         context,
@@ -542,6 +548,19 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
     if (!shouldShow) {
       return const SizedBox.shrink();
+    }
+
+    if (!_reminderPromptImpressionLogged) {
+      _reminderPromptImpressionLogged = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          unawaited(
+            ref.read(analyticsServiceProvider).logEvent(
+              name: AnalyticsEventConstants.endScreenReminderPromptShown,
+            ),
+          );
+        }
+      });
     }
 
     return Padding(
@@ -645,14 +664,25 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
   Future<void> _snoozeReminderPrompt() async {
     await ref.read(reminderPromptDismissedProvider.notifier).snooze();
+    unawaited(
+      ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.endScreenReminderPromptSnoozed,
+      ),
+    );
   }
 
   Future<void> _enableReminders() async {
     try {
       final accepted = await PermissionHandler.requestAlarmPermission(context);
-      if (!accepted || !mounted) {
+      if (!accepted) {
+        unawaited(
+          ref.read(analyticsServiceProvider).logEvent(
+            name: AnalyticsEventConstants.endScreenReminderOsDenied,
+          ),
+        );
         return;
       }
+      if (!mounted) return;
 
       final prefs = ref.read(sharedPreferencesProvider);
       final service = SmartRemindersService(

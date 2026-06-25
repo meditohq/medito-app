@@ -408,6 +408,26 @@ class AnalyticsEventConstants {
   static const String onboardingAttributionAnswered =
       'onboarding_attribution_answered';
 
+  /// Event logged when the end-screen smart-reminders card first becomes
+  /// visible to the user (i.e. shouldShowReminderPromptProvider is true).
+  static const String endScreenReminderPromptShown =
+      'end_screen_reminder_prompt_shown';
+
+  /// Event logged when the user taps "Not now" on the end-screen reminders card
+  /// (7-day snooze).
+  static const String endScreenReminderPromptSnoozed =
+      'end_screen_reminder_prompt_snoozed';
+
+  /// Event logged when the user taps the ✕ button on the end-screen reminders
+  /// card (permanent dismiss).
+  static const String endScreenReminderPromptDismissed =
+      'end_screen_reminder_prompt_dismissed';
+
+  /// Event logged when the user taps "Turn on smart reminders" but the OS
+  /// permission dialog returns denied.
+  static const String endScreenReminderOsDenied =
+      'end_screen_reminder_os_denied';
+
   /// Event logged when the user enables smart reminders/notifications.
   /// Parameter: paramSource ('end_screen', 'settings')
   static const String notificationsEnabled = 'notifications_enabled';
