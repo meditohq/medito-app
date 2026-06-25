@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -39,6 +42,39 @@ class _HomeViewState extends ConsumerState<HomeView>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _logScreenView();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fixBrokenNotificationPermission();
+    });
+  }
+
+  Future<void> _fixBrokenNotificationPermission() async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (!(prefs.getBool(SharedPreferenceConstants.notifPermissionFixNeeded) ??
+        false)) {
+      return;
+    }
+
+    await prefs.remove(SharedPreferenceConstants.notifPermissionFixNeeded);
+
+    final status = await Permission.notification.request();
+
+    if (!mounted) return;
+
+    if (status.isGranted) {
+      final service = SmartRemindersService(
+        prefs: prefs,
+        reminders: ref.read(reminderProvider),
+      );
+      await service.enable();
+      await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
+    } else {
+      // They declined again — reset so the end-screen prompt can show later.
+      await prefs.setBool(
+          SharedPreferenceConstants.dailyReminderEnabled, false);
+      await prefs.remove(
+          SharedPreferenceConstants.reminderPromptDismissedForever);
+      await prefs.remove(SharedPreferenceConstants.reminderPromptSnoozeUntil);
+    }
   }
 
   Future<void> _logScreenView() async {

@@ -24,6 +24,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
@@ -104,6 +105,24 @@ void main() async {
           SharedPreferenceConstants.analyticsFirebaseEnabled, false);
     }
     await prefs.remove(legacyKey);
+  }
+
+  // One-time detection pass for users who had daily_reminder_enabled=true but
+  // never actually granted POST_NOTIFICATIONS (the old flow requested
+  // SCHEDULE_EXACT_ALARM instead, which isn't needed and blocked many users).
+  // We flag them here; HomeView will prompt them immediately on first render.
+  const notifPermissionMigrationKey = 'notif_permission_migration_v1';
+  if (!(prefs.getBool(notifPermissionMigrationKey) ?? false)) {
+    await prefs.setBool(notifPermissionMigrationKey, true);
+    final remindersEnabled =
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ?? false;
+    if (remindersEnabled) {
+      final notifStatus = await Permission.notification.status;
+      if (!notifStatus.isGranted) {
+        await prefs.setBool(
+            SharedPreferenceConstants.notifPermissionFixNeeded, true);
+      }
+    }
   }
 
   if (!isMockMode) {
