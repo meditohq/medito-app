@@ -202,6 +202,7 @@ class AudioSessionTracker {
         AnalyticsEventConstants.paramAudioFileDuration: session.durationMs,
         AnalyticsEventConstants.paramPercentCompleted: percent,
         AnalyticsEventConstants.paramElapsedSeconds: elapsedSeconds,
+        AnalyticsEventConstants.paramReason: reason,
       },
     );
     AppLogger.d('SESSION',
