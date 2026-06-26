@@ -60,15 +60,16 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     visible: "See how to help"
     timeout: 20000
 - tapOn: "See how to help"
-- waitForAnimationToEnd
-- takeScreenshot: paywall-webview
 
 # Dismiss the webview. The webpage shows an × close glyph (aria-label
-# "Close") in the top-right that fades in 5s after the page loads, so
-# allow extra time before the assertion.
+# "Close") in the top-right that fades in 5s after the page loads.
+# Do NOT use waitForAnimationToEnd here — the webview can keep loading
+# indefinitely on CI and block the step. Wait directly for Close instead,
+# with a generous timeout to cover slow CI network.
 - extendedWaitUntil:
     visible: "Close"
-    timeout: 20000
+    timeout: 90000
+- takeScreenshot: paywall-webview
 - tapOn: "Close"
 
 - extendedWaitUntil:
