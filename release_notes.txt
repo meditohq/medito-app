@@ -1,6 +1,11 @@
 Unreleased
 -
 
+2606.26.0
+- Fixed reminders not showing for some users
+- Fixed meditation sessions silently failing to sync to Apple Health after an iOS update resets permissions
+- New onboarding: beginners can try a short guided meditation as part of getting started
+
 2606.23.0
 - Bug fixes
 
