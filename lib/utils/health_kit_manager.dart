@@ -128,7 +128,10 @@ class HealthKitManager {
 
       var hasPermissions = await isHealthSyncPermitted();
       if (hasPermissions == null || !hasPermissions) {
-        hasPermissions = await maybeRequestAuthorization();
+        // Always re-request rather than maybeRequestAuthorization() — iOS
+        // updates can reset HealthKit permissions without clearing our
+        // "already asked" flag, causing silent sync failures.
+        hasPermissions = await requestAuthorization();
       }
       if (!hasPermissions) return false;
 
