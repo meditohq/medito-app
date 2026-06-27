@@ -2182,4 +2182,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get closeButton => 'Close';
+
+  @override
+  String get markAllComplete => 'Mark all complete';
+
+  @override
+  String get markAllIncomplete => 'Mark all incomplete';
+
+  @override
+  String get markTrackComplete => 'Mark complete';
+
+  @override
+  String get markTrackIncomplete => 'Mark incomplete';
 }

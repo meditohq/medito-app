@@ -1,3 +1,4 @@
+import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/repositories.dart';
@@ -44,31 +45,66 @@ class Pack extends _$Pack {
     );
   }
 
-  /// Optimistically toggles a track's completion in local stats, then asks
+  /// Sets a track's completion to an absolute value in local stats, then asks
   /// the stats provider to refresh from local. The refresh propagates here
   /// automatically via the [statsProvider] watch above.
-  Future<void> toggleIsComplete({
-    required String audioFileId,
+  ///
+  /// Returns `true` when the change was persisted, `false` on failure — the
+  /// caller (the row's optimistic toggle) uses this to revert its UI.
+  /// Taking an absolute `complete` rather than toggling keeps rapid repeated
+  /// taps deterministic: each call states the desired end state outright.
+  Future<bool> setIsComplete({
     required String trackId,
-    required bool isComplete,
+    required bool complete,
   }) async {
+    try {
+      final statsManager = ref.read(statsManagerProvider);
+      await statsManager.initialize();
+      if (!ref.mounted) return false;
+
+      if (complete) {
+        await statsManager.addTrackChecked(trackId);
+      } else {
+        await statsManager.removeTrackChecked(trackId);
+      }
+      if (!ref.mounted) return true;
+
+      try {
+        await ref.read(statsProvider.notifier).refreshFromLocal();
+      } catch (_) {
+        // Best-effort: even if stats refresh fails, the local change stuck.
+      }
+      // upNextProvider rebuilds reactively via packProvider <- statsProvider,
+      // so no explicit refresh is needed here.
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Marks every track in the pack complete (or clears them all) in one
+  /// stats write. Backs the "mark all complete/incomplete" button.
+  Future<void> markAll({required bool complete}) async {
+    final pack = state.value;
+    if (pack == null) return;
+
+    final trackIds = pack.items
+        .where((item) => item.type == TypeConstants.track)
+        .map((item) => item.id)
+        .toList();
+    if (trackIds.isEmpty) return;
+
     final statsManager = ref.read(statsManagerProvider);
     await statsManager.initialize();
     if (!ref.mounted) return;
 
-    if (isComplete) {
-      await statsManager.removeTrackChecked(trackId);
-    } else {
-      await statsManager.addTrackChecked(trackId);
-    }
+    await statsManager.setTracksChecked(trackIds, checked: complete);
     if (!ref.mounted) return;
 
     try {
       await ref.read(statsProvider.notifier).refreshFromLocal();
     } catch (_) {
-      // Best-effort: even if stats refresh fails, the local toggle stuck.
+      // Best-effort: the local toggle stuck even if the refresh failed.
     }
-    // upNextProvider rebuilds reactively via packProvider <- statsProvider,
-    // so no explicit refresh is needed here.
   }
 }

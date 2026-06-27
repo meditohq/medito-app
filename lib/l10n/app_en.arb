@@ -1466,5 +1466,21 @@
   "closeButton": "Close",
   "@closeButton": {
     "description": "Close button on the paywall load-error screen"
+  },
+  "markAllComplete": "Mark all complete",
+  "@markAllComplete": {
+    "description": "Button at the bottom of a pack track list that marks every track complete"
+  },
+  "markAllIncomplete": "Mark all incomplete",
+  "@markAllIncomplete": {
+    "description": "Button at the bottom of a pack track list that clears completion on every track"
+  },
+  "markTrackComplete": "Mark complete",
+  "@markTrackComplete": {
+    "description": "Accessibility label for the per-track toggle when the track is not complete"
+  },
+  "markTrackIncomplete": "Mark incomplete",
+  "@markTrackIncomplete": {
+    "description": "Accessibility label for the per-track toggle when the track is complete"
   }
 }

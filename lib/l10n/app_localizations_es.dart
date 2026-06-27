@@ -2212,4 +2212,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get closeButton => 'Cerrar';
+
+  @override
+  String get markAllComplete => 'Marcar todo como completado';
+
+  @override
+  String get markAllIncomplete => 'Marcar todo como no completado';
+
+  @override
+  String get markTrackComplete => 'Marcar como completado';
+
+  @override
+  String get markTrackIncomplete => 'Marcar como no completado';
 }

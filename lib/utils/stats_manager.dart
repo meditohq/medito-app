@@ -651,6 +651,53 @@ class StatsManager {
     }
   }
 
+  /// Bulk variant of [addTrackChecked]/[removeTrackChecked] used by the
+  /// pack screen's "mark all" action. Applies every change in a single save +
+  /// POST instead of one network round-trip per track.
+  Future<void> setTracksChecked(
+    List<String> ids, {
+    required bool checked,
+  }) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+    if (_allStats == null) {
+      await sync();
+    }
+
+    _dirty = true;
+
+    var updatedTracksChecked = _allStats?.tracksChecked ?? [];
+    var changed = false;
+    if (checked) {
+      for (final id in ids) {
+        if (!updatedTracksChecked.contains(id)) {
+          updatedTracksChecked.add(id);
+          changed = true;
+        }
+      }
+    } else {
+      for (final id in ids) {
+        if (updatedTracksChecked.remove(id)) {
+          changed = true;
+        }
+      }
+    }
+
+    if (changed) {
+      _allStats = _allStats?.copyWith(
+        tracksChecked: updatedTracksChecked,
+        updated: _getCurrentDate().millisecondsSinceEpoch,
+      );
+
+      await _saveLocalAllStatsToSharedPrefs();
+      await _statsService.postStats(_allStats!);
+      _lastSyncedAt = _getCurrentDate();
+      await _saveLastSyncedAt();
+      _dirty = false;
+    }
+  }
+
   Future<void> removeTrackChecked(String trackId) async {
     if (!_isInitialized) {
       await initialize();

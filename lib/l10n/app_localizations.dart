@@ -4045,6 +4045,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get closeButton;
+
+  /// Button at the bottom of a pack track list that marks every track complete
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all complete'**
+  String get markAllComplete;
+
+  /// Button at the bottom of a pack track list that clears completion on every track
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all incomplete'**
+  String get markAllIncomplete;
+
+  /// Accessibility label for the per-track toggle when the track is not complete
+  ///
+  /// In en, this message translates to:
+  /// **'Mark complete'**
+  String get markTrackComplete;
+
+  /// Accessibility label for the per-track toggle when the track is complete
+  ///
+  /// In en, this message translates to:
+  /// **'Mark incomplete'**
+  String get markTrackIncomplete;
 }
 
 class _AppLocalizationsDelegate

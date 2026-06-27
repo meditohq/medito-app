@@ -1098,5 +1098,9 @@
   "connectionErrorTitle": "No se pudo cargar el paywall",
   "connectionErrorMessage": "Por favor revisa tu conexión e inténtalo de nuevo.",
   "tryAgainButton": "Reintentar",
-  "closeButton": "Cerrar"
+  "closeButton": "Cerrar",
+  "markAllComplete": "Marcar todo como completado",
+  "markAllIncomplete": "Marcar todo como no completado",
+  "markTrackComplete": "Marcar como completado",
+  "markTrackIncomplete": "Marcar como no completado"
 }

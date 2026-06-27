@@ -1,12 +1,11 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/utils/utils.dart';
-import 'package:medito/views/pack/widgets/pack_dismissible_widget.dart';
 import 'package:medito/views/pack/widgets/pack_item_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/pack_view_bottom_bar.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
@@ -29,6 +28,7 @@ class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
   final ScrollController _scrollController = ScrollController();
   final _analytics = FirebaseAnalyticsService();
+  bool _markingAll = false;
 
   @override
   void initState() {
@@ -116,6 +116,7 @@ class _PackViewState extends ConsumerState<PackView>
             delegate: SliverChildListDelegate([
               DescriptionWidget(description: pack.description ?? ''),
               ..._listItems(pack, ref),
+              _markAllButton(pack),
               height32,
             ]),
           ),
@@ -155,17 +156,9 @@ class _PackViewState extends ConsumerState<PackView>
           splashColor: ColorConstants.charcoal,
           child: item.type == TypeConstants.pack
               ? PackItemWidget(item: item)
-              : PackDismissibleWidget(
-                  child: PackItemWidget(item: item),
-                  onDismissed: () {
-                    ref
-                        .read(packProvider(packId: widget.id).notifier)
-                        .toggleIsComplete(
-                          audioFileId: item.path.getIdFromPath(),
-                          trackId: item.id,
-                          isComplete: item.isCompleted ?? false,
-                        );
-                  },
+              : PackItemWidget(
+                  item: item,
+                  onSetComplete: (complete) => _setComplete(item, complete),
                 ),
         ),
         if (!isLast)
@@ -175,6 +168,64 @@ class _PackViewState extends ConsumerState<PackView>
             height: 1,
           ),
       ],
+    );
+  }
+
+  Future<bool> _setComplete(PackItemsModel item, bool complete) {
+    return ref
+        .read(packProvider(packId: widget.id).notifier)
+        .setIsComplete(trackId: item.id, complete: complete);
+  }
+
+  Future<void> _markAll(bool complete) async {
+    if (_markingAll) return;
+    setState(() => _markingAll = true);
+    try {
+      await ref
+          .read(packProvider(packId: widget.id).notifier)
+          .markAll(complete: complete);
+    } finally {
+      if (mounted) setState(() => _markingAll = false);
+    }
+  }
+
+  Widget _markAllButton(PackModel pack) {
+    final trackItems =
+        pack.items.where((item) => item.type == TypeConstants.track).toList();
+    if (trackItems.isEmpty) return const SizedBox.shrink();
+
+    final l10n = AppLocalizations.of(context)!;
+    final allComplete = trackItems.every((item) => item.isCompleted == true);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: SizedBox(
+        width: double.infinity,
+        child: TextButton.icon(
+          onPressed: _markingAll ? null : () => _markAll(!allComplete),
+          style: TextButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+            foregroundColor: context.brandPurple,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: ColorConstants.charcoal),
+            ),
+          ),
+          icon: _markingAll
+              ? SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: context.brandPurple,
+                  ),
+                )
+              : Icon(allComplete ? Icons.remove_done : Icons.done_all),
+          label: Text(
+            allComplete ? l10n.markAllIncomplete : l10n.markAllComplete,
+          ),
+        ),
+      ),
     );
   }
 
