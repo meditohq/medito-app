@@ -1,5 +1,5 @@
 Unreleased
--
+- Removed the unnecessary notification prompt from the player screen
 
 2606.26.0
 - Fixed reminders not showing for some users

@@ -1,3 +1,4 @@
 After a session, the app now asks you how you feel.
 Handles stats for sessions around midnight better.
 Improved error and offline handling.
+Removed an unnecessary prompt from the player.
