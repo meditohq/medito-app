@@ -19,7 +19,6 @@ import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/player_action_bar.dart';
 import 'package:medito/views/player/widgets/duration_indicator_widget.dart';
-import 'package:medito/views/player/widgets/notification_permission_banner.dart';
 import 'package:medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
 import 'package:medito/widgets/report_button_widget.dart';
 import 'package:flutter/material.dart';
@@ -31,9 +30,7 @@ import '../../widgets/errors/medito_error_widget.dart';
 import '../../utils/health_kit_manager.dart';
 
 class PlayerView extends ConsumerStatefulWidget {
-  const PlayerView({
-    super.key,
-  });
+  const PlayerView({super.key});
 
   @override
   ConsumerState<PlayerView> createState() => _PlayerViewState();
@@ -87,13 +84,17 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           final networkImage = NetworkImage(imageUrl);
           unawaited(
             precacheImage(networkImage, context).catchError((error) {
-              AppLogger.d('PlayerView',
-                  'Failed to precache image: \$imageUrl, error: \$error');
+              AppLogger.d(
+                'PlayerView',
+                'Failed to precache image: \$imageUrl, error: \$error',
+              );
             }),
           );
         } catch (e) {
-          AppLogger.d('PlayerView',
-              'Failed to create or precache image: \$imageUrl, error: \$e');
+          AppLogger.d(
+            'PlayerView',
+            'Failed to create or precache image: \$imageUrl, error: \$e',
+          );
         }
       }
     }
@@ -141,8 +142,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted =
-        ref.watch(audioStateProvider.select((s) => s.isCompleted));
+    final isCompleted = ref.watch(
+      audioStateProvider.select((s) => s.isCompleted),
+    );
     if (isCompleted) {
       final position = ref.read(audioStateProvider).position;
       if (position > 5000) {
@@ -159,8 +161,10 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     });
 
     // Listen for track changes and handle background sounds
-    ref.listen(playerProvider.select((p) => p?.hasBackgroundSound),
-        (previous, next) {
+    ref.listen(playerProvider.select((p) => p?.hasBackgroundSound), (
+      previous,
+      next,
+    ) {
       if (next == false) {
         // Stop background sound if track doesn't allow it
         ref
@@ -212,11 +216,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                         // during pop animations, blurring the previous screen
                         // for a frame.
                         ImageFiltered(
-                          imageFilter:
-                              ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: _FadingNetworkImage(
-                            imageUrl: imageUrl,
-                          ),
+                          imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: _FadingNetworkImage(imageUrl: imageUrl),
                         ),
                       Container(
                         color: ColorConstants.black.withOpacityValue(0.3),
@@ -231,8 +232,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                         Center(
                           child: SingleChildScrollView(
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 32.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32.0,
+                              ),
                               child: orientation == Orientation.portrait
                                   ? _PortraitPlayerLayout(
                                       track: track,
@@ -250,14 +252,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                         Positioned(
                           top: 16,
                           right: 16,
-                          child:
-                              ReportButtonWidget(request: currentlyPlayingTrack),
-                        ),
-                        const Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 64,
-                          child: NotificationPermissionBanner(),
+                          child: ReportButtonWidget(
+                            request: currentlyPlayingTrack,
+                          ),
                         ),
                       ],
                     ),
@@ -405,8 +402,9 @@ class _PortraitPlayerLayout extends ConsumerWidget {
           onSkip10SecondsForward: () =>
               ref.read(playerProvider.notifier).skip10SecondsForward(),
           onRepeat: () {
-            final newMode =
-                ref.read(repeatStateProvider.notifier).toggleRepeat();
+            final newMode = ref
+                .read(repeatStateProvider.notifier)
+                .toggleRepeat();
             ref.read(playerProvider.notifier).setRepeatMode(newMode);
           },
           isPortrait: true,
@@ -452,8 +450,9 @@ class _LandscapePlayerLayout extends ConsumerWidget {
           onSkip10SecondsForward: () =>
               ref.read(playerProvider.notifier).skip10SecondsForward(),
           onRepeat: () {
-            final newMode =
-                ref.read(repeatStateProvider.notifier).toggleRepeat();
+            final newMode = ref
+                .read(repeatStateProvider.notifier)
+                .toggleRepeat();
             ref.read(playerProvider.notifier).setRepeatMode(newMode);
           },
           isPortrait: false,
@@ -466,9 +465,7 @@ class _LandscapePlayerLayout extends ConsumerWidget {
 class _FadingNetworkImage extends StatefulWidget {
   final String imageUrl;
 
-  const _FadingNetworkImage({
-    required this.imageUrl,
-  });
+  const _FadingNetworkImage({required this.imageUrl});
 
   @override
   State<_FadingNetworkImage> createState() => _FadingNetworkImageState();
@@ -488,9 +485,7 @@ class _FadingNetworkImageState extends State<_FadingNetworkImage> {
       fit: StackFit.expand,
       children: [
         // Grey background while loading
-        Container(
-          color: backgroundColor,
-        ),
+        Container(color: backgroundColor),
 
         // Network image with fade-in effect
         AnimatedOpacity(

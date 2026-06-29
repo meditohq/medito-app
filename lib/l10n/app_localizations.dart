@@ -614,24 +614,6 @@ abstract class AppLocalizations {
   /// **'We need permission to send you reminders about tracking your meditation progress. This helps you maintain consistency in your practice.'**
   String get weNeedYourPermissionReminder;
 
-  /// No description provided for @playerNotificationBannerText.
-  ///
-  /// In en, this message translates to:
-  /// **'Show playback controls on your lock screen'**
-  String get playerNotificationBannerText;
-
-  /// No description provided for @playerNotificationBannerEnable.
-  ///
-  /// In en, this message translates to:
-  /// **'Enable'**
-  String get playerNotificationBannerEnable;
-
-  /// No description provided for @playerNotificationBannerDismiss.
-  ///
-  /// In en, this message translates to:
-  /// **'Dismiss'**
-  String get playerNotificationBannerDismiss;
-
   /// No description provided for @syncWithHealth.
   ///
   /// In en, this message translates to:

@@ -283,16 +283,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Necesitamos permiso para enviarte recordatorios sobre el seguimiento de tu progreso de meditación. Esto te ayuda a mantener la consistencia en tu práctica.';
 
   @override
-  String get playerNotificationBannerText =>
-      'Mostrar controles de reproducción en tu pantalla de bloqueo';
-
-  @override
-  String get playerNotificationBannerEnable => 'Activar';
-
-  @override
-  String get playerNotificationBannerDismiss => 'Descartar';
-
-  @override
   String get syncWithHealth => 'Sincronizar con Apple Health';
 
   @override

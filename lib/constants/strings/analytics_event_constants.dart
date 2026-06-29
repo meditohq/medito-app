@@ -300,8 +300,7 @@ class AnalyticsEventConstants {
 
   /// Event logged when the in-app paywall webview fails to load (main-frame
   /// error or load timeout). Includes `duration_ms` and `reason`.
-  static const String paywallWebviewLoadFailed =
-      'paywall_webview_load_failed';
+  static const String paywallWebviewLoadFailed = 'paywall_webview_load_failed';
 
   /// Parameter for elapsed load time in milliseconds (paywall webview events)
   static const String paramDurationMs = 'duration_ms';
@@ -445,35 +444,6 @@ class AnalyticsEventConstants {
 
   /// Source value for notifications enabled from the settings screen
   static const String sourceSettings = 'settings';
-
-  /// Source value for permission flows triggered from the player banner
-  static const String sourcePlayerBanner = 'player_banner';
-
-  /// Event logged once per appearance of the quiet POST_NOTIFICATIONS banner
-  /// at the top of the player screen.
-  static const String mediaPermissionBannerShown =
-      'media_permission_banner_shown';
-
-  /// Event logged when the user taps "Enable" on the player banner.
-  static const String mediaPermissionBannerEnableTapped =
-      'media_permission_banner_enable_tapped';
-
-  /// Event logged when the user dismisses the player banner with the ✕ button.
-  static const String mediaPermissionBannerDismissed =
-      'media_permission_banner_dismissed';
-
-  /// Event logged when the OS notification prompt returns granted.
-  /// Parameter: paramSource (e.g. 'player_banner')
-  static const String mediaPermissionGranted = 'media_permission_granted';
-
-  /// Event logged when the OS notification prompt returns denied.
-  /// Parameter: paramSource (e.g. 'player_banner')
-  static const String mediaPermissionDenied = 'media_permission_denied';
-
-  /// Event logged when we deep-link to system settings on permanent denial.
-  /// Parameter: paramSource (e.g. 'player_banner')
-  static const String mediaPermissionSettingsOpened =
-      'media_permission_settings_opened';
 
   // Shortcut events
   /// Event logged when the user taps a shortcut chip on the home screen.
