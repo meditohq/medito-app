@@ -10,9 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/utils/audio_completion_tracker.dart';
 import 'package:medito/services/home_widget_service.dart';
+import 'package:medito/utils/consistency_score_history.dart';
 import 'package:medito/utils/day_boundary.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:medito/utils/stats_updater.dart';
 
 // Key Rules for a Normal Streak (Without Streak Freezes)
 // 1.	Meditating every day increases the streak by 1. Each consecutive day of meditation adds to the streak.
@@ -567,8 +567,11 @@ class StatsManager {
       await _saveLastSyncedAt();
       _dirty = false;
     } catch (e) {
-      AppLogger.e('STATS_MANAGER',
-          'restoreFromBackup: post failed, will retry on next sync', e);
+      AppLogger.e(
+        'STATS_MANAGER',
+        'restoreFromBackup: post failed, will retry on next sync',
+        e,
+      );
     }
 
     HomeWidgetService.updateWidgetFromStats(_allStats!).catchError((e) {
@@ -587,8 +590,7 @@ class StatsManager {
 
     final currentList = _allStats!.audioCompleted ?? [];
     final updatedList = currentList
-        .where((a) =>
-            !(a.id == session.id && a.timestamp == session.timestamp))
+        .where((a) => !(a.id == session.id && a.timestamp == session.timestamp))
         .toList();
 
     if (updatedList.length == currentList.length) {
@@ -598,7 +600,10 @@ class StatsManager {
 
     _dirty = true;
 
-    final newTotalTracks = (_allStats!.totalTracksCompleted - 1).clamp(0, 1 << 31);
+    final newTotalTracks = (_allStats!.totalTracksCompleted - 1).clamp(
+      0,
+      1 << 31,
+    );
 
     _allStats = _allStats!.copyWith(
       audioCompleted: updatedList,
@@ -884,8 +889,9 @@ class StatsManager {
 
   void _loadDayBoundaryOffset(SharedPreferences prefs) {
     try {
-      final hours =
-          prefs.getInt(SharedPreferenceConstants.dayBoundaryOffsetHours);
+      final hours = prefs.getInt(
+        SharedPreferenceConstants.dayBoundaryOffsetHours,
+      );
       if (hours != null) _dayBoundaryOffset = Duration(hours: hours);
     } catch (e) {
       _dayBoundaryOffset = Duration.zero;

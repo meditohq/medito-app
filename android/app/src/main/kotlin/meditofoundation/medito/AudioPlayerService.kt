@@ -254,6 +254,49 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     private var playbackState: PlaybackState? = null
 
+    private fun createMeditationAudioAttributes(): AudioAttributes {
+        return AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+            .setUsage(C.USAGE_MEDIA)
+            .build()
+    }
+
+    private fun createBackgroundAudioAttributes(): AudioAttributes {
+        return AudioAttributes.Builder()
+            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+            .setUsage(C.USAGE_GAME)
+            .build()
+    }
+
+    private fun createLoadControl(): DefaultLoadControl {
+        return DefaultLoadControl.Builder()
+            .setBufferDurationsMs(
+                DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
+                DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+            )
+            .setPrioritizeTimeOverSizeThresholds(true)
+            .build()
+    }
+
+    private fun createPrimaryMediaSourceFactory(): DefaultMediaSourceFactory {
+        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
+            .setUserAgent("Medito-Android")
+            .setConnectTimeoutMs(15_000)
+            .setReadTimeoutMs(30_000)
+            .setAllowCrossProtocolRedirects(true)
+
+        return DefaultMediaSourceFactory(this)
+            .setDataSourceFactory(DefaultDataSource.Factory(this, httpDataSourceFactory))
+    }
+
+    private fun createMediaSession(): MediaSession {
+        return MediaSession.Builder(this, primaryPlayer)
+            .setId("MeditoAudioSession_${System.currentTimeMillis()}")
+            .build()
+    }
+
     override fun onCreate() {
         super.onCreate()
         println("🔊 [AudioPlayerService] onCreate called")
@@ -264,48 +307,15 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         // flutterEngine = FlutterEngineCache.getInstance().get(MainActivity.ENGINE_ID) ?: run { ... }
 
         try {
-            // Create audio attributes for primary player - meditation track
-            val primaryAudioAttributes = AudioAttributes.Builder()
-                .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)  // Speech for meditation
-                .setUsage(C.USAGE_MEDIA)
-                .build()
-
-            // Create audio attributes for background player - ambient sounds
-            val backgroundAudioAttributes = AudioAttributes.Builder()
-                .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)  // Music for background
-                .setUsage(C.USAGE_GAME)  // Different usage to avoid focus conflicts
-                .build()
-
-            // Create primary player with its own load control
-            val primaryLoadControl = DefaultLoadControl.Builder()
-                .setBufferDurationsMs(
-                    DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
-                    DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
-                    DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-                    DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
-                )
-                .setPrioritizeTimeOverSizeThresholds(true)
-                .build()
-
-            // Explicit HTTP stack with timeouts + UA so background-throttled streams
-            // get a clean error (routed to onPlayerError below) rather than a silent hang.
-            val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-                .setUserAgent("Medito-Android")
-                .setConnectTimeoutMs(15_000)
-                .setReadTimeoutMs(30_000)
-                .setAllowCrossProtocolRedirects(true)
-            val primaryMediaSourceFactory = DefaultMediaSourceFactory(this)
-                .setDataSourceFactory(DefaultDataSource.Factory(this, httpDataSourceFactory))
-
             primaryPlayer = ExoPlayer.Builder(this)
                 .setAudioAttributes(
-                    primaryAudioAttributes,
+                    createMeditationAudioAttributes(),
                     false
                 )  // Don't handle focus automatically
                 .setHandleAudioBecomingNoisy(true)
                 .setWakeMode(C.WAKE_MODE_NETWORK)
-                .setLoadControl(primaryLoadControl)
-                .setMediaSourceFactory(primaryMediaSourceFactory)
+                .setLoadControl(createLoadControl())
+                .setMediaSourceFactory(createPrimaryMediaSourceFactory())
                 .build().apply {
                     addListener(object : Player.Listener {
                         override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
@@ -345,33 +355,20 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 }
             Log.d(TAG, "🔊 Primary player initialized successfully")
 
-            // Create background player with its own load control
-            val backgroundLoadControl = DefaultLoadControl.Builder()
-                .setBufferDurationsMs(
-                    DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
-                    DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
-                    DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-                    DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
-                )
-                .setPrioritizeTimeOverSizeThresholds(true)
-                .build()
-
             backgroundMusicPlayer = ExoPlayer.Builder(this)
                 .setAudioAttributes(
-                    backgroundAudioAttributes,
+                    createBackgroundAudioAttributes(),
                     false
                 )  // Don't handle focus automatically
                 .setHandleAudioBecomingNoisy(false)  // Don't respond to headphones disconnection
                 .setWakeMode(C.WAKE_MODE_LOCAL)
-                .setLoadControl(backgroundLoadControl)
+                .setLoadControl(createLoadControl())
                 .build()
             Log.d(TAG, "🔊 Background music player initialized successfully")
 
             primaryPlayer.addListener(this)
 
-            primaryMediaSession = MediaSession.Builder(this, primaryPlayer) 
-                .setId("MeditoAudioSession_${System.currentTimeMillis()}")
-                .build()
+            primaryMediaSession = createMediaSession()
             Log.d(TAG, "🔊 Media session created successfully")
             
             // Mark service as fully initialized
@@ -489,18 +486,8 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             return
         }
 
-        if (playbackState == Player.STATE_READY && primaryPlayer.isPlaying) {
-            // Similar to former onPlay - play background sound if it's set
-            if (backgroundSoundUri != null) {
-                playBackgroundSound()
-            }
-        } else if (playbackState == Player.STATE_IDLE ||
-            (playbackState == Player.STATE_READY && !primaryPlayer.isPlaying)
-        ) {
-            // Similar to former onPause - pause background sound
-            if (backgroundMusicPlayer.isPlaying) {
-                backgroundMusicPlayer.pause()
-            }
+        if (playbackState == Player.STATE_READY || playbackState == Player.STATE_IDLE) {
+            syncBackgroundWithPrimaryState()
         }
 
         // Update notification to reflect current state
@@ -528,10 +515,8 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 }
                 stopPositionUpdates()
                 clearNotification()
-                primaryPlayer.stop()
-                backgroundMusicPlayer.stop()
-                primaryPlayer.clearMediaItems()
-                backgroundMusicPlayer.clearMediaItems()
+                resetPrimaryQueue()
+                resetBackgroundQueue()
                 stopSelf()
             }
         }
@@ -543,11 +528,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
     private fun clearNotification() {
         stopForeground(STOP_FOREGROUND_REMOVE)
-        NotificationUtil.setNotification(
-            this@AudioPlayerService,
-            NOTIFICATION_ID,
-            null
-        )
+        publishNotification(null)
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
@@ -666,6 +647,61 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         return true
     }
 
+    private fun buildPrimaryMediaItem(audioData: AudioData): MediaItem {
+        return MediaItem.Builder()
+            .setUri(audioData.url)
+            .setMediaId(audioData.track.id)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(audioData.track.title)
+                    .setArtist(audioData.track.artist)
+                    .setDescription(audioData.track.description)
+                    .setArtworkUri(audioData.track.imageUrl?.let { Uri.parse(it) })
+                    .setExtras(android.os.Bundle().apply {
+                        putString(KEY_ARTIST_URL, audioData.track.artistUrl)
+                        putString(KEY_FILE_ID, audioData.track.fileId)
+                    })
+                    .build()
+            )
+            .build()
+    }
+
+    private fun resetPrimaryQueue() {
+        primaryPlayer.stop()
+        primaryPlayer.clearMediaItems()
+    }
+
+    private fun resetBackgroundQueue() {
+        backgroundMusicPlayer.stop()
+        backgroundMusicPlayer.clearMediaItems()
+    }
+
+    private fun configurePrimaryPlaylist(mediaItem: MediaItem, mode: RepeatMode) {
+        when (mode) {
+            RepeatMode.NONE -> {
+                primaryPlayer.setMediaItem(mediaItem)
+                primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
+            }
+            RepeatMode.ONCE -> {
+                primaryPlayer.addMediaItem(mediaItem)
+                primaryPlayer.addMediaItem(mediaItem)
+                primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
+                Log.d(TAG, "🔊 Added media item twice for repeat once mode")
+            }
+            RepeatMode.INFINITE -> {
+                primaryPlayer.setMediaItem(mediaItem)
+                primaryPlayer.repeatMode = Player.REPEAT_MODE_ONE
+            }
+        }
+    }
+
+    private fun ensureMediaSession() {
+        if (primaryMediaSession != null) return
+
+        Log.w(TAG, "⚠️ MediaSession is null, recreating it")
+        primaryMediaSession = createMediaSession()
+    }
+
     override fun playAudio(audioData: AudioData): Boolean {
         Log.d(TAG, "🔊 playAudio called with URL: ${audioData.url}, trackId: ${audioData.track.id}")
         if (!isServiceFullyInitialized || !::primaryPlayer.isInitialized || !::backgroundMusicPlayer.isInitialized) {
@@ -681,44 +717,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
             // Stop any existing playback
             Log.d(TAG, "🔊 Stopping any existing primary playback")
-            primaryPlayer.stop()
-            primaryPlayer.clearMediaItems()
-
-            val primaryMediaItem = MediaItem.Builder()
-                .setUri(audioData.url)
-                .setMediaId(audioData.track.id)
-                .setMediaMetadata(
-                    MediaMetadata.Builder()
-                        .setTitle(audioData.track.title)
-                        .setArtist(audioData.track.artist)
-                        .setDescription(audioData.track.description)
-                        .setArtworkUri(audioData.track.imageUrl?.let { Uri.parse(it) })
-                        .setExtras(android.os.Bundle().apply {
-                            putString(KEY_ARTIST_URL, audioData.track.artistUrl)
-                            putString(KEY_FILE_ID, audioData.track.fileId)
-                        })
-                        .build()
-                )
-                .build()
+            resetPrimaryQueue()
 
             // Apply current repeat mode
-            when (currentRepeatMode) {
-                RepeatMode.NONE -> {
-                    primaryPlayer.setMediaItem(primaryMediaItem)
-                    primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
-                }
-                RepeatMode.ONCE -> {
-                    // Add item twice for repeat once behavior
-                    primaryPlayer.addMediaItem(primaryMediaItem)
-                    primaryPlayer.addMediaItem(primaryMediaItem)
-                    primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
-                    Log.d(TAG, "🔊 Added media item twice for repeat once mode")
-                }
-                RepeatMode.INFINITE -> {
-                    primaryPlayer.setMediaItem(primaryMediaItem)
-                    primaryPlayer.repeatMode = Player.REPEAT_MODE_ONE
-                }
-            }
+            configurePrimaryPlaylist(buildPrimaryMediaItem(audioData), currentRepeatMode)
 
             // Request audio focus before preparing (but don't stop background sound)
             val audioFocusGranted = requestAudioFocus()
@@ -730,12 +732,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             }
 
             // Ensure MediaSession is ready (important for Android 16+)
-            if (primaryMediaSession == null) {
-                Log.w(TAG, "⚠️ MediaSession is null, recreating it")
-                primaryMediaSession = MediaSession.Builder(this, primaryPlayer)
-                    .setId("MeditoAudioSession_${System.currentTimeMillis()}")
-                    .build()
-            }
+            ensureMediaSession()
             
             // Prepare the player
             primaryPlayer.prepare()
@@ -822,31 +819,28 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 }
 
                 withContext(Dispatchers.Main) {
-                    val newNotification = createNotificationBuilder(title, artist, artworkBitmap)
-                        .build()
-
-                    notification = newNotification
-                    NotificationUtil.setNotification(
-                        this@AudioPlayerService,
-                        NOTIFICATION_ID,
-                        notification
-                    )
+                    showNotification(createNotificationBuilder(title, artist, artworkBitmap).build())
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    val fallbackNotification = createNotificationBuilder(title, artist, null)
-                        .build()
-
-                    notification = fallbackNotification
-                    NotificationUtil.setNotification(
-                        this@AudioPlayerService,
-                        NOTIFICATION_ID,
-                        notification
-                    )
+                    showNotification(createNotificationBuilder(title, artist, null).build())
                 }
             }
         }
+    }
+
+    private fun showNotification(newNotification: Notification) {
+        notification = newNotification
+        publishNotification(notification)
+    }
+
+    private fun publishNotification(newNotification: Notification?) {
+        NotificationUtil.setNotification(
+            this@AudioPlayerService,
+            NOTIFICATION_ID,
+            newNotification
+        )
     }
 
     private fun createNotificationBuilder(
@@ -940,8 +934,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             Log.d(TAG, "🔊 Setting up background sound: $backgroundSoundUri")
 
             // First ensure we've stopped any existing playback
-            backgroundMusicPlayer.stop()
-            backgroundMusicPlayer.clearMediaItems()
+            resetBackgroundQueue()
             Log.d(TAG, "🔊 Cleared existing background playback")
 
             val backgroundMediaItem = MediaItem.Builder()
@@ -1030,28 +1023,26 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun skip10SecondsForward() {
-        val duration = primaryPlayer.duration
-        val currentPosition = primaryPlayer.currentPosition
-
-        if (duration == C.TIME_UNSET) {
-            return
-        }
-
-        if (currentPosition + 15000 > duration) {
-            primaryPlayer.seekTo(duration)
-            return
-        }
-        primaryPlayer.seekTo(currentPosition + 15000)
+        seekBy(SEEK_INTERVAL_MS)
     }
 
     override fun skip10SecondsBackward() {
-        val currentPosition = primaryPlayer.currentPosition
+        seekBy(-SEEK_INTERVAL_MS)
+    }
 
-        if (currentPosition < 15000) {
-            primaryPlayer.seekTo(0)
-            return
+    private fun seekBy(deltaMs: Long) {
+        if (!::primaryPlayer.isInitialized) return
+
+        val currentPosition = primaryPlayer.currentPosition
+        val targetPosition = if (deltaMs > 0) {
+            val duration = primaryPlayer.duration
+            if (duration == C.TIME_UNSET) return
+            minOf(currentPosition + deltaMs, duration)
+        } else {
+            maxOf(currentPosition + deltaMs, 0L)
         }
-        primaryPlayer.seekTo(currentPosition - 15000)
+
+        primaryPlayer.seekTo(targetPosition)
     }
 
     override fun setRepeatMode(mode: RepeatMode) {
@@ -1070,28 +1061,8 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             val wasPlaying = primaryPlayer.isPlaying
 
             // Rebuild playlist based on repeat mode
-            primaryPlayer.stop()
-            primaryPlayer.clearMediaItems()
-
-            when (mode) {
-                RepeatMode.NONE -> {
-                    primaryPlayer.setMediaItem(currentMediaItem)
-                    primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
-                    Log.d(TAG, "🔊 Repeat mode set to OFF")
-                }
-                RepeatMode.ONCE -> {
-                    // Add item twice for repeat once behavior
-                    primaryPlayer.addMediaItem(currentMediaItem)
-                    primaryPlayer.addMediaItem(currentMediaItem)
-                    primaryPlayer.repeatMode = Player.REPEAT_MODE_OFF
-                    Log.d(TAG, "🔊 Repeat mode set to ONCE (added item twice)")
-                }
-                RepeatMode.INFINITE -> {
-                    primaryPlayer.setMediaItem(currentMediaItem)
-                    primaryPlayer.repeatMode = Player.REPEAT_MODE_ONE
-                    Log.d(TAG, "🔊 Repeat mode set to INFINITE (repeat forever)")
-                }
-            }
+            resetPrimaryQueue()
+            configurePrimaryPlaylist(currentMediaItem, mode)
 
             // Restore playback state
             primaryPlayer.prepare()
@@ -1286,13 +1257,13 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     private fun syncBackgroundWithPrimaryState() {
-        if (!::backgroundMusicPlayer.isInitialized || backgroundSoundUri == null) {
+        if (!::primaryPlayer.isInitialized || !::backgroundMusicPlayer.isInitialized) {
             return
         }
 
         try {
             // If primary is playing, ensure background is playing too
-            if (primaryPlayer.isPlaying) {
+            if (primaryPlayer.isPlaying && backgroundSoundUri != null) {
                 if (!backgroundMusicPlayer.isPlaying) {
                     Log.d(TAG, "🔊 Syncing background sound - playing")
                     playBackgroundSound()
@@ -1342,5 +1313,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         const val ACTION_SKIP_BACKWARD = "meditofoundation.medito.ACTION_SKIP_BACKWARD"
         private const val KEY_ARTIST_URL = "artistUrl"
         private const val KEY_FILE_ID = "fileId"
+        private const val SEEK_INTERVAL_MS = 15_000L
     }
 }

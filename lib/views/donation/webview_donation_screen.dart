@@ -11,7 +11,8 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
-import 'package:medito/models/stripe/payment_method_model.dart' as payment_models;
+import 'package:medito/models/stripe/payment_method_model.dart'
+    as payment_models;
 import 'package:medito/providers/locale_provider.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
@@ -81,8 +82,10 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
             }
           },
           onWebResourceError: (error) {
-            AppLogger.e(_logTag,
-                'Web resource error: ${error.description} (main=${error.isForMainFrame})');
+            AppLogger.e(
+              _logTag,
+              'Web resource error: ${error.description} (main=${error.isForMainFrame})',
+            );
             // Only fail closed for the main frame; subresource errors (icons,
             // analytics beacons, etc.) shouldn't tear down the whole paywall.
             if (error.isForMainFrame == true && _isLoading) {
@@ -115,13 +118,13 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     try {
       // Anon sign-in may still be in flight at initState; refresh now that the
       // webview has loaded a page and a couple of seconds have passed.
-      _capturedUserId ??=
-          ref.read(authRepositorySyncProvider).currentUser?.id;
+      _capturedUserId ??= ref.read(authRepositorySyncProvider).currentUser?.id;
       FirebaseAnalyticsService().logEvent(
         name: AnalyticsEventConstants.paywallPresented,
         parameters: {
           AnalyticsEventConstants.paramPaywallId: _paywallId,
-          AnalyticsEventConstants.paramMeditoUserId: _capturedUserId ?? 'unknown',
+          AnalyticsEventConstants.paramMeditoUserId:
+              _capturedUserId ?? 'unknown',
           AnalyticsEventConstants.paramPaywallSource:
               widget.source ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: _variantId,
@@ -160,7 +163,10 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     });
     _loadTimer = Timer(_loadTimeout, () {
       if (!mounted || !_isLoading) return;
-      AppLogger.w(_logTag, 'Paywall load timed out after ${_loadTimeout.inSeconds}s');
+      AppLogger.w(
+        _logTag,
+        'Paywall load timed out after ${_loadTimeout.inSeconds}s',
+      );
       _logWebviewLoadFailed('timeout');
       _showLoadError();
     });
@@ -314,8 +320,10 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     _variantId = (data['experiment_variant'] as String?) ?? 'unknown';
     final id = (data['experiment_id'] as String?)?.trim();
     if (id != null && id.isNotEmpty) _experimentId = id;
-    AppLogger.d(_logTag,
-        'page_view variant=$_variantId experiment_id=$_experimentId');
+    AppLogger.d(
+      _logTag,
+      'page_view variant=$_variantId experiment_id=$_experimentId',
+    );
     FirebaseAnalyticsService().logEvent(
       name: AnalyticsEventConstants.donationPageViewed,
       parameters: {
@@ -486,7 +494,8 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   Widget _buildErrorOverlay() {
     final loc = AppLocalizations.of(context);
     final title = loc?.connectionErrorTitle ?? "Couldn't load paywall";
-    final body = loc?.connectionErrorMessage ??
+    final body =
+        loc?.connectionErrorMessage ??
         'Please check your connection and try again.';
     final retry = loc?.tryAgainButton ?? 'Try again';
     final close = loc?.closeButton ?? 'Close';
@@ -502,7 +511,10 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           Text(
             title,
             style: const TextStyle(
-                fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF1A1A17)),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1A1A17),
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -524,8 +536,10 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           const SizedBox(height: 8),
           TextButton(
             onPressed: _closePaywall,
-            child: Text(close,
-                style: const TextStyle(color: Color(0xFFA8A49B))),
+            child: Text(
+              close,
+              style: const TextStyle(color: Color(0xFFA8A49B)),
+            ),
           ),
         ],
       ),
@@ -534,17 +548,14 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
   void _notifyJsResult({required String status, String? message}) {
     if (!mounted) return;
-    final payload = jsonEncode({
-      'status': status,
-      'message': ?message,
-    });
+    final payload = jsonEncode({'status': status, 'message': ?message});
     // Don't await — the JS handler is fire-and-forget.
     unawaited(
       _controller
           .runJavaScript('window.meditoOnPaymentResult($payload);')
           .catchError((Object e) {
-        AppLogger.w(_logTag, 'runJavaScript failed: $e');
-      }),
+            AppLogger.w(_logTag, 'runJavaScript failed: $e');
+          }),
     );
   }
 
@@ -588,11 +599,37 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
                   ),
                 ),
                 if (_hasLoadError) _buildErrorOverlay(),
+                if (isSmokeTestMode) _buildSmokeTestCloseButton(),
                 // Close affordance lives in the webpage itself (delayed fade-in
                 // so users don't dismiss before they've read the page). The JS
                 // bridge posts a `close` message which _handleClose() pops.
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSmokeTestCloseButton() {
+    return Positioned(
+      top: 8,
+      right: 8,
+      child: SafeArea(
+        child: Semantics(
+          label: 'Donation webview opened',
+          button: true,
+          child: IconButton.filledTonal(
+            onPressed: _closePaywall,
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.92),
+              foregroundColor: const Color(0xFF1A1A17),
+              minimumSize: const Size(44, 44),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            icon: const Icon(Icons.close, size: 20),
           ),
         ),
       ),

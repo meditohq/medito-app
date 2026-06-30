@@ -22,6 +22,8 @@ import '../services/home_widget_service.dart';
 import '../services/analytics/firebase_analytics_service.dart';
 import '../constants/strings/analytics_event_constants.dart';
 
+export 'consistency_score_history.dart';
+
 // Export the key for backward compatibility if needed
 const String completedTracksKey = CompletedTracksStorage.completedTracksKey;
 
@@ -41,7 +43,9 @@ Future<void> _refreshStatsAndUpNext() async {
   final context = navigatorKey.currentContext;
   if (context == null) {
     AppLogger.w(
-        'STATS', 'No navigator context available, skipping provider refresh');
+      'STATS',
+      'No navigator context available, skipping provider refresh',
+    );
     return;
   }
 
@@ -55,7 +59,9 @@ Future<void> _refreshStatsAndUpNext() async {
     }
   } catch (_) {
     AppLogger.w(
-        'STATS', 'No ProviderScope available, skipping provider refresh');
+      'STATS',
+      'No ProviderScope available, skipping provider refresh',
+    );
   }
 }
 
@@ -66,7 +72,7 @@ Future<void> _refreshStatsAndUpNext() async {
 /// channels.
 @visibleForTesting
 Future<void> Function({required int endMs, required int durationMs})?
-    smartReminderReschedulerOverride;
+smartReminderReschedulerOverride;
 
 /// Reschedules the Smart Reminder series so its anchor and the streak /
 /// consistency values baked into each day's copy reflect the latest session
@@ -80,10 +86,10 @@ Future<void> _rescheduleSmartReminders({
     final prefs = await SharedPreferences.getInstance();
     final hasSaved =
         prefs.getInt(SharedPreferenceConstants.savedHours) != null &&
-            prefs.getInt(SharedPreferenceConstants.savedMinutes) != null;
+        prefs.getInt(SharedPreferenceConstants.savedMinutes) != null;
     final enabled =
         prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
-            hasSaved;
+        hasSaved;
 
     if (!enabled) {
       AppLogger.d('STATS', 'Smart Reminders disabled; skipping scheduling');
@@ -146,8 +152,10 @@ Future<bool> handleStats(
     var duration = payload[TypeConstants.durationIdKey];
 
     await statsManager.addAudioCompleted(newAudioCompleted, duration);
-    AppLogger.d('STATS',
-        'Stats updated successfully for track ${newAudioCompleted.id}');
+    AppLogger.d(
+      'STATS',
+      'Stats updated successfully for track ${newAudioCompleted.id}',
+    );
 
     // Log Firebase analytics event for audio session completion
     try {
@@ -184,7 +192,10 @@ Future<bool> handleStats(
     } catch (widgetError) {
       // Don't fail the whole operation if widget update fails
       AppLogger.e(
-          'STATS', 'Failed to get stats for widget update', widgetError);
+        'STATS',
+        'Failed to get stats for widget update',
+        widgetError,
+      );
     }
 
     await _rescheduleSmartReminders(
@@ -214,7 +225,9 @@ Future<int> processPendingCompletedTracks([SharedPreferences? prefs]) async {
   // If already processing, skip this call
   if (_isProcessingPendingTracks) {
     AppLogger.d(
-        'STATS', 'Already processing pending tracks, skipping this call');
+      'STATS',
+      'Already processing pending tracks, skipping this call',
+    );
     return 0;
   }
 
@@ -239,7 +252,8 @@ Future<int> processPendingCompletedTracks([SharedPreferences? prefs]) async {
     for (var trackJson in pendingTracksJson) {
       try {
         final payload = Map<String, dynamic>.from(
-            jsonDecode(trackJson) as Map<dynamic, dynamic>);
+          jsonDecode(trackJson) as Map<dynamic, dynamic>,
+        );
 
         final success = await handleStats(payload);
         if (success) {
@@ -268,7 +282,9 @@ Future<int> processPendingCompletedTracks([SharedPreferences? prefs]) async {
 /// Store a track completion payload for later processing.
 /// This is typically called when immediate stats processing fails.
 Future<void> storeTrackCompletion(
-    SharedPreferences prefs, Map<String, dynamic> payload) async {
+  SharedPreferences prefs,
+  Map<String, dynamic> payload,
+) async {
   final storage = CompletedTracksStorage(prefs);
   await storage.addCompletedTrack(payload);
 }
@@ -276,12 +292,14 @@ Future<void> storeTrackCompletion(
 Future<void> _syncHealthKit(Map<String, dynamic> payload) async {
   var healthKitManager = HealthKitManager();
 
-  if (!await healthKitManager
-      .isSessionSynced(payload[TypeConstants.timestampIdKey])) {
+  if (!await healthKitManager.isSessionSynced(
+    payload[TypeConstants.timestampIdKey],
+  )) {
     var success = await _updateHealthKit(payload);
     if (success) {
-      await healthKitManager
-          .markSessionAsSynced(payload[TypeConstants.timestampIdKey]);
+      await healthKitManager.markSessionAsSynced(
+        payload[TypeConstants.timestampIdKey],
+      );
     }
   }
 }
@@ -290,68 +308,11 @@ Future<bool> _updateHealthKit(Map<String, dynamic> payload) async {
   final end = DateTime.fromMillisecondsSinceEpoch(
     payload[TypeConstants.timestampIdKey],
   );
-  final start = end
-      .subtract(Duration(milliseconds: payload[TypeConstants.durationIdKey]));
+  final start = end.subtract(
+    Duration(milliseconds: payload[TypeConstants.durationIdKey]),
+  );
 
   return await HealthKitManager().writeMindfulnessData(start, end);
-}
-
-/// Saves a consistency score entry to historical data
-/// Each entry contains the score and datetime timestamp
-Future<void> saveConsistencyScoreHistory(
-  double consistencyScore,
-) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final historyJson = prefs.getString(
-      SharedPreferenceConstants.consistencyScoreHistory,
-    );
-
-    List<Map<String, dynamic>> historyList = [];
-    if (historyJson != null && historyJson.isNotEmpty) {
-      final decoded = jsonDecode(historyJson) as List<dynamic>;
-      historyList =
-          decoded.map((item) => item as Map<String, dynamic>).toList();
-    }
-
-    final entry = {
-      'score': consistencyScore,
-      'datetime': DateTime.now().millisecondsSinceEpoch,
-    };
-
-    historyList.add(entry);
-
-    await prefs.setString(
-      SharedPreferenceConstants.consistencyScoreHistory,
-      jsonEncode(historyList),
-    );
-
-    AppLogger.d('STATS',
-        'Saved consistency score history entry: $consistencyScore at ${DateTime.now()}');
-  } catch (e) {
-    AppLogger.e('STATS', 'Failed to save consistency score history', e);
-  }
-}
-
-/// Retrieves historical consistency score data
-/// Returns a list of maps with 'score' and 'datetime' keys
-Future<List<Map<String, dynamic>>> getConsistencyScoreHistory() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final historyJson = prefs.getString(
-      SharedPreferenceConstants.consistencyScoreHistory,
-    );
-
-    if (historyJson == null || historyJson.isEmpty) {
-      return [];
-    }
-
-    final decoded = jsonDecode(historyJson) as List<dynamic>;
-    return decoded.map((item) => item as Map<String, dynamic>).toList();
-  } catch (e) {
-    AppLogger.e('STATS', 'Failed to get consistency score history', e);
-    return [];
-  }
 }
 
 /// Checks if a session was manually added (not from a track)
@@ -421,7 +382,10 @@ Future<bool> deleteSession({
       });
     } catch (widgetError) {
       AppLogger.e(
-          'STATS', 'Failed to get stats for widget update', widgetError);
+        'STATS',
+        'Failed to get stats for widget update',
+        widgetError,
+      );
     }
 
     return true;
@@ -463,8 +427,10 @@ Future<bool> addManualSession({
 
     // Add the manual session (this will update streaks, consistency score, etc.)
     await statsManager.addAudioCompleted(manualSession, durationMs);
-    AppLogger.d('STATS',
-        'Manual session added successfully for ${dateTime.toString()}');
+    AppLogger.d(
+      'STATS',
+      'Manual session added successfully for ${dateTime.toString()}',
+    );
 
     // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
@@ -481,7 +447,10 @@ Future<bool> addManualSession({
     } catch (widgetError) {
       // Don't fail the whole operation if widget update fails
       AppLogger.e(
-          'STATS', 'Failed to get stats for widget update', widgetError);
+        'STATS',
+        'Failed to get stats for widget update',
+        widgetError,
+      );
     }
 
     return true;
@@ -528,8 +497,7 @@ Future<int> addManualSessions({
         id: manualId,
         timestamp: dateTime.millisecondsSinceEpoch,
       );
-      await statsManager.addAudioCompleted(entry, durationMs,
-          skipPost: true);
+      await statsManager.addAudioCompleted(entry, durationMs, skipPost: true);
       added++;
       if (entry.timestamp > latestTimestamp) {
         latestTimestamp = entry.timestamp;
@@ -554,11 +522,16 @@ Future<int> addManualSessions({
       });
     } catch (widgetError) {
       AppLogger.e(
-          'STATS', 'Failed to get stats for widget update', widgetError);
+        'STATS',
+        'Failed to get stats for widget update',
+        widgetError,
+      );
     }
 
     await _rescheduleSmartReminders(
-        endMs: latestTimestamp, durationMs: durationMs);
+      endMs: latestTimestamp,
+      durationMs: durationMs,
+    );
   }
 
   return added;

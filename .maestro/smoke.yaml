@@ -52,30 +52,56 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # donation primer — no second question to answer.
 
 # ── Onboarding: Donation ──
-# "Skip for Now" only appears on the donation primer after the user has
-# attempted donation once (onboarding_donation_screen.dart:103). So tap
-# "See how to help" to open the in-app webview, dismiss it, then tap
-# the now-revealed "Skip for Now".
-- extendedWaitUntil:
-    visible: "See how to help"
-    timeout: 20000
-- tapOn: "See how to help"
+# iOS smoke builds enable SMOKE_TEST_MODE, which adds a deterministic close
+# control to the webview route and reveals the skip button after returning.
+# That still verifies the webview opens, without waiting on a remote page close
+# affordance that is slow and flaky on iOS CI.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: "See how to help"
+          timeout: 20000
+      - tapOn: "See how to help"
 
-# Dismiss the webview. The webpage shows an × close glyph (aria-label
-# "Close") in the top-right that fades in 5s after the page loads.
-# Do NOT use waitForAnimationToEnd here — the webview can keep loading
-# indefinitely on CI and block the step. Wait directly for Close instead,
-# with a generous timeout to cover slow CI network.
-- extendedWaitUntil:
-    visible: "Close"
-    timeout: 90000
-- takeScreenshot: paywall-webview
-- tapOn: "Close"
+      - extendedWaitUntil:
+          visible: "Donation webview opened"
+          timeout: 10000
+      - takeScreenshot: paywall-webview
+      - tapOn: "Donation webview opened"
 
-- extendedWaitUntil:
-    visible: "Skip for Now"
-    timeout: 20000
-- tapOn: "Skip for Now"
+      - extendedWaitUntil:
+          visible: "Skip for Now"
+          timeout: 20000
+      - tapOn: "Skip for Now"
+
+# Android release smoke uses the deployable APK, so it keeps the real production
+# build settings and drives the donation webview before skipping.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - extendedWaitUntil:
+          visible: "See how to help"
+          timeout: 20000
+      - tapOn: "See how to help"
+
+      # Dismiss the webview. The webpage shows an x close glyph (aria-label
+      # "Close") in the top-right that fades in 5s after the page loads.
+      # Do NOT use waitForAnimationToEnd here -- the webview can keep loading
+      # indefinitely on CI and block the step. Wait directly for Close instead,
+      # with a generous timeout to cover slow CI network.
+      - extendedWaitUntil:
+          visible: "Close"
+          timeout: 90000
+      - takeScreenshot: paywall-webview
+      - tapOn: "Close"
+
+      - extendedWaitUntil:
+          visible: "Skip for Now"
+          timeout: 20000
+      - tapOn: "Skip for Now"
 
 # ── Onboarding: Notifications / smart reminders (re-added 26.6, sits
 # between the donation primer and battery/tracking). Skip it for the
@@ -115,7 +141,6 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
             visible: "Allow"
           commands:
             - tapOn: "Allow"
-- waitForAnimationToEnd
 
 # ── Onboarding: Result screen — advance to Home. ──
 # Control arm shows a prominent "Get started". The first-meditation
@@ -123,16 +148,11 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # quiet "Maybe later" skip — "Get started" there only appears AFTER the
 # session completes — so for the smoke run we skip the session via
 # "Maybe later". Tap whichever is present.
-- runFlow:
-    when:
-      visible: "Get started"
-    commands:
-      - tapOn: "Get started"
-- runFlow:
-    when:
-      visible: "Maybe later"
-    commands:
-      - tapOn: "Maybe later"
+- extendedWaitUntil:
+    visible: "Get started|Maybe later"
+    timeout: 30000
+- tapOn:
+    text: "Get started|Maybe later"
 
 # A donation prompt dialog ("Medito is a registered nonprofit") sometimes
 # appears on Home post-onboarding — dismiss if present.

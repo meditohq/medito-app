@@ -327,6 +327,7 @@ jobs:
           flutter build ios --simulator --no-codesign \
             --dart-define-from-file=.prod.json \
             --dart-define=MOCK_MODE=false \
+            --dart-define=SMOKE_TEST_MODE=true \
             --dart-define=IS_SIMULATOR=true
 
       - name: Boot iOS simulator

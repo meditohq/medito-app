@@ -22,10 +22,7 @@ import 'manual_session_dialog.dart';
 class MeditationCalendarWidget extends ConsumerStatefulWidget {
   final LocalAllStats stats;
 
-  const MeditationCalendarWidget({
-    super.key,
-    required this.stats,
-  });
+  const MeditationCalendarWidget({super.key, required this.stats});
 
   @override
   ConsumerState<MeditationCalendarWidget> createState() =>
@@ -116,7 +113,8 @@ class _MeditationCalendarWidgetState
     for (final timestamp in stats.freezeUsageDates) {
       final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
       final dayStart = DateTime(date.year, date.month, date.day);
-      if (!dayStart.isAfter(todayStart) && !meditationDates.contains(dayStart)) {
+      if (!dayStart.isAfter(todayStart) &&
+          !meditationDates.contains(dayStart)) {
         dates.add(dayStart);
       }
     }
@@ -127,7 +125,8 @@ class _MeditationCalendarWidgetState
         if (!isFreezeSession(audio)) continue;
         final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
         final dayStart = DateTime(date.year, date.month, date.day);
-        if (!dayStart.isAfter(todayStart) && !meditationDates.contains(dayStart)) {
+        if (!dayStart.isAfter(todayStart) &&
+            !meditationDates.contains(dayStart)) {
           dates.add(dayStart);
         }
       }
@@ -150,13 +149,16 @@ class _MeditationCalendarWidgetState
 
     if (widget.stats.audioCompleted != null &&
         widget.stats.audioCompleted!.isNotEmpty) {
-      sessions.addAll(widget.stats.audioCompleted!.where((audio) {
-        if (isFreezeSession(audio)) return false;
-        final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-        return date
-                .isAfter(dayStart.subtract(const Duration(milliseconds: 1))) &&
-            date.isBefore(dayEnd);
-      }));
+      sessions.addAll(
+        widget.stats.audioCompleted!.where((audio) {
+          if (isFreezeSession(audio)) return false;
+          final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
+          return date.isAfter(
+                dayStart.subtract(const Duration(milliseconds: 1)),
+              ) &&
+              date.isBefore(dayEnd);
+        }),
+      );
     }
 
     sessions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
@@ -213,9 +215,7 @@ class _MeditationCalendarWidgetState
     if (success) {
       await ref.read(statsProvider.notifier).refreshFromLocal();
     } else {
-      messenger.showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(errorMessage)));
     }
   }
 
@@ -346,8 +346,11 @@ class _MeditationCalendarWidgetState
       _rangeEnd = null;
       if (added > 0) {
         _selectedDay = dates.last;
-        _selectedDayForSessions =
-            DateTime(dates.last.year, dates.last.month, dates.last.day);
+        _selectedDayForSessions = DateTime(
+          dates.last.year,
+          dates.last.month,
+          dates.last.day,
+        );
         _focusedDay = dates.last;
       }
     });
@@ -394,8 +397,11 @@ class _MeditationCalendarWidgetState
       case ManualSessionSingleResult(:final dateTime, :final duration):
         setState(() {
           _isAddingSession = true;
-          final dayStart =
-              DateTime(dateTime.year, dateTime.month, dateTime.day);
+          final dayStart = DateTime(
+            dateTime.year,
+            dateTime.month,
+            dateTime.day,
+          );
           _selectedDayForSessions = dayStart;
           _selectedDay = dayStart;
           _focusedDay = dayStart;
@@ -417,17 +423,18 @@ class _MeditationCalendarWidgetState
           });
         }
       case ManualSessionBulkResult(
-          :final rangeStart,
-          :final rangeEnd,
-          :final duration,
-        ):
+        :final rangeStart,
+        :final rangeEnd,
+        :final duration,
+      ):
         final dates = enumerateDays(rangeStart, rangeEnd);
         final existing = <DateTime>{
           ..._getMeditationDates(widget.stats),
           ..._getFreezeDates(widget.stats),
         };
-        final newSessionDays =
-            dates.where((d) => !existing.contains(d)).toList();
+        final newSessionDays = dates
+            .where((d) => !existing.contains(d))
+            .toList();
 
         setState(() {
           _isAddingSession = true;
@@ -448,8 +455,7 @@ class _MeditationCalendarWidgetState
           _isAddingSession = false;
           final last = dates.isNotEmpty ? dates.last : rangeEnd;
           _selectedDay = last;
-          _selectedDayForSessions =
-              DateTime(last.year, last.month, last.day);
+          _selectedDayForSessions = DateTime(last.year, last.month, last.day);
           _focusedDay = last;
         });
         _animationController.forward();
@@ -461,7 +467,6 @@ class _MeditationCalendarWidgetState
     final meditationDates = _getMeditationDates(widget.stats);
     final freezeDates = _getFreezeDates(widget.stats);
     final sessions = _getSessionsForDay(_selectedDayForSessions);
-    final isSelectedDayFreezeDay = _isFreezeDay(_selectedDayForSessions);
     final rangeDays = _datesInRange();
     final rangeNewSessions = _hasCompleteRange
         ? rangeDays.where((d) {
@@ -480,531 +485,547 @@ class _MeditationCalendarWidgetState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withOpacityValue(0.08),
-              width: 1,
-            ),
+        _buildCalendarCard(
+          context,
+          meditationDates: meditationDates,
+          freezeDates: freezeDates,
+        ),
+        _buildDayDetailsCard(
+          context,
+          sessions: sessions,
+          rangeDays: rangeDays,
+          rangeNewSessions: rangeNewSessions,
+          rangeProjectedStreak: rangeProjectedStreak,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCalendarCard(
+    BuildContext context, {
+    required Set<DateTime> meditationDates,
+    required Set<DateTime> freezeDates,
+  }) {
+    return Container(
+      decoration: _cardDecoration(context),
+      padding: const EdgeInsets.all(16),
+      child: TableCalendar<dynamic>(
+        firstDay: DateTime.utc(2020, 1, 1),
+        lastDay: DateTime.now(),
+        focusedDay: _focusedDay,
+        selectedDayPredicate: (day) {
+          // While a range is active, only range endpoints get selected styling.
+          if (_rangeStart != null) return _isRangeEndpoint(day);
+          return isSameDay(_selectedDay, day);
+        },
+        calendarFormat: CalendarFormat.month,
+        startingDayOfWeek: StartingDayOfWeek.monday,
+        headerStyle: _calendarHeaderStyle(context),
+        calendarStyle: _calendarStyle(context),
+        calendarBuilders: CalendarBuilders(
+          defaultBuilder: (context, date, events) => _buildDefaultDayCell(
+            context,
+            date,
+            meditationDates: meditationDates,
+            freezeDates: freezeDates,
           ),
-          padding: const EdgeInsets.all(16),
-          child: TableCalendar<dynamic>(
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.now(),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) {
-              // While a range (partial or complete) is active, only the
-              // range endpoints get the "selected" treatment — the previous
-              // single-tap selection should appear deselected.
-              if (_rangeStart != null) return _isRangeEndpoint(day);
-              return isSameDay(_selectedDay, day);
-            },
-            calendarFormat: CalendarFormat.month,
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            headerStyle: HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-              titleTextStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: dmSans,
-                      ) ??
-                  TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: dmSans,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              leftChevronIcon: MeditoIcon(
-                assetName: MeditoIcons.arrowLeft,
-                size: 20,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              rightChevronIcon: MeditoIcon(
-                assetName: MeditoIcons.arrowRight,
-                size: 20,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            calendarStyle: CalendarStyle(
-              outsideDaysVisible: false,
-              weekendTextStyle:
-                  Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: dmSans,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ) ??
-                      TextStyle(
-                        fontFamily: dmSans,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-              defaultTextStyle:
-                  Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: dmSans,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ) ??
-                      TextStyle(
-                        fontFamily: dmSans,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-              selectedDecoration: BoxDecoration(
-                color: context.brandPurple,
-                shape: BoxShape.circle,
-              ),
-              todayTextStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: dmSans,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ) ??
-                  TextStyle(
-                    fontFamily: dmSans,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
-              todayDecoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: context.brandPurple,
-                  width: 2,
-                ),
-              ),
-            ),
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, date, events) {
-                final dayStart = DateTime(date.year, date.month, date.day);
-                final hasMeditation = meditationDates.contains(dayStart);
-                final hasFreeze = freezeDates.contains(dayStart);
-                final inRange = _isInRange(date);
+          todayBuilder: (context, date, events) => _buildTodayDayCell(
+            context,
+            date,
+            meditationDates: meditationDates,
+            freezeDates: freezeDates,
+          ),
+          selectedBuilder: (context, date, events) =>
+              _buildSelectedDayCell(context, date, freezeDates: freezeDates),
+        ),
+        daysOfWeekStyle: _daysOfWeekStyle(context),
+        onDaySelected: _onDaySelected,
+        onDayLongPressed: (day, focusedDay) => _handleLongPress(day),
+        onPageChanged: (focusedDay) {
+          setState(() {
+            _focusedDay = focusedDay;
+          });
+        },
+      ),
+    );
+  }
 
-                if (inRange && !hasMeditation && !hasFreeze) {
-                  // Bumped from 0.08 → 0.20 so the in-range band is clearly
-                  // visible in both light and dark themes (0.08 disappeared
-                  // against the dark surface).
-                  return Container(
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: context.brandPurple.withOpacityValue(0.20),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${date.day}',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontFamily: dmSans,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                    ),
-                  );
-                }
+  HeaderStyle _calendarHeaderStyle(BuildContext context) {
+    final theme = Theme.of(context);
+    return HeaderStyle(
+      formatButtonVisible: false,
+      titleCentered: true,
+      titleTextStyle:
+          theme.textTheme.titleMedium?.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontFamily: dmSans,
+          ) ??
+          TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontFamily: dmSans,
+            color: theme.colorScheme.onSurface,
+          ),
+      leftChevronIcon: MeditoIcon(
+        assetName: MeditoIcons.arrowLeft,
+        size: 20,
+        color: theme.colorScheme.onSurface,
+      ),
+      rightChevronIcon: MeditoIcon(
+        assetName: MeditoIcons.arrowRight,
+        size: 20,
+        color: theme.colorScheme.onSurface,
+      ),
+    );
+  }
 
-                if (hasMeditation) {
-                  return Container(
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      // In-range meditation days get a deeper tint so the
-                      // range band stays continuous across them.
-                      color: context.brandPurple.withOpacityValue(
-                        inRange ? 0.32 : 0.15,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${date.day}',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontFamily: dmSans,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ),
-                  );
-                }
+  CalendarStyle _calendarStyle(BuildContext context) {
+    return CalendarStyle(
+      outsideDaysVisible: false,
+      weekendTextStyle: _dayTextStyle(context),
+      defaultTextStyle: _dayTextStyle(context),
+      selectedDecoration: BoxDecoration(
+        color: context.brandPurple,
+        shape: BoxShape.circle,
+      ),
+      todayTextStyle: _dayTextStyle(context, fontWeight: FontWeight.w600),
+      todayDecoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        shape: BoxShape.circle,
+        border: Border.all(color: context.brandPurple, width: 2),
+      ),
+    );
+  }
 
-                if (hasFreeze) {
-                  return Container(
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: ColorConstants.lightBlue.withOpacityValue(
-                        inRange ? 0.32 : 0.15,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${date.day}',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontFamily: dmSans,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ),
-                  );
-                }
+  DaysOfWeekStyle _daysOfWeekStyle(BuildContext context) {
+    final style = (Theme.of(context).textTheme.bodySmall ?? const TextStyle())
+        .copyWith(
+          fontFamily: dmSans,
+          color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
+          fontSize: 12,
+        );
 
-                return null;
-              },
-              todayBuilder: (context, date, events) {
-                final dayStart = DateTime(date.year, date.month, date.day);
-                final hasMeditation = meditationDates.contains(dayStart);
-                final hasFreeze = freezeDates.contains(dayStart);
+    return DaysOfWeekStyle(weekdayStyle: style, weekendStyle: style);
+  }
 
-                Color backgroundColor;
-                if (hasMeditation) {
-                  backgroundColor = context.brandPurple.withOpacityValue(0.25);
-                } else if (hasFreeze) {
-                  backgroundColor = ColorConstants.lightBlue.withOpacityValue(0.25);
-                } else {
-                  backgroundColor = Theme.of(context).colorScheme.surface;
-                }
+  Widget? _buildDefaultDayCell(
+    BuildContext context,
+    DateTime date, {
+    required Set<DateTime> meditationDates,
+    required Set<DateTime> freezeDates,
+  }) {
+    final dayStart = startOfDay(date);
+    final hasMeditation = meditationDates.contains(dayStart);
+    final hasFreeze = freezeDates.contains(dayStart);
+    final inRange = _isInRange(date);
 
-                return Container(
-                  margin: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: backgroundColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: context.brandPurple,
-                      width: 2,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${date.day}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: dmSans,
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ),
-                );
-              },
-              selectedBuilder: (context, date, events) {
-                final dayStart = DateTime(date.year, date.month, date.day);
-                final hasFreeze = freezeDates.contains(dayStart);
-                final isEndpoint = _isRangeEndpoint(date);
-                final fillColor =
-                    hasFreeze ? ColorConstants.lightBlue : context.brandPurple;
-                final dayText = Text(
-                  '${date.day}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: dmSans,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                );
+    if (inRange && !hasMeditation && !hasFreeze) {
+      return _buildDayCircle(
+        context,
+        date,
+        color: context.brandPurple.withOpacityValue(0.20),
+      );
+    }
 
-                if (isEndpoint) {
-                  // Range endpoints get a haloed solid circle so they read as
-                  // clearly heavier than today, meditation days, or a regular
-                  // tap-selected day. The translucent outer ring works in both
-                  // light and dark modes because it's the brand colour over
-                  // the surface, not a hardcoded shade.
-                  return Container(
-                    margin: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: fillColor.withOpacityValue(0.30),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Container(
-                      margin: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        color: fillColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(child: dayText),
-                    ),
-                  );
-                }
+    if (hasMeditation) {
+      return _buildDayCircle(
+        context,
+        date,
+        color: context.brandPurple.withOpacityValue(inRange ? 0.32 : 0.15),
+        fontWeight: FontWeight.w600,
+      );
+    }
 
-                return Container(
-                  margin: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: fillColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(child: dayText),
-                );
-              },
-            ),
-            daysOfWeekStyle: DaysOfWeekStyle(
-              weekdayStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontFamily: dmSans,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacityValue(0.6),
-                        fontSize: 12,
-                      ) ??
-                  TextStyle(
-                    fontFamily: dmSans,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacityValue(0.6),
-                    fontSize: 12,
-                  ),
-              weekendStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontFamily: dmSans,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacityValue(0.6),
-                        fontSize: 12,
-                      ) ??
-                  TextStyle(
-                    fontFamily: dmSans,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacityValue(0.6),
-                    fontSize: 12,
-                  ),
-            ),
-            onDaySelected: (selectedDay, focusedDay) {
-              // A regular tap dismisses any in-progress range and behaves
-              // like single-day selection.
-              if (_rangeStart != null) {
-                _clearRange();
-              }
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-              _toggleDaySessions(selectedDay);
-            },
-            onDayLongPressed: (day, focusedDay) {
-              _handleLongPress(day);
-            },
-            onPageChanged: (focusedDay) {
-              setState(() {
-                _focusedDay = focusedDay;
-              });
-            },
+    if (hasFreeze) {
+      return _buildDayCircle(
+        context,
+        date,
+        color: ColorConstants.lightBlue.withOpacityValue(inRange ? 0.32 : 0.15),
+        fontWeight: FontWeight.w600,
+      );
+    }
+
+    return null;
+  }
+
+  Widget _buildTodayDayCell(
+    BuildContext context,
+    DateTime date, {
+    required Set<DateTime> meditationDates,
+    required Set<DateTime> freezeDates,
+  }) {
+    final dayStart = startOfDay(date);
+    final hasMeditation = meditationDates.contains(dayStart);
+    final hasFreeze = freezeDates.contains(dayStart);
+    final backgroundColor = hasMeditation
+        ? context.brandPurple.withOpacityValue(0.25)
+        : hasFreeze
+        ? ColorConstants.lightBlue.withOpacityValue(0.25)
+        : Theme.of(context).colorScheme.surface;
+
+    return _buildDayCircle(
+      context,
+      date,
+      color: backgroundColor,
+      fontWeight: FontWeight.w600,
+      border: Border.all(color: context.brandPurple, width: 2),
+    );
+  }
+
+  Widget _buildSelectedDayCell(
+    BuildContext context,
+    DateTime date, {
+    required Set<DateTime> freezeDates,
+  }) {
+    final dayStart = startOfDay(date);
+    final fillColor = freezeDates.contains(dayStart)
+        ? ColorConstants.lightBlue
+        : context.brandPurple;
+
+    if (_isRangeEndpoint(date)) {
+      return Container(
+        margin: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          color: fillColor.withOpacityValue(0.30),
+          shape: BoxShape.circle,
+        ),
+        child: _buildDayCircle(
+          context,
+          date,
+          color: fillColor,
+          margin: const EdgeInsets.all(3),
+          textColor: Theme.of(context).colorScheme.onPrimary,
+          fontWeight: FontWeight.w700,
+        ),
+      );
+    }
+
+    return _buildDayCircle(
+      context,
+      date,
+      color: fillColor,
+      textColor: Theme.of(context).colorScheme.onPrimary,
+      fontWeight: FontWeight.w700,
+    );
+  }
+
+  Widget _buildDayCircle(
+    BuildContext context,
+    DateTime date, {
+    required Color color,
+    EdgeInsets margin = const EdgeInsets.all(4),
+    Color? textColor,
+    FontWeight? fontWeight,
+    BoxBorder? border,
+  }) {
+    return Container(
+      margin: margin,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: border,
+      ),
+      child: Center(
+        child: Text(
+          '${date.day}',
+          style: _dayTextStyle(
+            context,
+            color: textColor,
+            fontWeight: fontWeight,
           ),
         ),
-        FadeTransition(
-          opacity: _fadeAnimation,
-          child: Container(
-            margin: const EdgeInsets.only(top: 16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withOpacityValue(0.08),
-                width: 1,
+      ),
+    );
+  }
+
+  TextStyle _dayTextStyle(
+    BuildContext context, {
+    Color? color,
+    FontWeight? fontWeight,
+  }) {
+    final theme = Theme.of(context);
+    return (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+      fontFamily: dmSans,
+      color: color ?? theme.colorScheme.onSurface,
+      fontWeight: fontWeight,
+    );
+  }
+
+  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    // A regular tap dismisses any in-progress range and behaves like
+    // single-day selection.
+    if (_rangeStart != null) {
+      _clearRange();
+    }
+    setState(() {
+      _selectedDay = selectedDay;
+      _focusedDay = focusedDay;
+    });
+    _toggleDaySessions(selectedDay);
+  }
+
+  Widget _buildDayDetailsCard(
+    BuildContext context, {
+    required List<LocalAudioCompleted> sessions,
+    required List<DateTime> rangeDays,
+    required int rangeNewSessions,
+    required int rangeProjectedStreak,
+  }) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Container(
+        margin: const EdgeInsets.only(top: 16),
+        decoration: _cardDecoration(context),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailsTitle(context, rangeDays),
+            const SizedBox(height: 8),
+            _buildDetailsSubtitle(context, sessions),
+            const SizedBox(height: 16),
+            _buildSessionList(context, sessions),
+            const SizedBox(height: 16),
+            _hasCompleteRange
+                ? _buildRangeActions(
+                    context,
+                    rangeNewSessions: rangeNewSessions,
+                    rangeProjectedStreak: rangeProjectedStreak,
+                  )
+                : _buildAddSessionButton(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailsTitle(BuildContext context, List<DateTime> rangeDays) {
+    return Text(
+      _hasCompleteRange
+          ? AppLocalizations.of(context)!.daysSelected(rangeDays.length)
+          : DateFormat('EEEE, MMMM d, y').format(_selectedDayForSessions),
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+        fontFamily: dmSans,
+        fontWeight: FontWeight.w600,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
+    );
+  }
+
+  Widget _buildDetailsSubtitle(
+    BuildContext context,
+    List<LocalAudioCompleted> sessions,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_hasCompleteRange) {
+      return Text(
+        '${DateFormat('MMM d').format(_rangeStart!)} – ${DateFormat('MMM d, y').format(_rangeEnd!)}',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontFamily: dmSans,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      );
+    }
+
+    if (_isFreezeDay(_selectedDayForSessions)) {
+      return Row(
+        children: [
+          MeditoIcon(
+            assetName: MeditoIcons.snow,
+            size: 16,
+            color: ColorConstants.lightBlue,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            l10n.streakFreezeUsed,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontFamily: dmSans,
+              color: ColorConstants.lightBlue,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Text(
+      '${sessions.length} ${sessions.length == 1 ? l10n.session : l10n.sessions}',
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        fontFamily: dmSans,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
+    );
+  }
+
+  Widget _buildSessionList(
+    BuildContext context,
+    List<LocalAudioCompleted> sessions,
+  ) {
+    if (_isAddingSession) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Center(
+          child: CircularProgressIndicator(color: context.brandPurple),
+        ),
+      );
+    }
+
+    if (_hasCompleteRange || sessions.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      children: sessions.asMap().entries.map((entry) {
+        final index = entry.key;
+        final session = entry.value;
+        final isLast = index == sessions.length - 1;
+        return Padding(
+          padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
+          child: _SessionItemWidget(
+            key: ValueKey(session.id + session.timestamp.toString()),
+            session: session,
+            onLongPress: () => _confirmDeleteSession(session),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildRangeActions(
+    BuildContext context, {
+    required int rangeNewSessions,
+    required int rangeProjectedStreak,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final dayLabel = widget.stats.streakCurrent == 1
+        ? l10n.day.toLowerCase()
+        : l10n.days;
+    final projectedDayLabel = rangeProjectedStreak == 1
+        ? l10n.day.toLowerCase()
+        : l10n.days;
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(14),
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: context.brandPurple.withOpacityValue(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _RangePreviewRow(
+                label: l10n.currentStreak,
+                value: '${widget.stats.streakCurrent} $dayLabel',
+              ),
+              const SizedBox(height: 6),
+              _RangePreviewRow(
+                label: l10n.newStreak,
+                value: '$rangeProjectedStreak $projectedDayLabel',
+                emphasize: rangeProjectedStreak != widget.stats.streakCurrent,
+              ),
+              const SizedBox(height: 6),
+              _RangePreviewRow(
+                label: l10n.newSessions,
+                value: '$rangeNewSessions',
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _isAddingSession || rangeNewSessions == 0
+                ? null
+                : () => _showBulkAddDialog(context),
+            icon: Icon(
+              Icons.add,
+              size: 20,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            label: Text(
+              l10n.addSessionsToSelectedDays,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontFamily: dmSans,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _hasCompleteRange
-                      ? AppLocalizations.of(context)!
-                          .daysSelected(rangeDays.length)
-                      : DateFormat('EEEE, MMMM d, y')
-                          .format(_selectedDayForSessions),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontFamily: dmSans,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                if (_hasCompleteRange)
-                  Text(
-                    '${DateFormat('MMM d').format(_rangeStart!)} – ${DateFormat('MMM d, y').format(_rangeEnd!)}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontFamily: dmSans,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                  )
-                else if (isSelectedDayFreezeDay)
-                  Row(
-                    children: [
-                      MeditoIcon(
-                        assetName: MeditoIcons.snow,
-                        size: 16,
-                        color: ColorConstants.lightBlue,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        AppLocalizations.of(context)!.streakFreezeUsed,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontFamily: dmSans,
-                              color: ColorConstants.lightBlue,
-                              fontWeight: FontWeight.w500,
-                            ),
-                      ),
-                    ],
-                  )
-                else
-                  Text(
-                    '${sessions.length} ${sessions.length == 1 ? AppLocalizations.of(context)!.session : AppLocalizations.of(context)!.sessions}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontFamily: dmSans,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                  ),
-                const SizedBox(height: 16),
-                if (_isAddingSession)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: context.brandPurple,
-                      ),
-                    ),
-                  )
-                else if (_hasCompleteRange)
-                  const SizedBox.shrink()
-                else if (sessions.isNotEmpty)
-                  ...sessions.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final session = entry.value;
-                    final isLast = index == sessions.length - 1;
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
-                      child: _SessionItemWidget(
-                        key:
-                            ValueKey(session.id + session.timestamp.toString()),
-                        session: session,
-                        onLongPress: () => _confirmDeleteSession(session),
-                      ),
-                    );
-                  }),
-                const SizedBox(height: 16),
-                if (_hasCompleteRange) ...[
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: context.brandPurple.withOpacityValue(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _RangePreviewRow(
-                          label: AppLocalizations.of(context)!.currentStreak,
-                          value:
-                              '${widget.stats.streakCurrent} ${widget.stats.streakCurrent == 1 ? AppLocalizations.of(context)!.day.toLowerCase() : AppLocalizations.of(context)!.days}',
-                        ),
-                        const SizedBox(height: 6),
-                        _RangePreviewRow(
-                          label: AppLocalizations.of(context)!.newStreak,
-                          value:
-                              '$rangeProjectedStreak ${rangeProjectedStreak == 1 ? AppLocalizations.of(context)!.day.toLowerCase() : AppLocalizations.of(context)!.days}',
-                          emphasize: rangeProjectedStreak !=
-                              widget.stats.streakCurrent,
-                        ),
-                        const SizedBox(height: 6),
-                        _RangePreviewRow(
-                          label: AppLocalizations.of(context)!.newSessions,
-                          value: '$rangeNewSessions',
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _isAddingSession || rangeNewSessions == 0
-                          ? null
-                          : () => _showBulkAddDialog(context),
-                      icon: Icon(
-                        Icons.add,
-                        size: 20,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      label: Text(
-                        AppLocalizations.of(context)!.addSessionsToSelectedDays,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontFamily: dmSans,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: Theme.of(context).colorScheme.onSurface,
-                        side: BorderSide(
-                          color: context.brandPurple,
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: TextButton(
-                      onPressed: _isAddingSession ? null : _clearRange,
-                      child: Text(
-                        AppLocalizations.of(context)!.cancel,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontFamily: dmSans,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacityValue(0.7),
-                            ),
-                      ),
-                    ),
-                  ),
-                ] else
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showAddSessionDialog(context),
-                    icon: Icon(
-                      Icons.add,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    label: Text(
-                      AppLocalizations.of(context)!.addSession,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: dmSans,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Theme.of(context).colorScheme.onSurface,
-                      side: BorderSide(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacityValue(0.2),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+              side: BorderSide(color: context.brandPurple),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: _isAddingSession ? null : _clearRange,
+            child: Text(
+              l10n.cancel,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontFamily: dmSans,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacityValue(0.7),
+              ),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAddSessionButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => _showAddSessionDialog(context),
+        icon: Icon(
+          Icons.add,
+          size: 20,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        label: Text(
+          AppLocalizations.of(context)!.addSession,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontFamily: dmSans,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          side: BorderSide(
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withOpacityValue(0.2),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  BoxDecoration _cardDecoration(BuildContext context) {
+    return BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.08),
+        width: 1,
+      ),
     );
   }
 }
@@ -1024,8 +1045,9 @@ class _SessionItemWidget extends ConsumerWidget {
     final date = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
     final timeFormat = DateFormat('h:mm a');
     final isManual = isManualSession(session);
-    final trackAsync =
-        isManual ? null : ref.watch(tracksProvider(trackId: session.id));
+    final trackAsync = isManual
+        ? null
+        : ref.watch(tracksProvider(trackId: session.id));
 
     final content = Container(
       padding: const EdgeInsets.all(12),
@@ -1045,14 +1067,13 @@ class _SessionItemWidget extends ConsumerWidget {
             child: Text(
               timeFormat.format(date),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontFamily: dmSans,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacityValue(0.7),
-                    fontSize: 12,
-                  ),
+                fontFamily: dmSans,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacityValue(0.7),
+                fontSize: 12,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -1060,9 +1081,7 @@ class _SessionItemWidget extends ConsumerWidget {
             width: 8,
             height: 8,
             decoration: BoxDecoration(
-              color: isManual
-                  ? ColorConstants.graphite
-                  : context.brandPurple,
+              color: isManual ? ColorConstants.graphite : context.brandPurple,
               shape: BoxShape.circle,
             ),
           ),
@@ -1071,45 +1090,48 @@ class _SessionItemWidget extends ConsumerWidget {
             child: isManual
                 ? Text(
                     getManualSessionTitle(
-                        session.id, AppLocalizations.of(context)!),
+                      session.id,
+                      AppLocalizations.of(context)!,
+                    ),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontFamily: dmSans,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
+                      fontFamily: dmSans,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   )
                 : trackAsync!.when(
                     data: (track) => Text(
                       track.title,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: dmSans,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                        fontFamily: dmSans,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                     loading: () => Text(
                       'Loading...',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: dmSans,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                        fontFamily: dmSans,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                     error: (_, _) => Text(
                       'Track ${session.id}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontFamily: dmSans,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                        fontFamily: dmSans,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
           ),
           if (!isManual)
             Icon(
               Icons.chevron_right_rounded,
-              color:
-                  Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withOpacityValue(0.6),
               size: 20,
             ),
         ],
@@ -1129,9 +1151,7 @@ class _SessionItemWidget extends ConsumerWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TrackView(
-              trackId: session.id,
-            ),
+            builder: (context) => TrackView(trackId: session.id),
           ),
         );
       },
@@ -1162,19 +1182,19 @@ class _RangePreviewRow extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
-                color: theme.colorScheme.onSurface.withOpacityValue(0.75),
-              ),
+            fontFamily: dmSans,
+            color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+          ),
         ),
         Text(
           value,
           style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
-                fontWeight: FontWeight.w700,
-                color: emphasize
-                    ? context.brandPurple
-                    : theme.colorScheme.onSurface,
-              ),
+            fontFamily: dmSans,
+            fontWeight: FontWeight.w700,
+            color: emphasize
+                ? context.brandPurple
+                : theme.colorScheme.onSurface,
+          ),
         ),
       ],
     );

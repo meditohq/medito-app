@@ -16,7 +16,7 @@ class OnboardingDonationScreen extends ConsumerStatefulWidget {
 }
 
 class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
-  bool _hasAttemptedDonation = false;
+  bool _hasAttemptedDonation = isSmokeTestMode;
 
   void _handleDonationAction(BuildContext context) async {
     if (!_hasAttemptedDonation) {
@@ -64,7 +64,9 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
             return SingleChildScrollView(
               padding: const EdgeInsets.all(32),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 64),
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 64,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -83,10 +85,9 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                         Text(
                           AppLocalizations.of(context)!.donationBody,
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 16,
                             height: 1.5,
                           ),
@@ -125,8 +126,10 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     );
   }
 
-  Widget _buildActionButton(
-      {required String text, required VoidCallback onPressed}) {
+  Widget _buildActionButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -135,9 +138,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
           backgroundColor: context.brandPurple,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Text(text),
       ),

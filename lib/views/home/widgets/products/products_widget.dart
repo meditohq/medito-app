@@ -33,18 +33,20 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
+    _scrollController.addListener(_updateScrollGradients);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkScrollIndicator();
+      if (mounted) _updateScrollGradients();
     });
   }
 
-  void _checkScrollIndicator() {
+  void _updateScrollGradients() {
     if (!_scrollController.hasClients) return;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
+    final position = _scrollController.position;
+    final maxScroll = position.maxScrollExtent;
+    final currentScroll = position.pixels;
     final showLeft = currentScroll > 10;
     final showRight = maxScroll > 0 && currentScroll < maxScroll - 10;
+
     if (showLeft != _showLeftGradient || showRight != _showRightGradient) {
       setState(() {
         _showLeftGradient = showLeft;
@@ -58,34 +60,17 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.productGroups != widget.productGroups) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _checkScrollIndicator();
+        if (mounted) _updateScrollGradients();
       });
     }
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
+    _scrollController.removeListener(_updateScrollGradients);
     _scrollController.dispose();
     super.dispose();
   }
-
-  void _onScroll() {
-    if (!_scrollController.hasClients) return;
-
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    final showLeft = currentScroll > 10;
-    final showRight = currentScroll < maxScroll - 10;
-
-    if (showLeft != _showLeftGradient || showRight != _showRightGradient) {
-      setState(() {
-        _showLeftGradient = showLeft;
-        _showRightGradient = showRight;
-      });
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -224,9 +209,9 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                             end: Alignment.centerRight,
                             colors: [
                               Theme.of(context).scaffoldBackgroundColor,
-                              Theme.of(context)
-                                  .scaffoldBackgroundColor
-                                  .withValues(alpha: 0),
+                              Theme.of(
+                                context,
+                              ).scaffoldBackgroundColor.withValues(alpha: 0),
                             ],
                           ),
                         ),
@@ -247,9 +232,9 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                             end: Alignment.centerLeft,
                             colors: [
                               Theme.of(context).scaffoldBackgroundColor,
-                              Theme.of(context)
-                                  .scaffoldBackgroundColor
-                                  .withValues(alpha: 0),
+                              Theme.of(
+                                context,
+                              ).scaffoldBackgroundColor.withValues(alpha: 0),
                             ],
                           ),
                         ),
@@ -332,62 +317,76 @@ class ProductGroupCard extends ConsumerWidget {
               backgroundColor: backgroundColor,
               borderRadius: _kCardBorderRadius,
               borderWidth: _kCardBorderWidth,
-                child: Material(
+              child: Material(
                 color: Colors.transparent,
                 child: Semantics(
                   label: productGroup.name,
                   button: true,
                   child: InkWell(
-                  onTap: () async {
-                    // Log analytics event
-                    var analytics = ref.read(analyticsServiceProvider);
+                    onTap: () async {
+                      // Log analytics event
+                      var analytics = ref.read(analyticsServiceProvider);
 
-                    analytics.logEvent(
-                      name: AnalyticsEventConstants.productClicked,
-                      parameters: {
-                        'group_id': productGroup.groupId,
-                        'name': productGroup.name,
-                        'url': productGroup.url ?? '',
-                      },
-                    );
-                    analytics.logFirstActionAfterOnboardingIfNeeded('product');
+                      analytics.logEvent(
+                        name: AnalyticsEventConstants.productClicked,
+                        parameters: {
+                          'group_id': productGroup.groupId,
+                          'name': productGroup.name,
+                          'url': productGroup.url ?? '',
+                        },
+                      );
+                      analytics.logFirstActionAfterOnboardingIfNeeded(
+                        'product',
+                      );
 
-                    _openProductUrl(productGroup.url);
-                    for (final variant in productGroup.variants) {
-                      ProductsService().markProductAsSeen(variant.id);
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(
-                    _kCardBorderRadius - _kCardBorderWidth,
-                  ),
-                  child: Stack(
-                    children: [
-                      if (productGroup.allImageUrls.isNotEmpty)
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: ProductImageCarousel(
-                            productGroup: productGroup,
-                            cardWidth: cardWidth,
-                          ),
-                        )
-                      else if (productGroup.imageUrl != null)
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: CachedNetworkImage(
-                            imageUrl: productGroup.imageUrl!,
-                            fit: BoxFit.cover,
-                            width: cardWidth,
-                            key: ValueKey(
-                              'product_image_${productGroup.groupId}',
+                      _openProductUrl(productGroup.url);
+                      for (final variant in productGroup.variants) {
+                        ProductsService().markProductAsSeen(variant.id);
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(
+                      _kCardBorderRadius - _kCardBorderWidth,
+                    ),
+                    child: Stack(
+                      children: [
+                        if (productGroup.allImageUrls.isNotEmpty)
+                          AspectRatio(
+                            aspectRatio: 1,
+                            child: ProductImageCarousel(
+                              productGroup: productGroup,
+                              cardWidth: cardWidth,
                             ),
-                            placeholder: (context, url) => Container(
-                              color: Theme.of(context).colorScheme.surface,
-                              child: Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                          )
+                        else if (productGroup.imageUrl != null)
+                          AspectRatio(
+                            aspectRatio: 1,
+                            child: CachedNetworkImage(
+                              imageUrl: productGroup.imageUrl!,
+                              fit: BoxFit.cover,
+                              width: cardWidth,
+                              key: ValueKey(
+                                'product_image_${productGroup.groupId}',
+                              ),
+                              placeholder: (context, url) => Container(
+                                color: Theme.of(context).colorScheme.surface,
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                color: Theme.of(context).colorScheme.surface,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.image_not_supported_outlined,
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurface,
@@ -395,7 +394,11 @@ class ProductGroupCard extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            errorWidget: (context, url, error) => Container(
+                          )
+                        else
+                          AspectRatio(
+                            aspectRatio: 1,
+                            child: Container(
                               color: Theme.of(context).colorScheme.surface,
                               child: Center(
                                 child: Icon(
@@ -407,61 +410,45 @@ class ProductGroupCard extends ConsumerWidget {
                               ),
                             ),
                           ),
-                        )
-                      else
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: Container(
-                            color: Theme.of(context).colorScheme.surface,
-                            child: Center(
-                              child: Icon(
-                                Icons.image_not_supported_outlined,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface,
+                        if (hasNewVariant)
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.newProductLabel,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
                               ),
                             ),
                           ),
-                        ),
-                      if (hasNewVariant)
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surface,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              AppLocalizations.of(context)!.newProductLabel,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                            ),
-                          ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -508,7 +495,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
   int _currentImageIndex = 0;
   Timer? _imageTimer;
   final _imageDuration = const Duration(seconds: 10);
-  List<Map<String, dynamic>> _tshirtVariants = [];
+  List<String> _tshirtImageUrls = [];
   List<String> _imageUrls = [];
 
   @override
@@ -526,12 +513,9 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
   }
 
   void _updateImageUrls() {
-    final isTshirt =
-        widget.productGroup.description?.toLowerCase().contains('shirt') ??
-        false;
-    _imageUrls = isTshirt
-        ? _tshirtVariants.map((v) => v['imageUrl'] as String).toList()
-        : widget.productGroup.allImageUrls;
+    _imageUrls = _isTshirt
+        ? List<String>.from(_tshirtImageUrls)
+        : List<String>.from(widget.productGroup.allImageUrls);
   }
 
   @override
@@ -556,49 +540,24 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
   void _organizeImages() {
     _currentImageIndex = 0; // Reset index when organizing images
 
-    // Check if this is a t-shirt
-    final isTshirt =
-        widget.productGroup.description?.toLowerCase().contains('shirt') ??
-        false;
+    _tshirtImageUrls = [];
+    if (!_isTshirt) return;
 
-    if (isTshirt) {
-      // Create organized variants for t-shirts with color information
-      _tshirtVariants = [];
+    final imageByColor = <String, String>{};
+    for (final variant in widget.productGroup.variants) {
+      final color = variant.color;
+      final imageUrl = variant.imageUrl;
+      if (color == null || color.isEmpty || imageUrl == null) continue;
 
-      // Map between colors and their images
-      final colorMap = <String, List<String>>{};
-
-      // Organize variants by color
-      for (final variant in widget.productGroup.variants) {
-        if (variant.color != null &&
-            variant.color!.isNotEmpty &&
-            variant.imageUrl != null) {
-          final colorKey = variant.color!.toLowerCase();
-          colorMap.putIfAbsent(colorKey, () => []);
-          colorMap[colorKey]!.add(variant.imageUrl!);
-        }
-      }
-
-      // If colors are organized, create a list of variant data
-      if (colorMap.isNotEmpty) {
-        for (final entry in colorMap.entries) {
-          _tshirtVariants.add({
-            'color': entry.key,
-            'imageUrl': entry.value.first, // Use first image for this color
-          });
-        }
-      }
-
-      // If we couldn't organize by color, fall back to all images for this product
-      if (_tshirtVariants.isEmpty) {
-        for (final url in widget.productGroup.allImageUrls) {
-          _tshirtVariants.add({'color': 'unknown', 'imageUrl': url});
-        }
-      }
-
-      // Shuffle the t-shirt variants to show different colors in random order
-      _tshirtVariants.shuffle();
+      imageByColor.putIfAbsent(color.toLowerCase(), () => imageUrl);
     }
+
+    _tshirtImageUrls = imageByColor.values.toList();
+    if (_tshirtImageUrls.isEmpty) {
+      _tshirtImageUrls = List<String>.from(widget.productGroup.allImageUrls);
+    }
+
+    _tshirtImageUrls.shuffle();
   }
 
   void _precacheAllImages() {
@@ -629,22 +588,17 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
   }
 
   void _startImageTimer() {
-    // Cancel any existing timer
     _imageTimer?.cancel();
 
-    final imageList = _imageUrls;
+    if (_imageUrls.length <= 1) return;
 
-    // Start a new timer if we have multiple images
-    if (imageList.length > 1) {
-      _imageTimer = Timer.periodic(_imageDuration, (timer) {
-        if (mounted) {
-          setState(() {
-            // Move to next image, loop back to 0 if needed
-            _currentImageIndex = (_currentImageIndex + 1) % imageList.length;
-          });
-        }
+    _imageTimer = Timer.periodic(_imageDuration, (timer) {
+      if (!mounted) return;
+
+      setState(() {
+        _currentImageIndex = (_currentImageIndex + 1) % _imageUrls.length;
       });
-    }
+    });
   }
 
   @override
@@ -669,11 +623,6 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
 
     // Get current image URL (with bounds checking)
     final String currentImageUrl = _imageUrls[_currentImageIndex];
-
-    // Reset the timer if needed
-    if (_imageTimer == null && _imageUrls.length > 1) {
-      _startImageTimer();
-    }
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 500),
@@ -719,4 +668,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
       ),
     );
   }
+
+  bool get _isTshirt =>
+      widget.productGroup.description?.toLowerCase().contains('shirt') ?? false;
 }

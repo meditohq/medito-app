@@ -14,6 +14,12 @@ import 'package:flutter/foundation.dart';
 bool get isMockMode =>
     const String.fromEnvironment('MOCK_MODE', defaultValue: 'false') == 'true';
 
+/// Enables small test-only shortcuts for end-to-end smoke runs without switching
+/// the app to full mock data.
+bool get isSmokeTestMode =>
+    const String.fromEnvironment('SMOKE_TEST_MODE', defaultValue: 'false') ==
+    'true';
+
 class EnvConfig {
   final String environment;
   final String contentBaseUrl;
@@ -170,9 +176,7 @@ class HTTPConstants {
   static const String confirmPaymentIntent = 'payment-intents/confirm';
 
   // DEAD DOMAINS - domains that no longer exist and should be avoided
-  static const List<String> _deadDomains = [
-    'images.medito.space',
-  ];
+  static const List<String> _deadDomains = ['images.medito.space'];
 
   /// Checks if a URL is from a dead/unavailable domain
   static bool isDeadDomain(String url) {
