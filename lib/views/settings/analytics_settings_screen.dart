@@ -52,13 +52,14 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
                     ? AppLocalizations.of(context)!.iosTrackingDialogContent
                     : AppLocalizations.of(context)!.analyticsTrackingContent,
                 onChanged: (value) async {
-                  await ref.read(sharedPreferencesProvider).setBool(
+                  await ref
+                      .read(sharedPreferencesProvider)
+                      .setBool(
                         SharedPreferenceConstants.analyticsFirebaseEnabled,
                         value,
                       );
                   // Disable/enable the SDKs at the native level
-                  await FirebaseAnalyticsService()
-                      .setCollectionEnabled(value);
+                  await FirebaseAnalyticsService().setCollectionEnabled(value);
                   await CrashlyticsService().setCollectionEnabled(value);
                   ref.invalidate(_firebaseEnabledProvider);
                 },
@@ -70,7 +71,9 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
                     ? AppLocalizations.of(context)!.iosTrackingDialogContent
                     : AppLocalizations.of(context)!.analyticsTrackingContent,
                 onChanged: (value) async {
-                  await ref.read(sharedPreferencesProvider).setBool(
+                  await ref
+                      .read(sharedPreferencesProvider)
+                      .setBool(
                         SharedPreferenceConstants.analyticsMetaEnabled,
                         value,
                       );

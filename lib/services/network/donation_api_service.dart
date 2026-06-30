@@ -13,10 +13,7 @@ abstract class IDonationApiService {
     Map<String, dynamic>? queryParams,
   });
 
-  Future<Map<String, dynamic>> postRequest(
-    String path, {
-    dynamic body,
-  });
+  Future<Map<String, dynamic>> postRequest(String path, {dynamic body});
 }
 
 /// Donation API service that uses its own base URL and authentication
@@ -43,30 +40,21 @@ class DonationApiService implements IDonationApiService {
   Future<Map<String, dynamic>> getRequest(
     String path, {
     Map<String, dynamic>? queryParams,
-  }) async =>
-      _handleRequest(
-        () async {
-          final client = HttpClient();
-          client.connectionTimeout = const Duration(seconds: 30);
-          final request = await client.getUrl(_buildUri(path, queryParams));
-          return (request, client);
-        },
-      );
+  }) async => _handleRequest(() async {
+    final client = HttpClient();
+    client.connectionTimeout = const Duration(seconds: 30);
+    final request = await client.getUrl(_buildUri(path, queryParams));
+    return (request, client);
+  });
 
   @override
-  Future<Map<String, dynamic>> postRequest(
-    String path, {
-    dynamic body,
-  }) async =>
-      _handleRequest(
-        () async {
-          final client = HttpClient();
-          client.connectionTimeout = const Duration(seconds: 30);
-          final request = await client.postUrl(_buildUri(path));
-          return (request, client);
-        },
-        body: body,
-      );
+  Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async =>
+      _handleRequest(() async {
+        final client = HttpClient();
+        client.connectionTimeout = const Duration(seconds: 30);
+        final request = await client.postUrl(_buildUri(path));
+        return (request, client);
+      }, body: body);
 
   Uri _buildUri(String path, [Map<String, dynamic>? queryParams]) {
     if (donationBaseUrl.isEmpty) {
@@ -95,8 +83,9 @@ class DonationApiService implements IDonationApiService {
         request.write(encodedBody);
       }
 
-      final response =
-          await request.close().timeout(const Duration(seconds: 30));
+      final response = await request.close().timeout(
+        const Duration(seconds: 30),
+      );
       responseContent = await utf8.decodeStream(response);
 
       AppLogger.d('DONATION_API', 'RESPONSE: $responseContent');
@@ -122,7 +111,11 @@ class DonationApiService implements IDonationApiService {
       throw Exception('HTTP exception');
     } catch (e, stackTrace) {
       AppLogger.e(
-          'DONATION_API', 'Unexpected error in _handleRequest', e, stackTrace);
+        'DONATION_API',
+        'Unexpected error in _handleRequest',
+        e,
+        stackTrace,
+      );
       throw const UnknownError();
     } finally {
       client?.close();

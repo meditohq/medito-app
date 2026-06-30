@@ -4,8 +4,9 @@ import 'dart:io';
 void main() async {
   // Regular expressions to detect different patterns of debugPrint usage
   final debugPrintPattern = RegExp(r'debugPrint\((.*?)\);');
-  final debugPrintStackPattern =
-      RegExp(r'debugPrintStack\(stackTrace: (.*?)\);');
+  final debugPrintStackPattern = RegExp(
+    r'debugPrintStack\(stackTrace: (.*?)\);',
+  );
 
   // Files to process
   final result = await Process.run('find', [
@@ -25,7 +26,7 @@ void main() async {
     '-l',
     'debugPrint',
     '{}',
-    ';'
+    ';',
   ]);
 
   if (result.exitCode != 0) {
@@ -51,8 +52,9 @@ void main() async {
       var updatedContent = fileContent;
 
       // Add the logger import if not present
-      if (!updatedContent
-              .contains("import 'package:medito/utils/logger.dart';") &&
+      if (!updatedContent.contains(
+            "import 'package:medito/utils/logger.dart';",
+          ) &&
           !updatedContent.contains("import '../utils/logger.dart';") &&
           !updatedContent.contains("import '../../utils/logger.dart';") &&
           !updatedContent.contains("import 'logger.dart';")) {
@@ -77,22 +79,28 @@ void main() async {
         // Add import after other imports
         final importLines = updatedContent
             .split('\n')
-            .takeWhile((line) =>
-                line.trim().startsWith('import') || line.trim().isEmpty)
+            .takeWhile(
+              (line) => line.trim().startsWith('import') || line.trim().isEmpty,
+            )
             .toList();
 
         if (importLines.isNotEmpty) {
-          final lastImportIndex = updatedContent.lastIndexOf(importLines.last) +
+          final lastImportIndex =
+              updatedContent.lastIndexOf(importLines.last) +
               importLines.last.length;
-          updatedContent = '${updatedContent.substring(0, lastImportIndex)}\nimport \'$importPath\';${updatedContent.substring(lastImportIndex)}';
+          updatedContent =
+              '${updatedContent.substring(0, lastImportIndex)}\nimport \'$importPath\';${updatedContent.substring(lastImportIndex)}';
         }
       }
 
       // Try to determine appropriate tag for logger
       String tag = 'GENERAL';
 
-      final fileName =
-          file.split('/').last.replaceAll('.dart', '').toUpperCase();
+      final fileName = file
+          .split('/')
+          .last
+          .replaceAll('.dart', '')
+          .toUpperCase();
       if (fileName.contains('_')) {
         tag = fileName.split('_').first;
       } else {
@@ -101,13 +109,14 @@ void main() async {
 
       // Replace debugPrintStack
       updatedContent = updatedContent.replaceAllMapped(
-          debugPrintStackPattern,
-          (match) =>
-              'AppLogger.e(\'$tag\', \'Error\', null, ${match.group(1)});');
+        debugPrintStackPattern,
+        (match) => 'AppLogger.e(\'$tag\', \'Error\', null, ${match.group(1)});',
+      );
 
       // Replace debugPrint with log level based on content
-      updatedContent =
-          updatedContent.replaceAllMapped(debugPrintPattern, (match) {
+      updatedContent = updatedContent.replaceAllMapped(debugPrintPattern, (
+        match,
+      ) {
         final content = match.group(1)!;
         if (content.toLowerCase().contains('error') ||
             content.contains('❌') ||

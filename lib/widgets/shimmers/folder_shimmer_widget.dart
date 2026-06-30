@@ -12,9 +12,7 @@ class FolderShimmerWidget extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          const BoxShimmerWidget(
-            height: 380,
-          ),
+          const BoxShimmerWidget(height: 380),
           height8,
           Column(
             children: List.generate(5, (index) => _shimmerList(context, size)),
@@ -37,17 +35,11 @@ class FolderShimmerWidget extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: BoxShimmerWidget(
-                height: 10,
-                width: 300,
-              ),
+              child: BoxShimmerWidget(height: 10, width: 300),
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: BoxShimmerWidget(
-                height: 10,
-                width: 200,
-              ),
+              child: BoxShimmerWidget(height: 10, width: 200),
             ),
           ],
         ),

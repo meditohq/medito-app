@@ -10,13 +10,7 @@ class TilesShimmerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: padding16),
-      child: Row(
-        children: [
-          _tiles(context),
-          width16,
-          _tiles(context),
-        ],
-      ),
+      child: Row(children: [_tiles(context), width16, _tiles(context)]),
     );
   }
 
@@ -24,11 +18,7 @@ class TilesShimmerWidget extends StatelessWidget {
     var size = MediaQuery.of(context).size;
 
     return Expanded(
-      child: BoxShimmerWidget(
-        height: 100,
-        width: size.width,
-        borderRadius: 12,
-      ),
+      child: BoxShimmerWidget(height: 100, width: size.width, borderRadius: 12),
     );
   }
 }

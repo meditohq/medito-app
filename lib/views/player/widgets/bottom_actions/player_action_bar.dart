@@ -30,10 +30,7 @@ class PlayerActionBar extends StatelessWidget {
     return BottomActionBar(
       layout: BottomActionBarLayout.edgeAligned,
       leftItem: BottomActionBarItem(
-        child: const Icon(
-          Icons.close,
-          color: ColorConstants.white,
-        ),
+        child: const Icon(Icons.close, color: ColorConstants.white),
         onTap: onClosePressed,
         semanticLabel: l10n.close,
       ),
@@ -58,13 +55,8 @@ class PlayerActionBar extends StatelessWidget {
 
   Widget _buildBackgroundSoundWidget() {
     return request.hasBackgroundSound
-        ? BgSoundWidget(
-            isBackgroundSoundSelected: isBackgroundSoundSelected,
-          )
-        : const Icon(
-            Icons.music_off,
-            color: ColorConstants.white,
-          );
+        ? BgSoundWidget(isBackgroundSoundSelected: isBackgroundSoundSelected)
+        : const Icon(Icons.music_off, color: ColorConstants.white);
   }
 
   void _showBackgroundSoundDisabledMessage(BuildContext context) {

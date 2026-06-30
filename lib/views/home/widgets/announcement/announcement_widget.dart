@@ -64,8 +64,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       return const SizedBox.shrink();
     }
 
-    final rawBgColor =
-        ColorConstants.getColorFromString(widget.announcement.colorBackground);
+    final rawBgColor = ColorConstants.getColorFromString(
+      widget.announcement.colorBackground,
+    );
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark
         ? rawBgColor
@@ -73,29 +74,32 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
 
     return SizeTransition(
       sizeFactor: _sizeAnimation,
-      axisAlignment: -1,
+      alignment: AlignmentDirectional.topStart,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Padding(
           padding: const EdgeInsets.only(
-              top: padding8, left: padding16, right: padding16, bottom: padding16),
+            top: padding8,
+            left: padding16,
+            right: padding16,
+            bottom: padding16,
+          ),
           child: Container(
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(14),
             ),
             padding: const EdgeInsets.only(
-                left: padding16,
-                right: padding16,
-                bottom: padding12,
-                top: padding24),
+              left: padding16,
+              right: padding16,
+              bottom: padding12,
+              top: padding24,
+            ),
             child: Column(
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _text(context),
-                  ],
+                  children: [_text(context)],
                 ),
                 height16,
                 _actionBtn(context),
@@ -107,9 +111,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
     );
   }
 
-  Row _actionBtn(
-    BuildContext context,
-  ) {
+  Row _actionBtn(BuildContext context) {
     var textColor = ColorConstants.getColorFromString(
       widget.announcement.colorText,
     );
@@ -122,9 +124,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
         onPressed: _handleDismiss,
         child: Text(
           AppLocalizations.of(context)!.dismiss,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: textColor,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(color: textColor),
         ),
       ),
       width4,
@@ -139,9 +141,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
             foregroundColor: bgColor,
             padding: const EdgeInsets.all(8),
           ),
-          child: Text(
-            widget.announcement.ctaTitle ?? '',
-          ),
+          child: Text(widget.announcement.ctaTitle ?? ''),
         ),
       );
     }
@@ -157,9 +157,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       widget.announcement.colorText,
     );
 
-    var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: textColor,
-        );
+    var markDownTheme = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(color: textColor);
 
     return Flexible(
       child: MarkdownWidget(
@@ -170,27 +170,25 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
           decoration: TextDecoration.underline,
           fontWeight: FontWeight.w700,
         ),
-        p: markDownTheme?.copyWith(
-          fontWeight: FontWeight.w500,
-        ),
+        p: markDownTheme?.copyWith(fontWeight: FontWeight.w500),
       ),
     );
   }
 
-  void _handleCtaTitlePress(
-    BuildContext context,
-  ) async {
+  void _handleCtaTitlePress(BuildContext context) async {
     var path = widget.announcement.ctaPath;
     var type = widget.announcement.ctaType;
-    var isDonation = type == 'donation' ||
+    var isDonation =
+        type == 'donation' ||
         (type == TypeConstants.route && path == RouteConstants.donation);
     await handleNavigation(
       type,
       [path.toString().getIdFromPath(), path],
       context,
       ref: ref,
-      sourceRouteName:
-          isDonation ? FirebaseAnalyticsService.paywallSourceAnnouncement : null,
+      sourceRouteName: isDonation
+          ? FirebaseAnalyticsService.paywallSourceAnnouncement
+          : null,
     );
   }
 }

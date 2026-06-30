@@ -52,44 +52,44 @@ void main() {
 
       // diagnoseSecurity() also reads the refresh token; let the mock
       // answer that too.
-      when(() => mockAuthService.getStoredRefreshToken())
-          .thenAnswer((_) async => 'stub-refresh-token');
+      when(
+        () => mockAuthService.getStoredRefreshToken(),
+      ).thenAnswer((_) async => 'stub-refresh-token');
     });
 
-    test(
-      'concurrent callers share the in-flight refresh — auth service is '
-      'invoked exactly once',
-      () async {
-        final completer = Completer<AuthTokens>();
-        when(() => mockAuthService.refreshToken(any())).thenAnswer((_) {
-          // Don't resolve immediately — let multiple callers stack up
-          // waiting on the in-flight completer inside the service.
-          return completer.future;
-        });
+    test('concurrent callers share the in-flight refresh — auth service is '
+        'invoked exactly once', () async {
+      final completer = Completer<AuthTokens>();
+      when(() => mockAuthService.refreshToken(any())).thenAnswer((_) {
+        // Don't resolve immediately — let multiple callers stack up
+        // waiting on the in-flight completer inside the service.
+        return completer.future;
+      });
 
-        final service = HttpApiService.internal(authService: mockAuthService);
+      final service = HttpApiService.internal(authService: mockAuthService);
 
-        // Fire three concurrent refresh calls.
-        final f1 = service.refreshTokenForTesting();
-        final f2 = service.refreshTokenForTesting();
-        final f3 = service.refreshTokenForTesting();
+      // Fire three concurrent refresh calls.
+      final f1 = service.refreshTokenForTesting();
+      final f2 = service.refreshTokenForTesting();
+      final f3 = service.refreshTokenForTesting();
 
-        // Give microtasks a chance to wire up.
-        await Future<void>.delayed(Duration.zero);
+      // Give microtasks a chance to wire up.
+      await Future<void>.delayed(Duration.zero);
 
-        // Now finish the underlying refresh — all 3 should complete.
-        completer.complete(AuthTokens(
+      // Now finish the underlying refresh — all 3 should complete.
+      completer.complete(
+        AuthTokens(
           accessToken: 'new-access',
           refreshToken: 'stub-refresh-token',
           expiresIn: 3600,
           clientId: 'client-id',
-        ));
+        ),
+      );
 
-        await Future.wait([f1, f2, f3]);
+      await Future.wait([f1, f2, f3]);
 
-        verify(() => mockAuthService.refreshToken(any())).called(1);
-      },
-    );
+      verify(() => mockAuthService.refreshToken(any())).called(1);
+    });
 
     // NOTE: we'd like a 'after a failed refresh, the lock releases and a
     // subsequent caller can try again' test here, but it can't be written
@@ -101,45 +101,46 @@ void main() {
     // ever refactor the locking to use `Future<void>?` instead of
     // `Completer<void>` (which would also fix the test-ability gap).
 
-    test(
-      'a successful refresh sets the auth header so subsequent requests '
-      'are authorised',
-      () async {
-        when(() => mockAuthService.refreshToken(any())).thenAnswer(
-          (_) async => AuthTokens(
-            accessToken: 'fresh-bearer-token',
-            refreshToken: 'stub-refresh-token',
-            expiresIn: 3600,
-            clientId: 'client-id',
-          ),
-        );
+    test('a successful refresh sets the auth header so subsequent requests '
+        'are authorised', () async {
+      when(() => mockAuthService.refreshToken(any())).thenAnswer(
+        (_) async => AuthTokens(
+          accessToken: 'fresh-bearer-token',
+          refreshToken: 'stub-refresh-token',
+          expiresIn: 3600,
+          clientId: 'client-id',
+        ),
+      );
 
-        final service = HttpApiService.internal(authService: mockAuthService);
-        await service.refreshTokenForTesting();
+      final service = HttpApiService.internal(authService: mockAuthService);
+      await service.refreshTokenForTesting();
 
-        // We can't easily peek the private _headers map, but a follow-up
-        // refresh call will pick up the same flow. The lock state being
-        // false after completion is the visible contract.
-        expect(service.isRefreshingTokenForTesting, isFalse);
-        verify(() => mockAuthService.refreshToken(any())).called(1);
-      },
-    );
+      // We can't easily peek the private _headers map, but a follow-up
+      // refresh call will pick up the same flow. The lock state being
+      // false after completion is the visible contract.
+      expect(service.isRefreshingTokenForTesting, isFalse);
+      verify(() => mockAuthService.refreshToken(any())).called(1);
+    });
 
-    test(
-      'retryCountForTesting accessor exposes the singleton-scoped counter '
-      '— pins down the design choice flagged in audit P0-1',
-      () {
-        final service = HttpApiService.internal(authService: mockAuthService);
+    test('retryCountForTesting accessor exposes the singleton-scoped counter '
+        '— pins down the design choice flagged in audit P0-1', () {
+      final service = HttpApiService.internal(authService: mockAuthService);
 
-        expect(service.retryCountForTesting, 0,
-            reason: 'Fresh instance starts at 0');
+      expect(
+        service.retryCountForTesting,
+        0,
+        reason: 'Fresh instance starts at 0',
+      );
 
-        service.retryCountForTesting = 3;
-        expect(service.retryCountForTesting, 3,
-            reason: 'Counter persists across reads — singleton scope is '
-                'intentional. See the comment on _retryCount in '
-                'lib/services/network/http_api_service.dart');
-      },
-    );
+      service.retryCountForTesting = 3;
+      expect(
+        service.retryCountForTesting,
+        3,
+        reason:
+            'Counter persists across reads — singleton scope is '
+            'intentional. See the comment on _retryCount in '
+            'lib/services/network/http_api_service.dart',
+      );
+    });
   });
 }

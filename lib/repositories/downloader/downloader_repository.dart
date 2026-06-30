@@ -27,7 +27,7 @@ class DownloaderRepositoryImpl extends DownloaderRepository {
   final Ref ref;
 
   DownloaderRepositoryImpl({required this.ref})
-      : _downloadService = DownloadService();
+    : _downloadService = DownloadService();
 
   @override
   Future<bool> isFileDownloaded(String name) async {

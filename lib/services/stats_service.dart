@@ -94,9 +94,9 @@ class StatsService {
   StatsService({
     required HttpApiService httpApiService,
     required SharedPreferences prefs,
-  })  : _httpApiService = httpApiService,
-        _prefs = prefs,
-        _backupService = StatsBackupService(prefs: prefs);
+  }) : _httpApiService = httpApiService,
+       _prefs = prefs,
+       _backupService = StatsBackupService(prefs: prefs);
 
   Future<bool> hasRecentlySync() async {
     var lastSync = _prefs.getInt(_lastSyncKey);
@@ -188,7 +188,8 @@ class StatsService {
       dev.log('StatsService: Successfully backed up stats locally');
     } else {
       dev.log(
-          'StatsService: Failed to back up stats - they may be empty or backup failed');
+        'StatsService: Failed to back up stats - they may be empty or backup failed',
+      );
     }
 
     try {

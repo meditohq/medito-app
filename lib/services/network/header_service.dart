@@ -46,8 +46,10 @@ class HeaderService {
   void updateDeviceInfo(DeviceAndAppInfoModel newDeviceInfo) {
     _deviceInfo = newDeviceInfo;
     _updateHeaders();
-    AppLogger.i('HEADER',
-        'Device info updated, headers refreshed. Language: ${_deviceInfo.languageCode}');
+    AppLogger.i(
+      'HEADER',
+      'Device info updated, headers refreshed. Language: ${_deviceInfo.languageCode}',
+    );
   }
 
   void _updateHeaders() {
@@ -56,13 +58,13 @@ class HeaderService {
   }
 
   Map<String, String> _createCustomHeaders() => {
-        'device-os': _deviceInfo.os,
-        'device-language': _deviceInfo.languageCode,
-        'device-model': _deviceInfo.model,
-        'app-version': _deviceInfo.appVersion,
-        'device-time': '${DateTime.now()}',
-        'device-platform': _deviceInfo.platform,
-        'fcmt': ?_fcmToken,
-        'currency-name': _deviceInfo.currencyName,
-      };
+    'device-os': _deviceInfo.os,
+    'device-language': _deviceInfo.languageCode,
+    'device-model': _deviceInfo.model,
+    'app-version': _deviceInfo.appVersion,
+    'device-time': '${DateTime.now()}',
+    'device-platform': _deviceInfo.platform,
+    'fcmt': ?_fcmToken,
+    'currency-name': _deviceInfo.currencyName,
+  };
 }

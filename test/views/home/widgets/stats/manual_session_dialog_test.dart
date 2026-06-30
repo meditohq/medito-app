@@ -4,10 +4,10 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/stats/manual_session_dialog.dart';
 
 void main() {
-  testWidgets(
-      'Add button submits on a small screen with the keyboard up '
-      '(regression: overflowing button taps fell through to the barrier)',
-      (tester) async {
+  testWidgets('Add button submits on a small screen with the keyboard up '
+      '(regression: overflowing button taps fell through to the barrier)', (
+    tester,
+  ) async {
     // iPhone SE-class viewport with the number pad open. Before the dialog
     // body was scrollable, the Cancel/Add row painted below the dialog's
     // bounds here, so tapping Add hit the modal barrier and dismissed the
@@ -38,11 +38,11 @@ void main() {
                       selectedDate: DateTime(2020, 1, 1),
                       bulkPreviewBuilder: (start, end) =>
                           const BulkSessionPreview(
-                        dayCount: 1,
-                        newSessionsCount: 1,
-                        currentStreak: 0,
-                        projectedStreak: 1,
-                      ),
+                            dayCount: 1,
+                            newSessionsCount: 1,
+                            currentStreak: 0,
+                            projectedStreak: 1,
+                          ),
                     ),
                   );
                   dialogClosed = true;

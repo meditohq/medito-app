@@ -339,16 +339,8 @@ const mockDonation = DonationPageModel(
   text: 'Help keep meditation free for everyone.',
   footerText: 'All donations go directly to the Medito Foundation.',
   buttons: [
-    ButtonModel(
-      title: '\$5',
-      path: 'donate/5',
-      type: 'donation',
-    ),
-    ButtonModel(
-      title: '\$10',
-      path: 'donate/10',
-      type: 'donation',
-    ),
+    ButtonModel(title: '\$5', path: 'donate/5', type: 'donation'),
+    ButtonModel(title: '\$10', path: 'donate/10', type: 'donation'),
   ],
 );
 
@@ -356,6 +348,4 @@ const mockDonation = DonationPageModel(
 // Maintenance
 // ---------------------------------------------------------------------------
 
-const mockMaintenance = MaintenanceModel(
-  isUnderMaintenance: false,
-);
+const mockMaintenance = MaintenanceModel(isUnderMaintenance: false);

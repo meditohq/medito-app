@@ -12,11 +12,7 @@ class QuoteShimmerWidget extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: padding16),
-      child: BoxShimmerWidget(
-        height: 150,
-        width: size.width,
-        borderRadius: 14,
-      ),
+      child: BoxShimmerWidget(height: 150, width: size.width, borderRadius: 14),
     );
   }
 }

@@ -40,4 +40,3 @@ class ZenModeTile extends ConsumerWidget {
     );
   }
 }
-

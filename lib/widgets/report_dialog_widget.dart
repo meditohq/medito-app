@@ -22,8 +22,9 @@ class ReportDialogWidget extends ConsumerWidget {
     super.key,
     required this.request,
     required this.timestampAtOpen,
-  }) : formattedPosition =
-            Duration(milliseconds: timestampAtOpen).toMinutesSeconds();
+  }) : formattedPosition = Duration(
+         milliseconds: timestampAtOpen,
+       ).toMinutesSeconds();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,8 +53,7 @@ class ReportDialogWidget extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               GestureDetector(
-                onTap: () =>
-                    launchURLInBrowser('https://medito.support.site/'),
+                onTap: () => launchURLInBrowser('https://medito.support.site/'),
                 child: Text(
                   l10n.reportDialogHelpLink,
                   style: theme.textTheme.bodyMedium?.copyWith(

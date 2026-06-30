@@ -68,10 +68,10 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
     return Text(
       title,
       style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-            fontFamily: sourceSerif,
-            fontWeight: FontWeight.w700,
-            color: ColorConstants.white,
-          ),
+        fontFamily: sourceSerif,
+        fontWeight: FontWeight.w700,
+        color: ColorConstants.white,
+      ),
     );
   }
 
@@ -97,9 +97,7 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
 
     return Opacity(
       opacity: 1 - scrollFactor,
-      child: Container(
-        color: widget.bgColor,
-      ),
+      child: Container(color: widget.bgColor),
     );
   }
 }

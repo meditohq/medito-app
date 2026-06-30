@@ -8,8 +8,14 @@ Widget packCardWithImage(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.all(16),
     child: PackCardWidget(
-      title: context.knobs.string(label: 'Title', initialValue: 'Mindfulness Basics'),
-      subTitle: context.knobs.string(label: 'Subtitle', initialValue: '8 sessions · Beginner'),
+      title: context.knobs.string(
+        label: 'Title',
+        initialValue: 'Mindfulness Basics',
+      ),
+      subTitle: context.knobs.string(
+        label: 'Subtitle',
+        initialValue: '8 sessions · Beginner',
+      ),
       coverUrlPath: context.knobs.string(
         label: 'Cover URL',
         initialValue: 'https://picsum.photos/seed/pack/800/450',

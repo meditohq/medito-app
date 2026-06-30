@@ -6,8 +6,13 @@ void main() {
 
   group('SmartRemindersScheduler', () {
     test('rescheduleAfterSession calculates correct anchor time', () {
-      final endMs = DateTime(2025, 10, 24, 10, 15)
-          .millisecondsSinceEpoch; // End at 10:15 AM
+      final endMs = DateTime(
+        2025,
+        10,
+        24,
+        10,
+        15,
+      ).millisecondsSinceEpoch; // End at 10:15 AM
       const durationMs = 300000; // 5 minutes
 
       // Expected anchor: (end - duration) + 24h - 10m
@@ -27,8 +32,10 @@ void main() {
 
     test('series timing calculation works correctly', () {
       final anchor = DateTime(2025, 10, 24, 9, 30);
-      final expectedDates =
-          List.generate(15, (i) => anchor.add(Duration(days: i)));
+      final expectedDates = List.generate(
+        15,
+        (i) => anchor.add(Duration(days: i)),
+      );
 
       expect(expectedDates.length, 15);
       expect(expectedDates[0], anchor);

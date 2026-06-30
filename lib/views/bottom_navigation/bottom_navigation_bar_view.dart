@@ -169,11 +169,7 @@ class _BottomNavigationBarViewState
     }
 
     if (index != _currentPageIndex) {
-      const tabTargets = {
-        0: 'tab_home',
-        1: 'tab_explore',
-        3: 'tab_settings',
-      };
+      const tabTargets = {0: 'tab_home', 1: 'tab_explore', 3: 'tab_settings'};
       final target = tabTargets[index];
       if (target != null) {
         unawaited(

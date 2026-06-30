@@ -13,7 +13,9 @@ class LocaleNotifier extends Notifier<Locale?> {
   @override
   Locale? build() {
     final prefs = ref.read(sharedPreferencesProvider);
-    final savedLocale = prefs.getString(SharedPreferenceConstants.localePreference);
+    final savedLocale = prefs.getString(
+      SharedPreferenceConstants.localePreference,
+    );
 
     if (savedLocale == null || savedLocale == LocaleConstants.system) {
       // Force English until backend is ready for Spanish
@@ -26,7 +28,10 @@ class LocaleNotifier extends Notifier<Locale?> {
 
   Future<void> setLocale(String localeCode) async {
     final prefs = ref.read(sharedPreferencesProvider);
-    await prefs.setString(SharedPreferenceConstants.localePreference, localeCode);
+    await prefs.setString(
+      SharedPreferenceConstants.localePreference,
+      localeCode,
+    );
 
     // Force English until backend is ready for Spanish
     state = const Locale(LocaleConstants.english);

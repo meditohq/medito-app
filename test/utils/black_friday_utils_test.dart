@@ -67,7 +67,9 @@ void main() {
 
       test('returns true when dismissed', () async {
         await prefs.setBool(
-            SharedPreferenceConstants.blackFridayDismissed, true);
+          SharedPreferenceConstants.blackFridayDismissed,
+          true,
+        );
         expect(BlackFridayUtils.isBlackFridayDismissedSync(prefs), true);
       });
     });
@@ -87,8 +89,9 @@ void main() {
       test('sets dismissal flag', () async {
         await BlackFridayUtils.dismissBlackFriday();
         expect(
-            prefs.getBool(SharedPreferenceConstants.blackFridayDismissed),
-            true);
+          prefs.getBool(SharedPreferenceConstants.blackFridayDismissed),
+          true,
+        );
       });
     });
 
@@ -106,13 +109,15 @@ void main() {
 
       test('removes dismissal flag', () async {
         await prefs.setBool(
-            SharedPreferenceConstants.blackFridayDismissed, true);
+          SharedPreferenceConstants.blackFridayDismissed,
+          true,
+        );
         await BlackFridayUtils.resetBlackFridayDismissal();
         expect(
-            prefs.getBool(SharedPreferenceConstants.blackFridayDismissed),
-            null);
+          prefs.getBool(SharedPreferenceConstants.blackFridayDismissed),
+          null,
+        );
       });
     });
   });
 }
-

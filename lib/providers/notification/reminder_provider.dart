@@ -31,22 +31,27 @@ class ReminderProvider {
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
     );
-    await _flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
+    await _flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+    );
   }
 
   Future<void> clearBadge() async {
     await _initFuture;
     if (Platform.isIOS) {
       const iOSPlatformChannelSpecifics = DarwinNotificationDetails(
-          badgeNumber: 0,
-          presentAlert: false,
-          presentBadge: false,
-          presentSound: false);
+        badgeNumber: 0,
+        presentAlert: false,
+        presentBadge: false,
+        presentSound: false,
+      );
       await _flutterLocalNotificationsPlugin.show(
         id: 0,
         title: null,
         body: null,
-        notificationDetails: const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
+        notificationDetails: const NotificationDetails(
+          iOS: iOSPlatformChannelSpecifics,
+        ),
       );
     }
   }
@@ -55,8 +60,10 @@ class ReminderProvider {
     await _initFuture;
     try {
       await _flutterLocalNotificationsPlugin.cancel(id: dailyNotificationId);
-      AppLogger.d('REMINDER',
-          'Cancelled daily notification (id: $dailyNotificationId)');
+      AppLogger.d(
+        'REMINDER',
+        'Cancelled daily notification (id: $dailyNotificationId)',
+      );
     } catch (e, s) {
       AppLogger.e('REMINDER', 'Error cancelling daily notification: $e', s);
       CrashlyticsService().recordError(
@@ -68,24 +75,34 @@ class ReminderProvider {
     try {
       await clearBadge();
     } catch (e, s) {
-      AppLogger.e('REMINDER',
-          'Error clearing badge after cancelling daily notification: $e', s);
+      AppLogger.e(
+        'REMINDER',
+        'Error clearing badge after cancelling daily notification: $e',
+        s,
+      );
     }
   }
 
   Future<void> scheduleSmartReminderSeries(
-      List<ScheduledReminder> items) async {
+    List<ScheduledReminder> items,
+  ) async {
     await _initFuture;
-    AppLogger.d('XXXX',
-        'scheduleSmartReminderSeries called with ${items.length} items');
+    AppLogger.d(
+      'XXXX',
+      'scheduleSmartReminderSeries called with ${items.length} items',
+    );
     try {
       for (final item in items) {
         try {
           final payload = item.scheduledDate.toIso8601String();
-          AppLogger.d('REMINDER',
-              'Scheduling reminder ${item.id} with payload: $payload');
-          AppLogger.d('XXXX',
-              'Scheduling reminder ID=${item.id}, scheduledDate=${item.scheduledDate}, payload=$payload, title=${item.title}');
+          AppLogger.d(
+            'REMINDER',
+            'Scheduling reminder ${item.id} with payload: $payload',
+          );
+          AppLogger.d(
+            'XXXX',
+            'Scheduling reminder ID=${item.id}, scheduledDate=${item.scheduledDate}, payload=$payload, title=${item.title}',
+          );
           await _flutterLocalNotificationsPlugin.zonedSchedule(
             id: item.id,
             title: item.title,
@@ -103,15 +120,20 @@ class ReminderProvider {
               ),
             ),
           );
-          AppLogger.d('XXXX',
-              'Successfully scheduled reminder ID=${item.id} at ${item.scheduledDate}');
+          AppLogger.d(
+            'XXXX',
+            'Successfully scheduled reminder ID=${item.id} at ${item.scheduledDate}',
+          );
         } catch (e, s) {
           AppLogger.e(
-              'REMINDER',
-              'Error scheduling reminder ${item.id} at ${item.scheduledDate}: $e',
-              s);
-          AppLogger.e('XXXX',
-              'Error scheduling reminder ID=${item.id} at ${item.scheduledDate}: $e');
+            'REMINDER',
+            'Error scheduling reminder ${item.id} at ${item.scheduledDate}: $e',
+            s,
+          );
+          AppLogger.e(
+            'XXXX',
+            'Error scheduling reminder ID=${item.id} at ${item.scheduledDate}: $e',
+          );
           CrashlyticsService().recordError(
             e,
             s,
@@ -120,14 +142,20 @@ class ReminderProvider {
           );
         }
       }
-      AppLogger.d('XXXX',
-          'Finished scheduling ${items.length} reminders, checking pending notifications...');
+      AppLogger.d(
+        'XXXX',
+        'Finished scheduling ${items.length} reminders, checking pending notifications...',
+      );
       final pending = await getPendingNotifications();
-      AppLogger.d('XXXX',
-          'Pending notifications after scheduling: ${pending.length} found');
+      AppLogger.d(
+        'XXXX',
+        'Pending notifications after scheduling: ${pending.length} found',
+      );
       for (final notification in pending) {
-        AppLogger.d('XXXX',
-            'Pending notification: ID=${notification.id}, payload=${notification.payload}');
+        AppLogger.d(
+          'XXXX',
+          'Pending notification: ID=${notification.id}, payload=${notification.payload}',
+        );
       }
     } catch (e, s) {
       AppLogger.e('REMINDER', 'Error scheduling smart reminder series: $e', s);
@@ -151,8 +179,11 @@ class ReminderProvider {
           await _flutterLocalNotificationsPlugin.cancel(id: smartBaseId + i);
           cancelledCount++;
         } catch (e, s) {
-          AppLogger.e('REMINDER',
-              'Error cancelling smart reminder ${smartBaseId + i}: $e', s);
+          AppLogger.e(
+            'REMINDER',
+            'Error cancelling smart reminder ${smartBaseId + i}: $e',
+            s,
+          );
           CrashlyticsService().recordError(
             e,
             s,
@@ -164,11 +195,16 @@ class ReminderProvider {
         await _flutterLocalNotificationsPlugin.cancel(id: smartBaseId + 15);
         cancelledCount++;
       } catch (e, s) {
-        AppLogger.e('REMINDER',
-            'Error cancelling day 30 reminder ${smartBaseId + 15}: $e', s);
+        AppLogger.e(
+          'REMINDER',
+          'Error cancelling day 30 reminder ${smartBaseId + 15}: $e',
+          s,
+        );
       }
-      AppLogger.d('REMINDER',
-          'Cancelled $cancelledCount smart reminders (including day 30)');
+      AppLogger.d(
+        'REMINDER',
+        'Cancelled $cancelledCount smart reminders (including day 30)',
+      );
     } catch (e, s) {
       AppLogger.e('REMINDER', 'Error cancelling smart reminder series: $e', s);
       CrashlyticsService().recordError(
@@ -180,8 +216,11 @@ class ReminderProvider {
     try {
       await clearBadge();
     } catch (e, s) {
-      AppLogger.e('REMINDER',
-          'Error clearing badge after cancelling smart reminders: $e', s);
+      AppLogger.e(
+        'REMINDER',
+        'Error clearing badge after cancelling smart reminders: $e',
+        s,
+      );
     }
   }
 
@@ -189,13 +228,17 @@ class ReminderProvider {
     await _initFuture;
     AppLogger.d('REMINDER', 'Getting pending notifications...');
     try {
-      final pendingNotifications =
-          await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
-      AppLogger.d('REMINDER',
-          'Found ${pendingNotifications.length} pending notification(s)');
+      final pendingNotifications = await _flutterLocalNotificationsPlugin
+          .pendingNotificationRequests();
+      AppLogger.d(
+        'REMINDER',
+        'Found ${pendingNotifications.length} pending notification(s)',
+      );
       for (final notification in pendingNotifications) {
-        AppLogger.d('REMINDER',
-            'Notification ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}, Payload: ${notification.payload}');
+        AppLogger.d(
+          'REMINDER',
+          'Notification ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}, Payload: ${notification.payload}',
+        );
       }
       return pendingNotifications;
     } catch (e, s) {

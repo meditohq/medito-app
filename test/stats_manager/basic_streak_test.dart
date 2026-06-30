@@ -60,9 +60,7 @@ void main() {
 
       final result = statsManager.calculateStreak(
         statsFrom(
-          audio: [
-            LocalAudioCompleted(id: '1', timestamp: ms(day(2025, 3, 2))),
-          ],
+          audio: [LocalAudioCompleted(id: '1', timestamp: ms(day(2025, 3, 2)))],
         ),
       );
 

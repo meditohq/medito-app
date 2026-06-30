@@ -63,8 +63,10 @@ class StreakCircleController extends ChangeNotifier {
     }
   }
 
-  bool isStreakDoneToday(List<LocalAudioCompleted>? audioCompleted,
-      {DateTime? now}) {
+  bool isStreakDoneToday(
+    List<LocalAudioCompleted>? audioCompleted, {
+    DateTime? now,
+  }) {
     if (audioCompleted == null || audioCompleted.isEmpty) {
       return false;
     }
@@ -74,8 +76,11 @@ class StreakCircleController extends ChangeNotifier {
 
     return audioCompleted.any((audio) {
       var audioDate = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-      var audioDateOnly =
-          DateTime(audioDate.year, audioDate.month, audioDate.day);
+      var audioDateOnly = DateTime(
+        audioDate.year,
+        audioDate.month,
+        audioDate.day,
+      );
       return audioDateOnly == today;
     });
   }

@@ -13,10 +13,7 @@ import 'report_dialog_widget.dart';
 class ReportButtonWidget extends ConsumerWidget {
   final PlaybackRequest request;
 
-  const ReportButtonWidget({
-    super.key,
-    required this.request,
-  });
+  const ReportButtonWidget({super.key, required this.request});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,10 +26,7 @@ class ReportButtonWidget extends ConsumerWidget {
         size: 24,
       ),
       padding: const EdgeInsets.all(12),
-      constraints: const BoxConstraints(
-        minWidth: 48,
-        minHeight: 48,
-      ),
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
     );
   }
 

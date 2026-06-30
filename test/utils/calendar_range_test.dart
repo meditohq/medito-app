@@ -97,43 +97,47 @@ void main() {
     // spring-forward day; subsequent iterations would carry that 01:00
     // offset forward, breaking equality with midnight-normalised dates.
     test(
-        'crosses US DST spring-forward (Mar 8 2026) without drifting off midnight',
-        () {
-      final days = enumerateDays(DateTime(2026, 3, 6), DateTime(2026, 3, 11));
-      expect(days, [
-        DateTime(2026, 3, 6),
-        DateTime(2026, 3, 7),
-        DateTime(2026, 3, 8),
-        DateTime(2026, 3, 9),
-        DateTime(2026, 3, 10),
-        DateTime(2026, 3, 11),
-      ]);
-      // Every entry is local midnight.
-      for (final d in days) {
-        expect(d.hour, 0,
-            reason: 'expected midnight for $d, got hour=${d.hour}');
-      }
-    });
+      'crosses US DST spring-forward (Mar 8 2026) without drifting off midnight',
+      () {
+        final days = enumerateDays(DateTime(2026, 3, 6), DateTime(2026, 3, 11));
+        expect(days, [
+          DateTime(2026, 3, 6),
+          DateTime(2026, 3, 7),
+          DateTime(2026, 3, 8),
+          DateTime(2026, 3, 9),
+          DateTime(2026, 3, 10),
+          DateTime(2026, 3, 11),
+        ]);
+        // Every entry is local midnight.
+        for (final d in days) {
+          expect(
+            d.hour,
+            0,
+            reason: 'expected midnight for $d, got hour=${d.hour}',
+          );
+        }
+      },
+    );
 
-    test(
-        'crosses UK BST spring-forward (Mar 29 2026) — large range that hit '
+    test('crosses UK BST spring-forward (Mar 29 2026) — large range that hit '
         'the projected-streak bug', () {
-      final days =
-          enumerateDays(DateTime(2026, 3, 12), DateTime(2026, 4, 28));
+      final days = enumerateDays(DateTime(2026, 3, 12), DateTime(2026, 4, 28));
       expect(days.length, 48);
       // Critically, every entry is at local midnight — including the days
       // immediately after the transition.
       for (final d in days) {
-        expect(d.hour, 0,
-            reason: 'expected midnight for $d, got hour=${d.hour}');
+        expect(
+          d.hour,
+          0,
+          reason: 'expected midnight for $d, got hour=${d.hour}',
+        );
       }
       expect(days.first, DateTime(2026, 3, 12));
       expect(days.last, DateTime(2026, 4, 28));
     });
 
     test('crosses fall-back without producing duplicate days', () {
-      final days =
-          enumerateDays(DateTime(2026, 10, 30), DateTime(2026, 11, 3));
+      final days = enumerateDays(DateTime(2026, 10, 30), DateTime(2026, 11, 3));
       expect(days, [
         DateTime(2026, 10, 30),
         DateTime(2026, 10, 31),
@@ -161,8 +165,7 @@ void main() {
       expect(projectStreak([today], today), 1);
     });
 
-    test('only yesterday (no today) returns 1 — grace period before reset',
-        () {
+    test('only yesterday (no today) returns 1 — grace period before reset', () {
       final today = DateTime(2026, 4, 28);
       final yesterday = DateTime(2026, 4, 27);
       expect(projectStreak([yesterday], today), 1);
@@ -177,8 +180,7 @@ void main() {
     test('counts a long contiguous streak ending today', () {
       final today = DateTime(2026, 4, 28);
       final activity = <DateTime>[
-        for (var i = 0; i < 15; i++)
-          DateTime(2026, 4, 28 - i),
+        for (var i = 0; i < 15; i++) DateTime(2026, 4, 28 - i),
       ];
       expect(projectStreak(activity, today), 15);
     });
@@ -261,8 +263,7 @@ void main() {
       expect(projectStreak(activity, today), 5);
     });
 
-    test('future-dated activity entries are ignored, do not extend streak',
-        () {
+    test('future-dated activity entries are ignored, do not extend streak', () {
       final today = DateTime(2026, 4, 28);
       final activity = [
         DateTime(2026, 4, 28),
@@ -297,10 +298,7 @@ void main() {
       // +4h-shifted today=Apr 27) does → streak = 1.
       final now = DateTime(2026, 4, 28, 2, 0);
       final activity = [DateTime(2026, 4, 26, 21, 0)];
-      expect(
-        projectStreak(activity, now, dayBoundaryOffset: offset),
-        1,
-      );
+      expect(projectStreak(activity, now, dayBoundaryOffset: offset), 1);
     });
 
     test('+4h offset: late-night session bridges into today\'s streak', () {
@@ -315,10 +313,7 @@ void main() {
         DateTime(2026, 4, 27, 23, 0),
         DateTime(2026, 4, 26, 22, 0),
       ];
-      expect(
-        projectStreak(activity, now, dayBoundaryOffset: offset),
-        2,
-      );
+      expect(projectStreak(activity, now, dayBoundaryOffset: offset), 2);
     });
 
     test('+4h offset: three-day streak counting today', () {
@@ -332,10 +327,7 @@ void main() {
         DateTime(2026, 4, 27, 2, 0),
         DateTime(2026, 4, 26, 2, 0),
       ];
-      expect(
-        projectStreak(activity, now, dayBoundaryOffset: offset),
-        4,
-      );
+      expect(projectStreak(activity, now, dayBoundaryOffset: offset), 4);
     });
 
     test('default offset preserves existing behaviour', () {
@@ -452,14 +444,16 @@ void main() {
       expect(range.end, apr5);
     });
 
-    test('5th → 3rd → 1st yields range 1–5 (extending the other direction)',
-        () {
-      var range = expandRange(const RangeBounds(null, null), apr5);
-      range = expandRange(range, apr3);
-      range = expandRange(range, apr1);
-      expect(range.start, apr1);
-      expect(range.end, apr5);
-    });
+    test(
+      '5th → 3rd → 1st yields range 1–5 (extending the other direction)',
+      () {
+        var range = expandRange(const RangeBounds(null, null), apr5);
+        range = expandRange(range, apr3);
+        range = expandRange(range, apr1);
+        expect(range.start, apr1);
+        expect(range.end, apr5);
+      },
+    );
 
     test('RangeBounds.isComplete and isEmpty', () {
       expect(const RangeBounds(null, null).isEmpty, true);

@@ -13,8 +13,10 @@ class TrackVariantSelector {
     int? targetMs,
   ) {
     if (files.length == 1 || targetMs == null) return files.first;
-    return files.reduce((a, b) =>
-        (a.duration - targetMs).abs() < (b.duration - targetMs).abs() ? a : b);
+    return files.reduce(
+      (a, b) =>
+          (a.duration - targetMs).abs() < (b.duration - targetMs).abs() ? a : b,
+    );
   }
 
   /// Returns the voice matching [guideName], or the first voice when there is

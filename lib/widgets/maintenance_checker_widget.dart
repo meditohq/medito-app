@@ -8,10 +8,7 @@ import '../../../utils/logger.dart';
 
 /// Widget that watches for maintenance status and shows the maintenance screen when needed
 class MaintenanceChecker extends ConsumerStatefulWidget {
-  const MaintenanceChecker({
-    super.key,
-    required this.child,
-  });
+  const MaintenanceChecker({super.key, required this.child});
 
   final Widget child;
 
@@ -62,8 +59,10 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
         return widget.child;
       },
       error: (error, stackTrace) {
-        AppLogger.e('MAINTENANCE',
-            '[MAINTENANCE_ERROR] Error in maintenance checker: $error');
+        AppLogger.e(
+          'MAINTENANCE',
+          '[MAINTENANCE_ERROR] Error in maintenance checker: $error',
+        );
         if (_maintenanceOverlay != null) {
           _maintenanceOverlay?.remove();
           _maintenanceOverlay = null;
@@ -88,14 +87,18 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
     final navigator = navigatorKey.currentState;
     if (navigator == null) {
       AppLogger.e(
-          'MAINTENANCE', 'Navigator is null, cannot show maintenance view');
+        'MAINTENANCE',
+        'Navigator is null, cannot show maintenance view',
+      );
       return;
     }
 
     final overlay = navigator.overlay;
     if (overlay == null) {
       AppLogger.e(
-          'MAINTENANCE', 'Overlay is null, cannot show maintenance view');
+        'MAINTENANCE',
+        'Overlay is null, cannot show maintenance view',
+      );
       return;
     }
 

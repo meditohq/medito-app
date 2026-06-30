@@ -52,7 +52,6 @@ import 'package:medito/mock/mock_donation_api_service.dart';
 import 'package:medito/providers/stripe/payment_providers.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 
-
 // Completer used as both the guard and the barrier for duplicate main() calls.
 // It is set synchronously before any await, so a second call always finds it non-null.
 Completer<void>? _initCompleter;
@@ -102,7 +101,9 @@ void main() async {
     final legacyValue = prefs.getBool(legacyKey)!;
     if (!legacyValue) {
       await prefs.setBool(
-          SharedPreferenceConstants.analyticsFirebaseEnabled, false);
+        SharedPreferenceConstants.analyticsFirebaseEnabled,
+        false,
+      );
     }
     await prefs.remove(legacyKey);
   }
@@ -120,7 +121,9 @@ void main() async {
       final notifStatus = await Permission.notification.status;
       if (!notifStatus.isGranted) {
         await prefs.setBool(
-            SharedPreferenceConstants.notifPermissionFixNeeded, true);
+          SharedPreferenceConstants.notifPermissionFixNeeded,
+          true,
+        );
       }
     }
   }
@@ -138,14 +141,15 @@ void main() async {
 
       final analyticsEnabled =
           prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
-              true;
+          true;
       if (analyticsEnabled) {
         await CrashlyticsService().initialize();
       } else {
         // Explicitly disable Crashlytics collection so the SDK doesn't
         // phone home even though Firebase core is initialised.
-        await FirebaseCrashlytics.instance
-            .setCrashlyticsCollectionEnabled(false);
+        await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+          false,
+        );
       }
     } catch (e) {
       AppLogger.e('MAIN', 'Firebase initialization failed: $e');
@@ -253,7 +257,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void _updateSystemUiForTheme(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
     final brightness = MediaQuery.of(context).platformBrightness;
-    final isDark = themeMode == ThemeMode.dark ||
+    final isDark =
+        themeMode == ThemeMode.dark ||
         (themeMode == ThemeMode.system && brightness == Brightness.dark);
 
     SystemChrome.setSystemUIOverlayStyle(
@@ -261,8 +266,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         systemStatusBarContrastEnforced: false,
         systemNavigationBarColor: Colors.transparent,
         systemNavigationBarDividerColor: Colors.transparent,
-        systemNavigationBarIconBrightness:
-            isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness: isDark
+            ? Brightness.light
+            : Brightness.dark,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
     );
@@ -286,9 +292,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
       error: (error, stack) => MaterialApp(
-        home: Scaffold(
-          body: Center(child: Text('Error initializing: $error')),
-        ),
+        home: Scaffold(body: Center(child: Text('Error initializing: $error'))),
       ),
       data: (_) {
         // Initialize deep link service once we have context
@@ -337,10 +341,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              supportedLocales: const [
-                Locale('en'),
-                Locale('es'),
-              ],
+              supportedLocales: const [Locale('en'), Locale('es')],
               initialRoute: '/',
               routes: {
                 '/': (context) => const SplashView(),
@@ -428,7 +429,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
       appReadyCompleter = Completer<void>();
       // Check if we're already showing the SplashView by examining current route
       final currentRoute = ModalRoute.of(context);
-      final isAlreadyOnSplash = currentRoute != null &&
+      final isAlreadyOnSplash =
+          currentRoute != null &&
           currentRoute.settings.name == SplashView.routeName;
 
       if (isAlreadyOnSplash) {

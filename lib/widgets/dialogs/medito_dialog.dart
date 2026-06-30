@@ -32,9 +32,9 @@ class MeditoDialog extends StatelessWidget {
     this.maxHeight,
     this.padding = const EdgeInsets.all(24),
   }) : assert(
-          child != null || title != null || content != null,
-          'Provide either child or title/content',
-        );
+         child != null || title != null || content != null,
+         'Provide either child or title/content',
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +122,10 @@ class MeditoDialogTitle extends StatelessWidget {
     return Text(
       text,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontFamily: dmSans,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+        fontFamily: dmSans,
+        fontWeight: FontWeight.w600,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
     );
   }
 }
@@ -141,13 +141,10 @@ class MeditoDialogBody extends StatelessWidget {
     return Text(
       text,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontFamily: dmSans,
-            height: 1.5,
-            color: Theme.of(context)
-                .colorScheme
-                .onSurface
-                .withOpacityValue(0.75),
-          ),
+        fontFamily: dmSans,
+        height: 1.5,
+        color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.75),
+      ),
     );
   }
 }

@@ -28,14 +28,17 @@ class OnboardingMeditationExperiment {
   /// Returns the sticky variant for this install, assigning (50/50) and
   /// persisting it on first call.
   static String resolveVariant(SharedPreferences prefs) {
-    final existing =
-        prefs.getString(SharedPreferenceConstants.onboardingMeditationVariant);
+    final existing = prefs.getString(
+      SharedPreferenceConstants.onboardingMeditationVariant,
+    );
     if (existing == variantControl || existing == variantMeditation) {
       return existing!;
     }
     final assigned = Random().nextBool() ? variantMeditation : variantControl;
     prefs.setString(
-        SharedPreferenceConstants.onboardingMeditationVariant, assigned);
+      SharedPreferenceConstants.onboardingMeditationVariant,
+      assigned,
+    );
     return assigned;
   }
 }

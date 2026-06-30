@@ -16,7 +16,8 @@ class LocalAudioCompleted {
 
   // Convert from API model to local model
   factory LocalAudioCompleted.fromAudioCompleted(
-      AudioCompleted audioCompleted) {
+    AudioCompleted audioCompleted,
+  ) {
     return LocalAudioCompleted(
       timestamp: audioCompleted.timestamp,
       id: audioCompleted.id,
@@ -25,16 +26,10 @@ class LocalAudioCompleted {
 
   // Convert to API model
   AudioCompleted toAudioCompleted() {
-    return AudioCompleted(
-      timestamp: timestamp,
-      id: id,
-    );
+    return AudioCompleted(timestamp: timestamp, id: id);
   }
 
-  LocalAudioCompleted copyWith({
-    int? timestamp,
-    String? id,
-  }) {
+  LocalAudioCompleted copyWith({int? timestamp, String? id}) {
     return LocalAudioCompleted(
       timestamp: timestamp ?? this.timestamp,
       id: id ?? this.id,

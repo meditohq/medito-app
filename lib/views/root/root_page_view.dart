@@ -24,9 +24,7 @@ class _RootPageViewState extends ConsumerState<RootPageView> {
           children: [
             Stack(
               alignment: Alignment.bottomCenter,
-              children: [
-                widget.firstChild,
-              ],
+              children: [widget.firstChild],
             ),
           ],
         ),

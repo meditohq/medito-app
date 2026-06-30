@@ -5,10 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
 
 class DurationIndicatorWidget extends ConsumerStatefulWidget {
-  const DurationIndicatorWidget({
-    super.key,
-    required this.onSeekEnd,
-  });
+  const DurationIndicatorWidget({super.key, required this.onSeekEnd});
 
   final void Function(int) onSeekEnd;
 
@@ -24,8 +21,12 @@ class _DurationIndicatorWidgetState
 
   @override
   Widget build(BuildContext context) {
-    final totalDuration = ref.watch(audioStateProvider.select((s) => s.duration));
-    final currentPosition = ref.watch(audioStateProvider.select((s) => s.position));
+    final totalDuration = ref.watch(
+      audioStateProvider.select((s) => s.duration),
+    );
+    final currentPosition = ref.watch(
+      audioStateProvider.select((s) => s.position),
+    );
 
     // clamp values to avoid negative slider values
     final safeTotal = totalDuration < 0 ? 0 : totalDuration;
@@ -57,17 +58,19 @@ class _DurationIndicatorWidgetState
             data: SliderThemeData(
               trackHeight: 6,
               trackShape: CustomTrackShape(addTopPadding: false),
-              thumbShape: const RoundSliderThumbShape(
-                enabledThumbRadius: 6.0,
-              ),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
             ),
             child: Slider(
               min: 0.0,
               max: totalDuration > 0.0 ? totalDuration : 1.0,
               activeColor: ColorConstants.white,
               inactiveColor: ColorConstants.onyx,
-              value:
-                  _isSeekbarBeingDragged ? _dragSeekbarValue : currentDuration.clamp(0.0, (totalDuration > 0.0 ? totalDuration : 1.0)),
+              value: _isSeekbarBeingDragged
+                  ? _dragSeekbarValue
+                  : currentDuration.clamp(
+                      0.0,
+                      (totalDuration > 0.0 ? totalDuration : 1.0),
+                    ),
               onChanged: (val) {
                 if (!_isSeekbarBeingDragged) {
                   _isSeekbarBeingDragged = true;
@@ -107,13 +110,11 @@ class _DurationIndicatorWidgetState
       children: [
         _durationLabel(
           context,
-          Duration(milliseconds: currentPosition.round())
-              .toMinutesSeconds(),
+          Duration(milliseconds: currentPosition.round()).toMinutesSeconds(),
         ),
         _durationLabel(
           context,
-          Duration(milliseconds: totalDuration.round())
-              .toMinutesSeconds(),
+          Duration(milliseconds: totalDuration.round()).toMinutesSeconds(),
         ),
       ],
     );
@@ -123,10 +124,10 @@ class _DurationIndicatorWidgetState
     return Text(
       label,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: ColorConstants.white,
-            fontFamily: dmMono,
-            fontSize: 12,
-          ),
+        color: ColorConstants.white,
+        fontFamily: dmMono,
+        fontSize: 12,
+      ),
     );
   }
 }

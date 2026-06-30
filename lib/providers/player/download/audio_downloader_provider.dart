@@ -26,8 +26,8 @@ class AudioDownloaderState {
 
 final audioDownloaderProvider =
     NotifierProvider<AudioDownloaderProvider, AudioDownloaderState>(() {
-  return AudioDownloaderProvider();
-});
+      return AudioDownloaderProvider();
+    });
 
 class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
   @override
@@ -40,8 +40,9 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
         '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}';
     try {
       final downloadAudio = ref.read(downloaderRepositoryProvider);
-      var newDownloadState =
-          Map<String, AudioDownloadState>.from(state.audioDownloadState);
+      var newDownloadState = Map<String, AudioDownloadState>.from(
+        state.audioDownloadState,
+      );
       newDownloadState[fileName] = AudioDownloadState.downloading;
       state = state.copyWith(audioDownloadState: newDownloadState);
 
@@ -50,8 +51,9 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
         fileName: fileName,
         onReceiveProgress: (received, total) {
           if (total != -1 && ref.mounted) {
-            var newProgress =
-                Map<String, double>.from(state.downloadingProgress);
+            var newProgress = Map<String, double>.from(
+              state.downloadingProgress,
+            );
             newProgress[fileName] = (received / total * 100);
             state = state.copyWith(downloadingProgress: newProgress);
           }
@@ -62,25 +64,27 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
 
       var finalProgress = Map<String, double>.from(state.downloadingProgress);
       finalProgress.remove(fileName);
-      var finalDownloadState =
-          Map<String, AudioDownloadState>.from(state.audioDownloadState);
+      var finalDownloadState = Map<String, AudioDownloadState>.from(
+        state.audioDownloadState,
+      );
       finalDownloadState[fileName] = AudioDownloadState.downloaded;
       state = state.copyWith(
         downloadingProgress: finalProgress,
         audioDownloadState: finalDownloadState,
       );
 
-      await ref
-          .read(deleteDownloadedTrackByIdProvider(fileId: request.fileId).future);
+      await ref.read(
+        deleteDownloadedTrackByIdProvider(fileId: request.fileId).future,
+      );
 
       if (!ref.mounted) return;
 
-      await ref
-          .read(addDownloadedTrackProvider(request: request).future);
+      await ref.read(addDownloadedTrackProvider(request: request).future);
     } catch (e) {
       if (ref.mounted) {
-        var errorDownloadState =
-            Map<String, AudioDownloadState>.from(state.audioDownloadState);
+        var errorDownloadState = Map<String, AudioDownloadState>.from(
+          state.audioDownloadState,
+        );
         errorDownloadState[fileName] = AudioDownloadState.download;
         state = state.copyWith(audioDownloadState: errorDownloadState);
       }
@@ -94,8 +98,9 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
 
     if (!ref.mounted) return;
 
-    var newDownloadState =
-        Map<String, AudioDownloadState>.from(state.audioDownloadState);
+    var newDownloadState = Map<String, AudioDownloadState>.from(
+      state.audioDownloadState,
+    );
     newDownloadState[fileName] = AudioDownloadState.download;
     state = state.copyWith(audioDownloadState: newDownloadState);
   }
@@ -106,8 +111,9 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
 
     if (!ref.mounted) return audioPath;
 
-    var newDownloadState =
-        Map<String, AudioDownloadState>.from(state.audioDownloadState);
+    var newDownloadState = Map<String, AudioDownloadState>.from(
+      state.audioDownloadState,
+    );
     newDownloadState[fileName] = audioPath != null
         ? AudioDownloadState.downloaded
         : AudioDownloadState.download;
@@ -117,8 +123,4 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
   }
 }
 
-enum AudioDownloadState {
-  download,
-  downloading,
-  downloaded,
-}
+enum AudioDownloadState { download, downloading, downloaded }

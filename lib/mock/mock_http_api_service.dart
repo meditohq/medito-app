@@ -28,10 +28,7 @@ class MockHttpApiService extends HttpApiService {
   }
 
   @override
-  Future<Map<String, dynamic>> postRequest(
-    String path, {
-    dynamic body,
-  }) async {
+  Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async {
     await Future.delayed(const Duration(milliseconds: 100));
     AppLogger.d('MOCK_HTTP', 'POST $path');
     return _toJsonMap(_matchResponse(path));
@@ -95,16 +92,12 @@ class MockHttpApiService extends HttpApiService {
 
     // Favorites
     if (cleanPath == HTTPConstants.favorites) {
-      return {
-        'results': mockFavorites.map((f) => f.toJson()).toList(),
-      };
+      return {'results': mockFavorites.map((f) => f.toJson()).toList()};
     }
 
     // Background sounds
     if (cleanPath == HTTPConstants.backgroundSounds) {
-      return {
-        'results': mockBackgroundSounds.map((s) => s.toJson()).toList(),
-      };
+      return {'results': mockBackgroundSounds.map((s) => s.toJson()).toList()};
     }
 
     // Search tracks

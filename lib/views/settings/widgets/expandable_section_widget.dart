@@ -32,16 +32,13 @@ class _ExpandableSectionWidgetState
 
   void _showDebugBottomSheet(BuildContext context) {
     _ref.invalidate(meProvider);
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const DebugInfoScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const DebugInfoScreen()));
   }
 
   Future<void> _showDayBoundaryOffsetDialog(BuildContext context) async {
-    final current =
-        _ref.read(dayBoundaryOffsetProvider).value ?? 0;
+    final current = _ref.read(dayBoundaryOffsetProvider).value ?? 0;
     final picked = await showDialog<int>(
       context: context,
       builder: (_) => DayBoundaryOffsetDialog(currentHours: current),
@@ -55,9 +52,7 @@ class _ExpandableSectionWidgetState
 
   void _showOnboardingScreen(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const OnboardingPagerScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const OnboardingPagerScreen()),
     );
   }
 
@@ -90,34 +85,38 @@ class _ExpandableSectionWidgetState
           button: true,
           expanded: _isExpanded,
           child: InkWell(
-          onTap: () {
-            setState(() {
-              _isExpanded = !_isExpanded;
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 24.0, bottom: 8.0),
-            child: ExcludeSemantics(
-              child: Row(
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.advanced,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 16.0,
+                top: 24.0,
+                bottom: 8.0,
+              ),
+              child: ExcludeSemantics(
+                child: Row(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.advanced,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
                       ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    Icon(
+                      _isExpanded ? Icons.expand_less : Icons.expand_more,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      size: 20.0,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8.0),
-                Icon(
-                  _isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  size: 20.0,
-                ),
-              ],
+              ),
             ),
           ),
-          ),
-        ),
         ),
         if (_isExpanded)
           Consumer(
@@ -156,13 +155,11 @@ class _ExpandableSectionWidgetState
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.manageDefaults,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
+                                style: Theme.of(context).textTheme.labelMedium
                                     ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                               ),
                             ),
@@ -207,15 +204,14 @@ class _ExpandableSectionWidgetState
                             width16,
                             Expanded(
                               child: Text(
-                                AppLocalizations.of(context)!
-                                    .restorePreviousStats,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
+                                AppLocalizations.of(
+                                  context,
+                                )!.restorePreviousStats,
+                                style: Theme.of(context).textTheme.labelMedium
                                     ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                               ),
                             ),
@@ -259,13 +255,11 @@ class _ExpandableSectionWidgetState
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.debugInfo,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
+                                style: Theme.of(context).textTheme.labelMedium
                                     ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                               ),
                             ),
@@ -306,13 +300,11 @@ class _ExpandableSectionWidgetState
                               Expanded(
                                 child: Text(
                                   AppLocalizations.of(context)!.onboarding,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelMedium
+                                  style: Theme.of(context).textTheme.labelMedium
                                       ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
                                       ),
                                 ),
                               ),
@@ -352,13 +344,11 @@ class _ExpandableSectionWidgetState
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.termsOfService,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
+                                style: Theme.of(context).textTheme.labelMedium
                                     ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                               ),
                             ),
@@ -398,13 +388,11 @@ class _ExpandableSectionWidgetState
                             Expanded(
                               child: Text(
                                 AppLocalizations.of(context)!.privacyPolicy,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium
+                                style: Theme.of(context).textTheme.labelMedium
                                     ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
                                     ),
                               ),
                             ),
@@ -463,26 +451,21 @@ class _DayBoundaryOffsetRow extends ConsumerWidget {
                   children: [
                     Text(
                       'When my day starts',
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelMedium
-                          ?.copyWith(color: onSurface),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelMedium?.copyWith(color: onSurface),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       _subtitleFor(hours),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: onSurface.withOpacityValue(0.6),
-                          ),
+                        color: onSurface.withOpacityValue(0.6),
+                      ),
                     ),
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: onSurface,
-                size: 24.0,
-              ),
+              Icon(Icons.chevron_right_rounded, color: onSurface, size: 24.0),
             ],
           ),
         ),

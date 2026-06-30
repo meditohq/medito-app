@@ -5,9 +5,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/network/http_api_service.dart';
 
 // Auth events that can be emitted
-enum AuthStateEvent {
-  forceLogout,
-}
+enum AuthStateEvent { forceLogout }
 
 // Stream controller for auth state events
 final _authStateController = StreamController<AuthStateEvent>.broadcast();

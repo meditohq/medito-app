@@ -40,7 +40,10 @@ class FirebaseMessagingHandler {
 
   Future<void> initialize(BuildContext context, WidgetRef ref) async {
     if (isMockMode) {
-      AppLogger.d('FIREBASE_NOTIFICATIONS', 'Mock mode: skipping Firebase Messaging init');
+      AppLogger.d(
+        'FIREBASE_NOTIFICATIONS',
+        'Mock mode: skipping Firebase Messaging init',
+      );
       return;
     }
     try {
@@ -51,14 +54,16 @@ class FirebaseMessagingHandler {
       // Enable headless notification presentation for all platforms, but disable badges
       await FirebaseMessaging.instance
           .setForegroundNotificationPresentationOptions(
-        alert: true,
-        badge: false, // Never show badges
-        sound: true,
-      );
+            alert: true,
+            badge: false, // Never show badges
+            sound: true,
+          );
 
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_NOTIFICATIONS',
-            "Firebase Messaging initialized with foreground presentation enabled (badges disabled)");
+        AppLogger.d(
+          'FIREBASE_NOTIFICATIONS',
+          "Firebase Messaging initialized with foreground presentation enabled (badges disabled)",
+        );
       }
 
       // Request permission explicitly to ensure notifications can show
@@ -70,8 +75,10 @@ class FirebaseMessagingHandler {
       );
 
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_NOTIFICATIONS',
-            "Firebase Messaging permission status: ${settings.authorizationStatus}");
+        AppLogger.d(
+          'FIREBASE_NOTIFICATIONS',
+          "Firebase Messaging permission status: ${settings.authorizationStatus}",
+        );
       }
 
       if (Platform.isIOS) {
@@ -79,7 +86,10 @@ class FirebaseMessagingHandler {
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_NOTIFICATIONS', "Error initializing Firebase Messaging: $e");
+        AppLogger.d(
+          'FIREBASE_NOTIFICATIONS',
+          "Error initializing Firebase Messaging: $e",
+        );
       }
     }
   }
@@ -97,9 +107,10 @@ class FirebaseMessagingHandler {
     );
 
     // Check if the channel already exists (it might have been created in the native code)
-    final androidImplementation =
-        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final androidImplementation = _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     final channelExists =
         await androidImplementation?.areNotificationsEnabled() ?? false;
@@ -109,24 +120,19 @@ class FirebaseMessagingHandler {
     }
 
     _isFlutterLocalNotificationsInitialized = true;
-
   }
 
-  void _configureFirebaseMessaging(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  void _configureFirebaseMessaging(BuildContext context, WidgetRef ref) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    FirebaseMessaging.onMessage
-        .listen((message) => _handleForegroundMessage(message, context, ref));
-    FirebaseMessaging.onMessageOpenedApp
-        .listen((message) => _handleMessageOpenedApp(message, context, ref));
+    FirebaseMessaging.onMessage.listen(
+      (message) => _handleForegroundMessage(message, context, ref),
+    );
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (message) => _handleMessageOpenedApp(message, context, ref),
+    );
   }
 
-  void _initializeLocalNotifications(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
+  void _initializeLocalNotifications(BuildContext context, WidgetRef ref) {
     // Match the Firebase example approach
     const initializationSettingsAndroid = AndroidInitializationSettings('logo');
 
@@ -152,7 +158,10 @@ class FirebaseMessagingHandler {
             _navigate(context, ref, data);
           } catch (e) {
             if (kDebugMode) {
-              AppLogger.d('FIREBASE_NOTIFICATIONS', "Error decoding notification payload: $e");
+              AppLogger.d(
+                'FIREBASE_NOTIFICATIONS',
+                "Error decoding notification payload: $e",
+              );
             }
           }
         }
@@ -171,8 +180,10 @@ class FirebaseMessagingHandler {
   ) async {
     // Debug log
     if (kDebugMode) {
-      AppLogger.d('FIREBASE_NOTIFICATIONS',
-          "Received foreground message: ${message.notification?.title} / ${message.notification?.body}");
+      AppLogger.d(
+        'FIREBASE_NOTIFICATIONS',
+        "Received foreground message: ${message.notification?.title} / ${message.notification?.body}",
+      );
     }
 
     // Only show notification manually when the app is in foreground
@@ -186,7 +197,8 @@ class FirebaseMessagingHandler {
       final localizations = AppLocalizations.of(context)!;
       final snackBar = SnackBar(
         content: Text(
-            message.notification?.body ?? localizations.newMessageFallback),
+          message.notification?.body ?? localizations.newMessageFallback,
+        ),
         action: SnackBarAction(
           label: localizations.viewAction,
           onPressed: () {
@@ -274,7 +286,9 @@ class FirebaseMessagingHandler {
         id: 0,
         title: null,
         body: null,
-        notificationDetails: const NotificationDetails(iOS: iOSPlatformChannelSpecifics),
+        notificationDetails: const NotificationDetails(
+          iOS: iOSPlatformChannelSpecifics,
+        ),
       );
     }
   }
@@ -285,11 +299,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Initialize Firebase if needed (for background isolates)
   try {
     await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     // Firebase might already be initialized
     if (kDebugMode) {
-      AppLogger.d('FIREBASE_NOTIFICATIONS', 'Error initializing Firebase in background handler: $e');
+      AppLogger.d(
+        'FIREBASE_NOTIFICATIONS',
+        'Error initializing Firebase in background handler: $e',
+      );
     }
   }
 

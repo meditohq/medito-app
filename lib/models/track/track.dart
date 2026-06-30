@@ -15,9 +15,7 @@ abstract class Track with _$Track {
     @Default(false) bool isLiked,
     required bool hasBackgroundSound,
     @Default(null) TrackArtist? artist,
-    @Default(<TrackVoice>[])
-    @JsonKey(name: 'audio')
-    List<TrackVoice> voices,
+    @Default(<TrackVoice>[]) @JsonKey(name: 'audio') List<TrackVoice> voices,
   }) = _Track;
 
   factory Track.fromJson(Map<String, Object?> json) => _$TrackFromJson(json);
@@ -25,10 +23,8 @@ abstract class Track with _$Track {
 
 @freezed
 abstract class TrackArtist with _$TrackArtist {
-  const factory TrackArtist({
-    required String name,
-    required String path,
-  }) = _TrackArtist;
+  const factory TrackArtist({required String name, required String path}) =
+      _TrackArtist;
 
   factory TrackArtist.fromJson(Map<String, Object?> json) =>
       _$TrackArtistFromJson(json);

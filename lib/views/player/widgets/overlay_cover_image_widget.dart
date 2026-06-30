@@ -16,10 +16,7 @@ class OverlayCoverImageWidget extends StatelessWidget {
       height: dimension,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
-        child: NetworkImageWidget(
-          url: imageUrl,
-          shouldCache: true,
-        ),
+        child: NetworkImageWidget(url: imageUrl, shouldCache: true),
       ),
     );
   }

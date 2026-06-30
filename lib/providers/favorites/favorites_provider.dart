@@ -26,8 +26,10 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
     try {
       final serverFavorites = await _repository.loadFavoritesFromServer();
       final currentLocalFavorites = state.value ?? [];
-      final mergedFavorites =
-          mergeFavoriteLists(currentLocalFavorites, serverFavorites);
+      final mergedFavorites = mergeFavoriteLists(
+        currentLocalFavorites,
+        serverFavorites,
+      );
 
       // Update state only if merged list differs from current state
       // to avoid unnecessary rebuilds
@@ -40,7 +42,9 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
     } catch (e) {
       // If server fetch fails, log it but keep the current (local) state.
       AppLogger.e(
-          'FAVORITES', 'Failed to load or merge favorites from server: $e');
+        'FAVORITES',
+        'Failed to load or merge favorites from server: $e',
+      );
       // Do not change state to error here, local data is still valid.
     }
   }
@@ -76,7 +80,9 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
       await _repository.saveFavorites(updatedFavorites);
     } catch (e) {
       AppLogger.e(
-          'FAVORITES', 'Failed to save after adding favorite, reverting: $e');
+        'FAVORITES',
+        'Failed to save after adding favorite, reverting: $e',
+      );
       state = AsyncValue.data(previousFavorites);
       return;
     }
@@ -94,8 +100,9 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
   /// save-failure semantics as [addToFavorites].
   Future<void> removeFromFavorites(String id) async {
     final previousFavorites = state.value ?? [];
-    final updatedFavorites =
-        previousFavorites.where((item) => item.id != id).toList();
+    final updatedFavorites = previousFavorites
+        .where((item) => item.id != id)
+        .toList();
 
     if (updatedFavorites.length == previousFavorites.length) return;
 
@@ -105,7 +112,9 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
       await _repository.saveFavorites(updatedFavorites);
     } catch (e) {
       AppLogger.e(
-          'FAVORITES', 'Failed to save after removing favorite, reverting: $e');
+        'FAVORITES',
+        'Failed to save after removing favorite, reverting: $e',
+      );
       state = AsyncValue.data(previousFavorites);
       return;
     }
@@ -120,4 +129,5 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
 
 final favoritesNotifierProvider =
     AsyncNotifierProvider<FavoritesNotifier, List<FavoriteItem>>(
-        FavoritesNotifier.new);
+      FavoritesNotifier.new,
+    );

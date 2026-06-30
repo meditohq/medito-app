@@ -112,7 +112,12 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(padding24, padding16, padding24, padding24),
+      padding: const EdgeInsets.fromLTRB(
+        padding24,
+        padding16,
+        padding24,
+        padding24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

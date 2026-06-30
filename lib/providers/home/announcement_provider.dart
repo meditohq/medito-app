@@ -35,16 +35,15 @@ class DismissedAnnouncement extends Notifier<void> {
 
 final dismissedAnnouncementProvider =
     NotifierProvider<DismissedAnnouncement, void>(() {
-  return DismissedAnnouncement();
-});
+      return DismissedAnnouncement();
+    });
 
 @riverpod
-Future<AnnouncementModel?> fetchLatestAnnouncement(
-  Ref ref,
-) async {
+Future<AnnouncementModel?> fetchLatestAnnouncement(Ref ref) async {
   final homeRepository = ref.watch(homeRepositoryProvider);
-  final List<String> dismissedIds =
-      await ref.watch(getDismissedAnnouncementIdsProvider.future);
+  final List<String> dismissedIds = await ref.watch(
+    getDismissedAnnouncementIdsProvider.future,
+  );
   ref.keepAlive();
 
   final announcement = await homeRepository.fetchLatestAnnouncement();

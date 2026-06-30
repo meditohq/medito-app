@@ -70,12 +70,14 @@ class IosAudioHandler extends BaseAudioHandler {
         _player.pause();
       });
 
-      await session.configure(const AudioSessionConfiguration(
-        avAudioSessionCategory: AVAudioSessionCategory.playback,
-        avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.none,
-        avAudioSessionMode: AVAudioSessionMode.defaultMode,
-        avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      ));
+      await session.configure(
+        const AudioSessionConfiguration(
+          avAudioSessionCategory: AVAudioSessionCategory.playback,
+          avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.none,
+          avAudioSessionMode: AVAudioSessionMode.defaultMode,
+          avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+        ),
+      );
 
       _setupPlaybackState();
       _setupEventListeners();
@@ -88,51 +90,53 @@ class IosAudioHandler extends BaseAudioHandler {
   }
 
   void _setupPlaybackState() {
-    playbackState.add(playbackState.value.copyWith(
-      controls: [
-        MediaControl.rewind,
-        MediaControl.play,
-        MediaControl.fastForward,
-      ],
-      systemActions: const {
-        MediaAction.seek,
-        MediaAction.seekForward,
-        MediaAction.seekBackward,
-        MediaAction.setSpeed,
-        MediaAction.pause,
-        MediaAction.play,
-      },
-      playing: false,
-      updatePosition: Duration.zero,
-      bufferedPosition: Duration.zero,
-      speed: 1.0,
-    ));
+    playbackState.add(
+      playbackState.value.copyWith(
+        controls: [
+          MediaControl.rewind,
+          MediaControl.play,
+          MediaControl.fastForward,
+        ],
+        systemActions: const {
+          MediaAction.seek,
+          MediaAction.seekForward,
+          MediaAction.seekBackward,
+          MediaAction.setSpeed,
+          MediaAction.pause,
+          MediaAction.play,
+        },
+        playing: false,
+        updatePosition: Duration.zero,
+        bufferedPosition: Duration.zero,
+        speed: 1.0,
+      ),
+    );
   }
 
   void _setupEventListeners() {
-    iosStateStream.listen(
-      (event) {
-        mediaItem.add(
-          MediaItem(
-            id: event.track.toString(),
-            title: event.track.title,
-            artist: event.track.artist,
-            duration: event.duration,
-            artUri: Uri.parse(event.track.imageUrl),
-            playable: true,
-            displayTitle: event.track.title,
-            displaySubtitle: event.track.artist,
-          ),
-        );
+    iosStateStream.listen((event) {
+      mediaItem.add(
+        MediaItem(
+          id: event.track.toString(),
+          title: event.track.title,
+          artist: event.track.artist,
+          duration: event.duration,
+          artUri: Uri.parse(event.track.imageUrl),
+          playable: true,
+          displayTitle: event.track.title,
+          displaySubtitle: event.track.artist,
+        ),
+      );
 
-        playbackState.add(playbackState.value.copyWith(
+      playbackState.add(
+        playbackState.value.copyWith(
           updatePosition: event.position,
           bufferedPosition: event.bufferedPosition,
           speed: event.speed,
           playing: event.playerState.playing,
-        ));
-      },
-    );
+        ),
+      );
+    });
 
     _player.processingStateStream.listen((state) async {
       if (state == ProcessingState.completed) {
@@ -164,32 +168,34 @@ class IosAudioHandler extends BaseAudioHandler {
     _player.playbackEventStream.listen((event) {
       final playing = _player.playing;
 
-      playbackState.add(playbackState.value.copyWith(
-        controls: [
-          MediaControl.rewind,
-          if (playing) MediaControl.pause else MediaControl.play,
-          MediaControl.fastForward,
-        ],
-        systemActions: const {
-          MediaAction.seek,
-          MediaAction.seekForward,
-          MediaAction.seekBackward,
-          MediaAction.setSpeed,
-          MediaAction.pause,
-          MediaAction.play,
-        },
-        playing: playing,
-        processingState: const {
-          ProcessingState.idle: AudioProcessingState.idle,
-          ProcessingState.loading: AudioProcessingState.loading,
-          ProcessingState.buffering: AudioProcessingState.buffering,
-          ProcessingState.ready: AudioProcessingState.ready,
-          ProcessingState.completed: AudioProcessingState.completed,
-        }[_player.processingState]!,
-        updatePosition: _player.position,
-        bufferedPosition: _player.bufferedPosition,
-        speed: _player.speed,
-      ));
+      playbackState.add(
+        playbackState.value.copyWith(
+          controls: [
+            MediaControl.rewind,
+            if (playing) MediaControl.pause else MediaControl.play,
+            MediaControl.fastForward,
+          ],
+          systemActions: const {
+            MediaAction.seek,
+            MediaAction.seekForward,
+            MediaAction.seekBackward,
+            MediaAction.setSpeed,
+            MediaAction.pause,
+            MediaAction.play,
+          },
+          playing: playing,
+          processingState: const {
+            ProcessingState.idle: AudioProcessingState.idle,
+            ProcessingState.loading: AudioProcessingState.loading,
+            ProcessingState.buffering: AudioProcessingState.buffering,
+            ProcessingState.ready: AudioProcessingState.ready,
+            ProcessingState.completed: AudioProcessingState.completed,
+          }[_player.processingState]!,
+          updatePosition: _player.position,
+          bufferedPosition: _player.bufferedPosition,
+          speed: _player.speed,
+        ),
+      );
     });
   }
 
@@ -210,8 +216,16 @@ class IosAudioHandler extends BaseAudioHandler {
 
   Duration? get duration => _player.duration;
 
-  Stream<IosStateData> get iosStateStream => Rx.combineLatest6<double,
-          PlayerState, Track, Duration, Duration, Duration?, IosStateData>(
+  Stream<IosStateData> get iosStateStream =>
+      Rx.combineLatest6<
+        double,
+        PlayerState,
+        Track,
+        Duration,
+        Duration,
+        Duration?,
+        IosStateData
+      >(
         _player.speedStream,
         _player.playerStateStream,
         _trackStateStream,
@@ -245,7 +259,9 @@ class IosAudioHandler extends BaseAudioHandler {
       await _storeForLaterProcessing(payload);
     } catch (e) {
       AppLogger.e(
-          'IOS', 'Error processing track completion in AudioHandler: $e');
+        'IOS',
+        'Error processing track completion in AudioHandler: $e',
+      );
     }
   }
 
@@ -275,7 +291,9 @@ class IosAudioHandler extends BaseAudioHandler {
       }
     } catch (e) {
       AppLogger.e(
-          'IOS', 'Error updating stats directly from audio handler: $e');
+        'IOS',
+        'Error updating stats directly from audio handler: $e',
+      );
     }
     return false;
   }
@@ -283,7 +301,9 @@ class IosAudioHandler extends BaseAudioHandler {
   /// Store track completion data for later processing
   Future<void> _storeForLaterProcessing(Map<String, dynamic> payload) async {
     AppLogger.d(
-        'IOS', 'Storing track completion for later processing: ${trackState.id}');
+      'IOS',
+      'Storing track completion for later processing: ${trackState.id}',
+    );
     final prefs = await SharedPreferences.getInstance();
     await storeTrackCompletion(prefs, payload);
   }
@@ -395,23 +415,20 @@ class IosAudioHandler extends BaseAudioHandler {
   }
 
   Future<void> setUrl(
-      String? downloadPath, PlaybackRequest request, Track trackData) async {
+    String? downloadPath,
+    PlaybackRequest request,
+    Track trackData,
+  ) async {
     await ensureInitialized();
 
     _hasReplayedOnce = false;
 
     if (downloadPath == null) {
       await _player.setAudioSource(
-        AudioSource.uri(
-          Uri.parse(
-            request.remoteUrl,
-          ),
-        ),
+        AudioSource.uri(Uri.parse(request.remoteUrl)),
       );
     } else {
-      await _player.setAsset(
-        downloadPath,
-      );
+      await _player.setAsset(downloadPath);
     }
 
     await setCustomRepeatMode(_currentRepeatMode);

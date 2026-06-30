@@ -10,7 +10,8 @@ class PermissionHandler {
   // reminders need. SCHEDULE_EXACT_ALARM is not required because reminders
   // are scheduled with AndroidScheduleMode.inexactAllowWhileIdle.
   static Future<bool> requestNotificationPermission(
-      BuildContext context) async {
+    BuildContext context,
+  ) async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.status;
       if (status.isGranted) return true;

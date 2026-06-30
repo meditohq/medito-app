@@ -31,13 +31,9 @@ class DeepLinkService {
   // SplashView awaits this before applying stored UTM parameters to ensure
   // deferred deep links from Apple Search Ads are stored first.
   static final Completer<void> _initialLinkCompleter = Completer<void>();
-  static Future<void> get initialLinkProcessed =>
-      _initialLinkCompleter.future;
+  static Future<void> get initialLinkProcessed => _initialLinkCompleter.future;
 
-  DeepLinkService({
-    required this.ref,
-    required this.context,
-  });
+  DeepLinkService({required this.ref, required this.context});
 
   void initialize() {
     AppLogger.d('DEEPLINK', 'Setting up deep link handlers');
@@ -98,7 +94,10 @@ class DeepLinkService {
     if (_lastHandledUri == uri &&
         _lastHandledAt != null &&
         now.difference(_lastHandledAt!) < _dedupeWindow) {
-      AppLogger.d('DEEPLINK', 'Ignoring duplicate deep link within dedupe window: $uri');
+      AppLogger.d(
+        'DEEPLINK',
+        'Ignoring duplicate deep link within dedupe window: $uri',
+      );
       return;
     }
     _lastHandledUri = uri;
@@ -137,8 +136,10 @@ class DeepLinkService {
 
       // If no path segments, just open the app (e.g., for UTM-only links from Apple Ads)
       if (pathSegments.isEmpty) {
-        AppLogger.d('DEEPLINK',
-            'No path segments, opening app (UTM parameters already processed)');
+        AppLogger.d(
+          'DEEPLINK',
+          'No path segments, opening app (UTM parameters already processed)',
+        );
         return;
       }
 
@@ -192,7 +193,9 @@ class DeepLinkService {
       }
 
       unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
               name: AnalyticsEventConstants.homeWidgetTapped,
               parameters: params,
             ),
@@ -234,8 +237,10 @@ class DeepLinkService {
       }
 
       if (storedCount > 0) {
-        AppLogger.d('DEEPLINK',
-            'Stored $storedCount UTM parameter(s) for later application');
+        AppLogger.d(
+          'DEEPLINK',
+          'Stored $storedCount UTM parameter(s) for later application',
+        );
       } else {
         AppLogger.d('DEEPLINK', 'No UTM parameters found in query string');
       }

@@ -11,8 +11,9 @@ import 'package:medito/utils/stats_updater.dart';
 import '../maintenance/maintenance_provider.dart';
 
 /// Provides the maintenance model if maintenance is needed, null otherwise
-final maintenanceNeededProvider =
-    FutureProvider<MaintenanceModel?>((ref) async {
+final maintenanceNeededProvider = FutureProvider<MaintenanceModel?>((
+  ref,
+) async {
   try {
     final maintenanceData = await ref.read(fetchMaintenanceProvider.future);
 
@@ -35,16 +36,16 @@ final maintenanceNeededProvider =
 });
 
 /// The original provider, now just processes stats for iOS
-final rootCombineProvider = Provider.family<void, BuildContext>(
-  (ref, context) {
-    if (Platform.isIOS) {
-      // Process any pending track completions at startup
-      processPendingCompletedTracks().then((processedCount) {
-        if (processedCount > 0) {
-          AppLogger.d(
-              'STATS', 'Processed $processedCount pending tracks on startup');
-        }
-      });
-    }
-  },
-);
+final rootCombineProvider = Provider.family<void, BuildContext>((ref, context) {
+  if (Platform.isIOS) {
+    // Process any pending track completions at startup
+    processPendingCompletedTracks().then((processedCount) {
+      if (processedCount > 0) {
+        AppLogger.d(
+          'STATS',
+          'Processed $processedCount pending tracks on startup',
+        );
+      }
+    });
+  }
+});

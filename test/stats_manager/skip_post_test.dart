@@ -31,8 +31,9 @@ void main() {
     today = DateTime(2026, 4, 28);
     statsManager.setCurrentDateForTesting(today);
 
-    when(mockStatsService.postStats(any))
-        .thenAnswer((_) async => Future.value());
+    when(
+      mockStatsService.postStats(any),
+    ).thenAnswer((_) async => Future.value());
 
     statsManager.setStatsForTesting(
       LocalAllStats.empty().copyWith(streakCurrent: 0, streakLongest: 0),
@@ -67,8 +68,11 @@ void main() {
       final stats = statsManager.currentStats;
       expect(stats, isNotNull);
       expect(stats!.audioCompleted, isNotEmpty);
-      expect(stats.streakCurrent, 1,
-          reason: 'streak should be recalculated even when post is skipped');
+      expect(
+        stats.streakCurrent,
+        1,
+        reason: 'streak should be recalculated even when post is skipped',
+      );
     });
 
     test('default (skipPost: false) still posts — regression check', () async {

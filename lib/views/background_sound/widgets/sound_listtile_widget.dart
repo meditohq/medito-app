@@ -14,15 +14,11 @@ class SoundListTileWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bgSoundState = ref.watch(backgroundSoundsNotifierProvider);
     var selectedSoundId = bgSoundState.selectedBgSound?.id ?? '0';
-    var isDownloading =
-        bgSoundState.downloadingBgSound?.id == sound.id;
+    var isDownloading = bgSoundState.downloadingBgSound?.id == sound.id;
     var isSelected = selectedSoundId == sound.id;
 
     return InkWell(
-      onTap: () => _handleItemTap(
-        ref,
-        context,
-      ),
+      onTap: () => _handleItemTap(ref, context),
       child: Container(
         decoration: const BoxDecoration(
           border: Border(
@@ -38,9 +34,9 @@ class SoundListTileWidget extends ConsumerWidget {
             Text(
               sound.title,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontFamily: dmSans,
-                    fontSize: 16,
-                  ),
+                fontFamily: dmSans,
+                fontSize: 16,
+              ),
             ),
             isDownloading ? _loadingSpinner(context) : const SizedBox.shrink(),
           ],
@@ -75,7 +71,9 @@ class SoundListTileWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-            width: 2, color: Theme.of(context).colorScheme.onSurface),
+          width: 2,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
       padding: const EdgeInsets.all(4),
       child: CircleAvatar(
@@ -87,10 +85,7 @@ class SoundListTileWidget extends ConsumerWidget {
     );
   }
 
-  void _handleItemTap(
-    WidgetRef ref,
-    BuildContext context,
-  ) {
+  void _handleItemTap(WidgetRef ref, BuildContext context) {
     final notifier = ref.read(backgroundSoundsNotifierProvider.notifier);
     if (sound.title == AppLocalizations.of(context)!.none) {
       notifier.stopBackgroundSound();

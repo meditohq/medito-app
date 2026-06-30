@@ -63,10 +63,10 @@ void main() {
       // Second meditation: 1:30 AM EST (during repeated hour)
       // This is actually 1 hour later in UTC, even though clock shows same time
       final duringFallBack = DateTime.fromMillisecondsSinceEpoch(
-              beforeFallBack.millisecondsSinceEpoch +
-                  const Duration(hours: 1).inMilliseconds,
-              isUtc: true)
-          .toLocal();
+        beforeFallBack.millisecondsSinceEpoch +
+            const Duration(hours: 1).inMilliseconds,
+        isUtc: true,
+      ).toLocal();
 
       // Third meditation: 2:30 AM EST (after transition)
       final afterFallBack = DateTime(2023, 11, 5, 2, 30);
@@ -100,17 +100,21 @@ void main() {
 
       var result = statsManager.calculateStreak(mockStats);
       // All meditations should count for the same day despite the time change
-      expect(result.streakCurrent, 1,
-          reason:
-              'All meditations during DST fall back should count for the same day');
+      expect(
+        result.streakCurrent,
+        1,
+        reason:
+            'All meditations during DST fall back should count for the same day',
+      );
 
       // Verify the timestamps are actually different even though they show the same clock time
       expect(
-          beforeFallBack.millisecondsSinceEpoch !=
-              duringFallBack.millisecondsSinceEpoch,
-          true,
-          reason:
-              'Timestamps during fall back should be different even with same clock time');
+        beforeFallBack.millisecondsSinceEpoch !=
+            duringFallBack.millisecondsSinceEpoch,
+        true,
+        reason:
+            'Timestamps during fall back should be different even with same clock time',
+      );
     });
 
     test('streak should handle timezone change while traveling east', () {
@@ -137,8 +141,11 @@ void main() {
       );
 
       var nyResult = statsManager.calculateStreak(nyStats);
-      expect(nyResult.streakCurrent, 1,
-          reason: 'Should have streak of 1 in NY time');
+      expect(
+        nyResult.streakCurrent,
+        1,
+        reason: 'Should have streak of 1 in NY time',
+      );
 
       // Travel to London (5 hours ahead, now 4 AM next day)
       final londonDate = DateTime(2023, 6, 2, 4, 0);
@@ -156,45 +163,55 @@ void main() {
       );
 
       var londonResult = statsManager.calculateStreak(londonStats);
-      expect(londonResult.streakCurrent, 2,
-          reason:
-              'Should count as 2 days when NY meditation is interpreted in London time');
+      expect(
+        londonResult.streakCurrent,
+        2,
+        reason:
+            'Should count as 2 days when NY meditation is interpreted in London time',
+      );
     });
 
     test(
-        'streak should handle meditation crossing midnight in different timezone',
-        () async {
-      // User starts meditation at 11:45 PM in New York
-      final startDate = DateTime(2023, 6, 1, 23, 45); // 11:45 PM
-      final duration = 30 * 60 * 1000; // 30 minutes in milliseconds
+      'streak should handle meditation crossing midnight in different timezone',
+      () async {
+        // User starts meditation at 11:45 PM in New York
+        final startDate = DateTime(2023, 6, 1, 23, 45); // 11:45 PM
+        final duration = 30 * 60 * 1000; // 30 minutes in milliseconds
 
-      // Create the audio completion with the end timestamp
-      var endTimestamp =
-          startDate.add(const Duration(minutes: 30)).millisecondsSinceEpoch;
-      var audioCompleted = LocalAudioCompleted(
-        id: '1',
-        timestamp: endTimestamp,
-      );
+        // Create the audio completion with the end timestamp
+        var endTimestamp = startDate
+            .add(const Duration(minutes: 30))
+            .millisecondsSinceEpoch;
+        var audioCompleted = LocalAudioCompleted(
+          id: '1',
+          timestamp: endTimestamp,
+        );
 
-      // Add the audio completion which should adjust the timestamp to the start time
-      await statsManager.addAudioCompleted(audioCompleted, duration);
+        // Add the audio completion which should adjust the timestamp to the start time
+        await statsManager.addAudioCompleted(audioCompleted, duration);
 
-      // Test in original timezone
-      statsManager.setCurrentDateForTesting(startDate);
-      var stats = await statsManager.localAllStats;
-      var result = statsManager.calculateStreak(stats);
-      expect(result.streakCurrent, 1,
+        // Test in original timezone
+        statsManager.setCurrentDateForTesting(startDate);
+        var stats = await statsManager.localAllStats;
+        var result = statsManager.calculateStreak(stats);
+        expect(
+          result.streakCurrent,
+          1,
+          reason: 'Should count for start date even though it crossed midnight',
+        );
+
+        // Test in timezone 5 hours ahead
+        final aheadDate = startDate.add(const Duration(hours: 5));
+        statsManager.setCurrentDateForTesting(aheadDate);
+        stats = await statsManager.localAllStats;
+        result = statsManager.calculateStreak(stats);
+        expect(
+          result.streakCurrent,
+          1,
           reason:
-              'Should count for start date even though it crossed midnight');
-
-      // Test in timezone 5 hours ahead
-      final aheadDate = startDate.add(const Duration(hours: 5));
-      statsManager.setCurrentDateForTesting(aheadDate);
-      stats = await statsManager.localAllStats;
-      result = statsManager.calculateStreak(stats);
-      expect(result.streakCurrent, 1,
-          reason:
-              'Should still count as one meditation day in different timezone');
-    });
+              'Should still count as one meditation day in different timezone',
+        );
+      },
+    );
   });
 }

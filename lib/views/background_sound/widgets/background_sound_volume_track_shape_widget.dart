@@ -59,18 +59,12 @@ class BackgroundSoundVolumeTrackShapeWidget
       fontFamily: dmSans,
     );
     TextPainter textPainter(span) => TextPainter(
-          text: span,
-          textAlign: TextAlign.left,
-          textDirection: TextDirection.ltr,
-        );
-    var span = TextSpan(
-      style: textStyle,
-      text: leadingTitle,
+      text: span,
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
     );
-    var span1 = TextSpan(
-      style: textStyle,
-      text: tralingText,
-    );
+    var span = TextSpan(style: textStyle, text: leadingTitle);
+    var span1 = TextSpan(style: textStyle, text: tralingText);
     var tp = textPainter(span);
     var tp1 = textPainter(span1);
     tp.layout();

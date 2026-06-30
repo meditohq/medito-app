@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HandleBarWidget extends StatelessWidget {
-  const HandleBarWidget({
-    super.key,
-  });
+  const HandleBarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

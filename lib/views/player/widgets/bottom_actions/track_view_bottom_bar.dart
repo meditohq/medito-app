@@ -30,8 +30,7 @@ class TrackViewBottomBar extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<TrackViewBottomBar> createState() =>
-      _TrackViewBottomBarState();
+  ConsumerState<TrackViewBottomBar> createState() => _TrackViewBottomBarState();
 }
 
 class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
@@ -45,8 +44,9 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
 
   void _shareTrack(BuildContext context) {
     final deepLink = 'https://medito.app/tracks/${widget.trackId}';
-    final shareText =
-        AppLocalizations.of(context)!.shareTrackText(widget.trackTitle, deepLink);
+    final shareText = AppLocalizations.of(
+      context,
+    )!.shareTrackText(widget.trackTitle, deepLink);
     SharePlus.instance.share(ShareParams(text: shareText));
   }
 
@@ -145,8 +145,9 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
       data: (track) {
         return favoritesState.when(
           data: (favorites) {
-            final isFavorite =
-                favorites.any((item) => item.id == widget.trackId);
+            final isFavorite = favorites.any(
+              (item) => item.id == widget.trackId,
+            );
             return _buildBottomBar(
               context,
               track,
@@ -189,8 +190,9 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
       ),
       rightCenterItem: BottomActionBarItem(
         child: MeditoIcon(
-          assetName:
-              Platform.isIOS ? MeditoIcons.shareIos : MeditoIcons.shareAndroid,
+          assetName: Platform.isIOS
+              ? MeditoIcons.shareIos
+              : MeditoIcons.shareAndroid,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: Platform.isIOS

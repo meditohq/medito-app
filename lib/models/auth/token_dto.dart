@@ -41,10 +41,7 @@ class RefreshTokenDTO {
   @JsonKey(name: 'expires_in')
   final int expiresIn;
 
-  RefreshTokenDTO({
-    required this.accessToken,
-    required this.expiresIn,
-  });
+  RefreshTokenDTO({required this.accessToken, required this.expiresIn});
 
   factory RefreshTokenDTO.fromJson(Map<String, dynamic> json) =>
       _$RefreshTokenDTOFromJson(json);

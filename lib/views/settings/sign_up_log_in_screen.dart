@@ -32,10 +32,7 @@ import '../../providers/pack/pack_provider.dart';
 final dev = const AppLoggerAdapter('SIGN_UP');
 
 class SignUpLogInPage extends ConsumerWidget {
-  const SignUpLogInPage({
-    super.key,
-    this.fromSettings = false,
-  });
+  const SignUpLogInPage({super.key, this.fromSettings = false});
 
   final bool fromSettings;
   static const routeName = '/signup';
@@ -50,8 +47,10 @@ class SignUpLogInPage extends ConsumerWidget {
     dev.log('[SIGN_UP] User email: ${user?.email}', level: 1000);
 
     if (user?.email != null && user?.email?.isNotEmpty == true) {
-      dev.log('[SIGN_UP] User has email, navigating back or to home',
-          level: 1000);
+      dev.log(
+        '[SIGN_UP] User has email, navigating back or to home',
+        level: 1000,
+      );
       // If opened from settings and user is already logged in, just pop.
       // Otherwise, this case might not be reachable if auth guards are in place before this screen.
       // However, to be safe, popping is a sensible default.
@@ -63,8 +62,8 @@ class SignUpLogInPage extends ConsumerWidget {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
-            child:
-                CircularProgressIndicator(color: context.brandPurple)),
+          child: CircularProgressIndicator(color: context.brandPurple),
+        ),
       ); // Show loading while popping
     } else {
       dev.log('[SIGN_UP] User has no email, showing sign-up form', level: 1000);
@@ -74,10 +73,7 @@ class SignUpLogInPage extends ConsumerWidget {
 }
 
 class SignUpLogInForm extends ConsumerStatefulWidget {
-  const SignUpLogInForm({
-    super.key,
-    required this.fromSettings,
-  });
+  const SignUpLogInForm({super.key, required this.fromSettings});
 
   final bool fromSettings;
 
@@ -161,15 +157,16 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   Future<void> _requestOtp() async {
     if (_isLoading || _isRateLimited) return;
 
-    final hasLocalStats =
-        await ref.read(statsManagerProvider).hasLocalStats();
+    final hasLocalStats = await ref.read(statsManagerProvider).hasLocalStats();
 
     if (hasLocalStats) {
-      final proceed = await showDialog<bool>(
+      final proceed =
+          await showDialog<bool>(
             context: context,
             builder: (context) => MeditoDialog(
-              title:
-                  AppLocalizations.of(context)!.accountTransitionWarningTitle,
+              title: AppLocalizations.of(
+                context,
+              )!.accountTransitionWarningTitle,
               content: MeditoDialogBody(
                 AppLocalizations.of(context)!.loginWarningExplanation,
               ),
@@ -211,8 +208,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     } on InactiveEmailError {
       showSnackBar(context, AppLocalizations.of(context)!.accountInactiveError);
     } catch (e) {
-      showSnackBar(context,
-          '${AppLocalizations.of(context)!.errorPrefix}${e.toString()}');
+      showSnackBar(
+        context,
+        '${AppLocalizations.of(context)!.errorPrefix}${e.toString()}',
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -244,10 +243,14 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     try {
       dev.log('[SIGN_UP] Starting OTP verification', level: 1000);
       dev.log('[SIGN_UP] Email: ${_emailController.text.trim()}', level: 1000);
-      dev.log('[SIGN_UP] OTP length: ${_otpController.text.trim().length}',
-          level: 1000);
+      dev.log(
+        '[SIGN_UP] OTP length: ${_otpController.text.trim().length}',
+        level: 1000,
+      );
 
-      var success = await ref.read(authRepositorySyncProvider).verifyOtp(
+      var success = await ref
+          .read(authRepositorySyncProvider)
+          .verifyOtp(
             _emailController.text.trim().toLowerCase(),
             _otpController.text.trim(),
           );
@@ -255,17 +258,22 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       dev.log('[SIGN_UP] OTP verification result: $success', level: 1000);
 
       if (success) {
-        dev.log('[SIGN_UP] OTP verification successful, refreshing user info',
-            level: 1000);
+        dev.log(
+          '[SIGN_UP] OTP verification successful, refreshing user info',
+          level: 1000,
+        );
         await _refreshUserInfo();
 
         // Log the state of the auth repository after successful login
         final authRepo = ref.read(authRepositorySyncProvider);
         dev.log(
-            '[SIGN_UP] User after successful login: ${authRepo.currentUser}',
-            level: 1000);
-        dev.log('[SIGN_UP] User email after login: ${authRepo.getUserEmail()}',
-            level: 1000);
+          '[SIGN_UP] User after successful login: ${authRepo.currentUser}',
+          level: 1000,
+        );
+        dev.log(
+          '[SIGN_UP] User email after login: ${authRepo.getUserEmail()}',
+          level: 1000,
+        );
 
         // Set user ID for analytics immediately after successful sign-in
         // This ensures user ID is set before any events are logged
@@ -274,12 +282,16 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           if (userId != null && userId.isNotEmpty) {
             await FirebaseAnalyticsService().setUserId(userId);
             await MetaSdkService.instance.setUserId(userId);
-            dev.log('[SIGN_UP] User ID set for analytics: $userId',
-                level: 1000);
+            dev.log(
+              '[SIGN_UP] User ID set for analytics: $userId',
+              level: 1000,
+            );
           }
         } catch (e) {
-          dev.log('[SIGN_UP] Error setting user ID for analytics: $e',
-              level: 1000);
+          dev.log(
+            '[SIGN_UP] Error setting user ID for analytics: $e',
+            level: 1000,
+          );
         }
 
         // Log analytics event for completed signup
@@ -301,12 +313,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
         // Initialize favorites after successful login
         unawaited(
-            ref.read(favoritesNotifierProvider.notifier).syncWithServer());
+          ref.read(favoritesNotifierProvider.notifier).syncWithServer(),
+        );
 
         if (!mounted) return;
 
-        dev.log('[SIGN_UP] Login complete, navigating to next screen',
-            level: 1000);
+        dev.log(
+          '[SIGN_UP] Login complete, navigating to next screen',
+          level: 1000,
+        );
         if (widget.fromSettings) {
           Navigator.of(context).pop();
         } else {
@@ -319,18 +334,27 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         }
       } else {
         showSnackBar(
-            context, AppLocalizations.of(context)!.authenticationFailed);
+          context,
+          AppLocalizations.of(context)!.authenticationFailed,
+        );
       }
     } catch (e, st) {
       dev.log('[SIGN_UP] Error during OTP verification', error: e, level: 1000);
       if (e.toString().contains('403')) {
         showSnackBar(
-            context, AppLocalizations.of(context)!.invalidVerificationCode);
+          context,
+          AppLocalizations.of(context)!.invalidVerificationCode,
+        );
       } else {
-        CrashlyticsService().recordError(e, st,
-            reason: 'OTP verify post-success');
-        showSnackBar(context,
-            '${AppLocalizations.of(context)!.errorPrefix}${e.toString()}');
+        CrashlyticsService().recordError(
+          e,
+          st,
+          reason: 'OTP verify post-success',
+        );
+        showSnackBar(
+          context,
+          '${AppLocalizations.of(context)!.errorPrefix}${e.toString()}',
+        );
       }
     } finally {
       setState(() {
@@ -348,22 +372,26 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
     // Log current auth state before header initialization
     final authRepo = ref.read(authRepositorySyncProvider);
-    dev.log('[SIGN_UP] Auth state before header init: ${authRepo.currentUser}',
-        level: 1000);
+    dev.log(
+      '[SIGN_UP] Auth state before header init: ${authRepo.currentUser}',
+      level: 1000,
+    );
 
     // Then initialize headers with device info (which now includes user's language preference)
     final deviceInfo = await ref.read(deviceAndAppInfoProvider.future);
     await HeaderService(deviceInfo).initialise();
 
     dev.log(
-        '[SIGN_UP] Headers initialized, auth state after: ${authRepo.currentUser}',
-        level: 1000);
+      '[SIGN_UP] Headers initialized, auth state after: ${authRepo.currentUser}',
+      level: 1000,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final inputTextStyle =
-        TextStyle(color: Theme.of(context).colorScheme.onSurface);
+    final inputTextStyle = TextStyle(
+      color: Theme.of(context).colorScheme.onSurface,
+    );
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -391,7 +419,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height -
+              minHeight:
+                  MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top -
                   kToolbarHeight -
                   MediaQuery.of(context).viewInsets.bottom,
@@ -421,10 +450,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           AppLocalizations.of(context)!.emailVerificationText,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontSize: 13,
-                height: 1.5,
-                fontWeight: FontWeight.normal,
-              ),
+            fontSize: 13,
+            height: 1.5,
+            fontWeight: FontWeight.normal,
+          ),
         ),
         height16,
         _buildEmailField(inputTextStyle),
@@ -444,14 +473,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                   ),
                 )
               : _isRateLimited
-                  ? Text(AppLocalizations.of(context)!
-                      .retryInSeconds(_retryAfterSeconds.toString()))
-                  : Text(AppLocalizations.of(context)!.sendMeMyPasswordText),
+              ? Text(
+                  AppLocalizations.of(
+                    context,
+                  )!.retryInSeconds(_retryAfterSeconds.toString()),
+                )
+              : Text(AppLocalizations.of(context)!.sendMeMyPasswordText),
         ),
         _buildPrivacyPolicyLink(),
-        SizedBox.square(
-          dimension: 100,
-        )
+        SizedBox.square(dimension: 100),
       ],
     );
   }
@@ -467,20 +497,20 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               TextSpan(
                 text: '${AppLocalizations.of(context)!.otpInstructions}\n',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontSize: 18,
-                      height: 1.5,
-                      fontWeight: FontWeight.normal,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  fontSize: 18,
+                  height: 1.5,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               TextSpan(
                 text: _emailController.text,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontSize: 18,
-                      height: 1.5,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  fontSize: 18,
+                  height: 1.5,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ],
           ),
@@ -513,19 +543,18 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           ),
           child: Text(
             _isRateLimited
-                ? AppLocalizations.of(context)!
-                    .resendCodeInSeconds(_retryAfterSeconds.toString())
+                ? AppLocalizations.of(
+                    context,
+                  )!.resendCodeInSeconds(_retryAfterSeconds.toString())
                 : AppLocalizations.of(context)!.resendCode,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: _isLoading || _isRateLimited
-                      ? Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.color
-                          ?.withOpacityValue(0.38)
-                      : ColorConstants.brightSky,
-                  fontSize: 14,
-                ),
+              color: _isLoading || _isRateLimited
+                  ? Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.color?.withOpacityValue(0.38)
+                  : ColorConstants.brightSky,
+              fontSize: 14,
+            ),
           ),
         ),
       ],
@@ -536,36 +565,39 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     return TextField(
       controller: _emailController,
       enabled: !_hasRequestedOtp,
-      decoration: getInputDecoration(
-        AppLocalizations.of(context)!.emailLabel,
-        _isEmailValid || _emailController.text.isEmpty,
-        AppLocalizations.of(context)!.invalidEmailError,
-      ).copyWith(
-        fillColor: Theme.of(context).colorScheme.surface,
-        filled: true,
-        suffixIcon: _emailController.text.isNotEmpty && !_hasRequestedOtp
-            ? IconButton(
-                icon: Icon(Icons.clear,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacityValue(0.6)),
-                onPressed: () {
-                  _emailController.clear();
-                  _validateEmail();
-                },
-              )
-            : null,
-      ),
+      decoration:
+          getInputDecoration(
+            AppLocalizations.of(context)!.emailLabel,
+            _isEmailValid || _emailController.text.isEmpty,
+            AppLocalizations.of(context)!.invalidEmailError,
+          ).copyWith(
+            fillColor: Theme.of(context).colorScheme.surface,
+            filled: true,
+            suffixIcon: _emailController.text.isNotEmpty && !_hasRequestedOtp
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacityValue(0.6),
+                    ),
+                    onPressed: () {
+                      _emailController.clear();
+                      _validateEmail();
+                    },
+                  )
+                : null,
+          ),
       onChanged: (_) => setState(() {}),
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       keyboardType: TextInputType.emailAddress,
       inputFormatters: [
-        TextInputFormatter.withFunction((oldValue, newValue) =>
-            TextEditingValue(
-              text: newValue.text.toLowerCase(),
-              selection: newValue.selection,
-            )),
+        TextInputFormatter.withFunction(
+          (oldValue, newValue) => TextEditingValue(
+            text: newValue.text.toLowerCase(),
+            selection: newValue.selection,
+          ),
+        ),
       ],
     );
   }
@@ -573,14 +605,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   Widget _buildOtpField(TextStyle inputTextStyle) {
     return TextField(
       controller: _otpController,
-      decoration: getInputDecoration(
-        AppLocalizations.of(context)!.otpLabel,
-        _isOtpValid || _otpController.text.isEmpty,
-        AppLocalizations.of(context)!.invalidOtpError,
-      ).copyWith(
-        fillColor: Theme.of(context).colorScheme.surface,
-        filled: true,
-      ),
+      decoration:
+          getInputDecoration(
+            AppLocalizations.of(context)!.otpLabel,
+            _isOtpValid || _otpController.text.isEmpty,
+            AppLocalizations.of(context)!.invalidOtpError,
+          ).copyWith(
+            fillColor: Theme.of(context).colorScheme.surface,
+            filled: true,
+          ),
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       keyboardType: TextInputType.number,
       maxLength: 6,
@@ -595,13 +628,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           TextSpan(
             text: AppLocalizations.of(context)!.byContinuingAgreeTo,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withOpacityValue(0.7),
-                  fontSize: 12,
-                ),
+              color: Theme.of(
+                context,
+              ).textTheme.bodySmall?.color?.withOpacityValue(0.7),
+              fontSize: 12,
+            ),
             children: [
               TextSpan(
                 text: 'Terms of Service',
@@ -611,11 +642,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                 ),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () => routes.handleNavigation(
-                        TypeConstants.url,
-                        ['https://meditofoundation.org/terms'],
-                        context,
-                        ref: ref,
-                      ),
+                    TypeConstants.url,
+                    ['https://meditofoundation.org/terms'],
+                    context,
+                    ref: ref,
+                  ),
               ),
               TextSpan(text: AppLocalizations.of(context)!.andText),
               TextSpan(
@@ -626,11 +657,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                 ),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () => routes.handleNavigation(
-                        TypeConstants.url,
-                        ['https://meditofoundation.org/privacy'],
-                        context,
-                        ref: ref,
-                      ),
+                    TypeConstants.url,
+                    ['https://meditofoundation.org/privacy'],
+                    context,
+                    ref: ref,
+                  ),
               ),
             ],
           ),
@@ -651,13 +682,17 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   }
 
   InputDecoration getInputDecoration(
-      String hint, bool isValid, String? errorText) {
+    String hint,
+    bool isValid,
+    String? errorText,
+  ) {
     const borderRadius = BorderRadius.all(Radius.circular(4));
 
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6)),
+        color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
+      ),
       filled: true,
       fillColor: Theme.of(context).colorScheme.surface,
       enabledBorder: const OutlineInputBorder(
@@ -690,10 +725,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       text,
       textAlign: TextAlign.start,
       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontSize: 20,
-            height: 1.5,
-            fontWeight: FontWeight.w500,
-          ),
+        fontSize: 20,
+        height: 1.5,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 }

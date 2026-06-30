@@ -20,11 +20,15 @@ class _NoopAnalytics {
     bool? adPersonalizationSignalsConsentGranted,
   }) async {}
 
-  Future<void> logEvent(
-      {required String name, Map<String, Object?>? parameters}) async {}
+  Future<void> logEvent({
+    required String name,
+    Map<String, Object?>? parameters,
+  }) async {}
 
-  Future<void> logScreenView(
-      {required String screenName, String? screenClass}) async {}
+  Future<void> logScreenView({
+    required String screenName,
+    String? screenClass,
+  }) async {}
 
   Future<void> setUserId({String? id}) async {}
 
@@ -40,9 +44,8 @@ class FirebaseAnalyticsService {
   factory FirebaseAnalyticsService() => _instance;
 
   dynamic
-      _analytics; // FirebaseAnalytics or _NoopAnalytics - not late final anymore
+  _analytics; // FirebaseAnalytics or _NoopAnalytics - not late final anymore
   bool _initialized = false;
-
 
   // Analytics event names - These reference shared constants for consistency across all analytics platforms
   // For new code, prefer using AnalyticsEventConstants directly
@@ -157,14 +160,16 @@ class FirebaseAnalyticsService {
       final analyticsConsent = await _getConsentPreference();
 
       // Ad signals additionally require ATT authorization on iOS.
-      final adConsent = analyticsConsent &&
+      final adConsent =
+          analyticsConsent &&
           (!Platform.isIOS || attStatus == TrackingStatus.authorized);
 
       // Gate SDK collection on the analytics preference only (not ATT), so
       // events keep flowing for users who decline tracking.
       if (_analytics is FirebaseAnalytics) {
-        await (_analytics as FirebaseAnalytics)
-            .setAnalyticsCollectionEnabled(analyticsConsent);
+        await (_analytics as FirebaseAnalytics).setAnalyticsCollectionEnabled(
+          analyticsConsent,
+        );
       }
 
       // Consent mode v2: analytics_storage tracks product-analytics consent;
@@ -177,15 +182,19 @@ class FirebaseAnalyticsService {
       );
 
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Firebase Analytics initialized — analytics consent: $analyticsConsent, ad consent: $adConsent (ATT: $attStatus)');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Firebase Analytics initialized — analytics consent: $analyticsConsent, ad consent: $adConsent (ATT: $attStatus)',
+        );
       }
 
       _initialized = true;
     } catch (e) {
       if (kDebugMode) {
         AppLogger.d(
-            'FIREBASE_ANALYTICS', 'Error initializing Firebase Analytics: $e');
+          'FIREBASE_ANALYTICS',
+          'Error initializing Firebase Analytics: $e',
+        );
       }
     }
   }
@@ -202,8 +211,10 @@ class FirebaseAnalyticsService {
           .requestTrackingPermission();
 
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'iOS App Tracking Transparency status: $status');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'iOS App Tracking Transparency status: $status',
+        );
       }
 
       // ATT denial revokes only cross-app ad consent; product analytics
@@ -211,8 +222,10 @@ class FirebaseAnalyticsService {
       await applyAdConsentFromAttStatus(status);
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error requesting iOS tracking authorization: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error requesting iOS tracking authorization: $e',
+        );
       }
     }
   }
@@ -236,7 +249,10 @@ class FirebaseAnalyticsService {
     try {
       final prefs = await SharedPreferences.getInstance();
       // Default to true if not set - analytics is enabled by default
-      return prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ?? true;
+      return prefs.getBool(
+            SharedPreferenceConstants.analyticsFirebaseEnabled,
+          ) ??
+          true;
     } catch (e) {
       // If there's an error, default to true
       return true;
@@ -253,8 +269,9 @@ class FirebaseAnalyticsService {
   Future<void> setCollectionEnabled(bool enabled) async {
     try {
       if (_analytics is FirebaseAnalytics) {
-        await (_analytics as FirebaseAnalytics)
-            .setAnalyticsCollectionEnabled(enabled);
+        await (_analytics as FirebaseAnalytics).setAnalyticsCollectionEnabled(
+          enabled,
+        );
       }
       await setConsent(
         analyticsStorageConsentGranted: enabled,
@@ -263,13 +280,17 @@ class FirebaseAnalyticsService {
         adPersonalizationSignalsConsentGranted: enabled,
       );
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Analytics collection enabled: $enabled');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Analytics collection enabled: $enabled',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error setting analytics collection enabled: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error setting analytics collection enabled: $e',
+        );
       }
     }
   }
@@ -288,16 +309,23 @@ class FirebaseAnalyticsService {
 
       // Save preference
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(SharedPreferenceConstants.analyticsFirebaseEnabled, true);
+      await prefs.setBool(
+        SharedPreferenceConstants.analyticsFirebaseEnabled,
+        true,
+      );
 
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Firebase Analytics consent set to granted for all types');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Firebase Analytics consent set to granted for all types',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error setting Firebase Analytics consent: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error setting Firebase Analytics consent: $e',
+        );
       }
     }
   }
@@ -328,33 +356,47 @@ class FirebaseAnalyticsService {
               analyticsStorageConsentGranted) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool(
-            SharedPreferenceConstants.analyticsFirebaseEnabled, analyticsStorageConsentGranted);
+          SharedPreferenceConstants.analyticsFirebaseEnabled,
+          analyticsStorageConsentGranted,
+        );
       }
 
       if (kDebugMode) {
         AppLogger.d(
-            'FIREBASE_ANALYTICS', 'Firebase Analytics consent updated:');
+          'FIREBASE_ANALYTICS',
+          'Firebase Analytics consent updated:',
+        );
         if (analyticsStorageConsentGranted != null) {
-          AppLogger.d('FIREBASE_ANALYTICS',
-              'Analytics storage: $analyticsStorageConsentGranted');
+          AppLogger.d(
+            'FIREBASE_ANALYTICS',
+            'Analytics storage: $analyticsStorageConsentGranted',
+          );
         }
         if (adStorageConsentGranted != null) {
           AppLogger.d(
-              'FIREBASE_ANALYTICS', 'Ad storage: $adStorageConsentGranted');
+            'FIREBASE_ANALYTICS',
+            'Ad storage: $adStorageConsentGranted',
+          );
         }
         if (adUserDataConsentGranted != null) {
           AppLogger.d(
-              'FIREBASE_ANALYTICS', 'Ad user data: $adUserDataConsentGranted');
+            'FIREBASE_ANALYTICS',
+            'Ad user data: $adUserDataConsentGranted',
+          );
         }
         if (adPersonalizationSignalsConsentGranted != null) {
-          AppLogger.d('FIREBASE_ANALYTICS',
-              'Ad personalization: $adPersonalizationSignalsConsentGranted');
+          AppLogger.d(
+            'FIREBASE_ANALYTICS',
+            'Ad personalization: $adPersonalizationSignalsConsentGranted',
+          );
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error setting Firebase Analytics consent: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error setting Firebase Analytics consent: $e',
+        );
       }
     }
   }
@@ -396,21 +438,22 @@ class FirebaseAnalyticsService {
 
       final analyticsEnabled =
           prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
-              true;
+          true;
 
       if (analyticsEnabled && _analytics != null) {
-        await _analytics.logEvent(
-          name: name,
-          parameters: parameters,
-        );
+        await _analytics.logEvent(name: name, parameters: parameters);
       } else if (kDebugMode && !analyticsEnabled) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Firebase Analytics disabled by user preference, skipping event: $name');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Firebase Analytics disabled by user preference, skipping event: $name',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error logging event to Firebase Analytics: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error logging event to Firebase Analytics: $e',
+        );
       }
     }
   }
@@ -421,7 +464,8 @@ class FirebaseAnalyticsService {
   Future<void> logFirstActionAfterOnboardingIfNeeded(String target) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final pending = prefs.getBool(
+      final pending =
+          prefs.getBool(
             SharedPreferenceConstants.firstActionAfterOnboardingPending,
           ) ??
           false;
@@ -451,15 +495,17 @@ class FirebaseAnalyticsService {
       final prefs = await SharedPreferences.getInstance();
       final analyticsEnabled =
           prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
-              true;
+          true;
 
       if (analyticsEnabled && _analytics != null) {
         await _analytics.setUserId(id: userId);
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error setting user ID in Firebase Analytics: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error setting user ID in Firebase Analytics: $e',
+        );
       }
     }
   }
@@ -470,10 +516,7 @@ class FirebaseAnalyticsService {
   }
 
   /// Set a user property for Firebase Analytics
-  Future<void> setUserProperty({
-    required String name,
-    String? value,
-  }) async {
+  Future<void> setUserProperty({required String name, String? value}) async {
     if (_runningInTest) return;
     if (!_initialized) await initialize();
 
@@ -482,22 +525,28 @@ class FirebaseAnalyticsService {
       final prefs = await SharedPreferences.getInstance();
       final analyticsEnabled =
           prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
-              true;
+          true;
 
       if (analyticsEnabled && _analytics != null) {
         await _analytics.setUserProperty(name: name, value: value);
         if (kDebugMode) {
           AppLogger.d(
-              'FIREBASE_ANALYTICS', 'Set user property: $name = $value');
+            'FIREBASE_ANALYTICS',
+            'Set user property: $name = $value',
+          );
         }
       } else if (kDebugMode && !analyticsEnabled) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Firebase Analytics disabled by user preference, skipping user property: $name');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Firebase Analytics disabled by user preference, skipping user property: $name',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error setting user property in Firebase Analytics: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error setting user property in Firebase Analytics: $e',
+        );
       }
     }
   }
@@ -517,8 +566,10 @@ class FirebaseAnalyticsService {
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error resetting Firebase Analytics data: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error resetting Firebase Analytics data: $e',
+        );
       }
     }
   }
@@ -537,27 +588,28 @@ class FirebaseAnalyticsService {
       final prefs = await SharedPreferences.getInstance();
       final analyticsEnabled =
           prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ??
-              true;
+          true;
 
       if (analyticsEnabled && _analytics != null) {
         await _analytics.logScreenView(
           screenName: screenName,
           screenClass: screenClass ?? 'Flutter',
-          parameters: {
-            'screen_name': screenName,
-            if (parameters != null) ...parameters,
-          },
+          parameters: {'screen_name': screenName, ...?parameters},
         );
 
         if (kDebugMode) {
-          AppLogger.d('FIREBASE_ANALYTICS',
-              'Screen view logged: $screenName${parameters != null ? ' with parameters' : ''}');
+          AppLogger.d(
+            'FIREBASE_ANALYTICS',
+            'Screen view logged: $screenName${parameters != null ? ' with parameters' : ''}',
+          );
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        AppLogger.d('FIREBASE_ANALYTICS',
-            'Error logging screen view in Firebase Analytics: $e');
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error logging screen view in Firebase Analytics: $e',
+        );
       }
     }
   }
@@ -588,7 +640,10 @@ class FirebaseAnalyticsService {
     } catch (e) {
       if (kDebugMode) {
         AppLogger.e(
-            'FIREBASE_ANALYTICS', 'Error getting stored UTM parameters', e);
+          'FIREBASE_ANALYTICS',
+          'Error getting stored UTM parameters',
+          e,
+        );
       }
       return {};
     }
@@ -622,29 +677,33 @@ class FirebaseAnalyticsService {
       for (final paramKey in utmParams) {
         final value = prefs.getString(paramKey);
         if (value != null && value.isNotEmpty) {
-          await analyticsService.setUserProperty(
-            name: paramKey,
-            value: value,
-          );
+          await analyticsService.setUserProperty(name: paramKey, value: value);
           appliedCount++;
 
           if (kDebugMode) {
-            AppLogger.d('FIREBASE_ANALYTICS',
-                'Applied stored UTM parameter: $paramKey = $value');
+            AppLogger.d(
+              'FIREBASE_ANALYTICS',
+              'Applied stored UTM parameter: $paramKey = $value',
+            );
           }
         }
       }
 
       if (appliedCount > 0) {
         if (kDebugMode) {
-          AppLogger.d('FIREBASE_ANALYTICS',
-              'Applied $appliedCount stored UTM parameter(s)');
+          AppLogger.d(
+            'FIREBASE_ANALYTICS',
+            'Applied $appliedCount stored UTM parameter(s)',
+          );
         }
       }
     } catch (e) {
       if (kDebugMode) {
         AppLogger.e(
-            'FIREBASE_ANALYTICS', 'Error applying stored UTM parameters', e);
+          'FIREBASE_ANALYTICS',
+          'Error applying stored UTM parameters',
+          e,
+        );
       }
     }
   }

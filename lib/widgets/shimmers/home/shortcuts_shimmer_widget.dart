@@ -8,9 +8,7 @@ class ShortcutsShimmerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: _shortcuts(),
-    );
+    return SafeArea(child: _shortcuts());
   }
 
   GridView _shortcuts() {
@@ -23,10 +21,7 @@ class ShortcutsShimmerWidget extends StatelessWidget {
       shrinkWrap: true,
       childAspectRatio: 3,
       children: List.generate(4, (index) {
-        return const BoxShimmerWidget(
-          height: 40,
-          borderRadius: 12,
-        );
+        return const BoxShimmerWidget(height: 40, borderRadius: 12);
       }),
     );
   }

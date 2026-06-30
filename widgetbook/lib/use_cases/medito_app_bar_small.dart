@@ -7,10 +7,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 Widget defaultAppBarSmall(BuildContext context) {
   return Scaffold(
     appBar: MeditoAppBarSmall(
-      title: context.knobs.string(
-        label: 'Title',
-        initialValue: 'Meditations',
-      ),
+      title: context.knobs.string(label: 'Title', initialValue: 'Meditations'),
       hasBackButton: context.knobs.boolean(
         label: 'Back button',
         initialValue: true,

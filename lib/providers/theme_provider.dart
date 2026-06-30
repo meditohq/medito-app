@@ -13,7 +13,9 @@ class ThemeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
     final prefs = ref.read(sharedPreferencesProvider);
-    final savedTheme = prefs.getString(SharedPreferenceConstants.themePreference);
+    final savedTheme = prefs.getString(
+      SharedPreferenceConstants.themePreference,
+    );
 
     ThemeMode themeMode;
     switch (savedTheme) {
@@ -31,7 +33,7 @@ class ThemeNotifier extends Notifier<ThemeMode> {
         themeMode = ThemeMode.dark;
         break;
     }
-    
+
     // Save theme preference to widget when loading
     if (savedTheme != null) {
       HomeWidgetService.saveThemePreference(savedTheme);
@@ -56,9 +58,12 @@ class ThemeNotifier extends Notifier<ThemeMode> {
         break;
     }
 
-    await prefs.setString(SharedPreferenceConstants.themePreference, themeString);
+    await prefs.setString(
+      SharedPreferenceConstants.themePreference,
+      themeString,
+    );
     state = themeMode;
-    
+
     // Save theme preference to widget
     await HomeWidgetService.saveThemePreference(themeString);
   }

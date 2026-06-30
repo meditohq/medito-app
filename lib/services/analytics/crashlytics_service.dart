@@ -101,16 +101,18 @@ class CrashlyticsService {
     if (stackTrace == null) return false;
 
     final lowerStack = stackTrace.toLowerCase();
-    return _imageRelatedKeywords
-        .any((keyword) => lowerStack.contains(keyword.toLowerCase()));
+    return _imageRelatedKeywords.any(
+      (keyword) => lowerStack.contains(keyword.toLowerCase()),
+    );
   }
 
   bool _hasNetworkError(dynamic exception) {
     final exceptionString = exception.toString();
 
     // Check for network error patterns in the exception string
-    if (_networkErrorPatterns
-        .any((pattern) => exceptionString.contains(pattern))) {
+    if (_networkErrorPatterns.any(
+      (pattern) => exceptionString.contains(pattern),
+    )) {
       return true;
     }
 
@@ -127,10 +129,7 @@ class CrashlyticsService {
     return false;
   }
 
-  bool _shouldIgnoreImageLoadingError({
-    String? stack,
-    dynamic exception,
-  }) {
+  bool _shouldIgnoreImageLoadingError({String? stack, dynamic exception}) {
     // Special case for HttpException with 404/403/500 from image URLs
     if (exception is HttpException) {
       final uriString = exception.uri?.toString() ?? '';
@@ -151,14 +150,16 @@ class CrashlyticsService {
       final exceptionString = exception.toString();
       final lowerExceptionString = exceptionString.toLowerCase();
       final isCdnMeditoError = lowerExceptionString.contains('cdn.medito.app');
-      final isConnectionTimeout =
-          lowerExceptionString.contains('connection timed out');
+      final isConnectionTimeout = lowerExceptionString.contains(
+        'connection timed out',
+      );
       final isNetworkError =
           lowerExceptionString.contains('failed host lookup') ||
-              lowerExceptionString
-                  .contains('no address associated with hostname') ||
-              isConnectionTimeout ||
-              lowerExceptionString.contains('connection refused');
+          lowerExceptionString.contains(
+            'no address associated with hostname',
+          ) ||
+          isConnectionTimeout ||
+          lowerExceptionString.contains('connection refused');
 
       // If it's related to cdn.medito.app or is a network error, check if we should ignore it
       if (isCdnMeditoError || isNetworkError) {
@@ -194,9 +195,11 @@ class CrashlyticsService {
     final lowerExceptionString = exceptionString.toLowerCase();
     if (lowerExceptionString.contains('clientexception')) {
       final isCdnMeditoError = lowerExceptionString.contains('cdn.medito.app');
-      final isConnectionClosed =
-          lowerExceptionString.contains('connection closed');
-      final looksLikeImageUrl = lowerExceptionString.contains('.webp') ||
+      final isConnectionClosed = lowerExceptionString.contains(
+        'connection closed',
+      );
+      final looksLikeImageUrl =
+          lowerExceptionString.contains('.webp') ||
           lowerExceptionString.contains('.png') ||
           lowerExceptionString.contains('.jpg') ||
           lowerExceptionString.contains('cdn.') ||
@@ -240,7 +243,8 @@ class CrashlyticsService {
     // (handles wrapped or rethrown SocketException, e.g. from FlutterError)
     final exceptionStr = exception.toString();
     final lowerExceptionStr = exceptionStr.toLowerCase();
-    final isSocketHostLookup = lowerExceptionStr.contains('socketexception') &&
+    final isSocketHostLookup =
+        lowerExceptionStr.contains('socketexception') &&
         (lowerExceptionStr.contains('failed host lookup') ||
             lowerExceptionStr.contains('no address associated with hostname'));
     if (isSocketHostLookup && _isImageLoadingError(stack)) {
@@ -305,8 +309,9 @@ class CrashlyticsService {
   Future<void> setCollectionEnabled(bool enabled) async {
     _analyticsEnabled = enabled;
     try {
-      await FirebaseCrashlytics.instance
-          .setCrashlyticsCollectionEnabled(enabled && !kDebugMode);
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+        enabled && !kDebugMode,
+      );
       if (kDebugMode) {
         AppLogger.d('CRASHLYTICS', 'Collection enabled: $enabled');
       }

@@ -47,17 +47,15 @@ class MockFirebasePlatform extends FirebasePlatform {
 
 /// Mock implementation of Firebase App
 class MockFirebaseApp extends FirebaseAppPlatform {
-  MockFirebaseApp({
-    String? name,
-    FirebaseOptions? options,
-  }) : super(
-          name ?? defaultFirebaseAppName,
-          options ??
-              const FirebaseOptions(
-                apiKey: 'testApiKey',
-                appId: 'testAppId',
-                messagingSenderId: 'testSenderId',
-                projectId: 'testProjectId',
-              ),
-        );
+  MockFirebaseApp({String? name, FirebaseOptions? options})
+    : super(
+        name ?? defaultFirebaseAppName,
+        options ??
+            const FirebaseOptions(
+              apiKey: 'testApiKey',
+              appId: 'testAppId',
+              messagingSenderId: 'testSenderId',
+              projectId: 'testProjectId',
+            ),
+      );
 }

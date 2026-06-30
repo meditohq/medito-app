@@ -8,33 +8,38 @@ final trackSearchRepositoryProvider = Provider<TrackSearchRepository>((ref) {
   return TrackSearchRepository(HttpApiService());
 });
 
-final explorePacksProvider =
-    FutureProvider.autoDispose<List<PackItem>>((ref) async {
+final explorePacksProvider = FutureProvider.autoDispose<List<PackItem>>((
+  ref,
+) async {
   final packRepo = ref.watch(packRepositoryProvider);
   final packs = await packRepo.fetchAllPacks();
 
   return packs
-      .map((pack) => PackItem(
-            id: pack.id,
-            title: pack.title,
-            subtitle: pack.subtitle ?? '',
-            coverUrl: pack.coverUrl ?? '',
-            path: pack.path ?? '',
-          ))
+      .map(
+        (pack) => PackItem(
+          id: pack.id,
+          title: pack.title,
+          subtitle: pack.subtitle ?? '',
+          coverUrl: pack.coverUrl ?? '',
+          path: pack.path ?? '',
+        ),
+      )
       .toList();
 });
 
 final searchTracksProvider = FutureProvider.autoDispose
     .family<List<TrackItem>, String>((ref, query) async {
-  final searchRepo = ref.read(trackSearchRepositoryProvider);
-  final results = await searchRepo.searchTracks(query);
-  return results
-      .map((track) => TrackItem(
-            id: track.id,
-            title: track.title,
-            subtitle: track.subtitle,
-            coverUrl: track.coverUrl,
-            path: track.path,
-          ))
-      .toList();
-});
+      final searchRepo = ref.read(trackSearchRepositoryProvider);
+      final results = await searchRepo.searchTracks(query);
+      return results
+          .map(
+            (track) => TrackItem(
+              id: track.id,
+              title: track.title,
+              subtitle: track.subtitle,
+              coverUrl: track.coverUrl,
+              path: track.path,
+            ),
+          )
+          .toList();
+    });

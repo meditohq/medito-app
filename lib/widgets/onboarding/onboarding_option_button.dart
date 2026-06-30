@@ -32,9 +32,7 @@ class OnboardingOptionButton extends StatelessWidget {
           vertical: 18,
         ),
         decoration: BoxDecoration(
-          color: selected
-              ? colorScheme.primary.withAlpha(25)
-              : theme.cardColor,
+          color: selected ? colorScheme.primary.withAlpha(25) : theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: selected

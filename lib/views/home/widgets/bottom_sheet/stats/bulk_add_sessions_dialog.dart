@@ -53,8 +53,7 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MeditoDialogTitle(
-              l10n.addSessionsTitle(widget.newSessionsCount)),
+          MeditoDialogTitle(l10n.addSessionsTitle(widget.newSessionsCount)),
           const SizedBox(height: 12),
           MeditoDialogBody(
             '${dateFmt.format(widget.rangeStart)} – ${dateFmt.format(widget.rangeEnd)}',
@@ -64,9 +63,9 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
             Text(
               l10n.daysAlreadyHaveSession(alreadyFilled, widget.dayCount),
               style: theme.textTheme.bodySmall?.copyWith(
-                    fontFamily: dmSans,
-                    color: theme.colorScheme.onSurface.withOpacityValue(0.7),
-                  ),
+                fontFamily: dmSans,
+                color: theme.colorScheme.onSurface.withOpacityValue(0.7),
+              ),
             ),
           ],
           const SizedBox(height: 16),
@@ -107,10 +106,7 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
             onChanged: (_) => setState(() {}),
             labelText: l10n.minutesPerDayOptional,
             hintText: l10n.minutes,
-            prefixIcon: Icon(
-              Icons.timer,
-              color: theme.colorScheme.onSurface,
-            ),
+            prefixIcon: Icon(Icons.timer, color: theme.colorScheme.onSurface),
           ),
           const SizedBox(height: 24),
           Row(
@@ -129,8 +125,9 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
                       ? null
                       : () {
                           final text = _durationController.text.trim();
-                          final duration =
-                              text.isEmpty ? 0 : (int.tryParse(text) ?? 0);
+                          final duration = text.isEmpty
+                              ? 0
+                              : (int.tryParse(text) ?? 0);
                           Navigator.of(context).pop(duration);
                         },
                 ),
@@ -163,19 +160,19 @@ class _StreakRow extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
-                color: theme.colorScheme.onSurface.withOpacityValue(0.75),
-              ),
+            fontFamily: dmSans,
+            color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+          ),
         ),
         Text(
           value,
           style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
-                fontWeight: FontWeight.w700,
-                color: emphasize
-                    ? context.brandPurple
-                    : theme.colorScheme.onSurface,
-              ),
+            fontFamily: dmSans,
+            fontWeight: FontWeight.w700,
+            color: emphasize
+                ? context.brandPurple
+                : theme.colorScheme.onSurface,
+          ),
         ),
       ],
     );

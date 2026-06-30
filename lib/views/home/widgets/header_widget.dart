@@ -33,14 +33,8 @@ class _HeaderAndAnnouncementWidgetState extends ConsumerState<HeaderWidget>
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
-          child: HomeHeaderWidget(
-            greeting: widget.greeting,
-          ),
-        ),
-        StreakCircle(
-          onTap: widget.onStatsButtonTap,
-        ),
+        Expanded(child: HomeHeaderWidget(greeting: widget.greeting)),
+        StreakCircle(onTap: widget.onStatsButtonTap),
       ],
     );
   }

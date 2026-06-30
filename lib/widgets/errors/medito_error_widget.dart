@@ -34,26 +34,33 @@ class MeditoErrorWidget extends ConsumerWidget {
 
   String _getErrorMessage(BuildContext context) {
     return switch (error) {
-      NetworkConnectionError() =>
-        AppLocalizations.of(context)!.errorNoInternetMessage,
+      NetworkConnectionError() => AppLocalizations.of(
+        context,
+      )!.errorNoInternetMessage,
       TimeoutError() => AppLocalizations.of(context)!.errorTimeoutMessage,
-      UnauthorizedError() =>
-        AppLocalizations.of(context)!.errorUnauthorizedMessage,
+      UnauthorizedError() => AppLocalizations.of(
+        context,
+      )!.errorUnauthorizedMessage,
       NotFoundError() => AppLocalizations.of(context)!.errorNotFoundMessage,
       ServerError() => AppLocalizations.of(context)!.errorServerMessage,
       UnknownError() => AppLocalizations.of(context)!.errorUnknownMessage,
-      RefreshTokenError() =>
-        AppLocalizations.of(context)!.errorUnauthorizedMessage,
+      RefreshTokenError() => AppLocalizations.of(
+        context,
+      )!.errorUnauthorizedMessage,
       _ => AppLocalizations.of(context)!.errorUnknownMessage,
     };
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var uiState = ref.watch(meditoErrorWidgetProvider(
-      MeditoErrorWidgetUIState(
-          shouldShowCheckDownloadButton, _getErrorMessage(context)),
-    ));
+    var uiState = ref.watch(
+      meditoErrorWidgetProvider(
+        MeditoErrorWidgetUIState(
+          shouldShowCheckDownloadButton,
+          _getErrorMessage(context),
+        ),
+      ),
+    );
     var textStyle = Theme.of(context).textTheme.headlineMedium;
 
     var mainBody = _mainBody(
@@ -65,10 +72,7 @@ class MeditoErrorWidget extends ConsumerWidget {
     );
 
     if (isScaffold) {
-      return Scaffold(
-        backgroundColor: ColorConstants.ebony,
-        body: mainBody,
-      );
+      return Scaffold(backgroundColor: ColorConstants.ebony, body: mainBody);
     }
 
     return mainBody;
@@ -107,18 +111,19 @@ class MeditoErrorWidget extends ConsumerWidget {
                     ),
                   if (isShowCheckDownload)
                     TextSpan(
-                      text:
-                          AppLocalizations.of(context)!.downloads.toLowerCase(),
+                      text: AppLocalizations.of(
+                        context,
+                      )!.downloads.toLowerCase(),
                       style: textStyle?.copyWith(
                         decoration: TextDecoration.underline,
                         color: ColorConstants.lightPurple,
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const DownloadsView(),
-                              ),
-                            ),
+                          MaterialPageRoute(
+                            builder: (context) => const DownloadsView(),
+                          ),
+                        ),
                     ),
                 ],
               ),
@@ -147,8 +152,9 @@ class MeditoErrorWidget extends ConsumerWidget {
                     child: LoadingButtonWidget(
                       btnText: AppLocalizations.of(context)!.signInAgain,
                       onPressed: () async {
-                        final authRepository =
-                            ref.read(authRepositorySyncProvider);
+                        final authRepository = ref.read(
+                          authRepositorySyncProvider,
+                        );
                         await authRepository.signOut();
                         await ref.read(statsManagerProvider).clearAllStats();
                         if (context.mounted) {
@@ -156,7 +162,8 @@ class MeditoErrorWidget extends ConsumerWidget {
 
                           // Add a small delay to let the me provider refresh before navigation
                           await Future.delayed(
-                              const Duration(milliseconds: 100));
+                            const Duration(milliseconds: 100),
+                          );
 
                           if (context.mounted) {
                             // Navigate to splash screen from UI
@@ -198,11 +205,9 @@ class MeditoErrorWidget extends ConsumerWidget {
                     width: 300,
                     child: ElevatedButton(
                       onPressed: () {
-                        handleNavigation(
-                          TypeConstants.flow,
-                          [TypeConstants.downloads],
-                          context,
-                        );
+                        handleNavigation(TypeConstants.flow, [
+                          TypeConstants.downloads,
+                        ], context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ColorConstants.lightPurple,

@@ -95,16 +95,11 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   ReorderableListView _getDownloadList(List<Track> tracks) {
     return ReorderableListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      onReorder: (int oldIndex, int newIndex) {
+      onReorderItem: (int oldIndex, int newIndex) {
         setState(() {
-          if (oldIndex < newIndex) {
-            newIndex -= 1;
-          }
           var reorderedItem = tracks.removeAt(oldIndex);
           tracks.insert(newIndex, reorderedItem);
-          ref.read(
-            addTrackListInPreferenceProvider(tracks: tracks),
-          );
+          ref.read(addTrackListInPreferenceProvider(tracks: tracks));
         });
       },
       children: tracks.map((item) => _getSlidingItem(item)).toList(),
@@ -112,8 +107,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   }
 
   Widget _getEmptyWidget() => EmptyStateWidget(
-        message: AppLocalizations.of(context)!.emptyDownloadsMessage,
-      );
+    message: AppLocalizations.of(context)!.emptyDownloadsMessage,
+  );
 
   Widget _getSlidingItem(Track item) {
     final firstFile = item.voices.first.audioFiles.first;
@@ -133,28 +128,29 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   }
 
   Widget _getDismissibleBackgroundWidget() => Container(
-        color: ColorConstants.charcoal,
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Spacer(),
-              const MeditoIcon(
-                assetName: MeditoIcons.xmark,
-                color: Colors.redAccent,
-              ),
-            ],
+    color: ColorConstants.charcoal,
+    child: Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Spacer(),
+          const MeditoIcon(
+            assetName: MeditoIcons.xmark,
+            color: Colors.redAccent,
           ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 
   DownloadListItemWidget _getListItemWidget(Track item) {
     final firstVoice = item.voices.first;
     final firstFile = firstVoice.audioFiles.first;
-    var audioLength =
-        Duration(milliseconds: firstFile.duration).inMinutes.toString();
+    var audioLength = Duration(
+      milliseconds: firstFile.duration,
+    ).inMinutes.toString();
     var guideName = firstVoice.guideName;
     var duration = _getDuration(audioLength);
     var subTitle = guideName != null ? '$guideName — $duration' : duration;
@@ -177,12 +173,12 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     final file = voice.audioFiles.first;
     final request = PlaybackRequest.fromTrack(track, voice, file);
     await ref.read(playerProvider.notifier).play(request);
-    unawaited(Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const PlayerView(),
+    unawaited(
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const PlayerView()),
       ),
-    ));
+    );
   }
 
   void _handleDismissible(DismissDirection _, Track item) async {
@@ -227,18 +223,21 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     final fileName =
         '${item.id}-${firstFile.id}${getAudioFileExtension(firstFile.path)}';
 
-    final isDownloaded =
-        await ref.read(downloaderRepositoryProvider).isFileDownloaded(fileName);
+    final isDownloaded = await ref
+        .read(downloaderRepositoryProvider)
+        .isFileDownloaded(fileName);
     if (isDownloaded) {
       await ref
           .read(audioDownloaderProvider.notifier)
           .deleteTrackAudio(fileName);
     }
 
-    final trackList =
-        await ref.read(trackRepositoryProvider).fetchTrackFromPreference();
-    trackList.removeWhere((t) => t.voices
-        .first.audioFiles.any((f) => f.id == firstFile.id));
+    final trackList = await ref
+        .read(trackRepositoryProvider)
+        .fetchTrackFromPreference();
+    trackList.removeWhere(
+      (t) => t.voices.first.audioFiles.any((f) => f.id == firstFile.id),
+    );
     await ref.read(trackRepositoryProvider).addTrackInPreference(trackList);
 
     ref.invalidate(downloadedTracksProvider);

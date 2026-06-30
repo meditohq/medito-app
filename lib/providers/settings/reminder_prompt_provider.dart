@@ -15,7 +15,8 @@ class ReminderPromptNotifier extends Notifier<ReminderPromptState> {
   ReminderPromptState build() {
     final prefs = ref.read(sharedPreferencesProvider);
     return ReminderPromptState(
-      dismissedForever: prefs.getBool(
+      dismissedForever:
+          prefs.getBool(
             SharedPreferenceConstants.reminderPromptDismissedForever,
           ) ??
           false,
@@ -63,17 +64,16 @@ class ReminderPromptState {
   ReminderPromptState copyWith({
     bool? dismissedForever,
     int? snoozeUntilMillis,
-  }) =>
-      ReminderPromptState(
-        dismissedForever: dismissedForever ?? this.dismissedForever,
-        snoozeUntilMillis: snoozeUntilMillis ?? this.snoozeUntilMillis,
-      );
+  }) => ReminderPromptState(
+    dismissedForever: dismissedForever ?? this.dismissedForever,
+    snoozeUntilMillis: snoozeUntilMillis ?? this.snoozeUntilMillis,
+  );
 }
 
 final reminderPromptDismissedProvider =
     NotifierProvider<ReminderPromptNotifier, ReminderPromptState>(
-  () => ReminderPromptNotifier(),
-);
+      () => ReminderPromptNotifier(),
+    );
 
 final shouldShowReminderPromptProvider = Provider<bool>((ref) {
   final isReminderEnabled = ref.watch(reminderEnabledProvider);
@@ -82,5 +82,3 @@ final shouldShowReminderPromptProvider = Provider<bool>((ref) {
   final promptState = ref.watch(reminderPromptDismissedProvider);
   return !promptState.dismissedForever && !promptState.isSnoozed;
 });
-
-

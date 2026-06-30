@@ -79,22 +79,26 @@ void main() {
   });
 
   group('dayOf - month and year boundaries with offset', () {
-    test('02:00 on Jan 1 with +4h offset rolls back to Dec 31 of prior year',
-        () {
-      final t = DateTime(2026, 1, 1, 2, 0);
-      expect(dayOf(t, const Duration(hours: 4)), DateTime(2025, 12, 31));
-    });
+    test(
+      '02:00 on Jan 1 with +4h offset rolls back to Dec 31 of prior year',
+      () {
+        final t = DateTime(2026, 1, 1, 2, 0);
+        expect(dayOf(t, const Duration(hours: 4)), DateTime(2025, 12, 31));
+      },
+    );
 
     test('02:00 on May 1 with +4h offset rolls back to Apr 30', () {
       final t = DateTime(2026, 5, 1, 2, 0);
       expect(dayOf(t, const Duration(hours: 4)), DateTime(2026, 4, 30));
     });
 
-    test('23:00 on Dec 31 with -2h offset rolls forward to Jan 1 next year',
-        () {
-      final t = DateTime(2025, 12, 31, 23, 0);
-      expect(dayOf(t, const Duration(hours: -2)), DateTime(2026, 1, 1));
-    });
+    test(
+      '23:00 on Dec 31 with -2h offset rolls forward to Jan 1 next year',
+      () {
+        final t = DateTime(2025, 12, 31, 23, 0);
+        expect(dayOf(t, const Duration(hours: -2)), DateTime(2026, 1, 1));
+      },
+    );
 
     test('02:00 on Mar 1 (non-leap year) with +4h offset → Feb 28', () {
       final t = DateTime(2025, 3, 1, 2, 0);
@@ -123,50 +127,45 @@ void main() {
       }
     });
 
-    test(
-      'a timestamp exactly at the boundary belongs to the new user-day',
-      () {
-        // For any offset of N whole hours, a timestamp at HH:00:00 where
-        // HH == N should bucket to the same calendar day.
-        for (final hours in const [1, 2, 3, 4, 5, 6, 8, 10, 12]) {
-          final offset = Duration(hours: hours);
-          final t = DateTime(2026, 5, 18, hours, 0);
-          expect(
-            dayOf(t, offset),
-            DateTime(2026, 5, 18),
-            reason: 'offset=$offset boundary moment should be inclusive',
-          );
-          // One millisecond before should belong to the previous day.
-          final beforeBoundary = t.subtract(const Duration(milliseconds: 1));
-          expect(
-            dayOf(beforeBoundary, offset),
-            DateTime(2026, 5, 17),
-            reason: 'offset=$offset one ms before boundary belongs to '
-                'previous user-day',
-          );
-        }
-      },
-    );
+    test('a timestamp exactly at the boundary belongs to the new user-day', () {
+      // For any offset of N whole hours, a timestamp at HH:00:00 where
+      // HH == N should bucket to the same calendar day.
+      for (final hours in const [1, 2, 3, 4, 5, 6, 8, 10, 12]) {
+        final offset = Duration(hours: hours);
+        final t = DateTime(2026, 5, 18, hours, 0);
+        expect(
+          dayOf(t, offset),
+          DateTime(2026, 5, 18),
+          reason: 'offset=$offset boundary moment should be inclusive',
+        );
+        // One millisecond before should belong to the previous day.
+        final beforeBoundary = t.subtract(const Duration(milliseconds: 1));
+        expect(
+          dayOf(beforeBoundary, offset),
+          DateTime(2026, 5, 17),
+          reason:
+              'offset=$offset one ms before boundary belongs to '
+              'previous user-day',
+        );
+      }
+    });
 
-    test(
-      'shifting a timestamp by one user-day always advances the bucket',
-      () {
-        for (var i = 0; i < 50; i++) {
-          final t = _randomDateTime(rng);
-          final offset = _randomOffset(rng);
-          final today = dayOf(t, offset);
-          // Adding 24h to the wall-clock should always land in the next
-          // user-day, regardless of offset — there's no DST in pure-Dart
-          // local time here (test env is fixed), so 24h ≡ 1 day.
-          final tomorrow = dayOf(t.add(const Duration(days: 1)), offset);
-          expect(
-            tomorrow.difference(today).inDays,
-            1,
-            reason: 't=$t offset=$offset today=$today tomorrow=$tomorrow',
-          );
-        }
-      },
-    );
+    test('shifting a timestamp by one user-day always advances the bucket', () {
+      for (var i = 0; i < 50; i++) {
+        final t = _randomDateTime(rng);
+        final offset = _randomOffset(rng);
+        final today = dayOf(t, offset);
+        // Adding 24h to the wall-clock should always land in the next
+        // user-day, regardless of offset — there's no DST in pure-Dart
+        // local time here (test env is fixed), so 24h ≡ 1 day.
+        final tomorrow = dayOf(t.add(const Duration(days: 1)), offset);
+        expect(
+          tomorrow.difference(today).inDays,
+          1,
+          reason: 't=$t offset=$offset today=$today tomorrow=$tomorrow',
+        );
+      }
+    });
 
     test(
       'dayOf is monotonic: t1 <= t2 ⇒ dayOf(t1) <= dayOf(t2) for same offset',
@@ -182,7 +181,8 @@ void main() {
           expect(
             dEarlier.isAfter(dLater),
             false,
-            reason: 'earlier=$earlier later=$later offset=$offset '
+            reason:
+                'earlier=$earlier later=$later offset=$offset '
                 'dEarlier=$dEarlier dLater=$dLater',
           );
         }

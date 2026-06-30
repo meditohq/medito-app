@@ -80,11 +80,7 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         children: [
           const VolumeSliderWidget(),
           Column(
-            children: data
-                .map((e) => SoundListTileWidget(
-                      sound: e,
-                    ))
-                .toList(),
+            children: data.map((e) => SoundListTileWidget(sound: e)).toList(),
           ),
           height32,
         ],

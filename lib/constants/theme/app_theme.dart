@@ -9,7 +9,8 @@ import 'input_theme.dart';
 
 ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
   final brightness = MediaQuery.of(context).platformBrightness;
-  final isDark = themeMode == ThemeMode.dark ||
+  final isDark =
+      themeMode == ThemeMode.dark ||
       (themeMode == ThemeMode.system && brightness == Brightness.dark);
 
   return ThemeData(
@@ -45,16 +46,19 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
             error: ColorConstants.lightError,
             onError: ColorConstants.white,
           ),
-    scaffoldBackgroundColor:
-        isDark ? ColorConstants.ebony : ColorConstants.lightBackground,
+    scaffoldBackgroundColor: isDark
+        ? ColorConstants.ebony
+        : ColorConstants.lightBackground,
     textTheme: meditoTextTheme(context, themeMode),
     inputDecorationTheme: inputDecorationTheme(),
     appBarTheme: AppBarTheme(
       systemOverlayStyle: SystemUiOverlayStyle(
-        systemNavigationBarColor:
-            isDark ? ColorConstants.ebony : ColorConstants.lightBackground,
-        systemNavigationBarIconBrightness:
-            isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: isDark
+            ? ColorConstants.ebony
+            : ColorConstants.lightBackground,
+        systemNavigationBarIconBrightness: isDark
+            ? Brightness.light
+            : Brightness.dark,
         statusBarColor: ColorConstants.transparent,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
         statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
@@ -65,13 +69,12 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     // fills and text; dark mode keeps the brand lightPurple on dark surfaces.
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
+        backgroundColor: isDark
+            ? ColorConstants.lightPurple
+            : ColorConstants.lightPrimary,
         foregroundColor: ColorConstants.white,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -82,15 +85,15 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.transparent,
-        foregroundColor:
-            isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
+        foregroundColor: isDark
+            ? ColorConstants.lightPurple
+            : ColorConstants.lightPrimary,
         side: BorderSide(
-          color:
-              isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
+          color: isDark
+              ? ColorConstants.lightPurple
+              : ColorConstants.lightPrimary,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
@@ -100,11 +103,10 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor:
-            isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        foregroundColor: isDark
+            ? ColorConstants.lightPurple
+            : ColorConstants.lightPrimary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -114,8 +116,9 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     ),
     // Dialog theme
     dialogTheme: DialogThemeData(
-      backgroundColor:
-          isDark ? ColorConstants.ebony : ColorConstants.lightSurface,
+      backgroundColor: isDark
+          ? ColorConstants.ebony
+          : ColorConstants.lightSurface,
       titleTextStyle: TextStyle(
         color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
         fontSize: 18,
@@ -128,9 +131,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
         fontWeight: FontWeight.w400,
         fontFamily: dmSans,
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     // Bottom sheet theme
     bottomSheetTheme: BottomSheetThemeData(
@@ -145,9 +146,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     // Card theme
     cardTheme: CardThemeData(
       color: isDark ? ColorConstants.onyx : ColorConstants.lightCard,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       elevation: 0,
     ),
     // Switch theme
@@ -176,12 +175,13 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     ),
     // Progress indicator theme
     progressIndicatorTheme: ProgressIndicatorThemeData(
-      color:
-          isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
-      linearTrackColor:
-          isDark ? ColorConstants.greyIsTheNewGrey : ColorConstants.lightGrey,
-      circularTrackColor:
-          isDark ? ColorConstants.greyIsTheNewGrey : ColorConstants.lightGrey,
+      color: isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
+      linearTrackColor: isDark
+          ? ColorConstants.greyIsTheNewGrey
+          : ColorConstants.lightGrey,
+      circularTrackColor: isDark
+          ? ColorConstants.greyIsTheNewGrey
+          : ColorConstants.lightGrey,
     ),
   );
 }

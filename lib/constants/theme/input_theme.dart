@@ -26,9 +26,7 @@ InputDecorationTheme inputDecorationTheme() {
   );
 }
 
-OutlineInputBorder _outlineInputBorder({
-  Color color = ColorConstants.onyx,
-}) =>
+OutlineInputBorder _outlineInputBorder({Color color = ColorConstants.onyx}) =>
     OutlineInputBorder(
       borderSide: BorderSide(color: color, width: 0),
       borderRadius: BorderRadius.circular(40),

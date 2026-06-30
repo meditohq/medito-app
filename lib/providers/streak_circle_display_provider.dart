@@ -2,10 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 
-enum StreakCircleDisplayType {
-  consistencyScore,
-  currentStreak,
-}
+enum StreakCircleDisplayType { consistencyScore, currentStreak }
 
 class StreakCircleDisplayNotifier
     extends AsyncNotifier<StreakCircleDisplayType> {
@@ -33,5 +30,5 @@ class StreakCircleDisplayNotifier
 
 final streakCircleDisplayProvider =
     AsyncNotifierProvider<StreakCircleDisplayNotifier, StreakCircleDisplayType>(
-  StreakCircleDisplayNotifier.new,
-);
+      StreakCircleDisplayNotifier.new,
+    );

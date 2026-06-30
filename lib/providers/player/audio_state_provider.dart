@@ -89,31 +89,28 @@ class AudioStateNotifier extends Notifier<PlaybackState> {
     );
 
     if (Platform.isIOS) {
-      iosAudioHandler.iosStateStream.listen(
-        (event) {
-          var playerState = event.playerState;
-          final isCompleted =
-              playerState.processingState == ProcessingState.completed;
-          state = state.copyWith(
-            speed: Speed(speed: event.speed),
-            track: iosAudioHandler.trackState,
-            isPlaying: event.playerState.playing,
-            isBuffering:
-                playerState.processingState == ProcessingState.buffering,
-            isSeeking: false,
-            isCompleted: isCompleted,
-            position: event.position.inMilliseconds,
-            duration: event.duration.inMilliseconds,
-          );
-          // iOS position feed for session analytics.
-          AudioSessionTracker.instance.onPositionUpdate(
-            positionMs: event.position.inMilliseconds,
-            durationMs: event.duration.inMilliseconds,
-            isPlaying: event.playerState.playing,
-            isCompleted: isCompleted,
-          );
-        },
-      );
+      iosAudioHandler.iosStateStream.listen((event) {
+        var playerState = event.playerState;
+        final isCompleted =
+            playerState.processingState == ProcessingState.completed;
+        state = state.copyWith(
+          speed: Speed(speed: event.speed),
+          track: iosAudioHandler.trackState,
+          isPlaying: event.playerState.playing,
+          isBuffering: playerState.processingState == ProcessingState.buffering,
+          isSeeking: false,
+          isCompleted: isCompleted,
+          position: event.position.inMilliseconds,
+          duration: event.duration.inMilliseconds,
+        );
+        // iOS position feed for session analytics.
+        AudioSessionTracker.instance.onPositionUpdate(
+          positionMs: event.position.inMilliseconds,
+          durationMs: event.duration.inMilliseconds,
+          isPlaying: event.playerState.playing,
+          isCompleted: isCompleted,
+        );
+      });
     }
 
     return initialState;
@@ -147,10 +144,11 @@ class AudioStateNotifier extends Notifier<PlaybackState> {
 
 var audioStateNotifier = AudioStateNotifier();
 
-final audioStateProvider =
-    NotifierProvider<AudioStateNotifier, PlaybackState>(() {
-  return audioStateNotifier;
-});
+final audioStateProvider = NotifierProvider<AudioStateNotifier, PlaybackState>(
+  () {
+    return audioStateNotifier;
+  },
+);
 
 extension PlaybackStateExt on PlaybackState {
   PlaybackState copyWith({

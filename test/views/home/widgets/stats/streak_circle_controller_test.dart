@@ -20,7 +20,9 @@ void main() {
     test('initialises with animation controller', () {
       expect(controller.animationController, isNotNull);
       expect(
-          controller.animationController.duration, const Duration(seconds: 3));
+        controller.animationController.duration,
+        const Duration(seconds: 3),
+      );
       expect(controller.isAnimating, false);
     });
 
@@ -46,28 +48,27 @@ void main() {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final audioCompleted = [
-        LocalAudioCompleted(
-          timestamp: today.millisecondsSinceEpoch,
-          id: '123',
-        ),
+        LocalAudioCompleted(timestamp: today.millisecondsSinceEpoch, id: '123'),
       ];
 
       expect(controller.isStreakDoneToday(audioCompleted), true);
     });
 
-    test('isStreakDoneToday returns false for audio completed before today',
-        () {
-      final now = DateTime.now();
-      final yesterday = DateTime(now.year, now.month, now.day - 1);
-      final audioCompleted = [
-        LocalAudioCompleted(
-          timestamp: yesterday.millisecondsSinceEpoch,
-          id: '123',
-        ),
-      ];
+    test(
+      'isStreakDoneToday returns false for audio completed before today',
+      () {
+        final now = DateTime.now();
+        final yesterday = DateTime(now.year, now.month, now.day - 1);
+        final audioCompleted = [
+          LocalAudioCompleted(
+            timestamp: yesterday.millisecondsSinceEpoch,
+            id: '123',
+          ),
+        ];
 
-      expect(controller.isStreakDoneToday(audioCompleted), false);
-    });
+        expect(controller.isStreakDoneToday(audioCompleted), false);
+      },
+    );
 
     test('isStreakDoneToday uses provided now parameter', () {
       final customNow = DateTime(2024, 3, 15);
@@ -86,14 +87,15 @@ void main() {
 
     group('Streak vs Consistency Score', () {
       test(
-          'shouldShowConsistencyScore returns true when streak < 100 and consistency score exists',
-          () {
-        final stats = LocalAllStats.empty().copyWith(
-          streakCurrent: 50,
-          consistencyScore: 0.75,
-        );
-        expect(controller.shouldShowConsistencyScore(stats), true);
-      });
+        'shouldShowConsistencyScore returns true when streak < 100 and consistency score exists',
+        () {
+          final stats = LocalAllStats.empty().copyWith(
+            streakCurrent: 50,
+            consistencyScore: 0.75,
+          );
+          expect(controller.shouldShowConsistencyScore(stats), true);
+        },
+      );
 
       test('shouldShowConsistencyScore returns false when streak >= 100', () {
         final stats = LocalAllStats.empty().copyWith(
@@ -119,14 +121,16 @@ void main() {
         expect('${controller.getDisplayValue(stats)}%', '150%');
       });
 
-      test('getProgressValue returns consistency score when below threshold',
-          () {
-        final stats = LocalAllStats.empty().copyWith(
-          streakCurrent: 50,
-          consistencyScore: 0.75,
-        );
-        expect(controller.getProgressValue(stats), 0.75);
-      });
+      test(
+        'getProgressValue returns consistency score when below threshold',
+        () {
+          final stats = LocalAllStats.empty().copyWith(
+            streakCurrent: 50,
+            consistencyScore: 0.75,
+          );
+          expect(controller.getProgressValue(stats), 0.75);
+        },
+      );
 
       test('getProgressValue returns 0 when above threshold', () {
         final stats = LocalAllStats.empty().copyWith(

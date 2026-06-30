@@ -48,11 +48,10 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   }
 
   void _onScroll() {
-    final showLeft =
-        _controller.hasClients && _controller.position.pixels > 10;
-    final showRight = _controller.hasClients &&
-        _controller.position.pixels <
-            _controller.position.maxScrollExtent - 10;
+    final showLeft = _controller.hasClients && _controller.position.pixels > 10;
+    final showRight =
+        _controller.hasClients &&
+        _controller.position.pixels < _controller.position.maxScrollExtent - 10;
     if (showLeft != _showLeftGradient || showRight != _showRightGradient) {
       setState(() {
         _showLeftGradient = showLeft;
@@ -81,7 +80,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width >
+    final isWide =
+        MediaQuery.of(context).size.width >
             MediaQuery.of(context).size.height ||
         MediaQuery.of(context).size.shortestSide >= 600;
 
@@ -95,21 +95,19 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
           child: Text(
             AppLocalizations.of(context)!.carouselTitle,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontFamily: teachers,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                  height: 28 / 24,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+              fontFamily: teachers,
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              height: 28 / 24,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ),
         height8,
         Stack(
           children: [
             ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: _kCarouselHeight,
-              ),
+              constraints: const BoxConstraints(maxHeight: _kCarouselHeight),
               child: CarouselView.weighted(
                 controller: _controller,
                 itemSnapping: true,
@@ -148,9 +146,9 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                         end: Alignment.centerRight,
                         colors: [
                           Theme.of(context).scaffoldBackgroundColor,
-                          Theme.of(context)
-                              .scaffoldBackgroundColor
-                              .withValues(alpha: 0),
+                          Theme.of(
+                            context,
+                          ).scaffoldBackgroundColor.withValues(alpha: 0),
                         ],
                       ),
                     ),
@@ -175,9 +173,9 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                         end: Alignment.centerLeft,
                         colors: [
                           Theme.of(context).scaffoldBackgroundColor,
-                          Theme.of(context)
-                              .scaffoldBackgroundColor
-                              .withValues(alpha: 0),
+                          Theme.of(
+                            context,
+                          ).scaffoldBackgroundColor.withValues(alpha: 0),
                         ],
                       ),
                     ),
@@ -229,8 +227,10 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                 alignment: Alignment.centerLeft,
                 child: SizedBox(
                   width: imageWidth,
-                  child:
-                      NetworkImageWidget(url: item.coverUrl, shouldCache: true),
+                  child: NetworkImageWidget(
+                    url: item.coverUrl,
+                    shouldCache: true,
+                  ),
                 ),
               ),
               Positioned(
@@ -249,12 +249,12 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   child: Text(
                     item.title,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontFamily: dmSans,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          height: 1.2,
-                          color: Colors.white,
-                        ),
+                      fontFamily: dmSans,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      height: 1.2,
+                      color: Colors.white,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

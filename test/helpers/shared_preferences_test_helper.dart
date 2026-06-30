@@ -17,38 +17,38 @@ class SharedPreferencesTestHelper {
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      switch (methodCall.method) {
-        case 'getAll':
-          return preferences;
-        case 'setBool':
-          preferences[(methodCall.arguments as Map)['key']] =
-              (methodCall.arguments as Map)['value'];
-          return true;
-        case 'setInt':
-          preferences[(methodCall.arguments as Map)['key']] =
-              (methodCall.arguments as Map)['value'];
-          return true;
-        case 'setDouble':
-          preferences[(methodCall.arguments as Map)['key']] =
-              (methodCall.arguments as Map)['value'];
-          return true;
-        case 'setString':
-          preferences[(methodCall.arguments as Map)['key']] =
-              (methodCall.arguments as Map)['value'];
-          return true;
-        case 'setStringList':
-          preferences[(methodCall.arguments as Map)['key']] =
-              (methodCall.arguments as Map)['value'];
-          return true;
-        case 'remove':
-          preferences.remove((methodCall.arguments as Map)['key']);
-          return true;
-        case 'clear':
-          preferences.clear();
-          return true;
-        default:
-          return null;
-      }
-    });
+          switch (methodCall.method) {
+            case 'getAll':
+              return preferences;
+            case 'setBool':
+              preferences[(methodCall.arguments as Map)['key']] =
+                  (methodCall.arguments as Map)['value'];
+              return true;
+            case 'setInt':
+              preferences[(methodCall.arguments as Map)['key']] =
+                  (methodCall.arguments as Map)['value'];
+              return true;
+            case 'setDouble':
+              preferences[(methodCall.arguments as Map)['key']] =
+                  (methodCall.arguments as Map)['value'];
+              return true;
+            case 'setString':
+              preferences[(methodCall.arguments as Map)['key']] =
+                  (methodCall.arguments as Map)['value'];
+              return true;
+            case 'setStringList':
+              preferences[(methodCall.arguments as Map)['key']] =
+                  (methodCall.arguments as Map)['value'];
+              return true;
+            case 'remove':
+              preferences.remove((methodCall.arguments as Map)['key']);
+              return true;
+            case 'clear':
+              preferences.clear();
+              return true;
+            default:
+              return null;
+          }
+        });
   }
 }

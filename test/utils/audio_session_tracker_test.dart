@@ -36,18 +36,22 @@ void main() {
 
   group('started', () {
     test('fires once with the file/guide/duration params', () async {
-      await tracker.onStarted(
-          fileId: 'f1', guide: 'Will', durationMs: 600000);
+      await tracker.onStarted(fileId: 'f1', guide: 'Will', durationMs: 600000);
 
       final started = of(AnalyticsEventConstants.audioSessionStarted);
       expect(started, hasLength(1));
-      expect(started.first.params[AnalyticsEventConstants.paramAudioFileId],
-          'f1');
-      expect(started.first.params[AnalyticsEventConstants.paramAudioFileGuide],
-          'Will');
       expect(
-          started.first.params[AnalyticsEventConstants.paramAudioFileDuration],
-          600000);
+        started.first.params[AnalyticsEventConstants.paramAudioFileId],
+        'f1',
+      );
+      expect(
+        started.first.params[AnalyticsEventConstants.paramAudioFileGuide],
+        'Will',
+      );
+      expect(
+        started.first.params[AnalyticsEventConstants.paramAudioFileDuration],
+        600000,
+      );
       // An in-progress record is persisted for crash recovery.
       expect(await persisted(), isNotNull);
     });
@@ -55,10 +59,11 @@ void main() {
     test('missing guide falls back to unknown', () async {
       await tracker.onStarted(fileId: 'f1', guide: null, durationMs: 1000);
       expect(
-          of(AnalyticsEventConstants.audioSessionStarted)
-              .first
-              .params[AnalyticsEventConstants.paramAudioFileGuide],
-          'unknown');
+        of(
+          AnalyticsEventConstants.audioSessionStarted,
+        ).first.params[AnalyticsEventConstants.paramAudioFileGuide],
+        'unknown',
+      );
     });
   });
 
@@ -74,74 +79,90 @@ void main() {
   });
 
   group('abandoned', () {
-    test('stop midway fires abandoned with bucketed percent + elapsed',
-        () async {
-      await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 600000);
-      // 252s of 600s => 42% => bucket 40.
-      tracker.onPositionUpdate(
+    test(
+      'stop midway fires abandoned with bucketed percent + elapsed',
+      () async {
+        await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 600000);
+        // 252s of 600s => 42% => bucket 40.
+        tracker.onPositionUpdate(
           positionMs: 252000,
           durationMs: 600000,
           isPlaying: false,
-          isCompleted: false);
-      await tracker.onStopped();
+          isCompleted: false,
+        );
+        await tracker.onStopped();
 
-      final ab = of(AnalyticsEventConstants.audioSessionAbandoned);
-      expect(ab, hasLength(1));
-      expect(ab.first.params[AnalyticsEventConstants.paramPercentCompleted], 40);
-      expect(ab.first.params[AnalyticsEventConstants.paramElapsedSeconds], 252);
-      expect(await persisted(), isNull);
-    });
+        final ab = of(AnalyticsEventConstants.audioSessionAbandoned);
+        expect(ab, hasLength(1));
+        expect(
+          ab.first.params[AnalyticsEventConstants.paramPercentCompleted],
+          40,
+        );
+        expect(
+          ab.first.params[AnalyticsEventConstants.paramElapsedSeconds],
+          252,
+        );
+        expect(await persisted(), isNull);
+      },
+    );
 
     test('percent is clamped to 90 even past ~95%', () async {
       await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
       tracker.onPositionUpdate(
-          positionMs: 980,
-          durationMs: 1000,
-          isPlaying: false,
-          isCompleted: false);
+        positionMs: 980,
+        durationMs: 1000,
+        isPlaying: false,
+        isCompleted: false,
+      );
       await tracker.onStopped();
       expect(
-          of(AnalyticsEventConstants.audioSessionAbandoned)
-              .first
-              .params[AnalyticsEventConstants.paramPercentCompleted],
-          90);
+        of(
+          AnalyticsEventConstants.audioSessionAbandoned,
+        ).first.params[AnalyticsEventConstants.paramPercentCompleted],
+        90,
+      );
     });
 
     test('fires at most once per session', () async {
       await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
       tracker.onPositionUpdate(
-          positionMs: 500,
-          durationMs: 1000,
-          isPlaying: false,
-          isCompleted: false);
+        positionMs: 500,
+        durationMs: 1000,
+        isPlaying: false,
+        isCompleted: false,
+      );
       await tracker.onStopped();
       await tracker.onStopped();
       await tracker.onAppBackgrounded();
       expect(of(AnalyticsEventConstants.audioSessionAbandoned), hasLength(1));
     });
 
-    test('player-completed position is not double-counted as abandon',
-        () async {
-      await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
-      // Stream reports completion (race with the completion event path).
-      tracker.onPositionUpdate(
+    test(
+      'player-completed position is not double-counted as abandon',
+      () async {
+        await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
+        // Stream reports completion (race with the completion event path).
+        tracker.onPositionUpdate(
           positionMs: 1000,
           durationMs: 1000,
           isPlaying: false,
-          isCompleted: true);
-      await tracker.onStopped();
-      expect(of(AnalyticsEventConstants.audioSessionAbandoned), isEmpty);
-    });
+          isCompleted: true,
+        );
+        await tracker.onStopped();
+        expect(of(AnalyticsEventConstants.audioSessionAbandoned), isEmpty);
+      },
+    );
   });
 
   group('backgrounding / navigate-away', () {
     test('backgrounding while PLAYING does not abandon', () async {
       await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
       tracker.onPositionUpdate(
-          positionMs: 300,
-          durationMs: 1000,
-          isPlaying: true,
-          isCompleted: false);
+        positionMs: 300,
+        durationMs: 1000,
+        isPlaying: true,
+        isCompleted: false,
+      );
       await tracker.onAppBackgrounded();
       expect(of(AnalyticsEventConstants.audioSessionAbandoned), isEmpty);
       // Session still alive and recoverable.
@@ -151,43 +172,47 @@ void main() {
     test('backgrounding while paused abandons', () async {
       await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
       tracker.onPositionUpdate(
-          positionMs: 300,
-          durationMs: 1000,
-          isPlaying: false,
-          isCompleted: false);
+        positionMs: 300,
+        durationMs: 1000,
+        isPlaying: false,
+        isCompleted: false,
+      );
       await tracker.onAppBackgrounded();
-      expect(
-          of(AnalyticsEventConstants.audioSessionAbandoned), hasLength(1));
+      expect(of(AnalyticsEventConstants.audioSessionAbandoned), hasLength(1));
     });
 
     test('navigate away while playing does not abandon', () async {
       await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
       tracker.onPositionUpdate(
-          positionMs: 300,
-          durationMs: 1000,
-          isPlaying: true,
-          isCompleted: false);
+        positionMs: 300,
+        durationMs: 1000,
+        isPlaying: true,
+        isCompleted: false,
+      );
       await tracker.onPlayerClosed();
       expect(of(AnalyticsEventConstants.audioSessionAbandoned), isEmpty);
     });
   });
 
   group('switch track', () {
-    test('starting a new track abandons the previous unfinished one',
-        () async {
+    test('starting a new track abandons the previous unfinished one', () async {
       await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
       tracker.onPositionUpdate(
-          positionMs: 200,
-          durationMs: 1000,
-          isPlaying: true,
-          isCompleted: false);
+        positionMs: 200,
+        durationMs: 1000,
+        isPlaying: true,
+        isCompleted: false,
+      );
       await tracker.onStarted(fileId: 'f2', guide: 'g', durationMs: 1000);
 
       expect(of(AnalyticsEventConstants.audioSessionStarted), hasLength(2));
       final ab = of(AnalyticsEventConstants.audioSessionAbandoned);
       expect(ab, hasLength(1));
       expect(ab.first.params[AnalyticsEventConstants.paramAudioFileId], 'f1');
-      expect(ab.first.params[AnalyticsEventConstants.paramPercentCompleted], 20);
+      expect(
+        ab.first.params[AnalyticsEventConstants.paramPercentCompleted],
+        20,
+      );
     });
   });
 
@@ -198,7 +223,7 @@ void main() {
       SharedPreferences.setMockInitialValues({
         SharedPreferenceConstants.incompleteAudioSession:
             '{"fileId":"f9","guide":"Sky","durationMs":1000,'
-                '"startMs":111,"lastPositionMs":300}',
+            '"startMs":111,"lastPositionMs":300}',
       });
       tracker.resetForTesting();
       events.clear();
@@ -208,8 +233,14 @@ void main() {
       final ab = of(AnalyticsEventConstants.audioSessionAbandoned);
       expect(ab, hasLength(1));
       expect(ab.first.params[AnalyticsEventConstants.paramAudioFileId], 'f9');
-      expect(ab.first.params[AnalyticsEventConstants.paramAudioFileGuide], 'Sky');
-      expect(ab.first.params[AnalyticsEventConstants.paramPercentCompleted], 30);
+      expect(
+        ab.first.params[AnalyticsEventConstants.paramAudioFileGuide],
+        'Sky',
+      );
+      expect(
+        ab.first.params[AnalyticsEventConstants.paramPercentCompleted],
+        30,
+      );
       expect(await persisted(), isNull);
     });
 

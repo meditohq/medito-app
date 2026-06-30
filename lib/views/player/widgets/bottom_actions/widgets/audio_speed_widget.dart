@@ -48,10 +48,10 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
               child: Text(
                 '${_currentSpeed.toStringAsFixed(1)}×',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: ColorConstants.white,
-                      fontFamily: dmMono,
-                      fontSize: 18,
-                    ),
+                  color: ColorConstants.white,
+                  fontFamily: dmMono,
+                  fontSize: 18,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),

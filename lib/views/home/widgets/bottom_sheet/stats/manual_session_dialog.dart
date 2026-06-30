@@ -22,10 +22,8 @@ class BulkSessionPreview {
   });
 }
 
-typedef BulkPreviewBuilder = BulkSessionPreview Function(
-  DateTime start,
-  DateTime end,
-);
+typedef BulkPreviewBuilder =
+    BulkSessionPreview Function(DateTime start, DateTime end);
 
 /// Result returned from [ManualSessionDialog]. Pops with `null` on cancel,
 /// otherwise either a [ManualSessionSingleResult] or [ManualSessionBulkResult].
@@ -139,7 +137,10 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
     }
   }
 
-  Future<void> _selectRangeDate(BuildContext context, {required bool isStart}) async {
+  Future<void> _selectRangeDate(
+    BuildContext context, {
+    required bool isStart,
+  }) async {
     final today = DateTime.now();
     final todayStart = DateTime(today.year, today.month, today.day);
     final initial = isStart ? _rangeStart : _rangeEnd;
@@ -253,10 +254,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           labelText:
               '${l10n.duration} (in ${l10n.minutes.toLowerCase()}, ${l10n.optional.toLowerCase()})',
           hintText: l10n.minutes,
-          prefixIcon: Icon(
-            Icons.timer,
-            color: theme.colorScheme.onSurface,
-          ),
+          prefixIcon: Icon(Icons.timer, color: theme.colorScheme.onSurface),
           suffixIcon: _durationController.text.isNotEmpty
               ? IconButton(
                   icon: Icon(
@@ -386,10 +384,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           onChanged: (_) => setState(() {}),
           labelText: l10n.minutesPerDayOptional,
           hintText: l10n.minutes,
-          prefixIcon: Icon(
-            Icons.timer,
-            color: theme.colorScheme.onSurface,
-          ),
+          prefixIcon: Icon(Icons.timer, color: theme.colorScheme.onSurface),
         ),
         const SizedBox(height: 24),
         Row(
@@ -426,14 +421,12 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
       _selectedTime?.minute ?? TimeOfDay.now().minute,
     );
     final durationText = _durationController.text.trim();
-    final duration =
-        durationText.isEmpty ? 0 : (int.tryParse(durationText) ?? 0);
+    final duration = durationText.isEmpty
+        ? 0
+        : (int.tryParse(durationText) ?? 0);
 
     Navigator.of(context).pop(
-      ManualSessionSingleResult(
-        dateTime: selectedDateTime,
-        duration: duration,
-      ),
+      ManualSessionSingleResult(dateTime: selectedDateTime, duration: duration),
     );
   }
 
@@ -480,8 +473,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
                     l10n.time,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontFamily: dmSans,
-                      color:
-                          theme.colorScheme.onSurface.withOpacityValue(0.75),
+                      color: theme.colorScheme.onSurface.withOpacityValue(0.75),
                     ),
                   ),
                   const SizedBox(height: 4),

@@ -11,32 +11,32 @@ class FirebaseAnalyticsTestHelper {
     // Setup mock for the analytics method channel
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/firebase_analytics'),
-      (MethodCall methodCall) async {
-        switch (methodCall.method) {
-          case 'Analytics#getAppInstanceId':
-            return 'mock-app-instance-id';
-          case 'Analytics#setConsent':
-            return null;
-          case 'Analytics#logEvent':
-            return null;
-          case 'Analytics#setUserId':
-            return null;
-          case 'Analytics#setUserProperty':
-            return null;
-          case 'Analytics#setAnalyticsCollectionEnabled':
-            return null;
-          case 'Analytics#resetAnalyticsData':
-            return null;
-          case 'Analytics#setSessionTimeoutDuration':
-            return null;
-          case 'Analytics#setDefaultEventParameters':
-            return null;
-          default:
-            return null;
-        }
-      },
-    );
+          const MethodChannel('plugins.flutter.io/firebase_analytics'),
+          (MethodCall methodCall) async {
+            switch (methodCall.method) {
+              case 'Analytics#getAppInstanceId':
+                return 'mock-app-instance-id';
+              case 'Analytics#setConsent':
+                return null;
+              case 'Analytics#logEvent':
+                return null;
+              case 'Analytics#setUserId':
+                return null;
+              case 'Analytics#setUserProperty':
+                return null;
+              case 'Analytics#setAnalyticsCollectionEnabled':
+                return null;
+              case 'Analytics#resetAnalyticsData':
+                return null;
+              case 'Analytics#setSessionTimeoutDuration':
+                return null;
+              case 'Analytics#setDefaultEventParameters':
+                return null;
+              default:
+                return null;
+            }
+          },
+        );
   }
 
   /// Mock FirebaseAnalytics to return for testing

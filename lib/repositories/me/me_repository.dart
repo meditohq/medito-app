@@ -17,7 +17,10 @@ class MeRepositoryImpl extends MeRepository {
   final _instanceId = ++_instanceCount;
 
   MeRepositoryImpl({required this.client}) {
-    AppLogger.d('ME_REPO', 'Created new MeRepositoryImpl instance #$_instanceId');
+    AppLogger.d(
+      'ME_REPO',
+      'Created new MeRepositoryImpl instance #$_instanceId',
+    );
   }
 
   @override

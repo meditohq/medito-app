@@ -33,5 +33,5 @@ class DayBoundaryOffsetNotifier extends AsyncNotifier<int> {
 
 final dayBoundaryOffsetProvider =
     AsyncNotifierProvider<DayBoundaryOffsetNotifier, int>(
-  DayBoundaryOffsetNotifier.new,
-);
+      DayBoundaryOffsetNotifier.new,
+    );

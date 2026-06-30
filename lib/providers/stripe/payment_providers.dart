@@ -112,15 +112,17 @@ String _subscriptionIntervalWire(SubscriptionInterval i) {
 }
 
 Map<String, dynamic> _buildPaymentIntentRequestBody(
-    PaymentIntentRequest request) {
+  PaymentIntentRequest request,
+) {
   return {
     'amount': request.amount,
     'currency': request.currency,
     'paymentMethod': request.paymentMethod,
     'paymentType': _paymentTypeWire(request.paymentType),
     if (request.subscriptionInterval != null)
-      'subscriptionInterval':
-          _subscriptionIntervalWire(request.subscriptionInterval!),
+      'subscriptionInterval': _subscriptionIntervalWire(
+        request.subscriptionInterval!,
+      ),
     'metadata': request.metadata ?? {},
   };
 }
@@ -150,8 +152,8 @@ Future<bool> applePayAvailable(Ref ref) async {
   try {
     if (!Platform.isIOS) return false;
 
-    final isPlatformPaySupported =
-        await Stripe.instance.isPlatformPaySupported();
+    final isPlatformPaySupported = await Stripe.instance
+        .isPlatformPaySupported();
 
     AppLogger.d('PAYMENT', 'Apple Pay supported: $isPlatformPaySupported');
     return isPlatformPaySupported;
@@ -188,7 +190,8 @@ class CardPaymentService implements PaymentMethodService {
 
   @override
   Future<PaymentIntentModel> createPaymentIntent(
-      PaymentIntentRequest request) async {
+    PaymentIntentRequest request,
+  ) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.setStatus(PaymentStatus.creatingPaymentIntent);
 
@@ -205,8 +208,9 @@ class CardPaymentService implements PaymentMethodService {
 
       AppLogger.d('PAYMENT', 'Payment intent response: $response');
 
-      final paymentIntent =
-          PaymentIntentModel.fromJson(response['data'] as Map<String, dynamic>);
+      final paymentIntent = PaymentIntentModel.fromJson(
+        response['data'] as Map<String, dynamic>,
+      );
       paymentState.setPaymentIntent(paymentIntent);
 
       return paymentIntent;
@@ -244,8 +248,10 @@ class CardPaymentService implements PaymentMethodService {
       AppLogger.d('PAYMENT', 'Presenting PaymentSheet');
       await Stripe.instance.presentPaymentSheet();
 
-      AppLogger.d('PAYMENT',
-          'PaymentSheet completed successfully for ${paymentIntent.id}');
+      AppLogger.d(
+        'PAYMENT',
+        'PaymentSheet completed successfully for ${paymentIntent.id}',
+      );
 
       paymentState.setStatus(PaymentStatus.success);
 
@@ -255,8 +261,10 @@ class CardPaymentService implements PaymentMethodService {
         currency: paymentIntent.currency,
       );
 
-      AppLogger.d('PAYMENT',
-          'Card payment complete: ${paymentIntent.amount} ${paymentIntent.currency}');
+      AppLogger.d(
+        'PAYMENT',
+        'Card payment complete: ${paymentIntent.amount} ${paymentIntent.currency}',
+      );
 
       return result;
     } catch (e) {
@@ -269,8 +277,8 @@ class CardPaymentService implements PaymentMethodService {
       AppLogger.e(
         'PAYMENT',
         '❌ PaymentSheet failed: type=${e.runtimeType} '
-        'code=${e is StripeException ? e.error.code : 'n/a'} '
-        'message=${e is StripeException ? e.error.message : e}',
+            'code=${e is StripeException ? e.error.code : 'n/a'} '
+            'message=${e is StripeException ? e.error.message : e}',
         e,
       );
       final error = PaymentErrorHandler.handleStripeError(e);
@@ -300,7 +308,8 @@ class ApplePayService implements PaymentMethodService {
 
   @override
   Future<PaymentIntentModel> createPaymentIntent(
-      PaymentIntentRequest request) async {
+    PaymentIntentRequest request,
+  ) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.setStatus(PaymentStatus.creatingPaymentIntent);
 
@@ -313,8 +322,9 @@ class ApplePayService implements PaymentMethodService {
         body: body,
       );
 
-      final paymentIntent =
-          PaymentIntentModel.fromJson(response['data'] as Map<String, dynamic>);
+      final paymentIntent = PaymentIntentModel.fromJson(
+        response['data'] as Map<String, dynamic>,
+      );
       paymentState.setPaymentIntent(paymentIntent);
 
       return paymentIntent;
@@ -331,8 +341,10 @@ class ApplePayService implements PaymentMethodService {
     paymentState.setStatus(PaymentStatus.presentingPaymentSheet);
 
     try {
-      AppLogger.d('PAYMENT',
-          'Presenting Apple Pay sheet for ${paymentIntent.id}, amount: ${(paymentIntent.amount / 100).toStringAsFixed(2)} ${paymentIntent.currency}');
+      AppLogger.d(
+        'PAYMENT',
+        'Presenting Apple Pay sheet for ${paymentIntent.id}, amount: ${(paymentIntent.amount / 100).toStringAsFixed(2)} ${paymentIntent.currency}',
+      );
 
       final amountString = (paymentIntent.amount / 100).toStringAsFixed(2);
       final paymentLabel = _getPaymentLabel(paymentIntent);
@@ -358,8 +370,10 @@ class ApplePayService implements PaymentMethodService {
         ),
       );
 
-      AppLogger.d('PAYMENT',
-          '✅ Apple Pay payment confirmed successfully for ${paymentIntent.id}');
+      AppLogger.d(
+        'PAYMENT',
+        '✅ Apple Pay payment confirmed successfully for ${paymentIntent.id}',
+      );
 
       // Payment is already confirmed by Stripe SDK for Apple Pay
       // No need to call backend confirmation endpoint
@@ -371,8 +385,10 @@ class ApplePayService implements PaymentMethodService {
         currency: paymentIntent.currency,
       );
 
-      AppLogger.d('PAYMENT',
-          '✅ Apple Pay payment complete: ${(paymentIntent.amount / 100).toStringAsFixed(2)} ${paymentIntent.currency}');
+      AppLogger.d(
+        'PAYMENT',
+        '✅ Apple Pay payment complete: ${(paymentIntent.amount / 100).toStringAsFixed(2)} ${paymentIntent.currency}',
+      );
 
       return result;
     } catch (e) {
@@ -385,8 +401,8 @@ class ApplePayService implements PaymentMethodService {
       AppLogger.e(
         'PAYMENT',
         '❌ Apple Pay payment failed: type=${e.runtimeType} '
-        'code=${e is StripeException ? e.error.code : 'n/a'} '
-        'message=${e is StripeException ? e.error.message : e}',
+            'code=${e is StripeException ? e.error.code : 'n/a'} '
+            'message=${e is StripeException ? e.error.message : e}',
         e,
       );
       final error = PaymentErrorHandler.handleStripeError(e);
@@ -424,8 +440,9 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     try {
       state = const AsyncValue.loading();
 
-      final utmParams =
-          _getStoredUtmParameters(ref.read(sharedPreferencesProvider));
+      final utmParams = _getStoredUtmParameters(
+        ref.read(sharedPreferencesProvider),
+      );
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,
@@ -496,8 +513,9 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     try {
       state = const AsyncValue.loading();
 
-      final utmParams =
-          _getStoredUtmParameters(ref.read(sharedPreferencesProvider));
+      final utmParams = _getStoredUtmParameters(
+        ref.read(sharedPreferencesProvider),
+      );
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,
@@ -570,8 +588,9 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     try {
       state = const AsyncValue.loading();
 
-      final utmParams =
-          _getStoredUtmParameters(ref.read(sharedPreferencesProvider));
+      final utmParams = _getStoredUtmParameters(
+        ref.read(sharedPreferencesProvider),
+      );
       final metadata = <String, dynamic>{
         'user_id': ?userId,
         'email': ?userEmail,

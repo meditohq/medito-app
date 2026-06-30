@@ -47,8 +47,9 @@ void main() {
     mockCrashlyticsService = MockCrashlyticsService();
 
     // Mock getUserEmail to return null by default
-    when(() => mockSecureStorageService.getUserEmail())
-        .thenAnswer((_) async => null);
+    when(
+      () => mockSecureStorageService.getUserEmail(),
+    ).thenAnswer((_) async => null);
 
     authRepository = AuthRepositoryImpl(
       authService: mockAuthApiService,
@@ -71,140 +72,188 @@ void main() {
     const email = 'test@example.com';
     const refreshToken = 'test-refresh-token';
 
-    test('signInAnonymously calls API service and stores tokens on success',
-        () async {
-      // Setup
-      final tokens = AuthTokens(
-        accessToken: 'test-access',
-        refreshToken: 'test-refresh',
-        expiresIn: 900,
-        clientId: clientId,
-      );
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
-      when(() => mockAuthApiService.signIn(clientId: clientId))
-          .thenAnswer((_) async => tokens);
-      when(() => mockHttpApiService.setAuthHeader(any()))
-          .thenAnswer((_) async {});
-      when(() => mockPreferences.setString(any(), any()))
-          .thenAnswer((_) async => true);
-      when(() => mockPreferences.setBool(any(), any()))
-          .thenAnswer((_) async => true);
+    test(
+      'signInAnonymously calls API service and stores tokens on success',
+      () async {
+        // Setup
+        final tokens = AuthTokens(
+          accessToken: 'test-access',
+          refreshToken: 'test-refresh',
+          expiresIn: 900,
+          clientId: clientId,
+        );
+        when(
+          () => mockPreferences.getString(SharedPreferenceConstants.userId),
+        ).thenReturn(clientId);
+        when(
+          () => mockAuthApiService.signIn(clientId: clientId),
+        ).thenAnswer((_) async => tokens);
+        when(
+          () => mockHttpApiService.setAuthHeader(any()),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockPreferences.setString(any(), any()),
+        ).thenAnswer((_) async => true);
+        when(
+          () => mockPreferences.setBool(any(), any()),
+        ).thenAnswer((_) async => true);
 
-      // Action
-      await authRepository.signInAnonymously();
+        // Action
+        await authRepository.signInAnonymously();
 
-      // Verify
-      verify(() => mockAuthApiService.signIn(clientId: clientId)).called(1);
-      verify(() => mockHttpApiService.setAuthHeader(tokens.accessToken))
-          .called(1);
-      verify(() => mockPreferences.setString(
-          SharedPreferenceConstants.userId, tokens.clientId)).called(1);
-      verify(() => mockPreferences.setBool(
-          SharedPreferenceConstants.isLoggedIn, true)).called(1);
-    });
-
-    test('signInAnonymously retries with new client ID on EmailExistsError', () async {
-      // Setup
-      final retryTokens = AuthTokens(
-        accessToken: 'test-access-retry',
-        refreshToken: 'test-refresh-retry',
-        expiresIn: 900,
-        clientId: 'new-client-id-from-server',
-      );
-      
-      var callCount = 0;
-      
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
-      // First call throws EmailExistsError, subsequent calls succeed
-      when(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
-          .thenAnswer((invocation) {
-        callCount++;
-        final calledClientId = invocation.namedArguments[#clientId] as String;
-        // First call with original client ID throws
-        if (callCount == 1 && calledClientId == clientId) {
-          throw const EmailExistsError(email: email);
-        }
-        // Retry with new client ID succeeds
-        return Future.value(retryTokens);
-      });
-      when(() => mockPreferences.setString(any(), any()))
-          .thenAnswer((_) async => true);
-      when(() => mockPreferences.setBool(any(), any()))
-          .thenAnswer((_) async => true);
-      when(() => mockHttpApiService.setAuthHeader(any()))
-          .thenAnswer((_) async {});
-
-      // Action
-      await authRepository.signInAnonymously();
-
-      // Assert - verify signIn was called twice (first fails, retry succeeds)
-      expect(callCount, equals(2));
-      verify(() => mockAuthApiService.signIn(clientId: any(named: 'clientId')))
-          .called(2);
-      
-      // Assert - verify successful sign-in setup after retry
-      verify(() => mockHttpApiService.setAuthHeader(retryTokens.accessToken))
-          .called(1);
-      verify(() => mockPreferences.setString(
-          SharedPreferenceConstants.userId, retryTokens.clientId)).called(1);
-      verify(() => mockPreferences.setBool(
-          SharedPreferenceConstants.isLoggedIn, true)).called(1);
-    });
-
-    test('requestOtp completes successfully when service call succeeds',
-        () async {
-      // Setup
-      when(() => mockAuthApiService.requestOtp(any(), any()))
-          .thenAnswer((_) async {});
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
-
-      // Action & Assert
-      await expectLater(authRepository.requestOtp(email), completes);
-      verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
-    });
+        // Verify
+        verify(() => mockAuthApiService.signIn(clientId: clientId)).called(1);
+        verify(
+          () => mockHttpApiService.setAuthHeader(tokens.accessToken),
+        ).called(1);
+        verify(
+          () => mockPreferences.setString(
+            SharedPreferenceConstants.userId,
+            tokens.clientId,
+          ),
+        ).called(1);
+        verify(
+          () => mockPreferences.setBool(
+            SharedPreferenceConstants.isLoggedIn,
+            true,
+          ),
+        ).called(1);
+      },
+    );
 
     test(
-        'requestOtp throws RateLimitError when service throws RateLimitException',
-        () async {
-      // Setup
-      const retrySeconds = 59;
-      const exceptionMessage = 'Please wait 59 seconds';
-      final serviceException = RateLimitError(
-        tryAfterSeconds: retrySeconds,
-        message: exceptionMessage,
-      );
-      when(() => mockAuthApiService.requestOtp(email, clientId))
-          .thenThrow(serviceException);
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
+      'signInAnonymously retries with new client ID on EmailExistsError',
+      () async {
+        // Setup
+        final retryTokens = AuthTokens(
+          accessToken: 'test-access-retry',
+          refreshToken: 'test-refresh-retry',
+          expiresIn: 900,
+          clientId: 'new-client-id-from-server',
+        );
 
-      // Action & Assert
-      expect(
-        () => authRepository.requestOtp(email),
-        throwsA(
-          isA<RateLimitError>()
-              .having((e) => e.message, 'message', exceptionMessage)
-              .having(
-                  (e) => e.tryAfterSeconds, 'tryAfterSeconds', retrySeconds),
-        ),
-      );
-      verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
-    });
+        var callCount = 0;
+
+        when(
+          () => mockPreferences.getString(SharedPreferenceConstants.userId),
+        ).thenReturn(clientId);
+        // First call throws EmailExistsError, subsequent calls succeed
+        when(
+          () => mockAuthApiService.signIn(clientId: any(named: 'clientId')),
+        ).thenAnswer((invocation) {
+          callCount++;
+          final calledClientId = invocation.namedArguments[#clientId] as String;
+          // First call with original client ID throws
+          if (callCount == 1 && calledClientId == clientId) {
+            throw const EmailExistsError(email: email);
+          }
+          // Retry with new client ID succeeds
+          return Future.value(retryTokens);
+        });
+        when(
+          () => mockPreferences.setString(any(), any()),
+        ).thenAnswer((_) async => true);
+        when(
+          () => mockPreferences.setBool(any(), any()),
+        ).thenAnswer((_) async => true);
+        when(
+          () => mockHttpApiService.setAuthHeader(any()),
+        ).thenAnswer((_) async {});
+
+        // Action
+        await authRepository.signInAnonymously();
+
+        // Assert - verify signIn was called twice (first fails, retry succeeds)
+        expect(callCount, equals(2));
+        verify(
+          () => mockAuthApiService.signIn(clientId: any(named: 'clientId')),
+        ).called(2);
+
+        // Assert - verify successful sign-in setup after retry
+        verify(
+          () => mockHttpApiService.setAuthHeader(retryTokens.accessToken),
+        ).called(1);
+        verify(
+          () => mockPreferences.setString(
+            SharedPreferenceConstants.userId,
+            retryTokens.clientId,
+          ),
+        ).called(1);
+        verify(
+          () => mockPreferences.setBool(
+            SharedPreferenceConstants.isLoggedIn,
+            true,
+          ),
+        ).called(1);
+      },
+    );
+
+    test(
+      'requestOtp completes successfully when service call succeeds',
+      () async {
+        // Setup
+        when(
+          () => mockAuthApiService.requestOtp(any(), any()),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockPreferences.getString(SharedPreferenceConstants.userId),
+        ).thenReturn(clientId);
+
+        // Action & Assert
+        await expectLater(authRepository.requestOtp(email), completes);
+        verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
+      },
+    );
+
+    test(
+      'requestOtp throws RateLimitError when service throws RateLimitException',
+      () async {
+        // Setup
+        const retrySeconds = 59;
+        const exceptionMessage = 'Please wait 59 seconds';
+        final serviceException = RateLimitError(
+          tryAfterSeconds: retrySeconds,
+          message: exceptionMessage,
+        );
+        when(
+          () => mockAuthApiService.requestOtp(email, clientId),
+        ).thenThrow(serviceException);
+        when(
+          () => mockPreferences.getString(SharedPreferenceConstants.userId),
+        ).thenReturn(clientId);
+
+        // Action & Assert
+        expect(
+          () => authRepository.requestOtp(email),
+          throwsA(
+            isA<RateLimitError>()
+                .having((e) => e.message, 'message', exceptionMessage)
+                .having(
+                  (e) => e.tryAfterSeconds,
+                  'tryAfterSeconds',
+                  retrySeconds,
+                ),
+          ),
+        );
+        verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
+      },
+    );
 
     test('requestOtp rethrows other errors from service', () async {
       // Setup
       final otherError = Exception('Some unexpected service error');
-      when(() => mockAuthApiService.requestOtp(email, clientId))
-          .thenThrow(otherError);
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
+      when(
+        () => mockAuthApiService.requestOtp(email, clientId),
+      ).thenThrow(otherError);
+      when(
+        () => mockPreferences.getString(SharedPreferenceConstants.userId),
+      ).thenReturn(clientId);
 
       // Action & Assert
       expect(
-          () => authRepository.requestOtp(email), throwsA(equals(otherError)));
+        () => authRepository.requestOtp(email),
+        throwsA(equals(otherError)),
+      );
       verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
     });
 
@@ -219,47 +268,70 @@ void main() {
         email: email,
       );
 
-      when(() => mockAuthApiService.signIn(
+      when(
+        () => mockAuthApiService.signIn(
           email: email,
           otp: otp,
-          clientId: any(named: 'clientId'))).thenAnswer((_) async => tokens);
-      when(() => mockHttpApiService.setAuthHeader(any()))
-          .thenAnswer((_) async {});
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
-      when(() => mockPreferences.setString(any(), any()))
-          .thenAnswer((_) async => true);
-      when(() => mockPreferences.setBool(any(), any()))
-          .thenAnswer((_) async => true);
-      when(() => mockSecureStorageService.storeUserEmail(any()))
-          .thenAnswer((_) async {});
+          clientId: any(named: 'clientId'),
+        ),
+      ).thenAnswer((_) async => tokens);
+      when(
+        () => mockHttpApiService.setAuthHeader(any()),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockPreferences.getString(SharedPreferenceConstants.userId),
+      ).thenReturn(clientId);
+      when(
+        () => mockPreferences.setString(any(), any()),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockPreferences.setBool(any(), any()),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockSecureStorageService.storeUserEmail(any()),
+      ).thenAnswer((_) async {});
 
       // Action
       final result = await authRepository.verifyOtp(email, otp);
 
       // Verify
       expect(result, isTrue);
-      verify(() => mockAuthApiService.signIn(
-          email: email, otp: otp, clientId: clientId)).called(1);
-      verify(() => mockHttpApiService.setAuthHeader(tokens.accessToken))
-          .called(1);
-      verify(() => mockPreferences.setString(
-          SharedPreferenceConstants.userId, tokens.clientId)).called(1);
-      verify(() => mockPreferences.setBool(
-          SharedPreferenceConstants.isLoggedIn, true)).called(1);
+      verify(
+        () => mockAuthApiService.signIn(
+          email: email,
+          otp: otp,
+          clientId: clientId,
+        ),
+      ).called(1);
+      verify(
+        () => mockHttpApiService.setAuthHeader(tokens.accessToken),
+      ).called(1);
+      verify(
+        () => mockPreferences.setString(
+          SharedPreferenceConstants.userId,
+          tokens.clientId,
+        ),
+      ).called(1);
+      verify(
+        () =>
+            mockPreferences.setBool(SharedPreferenceConstants.isLoggedIn, true),
+      ).called(1);
       verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
     });
 
     test('signOut clears tokens', () async {
       // Setup
       when(() => mockHttpApiService.signOut()).thenAnswer((_) async {});
-      when(() => mockSecureStorageService.clearRefreshToken())
-          .thenAnswer((_) async {});
-      when(() => mockSecureStorageService.clearUserEmail())
-          .thenAnswer((_) async {});
+      when(
+        () => mockSecureStorageService.clearRefreshToken(),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockSecureStorageService.clearUserEmail(),
+      ).thenAnswer((_) async {});
       when(() => mockHttpApiService.clearAuthHeader()).thenAnswer((_) async {});
-      when(() => mockPreferences.setBool(any(), any()))
-          .thenAnswer((_) async => true);
+      when(
+        () => mockPreferences.setBool(any(), any()),
+      ).thenAnswer((_) async => true);
 
       // Action
       final result = await authRepository.signOut();
@@ -270,152 +342,180 @@ void main() {
       verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
       verify(() => mockSecureStorageService.clearUserEmail()).called(1);
       verify(() => mockHttpApiService.clearAuthHeader()).called(1);
-      verify(() => mockPreferences.setBool(
-          SharedPreferenceConstants.isLoggedIn, false)).called(1);
+      verify(
+        () => mockPreferences.setBool(
+          SharedPreferenceConstants.isLoggedIn,
+          false,
+        ),
+      ).called(1);
     });
 
     test('initiateUser creates client ID with expected format', () async {
       // Setup
       final dateStr = DateFormat('yyyyMMdd').format(DateTime.now());
       when(() => mockUuid.v6()).thenReturn('test-uuid-value-123');
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(null);
-      when(() => mockPreferences.setString(any(), any()))
-          .thenAnswer((_) async => true);
+      when(
+        () => mockPreferences.getString(SharedPreferenceConstants.userId),
+      ).thenReturn(null);
+      when(
+        () => mockPreferences.setString(any(), any()),
+      ).thenAnswer((_) async => true);
 
       // Action
       await authRepository.initializeUser();
 
       // Verify
-      final verifyPattern = verify(() => mockPreferences.setString(
-          SharedPreferenceConstants.userId, captureAny()));
+      final verifyPattern = verify(
+        () => mockPreferences.setString(
+          SharedPreferenceConstants.userId,
+          captureAny(),
+        ),
+      );
       final capturedId = verifyPattern.captured.first as String;
       expect(capturedId, contains(dateStr));
       expect(capturedId, contains('test'));
     });
 
     test(
-        'getToken refreshes token when internal token is null but refresh token exists',
-        () async {
-      // Setup: Assume internal token is null (initial state or after logout)
-      // No need to call setTokensForTest(null) explicitly
+      'getToken refreshes token when internal token is null but refresh token exists',
+      () async {
+        // Setup: Assume internal token is null (initial state or after logout)
+        // No need to call setTokensForTest(null) explicitly
 
-      final newTokens = AuthTokens(
+        final newTokens = AuthTokens(
           accessToken: 'new-access',
           refreshToken: refreshToken,
           expiresIn: 900,
-          clientId: clientId);
+          clientId: clientId,
+        );
 
-      when(() => mockSecureStorageService.getRefreshToken())
-          .thenAnswer((_) async => refreshToken);
-      when(() => mockSecureStorageService.getUserEmail())
-          .thenAnswer((_) async => null); // Explicitly mock here too
-      when(() => mockAuthApiService.refreshToken(refreshToken))
-          .thenAnswer((_) async => newTokens);
-      when(() => mockHttpApiService.setAuthHeader(any()))
-          .thenAnswer((_) async {});
+        when(
+          () => mockSecureStorageService.getRefreshToken(),
+        ).thenAnswer((_) async => refreshToken);
+        when(
+          () => mockSecureStorageService.getUserEmail(),
+        ).thenAnswer((_) async => null); // Explicitly mock here too
+        when(
+          () => mockAuthApiService.refreshToken(refreshToken),
+        ).thenAnswer((_) async => newTokens);
+        when(
+          () => mockHttpApiService.setAuthHeader(any()),
+        ).thenAnswer((_) async {});
 
-      // Action
-      final result = await authRepository.getToken();
+        // Action
+        final result = await authRepository.getToken();
 
-      // Verify
-      expect(result, equals(newTokens.accessToken));
-      verify(() => mockSecureStorageService.getRefreshToken()).called(1);
-      verify(() => mockSecureStorageService.getUserEmail()).called(1);
-      verify(() => mockAuthApiService.refreshToken(refreshToken)).called(1);
-      verify(() => mockHttpApiService.setAuthHeader(newTokens.accessToken))
-          .called(1);
-    });
-
-    test(
-        'getToken throws UnauthorizedError if no internal token and no refresh token',
-        () async {
-      // Setup: Assume internal token is null
-      // No need to call setTokensForTest(null) explicitly
-      when(() => mockSecureStorageService.getRefreshToken())
-          .thenAnswer((_) async => null);
-
-      // Action & Assert
-      expect(
-          () => authRepository.getToken(), throwsA(isA<UnauthorizedError>()));
-
-      // Verify
-      verify(() => mockSecureStorageService.getRefreshToken()).called(1);
-      verifyNever(() => mockAuthApiService.refreshToken(any()));
-    });
+        // Verify
+        expect(result, equals(newTokens.accessToken));
+        verify(() => mockSecureStorageService.getRefreshToken()).called(1);
+        verify(() => mockSecureStorageService.getUserEmail()).called(1);
+        verify(() => mockAuthApiService.refreshToken(refreshToken)).called(1);
+        verify(
+          () => mockHttpApiService.setAuthHeader(newTokens.accessToken),
+        ).called(1);
+      },
+    );
 
     test(
-        'initializeUser when logged in with refresh token does not refresh immediately',
-        () async {
-      // Setup
-      when(() => mockPreferences.getString(SharedPreferenceConstants.userId))
-          .thenReturn(clientId);
-      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-          .thenReturn(true);
-      when(() => mockSecureStorageService.getRefreshToken())
-          .thenAnswer((_) async => refreshToken);
-      when(() => mockSecureStorageService.getUserEmail())
-          .thenAnswer((_) async => email);
+      'getToken throws UnauthorizedError if no internal token and no refresh token',
+      () async {
+        // Setup: Assume internal token is null
+        // No need to call setTokensForTest(null) explicitly
+        when(
+          () => mockSecureStorageService.getRefreshToken(),
+        ).thenAnswer((_) async => null);
 
-      // Action
-      await authRepository.initializeUser();
+        // Action & Assert
+        expect(
+          () => authRepository.getToken(),
+          throwsA(isA<UnauthorizedError>()),
+        );
 
-      // Verify
-      expect(authRepository.currentUser, isNotNull);
-      expect(authRepository.currentUser?.id, clientId);
-      expect(authRepository.currentUser?.email, email);
-      verifyNever(() => mockAuthApiService.refreshToken(any()));
-      verifyNever(() => mockHttpApiService.setAuthHeader(any()));
-    });
+        // Verify
+        verify(() => mockSecureStorageService.getRefreshToken()).called(1);
+        verifyNever(() => mockAuthApiService.refreshToken(any()));
+      },
+    );
+
+    test(
+      'initializeUser when logged in with refresh token does not refresh immediately',
+      () async {
+        // Setup
+        when(
+          () => mockPreferences.getString(SharedPreferenceConstants.userId),
+        ).thenReturn(clientId);
+        when(
+          () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+        ).thenReturn(true);
+        when(
+          () => mockSecureStorageService.getRefreshToken(),
+        ).thenAnswer((_) async => refreshToken);
+        when(
+          () => mockSecureStorageService.getUserEmail(),
+        ).thenAnswer((_) async => email);
+
+        // Action
+        await authRepository.initializeUser();
+
+        // Verify
+        expect(authRepository.currentUser, isNotNull);
+        expect(authRepository.currentUser?.id, clientId);
+        expect(authRepository.currentUser?.email, email);
+        verifyNever(() => mockAuthApiService.refreshToken(any()));
+        verifyNever(() => mockHttpApiService.setAuthHeader(any()));
+      },
+    );
 
     group('isLoggedIn method tests', () {
       test('isLoggedIn returns true when preference is set to true', () async {
         // Setup
-        when(() =>
-                mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-            .thenReturn(true);
+        when(
+          () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+        ).thenReturn(true);
 
         // Action
         final result = await authRepository.isLoggedIn();
 
         // Verify
         expect(result, isTrue);
-        verify(() =>
-                mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-            .called(1);
+        verify(
+          () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+        ).called(1);
       });
 
-      test('isLoggedIn returns false when preference is set to false',
-          () async {
-        // Setup
-        when(() =>
-                mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-            .thenReturn(false);
+      test(
+        'isLoggedIn returns false when preference is set to false',
+        () async {
+          // Setup
+          when(
+            () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+          ).thenReturn(false);
 
-        // Action
-        final result = await authRepository.isLoggedIn();
+          // Action
+          final result = await authRepository.isLoggedIn();
 
-        // Verify
-        expect(result, isFalse);
-        verify(() =>
-                mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-            .called(1);
-      });
+          // Verify
+          expect(result, isFalse);
+          verify(
+            () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+          ).called(1);
+        },
+      );
 
       test('isLoggedIn returns false when preference is not set', () async {
         // Setup
-        when(() =>
-                mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-            .thenReturn(null);
+        when(
+          () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+        ).thenReturn(null);
 
         // Action
         final result = await authRepository.isLoggedIn();
 
         // Verify
         expect(result, isFalse);
-        verify(() =>
-                mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-            .called(1);
+        verify(
+          () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+        ).called(1);
       });
     });
 
@@ -424,15 +524,18 @@ void main() {
 
       test('getToken retries on temporary network errors', () async {
         // Setup
-        when(() => mockSecureStorageService.getRefreshToken())
-            .thenAnswer((_) async => refreshToken);
-        when(() => mockSecureStorageService.getUserEmail())
-            .thenAnswer((_) async => null);
+        when(
+          () => mockSecureStorageService.getRefreshToken(),
+        ).thenAnswer((_) async => refreshToken);
+        when(
+          () => mockSecureStorageService.getUserEmail(),
+        ).thenAnswer((_) async => null);
 
         // Setup the first two calls to fail with network error, third one succeeds
         var callCount = 0;
-        when(() => mockAuthApiService.refreshToken(refreshToken))
-            .thenAnswer((_) async {
+        when(() => mockAuthApiService.refreshToken(refreshToken)).thenAnswer((
+          _,
+        ) async {
           callCount++;
           if (callCount < 3) {
             // First two calls fail with network error
@@ -448,8 +551,9 @@ void main() {
           }
         });
 
-        when(() => mockHttpApiService.setAuthHeader(any()))
-            .thenAnswer((_) async {});
+        when(
+          () => mockHttpApiService.setAuthHeader(any()),
+        ).thenAnswer((_) async {});
 
         // Action
         final result = await authRepository.getToken();
@@ -462,15 +566,18 @@ void main() {
 
       test('getToken retries on timeout errors', () async {
         // Setup
-        when(() => mockSecureStorageService.getRefreshToken())
-            .thenAnswer((_) async => refreshToken);
-        when(() => mockSecureStorageService.getUserEmail())
-            .thenAnswer((_) async => null);
+        when(
+          () => mockSecureStorageService.getRefreshToken(),
+        ).thenAnswer((_) async => refreshToken);
+        when(
+          () => mockSecureStorageService.getUserEmail(),
+        ).thenAnswer((_) async => null);
 
         // Setup the first call to fail with timeout, second one succeeds
         var callCount = 0;
-        when(() => mockAuthApiService.refreshToken(refreshToken))
-            .thenAnswer((_) async {
+        when(() => mockAuthApiService.refreshToken(refreshToken)).thenAnswer((
+          _,
+        ) async {
           callCount++;
           if (callCount < 2) {
             // First call fails with timeout
@@ -486,8 +593,9 @@ void main() {
           }
         });
 
-        when(() => mockHttpApiService.setAuthHeader(any()))
-            .thenAnswer((_) async {});
+        when(
+          () => mockHttpApiService.setAuthHeader(any()),
+        ).thenAnswer((_) async {});
 
         // Action
         final result = await authRepository.getToken();
@@ -500,15 +608,18 @@ void main() {
 
       test('getToken retries on server errors', () async {
         // Setup
-        when(() => mockSecureStorageService.getRefreshToken())
-            .thenAnswer((_) async => refreshToken);
-        when(() => mockSecureStorageService.getUserEmail())
-            .thenAnswer((_) async => null);
+        when(
+          () => mockSecureStorageService.getRefreshToken(),
+        ).thenAnswer((_) async => refreshToken);
+        when(
+          () => mockSecureStorageService.getUserEmail(),
+        ).thenAnswer((_) async => null);
 
         // Setup the first call to fail with server error, second one succeeds
         var callCount = 0;
-        when(() => mockAuthApiService.refreshToken(refreshToken))
-            .thenAnswer((_) async {
+        when(() => mockAuthApiService.refreshToken(refreshToken)).thenAnswer((
+          _,
+        ) async {
           callCount++;
           if (callCount < 2) {
             // First call fails with server error
@@ -524,8 +635,9 @@ void main() {
           }
         });
 
-        when(() => mockHttpApiService.setAuthHeader(any()))
-            .thenAnswer((_) async {});
+        when(
+          () => mockHttpApiService.setAuthHeader(any()),
+        ).thenAnswer((_) async {});
 
         // Action
         final result = await authRepository.getToken();
@@ -538,25 +650,34 @@ void main() {
 
       test('getToken does not retry on RefreshTokenError', () async {
         // Setup
-        when(() => mockSecureStorageService.getRefreshToken())
-            .thenAnswer((_) async => refreshToken);
-        when(() => mockSecureStorageService.getUserEmail())
-            .thenAnswer((_) async => null);
-        when(() => mockSecureStorageService.clearRefreshToken())
-            .thenAnswer((_) async {});
-        when(() => mockSecureStorageService.clearUserEmail())
-            .thenAnswer((_) async {});
-        when(() => mockHttpApiService.clearAuthHeader())
-            .thenAnswer((_) async {});
-        when(() => mockPreferences.setBool(any(), any()))
-            .thenAnswer((_) async => true);
+        when(
+          () => mockSecureStorageService.getRefreshToken(),
+        ).thenAnswer((_) async => refreshToken);
+        when(
+          () => mockSecureStorageService.getUserEmail(),
+        ).thenAnswer((_) async => null);
+        when(
+          () => mockSecureStorageService.clearRefreshToken(),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockSecureStorageService.clearUserEmail(),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockHttpApiService.clearAuthHeader(),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockPreferences.setBool(any(), any()),
+        ).thenAnswer((_) async => true);
 
-        when(() => mockAuthApiService.refreshToken(refreshToken))
-            .thenThrow(const RefreshTokenError());
+        when(
+          () => mockAuthApiService.refreshToken(refreshToken),
+        ).thenThrow(const RefreshTokenError());
 
         // Action & Assert
         expect(
-            () => authRepository.getToken(), throwsA(isA<RefreshTokenError>()));
+          () => authRepository.getToken(),
+          throwsA(isA<RefreshTokenError>()),
+        );
 
         // Wait for the async operations to complete
         await Future.delayed(Duration.zero);
@@ -566,24 +687,33 @@ void main() {
         verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
         verify(() => mockSecureStorageService.clearUserEmail()).called(1);
         verify(() => mockHttpApiService.clearAuthHeader()).called(1);
-        verify(() => mockPreferences.setBool(
-            SharedPreferenceConstants.isLoggedIn, false)).called(1);
+        verify(
+          () => mockPreferences.setBool(
+            SharedPreferenceConstants.isLoggedIn,
+            false,
+          ),
+        ).called(1);
       });
 
       test('getToken gives up after max retries', () async {
         // Setup
-        when(() => mockSecureStorageService.getRefreshToken())
-            .thenAnswer((_) async => refreshToken);
-        when(() => mockSecureStorageService.getUserEmail())
-            .thenAnswer((_) async => null);
+        when(
+          () => mockSecureStorageService.getRefreshToken(),
+        ).thenAnswer((_) async => refreshToken);
+        when(
+          () => mockSecureStorageService.getUserEmail(),
+        ).thenAnswer((_) async => null);
 
         // Always fail with network error
-        when(() => mockAuthApiService.refreshToken(refreshToken))
-            .thenThrow(const NetworkConnectionError());
+        when(
+          () => mockAuthApiService.refreshToken(refreshToken),
+        ).thenThrow(const NetworkConnectionError());
 
         // Action & Assert
         await expectLater(
-            authRepository.getToken(), throwsA(isA<NetworkConnectionError>()));
+          authRepository.getToken(),
+          throwsA(isA<NetworkConnectionError>()),
+        );
 
         // Verify called 3 times (max retries)
         verify(() => mockAuthApiService.refreshToken(refreshToken)).called(3);
@@ -593,8 +723,9 @@ void main() {
 
   group('Email Migration Tests', () {
     test('skips migration for anonymous user', () async {
-      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-          .thenReturn(false);
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(false);
 
       await authRepository.migrateEmailToStorage();
 
@@ -604,12 +735,15 @@ void main() {
     test('migrates email from current state if available', () async {
       const email = 'test@example.com';
       final mockUser = User(id: 'test-id', email: email);
-      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-          .thenReturn(true);
-      when(() => mockSecureStorageService.getUserEmail())
-          .thenAnswer((_) async => null);
-      when(() => mockSecureStorageService.storeUserEmail(any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(true);
+      when(
+        () => mockSecureStorageService.getUserEmail(),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockSecureStorageService.storeUserEmail(any()),
+      ).thenAnswer((_) async {});
 
       authRepository.setCurrentUserForTesting(mockUser);
       await authRepository.migrateEmailToStorage();
@@ -617,37 +751,54 @@ void main() {
       verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
     });
 
-    test('fetches and migrates email from /me endpoint when upgrading app',
-        () async {
-      const email = 'test@example.com';
-      final mockUser =
-          User(id: 'test-id', email: null); // No email in current state
-      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-          .thenReturn(true);
-      when(() => mockSecureStorageService.getUserEmail())
-          .thenAnswer((_) async => null);
-      when(() => mockSecureStorageService.storeUserEmail(any()))
-          .thenAnswer((_) async {});
-      when(() => mockHttpApiService.getRequest(any())).thenAnswer((_) async =>
-          MeModel(id: 'test-id', email: email, hasActiveSubscription: false)
-              .toJson());
+    test(
+      'fetches and migrates email from /me endpoint when upgrading app',
+      () async {
+        const email = 'test@example.com';
+        final mockUser = User(
+          id: 'test-id',
+          email: null,
+        ); // No email in current state
+        when(
+          () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+        ).thenReturn(true);
+        when(
+          () => mockSecureStorageService.getUserEmail(),
+        ).thenAnswer((_) async => null);
+        when(
+          () => mockSecureStorageService.storeUserEmail(any()),
+        ).thenAnswer((_) async {});
+        when(() => mockHttpApiService.getRequest(any())).thenAnswer(
+          (_) async => MeModel(
+            id: 'test-id',
+            email: email,
+            hasActiveSubscription: false,
+          ).toJson(),
+        );
 
-      authRepository.setCurrentUserForTesting(mockUser);
-      await authRepository.migrateEmailToStorage();
+        authRepository.setCurrentUserForTesting(mockUser);
+        await authRepository.migrateEmailToStorage();
 
-      verify(() => mockHttpApiService.getRequest(any())).called(1);
-      verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
-    });
+        verify(() => mockHttpApiService.getRequest(any())).called(1);
+        verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
+      },
+    );
 
     test('handles /me endpoint returning no email', () async {
       final mockUser = User(id: 'test-id', email: null);
-      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-          .thenReturn(true);
-      when(() => mockSecureStorageService.getUserEmail())
-          .thenAnswer((_) async => null);
-      when(() => mockHttpApiService.getRequest(any())).thenAnswer((_) async =>
-          MeModel(id: 'test-id', email: null, hasActiveSubscription: false)
-              .toJson());
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(true);
+      when(
+        () => mockSecureStorageService.getUserEmail(),
+      ).thenAnswer((_) async => null);
+      when(() => mockHttpApiService.getRequest(any())).thenAnswer(
+        (_) async => MeModel(
+          id: 'test-id',
+          email: null,
+          hasActiveSubscription: false,
+        ).toJson(),
+      );
 
       authRepository.setCurrentUserForTesting(mockUser);
       await authRepository.migrateEmailToStorage();
@@ -658,12 +809,15 @@ void main() {
 
     test('handles /me endpoint error gracefully', () async {
       final mockUser = User(id: 'test-id', email: null);
-      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-          .thenReturn(true);
-      when(() => mockSecureStorageService.getUserEmail())
-          .thenAnswer((_) async => null);
-      when(() => mockHttpApiService.getRequest(any()))
-          .thenThrow(Exception('Network error'));
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(true);
+      when(
+        () => mockSecureStorageService.getUserEmail(),
+      ).thenAnswer((_) async => null);
+      when(
+        () => mockHttpApiService.getRequest(any()),
+      ).thenThrow(Exception('Network error'));
 
       authRepository.setCurrentUserForTesting(mockUser);
       await authRepository.migrateEmailToStorage();
@@ -675,10 +829,12 @@ void main() {
     test('does not store email if already in secure storage', () async {
       const email = 'test@example.com';
       final mockUser = User(id: 'test-id', email: null);
-      when(() => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn))
-          .thenReturn(true);
-      when(() => mockSecureStorageService.getUserEmail())
-          .thenAnswer((_) async => email);
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(true);
+      when(
+        () => mockSecureStorageService.getUserEmail(),
+      ).thenAnswer((_) async => email);
 
       authRepository.setCurrentUserForTesting(mockUser);
       await authRepository.migrateEmailToStorage();

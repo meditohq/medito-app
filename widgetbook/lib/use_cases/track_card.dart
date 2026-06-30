@@ -18,8 +18,7 @@ Widget trackCardWithImage(BuildContext context) {
       ),
       coverUrlPath: context.knobs.string(
         label: 'Cover URL',
-        initialValue:
-            'https://picsum.photos/seed/medito/200/200',
+        initialValue: 'https://picsum.photos/seed/medito/200/200',
       ),
       onTap: () {},
     ),

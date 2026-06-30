@@ -64,8 +64,9 @@ class AuthTokens {
     final expiration = createdAt.add(Duration(seconds: expiresIn));
     final isExpired = DateTime.now().isAfter(expiration);
     dev.log(
-        '[AUTH_TOKENS] Token expired check: $isExpired (expiration: $expiration)',
-        level: 1000);
+      '[AUTH_TOKENS] Token expired check: $isExpired (expiration: $expiration)',
+      level: 1000,
+    );
     return isExpired;
   }
 
@@ -124,8 +125,9 @@ class AuthTokens {
     // Check if email changed
     if (oldTokens.email != newTokens.email) {
       dev.log(
-          '[AUTH_TOKENS] ⚠️ EMAIL CHANGED from ${oldTokens.email} to ${newTokens.email}',
-          level: 1000);
+        '[AUTH_TOKENS] ⚠️ EMAIL CHANGED from ${oldTokens.email} to ${newTokens.email}',
+        level: 1000,
+      );
     } else {
       dev.log('[AUTH_TOKENS] Email unchanged: ${newTokens.email}', level: 1000);
     }
@@ -133,22 +135,30 @@ class AuthTokens {
     // Check if client ID changed
     if (oldTokens.clientId != newTokens.clientId) {
       dev.log(
-          '[AUTH_TOKENS] ⚠️ CLIENT ID CHANGED from ${oldTokens.clientId} to ${newTokens.clientId}',
-          level: 1000);
+        '[AUTH_TOKENS] ⚠️ CLIENT ID CHANGED from ${oldTokens.clientId} to ${newTokens.clientId}',
+        level: 1000,
+      );
     } else {
-      dev.log('[AUTH_TOKENS] Client ID unchanged: ${newTokens.clientId}',
-          level: 1000);
+      dev.log(
+        '[AUTH_TOKENS] Client ID unchanged: ${newTokens.clientId}',
+        level: 1000,
+      );
     }
 
     // Access token always changes in a refresh
     dev.log(
-        '[AUTH_TOKENS] New access token prefix: ${_safeSubstring(newTokens.accessToken, 0, 10)}...',
-        level: 1000);
+      '[AUTH_TOKENS] New access token prefix: ${_safeSubstring(newTokens.accessToken, 0, 10)}...',
+      level: 1000,
+    );
 
     // Check expiration time
-    dev.log('[AUTH_TOKENS] New expiration: ${newTokens.expiresIn} seconds',
-        level: 1000);
-    dev.log('[AUTH_TOKENS] Creation timestamp: ${newTokens.createdAt}',
-        level: 1000);
+    dev.log(
+      '[AUTH_TOKENS] New expiration: ${newTokens.expiresIn} seconds',
+      level: 1000,
+    );
+    dev.log(
+      '[AUTH_TOKENS] Creation timestamp: ${newTokens.createdAt}',
+      level: 1000,
+    );
   }
 }

@@ -18,16 +18,10 @@ Future<void> launchURLInBrowser(String url) async {
   try {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      var launched = await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+      var launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
 
       if (!launched) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.inAppWebView,
-        );
+        await launchUrl(uri, mode: LaunchMode.inAppWebView);
       }
     }
   } catch (e) {

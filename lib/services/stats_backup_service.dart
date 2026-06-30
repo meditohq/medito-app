@@ -51,10 +51,7 @@ class StatsBackupService {
 
     // Save backup
     final backupKey = _getBackupKey(nextIndex);
-    final success = await _prefs.setString(
-      backupKey,
-      jsonEncode(backupData),
-    );
+    final success = await _prefs.setString(backupKey, jsonEncode(backupData));
 
     if (success) {
       // Update index
@@ -93,7 +90,8 @@ class StatsBackupService {
           // Only include backups for this user
           if (backupUserId == userId) {
             final timestamp = backupData['timestamp'] as int;
-            final version = backupData['version'] as int? ??
+            final version =
+                backupData['version'] as int? ??
                 1; // Default to version 1 for existing backups
             final statsJson = backupData['stats'] as Map<String, dynamic>;
 
@@ -101,12 +99,14 @@ class StatsBackupService {
             final migratedStatsJson = _migrateStatsIfNeeded(statsJson, version);
             final stats = LocalAllStats.fromJson(migratedStatsJson);
 
-            result.add(StatsBackup(
-              timestamp: timestamp,
-              stats: stats,
-              userId: backupUserId,
-              slotIndex: i,
-            ));
+            result.add(
+              StatsBackup(
+                timestamp: timestamp,
+                stats: stats,
+                userId: backupUserId,
+                slotIndex: i,
+              ),
+            );
           }
         } catch (e) {
           // Skip invalid entries
@@ -138,12 +138,14 @@ class StatsBackupService {
         final migratedStatsJson = _migrateStatsIfNeeded(statsJson, version);
         final stats = LocalAllStats.fromJson(migratedStatsJson);
 
-        result.add(StatsBackup(
-          timestamp: timestamp,
-          stats: stats,
-          userId: backupUserId,
-          slotIndex: i,
-        ));
+        result.add(
+          StatsBackup(
+            timestamp: timestamp,
+            stats: stats,
+            userId: backupUserId,
+            slotIndex: i,
+          ),
+        );
       } catch (_) {
         // Skip invalid entries.
       }
@@ -155,7 +157,9 @@ class StatsBackupService {
   /// Migrates stats from older versions to the current version
   /// This method will grow as the schema evolves
   Map<String, dynamic> _migrateStatsIfNeeded(
-      Map<String, dynamic> statsJson, int version) {
+    Map<String, dynamic> statsJson,
+    int version,
+  ) {
     // Currently at version 1, no migrations needed yet
     // When schema changes in the future, add migration logic here
 

@@ -59,7 +59,11 @@ int projectStreak(
   }
   if (normalised.isEmpty) return 0;
 
-  final yesterday = DateTime(todayStart.year, todayStart.month, todayStart.day - 1);
+  final yesterday = DateTime(
+    todayStart.year,
+    todayStart.month,
+    todayStart.day - 1,
+  );
   final hasToday = normalised.contains(todayStart);
   final hasYesterday = normalised.contains(yesterday);
   if (!hasToday && !hasYesterday) return 0;

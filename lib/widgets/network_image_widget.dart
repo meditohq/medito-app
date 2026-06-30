@@ -29,8 +29,10 @@ class NetworkImageWidget extends StatelessWidget {
   String _getWebPImageUrl(BuildContext context, String imagePath) {
     var pixelRatio = MediaQuery.of(context).devicePixelRatio;
     var suffix = _resolutionSuffixes.entries
-        .firstWhere((entry) => pixelRatio >= entry.key,
-            orElse: () => _resolutionSuffixes.entries.last)
+        .firstWhere(
+          (entry) => pixelRatio >= entry.key,
+          orElse: () => _resolutionSuffixes.entries.last,
+        )
         .value;
 
     return '$contentBaseUrl$imagePath$suffix';
@@ -44,15 +46,16 @@ class NetworkImageWidget extends StatelessWidget {
           Image.asset(AssetConstants.placeholder, fit: BoxFit.cover);
     }
 
-    var scaledImageUrl =
-        url.startsWith('http') ? url : _getWebPImageUrl(context, url);
+    var scaledImageUrl = url.startsWith('http')
+        ? url
+        : _getWebPImageUrl(context, url);
     var originalImageUrl = url.startsWith('http') ? url : '$contentBaseUrl$url';
 
     return scaledImageUrl.endsWith('.svg')
         ? _buildSvgImage(scaledImageUrl)
         : shouldCache
-            ? _buildCachedImage(scaledImageUrl, originalImageUrl)
-            : _buildNetworkImage(scaledImageUrl, originalImageUrl);
+        ? _buildCachedImage(scaledImageUrl, originalImageUrl)
+        : _buildNetworkImage(scaledImageUrl, originalImageUrl);
   }
 
   Widget _buildSvgImage(String url) {
@@ -70,10 +73,7 @@ class NetworkImageWidget extends StatelessWidget {
       imageUrl: scaledUrl,
       imageBuilder: (context, imageProvider) => Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: imageProvider,
-            fit: BoxFit.cover,
-          ),
+          image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
         ),
         foregroundDecoration: BoxDecoration(gradient: gradient),
       ),
@@ -85,10 +85,7 @@ class NetworkImageWidget extends StatelessWidget {
             imageUrl: originalUrl,
             imageBuilder: (context, imageProvider) => Container(
               decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.cover,
-                ),
+                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
               ),
               foregroundDecoration: BoxDecoration(gradient: gradient),
             ),
@@ -141,10 +138,12 @@ class NetworkImageWidget extends StatelessWidget {
     return Builder(
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final baseColor =
-            isDark ? ColorConstants.greyIsTheNewGrey : ColorConstants.lightGrey;
-        final backgroundColor =
-            isDark ? ColorConstants.onyx : ColorConstants.lightCard;
+        final baseColor = isDark
+            ? ColorConstants.greyIsTheNewGrey
+            : ColorConstants.lightGrey;
+        final backgroundColor = isDark
+            ? ColorConstants.onyx
+            : ColorConstants.lightCard;
 
         return Shimmer.fromColors(
           period: const Duration(seconds: 1),

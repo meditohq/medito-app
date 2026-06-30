@@ -12,4 +12,4 @@ final class AccountActionCreateAccount extends AccountAction {
 
 final class AccountActionLogin extends AccountAction {
   const AccountActionLogin();
-} 
+}

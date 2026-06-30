@@ -10,8 +10,12 @@ class AppLogger {
   }
 
   /// Log an error message that will only be shown in debug mode
-  static void e(String tag, String message,
-      [dynamic error, StackTrace? stackTrace]) {
+  static void e(
+    String tag,
+    String message, [
+    dynamic error,
+    StackTrace? stackTrace,
+  ]) {
     if (kDebugMode) {
       debugPrint('[${DateTime.now()} $tag] 🛑 ERROR: $message');
       if (error != null) {

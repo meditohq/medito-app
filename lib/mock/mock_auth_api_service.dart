@@ -6,10 +6,10 @@ import 'package:medito/utils/logger.dart';
 /// OTP flow is a no-op — sign-in succeeds immediately.
 class MockAuthApiService extends AuthApiService {
   MockAuthApiService()
-      : super(
-          baseUrl: 'https://mock-auth.medito.invalid/',
-          customApiKey: 'mock-api-key',
-        );
+    : super(
+        baseUrl: 'https://mock-auth.medito.invalid/',
+        customApiKey: 'mock-api-key',
+      );
 
   @override
   Future<AuthTokens> signIn({
@@ -19,8 +19,7 @@ class MockAuthApiService extends AuthApiService {
   }) async {
     AppLogger.d('MOCK_AUTH', 'Sign in (mock) for clientId: $clientId');
     final tokens = AuthTokens(
-      accessToken:
-          'mock-access-token-${DateTime.now().millisecondsSinceEpoch}',
+      accessToken: 'mock-access-token-${DateTime.now().millisecondsSinceEpoch}',
       refreshToken: 'mock-refresh-token',
       expiresIn: 3600,
       clientId: clientId,

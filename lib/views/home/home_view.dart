@@ -70,9 +70,12 @@ class _HomeViewState extends ConsumerState<HomeView>
     } else {
       // They declined again — reset so the end-screen prompt can show later.
       await prefs.setBool(
-          SharedPreferenceConstants.dailyReminderEnabled, false);
+        SharedPreferenceConstants.dailyReminderEnabled,
+        false,
+      );
       await prefs.remove(
-          SharedPreferenceConstants.reminderPromptDismissedForever);
+        SharedPreferenceConstants.reminderPromptDismissedForever,
+      );
       await prefs.remove(SharedPreferenceConstants.reminderPromptSnoozeUntil);
     }
   }
@@ -94,9 +97,8 @@ class _HomeViewState extends ConsumerState<HomeView>
     final home = ref.watch(fetchHomeProvider);
 
     return home.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (err, stack) {
         final error = err is AppError ? err : const UnknownError();
 
@@ -112,80 +114,83 @@ class _HomeViewState extends ConsumerState<HomeView>
         return Scaffold(
           body: SafeArea(
             child: RefreshIndicator(
-            onRefresh: _onRefresh,
-            edgeOffset: 150,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverAppBar(
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  floating: false,
-                  pinned: false,
-                  elevation: 0.0,
-                  toolbarHeight: 56.0,
-                  title: HeaderWidget(
-                    greeting: homeData.greeting ??
-                        AppLocalizations.of(context)!.welcome,
-                    onStatsButtonTap: () => _onStatsButtonTapped(context),
+              onRefresh: _onRefresh,
+              edgeOffset: 150,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                    floating: false,
+                    pinned: false,
+                    elevation: 0.0,
+                    toolbarHeight: 56.0,
+                    title: HeaderWidget(
+                      greeting:
+                          homeData.greeting ??
+                          AppLocalizations.of(context)!.welcome,
+                      onStatsButtonTap: () => _onStatsButtonTapped(context),
+                    ),
                   ),
-                ),
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 20),
-                    child: HomeAnnouncementSection(),
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: HomeAnnouncementSection(),
+                    ),
                   ),
-                ),
-                SliverList.separated(
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1,
-                    thickness: 0.5,
-                    indent: padding16,
-                    endIndent: padding16,
-                    color: context.brandPurple.withValues(alpha: 0.2),
+                  SliverList.separated(
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      thickness: 0.5,
+                      indent: padding16,
+                      endIndent: padding16,
+                      color: context.brandPurple.withValues(alpha: 0.2),
+                    ),
+                    itemBuilder: (context, index) {
+                      var type = widgetOrder[index];
+                      Widget child;
+                      switch (type) {
+                        case HomeWidgetType.shortcuts:
+                          child = ShortcutsItemsWidget(
+                            key: ValueKey(type.name),
+                            data: homeData.shortcuts,
+                          );
+                          break;
+                        case HomeWidgetType.carousel:
+                          child = CarouselWidget(
+                            key: ValueKey(type.name),
+                            carouselItems: homeData.carousel,
+                          );
+                          break;
+                        case HomeWidgetType.quote:
+                          child = QuoteWidget(
+                            key: ValueKey(type.name),
+                            data: homeData.todayQuote,
+                          );
+                          break;
+                        case HomeWidgetType.products:
+                          child = const HomeProductsSection();
+                          break;
+                        case HomeWidgetType.upNext:
+                          child = UpNextWidget(
+                            key: ValueKey(type.name),
+                            inlineStrip: const YourPathExplainerStrip(),
+                          );
+                          break;
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: padding16,
+                        ),
+                        child: child,
+                      );
+                    },
+                    itemCount: widgetOrder.length,
                   ),
-                  itemBuilder: (context, index) {
-                    var type = widgetOrder[index];
-                    Widget child;
-                    switch (type) {
-                      case HomeWidgetType.shortcuts:
-                        child = ShortcutsItemsWidget(
-                          key: ValueKey(type.name),
-                          data: homeData.shortcuts,
-                        );
-                        break;
-                      case HomeWidgetType.carousel:
-                        child = CarouselWidget(
-                          key: ValueKey(type.name),
-                          carouselItems: homeData.carousel,
-                        );
-                        break;
-                      case HomeWidgetType.quote:
-                        child = QuoteWidget(
-                          key: ValueKey(type.name),
-                          data: homeData.todayQuote,
-                        );
-                        break;
-                      case HomeWidgetType.products:
-                        child = const HomeProductsSection();
-                        break;
-                      case HomeWidgetType.upNext:
-                        child = UpNextWidget(
-                          key: ValueKey(type.name),
-                          inlineStrip: const YourPathExplainerStrip(),
-                        );
-                        break;
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: padding16),
-                      child: child,
-                    );
-                  },
-                  itemCount: widgetOrder.length,
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 20)),
-              ],
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                ],
+              ),
             ),
-          ),
           ),
         );
       },

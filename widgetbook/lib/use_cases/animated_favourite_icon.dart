@@ -7,8 +7,13 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 Widget defaultAnimatedFavouriteIcon(BuildContext context) {
   return Center(
     child: AnimatedFavouriteIcon(
-      key: ValueKey(context.knobs.boolean(label: 'Is favourite', initialValue: false)),
-      isFavorite: context.knobs.boolean(label: 'Is favourite', initialValue: false),
+      key: ValueKey(
+        context.knobs.boolean(label: 'Is favourite', initialValue: false),
+      ),
+      isFavorite: context.knobs.boolean(
+        label: 'Is favourite',
+        initialValue: false,
+      ),
       color: Theme.of(context).colorScheme.onSurface,
     ),
   );

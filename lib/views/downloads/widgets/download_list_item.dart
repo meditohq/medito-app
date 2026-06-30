@@ -40,32 +40,29 @@ class DownloadListItemWidget extends StatelessWidget {
       Text(data.subtitle ?? '', style: Theme.of(context).textTheme.titleMedium);
 
   Text _getTitle(BuildContext context) => Text(
-        data.title ?? '',
-        style: Theme.of(context).textTheme.headlineMedium,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      );
+    data.title ?? '',
+    style: Theme.of(context).textTheme.headlineMedium,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+  );
 
   Widget _getListItemLeadingImageWidget() => ClipRRect(
-        borderRadius: BorderRadius.circular(3.0),
-        child: Container(
-          color: data.colorPrimary,
-          child: SizedBox(
-            height: data.coverSize,
-            width: data.coverSize,
-            child: _coverImageWidget(),
-          ),
-        ),
-      );
+    borderRadius: BorderRadius.circular(3.0),
+    child: Container(
+      color: data.colorPrimary,
+      child: SizedBox(
+        height: data.coverSize,
+        width: data.coverSize,
+        child: _coverImageWidget(),
+      ),
+    ),
+  );
 
   Padding _coverImageWidget() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: data.icon ??
-          NetworkImageWidget(
-            url: data.cover!,
-            shouldCache: true,
-          ),
+      child:
+          data.icon ?? NetworkImageWidget(url: data.cover!, shouldCache: true),
     );
   }
 }

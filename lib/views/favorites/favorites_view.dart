@@ -19,18 +19,16 @@ enum FavoritesFilter {
   packs;
 
   String label(BuildContext context) => switch (this) {
-        FavoritesFilter.all => AppLocalizations.of(context)!.all,
-        FavoritesFilter.tracks => AppLocalizations.of(context)!.tracks,
-        FavoritesFilter.packs => AppLocalizations.of(context)!.packs,
-      };
+    FavoritesFilter.all => AppLocalizations.of(context)!.all,
+    FavoritesFilter.tracks => AppLocalizations.of(context)!.tracks,
+    FavoritesFilter.packs => AppLocalizations.of(context)!.packs,
+  };
 
   String emptyStateMessage(BuildContext context) => switch (this) {
-        FavoritesFilter.tracks =>
-          AppLocalizations.of(context)!.noFavoriteTracksYet,
-        FavoritesFilter.packs =>
-          AppLocalizations.of(context)!.noFavoritePacksYet,
-        FavoritesFilter.all => AppLocalizations.of(context)!.noFavoritesYet,
-      };
+    FavoritesFilter.tracks => AppLocalizations.of(context)!.noFavoriteTracksYet,
+    FavoritesFilter.packs => AppLocalizations.of(context)!.noFavoritePacksYet,
+    FavoritesFilter.all => AppLocalizations.of(context)!.noFavoritesYet,
+  };
 }
 
 class FavoritesView extends ConsumerStatefulWidget {
@@ -154,12 +152,10 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
             Text(
               AppLocalizations.of(context)!.addItemsToFavoritesMessage,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.color
-                        ?.withOpacityValue(0.7),
-                  ),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withOpacityValue(0.7),
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -173,31 +169,26 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
     AsyncValue<LocalAllStats> statsState,
   ) {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = favorites[index];
-          return Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _onItemTap(item, context),
-              child: Column(
-                children: [
-                  PackItemWidget(
-                    item: _buildPackItemModel(item, statsState),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final item = favorites[index];
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _onItemTap(item, context),
+            child: Column(
+              children: [
+                PackItemWidget(item: _buildPackItemModel(item, statsState)),
+                if (index < favorites.length - 1)
+                  Divider(
+                    color: Theme.of(context).colorScheme.outline,
+                    thickness: 0.5,
+                    height: 1,
                   ),
-                  if (index < favorites.length - 1)
-                    Divider(
-                      color: Theme.of(context).colorScheme.outline,
-                      thickness: 0.5,
-                      height: 1,
-                    ),
-                ],
-              ),
+              ],
             ),
-          );
-        },
-        childCount: favorites.length,
-      ),
+          ),
+        );
+      }, childCount: favorites.length),
     );
   }
 
@@ -208,9 +199,10 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
     final isTrack = item.type == FavoriteItemType.track;
     final isCompleted = isTrack
         ? statsState.whenOrNull(
-              data: (stats) => stats.tracksChecked?.contains(item.id) ?? false,
-            ) ??
-            false
+                data: (stats) =>
+                    stats.tracksChecked?.contains(item.id) ?? false,
+              ) ??
+              false
         : false;
 
     return PackItemsModel(
@@ -231,10 +223,10 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
       label: Text(
         filter.label(context),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: isSelected
-                  ? Theme.of(context).colorScheme.onPrimary
-                  : Theme.of(context).colorScheme.onSurface,
-            ),
+          color: isSelected
+              ? Theme.of(context).colorScheme.onPrimary
+              : Theme.of(context).colorScheme.onSurface,
+        ),
       ),
       selected: isSelected,
       selectedColor: Theme.of(context).colorScheme.primary,

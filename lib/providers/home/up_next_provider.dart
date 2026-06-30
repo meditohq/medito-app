@@ -53,8 +53,9 @@ AsyncValue<UpNextData> upNext(Ref ref) {
   final packAsync = ref.watch(packProvider(packId: packId));
 
   return packAsync.whenData((pack) {
-    final completedCount =
-        pack.items.where((item) => item.isCompleted == true).length;
+    final completedCount = pack.items
+        .where((item) => item.isCompleted == true)
+        .length;
     final isCompleted = completedCount >= pack.items.length;
     final isDefaultPack = packId == ConfigConstants.basicsPackId;
 

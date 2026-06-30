@@ -45,7 +45,11 @@ class _LocaleInfo {
   final String? country;
 
   _LocaleInfo(
-      this.languageCode, this.currencyName, this.currency, this.country);
+    this.languageCode,
+    this.currencyName,
+    this.currency,
+    this.country,
+  );
 }
 
 _LocaleInfo _getLocaleInfo(Ref ref) {
@@ -53,13 +57,15 @@ _LocaleInfo _getLocaleInfo(Ref ref) {
   final currentLocale = ref.watch(localeProvider);
 
   // Use the user's selected locale, fallback to system locale if not set
-  var languageCode = currentLocale?.languageCode ??
+  var languageCode =
+      currentLocale?.languageCode ??
       PlatformDispatcher.instance.locale.languageCode;
   var currencyName =
       NumberFormat.simpleCurrency(locale: languageCode).currencyName ?? '';
 
   // Get country code (ISO format like "US", "GB")
-  var country = currentLocale?.countryCode ??
+  var country =
+      currentLocale?.countryCode ??
       PlatformDispatcher.instance.locale.countryCode;
 
   // Get currency code (ISO format like "usd", "eur")
@@ -211,4 +217,3 @@ String _formatBasicInfo(
 
   return '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$isMonthlyDonorString';
 }
-

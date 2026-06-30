@@ -17,8 +17,8 @@ class BatteryOptimizationScreen extends StatefulWidget {
       _BatteryOptimizationScreenState();
 }
 
-class _BatteryOptimizationScreenState
-    extends State<BatteryOptimizationScreen> with WidgetsBindingObserver {
+class _BatteryOptimizationScreenState extends State<BatteryOptimizationScreen>
+    with WidgetsBindingObserver {
   bool _isProcessing = false;
 
   @override
@@ -74,7 +74,9 @@ class _BatteryOptimizationScreenState
             return SingleChildScrollView(
               padding: const EdgeInsets.all(32),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 64),
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 64,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -88,20 +90,18 @@ class _BatteryOptimizationScreenState
                         const SizedBox(height: 20),
                         Text(
                           l10n.onboardingBatteryTitle,
-                          style:
-                              Theme.of(context).textTheme.displayLarge?.copyWith(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                          style: Theme.of(context).textTheme.displayLarge
+                              ?.copyWith(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                              ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           l10n.onboardingBatteryBody,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 16,
-                                height: 1.5,
-                              ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontSize: 16, height: 1.5),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -157,8 +157,8 @@ const _affectedManufacturers = {
   'blackview',
   'tecno',
   'sony',
-  'unihertz'
-  };
+  'unihertz',
+};
 
 // Specific models to exclude even when their manufacturer is in the list above.
 const _excludedModels = {

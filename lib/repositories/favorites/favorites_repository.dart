@@ -24,8 +24,8 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   FavoritesRepositoryImpl({
     required HttpApiService httpApiService,
     required SharedPreferences prefs,
-  })  : _httpApiService = httpApiService,
-        _prefs = prefs;
+  }) : _httpApiService = httpApiService,
+       _prefs = prefs;
 
   @override
   Future<List<FavoriteItem>> loadFavorites() async {
@@ -48,11 +48,13 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   @override
   Future<List<FavoriteItem>> loadFavoritesFromServer() async {
     try {
-      final response =
-          await _httpApiService.getRequest(HTTPConstants.favorites);
+      final response = await _httpApiService.getRequest(
+        HTTPConstants.favorites,
+      );
       final List<dynamic> jsonList = response['results'] as List<dynamic>;
-      final List<FavoriteItemDto> dtos =
-          jsonList.map((json) => FavoriteItemDto.fromJson(json)).toList();
+      final List<FavoriteItemDto> dtos = jsonList
+          .map((json) => FavoriteItemDto.fromJson(json))
+          .toList();
       return dtos.map((dto) => FavoriteItem.fromDto(dto)).toList();
     } catch (e) {
       AppLogger.e('FAVORITES', 'Error loading favorites from server: $e');
@@ -66,14 +68,16 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
 
     try {
       final dtos = favorites
-          .map((item) => FavoriteItemDto(
-                id: item.id,
-                title: item.title,
-                subtitle: item.subtitle,
-                path: item.path,
-                type: item.type.toString().split('.').last,
-                timestamp: item.timestamp,
-              ))
+          .map(
+            (item) => FavoriteItemDto(
+              id: item.id,
+              title: item.title,
+              subtitle: item.subtitle,
+              path: item.path,
+              type: item.type.toString().split('.').last,
+              timestamp: item.timestamp,
+            ),
+          )
           .toList();
 
       await _httpApiService.postRequest(

@@ -48,8 +48,9 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
 
   void _sharePack(BuildContext context) {
     final deepLink = 'https://medito.app/packs/${widget.packId}';
-    final shareText = AppLocalizations.of(context)!
-        .sharePackText(widget.packName, deepLink);
+    final shareText = AppLocalizations.of(
+      context,
+    )!.sharePackText(widget.packName, deepLink);
     SharePlus.instance.share(ShareParams(text: shareText));
   }
 
@@ -150,8 +151,9 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
         );
         return favoritesState.when(
           data: (favorites) {
-            final isFavorite =
-                favorites.any((item) => item.id == widget.packId);
+            final isFavorite = favorites.any(
+              (item) => item.id == widget.packId,
+            );
             final isUpNext = currentUpNextPackId == widget.packId;
             return _buildBottomBar(
               context,
@@ -220,8 +222,9 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
       ),
       rightCenterItem: BottomActionBarItem(
         child: MeditoIcon(
-          assetName:
-              Platform.isIOS ? MeditoIcons.shareIos : MeditoIcons.shareAndroid,
+          assetName: Platform.isIOS
+              ? MeditoIcons.shareIos
+              : MeditoIcons.shareAndroid,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: Platform.isIOS
@@ -236,8 +239,7 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
                 color: pinColour,
               ),
               onTap: () => _onPinTap(context, isUpNext, isDefaultPack),
-              semanticLabel:
-                  isUpNext ? l10n.unpinFromUpNext : l10n.pinToUpNext,
+              semanticLabel: isUpNext ? l10n.unpinFromUpNext : l10n.pinToUpNext,
             )
           : null,
       rightItem: BottomActionBarItem(
@@ -246,8 +248,9 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
           color: favouriteColour,
           controller: _favoriteController,
         ),
-        semanticLabel:
-            isFavorite ? l10n.removeFromFavorites : l10n.addToFavorites,
+        semanticLabel: isFavorite
+            ? l10n.removeFromFavorites
+            : l10n.addToFavorites,
         onTap: () => _toggleFavorite(isFavorite, pack),
       ),
     );
@@ -269,7 +272,9 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
     } else if (!isUpNext) {
       // Pin: set this pack as up next
       await prefs.setString(
-          SharedPreferenceConstants.upNextPackId, widget.packId);
+        SharedPreferenceConstants.upNextPackId,
+        widget.packId,
+      );
       ref.invalidate(upNextPackIdProvider);
       if (context.mounted) showSnackBar(context, l10n.packSetAsUpNext);
     }

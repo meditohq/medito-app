@@ -51,7 +51,8 @@ class ReminderEnabledNotifier extends Notifier<bool> {
 }
 
 final reminderEnabledProvider = NotifierProvider<ReminderEnabledNotifier, bool>(
-    () => ReminderEnabledNotifier());
+  () => ReminderEnabledNotifier(),
+);
 
 class ZenModeNotifier extends Notifier<bool> {
   @override
@@ -68,7 +69,8 @@ class ZenModeNotifier extends Notifier<bool> {
 }
 
 final zenModeProvider = NotifierProvider<ZenModeNotifier, bool>(
-    () => ZenModeNotifier());
+  () => ZenModeNotifier(),
+);
 
 TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
   final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
@@ -78,4 +80,3 @@ TimeOfDay? _getReminderTimeFromPrefs(SharedPreferences prefs) {
       ? TimeOfDay(hour: savedHour, minute: savedMinute)
       : null;
 }
-

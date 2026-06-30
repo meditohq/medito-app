@@ -203,7 +203,8 @@ class ProductsResponse {
   factory ProductsResponse.fromRss(Map<String, dynamic> json) {
     final items = json['items'] as List<dynamic>?;
 
-    final products = items
+    final products =
+        items
             ?.map((item) => ProductModel.fromRss(item as Map<String, dynamic>))
             .toList() ??
         [];

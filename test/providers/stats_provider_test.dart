@@ -56,7 +56,7 @@ void main() {
     test('refreshFromLocal - reads from local stats without syncing', () async {
       // Arrange
       var yesterday = DateTime(2025, 3, 14);
-      
+
       var localStats = LocalAllStats.empty().copyWith(
         streakCurrent: 5,
         streakFreezes: 2,
@@ -82,7 +82,7 @@ void main() {
       final state = container.read(statsProvider);
       expect(state.isLoading, false);
       expect(state.hasValue, true);
-      
+
       final stats = state.value!;
       expect(stats.streakCurrent, 5);
       expect(stats.streakFreezes, 2);
@@ -98,7 +98,7 @@ void main() {
           authRepositorySyncProvider.overrideWithValue(_FakeAuthRepository()),
         ],
       );
-      
+
       // Get the notifier
       final notifier = container.read(statsProvider.notifier);
 
@@ -113,4 +113,3 @@ void main() {
     });
   });
 }
-

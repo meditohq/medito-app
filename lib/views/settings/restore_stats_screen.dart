@@ -64,9 +64,8 @@ class _RestoreStatsScreenState extends ConsumerState<RestoreStatsScreen> {
                 child: Text(
                   l10n.restorePreviousStatsExplainer,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color:
-                            Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ),
@@ -97,8 +96,10 @@ class _RestoreStatsScreenState extends ConsumerState<RestoreStatsScreen> {
                 }
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) =>
-                        _BackupRow(backup: backups[index], onRestored: _refresh),
+                    (context, index) => _BackupRow(
+                      backup: backups[index],
+                      onRestored: _refresh,
+                    ),
                     childCount: backups.length,
                   ),
                 );
@@ -158,9 +159,9 @@ class _BackupRow extends ConsumerWidget {
                     Text(
                       _formatDate(when),
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -170,10 +171,8 @@ class _BackupRow extends ConsumerWidget {
                         minutes,
                       ),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),

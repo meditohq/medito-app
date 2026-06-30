@@ -38,7 +38,8 @@ class MarkdownWidget extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       selectable: selectable,
       styleSheet: buildMarkdownStyleSheet(context).copyWith(
-        p: p ??
+        p:
+            p ??
             titleMedium?.copyWith(
               fontFamily: dmMono,
               fontSize: pFontSize,
@@ -46,7 +47,8 @@ class MarkdownWidget extends StatelessWidget {
               color: walterWhite,
             ),
         textAlign: textAlign ?? WrapAlignment.center,
-        a: a ??
+        a:
+            a ??
             titleMedium?.copyWith(
               fontFamily: dmMono,
               color: walterWhite,
@@ -58,10 +60,6 @@ class MarkdownWidget extends StatelessWidget {
   }
 
   void _linkTap(BuildContext context, String? href) {
-    handleNavigation(
-      TypeConstants.url,
-      [href],
-      context,
-    );
+    handleNavigation(TypeConstants.url, [href], context);
   }
 }

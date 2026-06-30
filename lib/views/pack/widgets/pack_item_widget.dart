@@ -6,11 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PackItemWidget extends StatelessWidget {
-  const PackItemWidget({
-    super.key,
-    required this.item,
-    this.onSetComplete,
-  });
+  const PackItemWidget({super.key, required this.item, this.onSetComplete});
 
   final PackItemsModel item;
 
@@ -42,13 +38,8 @@ class PackItemWidget extends StatelessWidget {
                       if (item.title.isNotNullAndNotEmpty())
                         Text(
                           item.title,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
-                              ?.copyWith(
-                                fontFamily: dmSans,
-                                fontSize: 16,
-                              ),
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(fontFamily: dmSans, fontSize: 16),
                         ),
                       if (hasSubtitle)
                         Flexible(
@@ -56,9 +47,7 @@ class PackItemWidget extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               item.subtitle ?? '',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
+                              style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     fontFamily: dmMono,
                                     fontSize: 14,

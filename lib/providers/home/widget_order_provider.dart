@@ -6,20 +6,22 @@ import 'package:medito/utils/black_friday_utils.dart';
 
 final homeWidgetOrderProvider =
     NotifierProvider<HomeWidgetOrderNotifier, List<HomeWidgetType>>(
-  HomeWidgetOrderNotifier.new,
-);
+      HomeWidgetOrderNotifier.new,
+    );
 
 class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
   @override
   List<HomeWidgetType> build() {
     final prefs = ref.read(sharedPreferencesProvider);
-    final savedOrder =
-        prefs.getStringList(SharedPreferenceConstants.homeWidgetOrder);
+    final savedOrder = prefs.getStringList(
+      SharedPreferenceConstants.homeWidgetOrder,
+    );
 
     List<HomeWidgetType> baseOrder;
     if (savedOrder != null) {
-      baseOrder =
-          savedOrder.map((type) => HomeWidgetType.fromString(type)).toList();
+      baseOrder = savedOrder
+          .map((type) => HomeWidgetType.fromString(type))
+          .toList();
       // Ensure upNext is always included if not already present
       if (!baseOrder.contains(HomeWidgetType.upNext)) {
         baseOrder.insert(0, HomeWidgetType.upNext);
@@ -38,7 +40,8 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
   }
 
   List<HomeWidgetType> _applyBlackFridayOrdering(
-      List<HomeWidgetType> baseOrder) {
+    List<HomeWidgetType> baseOrder,
+  ) {
     final now = DateTime.now();
     if (!BlackFridayUtils.isBlackFridayWeek(now)) {
       return baseOrder;
@@ -86,7 +89,8 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
   }
 
   List<HomeWidgetType> _restoreBaseOrderFromBlackFridayOrder(
-      List<HomeWidgetType> blackFridayOrder) {
+    List<HomeWidgetType> blackFridayOrder,
+  ) {
     final shortcutsIndex = blackFridayOrder.indexOf(HomeWidgetType.shortcuts);
     final productsIndex = blackFridayOrder.indexOf(HomeWidgetType.products);
 
@@ -107,8 +111,9 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
   }
 
   int _findOriginalProductsPosition(List<HomeWidgetType> orderWithoutProducts) {
-    final shortcutsIndex =
-        orderWithoutProducts.indexOf(HomeWidgetType.shortcuts);
+    final shortcutsIndex = orderWithoutProducts.indexOf(
+      HomeWidgetType.shortcuts,
+    );
     final carouselIndex = orderWithoutProducts.indexOf(HomeWidgetType.carousel);
     final quoteIndex = orderWithoutProducts.indexOf(HomeWidgetType.quote);
 
@@ -139,18 +144,22 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
     final prefs = ref.read(sharedPreferencesProvider);
     final stringOrder = order.map((type) => type.name).toList();
     await prefs.setStringList(
-        SharedPreferenceConstants.homeWidgetOrder, stringOrder);
+      SharedPreferenceConstants.homeWidgetOrder,
+      stringOrder,
+    );
   }
 
   void refreshOrder() {
     final prefs = ref.read(sharedPreferencesProvider);
-    final savedOrder =
-        prefs.getStringList(SharedPreferenceConstants.homeWidgetOrder);
+    final savedOrder = prefs.getStringList(
+      SharedPreferenceConstants.homeWidgetOrder,
+    );
 
     List<HomeWidgetType> baseOrder;
     if (savedOrder != null) {
-      baseOrder =
-          savedOrder.map((type) => HomeWidgetType.fromString(type)).toList();
+      baseOrder = savedOrder
+          .map((type) => HomeWidgetType.fromString(type))
+          .toList();
       // Ensure upNext is always included if not already present
       if (!baseOrder.contains(HomeWidgetType.upNext)) {
         baseOrder.insert(0, HomeWidgetType.upNext);

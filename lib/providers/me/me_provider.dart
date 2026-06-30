@@ -90,13 +90,13 @@ Future<MeModel> me(Ref ref) async {
     // If no email found anywhere, return anonymous user
     AppLogger.d('ME_PROVIDER', 'No email found, user likely not authenticated');
     final prefs = ref.read(sharedPreferencesProvider);
-    await prefs.setBool(
-      SharedPreferenceConstants.hasActiveSubscription,
-      false,
-    );
+    await prefs.setBool(SharedPreferenceConstants.hasActiveSubscription, false);
 
     return MeModel(
-        id: currentUser?.id ?? '', email: null, hasActiveSubscription: false);
+      id: currentUser?.id ?? '',
+      email: null,
+      hasActiveSubscription: false,
+    );
   } catch (e) {
     AppLogger.e('ME_PROVIDER', 'Error checking auth state', e);
     rethrow;

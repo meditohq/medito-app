@@ -23,56 +23,57 @@ class ThemeInlineSelector extends ConsumerWidget {
         borderWidth: 0.5,
         child: Padding(
           padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                MeditoIcon(
-                  assetName: AssetConstants.icSparks,
-                  size: 24,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                width16,
-                Text(
-                  l10n.themeTitle,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _ThemeButton(
-                  label: l10n.darkTheme,
-                  iconAsset: MeditoIcons.moon,
-                  isSelected: currentTheme == ThemeMode.dark,
-                  onTap: () =>
-                      ref.read(themeProvider.notifier).setTheme(ThemeMode.dark),
-                ),
-                const SizedBox(width: 8),
-                _ThemeButton(
-                  label: l10n.lightTheme,
-                  iconAsset: MeditoIcons.sun,
-                  isSelected: currentTheme == ThemeMode.light,
-                  onTap: () => ref
-                      .read(themeProvider.notifier)
-                      .setTheme(ThemeMode.light),
-                ),
-                const SizedBox(width: 8),
-                _ThemeButton(
-                  label: l10n.systemTheme,
-                  iconAsset: MeditoIcons.settings,
-                  isSelected: currentTheme == ThemeMode.system,
-                  onTap: () => ref
-                      .read(themeProvider.notifier)
-                      .setTheme(ThemeMode.system),
-                ),
-              ],
-            ),
-          ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  MeditoIcon(
+                    assetName: AssetConstants.icSparks,
+                    size: 24,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  width16,
+                  Text(
+                    l10n.themeTitle,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _ThemeButton(
+                    label: l10n.darkTheme,
+                    iconAsset: MeditoIcons.moon,
+                    isSelected: currentTheme == ThemeMode.dark,
+                    onTap: () => ref
+                        .read(themeProvider.notifier)
+                        .setTheme(ThemeMode.dark),
+                  ),
+                  const SizedBox(width: 8),
+                  _ThemeButton(
+                    label: l10n.lightTheme,
+                    iconAsset: MeditoIcons.sun,
+                    isSelected: currentTheme == ThemeMode.light,
+                    onTap: () => ref
+                        .read(themeProvider.notifier)
+                        .setTheme(ThemeMode.light),
+                  ),
+                  const SizedBox(width: 8),
+                  _ThemeButton(
+                    label: l10n.systemTheme,
+                    iconAsset: MeditoIcons.settings,
+                    isSelected: currentTheme == ThemeMode.system,
+                    onTap: () => ref
+                        .read(themeProvider.notifier)
+                        .setTheme(ThemeMode.system),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
@@ -105,46 +106,43 @@ class _ThemeButton extends StatelessWidget {
         button: true,
         selected: isSelected,
         child: GestureDetector(
-        onTap: onTap,
-        child: ExcludeSemantics(
-          child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: isSelected
-                ? primary.withValues(alpha: 0.15)
-                : Colors.transparent,
-            border: Border.all(
-              color: isSelected
-                  ? primary
-                  : onSurface.withValues(alpha: 0.18),
-              width: 1.5,
+          onTap: onTap,
+          child: ExcludeSemantics(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: isSelected
+                    ? primary.withValues(alpha: 0.15)
+                    : Colors.transparent,
+                border: Border.all(
+                  color: isSelected
+                      ? primary
+                      : onSurface.withValues(alpha: 0.18),
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  MeditoIcon(assetName: iconAsset, size: 20, color: color),
+                  const SizedBox(height: 4),
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: color,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              MeditoIcon(
-                assetName: iconAsset,
-                size: 20,
-                color: color,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: color,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.w400,
-                    ),
-              ),
-              ],
-          ),
         ),
-      ),
-      ),
       ),
     );
   }

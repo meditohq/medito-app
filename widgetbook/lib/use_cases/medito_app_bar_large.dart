@@ -13,12 +13,18 @@ Widget appBarLargeWithImage(BuildContext context) {
       slivers: [
         MeditoAppBarLarge(
           scrollController: controller,
-          title: context.knobs.string(label: 'Title', initialValue: 'Mindfulness Basics'),
+          title: context.knobs.string(
+            label: 'Title',
+            initialValue: 'Mindfulness Basics',
+          ),
           coverUrl: context.knobs.string(
             label: 'Cover URL',
             initialValue: 'https://picsum.photos/seed/appbar/800/450',
           ),
-          hasLeading: context.knobs.boolean(label: 'Has back button', initialValue: true),
+          hasLeading: context.knobs.boolean(
+            label: 'Has back button',
+            initialValue: true,
+          ),
         ),
         SliverList(
           delegate: SliverChildBuilderDelegate(
@@ -41,8 +47,14 @@ Widget appBarLargeNoImage(BuildContext context) {
       slivers: [
         MeditoAppBarLarge(
           scrollController: controller,
-          title: context.knobs.string(label: 'Title', initialValue: 'Sleep Meditations'),
-          hasLeading: context.knobs.boolean(label: 'Has back button', initialValue: false),
+          title: context.knobs.string(
+            label: 'Title',
+            initialValue: 'Sleep Meditations',
+          ),
+          hasLeading: context.knobs.boolean(
+            label: 'Has back button',
+            initialValue: false,
+          ),
         ),
         SliverList(
           delegate: SliverChildBuilderDelegate(

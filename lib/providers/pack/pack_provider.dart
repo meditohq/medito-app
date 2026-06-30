@@ -9,9 +9,9 @@ part 'pack_provider.g.dart';
 @Riverpod(keepAlive: true)
 Future<List<PackItemsModel>> fetchAllPacks(Ref ref) {
   var packRepository = ref.watch(packRepositoryProvider);
-  return packRepository
-      .fetchAllPacks()
-      .then((packs) => packs.expand((pack) => pack.items).toList());
+  return packRepository.fetchAllPacks().then(
+    (packs) => packs.expand((pack) => pack.items).toList(),
+  );
 }
 
 /// Raw pack fetched from the API. Refresh this provider for pull-to-refresh
@@ -38,8 +38,9 @@ class Pack extends _$Pack {
     return rawPack.whenData(
       (pack) => pack.copyWith(
         items: pack.items
-            .map((item) =>
-                item.copyWith(isCompleted: completed.contains(item.id)))
+            .map(
+              (item) => item.copyWith(isCompleted: completed.contains(item.id)),
+            )
             .toList(),
       ),
     );

@@ -15,9 +15,7 @@ abstract class TrackRepository {
 
   Future<void> addTrackInPreference(List<Track> trackList);
 
-  Future<void> addCurrentlyPlayingTrackInPreference(
-    Track track,
-  );
+  Future<void> addCurrentlyPlayingTrackInPreference(Track track);
 
   Future<void> removeCurrentlyPlayingTrackInPreference();
 
@@ -33,8 +31,9 @@ class TrackRepositoryImpl extends TrackRepository {
   @override
   Future<Track> fetchTrack(String trackId) async {
     try {
-      var response =
-          await client.getRequest('${HTTPConstants.tracks}/$trackId');
+      var response = await client.getRequest(
+        '${HTTPConstants.tracks}/$trackId',
+      );
       return Track.fromJson(response);
     } catch (e) {
       rethrow;
@@ -60,17 +59,16 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<void> addTrackInPreference(List<Track> trackList) async {
-    await ref.read(sharedPreferencesProvider).setString(
-          SharedPreferenceConstants.downloads,
-          json.encode(trackList),
-        );
+    await ref
+        .read(sharedPreferencesProvider)
+        .setString(SharedPreferenceConstants.downloads, json.encode(trackList));
   }
 
   @override
-  Future<void> addCurrentlyPlayingTrackInPreference(
-    Track track,
-  ) async {
-    await ref.read(sharedPreferencesProvider).setString(
+  Future<void> addCurrentlyPlayingTrackInPreference(Track track) async {
+    await ref
+        .read(sharedPreferencesProvider)
+        .setString(
           SharedPreferenceConstants.currentPlayingTrack,
           json.encode(track),
         );
@@ -78,16 +76,16 @@ class TrackRepositoryImpl extends TrackRepository {
 
   @override
   Future<void> removeCurrentlyPlayingTrackInPreference() async {
-    await ref.read(sharedPreferencesProvider).remove(
-          SharedPreferenceConstants.currentPlayingTrack,
-        );
+    await ref
+        .read(sharedPreferencesProvider)
+        .remove(SharedPreferenceConstants.currentPlayingTrack);
   }
 
   @override
   Future<Track?> fetchCurrentlyPlayingTrackFromPreference() async {
-    var track = ref.read(sharedPreferencesProvider).getString(
-          SharedPreferenceConstants.currentPlayingTrack,
-        );
+    var track = ref
+        .read(sharedPreferencesProvider)
+        .getString(SharedPreferenceConstants.currentPlayingTrack);
     if (track != null) {
       return Track.fromJson(json.decode(track));
     }

@@ -90,10 +90,7 @@ class MeditoDialogSecondaryButton extends StatelessWidget {
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           foregroundColor: onSurface,
-          side: BorderSide(
-            color: onSurface.withOpacityValue(0.3),
-            width: 0.5,
-          ),
+          side: BorderSide(color: onSurface.withOpacityValue(0.3), width: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(_buttonRadius),
           ),

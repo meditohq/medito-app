@@ -7,17 +7,15 @@ class ApiResponse<T> extends Equatable {
   final AppError? error;
 
   const ApiResponse.loading()
-      : status = Status.loading,
-        body = null,
-        error = null;
+    : status = Status.loading,
+      body = null,
+      error = null;
 
   const ApiResponse.completed(this.body)
-      : status = Status.completed,
-        error = null;
+    : status = Status.completed,
+      error = null;
 
-  const ApiResponse.error(this.error)
-      : status = Status.error,
-        body = null;
+  const ApiResponse.error(this.error) : status = Status.error, body = null;
 
   bool hasData() {
     return status != Status.loading && body != null;

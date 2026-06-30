@@ -48,7 +48,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
       _meditationVariant == OnboardingMeditationExperiment.variantMeditation &&
       (_experienceIndex == 0 || _experienceIndex == 1);
 
-final List<String> _images = [
+  final List<String> _images = [
     AssetConstants.onboardingImage1,
     AssetConstants.onboardingImage2,
     AssetConstants.onboardingImage3,
@@ -67,9 +67,7 @@ final List<String> _images = [
     unawaited(
       analytics.logEvent(
         name: AnalyticsEventConstants.onboardingExperienceAnswered,
-        parameters: {
-          AnalyticsEventConstants.paramAnswer: answers[index],
-        },
+        parameters: {AnalyticsEventConstants.paramAnswer: answers[index]},
       ),
     );
     // Set as a GA4 user property so every downstream event (incl. the
@@ -85,17 +83,18 @@ final List<String> _images = [
     // Persist the answer so it outlives onboarding — used to segment the
     // first-session experience (and its A/B test) and later personalisation.
     unawaited(
-      ref.read(sharedPreferencesProvider).setInt(
-            SharedPreferenceConstants.onboardingExperienceLevel,
-            index,
-          ),
+      ref
+          .read(sharedPreferencesProvider)
+          .setInt(SharedPreferenceConstants.onboardingExperienceLevel, index),
     );
     // Regular meditators (top experience level) start on a more advanced pack
     // rather than the beginner-oriented default "Up Next".
     if (index == 2) {
       const experiencedPackId = 'J3DsFVgKjZdbDiif';
       unawaited(
-        ref.read(sharedPreferencesProvider).setString(
+        ref
+            .read(sharedPreferencesProvider)
+            .setString(
               SharedPreferenceConstants.upNextPackId,
               experiencedPackId,
             ),
@@ -111,16 +110,16 @@ final List<String> _images = [
   }
 
   void _logQuestionFlowCompleted() {
-    final state = deriveOnboardingState(
-      experienceIndex: _experienceIndex ?? 0,
-    );
+    final state = deriveOnboardingState(experienceIndex: _experienceIndex ?? 0);
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.onboardingQuestionFlowCompleted,
-        parameters: {
-          AnalyticsEventConstants.paramResultState: state.analyticsLabel,
-        },
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.onboardingQuestionFlowCompleted,
+            parameters: {
+              AnalyticsEventConstants.paramResultState: state.analyticsLabel,
+            },
+          ),
     );
   }
 
@@ -154,12 +153,14 @@ final List<String> _images = [
 
   Future<void> _onGetStarted() async {
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.onboardingCompleted,
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(name: AnalyticsEventConstants.onboardingCompleted),
     );
     unawaited(
-      ref.read(sharedPreferencesProvider).setBool(
+      ref
+          .read(sharedPreferencesProvider)
+          .setBool(
             SharedPreferenceConstants.firstActionAfterOnboardingPending,
             true,
           ),
@@ -171,14 +172,16 @@ final List<String> _images = [
             OnboardingMeditationExperiment.variantMeditation &&
         !_showMeditationStep) {
       unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.onboardingFirstMeditationGated,
-          parameters: {
-            AnalyticsEventConstants.paramExperimentName:
-                OnboardingMeditationExperiment.experimentName,
-            AnalyticsEventConstants.paramVariantId: _meditationVariant,
-          },
-        ),
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.onboardingFirstMeditationGated,
+              parameters: {
+                AnalyticsEventConstants.paramExperimentName:
+                    OnboardingMeditationExperiment.experimentName,
+                AnalyticsEventConstants.paramVariantId: _meditationVariant,
+              },
+            ),
       );
     }
     await _finishToHome();
@@ -211,9 +214,11 @@ final List<String> _images = [
   void initState() {
     super.initState();
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
+          ),
     );
     // Resolve the sticky experiment arm and log a one-time exposure so the test
     // is segmentable in BigQuery (experiment_name + variant_id), matching the
@@ -222,14 +227,16 @@ final List<String> _images = [
       ref.read(sharedPreferencesProvider),
     );
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.onboardingExperimentExposure,
-        parameters: {
-          AnalyticsEventConstants.paramExperimentName:
-              OnboardingMeditationExperiment.experimentName,
-          AnalyticsEventConstants.paramVariantId: _meditationVariant,
-        },
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.onboardingExperimentExposure,
+            parameters: {
+              AnalyticsEventConstants.paramExperimentName:
+                  OnboardingMeditationExperiment.experimentName,
+              AnalyticsEventConstants.paramVariantId: _meditationVariant,
+            },
+          ),
     );
     shouldShowBatteryOptimizationScreen().then((show) {
       if (mounted) setState(() => _showBatteryScreen = show);
@@ -248,7 +255,8 @@ final List<String> _images = [
         child: Column(
           children: [
             Visibility(
-              visible: MediaQuery.of(context).size.height > 500 &&
+              visible:
+                  MediaQuery.of(context).size.height > 500 &&
                   MediaQuery.of(context).orientation == Orientation.portrait,
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.3,
@@ -257,18 +265,17 @@ final List<String> _images = [
                   duration: const Duration(milliseconds: 300),
                   transitionBuilder:
                       (Widget child, Animation<double> animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    );
-                  },
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                   child: Image.asset(
                     _images[_currentPage < _images.length
                         ? _currentPage
                         : _images.length - 1],
-                    key: ValueKey<String>(_images[_currentPage < _images.length
-                        ? _currentPage
-                        : _images.length - 1]),
+                    key: ValueKey<String>(
+                      _images[_currentPage < _images.length
+                          ? _currentPage
+                          : _images.length - 1],
+                    ),
                     width: MediaQuery.of(context).size.width,
                     fit: BoxFit.fitWidth,
                   ),

@@ -11,7 +11,6 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 
-
 const _kStage2AutoDismissMs = 2000;
 
 /// A one-time explainer strip that attaches flush below the Your Path card.
@@ -25,8 +24,7 @@ class YourPathExplainerStrip extends ConsumerStatefulWidget {
       _YourPathExplainerStripState();
 }
 
-class _YourPathExplainerStripState
-    extends ConsumerState<YourPathExplainerStrip>
+class _YourPathExplainerStripState extends ConsumerState<YourPathExplainerStrip>
     with TickerProviderStateMixin {
   _StripStage _stage = _StripStage.stage1;
   bool _collapsed = false;
@@ -44,9 +42,8 @@ class _YourPathExplainerStripState
     super.initState();
 
     final prefs = ref.read(sharedPreferencesProvider);
-    final alreadySeen = prefs.getBool(
-          SharedPreferenceConstants.hasSeenYourPathExplainer,
-        ) ??
+    final alreadySeen =
+        prefs.getBool(SharedPreferenceConstants.hasSeenYourPathExplainer) ??
         false;
     _collapsed = alreadySeen;
 
@@ -77,9 +74,9 @@ class _YourPathExplainerStripState
 
   void _logStripShown() {
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.yourPathExplainerShown,
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(name: AnalyticsEventConstants.yourPathExplainerShown),
     );
   }
 
@@ -97,12 +94,14 @@ class _YourPathExplainerStripState
 
   Future<void> _collapse({required String dismissMethod}) async {
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.yourPathExplainerDismissed,
-        parameters: {
-          AnalyticsEventConstants.paramDismissMethod: dismissMethod,
-        },
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.yourPathExplainerDismissed,
+            parameters: {
+              AnalyticsEventConstants.paramDismissMethod: dismissMethod,
+            },
+          ),
     );
 
     await _collapseController.reverse();
@@ -133,18 +132,15 @@ class _YourPathExplainerStripState
 
     // Subtle separator tint — just slightly darker than the card in both modes.
     final isDark = theme.brightness == Brightness.dark;
-    final stripBackground = Color.lerp(
-          theme.cardColor,
-          Colors.black,
-          isDark ? 0.15 : 0.05,
-        ) ??
+    final stripBackground =
+        Color.lerp(theme.cardColor, Colors.black, isDark ? 0.15 : 0.05) ??
         theme.cardColor;
 
     final l10n = AppLocalizations.of(context)!;
 
     return SizeTransition(
       sizeFactor: _heightFactor,
-      axisAlignment: -1,
+      alignment: AlignmentDirectional.topStart,
       child: Container(
         color: stripBackground,
         padding: const EdgeInsets.fromLTRB(
@@ -232,10 +228,7 @@ class _Stage2Content extends StatelessWidget {
   final Animation<double> fadeAnimation;
   final String text;
 
-  const _Stage2Content({
-    required this.fadeAnimation,
-    required this.text,
-  });
+  const _Stage2Content({required this.fadeAnimation, required this.text});
 
   @override
   Widget build(BuildContext context) {

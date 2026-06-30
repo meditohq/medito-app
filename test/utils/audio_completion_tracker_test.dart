@@ -80,96 +80,102 @@ void main() {
     });
   });
 
-  group('AudioCompletionTracker.checkTrackCrossedMidnight with dayBoundaryOffset',
-      () {
-    // +4h offset means the user's day starts at 04:00 local time.
-    const offset = Duration(hours: 4);
+  group(
+    'AudioCompletionTracker.checkTrackCrossedMidnight with dayBoundaryOffset',
+    () {
+      // +4h offset means the user's day starts at 04:00 local time.
+      const offset = Duration(hours: 4);
 
-    test('default offset of zero preserves existing midnight behaviour', () {
-      // 23:30 → 00:15 crosses midnight at offset=0 (legacy behaviour).
-      final endTime = DateTime(2023, 1, 2, 0, 15).millisecondsSinceEpoch;
-      final startTime = DateTime(2023, 1, 1, 23, 30).millisecondsSinceEpoch;
-      final duration = endTime - startTime;
+      test('default offset of zero preserves existing midnight behaviour', () {
+        // 23:30 → 00:15 crosses midnight at offset=0 (legacy behaviour).
+        final endTime = DateTime(2023, 1, 2, 0, 15).millisecondsSinceEpoch;
+        final startTime = DateTime(2023, 1, 1, 23, 30).millisecondsSinceEpoch;
+        final duration = endTime - startTime;
 
-      final explicitZero = AudioCompletionTracker.checkTrackCrossedMidnight(
-        endTimestamp: endTime,
-        duration: duration,
-        dayBoundaryOffset: Duration.zero,
-      );
-      final implicitDefault = AudioCompletionTracker.checkTrackCrossedMidnight(
-        endTimestamp: endTime,
-        duration: duration,
-      );
+        final explicitZero = AudioCompletionTracker.checkTrackCrossedMidnight(
+          endTimestamp: endTime,
+          duration: duration,
+          dayBoundaryOffset: Duration.zero,
+        );
+        final implicitDefault =
+            AudioCompletionTracker.checkTrackCrossedMidnight(
+              endTimestamp: endTime,
+              duration: duration,
+            );
 
-      expect(explicitZero, true);
-      expect(implicitDefault, true);
-      expect(explicitZero, implicitDefault);
-    });
+        expect(explicitZero, true);
+        expect(implicitDefault, true);
+        expect(explicitZero, implicitDefault);
+      });
 
-    test('+4h offset: session 23:30 → 00:30 does NOT cross day boundary', () {
-      // Both timestamps are before the 04:00 boundary the next morning,
-      // so under +4h offset they belong to the same user-day.
-      // This is the headline user-facing benefit: a night-owl meditator
-      // doesn't lose their session to a midnight rollover.
-      final startTime = DateTime(2023, 1, 1, 23, 30).millisecondsSinceEpoch;
-      final endTime = DateTime(2023, 1, 2, 0, 30).millisecondsSinceEpoch;
-      final duration = endTime - startTime;
+      test('+4h offset: session 23:30 → 00:30 does NOT cross day boundary', () {
+        // Both timestamps are before the 04:00 boundary the next morning,
+        // so under +4h offset they belong to the same user-day.
+        // This is the headline user-facing benefit: a night-owl meditator
+        // doesn't lose their session to a midnight rollover.
+        final startTime = DateTime(2023, 1, 1, 23, 30).millisecondsSinceEpoch;
+        final endTime = DateTime(2023, 1, 2, 0, 30).millisecondsSinceEpoch;
+        final duration = endTime - startTime;
 
-      final result = AudioCompletionTracker.checkTrackCrossedMidnight(
-        endTimestamp: endTime,
-        duration: duration,
-        dayBoundaryOffset: offset,
-      );
+        final result = AudioCompletionTracker.checkTrackCrossedMidnight(
+          endTimestamp: endTime,
+          duration: duration,
+          dayBoundaryOffset: offset,
+        );
 
-      expect(result, false);
-    });
+        expect(result, false);
+      });
 
-    test('+4h offset: session 03:30 → 04:30 DOES cross day boundary', () {
-      // Start is before the user's 04:00 boundary, end is after it.
-      final startTime = DateTime(2023, 1, 2, 3, 30).millisecondsSinceEpoch;
-      final endTime = DateTime(2023, 1, 2, 4, 30).millisecondsSinceEpoch;
-      final duration = endTime - startTime;
+      test('+4h offset: session 03:30 → 04:30 DOES cross day boundary', () {
+        // Start is before the user's 04:00 boundary, end is after it.
+        final startTime = DateTime(2023, 1, 2, 3, 30).millisecondsSinceEpoch;
+        final endTime = DateTime(2023, 1, 2, 4, 30).millisecondsSinceEpoch;
+        final duration = endTime - startTime;
 
-      final result = AudioCompletionTracker.checkTrackCrossedMidnight(
-        endTimestamp: endTime,
-        duration: duration,
-        dayBoundaryOffset: offset,
-      );
+        final result = AudioCompletionTracker.checkTrackCrossedMidnight(
+          endTimestamp: endTime,
+          duration: duration,
+          dayBoundaryOffset: offset,
+        );
 
-      expect(result, true);
-    });
+        expect(result, true);
+      });
 
-    test('+4h offset: same-day session within one user-day returns false', () {
-      // 10:00 → 10:30 — entirely within May 18 in user-day terms.
-      final startTime = DateTime(2023, 5, 18, 10, 0).millisecondsSinceEpoch;
-      final endTime = DateTime(2023, 5, 18, 10, 30).millisecondsSinceEpoch;
-      final duration = endTime - startTime;
+      test(
+        '+4h offset: same-day session within one user-day returns false',
+        () {
+          // 10:00 → 10:30 — entirely within May 18 in user-day terms.
+          final startTime = DateTime(2023, 5, 18, 10, 0).millisecondsSinceEpoch;
+          final endTime = DateTime(2023, 5, 18, 10, 30).millisecondsSinceEpoch;
+          final duration = endTime - startTime;
 
-      final result = AudioCompletionTracker.checkTrackCrossedMidnight(
-        endTimestamp: endTime,
-        duration: duration,
-        dayBoundaryOffset: offset,
-      );
+          final result = AudioCompletionTracker.checkTrackCrossedMidnight(
+            endTimestamp: endTime,
+            duration: duration,
+            dayBoundaryOffset: offset,
+          );
 
-      expect(result, false);
-    });
-
-    test('-2h offset: session 21:30 → 22:30 crosses the 22:00 boundary', () {
-      // -2h offset means the user-day starts at 22:00. A session that
-      // straddles 22:00 should be treated as crossing.
-      final startTime = DateTime(2023, 5, 18, 21, 30).millisecondsSinceEpoch;
-      final endTime = DateTime(2023, 5, 18, 22, 30).millisecondsSinceEpoch;
-      final duration = endTime - startTime;
-
-      final result = AudioCompletionTracker.checkTrackCrossedMidnight(
-        endTimestamp: endTime,
-        duration: duration,
-        dayBoundaryOffset: const Duration(hours: -2),
+          expect(result, false);
+        },
       );
 
-      expect(result, true);
-    });
-  });
+      test('-2h offset: session 21:30 → 22:30 crosses the 22:00 boundary', () {
+        // -2h offset means the user-day starts at 22:00. A session that
+        // straddles 22:00 should be treated as crossing.
+        final startTime = DateTime(2023, 5, 18, 21, 30).millisecondsSinceEpoch;
+        final endTime = DateTime(2023, 5, 18, 22, 30).millisecondsSinceEpoch;
+        final duration = endTime - startTime;
+
+        final result = AudioCompletionTracker.checkTrackCrossedMidnight(
+          endTimestamp: endTime,
+          duration: duration,
+          dayBoundaryOffset: const Duration(hours: -2),
+        );
+
+        expect(result, true);
+      });
+    },
+  );
 
   group('AudioCompletionTracker.updateStatsWithCompletedAudio', () {
     test('creates new stats when given null stats', () {
@@ -269,7 +275,9 @@ void main() {
       expect(result.tracksChecked?.length, 1); // But only one unique track ID
       expect(result.tracksChecked?[0], 'track100');
       expect(
-          result.totalTracksCompleted, 2); // Total tracks completed increases
+        result.totalTracksCompleted,
+        2,
+      ); // Total tracks completed increases
       expect(result.totalTimeListened, 900000); // 15 minutes total
     });
 
@@ -315,8 +323,10 @@ void main() {
       expect(result.streakLongest, 10);
       expect(result.streakFreezes, 3);
       expect(result.freezeUsageDates.length, 1);
-      expect(result.freezeUsageDates[0],
-          DateTime(2023, 1, 1).millisecondsSinceEpoch);
+      expect(
+        result.freezeUsageDates[0],
+        DateTime(2023, 1, 1).millisecondsSinceEpoch,
+      );
     });
   });
 }

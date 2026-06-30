@@ -43,74 +43,70 @@ class RowItemWidget extends StatelessWidget {
       bottom: hasUnderline
           ? BorderSide(
               width: 0.7,
-              color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withOpacityValue(0.2),
             )
           : BorderSide.none,
     );
 
     return MergeSemantics(
       child: InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            border: border,
-          ),
-          padding: const EdgeInsets.symmetric(
-            vertical: 16,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    _buildIconWithColor(),
-                    width16,
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          style: const TextStyle(fontSize: 18.0),
-                          children: [
-                            TextSpan(
-                              text: title,
-                              style: titleStyle ??
-                                  Theme.of(context)
-                                      .textTheme
-                                      .labelMedium
-                                      ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                            ),
-                            if (subTitle != null) _subtitle(context),
-                          ],
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            decoration: BoxDecoration(border: border),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      _buildIconWithColor(),
+                      width16,
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(
+                            style: const TextStyle(fontSize: 18.0),
+                            children: [
+                              TextSpan(
+                                text: title,
+                                style:
+                                    titleStyle ??
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.labelMedium?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                              ),
+                              if (subTitle != null) _subtitle(context),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              if (isTrailingIcon && !isSwitch)
-                Icon(
-                  trailingIcon,
-                  size: trailingIconSize,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              if (isSwitch)
-                Switch(
-                  value: switchValue ?? false,
-                  onChanged: onSwitchChanged,
-                ),
-            ],
+                if (isTrailingIcon && !isSwitch)
+                  Icon(
+                    trailingIcon,
+                    size: trailingIconSize,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                if (isSwitch)
+                  Switch(
+                    value: switchValue ?? false,
+                    onChanged: onSwitchChanged,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 
@@ -130,11 +126,10 @@ class RowItemWidget extends StatelessWidget {
     return TextSpan(
       text: subTitle != null ? '\n$subTitle' : '',
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-            letterSpacing: 0,
-            height: 1.7,
-          ),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+        letterSpacing: 0,
+        height: 1.7,
+      ),
     );
   }
 }

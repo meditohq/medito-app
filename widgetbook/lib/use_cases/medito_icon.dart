@@ -84,11 +84,9 @@ Widget allMeditoIcons(BuildContext context) {
     child: Wrap(
       spacing: 24,
       runSpacing: 24,
-      children: _allIcons.entries.map((e) => _IconTile(
-        name: e.key,
-        assetName: e.value,
-        size: size,
-      )).toList(),
+      children: _allIcons.entries
+          .map((e) => _IconTile(name: e.key, assetName: e.value, size: size))
+          .toList(),
     ),
   );
 }
@@ -148,12 +146,16 @@ Widget meditoRemoteIconUseCase(BuildContext context) {
     child: Wrap(
       spacing: 24,
       runSpacing: 24,
-      children: hugeIcons.map((icon) => _IconTile(
-        name: icon,
-        assetName: null,
-        size: size,
-        hugeIcon: icon,
-      )).toList(),
+      children: hugeIcons
+          .map(
+            (icon) => _IconTile(
+              name: icon,
+              assetName: null,
+              size: size,
+              hugeIcon: icon,
+            ),
+          )
+          .toList(),
     ),
   );
 }
@@ -192,11 +194,7 @@ class _IconTile extends StatelessWidget {
                     width: size,
                     height: size,
                   )
-                : SvgPicture.asset(
-                    assetName!,
-                    width: size,
-                    height: size,
-                  ),
+                : SvgPicture.asset(assetName!, width: size, height: size),
           ),
           const SizedBox(height: 6),
           Text(
@@ -204,7 +202,9 @@ class _IconTile extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(fontSize: 10),
           ),
         ],
       ),

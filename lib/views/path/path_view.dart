@@ -55,9 +55,7 @@ class _JourneyViewState extends ConsumerState<JourneyView>
         backgroundColor: ColorConstants.ebony,
         title: Column(
           children: [
-            HomeHeaderWidget(
-              greeting: AppLocalizations.of(context)!.path,
-            ),
+            HomeHeaderWidget(greeting: AppLocalizations.of(context)!.path),
           ],
         ),
         elevation: 0.0,
@@ -91,10 +89,12 @@ class _JourneyViewState extends ConsumerState<JourneyView>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         final position = index * JourneyView.kItemHeight;
-        _scrollController.jumpTo(position.clamp(
-          _scrollController.position.minScrollExtent,
-          _scrollController.position.maxScrollExtent,
-        ));
+        _scrollController.jumpTo(
+          position.clamp(
+            _scrollController.position.minScrollExtent,
+            _scrollController.position.maxScrollExtent,
+          ),
+        );
         _initialScrollDone = true;
       }
     });
@@ -110,37 +110,31 @@ class _JourneyViewState extends ConsumerState<JourneyView>
           SliverPadding(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
             sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final firstUncompletedIndex = pack.items.indexWhere(
-                    (item) => !(item.isCompleted ?? false),
-                  );
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final firstUncompletedIndex = pack.items.indexWhere(
+                  (item) => !(item.isCompleted ?? false),
+                );
 
-                  final screenWidth = MediaQuery.of(context).size.width;
-                  final availableWidth =
-                      screenWidth - 80; // 40px padding on both sides
-                  final maxOffset = availableWidth * 0.25;
+                final screenWidth = MediaQuery.of(context).size.width;
+                final availableWidth =
+                    screenWidth - 80; // 40px padding on both sides
+                final maxOffset = availableWidth * 0.25;
 
-                  return Center(
-                    child: Transform.translate(
-                      offset: Offset(
-                        sin(index * 0.5 - pi / 2) * maxOffset,
-                        0,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0),
-                        child: TrackItemWidget(
-                          key: ValueKey('track_item_${pack.items[index].id}'),
-                          item: pack.items[index],
-                          index: index,
-                          isFirstUncompleted: index == firstUncompletedIndex,
-                        ),
+                return Center(
+                  child: Transform.translate(
+                    offset: Offset(sin(index * 0.5 - pi / 2) * maxOffset, 0),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 0),
+                      child: TrackItemWidget(
+                        key: ValueKey('track_item_${pack.items[index].id}'),
+                        item: pack.items[index],
+                        index: index,
+                        isFirstUncompleted: index == firstUncompletedIndex,
                       ),
                     ),
-                  );
-                },
-                childCount: pack.items.length,
-              ),
+                  ),
+                );
+              }, childCount: pack.items.length),
             ),
           ),
         ],

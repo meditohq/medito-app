@@ -39,8 +39,9 @@ void main() {
     today = DateTime(2026, 4, 28);
     statsManager.setCurrentDateForTesting(today);
 
-    when(mockStatsService.postStats(any))
-        .thenAnswer((_) async => Future.value());
+    when(
+      mockStatsService.postStats(any),
+    ).thenAnswer((_) async => Future.value());
 
     statsManager.setStatsForTesting(
       LocalAllStats.empty().copyWith(streakCurrent: 0, streakLongest: 0),
@@ -83,8 +84,8 @@ void main() {
         dates: [
           DateTime(2026, 4, 26), // past
           DateTime(2026, 4, 27), // past
-          DateTime(2026, 5, 1),  // future
-          DateTime(2026, 5, 2),  // future
+          DateTime(2026, 5, 1), // future
+          DateTime(2026, 5, 2), // future
         ],
         durationMinutes: 10,
         statsManager: statsManager,
@@ -143,26 +144,17 @@ void main() {
 
     test('total time listened is updated in milliseconds', () async {
       await addManualSessions(
-        dates: [
-          DateTime(2026, 4, 26),
-          DateTime(2026, 4, 27),
-        ],
+        dates: [DateTime(2026, 4, 26), DateTime(2026, 4, 27)],
         durationMinutes: 15,
         statsManager: statsManager,
       );
       // 2 days × 15 minutes × 60s × 1000ms.
-      expect(
-        statsManager.currentStats!.totalTimeListened,
-        2 * 15 * 60 * 1000,
-      );
+      expect(statsManager.currentStats!.totalTimeListened, 2 * 15 * 60 * 1000);
     });
 
     test('zero-minute duration is allowed and adds entries', () async {
       final added = await addManualSessions(
-        dates: [
-          DateTime(2026, 4, 26),
-          DateTime(2026, 4, 27),
-        ],
+        dates: [DateTime(2026, 4, 26), DateTime(2026, 4, 27)],
         durationMinutes: 0,
         statsManager: statsManager,
       );
@@ -197,9 +189,7 @@ void main() {
       // The original implementation called postStats inside every
       // addAudioCompleted, so 30 days = 30 sequential network calls. After
       // the skipPost+flushPendingPost refactor, it should be exactly one.
-      final dates = [
-        for (var d = 1; d <= 30; d++) DateTime(2026, 3, d, 12),
-      ];
+      final dates = [for (var d = 1; d <= 30; d++) DateTime(2026, 3, d, 12)];
       final added = await addManualSessions(
         dates: dates,
         durationMinutes: 10,
@@ -229,20 +219,22 @@ void main() {
       verifyNever(mockStatsService.postStats(any));
     });
 
-    test('two consecutive bulk calls each post once (state stays tidy)',
-        () async {
-      await addManualSessions(
-        dates: [DateTime(2026, 4, 26), DateTime(2026, 4, 27)],
-        durationMinutes: 10,
-        statsManager: statsManager,
-      );
-      await addManualSessions(
-        dates: [DateTime(2026, 4, 24), DateTime(2026, 4, 25)],
-        durationMinutes: 10,
-        statsManager: statsManager,
-      );
-      verify(mockStatsService.postStats(any)).called(2);
-    });
+    test(
+      'two consecutive bulk calls each post once (state stays tidy)',
+      () async {
+        await addManualSessions(
+          dates: [DateTime(2026, 4, 26), DateTime(2026, 4, 27)],
+          durationMinutes: 10,
+          statsManager: statsManager,
+        );
+        await addManualSessions(
+          dates: [DateTime(2026, 4, 24), DateTime(2026, 4, 25)],
+          durationMinutes: 10,
+          statsManager: statsManager,
+        );
+        verify(mockStatsService.postStats(any)).called(2);
+      },
+    );
   });
 
   group('addManualSessions — streak side effects', () {

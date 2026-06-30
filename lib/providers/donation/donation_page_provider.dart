@@ -6,9 +6,7 @@ import '../../repositories/donation/donation_page_repository.dart';
 part 'donation_page_provider.g.dart';
 
 @riverpod
-Future<DonationPageModel> fetchDonationPage(
-  Ref ref,
-) {
+Future<DonationPageModel> fetchDonationPage(Ref ref) {
   final donationPageRepository = ref.watch(donationPageRepositoryProvider);
   ref.keepAlive();
 

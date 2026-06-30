@@ -53,45 +53,42 @@ void main() {
       },
     );
 
-    test(
-      'night-owl meditator: streak unbroken across midnight when sessions '
-      'happen at 01:00 each "day"',
-      () {
-        // "Now" = Apr 28 14:00 → user-day Apr 28.
-        statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
-        statsManager.setDayBoundaryOffsetForTesting(offset);
+    test('night-owl meditator: streak unbroken across midnight when sessions '
+        'happen at 01:00 each "day"', () {
+      // "Now" = Apr 28 14:00 → user-day Apr 28.
+      statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
+      statsManager.setDayBoundaryOffsetForTesting(offset);
 
-        // Three sessions, each at 01:00 wall-clock — under +4h offset these
-        // are user-days Apr 27, Apr 26, Apr 25 respectively.
-        // Plus one session today at 10:00 → user-day Apr 28.
-        // Expect 4-day streak.
-        final result = statsManager.calculateStreak(
-          statsFrom(
-            audio: [
-              LocalAudioCompleted(
-                id: 'today',
-                timestamp: ms(DateTime(2026, 4, 28, 10, 0)),
-              ),
-              LocalAudioCompleted(
-                id: 'd-1',
-                timestamp: ms(DateTime(2026, 4, 28, 1, 0)),
-              ),
-              LocalAudioCompleted(
-                id: 'd-2',
-                timestamp: ms(DateTime(2026, 4, 27, 1, 0)),
-              ),
-              LocalAudioCompleted(
-                id: 'd-3',
-                timestamp: ms(DateTime(2026, 4, 26, 1, 0)),
-              ),
-            ],
-          ),
-        );
+      // Three sessions, each at 01:00 wall-clock — under +4h offset these
+      // are user-days Apr 27, Apr 26, Apr 25 respectively.
+      // Plus one session today at 10:00 → user-day Apr 28.
+      // Expect 4-day streak.
+      final result = statsManager.calculateStreak(
+        statsFrom(
+          audio: [
+            LocalAudioCompleted(
+              id: 'today',
+              timestamp: ms(DateTime(2026, 4, 28, 10, 0)),
+            ),
+            LocalAudioCompleted(
+              id: 'd-1',
+              timestamp: ms(DateTime(2026, 4, 28, 1, 0)),
+            ),
+            LocalAudioCompleted(
+              id: 'd-2',
+              timestamp: ms(DateTime(2026, 4, 27, 1, 0)),
+            ),
+            LocalAudioCompleted(
+              id: 'd-3',
+              timestamp: ms(DateTime(2026, 4, 26, 1, 0)),
+            ),
+          ],
+        ),
+      );
 
-        expect(result.streakCurrent, 4);
-        expect(result.streakLongest, 4);
-      },
-    );
+      expect(result.streakCurrent, 4);
+      expect(result.streakLongest, 4);
+    });
 
     test('+4h offset: skipping a real user-day still breaks the streak', () {
       // "Now" = Apr 28 14:00 → user-day Apr 28.
@@ -142,29 +139,26 @@ void main() {
       },
     );
 
-    test(
-      '+4h offset: future user-day sessions are ignored',
-      () {
-        // "Now" = Apr 28 14:00 → user-day Apr 28.
-        // A session at Apr 29 10:00 → user-day Apr 29 → in the future,
-        // should be ignored.
-        statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
-        statsManager.setDayBoundaryOffsetForTesting(offset);
+    test('+4h offset: future user-day sessions are ignored', () {
+      // "Now" = Apr 28 14:00 → user-day Apr 28.
+      // A session at Apr 29 10:00 → user-day Apr 29 → in the future,
+      // should be ignored.
+      statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
+      statsManager.setDayBoundaryOffsetForTesting(offset);
 
-        final result = statsManager.calculateStreak(
-          statsFrom(
-            audio: [
-              LocalAudioCompleted(
-                id: 'future',
-                timestamp: ms(DateTime(2026, 4, 29, 10, 0)),
-              ),
-            ],
-          ),
-        );
+      final result = statsManager.calculateStreak(
+        statsFrom(
+          audio: [
+            LocalAudioCompleted(
+              id: 'future',
+              timestamp: ms(DateTime(2026, 4, 29, 10, 0)),
+            ),
+          ],
+        ),
+      );
 
-        expect(result.streakCurrent, 0);
-      },
-    );
+      expect(result.streakCurrent, 0);
+    });
   });
 
   group('StatsManager.calculateStreak - dayBoundaryOffset (negative)', () {
@@ -220,24 +214,21 @@ void main() {
       expect(result.streakLongest, 3);
     });
 
-    test(
-      'unset offset (never called setter) behaves like zero offset',
-      () {
-        // No call to setDayBoundaryOffsetForTesting at all — verifies the
-        // default field value is Duration.zero.
-        statsManager.setCurrentDateForTesting(DateTime(2025, 3, 3));
+    test('unset offset (never called setter) behaves like zero offset', () {
+      // No call to setDayBoundaryOffsetForTesting at all — verifies the
+      // default field value is Duration.zero.
+      statsManager.setCurrentDateForTesting(DateTime(2025, 3, 3));
 
-        final result = statsManager.calculateStreak(
-          statsFrom(
-            audio: [
-              LocalAudioCompleted(id: '1', timestamp: ms(DateTime(2025, 3, 3))),
-              LocalAudioCompleted(id: '2', timestamp: ms(DateTime(2025, 3, 2))),
-            ],
-          ),
-        );
+      final result = statsManager.calculateStreak(
+        statsFrom(
+          audio: [
+            LocalAudioCompleted(id: '1', timestamp: ms(DateTime(2025, 3, 3))),
+            LocalAudioCompleted(id: '2', timestamp: ms(DateTime(2025, 3, 2))),
+          ],
+        ),
+      );
 
-        expect(result.streakCurrent, 2);
-      },
-    );
+      expect(result.streakCurrent, 2);
+    });
   });
 }

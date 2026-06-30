@@ -18,19 +18,21 @@ import 'package:medito/widgets/track_card_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:medito/utils/utils.dart';
 
-final filteredPacksProvider =
-    Provider.autoDispose.family<List<PackItem>, String>((ref, query) {
-  final packs = ref.watch(
-    explorePacksProvider.select((asyncValue) => asyncValue.value ?? []),
-  );
-  if (query.isEmpty) return packs;
-  final lowerQuery = query.toLowerCase();
-  return packs
-      .where((p) =>
-          p.title.toLowerCase().contains(lowerQuery) ||
-          p.subtitle.toLowerCase().contains(lowerQuery))
-      .toList();
-});
+final filteredPacksProvider = Provider.autoDispose
+    .family<List<PackItem>, String>((ref, query) {
+      final packs = ref.watch(
+        explorePacksProvider.select((asyncValue) => asyncValue.value ?? []),
+      );
+      if (query.isEmpty) return packs;
+      final lowerQuery = query.toLowerCase();
+      return packs
+          .where(
+            (p) =>
+                p.title.toLowerCase().contains(lowerQuery) ||
+                p.subtitle.toLowerCase().contains(lowerQuery),
+          )
+          .toList();
+    });
 
 enum ExploreFilter {
   all,
@@ -38,10 +40,10 @@ enum ExploreFilter {
   tracks;
 
   String label(BuildContext context) => switch (this) {
-        ExploreFilter.all => AppLocalizations.of(context)!.all,
-        ExploreFilter.packs => AppLocalizations.of(context)!.packs,
-        ExploreFilter.tracks => AppLocalizations.of(context)!.tracks,
-      };
+    ExploreFilter.all => AppLocalizations.of(context)!.all,
+    ExploreFilter.packs => AppLocalizations.of(context)!.packs,
+    ExploreFilter.tracks => AppLocalizations.of(context)!.tracks,
+  };
 }
 
 class ExploreView extends ConsumerStatefulWidget {
@@ -141,18 +143,11 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   Widget _buildHeader() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          padding16,
-          padding16,
-          padding16,
-          18,
-        ),
+        padding: const EdgeInsets.fromLTRB(padding16, padding16, padding16, 18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            HomeHeaderWidget(
-              greeting: AppLocalizations.of(context)!.explore,
-            ),
+            HomeHeaderWidget(greeting: AppLocalizations.of(context)!.explore),
             const SizedBox(height: 18),
             SearchBox(
               controller: _searchController,
@@ -211,8 +206,9 @@ class ExploreViewState extends ConsumerState<ExploreView> {
         padding: const EdgeInsets.fromLTRB(padding16, 4, padding16, 0),
         child: Row(
           children: tabs.map((filter) {
-            final count =
-                filter == ExploreFilter.packs ? packsCount : tracksCount;
+            final count = filter == ExploreFilter.packs
+                ? packsCount
+                : tracksCount;
             return Expanded(child: _buildFilterTab(filter, count));
           }).toList(),
         ),
@@ -254,8 +250,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
             ),
             const SizedBox(width: 6),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: isSelected
                     ? theme.colorScheme.primary.withOpacityValue(0.15)
@@ -265,7 +260,9 @@ class ExploreViewState extends ConsumerState<ExploreView> {
               child: Text(
                 '$count',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: isSelected ? theme.colorScheme.primary : unselectedColor,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : unselectedColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -324,10 +321,12 @@ class ExploreViewState extends ConsumerState<ExploreView> {
 
     return searchTracksAsync.when(
       data: (tracks) {
-        final filteredPacks =
-            _currentFilter == ExploreFilter.tracks ? <PackItem>[] : packs;
-        final filteredTracks =
-            _currentFilter == ExploreFilter.packs ? <TrackItem>[] : tracks;
+        final filteredPacks = _currentFilter == ExploreFilter.tracks
+            ? <PackItem>[]
+            : packs;
+        final filteredTracks = _currentFilter == ExploreFilter.packs
+            ? <TrackItem>[]
+            : tracks;
 
         if (filteredPacks.isEmpty && filteredTracks.isEmpty) {
           return [
@@ -338,11 +337,10 @@ class ExploreViewState extends ConsumerState<ExploreView> {
                   child: Text(
                     AppLocalizations.of(context)!.noResultsFound,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacityValue(0.7),
-                        ),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacityValue(0.7),
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -392,37 +390,29 @@ class ExploreViewState extends ConsumerState<ExploreView> {
   ) {
     return [
       SliverPadding(
-        padding: const EdgeInsets.fromLTRB(
-          padding16,
-          padding16,
-          padding16,
-          0,
-        ),
+        padding: const EdgeInsets.fromLTRB(padding16, padding16, padding16, 0),
         sliver: SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final item = tracks[index];
-              return Padding(
-                key: ValueKey('track_${item.id}'),
-                padding: const EdgeInsets.only(bottom: padding16),
-                child: TrackCardWidget(
-                  title: item.title,
-                  subTitle: item.subtitle,
-                  coverUrlPath: item.coverUrl,
-                  onTap: () {
-                    unfocusSearch();
-                    handleNavigation(
-                      TypeConstants.track,
-                      [item.id, item.path],
-                      context,
-                      ref: ref,
-                    );
-                  },
-                ),
-              );
-            },
-            childCount: tracks.length,
-          ),
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final item = tracks[index];
+            return Padding(
+              key: ValueKey('track_${item.id}'),
+              padding: const EdgeInsets.only(bottom: padding16),
+              child: TrackCardWidget(
+                title: item.title,
+                subTitle: item.subtitle,
+                coverUrlPath: item.coverUrl,
+                onTap: () {
+                  unfocusSearch();
+                  handleNavigation(
+                    TypeConstants.track,
+                    [item.id, item.path],
+                    context,
+                    ref: ref,
+                  );
+                },
+              ),
+            );
+          }, childCount: tracks.length),
         ),
       ),
     ];
@@ -438,12 +428,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
 
     return [
       SliverPadding(
-        padding: const EdgeInsets.fromLTRB(
-          padding16,
-          padding16,
-          padding16,
-          0,
-        ),
+        padding: const EdgeInsets.fromLTRB(padding16, padding16, padding16, 0),
         sliver: SliverMasonryGrid.count(
           crossAxisCount: crossAxisCount,
           mainAxisSpacing: padding16,
@@ -515,10 +500,7 @@ class SearchBox extends StatelessWidget {
         ),
         suffixIcon: IconButton(
           tooltip: AppLocalizations.of(context)!.clearSearch,
-          icon: Icon(
-            Icons.clear,
-            color: theme.colorScheme.onSurface,
-          ),
+          icon: Icon(Icons.clear, color: theme.colorScheme.onSurface),
           onPressed: onClear,
         ),
         filled: true,

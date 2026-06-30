@@ -99,10 +99,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildStatsTab(),
-          _buildHistoryTab(),
-        ],
+        children: [_buildStatsTab(), _buildHistoryTab()],
       ),
     );
   }
@@ -262,10 +259,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       trailingIcon: Icons.info_outline,
       onTap: onTap,
       titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            fontFamily: dmSans,
-          ),
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        fontFamily: dmSans,
+      ),
     );
   }
 
@@ -290,7 +287,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
   }
 
   Column _statsList(BuildContext context, LocalAllStats stats, WidgetRef ref) {
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -300,10 +296,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withOpacityValue(0.08),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withOpacityValue(0.08),
               width: 1,
             ),
           ),
@@ -344,8 +339,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () =>
-                  SharePlus.instance.share(ShareParams(text: AppLocalizations.of(context)!.shareStatsText)),
+              onPressed: () => SharePlus.instance.share(
+                ShareParams(text: AppLocalizations.of(context)!.shareStatsText),
+              ),
               icon: MeditoIcon(
                 assetName: MeditoIcons.shareAndroid,
                 size: 20,
@@ -354,8 +350,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
               label: Text(
                 AppLocalizations.of(context)!.share,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -373,26 +369,22 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
           alignment: Alignment.center,
           child: TextButton.icon(
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const RestoreStatsScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const RestoreStatsScreen()),
             ),
             icon: Icon(
               Icons.restore_outlined,
               size: 18,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withOpacityValue(0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withOpacityValue(0.7),
             ),
             label: Text(
               AppLocalizations.of(context)!.restorePreviousStats,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacityValue(0.7),
-                  ),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacityValue(0.7),
+              ),
             ),
           ),
         ),
@@ -432,49 +424,47 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
 
               return MergeSemantics(
                 child: InkWell(
-                onTap: handleToggle,
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Checkbox(
-                          value: isStreakSelected,
-                          onChanged: (_) => handleToggle(),
-                          activeColor: context.brandPurple,
-                          checkColor: Theme.of(context).colorScheme.onPrimary,
-                          side: BorderSide(
-                            color: Theme.of(
+                  onTap: handleToggle,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: Checkbox(
+                            value: isStreakSelected,
+                            onChanged: (_) => handleToggle(),
+                            activeColor: context.brandPurple,
+                            checkColor: Theme.of(context).colorScheme.onPrimary,
+                            side: BorderSide(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacityValue(0.6),
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(
                               context,
-                            ).colorScheme.onSurface.withOpacityValue(0.6),
-                            width: 1.5,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
+                            )!.alwaysShowStreakOnHomepage,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(fontSize: 14, fontFamily: dmSans),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          AppLocalizations.of(context)!
-                              .alwaysShowStreakOnHomepage,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontSize: 14,
-                                    fontFamily: dmSans,
-                                  ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
               );
             },
           );

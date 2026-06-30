@@ -25,4 +25,4 @@ class TrackSearchModel {
       path: json['path'] as String,
     );
   }
-} 
+}

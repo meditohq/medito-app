@@ -29,8 +29,8 @@ class OnboardingProgressIndicator extends StatelessWidget {
               color: index == currentIndex
                   ? context.brandPurple
                   : isDark
-                      ? Colors.white24
-                      : ColorConstants.lightGrey,
+                  ? Colors.white24
+                  : ColorConstants.lightGrey,
             ),
           );
         }),

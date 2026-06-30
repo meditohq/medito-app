@@ -12,10 +12,7 @@ Widget defaultLoadingButton(BuildContext context) {
         label: 'Button text',
         initialValue: 'Get Started',
       ),
-      isLoading: context.knobs.boolean(
-        label: 'Loading',
-        initialValue: false,
-      ),
+      isLoading: context.knobs.boolean(label: 'Loading', initialValue: false),
       onPressed: () {},
     ),
   );
@@ -25,9 +22,6 @@ Widget defaultLoadingButton(BuildContext context) {
 Widget loadingStateButton(BuildContext context) {
   return const Padding(
     padding: EdgeInsets.all(24),
-    child: LoadingButtonWidget(
-      btnText: 'Saving...',
-      isLoading: true,
-    ),
+    child: LoadingButtonWidget(btnText: 'Saving...', isLoading: true),
   );
 }

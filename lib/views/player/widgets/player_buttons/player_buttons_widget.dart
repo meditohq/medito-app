@@ -39,10 +39,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PlayPauseButtonWidget(
-            isPlaying: isPlaying,
-            onPlayPause: onPlayPause,
-          ),
+          PlayPauseButtonWidget(isPlaying: isPlaying, onPlayPause: onPlayPause),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -64,10 +61,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
         children: [
           _rewindButton(l10n),
           const SizedBox(width: 32),
-          PlayPauseButtonWidget(
-            isPlaying: isPlaying,
-            onPlayPause: onPlayPause,
-          ),
+          PlayPauseButtonWidget(isPlaying: isPlaying, onPlayPause: onPlayPause),
           const SizedBox(width: 32),
           _forwardButton(l10n),
           const SizedBox(width: 32),
@@ -215,11 +209,7 @@ class _RepeatButtonWithLabelState
         IconButton(
           onPressed: _handleTap,
           tooltip: _tooltipForMode(repeatMode),
-          icon: MeditoIcon(
-            assetName: iconAsset,
-            size: 32,
-            color: iconColor,
-          ),
+          icon: MeditoIcon(assetName: iconAsset, size: 32, color: iconColor),
         ),
         if (_showLabel)
           Positioned(
@@ -238,10 +228,7 @@ class _RepeatButtonWithLabelState
                 ),
                 child: Text(
                   _currentLabel,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),
             ),

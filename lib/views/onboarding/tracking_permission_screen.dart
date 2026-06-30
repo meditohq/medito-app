@@ -36,9 +36,9 @@ class TrackingPermissionScreen extends ConsumerWidget {
         await FirebaseAnalyticsService().logEvent(
           name: status == TrackingStatus.authorized
               ? FirebaseAnalyticsService
-                  .eventOnboardingTrackingPermissionGranted
+                    .eventOnboardingTrackingPermissionGranted
               : FirebaseAnalyticsService
-                  .eventOnboardingTrackingPermissionDenied,
+                    .eventOnboardingTrackingPermissionDenied,
         );
       } catch (e) {
         if (context.mounted) {
@@ -67,7 +67,9 @@ class TrackingPermissionScreen extends ConsumerWidget {
             return SingleChildScrollView(
               padding: const EdgeInsets.all(32),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 64),
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 64,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -81,18 +83,19 @@ class TrackingPermissionScreen extends ConsumerWidget {
                         const SizedBox(height: 20),
                         Text(
                           l10n.trackingPermissionTitle,
-                          style:
-                              Theme.of(context).textTheme.displayLarge?.copyWith(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w600,
-                                    color: onSurface,
-                                  ),
+                          style: Theme.of(context).textTheme.displayLarge
+                              ?.copyWith(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: onSurface,
+                              ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           l10n.trackingPermissionBody,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
                                 fontSize: 16,
                                 height: 1.5,
                                 color: onSurface.withOpacityValue(0.9),
@@ -134,26 +137,25 @@ class TrackingPermissionScreen extends ConsumerWidget {
           child: Text(
             l10n.trackingPermissionPrivacyNote,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontSize: 13,
-                  height: 1.3,
-                  color: onSurface.withOpacityValue(0.85),
-                ),
+              fontSize: 13,
+              height: 1.3,
+              color: onSurface.withOpacityValue(0.85),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildActionButton(
-      {required String text, required VoidCallback onPressed}) {
+  Widget _buildActionButton({
+    required String text,
+    required VoidCallback onPressed,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white),
-        ),
+        child: Text(text, style: const TextStyle(color: Colors.white)),
       ),
     );
   }

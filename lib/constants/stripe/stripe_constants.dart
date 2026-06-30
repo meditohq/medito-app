@@ -29,12 +29,7 @@ class StripeConstants {
     'requiredBillingContactFields': [],
     'requiredShippingContactFields': [],
     'shippingMethods': [],
-    'supportedNetworks': [
-      'americanExpress',
-      'discover',
-      'masterCard',
-      'visa',
-    ],
+    'supportedNetworks': ['americanExpress', 'discover', 'masterCard', 'visa'],
     'merchantCapabilities': ['capability3DS'],
   };
 

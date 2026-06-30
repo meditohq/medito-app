@@ -16,7 +16,9 @@ class GuideNamePreferenceNotifier extends Notifier<String?> {
     final prefs = ref.read(sharedPreferencesProvider);
     if (guideName != null) {
       prefs.setString(
-          SharedPreferenceConstants.lastSelectedGuideName, guideName);
+        SharedPreferenceConstants.lastSelectedGuideName,
+        guideName,
+      );
     } else {
       prefs.remove(SharedPreferenceConstants.lastSelectedGuideName);
     }
@@ -29,5 +31,5 @@ class GuideNamePreferenceNotifier extends Notifier<String?> {
 
 final guideNamePreferenceProvider =
     NotifierProvider<GuideNamePreferenceNotifier, String?>(
-  GuideNamePreferenceNotifier.new,
-);
+      GuideNamePreferenceNotifier.new,
+    );

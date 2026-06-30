@@ -27,13 +27,15 @@ class PackRepositoryImpl extends PacksRepository {
     // Verify final data format
     if (responseData is! List) {
       throw FormatException(
-          '''Expected array of packs, got ${responseData.runtimeType}.
-        Full response: ${response.toString()}''');
+        '''Expected array of packs, got ${responseData.runtimeType}.
+        Full response: ${response.toString()}''',
+      );
     }
 
     return (responseData)
         .map<PackModel>(
-            (json) => PackModel.fromJson(json as Map<String, dynamic>))
+          (json) => PackModel.fromJson(json as Map<String, dynamic>),
+        )
         .toList();
   }
 

@@ -1,8 +1,4 @@
-
-enum FavoriteItemType {
-  track,
-  pack,
-}
+enum FavoriteItemType { track, pack }
 
 class FavoriteItemDto {
   final String id;

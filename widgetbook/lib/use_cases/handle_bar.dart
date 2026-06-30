@@ -4,7 +4,5 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 
 @UseCase(name: 'Default', type: HandleBarWidget)
 Widget defaultHandleBar(BuildContext context) {
-  return const Center(
-    child: HandleBarWidget(),
-  );
+  return const Center(child: HandleBarWidget());
 }

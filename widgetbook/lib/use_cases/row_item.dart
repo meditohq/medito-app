@@ -11,10 +11,19 @@ Widget rowItemWithChevron(BuildContext context) {
     mainAxisSize: MainAxisSize.min,
     children: [
       RowItemWidget(
-        title: context.knobs.string(label: 'Title', initialValue: 'Notifications'),
-        subTitle: context.knobs.stringOrNull(label: 'Subtitle', initialValue: null),
+        title: context.knobs.string(
+          label: 'Title',
+          initialValue: 'Notifications',
+        ),
+        subTitle: context.knobs.stringOrNull(
+          label: 'Subtitle',
+          initialValue: null,
+        ),
         icon: const MeditoIcon(assetName: MeditoIcons.bell),
-        hasUnderline: context.knobs.boolean(label: 'Underline', initialValue: true),
+        hasUnderline: context.knobs.boolean(
+          label: 'Underline',
+          initialValue: true,
+        ),
         onTap: () {},
       ),
     ],
@@ -32,7 +41,10 @@ Widget rowItemWithSwitch(BuildContext context) {
         icon: const MeditoIcon(assetName: MeditoIcons.bell),
         isTrailingIcon: false,
         isSwitch: true,
-        switchValue: context.knobs.boolean(label: 'Switch value', initialValue: false),
+        switchValue: context.knobs.boolean(
+          label: 'Switch value',
+          initialValue: false,
+        ),
         onSwitchChanged: (_) {},
       ),
     ],

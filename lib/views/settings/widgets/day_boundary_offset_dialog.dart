@@ -153,8 +153,7 @@ class _OffsetOptionTile extends StatelessWidget {
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontFamily: dmSans,
                   color: onSurface,
-                  fontWeight:
-                      selected ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),

@@ -8,10 +8,7 @@ import 'package:medito/widgets/medito_icon.dart';
 import '../../../../background_sound/background_sound_view.dart';
 
 class BgSoundWidget extends ConsumerStatefulWidget {
-  const BgSoundWidget({
-    super.key,
-    required this.isBackgroundSoundSelected,
-  });
+  const BgSoundWidget({super.key, required this.isBackgroundSoundSelected});
 
   final bool isBackgroundSoundSelected;
 

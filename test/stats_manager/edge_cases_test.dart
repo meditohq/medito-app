@@ -16,13 +16,17 @@ void main() {
     test('calculateStreak should handle a very long streak', () {
       final testDate = DateTime(2023, 5, 15);
       statsManager.setCurrentDateForTesting(testDate);
-      
+
       var today = DateTime(2023, 5, 15);
-      
+
       var audioCompleted = List.generate(100, (index) {
         return LocalAudioCompleted(
           id: index.toString(),
-          timestamp: DateTime(today.year, today.month, today.day - index).millisecondsSinceEpoch,
+          timestamp: DateTime(
+            today.year,
+            today.month,
+            today.day - index,
+          ).millisecondsSinceEpoch,
         );
       });
 
@@ -42,7 +46,7 @@ void main() {
       expect(result.streakCurrent, 100);
       expect(result.streakLongest, 100);
     });
-    
+
     // Add other edge case tests
   });
-} 
+}

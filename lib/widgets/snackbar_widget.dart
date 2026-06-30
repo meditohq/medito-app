@@ -22,10 +22,10 @@ void showSnackBar(
             text,
             style: context != null
                 ? Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: foregroundColor,
-                      fontFamily: dmSans,
-                      fontSize: 14,
-                    )
+                    color: foregroundColor,
+                    fontFamily: dmSans,
+                    fontSize: 14,
+                  )
                 : null,
           ),
         ),

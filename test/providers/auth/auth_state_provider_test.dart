@@ -100,47 +100,50 @@ void main() {
       // Reading the provider runs its body, which calls addAuthCallback.
       container.read(authStateListenerProvider);
 
-      expect(fakeHttp.callbackCount, 1,
-          reason: 'Provider body should register exactly one callback');
+      expect(
+        fakeHttp.callbackCount,
+        1,
+        reason: 'Provider body should register exactly one callback',
+      );
     });
 
-    test(
-      'registered callback notifies AuthRepository and the state stream on '
-      'forceLogout',
-      () async {
-        final container = ProviderContainer(
-          overrides: [
-            httpApiServiceProvider.overrideWithValue(fakeHttp),
-            authRepositorySyncProvider.overrideWithValue(fakeAuth),
-          ],
-        );
-        addTearDown(container.dispose);
+    test('registered callback notifies AuthRepository and the state stream on '
+        'forceLogout', () async {
+      final container = ProviderContainer(
+        overrides: [
+          httpApiServiceProvider.overrideWithValue(fakeHttp),
+          authRepositorySyncProvider.overrideWithValue(fakeAuth),
+        ],
+      );
+      addTearDown(container.dispose);
 
-        container.read(authStateListenerProvider);
+      container.read(authStateListenerProvider);
 
-        // Subscribe to the stream BEFORE firing.
-        final events = <AsyncValue<AuthStateEvent>>[];
-        final sub = container.listen<AsyncValue<AuthStateEvent>>(
-          authStateStreamProvider,
-          (_, next) => events.add(next),
-        );
-        addTearDown(sub.close);
+      // Subscribe to the stream BEFORE firing.
+      final events = <AsyncValue<AuthStateEvent>>[];
+      final sub = container.listen<AsyncValue<AuthStateEvent>>(
+        authStateStreamProvider,
+        (_, next) => events.add(next),
+      );
+      addTearDown(sub.close);
 
-        // Fire forceLogout — callback should route to auth repo and stream.
-        fakeHttp.fireAuthEvent(AuthEvent.forceLogout);
+      // Fire forceLogout — callback should route to auth repo and stream.
+      fakeHttp.fireAuthEvent(AuthEvent.forceLogout);
 
-        // Stream emits asynchronously, give it a tick.
-        await Future<void>.delayed(Duration.zero);
+      // Stream emits asynchronously, give it a tick.
+      await Future<void>.delayed(Duration.zero);
 
-        expect(fakeAuth.resetAuthStateCallCount, 1,
-            reason: 'forceLogout should reset auth state exactly once');
-        expect(
-          events.any((e) => e.value == AuthStateEvent.forceLogout),
-          isTrue,
-          reason: 'forceLogout should be emitted on the auth state stream',
-        );
-      },
-    );
+      expect(
+        fakeAuth.resetAuthStateCallCount,
+        1,
+        reason: 'forceLogout should reset auth state exactly once',
+      );
+      expect(
+        events.any((e) => e.value == AuthStateEvent.forceLogout),
+        isTrue,
+        reason: 'forceLogout should be emitted on the auth state stream',
+      );
+    });
 
     test('removes the registered callback when the container is disposed', () {
       final container = ProviderContainer(
@@ -159,49 +162,52 @@ void main() {
       // ends up empty. Regression check for audit P0-3.
       container.dispose();
 
-      expect(fakeHttp.callbackCount, 0,
-          reason: 'Callback should be removed cleanly on dispose');
+      expect(
+        fakeHttp.callbackCount,
+        0,
+        reason: 'Callback should be removed cleanly on dispose',
+      );
     });
 
-    test(
-      'rebuilding the provider does not duplicate callbacks — disposed '
-      'instances cleanly release their registration. Regression check for '
-      'audit P0-3.',
-      () {
-        // First container: register callback #1.
-        final c1 = ProviderContainer(
-          overrides: [
-            httpApiServiceProvider.overrideWithValue(fakeHttp),
-            authRepositorySyncProvider.overrideWithValue(fakeAuth),
-          ],
-        );
-        c1.read(authStateListenerProvider);
-        expect(fakeHttp.callbackCount, 1);
-        c1.dispose();
-        // After dispose, callback should be gone.
-        expect(fakeHttp.callbackCount, 0);
+    test('rebuilding the provider does not duplicate callbacks — disposed '
+        'instances cleanly release their registration. Regression check for '
+        'audit P0-3.', () {
+      // First container: register callback #1.
+      final c1 = ProviderContainer(
+        overrides: [
+          httpApiServiceProvider.overrideWithValue(fakeHttp),
+          authRepositorySyncProvider.overrideWithValue(fakeAuth),
+        ],
+      );
+      c1.read(authStateListenerProvider);
+      expect(fakeHttp.callbackCount, 1);
+      c1.dispose();
+      // After dispose, callback should be gone.
+      expect(fakeHttp.callbackCount, 0);
 
-        // A fresh container should register exactly one — not stack on top
-        // of a leaked predecessor.
-        final c2 = ProviderContainer(
-          overrides: [
-            httpApiServiceProvider.overrideWithValue(fakeHttp),
-            authRepositorySyncProvider.overrideWithValue(fakeAuth),
-          ],
-        );
-        addTearDown(c2.dispose);
-        c2.read(authStateListenerProvider);
-        expect(fakeHttp.callbackCount, 1);
+      // A fresh container should register exactly one — not stack on top
+      // of a leaked predecessor.
+      final c2 = ProviderContainer(
+        overrides: [
+          httpApiServiceProvider.overrideWithValue(fakeHttp),
+          authRepositorySyncProvider.overrideWithValue(fakeAuth),
+        ],
+      );
+      addTearDown(c2.dispose);
+      c2.read(authStateListenerProvider);
+      expect(fakeHttp.callbackCount, 1);
 
-        // Firing once should reset auth state exactly once (not N times for
-        // N leaked callbacks).
-        fakeHttp.fireAuthEvent(AuthEvent.forceLogout);
+      // Firing once should reset auth state exactly once (not N times for
+      // N leaked callbacks).
+      fakeHttp.fireAuthEvent(AuthEvent.forceLogout);
 
-        expect(fakeAuth.resetAuthStateCallCount, 1,
-            reason:
-                'A single forceLogout must produce a single resetAuthState '
-                'call — duplicates indicate the P0-3 leak has regressed');
-      },
-    );
+      expect(
+        fakeAuth.resetAuthStateCallCount,
+        1,
+        reason:
+            'A single forceLogout must produce a single resetAuthState '
+            'call — duplicates indicate the P0-3 leak has regressed',
+      );
+    });
   });
 }

@@ -12,11 +12,10 @@ class ReviewService {
   final StatsManager _statsManager;
 
   ReviewService({required StatsManager statsManager})
-      : _statsManager = statsManager;
+    : _statsManager = statsManager;
 
   Future<void> checkAndRequestReview() async {
     try {
-
       final stats = await _statsManager.localAllStats;
 
       // 2. Check if streak is at least 2
@@ -55,8 +54,9 @@ class ReviewService {
         return true;
       }
 
-      final lastRequestDate =
-          DateTime.fromMillisecondsSinceEpoch(lastRequestTimestamp);
+      final lastRequestDate = DateTime.fromMillisecondsSinceEpoch(
+        lastRequestTimestamp,
+      );
       final now = DateTime.now();
       final difference = now.difference(lastRequestDate).inDays;
 
@@ -70,12 +70,9 @@ class ReviewService {
     try {
       await _inAppReview.requestReview();
     } catch (e) {
-
       // Fallback to store listing if requesting review fails
       try {
-        await _inAppReview.openStoreListing(
-          appStoreId: '1500780518',
-        );
+        await _inAppReview.openStoreListing(appStoreId: '1500780518');
       } catch (storeError) {
         AppLogger.e('REVIEW', 'Error opening store listing: $storeError');
       }
@@ -86,7 +83,9 @@ class ReviewService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(
-          _reviewRequestKey, DateTime.now().millisecondsSinceEpoch);
+        _reviewRequestKey,
+        DateTime.now().millisecondsSinceEpoch,
+      );
     } catch (e) {
       AppLogger.e('REVIEW', 'Error saving review request timestamp: $e');
     }

@@ -40,10 +40,7 @@ class TrackCardWidget extends StatelessWidget {
                   children: [
                     _title(textTheme, title: title),
                     if (subTitle != null) height4,
-                    _description(
-                      textTheme,
-                      subtitle: subTitle,
-                    ),
+                    _description(textTheme, subtitle: subTitle),
                   ],
                 ),
               ),
@@ -90,10 +87,7 @@ class TrackCardWidget extends StatelessWidget {
         child: SizedBox(
           height: 80,
           width: 80,
-          child: NetworkImageWidget(
-            url: coverUrlPath ?? '',
-            shouldCache: true,
-          ),
+          child: NetworkImageWidget(url: coverUrlPath ?? '', shouldCache: true),
         ),
       );
     }

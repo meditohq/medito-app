@@ -82,13 +82,11 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 
   @override
   Future<List<BackgroundSoundsModel>?>
-      fetchLocallySavedBackgroundSounds() async {
+  fetchLocallySavedBackgroundSounds() async {
     try {
       var pref = ref.read(sharedPreferencesProvider);
-      var soundList = pref.getStringList(
-            SharedPreferenceConstants.listBgSound,
-          ) ??
-          [];
+      var soundList =
+          pref.getStringList(SharedPreferenceConstants.listBgSound) ?? [];
       if (soundList.isNotEmpty) {
         var sounds = <BackgroundSoundsModel>[];
         for (var element in soundList) {
@@ -113,10 +111,8 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
         return;
       } else {
         var pref = ref.read(sharedPreferencesProvider);
-        var soundList = pref.getStringList(
-              SharedPreferenceConstants.listBgSound,
-            ) ??
-            [];
+        var soundList =
+            pref.getStringList(SharedPreferenceConstants.listBgSound) ?? [];
         var sounds = <BackgroundSoundsModel>[];
         for (var element in soundList) {
           sounds.add(BackgroundSoundsModel.fromJson(json.decode(element)));
@@ -140,18 +136,17 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
   void saveSelectedBgSoundToSharedPreferences(BackgroundSoundsModel sound) {
     var bgSoundJson = json.encode(sound.toJson());
     unawaited(
-      ref.read(sharedPreferencesProvider).setString(
-            SharedPreferenceConstants.bgSound,
-            bgSoundJson,
-          ),
+      ref
+          .read(sharedPreferencesProvider)
+          .setString(SharedPreferenceConstants.bgSound, bgSoundJson),
     );
   }
 
   @override
   BackgroundSoundsModel? getSelectedBgSoundFromSharedPreferences() {
-    var bgSoundJson = ref.read(sharedPreferencesProvider).getString(
-          SharedPreferenceConstants.bgSound,
-        );
+    var bgSoundJson = ref
+        .read(sharedPreferencesProvider)
+        .getString(SharedPreferenceConstants.bgSound);
 
     return bgSoundJson != null
         ? BackgroundSoundsModel.fromJson(json.decode(bgSoundJson))
@@ -160,9 +155,11 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 
   @override
   void removeSelectedBgSound() {
-    unawaited(ref
-        .read(sharedPreferencesProvider)
-        .remove(SharedPreferenceConstants.bgSound));
+    unawaited(
+      ref
+          .read(sharedPreferencesProvider)
+          .remove(SharedPreferenceConstants.bgSound),
+    );
   }
 
   @override

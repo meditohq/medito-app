@@ -21,5 +21,3 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 final analyticsServiceProvider = Provider<FirebaseAnalyticsService>(
   (ref) => FirebaseAnalyticsService(),
 );
-
-

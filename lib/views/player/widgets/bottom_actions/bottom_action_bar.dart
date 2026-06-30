@@ -93,7 +93,8 @@ class BottomActionBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Row(
-          mainAxisAlignment: layout == BottomActionBarLayout.evenlySpaced ||
+          mainAxisAlignment:
+              layout == BottomActionBarLayout.evenlySpaced ||
                   layout == BottomActionBarLayout.homePage
               ? MainAxisAlignment.spaceEvenly
               : MainAxisAlignment.start,

@@ -30,17 +30,16 @@ abstract class PlaybackRequest with _$PlaybackRequest {
     Track track,
     TrackVoice voice,
     TrackAudioFile file,
-  ) =>
-      PlaybackRequest(
-        trackId: track.id,
-        fileId: file.id,
-        title: track.title,
-        description: track.description,
-        coverUrl: track.coverUrl,
-        remoteUrl: file.path,
-        duration: file.duration,
-        hasBackgroundSound: track.hasBackgroundSound,
-        guideName: voice.guideName,
-        artist: track.artist,
-      );
+  ) => PlaybackRequest(
+    trackId: track.id,
+    fileId: file.id,
+    title: track.title,
+    description: track.description,
+    coverUrl: track.coverUrl,
+    remoteUrl: file.path,
+    duration: file.duration,
+    hasBackgroundSound: track.hasBackgroundSound,
+    guideName: voice.guideName,
+    artist: track.artist,
+  );
 }

@@ -13,10 +13,7 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
 class AudioDownloadWidget extends ConsumerWidget {
-  const AudioDownloadWidget({
-    required this.request,
-    super.key,
-  });
+  const AudioDownloadWidget({required this.request, super.key});
 
   final PlaybackRequest request;
 
@@ -48,10 +45,10 @@ class AudioDownloadWidget extends ConsumerWidget {
   ) {
     var isDownloaded =
         downloadAudioState.audioDownloadState[downloadFileKey] ==
-            AudioDownloadState.downloaded;
+        AudioDownloadState.downloaded;
     var isDownloading =
         downloadAudioState.audioDownloadState[downloadFileKey] ==
-            AudioDownloadState.downloading;
+        AudioDownloadState.downloading;
 
     return Container(
       decoration: isDownloaded
@@ -60,8 +57,14 @@ class AudioDownloadWidget extends ConsumerWidget {
               borderRadius: BorderRadius.circular(6),
             )
           : null,
-      child: _buildDownloadContent(downloadAudioState, downloadFileKey,
-          isDownloaded, isDownloading, context, ref),
+      child: _buildDownloadContent(
+        downloadAudioState,
+        downloadFileKey,
+        isDownloaded,
+        isDownloading,
+        context,
+        ref,
+      ),
     );
   }
 
@@ -83,8 +86,7 @@ class AudioDownloadWidget extends ConsumerWidget {
         ),
       );
     } else if (isDownloading) {
-      return showDownloadProgress(
-          downloadAudioState, downloadFileKey, context);
+      return showDownloadProgress(downloadAudioState, downloadFileKey, context);
     } else {
       return IconButton(
         onPressed: () => _handleDownload(ref, context),
@@ -149,20 +151,13 @@ class AudioDownloadWidget extends ConsumerWidget {
     return 0;
   }
 
-  Future<void> _handleDownload(
-    WidgetRef ref,
-    BuildContext context,
-  ) async {
+  Future<void> _handleDownload(WidgetRef ref, BuildContext context) async {
     try {
-      await ref.read(audioDownloaderProvider.notifier).downloadTrackAudio(
-            request,
-          );
+      await ref
+          .read(audioDownloaderProvider.notifier)
+          .downloadTrackAudio(request);
     } catch (e) {
-      showSnackBar(
-        context,
-        e.toString(),
-        backgroundColor: Colors.red,
-      );
+      showSnackBar(context, e.toString(), backgroundColor: Colors.red);
     }
   }
 
@@ -194,18 +189,14 @@ class AudioDownloadWidget extends ConsumerWidget {
 
     if (confirmDelete == true) {
       try {
-        await ref.read(audioDownloaderProvider.notifier).deleteTrackAudio(
+        await ref
+            .read(audioDownloaderProvider.notifier)
+            .deleteTrackAudio(
               '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}',
             );
-        ref.read(deleteDownloadedTrackByIdProvider(
-          fileId: request.fileId,
-        ));
+        ref.read(deleteDownloadedTrackByIdProvider(fileId: request.fileId));
       } catch (e) {
-        showSnackBar(
-          context,
-          e.toString(),
-          backgroundColor: Colors.red,
-        );
+        showSnackBar(context, e.toString(), backgroundColor: Colors.red);
       }
     }
   }

@@ -23,8 +23,7 @@ class SingleBackButtonActionBar extends StatelessWidget {
     return BottomActionBar(
       leftItem: BottomActionBarItem(
         child: MeditoIcon(
-          assetName:
-              showCloseIcon ? MeditoIcons.xmark : MeditoIcons.arrowLeft,
+          assetName: showCloseIcon ? MeditoIcons.xmark : MeditoIcons.arrowLeft,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         onTap: onBackPressed,

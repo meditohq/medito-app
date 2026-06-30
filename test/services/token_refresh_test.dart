@@ -25,41 +25,46 @@ void main() {
   });
 
   group('Token Refresh Tests', () {
-    test('should successfully refresh token when valid refresh token exists',
-        () async {
-      // Arrange
-      final refreshToken = 'valid-refresh-token';
-      final newAccessToken = 'new-access-token';
+    test(
+      'should successfully refresh token when valid refresh token exists',
+      () async {
+        // Arrange
+        final refreshToken = 'valid-refresh-token';
+        final newAccessToken = 'new-access-token';
 
-      // Use the proper AuthTokens model instead of the HTTP constants version
-      final tokens = AuthTokens(
-        accessToken: newAccessToken,
-        refreshToken: refreshToken,
-        expiresIn: 3600,
-        clientId: 'test-client-id',
-        email: null,
-      );
+        // Use the proper AuthTokens model instead of the HTTP constants version
+        final tokens = AuthTokens(
+          accessToken: newAccessToken,
+          refreshToken: refreshToken,
+          expiresIn: 3600,
+          clientId: 'test-client-id',
+          email: null,
+        );
 
-      when(() => mockSecureStorage.getRefreshToken())
-          .thenAnswer((_) async => refreshToken);
-      when(() => mockAuthService.refreshToken(any()))
-          .thenAnswer((_) => Future<AuthTokens>.value(tokens));
+        when(
+          () => mockSecureStorage.getRefreshToken(),
+        ).thenAnswer((_) async => refreshToken);
+        when(
+          () => mockAuthService.refreshToken(any()),
+        ).thenAnswer((_) => Future<AuthTokens>.value(tokens));
 
-      // Act & Assert
-      // This would need to call a method that triggers the refresh token flow
-      // For example, httpService.getRequest('/some-endpoint')
-      // But since HttpApiService is a singleton with internal auth service,
-      // we would need to modify it to accept injected dependencies for testing
+        // Act & Assert
+        // This would need to call a method that triggers the refresh token flow
+        // For example, httpService.getRequest('/some-endpoint')
+        // But since HttpApiService is a singleton with internal auth service,
+        // we would need to modify it to accept injected dependencies for testing
 
-      // For now, this test is a placeholder to show the structure
-      expect(await mockSecureStorage.getRefreshToken(), equals(refreshToken));
-      verify(() => mockSecureStorage.getRefreshToken()).called(1);
-    });
+        // For now, this test is a placeholder to show the structure
+        expect(await mockSecureStorage.getRefreshToken(), equals(refreshToken));
+        verify(() => mockSecureStorage.getRefreshToken()).called(1);
+      },
+    );
 
     test('should handle missing refresh token correctly', () async {
       // Arrange
-      when(() => mockSecureStorage.getRefreshToken())
-          .thenAnswer((_) async => null);
+      when(
+        () => mockSecureStorage.getRefreshToken(),
+      ).thenAnswer((_) async => null);
 
       // Act & Assert
       // Similar issue as above - would need to modify HttpApiService for proper testing
@@ -71,12 +76,15 @@ void main() {
       // Arrange
       final refreshToken = 'invalid-refresh-token';
 
-      when(() => mockSecureStorage.getRefreshToken())
-          .thenAnswer((_) async => refreshToken);
-      when(() => mockAuthService.refreshToken(refreshToken))
-          .thenThrow(const RefreshTokenError());
-      when(() => mockSecureStorage.clearRefreshToken())
-          .thenAnswer((_) async => {});
+      when(
+        () => mockSecureStorage.getRefreshToken(),
+      ).thenAnswer((_) async => refreshToken);
+      when(
+        () => mockAuthService.refreshToken(refreshToken),
+      ).thenThrow(const RefreshTokenError());
+      when(
+        () => mockSecureStorage.clearRefreshToken(),
+      ).thenAnswer((_) async => {});
 
       // Act & Assert
       // Similar to above tests, would need modified HttpApiService

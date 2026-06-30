@@ -37,8 +37,11 @@ void main() {
       // These events will provide visibility into how often the secure storage fails
       // and whether the backup storage is successfully being used
 
-      expect(true, isTrue,
-          reason: 'Analytics for token backup retrieval implemented');
+      expect(
+        true,
+        isTrue,
+        reason: 'Analytics for token backup retrieval implemented',
+      );
     });
 
     // While comprehensive unit testing of the backup mechanism is complex due to:

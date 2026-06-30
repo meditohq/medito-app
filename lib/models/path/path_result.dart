@@ -64,11 +64,7 @@ class ArticleData extends TaskData {
   ArticleData({required this.content, required super.id});
 }
 
-enum TaskType {
-  track,
-  journal,
-  article,
-}
+enum TaskType { track, journal, article }
 
 class TaskUpdate {
   final String stepId;
@@ -84,11 +80,11 @@ class TaskUpdate {
   });
 
   Map<String, dynamic> toJson() => {
-        'step_id': stepId,
-        'task_id': taskId,
-        'completed_at': completedAt,
-        'data': data,
-      };
+    'step_id': stepId,
+    'task_id': taskId,
+    'completed_at': completedAt,
+    'data': data,
+  };
 }
 
 class TaskUpdatePayload {
@@ -96,15 +92,11 @@ class TaskUpdatePayload {
   final int? updated;
   final List<TaskUpdate> tasks;
 
-  TaskUpdatePayload({
-    this.id,
-    this.updated,
-    required this.tasks,
-  });
+  TaskUpdatePayload({this.id, this.updated, required this.tasks});
 
   Map<String, dynamic> toJson() => {
-        if (id != null) 'id': id,
-        if (updated != null) 'updated': updated,
-        'tasks': tasks.map((t) => t.toJson()).toList(),
-      };
+    if (id != null) 'id': id,
+    if (updated != null) 'updated': updated,
+    'tasks': tasks.map((t) => t.toJson()).toList(),
+  };
 }

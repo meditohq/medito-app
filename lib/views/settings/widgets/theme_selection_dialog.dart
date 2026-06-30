@@ -103,20 +103,15 @@ class ThemeSelectionDialog extends ConsumerWidget {
               child: Text(
                 title,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isSelected
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurface,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.w400,
-                    ),
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
               ),
             ),
             if (isSelected)
-              Icon(
-                Icons.check,
-                size: 20,
-                color: theme.colorScheme.primary,
-              ),
+              Icon(Icons.check, size: 20, color: theme.colorScheme.primary),
           ],
         ),
       ),

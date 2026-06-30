@@ -48,22 +48,12 @@ class _ZenModeAnimationState extends State<ZenModeAnimation>
     _opacityAnimation = Tween<double>(
       begin: 0.3,
       end: 1.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _blurAnimation = Tween<double>(
       begin: 10.0,
       end: 0.0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
   }
@@ -91,11 +81,11 @@ class _ZenModeAnimationState extends State<ZenModeAnimation>
               child: Text(
                 _selectedMessage,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontFamily: teachers,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w400,
-                      height: 1.25,
-                    ),
+                  fontFamily: teachers,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w400,
+                  height: 1.25,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -105,4 +95,3 @@ class _ZenModeAnimationState extends State<ZenModeAnimation>
     );
   }
 }
-

@@ -35,11 +35,7 @@ class EndScreenView extends ConsumerStatefulWidget {
   /// once the entrance slide completes. Null on first-ever session.
   final LocalAllStats? priorStats;
 
-  const EndScreenView({
-    super.key,
-    required this.request,
-    this.priorStats,
-  });
+  const EndScreenView({super.key, required this.request, this.priorStats});
 
   @override
   ConsumerState<EndScreenView> createState() => _EndScreenViewState();
@@ -88,53 +84,44 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       duration: const Duration(milliseconds: 600),
     );
 
-    _statsSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _statsAnimationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _statsSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _statsAnimationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
-    _statsFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _statsAnimationController,
-      curve: Curves.easeOut,
-    ));
+    _statsFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _statsAnimationController, curve: Curves.easeOut),
+    );
 
-    _reminderSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _reminderAnimationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _reminderSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _reminderAnimationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
-    _reminderFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _reminderAnimationController,
-      curve: Curves.easeOut,
-    ));
+    _reminderFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _reminderAnimationController,
+        curve: Curves.easeOut,
+      ),
+    );
 
-    _cardSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _cardAnimationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _cardSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _cardAnimationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
-    _cardFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _cardAnimationController,
-      curve: Curves.easeOut,
-    ));
+    _cardFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _cardAnimationController, curve: Curves.easeOut),
+    );
 
     _startAnimations();
   }
@@ -193,9 +180,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   void _navigateToHome() {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (context) => const RootPageView(
-          firstChild: BottomNavigationBarView(),
-        ),
+        builder: (context) =>
+            const RootPageView(firstChild: BottomNavigationBarView()),
       ),
       (route) => false,
     );
@@ -286,10 +272,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         height: 200,
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (err, _) => SizedBox(
-        height: 200,
-        child: Center(child: Text('Error: $err')),
-      ),
+      error: (err, _) =>
+          SizedBox(height: 200, child: Center(child: Text('Error: $err'))),
       data: (localAllStats) {
         var streak = localAllStats.streakCurrent;
         var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
@@ -324,10 +308,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 child: Text(
                   streak.toString(),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontFamily: dmSerif,
-                        fontSize: 100,
-                        fontWeight: FontWeight.w400,
-                      ),
+                    fontFamily: dmSerif,
+                    fontSize: 100,
+                    fontWeight: FontWeight.w400,
+                  ),
                   textAlign: TextAlign.left,
                 ),
               ),
@@ -335,12 +319,12 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             Text(
               AppLocalizations.of(context)!.dayStreak,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    fontFamily: teachers,
-                    fontSize: 40,
-                    fontWeight: FontWeight.w400,
-                    height: 1,
-                    color: context.brandPurple,
-                  ),
+                fontFamily: teachers,
+                fontSize: 40,
+                fontWeight: FontWeight.w400,
+                height: 1,
+                color: context.brandPurple,
+              ),
               textAlign: TextAlign.left,
             ),
             const SizedBox(height: 24),
@@ -359,11 +343,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 AppLocalizations.of(context)!.dailyPracticeMessage,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontFamily: teachers,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      height: 1.3,
-                    ),
+                  fontFamily: teachers,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  height: 1.3,
+                ),
               ),
             ),
             const SizedBox(height: 40),
@@ -375,32 +359,38 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
   List<String> _getDaysMeditated(List<LocalAudioCompleted>? audioCompleted) {
     return audioCompleted
-            ?.map((audio) =>
-                DateTime.fromMillisecondsSinceEpoch(audio.timestamp)
-                    .toIso8601String()
-                    .split('T')[0])
+            ?.map(
+              (audio) => DateTime.fromMillisecondsSinceEpoch(
+                audio.timestamp,
+              ).toIso8601String().split('T')[0],
+            )
             .toList() ??
         [];
   }
 
   List<String> _getDaysWithStreakFreeze(LocalAllStats stats) {
     return stats.freezeUsageDates
-        .map((timestamp) => DateTime.fromMillisecondsSinceEpoch(timestamp)
-            .toIso8601String()
-            .split('T')[0])
+        .map(
+          (timestamp) => DateTime.fromMillisecondsSinceEpoch(
+            timestamp,
+          ).toIso8601String().split('T')[0],
+        )
         .toList();
   }
 
   Widget _buildDayLettersAndIcons(
-      List<DateTime> lastFiveDays, List<String> daysMeditated,
-      {Key? key}) {
+    List<DateTime> lastFiveDays,
+    List<String> daysMeditated, {
+    Key? key,
+  }) {
     lastFiveDays = lastFiveDays.reversed.toList();
 
     final statsData = _showPriorStats && widget.priorStats != null
         ? widget.priorStats
         : ref.watch(statsProvider).value;
-    var daysWithFreeze =
-        statsData != null ? _getDaysWithStreakFreeze(statsData) : <String>[];
+    var daysWithFreeze = statsData != null
+        ? _getDaysWithStreakFreeze(statsData)
+        : <String>[];
 
     var dayLetters = lastFiveDays.map((day) {
       switch (day.weekday) {
@@ -432,21 +422,30 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         var isMeditated = daysMeditated.contains(dayString);
         var isFreeze = daysWithFreeze.contains(dayString);
 
-        var isConsecutive = (isMeditated || isFreeze) &&
+        var isConsecutive =
+            (isMeditated || isFreeze) &&
             (index > 0 &&
-                    (daysMeditated.contains(lastFiveDays[index - 1]
-                            .toIso8601String()
-                            .split('T')[0]) ||
-                        daysWithFreeze.contains(lastFiveDays[index - 1]
-                            .toIso8601String()
-                            .split('T')[0])) ||
+                    (daysMeditated.contains(
+                          lastFiveDays[index - 1].toIso8601String().split(
+                            'T',
+                          )[0],
+                        ) ||
+                        daysWithFreeze.contains(
+                          lastFiveDays[index - 1].toIso8601String().split(
+                            'T',
+                          )[0],
+                        )) ||
                 index < dayLetters.length - 1 &&
-                    (daysMeditated.contains(lastFiveDays[index + 1]
-                            .toIso8601String()
-                            .split('T')[0]) ||
-                        daysWithFreeze.contains(lastFiveDays[index + 1]
-                            .toIso8601String()
-                            .split('T')[0])));
+                    (daysMeditated.contains(
+                          lastFiveDays[index + 1].toIso8601String().split(
+                            'T',
+                          )[0],
+                        ) ||
+                        daysWithFreeze.contains(
+                          lastFiveDays[index + 1].toIso8601String().split(
+                            'T',
+                          )[0],
+                        )));
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -456,57 +455,56 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               Text(
                 dayLetters[index],
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontFamily: teachers,
-                      fontSize: 14,
-                      fontWeight: (isMeditated || isFreeze)
-                          ? FontWeight.w600
-                          : FontWeight.w500,
-                      height: 1.2,
-                      color: isFreeze
-                          ? ColorConstants.graphite
-                          : isMeditated
-                              ? context.brandPurple
-                              : ColorConstants.moon,
-                    ),
+                  fontFamily: teachers,
+                  fontSize: 14,
+                  fontWeight: (isMeditated || isFreeze)
+                      ? FontWeight.w600
+                      : FontWeight.w500,
+                  height: 1.2,
+                  color: isFreeze
+                      ? ColorConstants.graphite
+                      : isMeditated
+                      ? context.brandPurple
+                      : ColorConstants.moon,
+                ),
               ),
               const SizedBox(height: 4),
               SizedBox(
                 width: 36,
                 height: 36,
                 child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isConsecutive
-                            ? Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.12)
-                            : Colors.transparent,
-                        width: 2,
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isConsecutive
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.12)
+                              : Colors.transparent,
+                          width: 2,
+                        ),
                       ),
                     ),
-                  ),
-                  if (isFreeze)
-                    MeditoIcon(
-                      assetName: MeditoIcons.snow,
-                      size: 32,
-                      color: ColorConstants.graphite,
-                    )
-                  else if (isMeditated)
-                    MeditoIcon(
-                      assetName: MeditoIcons.checkCircleSolid,
-                      size: 32,
-                      color: context.brandPurple,
-                    )
-                  else
-                    _buildCircle(32, ColorConstants.moon),
-                ],
+                    if (isFreeze)
+                      MeditoIcon(
+                        assetName: MeditoIcons.snow,
+                        size: 32,
+                        color: ColorConstants.graphite,
+                      )
+                    else if (isMeditated)
+                      MeditoIcon(
+                        assetName: MeditoIcons.checkCircleSolid,
+                        size: 32,
+                        color: context.brandPurple,
+                      )
+                    else
+                      _buildCircle(32, ColorConstants.moon),
+                  ],
                 ),
               ),
             ],
@@ -520,19 +518,18 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: colour,
-      ),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: colour),
     );
   }
 
   Future<void> _dismissReminderPromptForever() async {
     await ref.read(reminderPromptDismissedProvider.notifier).dismissForever();
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.endScreenReminderPromptDismissed,
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.endScreenReminderPromptDismissed,
+          ),
     );
     if (mounted) {
       showSnackBar(
@@ -555,9 +552,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           unawaited(
-            ref.read(analyticsServiceProvider).logEvent(
-              name: AnalyticsEventConstants.endScreenReminderPromptShown,
-            ),
+            ref
+                .read(analyticsServiceProvider)
+                .logEvent(
+                  name: AnalyticsEventConstants.endScreenReminderPromptShown,
+                ),
           );
         }
       });
@@ -581,81 +580,83 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             bottom: 4,
           ),
           child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                MeditoIcon(
-                  assetName: MeditoIcons.bell,
-                  size: 24,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    AppLocalizations.of(context)!.smartReminders,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ),
-                IconButton(
-                  tooltip: AppLocalizations.of(context)!.dismiss,
-                  icon: MeditoIcon(
-                    assetName: MeditoIcons.xmark,
-                    size: 20,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  MeditoIcon(
+                    assetName: MeditoIcons.bell,
+                    size: 24,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-                  onPressed: _dismissReminderPromptForever,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-            if (!isReminderEnabled) ...[
-              const SizedBox(height: 8),
-              Text(
-                AppLocalizations.of(context)!.enableNotificationsBody,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context)!.smartReminders,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
+                  ),
+                  IconButton(
+                    tooltip: AppLocalizations.of(context)!.dismiss,
+                    icon: MeditoIcon(
+                      assetName: MeditoIcons.xmark,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    onPressed: _dismissReminderPromptForever,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
               ),
-            ],
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isReminderEnabled ? null : () => _enableReminders(),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                ),
-                child: Text(
-                  isReminderEnabled
-                      ? AppLocalizations.of(context)!.smartRemindersOn
-                      : AppLocalizations.of(context)!.turnOnSmartReminders,
+              if (!isReminderEnabled) ...[
+                const SizedBox(height: 8),
+                Text(
+                  AppLocalizations.of(context)!.enableNotificationsBody,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
-              ),
-            ),
-            if (!isReminderEnabled)
+              ],
+              const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: TextButton(
-                  onPressed: _snoozeReminderPrompt,
-                  child: Text(AppLocalizations.of(context)!.notNow),
+                child: ElevatedButton(
+                  onPressed: isReminderEnabled
+                      ? null
+                      : () => _enableReminders(),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  child: Text(
+                    isReminderEnabled
+                        ? AppLocalizations.of(context)!.smartRemindersOn
+                        : AppLocalizations.of(context)!.turnOnSmartReminders,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
-          ],
+              if (!isReminderEnabled)
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: _snoozeReminderPrompt,
+                    child: Text(AppLocalizations.of(context)!.notNow),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -665,21 +666,26 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   Future<void> _snoozeReminderPrompt() async {
     await ref.read(reminderPromptDismissedProvider.notifier).snooze();
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.endScreenReminderPromptSnoozed,
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.endScreenReminderPromptSnoozed,
+          ),
     );
   }
 
   Future<void> _enableReminders() async {
     try {
-      final accepted =
-          await PermissionHandler.requestNotificationPermission(context);
+      final accepted = await PermissionHandler.requestNotificationPermission(
+        context,
+      );
       if (!accepted) {
         unawaited(
-          ref.read(analyticsServiceProvider).logEvent(
-            name: AnalyticsEventConstants.endScreenReminderOsDenied,
-          ),
+          ref
+              .read(analyticsServiceProvider)
+              .logEvent(
+                name: AnalyticsEventConstants.endScreenReminderOsDenied,
+              ),
         );
         return;
       }
@@ -696,13 +702,15 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       await ref.read(reminderTimeProvider.notifier).setTime(time);
 
       unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.notificationsEnabled,
-          parameters: {
-            AnalyticsEventConstants.paramSource:
-                AnalyticsEventConstants.sourceEndScreen,
-          },
-        ),
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.notificationsEnabled,
+              parameters: {
+                AnalyticsEventConstants.paramSource:
+                    AnalyticsEventConstants.sourceEndScreen,
+              },
+            ),
       );
 
       if (mounted) {

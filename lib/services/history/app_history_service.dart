@@ -28,7 +28,9 @@ class AppHistoryService {
   }
 
   static List<Map<String, dynamic>> getVersionHistory(SharedPreferences prefs) {
-    final raw = prefs.getString(SharedPreferenceConstants.installedVersionHistory);
+    final raw = prefs.getString(
+      SharedPreferenceConstants.installedVersionHistory,
+    );
     return _decodeList(raw);
   }
 
@@ -38,8 +40,9 @@ class AppHistoryService {
     String? email,
   }) async {
     final list = getSignInHistory(prefs);
-    final alreadyRecorded =
-        list.any((e) => e['userId'] == userId && e['email'] == email);
+    final alreadyRecorded = list.any(
+      (e) => e['userId'] == userId && e['email'] == email,
+    );
     if (alreadyRecorded) return;
 
     list.add({

@@ -40,8 +40,9 @@ class PlayPauseButtonWidget extends ConsumerWidget {
               size: iconSize,
               color: ColorConstants.white,
             ),
-            crossFadeState:
-                isPlaying ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: isPlaying
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 100),
           ),
         ),

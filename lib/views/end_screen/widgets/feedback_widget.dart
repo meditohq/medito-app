@@ -4,9 +4,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
 class FeedbackWidget extends StatefulWidget {
-  const FeedbackWidget({
-    super.key,
-  });
+  const FeedbackWidget({super.key});
 
   @override
   State<FeedbackWidget> createState() => FeedbackWidgetState();
@@ -29,10 +27,10 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
               AppLocalizations.of(context)!.howDoYouFeel,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontFamily: teachers,
-                    fontSize: 22,
-                    fontWeight: FontWeight.normal,
-                  ),
+                fontFamily: teachers,
+                fontSize: 22,
+                fontWeight: FontWeight.normal,
+              ),
             ),
             _showThankYouMessage
                 ? _buildThanksMessage()
@@ -42,8 +40,9 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
                     children: [
                       Semantics(
                         button: true,
-                        label:
-                            AppLocalizations.of(context)!.thanksForSharingSad,
+                        label: AppLocalizations.of(
+                          context,
+                        )!.thanksForSharingSad,
                         child: _buildEmotionButton(
                           context,
                           '☹️',
@@ -53,8 +52,9 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
                       ),
                       Semantics(
                         button: true,
-                        label: AppLocalizations.of(context)!
-                            .thanksForSharingNeutral,
+                        label: AppLocalizations.of(
+                          context,
+                        )!.thanksForSharingNeutral,
                         child: _buildEmotionButton(
                           context,
                           '😐',
@@ -64,8 +64,9 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
                       ),
                       Semantics(
                         button: true,
-                        label:
-                            AppLocalizations.of(context)!.thanksForSharingHappy,
+                        label: AppLocalizations.of(
+                          context,
+                        )!.thanksForSharingHappy,
                         child: _buildEmotionButton(
                           context,
                           '😊',
@@ -88,9 +89,9 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
         AppLocalizations.of(context)!.thanksForSharing,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -102,9 +103,7 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
 
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventPostMeditationFeedback,
-      parameters: {
-        'type': 'thumbs_up',
-      },
+      parameters: {'type': 'thumbs_up'},
     );
   }
 
@@ -115,9 +114,7 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
 
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventPostMeditationFeedback,
-      parameters: {
-        'type': 'neutral',
-      },
+      parameters: {'type': 'neutral'},
     );
   }
 
@@ -128,9 +125,7 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
 
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventPostMeditationFeedback,
-      parameters: {
-        'type': 'thumbs_down',
-      },
+      parameters: {'type': 'thumbs_down'},
     );
   }
 
@@ -151,15 +146,9 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
           borderRadius: BorderRadius.circular(12),
           color: isDark
               ? ColorConstants.ebony
-              : Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.06),
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         ),
-        child: Text(
-          emoji,
-          style: const TextStyle(fontSize: 32),
-        ),
+        child: Text(emoji, style: const TextStyle(fontSize: 32)),
       ),
     );
   }

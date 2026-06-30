@@ -128,19 +128,22 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
     // whether the user completes the share, so this captures the moment they
     // committed to it. Fire-and-forget so analytics never blocks the share.
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.quoteShared,
-        parameters: {
-          AnalyticsEventConstants.paramQuoteId: widget.data.id,
-          AnalyticsEventConstants.paramQuoteAuthor: widget.data.author,
-          AnalyticsEventConstants.paramQuoteSharePalette:
-              _palettes[_paletteIndex].name,
-        },
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.quoteShared,
+            parameters: {
+              AnalyticsEventConstants.paramQuoteId: widget.data.id,
+              AnalyticsEventConstants.paramQuoteAuthor: widget.data.author,
+              AnalyticsEventConstants.paramQuoteSharePalette:
+                  _palettes[_paletteIndex].name,
+            },
+          ),
     );
     try {
-      final boundary = _repaintKey.currentContext!.findRenderObject()!
-          as RenderRepaintBoundary;
+      final boundary =
+          _repaintKey.currentContext!.findRenderObject()!
+              as RenderRepaintBoundary;
       // Target ~1080px output regardless of how large the card is rendered,
       // so iPads don't produce huge multi-MB PNGs.
       final logicalWidth = boundary.size.width;
@@ -148,8 +151,7 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
           ? (1080 / logicalWidth).clamp(1.0, 3.0)
           : 3.0;
       final image = await boundary.toImage(pixelRatio: pixelRatio);
-      final byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final bytes = byteData!.buffer.asUint8List();
 
       final dir = await getTemporaryDirectory();
@@ -197,10 +199,7 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
                     constraints: const BoxConstraints(maxWidth: 440),
                     child: RepaintBoundary(
                       key: _repaintKey,
-                      child: _ShareCard(
-                        data: widget.data,
-                        palette: palette,
-                      ),
+                      child: _ShareCard(data: widget.data, palette: palette),
                     ),
                   ),
                 ),
@@ -478,8 +477,7 @@ class _FlowLinesPainter extends CustomPainter {
         y += math.sin(angle) * stepLen;
         path.lineTo(x, y);
 
-        if (x < -40 || x > size.width + 40 ||
-            y < -40 || y > size.height + 40) {
+        if (x < -40 || x > size.width + 40 || y < -40 || y > size.height + 40) {
           break;
         }
       }

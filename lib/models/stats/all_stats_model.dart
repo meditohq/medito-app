@@ -30,15 +30,18 @@ class AllStats {
       totalTimeListened: json['total_time_listened'] as int? ?? 0,
       tracksChecked:
           (json['tracks_checked'] as List<dynamic>?)?.cast<String>() ?? [],
-      audioCompleted: (json['audio_completed'] as List<dynamic>?)
-              ?.map((item) =>
-                  AudioCompleted.fromJson(item as Map<String, dynamic>))
+      audioCompleted:
+          (json['audio_completed'] as List<dynamic>?)
+              ?.map(
+                (item) => AudioCompleted.fromJson(item as Map<String, dynamic>),
+              )
               .toList() ??
           [],
       updated: json['updated'] as int? ?? 0,
       streakFreezes: json['streak_freezes'] as int? ?? 0,
       maxStreakFreezes: json['max_streak_freezes'] as int? ?? 0,
-      freezeUsageDates: (json['freeze_usage_dates'] as List<dynamic>?)
+      freezeUsageDates:
+          (json['freeze_usage_dates'] as List<dynamic>?)
               ?.cast<int>()
               .toList() ??
           [],
@@ -91,10 +94,7 @@ class AudioCompleted {
   final int timestamp;
   final String id;
 
-  AudioCompleted({
-    required this.timestamp,
-    required this.id,
-  });
+  AudioCompleted({required this.timestamp, required this.id});
 
   factory AudioCompleted.fromJson(Map<String, dynamic> json) {
     return AudioCompleted(
@@ -104,10 +104,7 @@ class AudioCompleted {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'timestamp': timestamp,
-      'id': id,
-    };
+    return {'timestamp': timestamp, 'id': id};
   }
 
   @override

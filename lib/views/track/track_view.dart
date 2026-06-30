@@ -130,10 +130,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AspectRatio(
-          aspectRatio: 16 / 9,
-          child: _buildCoverImage(track),
-        ),
+        AspectRatio(aspectRatio: 16 / 9, child: _buildCoverImage(track)),
         const SizedBox(height: 24),
         _buildTrackContent(
           track,
@@ -174,19 +171,14 @@ class _TrackViewState extends ConsumerState<TrackView>
             const SizedBox(width: 24),
             Expanded(
               child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: maxHeight,
-                ),
+                constraints: BoxConstraints(maxHeight: maxHeight),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _title(context, track.title),
                       const SizedBox(height: 8),
-                      _getSubTitle(
-                        context,
-                        track.description,
-                      ),
+                      _getSubTitle(context, track.description),
                     ],
                   ),
                 ),
@@ -215,10 +207,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       backgroundColor: Theme.of(context).cardColor,
       borderRadius: 20,
       borderWidth: 0.5,
-      child: NetworkImageWidget(
-        url: url,
-        shouldCache: true,
-      ),
+      child: NetworkImageWidget(url: url, shouldCache: true),
     );
   }
 
@@ -229,53 +218,69 @@ class _TrackViewState extends ConsumerState<TrackView>
     required bool isLandscape,
     required bool useCompactLayout,
   }) {
-    final showGuideNameDropdown =
-        track.voices.first.guideName.isNotNullAndNotEmpty();
+    final showGuideNameDropdown = track.voices.first.guideName
+        .isNotNullAndNotEmpty();
     final guideName = ref.watch(guideNamePreferenceProvider);
 
     if (isLandscape) {
-      return Row(children: [
-        if (showGuideNameDropdown)
-          Expanded(
+      return Row(
+        children: [
+          if (showGuideNameDropdown)
+            Expanded(
               child: _guideNameDropdown(
-            track,
-            activeVoice,
-            isLandscape: true,
-            guideNameState: guideName,
-          )),
-        const SizedBox(width: 12),
-        Expanded(
-            child: _durationDropdown(activeVoice, activeFile,
-                isLandscape: true)),
-        const SizedBox(width: 12),
-        Expanded(
-            child: _playBtn(ref, track, activeVoice, activeFile,
-                isFullWidth: false)),
-      ]);
+                track,
+                activeVoice,
+                isLandscape: true,
+                guideNameState: guideName,
+              ),
+            ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _durationDropdown(
+              activeVoice,
+              activeFile,
+              isLandscape: true,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _playBtn(
+              ref,
+              track,
+              activeVoice,
+              activeFile,
+              isFullWidth: false,
+            ),
+          ),
+        ],
+      );
     }
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _title(context, track.title),
-      const SizedBox(height: 8),
-      _getSubTitle(context, track.description),
-      const SizedBox(height: 24),
-      if (useCompactLayout && showGuideNameDropdown)
-        _buildCompactPickers(track, activeVoice, activeFile, guideName)
-      else ...[
-        if (showGuideNameDropdown) ...[
-          _guideNameDropdown(
-            track,
-            activeVoice,
-            isLandscape: false,
-            guideNameState: guideName,
-          ),
-          const SizedBox(height: 12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _title(context, track.title),
+        const SizedBox(height: 8),
+        _getSubTitle(context, track.description),
+        const SizedBox(height: 24),
+        if (useCompactLayout && showGuideNameDropdown)
+          _buildCompactPickers(track, activeVoice, activeFile, guideName)
+        else ...[
+          if (showGuideNameDropdown) ...[
+            _guideNameDropdown(
+              track,
+              activeVoice,
+              isLandscape: false,
+              guideNameState: guideName,
+            ),
+            const SizedBox(height: 12),
+          ],
+          _durationDropdown(activeVoice, activeFile, isLandscape: false),
         ],
-        _durationDropdown(activeVoice, activeFile, isLandscape: false),
+        const SizedBox(height: 12),
+        _playBtn(ref, track, activeVoice, activeFile, isFullWidth: true),
       ],
-      const SizedBox(height: 12),
-      _playBtn(ref, track, activeVoice, activeFile, isFullWidth: true),
-    ]);
+    );
   }
 
   Widget _buildCompactPickers(
@@ -342,12 +347,12 @@ class _TrackViewState extends ConsumerState<TrackView>
     return Text(
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontFamily: sourceSerif,
-            letterSpacing: 0.2,
-            fontSize: 24,
-            color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.normal,
-          ),
+        fontFamily: sourceSerif,
+        letterSpacing: 0.2,
+        fontSize: 24,
+        color: Theme.of(context).colorScheme.onSurface,
+        fontWeight: FontWeight.normal,
+      ),
     );
   }
 
@@ -358,24 +363,20 @@ class _TrackViewState extends ConsumerState<TrackView>
         selectable: true,
         textAlign: WrapAlignment.start,
         p: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontFamily: dmSans,
-              fontSize: 16,
-              fontWeight: FontWeight.normal,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+          fontFamily: dmSans,
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         a: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontFamily: dmSans,
-              decoration: TextDecoration.underline,
-              fontSize: 16,
-              fontWeight: FontWeight.normal,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+          fontFamily: dmSans,
+          decoration: TextDecoration.underline,
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         onTapLink: (text, href, title) {
-          handleNavigation(
-            TypeConstants.url,
-            [href],
-            context,
-          );
+          handleNavigation(TypeConstants.url, [href], context);
         },
       );
     }
@@ -420,9 +421,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       await ref.read(playerProvider.notifier).play(request);
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const PlayerView(),
-        ),
+        MaterialPageRoute(builder: (context) => const PlayerView()),
       );
     } catch (e, st) {
       AppLogger.e('TRACK', 'Failed to start playback', e, st);
@@ -452,16 +451,16 @@ class _TrackViewState extends ConsumerState<TrackView>
       bottomLeft: 7,
       disabledLabelText:
           '${convertDurationToMinutes(milliseconds: activeFile.duration)} ${AppLocalizations.of(context)!.min}',
-      items: activeVoice.audioFiles.map<DropdownMenuItem<TrackAudioFile>>(
-        (TrackAudioFile value) {
-          return DropdownMenuItem<TrackAudioFile>(
-            value: value,
-            child: Text(
-              '${convertDurationToMinutes(milliseconds: value.duration)} ${AppLocalizations.of(context)!.min}',
-            ),
-          );
-        },
-      ).toList(),
+      items: activeVoice.audioFiles.map<DropdownMenuItem<TrackAudioFile>>((
+        TrackAudioFile value,
+      ) {
+        return DropdownMenuItem<TrackAudioFile>(
+          value: value,
+          child: Text(
+            '${convertDurationToMinutes(milliseconds: value.duration)} ${AppLocalizations.of(context)!.min}',
+          ),
+        );
+      }).toList(),
       onChanged: _handleOnDurationChange,
       isLandscape: isLandscape,
     );
@@ -482,14 +481,14 @@ class _TrackViewState extends ConsumerState<TrackView>
         topRight: 7,
         bottomLeft: 7,
         disabledLabelText: '${activeVoice.guideName}',
-        items: track.voices.map<DropdownMenuItem<TrackVoice>>(
-          (TrackVoice value) {
-            return DropdownMenuItem<TrackVoice>(
-              value: value,
-              child: Text(value.guideName ?? ''),
-            );
-          },
-        ).toList(),
+        items: track.voices.map<DropdownMenuItem<TrackVoice>>((
+          TrackVoice value,
+        ) {
+          return DropdownMenuItem<TrackVoice>(
+            value: value,
+            child: Text(value.guideName ?? ''),
+          );
+        }).toList(),
         onChanged: _handleOnGuideNameChange,
         isLandscape: isLandscape,
       );

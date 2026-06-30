@@ -25,10 +25,10 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
   @override
   Widget build(BuildContext context) {
     var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: ColorConstants.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-        );
+      color: ColorConstants.white,
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+    );
 
     return Scaffold(
       backgroundColor: ColorConstants.ebony,
@@ -44,9 +44,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(
-                        height: 24,
-                      ),
+                      const SizedBox(height: 24),
                       Text(
                         AppLocalizations.of(context)!.hey,
                         style: const TextStyle(
@@ -55,9 +53,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(
-                        height: 12,
-                      ),
+                      const SizedBox(height: 12),
                       MarkdownWidget(
                         body: widget.maintenanceModel.message ?? '',
                         textAlign: WrapAlignment.start,
@@ -72,9 +68,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                           height: 1.5,
                         ),
                       ),
-                      const SizedBox(
-                        height: 24,
-                      ),
+                      const SizedBox(height: 24),
                       if (widget.maintenanceModel.ctaLabel != null &&
                           widget.maintenanceModel.ctaLabel!.isNotEmpty)
                         SizedBox(
@@ -89,9 +83,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: Text(
-                              widget.maintenanceModel.ctaLabel ?? '',
-                            ),
+                            child: Text(widget.maintenanceModel.ctaLabel ?? ''),
                           ),
                         ),
                     ],
@@ -104,11 +96,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
               right: 16,
               child: IconButton(
                 tooltip: AppLocalizations.of(context)!.close,
-                icon: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 24,
-                ),
+                icon: const Icon(Icons.close, color: Colors.white, size: 24),
                 onPressed: () {
                   if (widget.onClose != null) {
                     widget.onClose!();

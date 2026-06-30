@@ -10,7 +10,7 @@ class AccountService {
   final AuthRepository _authRepository;
 
   AccountService({required AuthRepository authRepository})
-      : _authRepository = authRepository;
+    : _authRepository = authRepository;
 
   Future<void> openAccountDeletionPage() async {
     final user = _authRepository.currentUser;
@@ -18,8 +18,9 @@ class AccountService {
 
     if (user == null || user.id.isEmpty || email == null || email.isEmpty) {
       dev.log(
-          '[ACCOUNT_SERVICE] User ID or Email is missing, cannot open deletion page.',
-          level: 800);
+        '[ACCOUNT_SERVICE] User ID or Email is missing, cannot open deletion page.',
+        level: 800,
+      );
       throw Exception('User ID or Email is missing.');
     }
 
@@ -28,8 +29,10 @@ class AccountService {
 
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
-      dev.log('[ACCOUNT_SERVICE] Opened account deletion page: $url',
-          level: 500);
+      dev.log(
+        '[ACCOUNT_SERVICE] Opened account deletion page: $url',
+        level: 500,
+      );
     } else {
       dev.log('[ACCOUNT_SERVICE] Could not launch URL: $url', level: 800);
       throw Exception('Could not launch URL');

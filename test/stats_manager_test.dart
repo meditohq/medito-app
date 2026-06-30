@@ -776,7 +776,6 @@ void main() {
       });
     });
 
-
     group('StatsManager Track Checked Tests', () {
       test('addTrackChecked - adds track to checked list', () async {
         // Arrange
@@ -1221,7 +1220,6 @@ void main() {
         expect(result.streakCurrent, 9);
         expect(result.streakLongest, 9);
       });
-
     });
 
     group('StatsManager addAudioCompleted Tests', () {});
@@ -1686,20 +1684,26 @@ void main() {
     // called before initialize() — the OTP-verify crash that affected
     // users who signed in straight from onboarding without ever loading
     // the home screen (which is what otherwise triggers initialize()).
-    test('clearAllStats does not throw when called before initialize', () async {
-      statsManager.resetForTesting();
-      SharedPreferences.setMockInitialValues({});
+    test(
+      'clearAllStats does not throw when called before initialize',
+      () async {
+        statsManager.resetForTesting();
+        SharedPreferences.setMockInitialValues({});
 
-      await expectLater(StatsManager().clearAllStats(), completes);
-      expect(StatsManager().isInitialized, isTrue);
-    });
+        await expectLater(StatsManager().clearAllStats(), completes);
+        expect(StatsManager().isInitialized, isTrue);
+      },
+    );
 
-    test('hasLocalStats does not throw when called before initialize', () async {
-      statsManager.resetForTesting();
-      SharedPreferences.setMockInitialValues({});
+    test(
+      'hasLocalStats does not throw when called before initialize',
+      () async {
+        statsManager.resetForTesting();
+        SharedPreferences.setMockInitialValues({});
 
-      await expectLater(StatsManager().hasLocalStats(), completes);
-      expect(StatsManager().isInitialized, isTrue);
-    });
+        await expectLater(StatsManager().hasLocalStats(), completes);
+        expect(StatsManager().isInitialized, isTrue);
+      },
+    );
   });
 }

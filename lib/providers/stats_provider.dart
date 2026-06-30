@@ -32,7 +32,8 @@ final editStatsUrlProvider = FutureProvider<String>((ref) async {
 
   // If clientId is empty, try to get it directly from SharedPreferences
   if (clientId.isEmpty) {
-    clientId = ref
+    clientId =
+        ref
             .read(sharedPreferencesProvider)
             .getString(SharedPreferenceConstants.userId) ??
         '';

@@ -18,9 +18,7 @@ import 'package:medito/mock/mock_http_api_service.dart';
 typedef AuthStateCallback = void Function(AuthEvent event);
 
 // Auth events that can be emitted
-enum AuthEvent {
-  forceLogout,
-}
+enum AuthEvent { forceLogout }
 
 class HttpApiService {
   static HttpApiService? _instance;
@@ -75,7 +73,9 @@ class HttpApiService {
       _instance ??= HttpApiService._internal();
     }
     AppLogger.d(
-        'HTTP', 'Returning singleton instance #${_instance!._instanceId}');
+      'HTTP',
+      'Returning singleton instance #${_instance!._instanceId}',
+    );
     return _instance!;
   }
 
@@ -85,10 +85,10 @@ class HttpApiService {
   /// lets tests inject a fake [AuthApiService] without going through the
   /// singleton factory.
   HttpApiService.internal({AuthApiService? authService})
-      : this._internal(authService: authService);
+    : this._internal(authService: authService);
 
   HttpApiService._internal({AuthApiService? authService})
-      : _authService = authService ?? AuthApiService() {
+    : _authService = authService ?? AuthApiService() {
     AppLogger.d('HTTP', 'Creating new HttpApiService instance #$_instanceId');
     _client.connectionTimeout = kTimeoutDuration;
     _initializeHeaders();
@@ -118,8 +118,10 @@ class HttpApiService {
   }
 
   void setAuthHeader(String accessToken) {
-    AppLogger.d('HTTP',
-        'Setting auth header on instance #$_instanceId. Prefix: ${accessToken.substring(0, min(10, accessToken.length))}');
+    AppLogger.d(
+      'HTTP',
+      'Setting auth header on instance #$_instanceId. Prefix: ${accessToken.substring(0, min(10, accessToken.length))}',
+    );
     _headers[kAuthorizationHeader] = 'Bearer $accessToken';
   }
 
@@ -155,29 +157,18 @@ class HttpApiService {
     String path, {
     Map<String, dynamic>? queryParams,
   }) async =>
-      _handleRequest(
-        () async => _client.getUrl(_buildUri(path, queryParams)),
-      );
+      _handleRequest(() async => _client.getUrl(_buildUri(path, queryParams)));
 
-  Future<Map<String, dynamic>> postRequest(
-    String path, {
-    dynamic body,
-  }) async =>
-      _handleRequest(
-        () async => _client.postUrl(_buildUri(path)),
-        body: body,
-      );
+  Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async =>
+      _handleRequest(() async => _client.postUrl(_buildUri(path)), body: body);
 
-  Future<Map<String, dynamic>> deleteRequest(
-    String path,
-  ) async =>
-      _handleRequest(
-        () async => _client.deleteUrl(_buildUri(path)),
-      );
+  Future<Map<String, dynamic>> deleteRequest(String path) async =>
+      _handleRequest(() async => _client.deleteUrl(_buildUri(path)));
 
   Uri _buildUri(String path, [Map<String, dynamic>? queryParams]) {
-    return Uri.parse('$contentBaseUrl$path')
-        .replace(queryParameters: queryParams);
+    return Uri.parse(
+      '$contentBaseUrl$path',
+    ).replace(queryParameters: queryParams);
   }
 
   Uri _buildAuthUri(String path) {
@@ -193,8 +184,9 @@ class HttpApiService {
     }
 
     try {
-      final request =
-          await _client.postUrl(_buildAuthUri(HTTPConstants.authTokensSignout));
+      final request = await _client.postUrl(
+        _buildAuthUri(HTTPConstants.authTokensSignout),
+      );
       _headers.forEach(request.headers.set);
 
       AppLogger.d('HTTP', 'Signout request headers set');
@@ -202,12 +194,16 @@ class HttpApiService {
       final response = await request.close().timeout(kTimeoutDuration);
       final content = await utf8.decodeStream(response);
 
-      AppLogger.d('HTTP',
-          'Signout response received. Status: ${response.statusCode}, Content: $content');
+      AppLogger.d(
+        'HTTP',
+        'Signout response received. Status: ${response.statusCode}, Content: $content',
+      );
 
       if (response.statusCode >= HttpStatus.badRequest) {
-        AppLogger.w('HTTP',
-            'Signout request failed. Status: ${response.statusCode}, Content: $content');
+        AppLogger.w(
+          'HTTP',
+          'Signout request failed. Status: ${response.statusCode}, Content: $content',
+        );
       }
     } catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Signout request error', e, stackTrace);
@@ -227,8 +223,10 @@ class HttpApiService {
       final request = await requestBuilder();
       _headers.forEach(request.headers.set);
 
-      AppLogger.d('HTTP',
-          'Request headers set. Instance: $_instanceId, HasAuth: ${request.headers.value(kAuthorizationHeader) != null}');
+      AppLogger.d(
+        'HTTP',
+        'Request headers set. Instance: $_instanceId, HasAuth: ${request.headers.value(kAuthorizationHeader) != null}',
+      );
 
       if (body != null) {
         final encodedBody = jsonEncode(body);
@@ -238,12 +236,17 @@ class HttpApiService {
       final response = await request.close().timeout(kTimeoutDuration);
       final content = await utf8.decodeStream(response);
 
-      AppLogger.d('HTTP',
-          'Response received. Instance: $_instanceId, Status: ${response.statusCode}, Length: ${content.length}');
+      AppLogger.d(
+        'HTTP',
+        'Response received. Instance: $_instanceId, Status: ${response.statusCode}, Length: ${content.length}',
+      );
 
       if (response.statusCode == HttpStatus.unauthorized) {
         return _handleUnauthorizedResponse(
-            response.statusCode, requestBuilder, body);
+          response.statusCode,
+          requestBuilder,
+          body,
+        );
       }
 
       if (response.statusCode >= HttpStatus.badRequest) {
@@ -257,7 +260,11 @@ class HttpApiService {
       throw NetworkConnectionError(originalException: e);
     } on NetworkConnectionError catch (e, stackTrace) {
       AppLogger.e(
-          'HTTP', 'Network Error (NetworkConnectionError)', e, stackTrace);
+        'HTTP',
+        'Network Error (NetworkConnectionError)',
+        e,
+        stackTrace,
+      );
       throw NetworkConnectionError(originalException: e);
     } on TimeoutException catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Request Timeout', e, stackTrace);
@@ -293,18 +300,24 @@ class HttpApiService {
     dynamic body,
   ) async {
     AppLogger.w(
-        'HTTP', 'Unauthorized response (401) - retry count: $_retryCount');
+      'HTTP',
+      'Unauthorized response (401) - retry count: $_retryCount',
+    );
     await _addHttpDebugLog(
-        'Unauthorized response (401) - retry count: $_retryCount');
+      'Unauthorized response (401) - retry count: $_retryCount',
+    );
 
     // Much higher retry limit (up to 5) to be extra forgiving
     // when user might be coming back from background with expired tokens
     const maxBackgroundRetries = 5;
     if (_retryCount >= maxBackgroundRetries) {
-      AppLogger.w('HTTP',
-          'Max retries ($maxBackgroundRetries) reached for request after auth error');
+      AppLogger.w(
+        'HTTP',
+        'Max retries ($maxBackgroundRetries) reached for request after auth error',
+      );
       await _addHttpDebugLog(
-          'Max retries ($maxBackgroundRetries) reached - FORCING LOGOUT (removed)');
+        'Max retries ($maxBackgroundRetries) reached - FORCING LOGOUT (removed)',
+      );
       throw const UnauthorizedError();
     }
 
@@ -321,7 +334,11 @@ class HttpApiService {
       }
     } catch (e, stackTrace) {
       AppLogger.e(
-          'HTTP', 'Error checking login state before refresh', e, stackTrace);
+        'HTTP',
+        'Error checking login state before refresh',
+        e,
+        stackTrace,
+      );
       // Continue with refresh attempt
     }
 
@@ -337,7 +354,8 @@ class HttpApiService {
       await _refreshTokenThroughAuthService();
 
       await _addHttpDebugLog(
-          'Token refresh successful - attempt ${_retryCount + 1}');
+        'Token refresh successful - attempt ${_retryCount + 1}',
+      );
 
       // Increment retry count and retry the original request with new token
       _retryCount++;
@@ -370,7 +388,9 @@ class HttpApiService {
     } on NetworkConnectionError catch (e, _) {
       // Don't log out on connection issues - let the user retry when connection is available
       AppLogger.w(
-          'HTTP', 'No internet connection during token refresh attempt');
+        'HTTP',
+        'No internet connection during token refresh attempt',
+      );
       await _addHttpDebugLog('No internet connection during token refresh');
       rethrow;
     } catch (e, stackTrace) {
@@ -381,32 +401,39 @@ class HttpApiService {
       var maxLength = errorStr.length < 200 ? errorStr.length : 200;
 
       await _addHttpDebugLog(
-          'Token refresh error: ${errorStr.substring(0, maxLength)}');
+        'Token refresh error: ${errorStr.substring(0, maxLength)}',
+      );
 
       // Only force logout for specific refresh token errors and only after multiple retries
       if (e is RefreshTokenError && _retryCount >= 3) {
         AppLogger.e(
-            'HTTP',
-            'RefreshTokenError after multiple retries - forcing logout',
-            e,
-            stackTrace);
+          'HTTP',
+          'RefreshTokenError after multiple retries - forcing logout',
+          e,
+          stackTrace,
+        );
         await _addHttpDebugLog('RefreshTokenError after multiple retries');
         await _forceLogout(
-            'Refresh token invalid/expired after multiple attempts');
+          'Refresh token invalid/expired after multiple attempts',
+        );
       } else if (e is UnauthorizedError &&
           _retryCount >= maxBackgroundRetries) {
         AppLogger.e(
-            'HTTP',
-            'Too many failed attempts after refresh - forcing logout',
-            e,
-            stackTrace);
+          'HTTP',
+          'Too many failed attempts after refresh - forcing logout',
+          e,
+          stackTrace,
+        );
         await _addHttpDebugLog('Too many failed attempts ($_retryCount)');
         await _forceLogout('Too many token refresh failures');
       } else {
-        AppLogger.w('HTTP',
-            'Error during refresh but still have retries - not forcing logout yet');
+        AppLogger.w(
+          'HTTP',
+          'Error during refresh but still have retries - not forcing logout yet',
+        );
         await _addHttpDebugLog(
-            'Error during refresh, will retry (attempt ${_retryCount + 1}/$maxBackgroundRetries)');
+          'Error during refresh, will retry (attempt ${_retryCount + 1}/$maxBackgroundRetries)',
+        );
       }
 
       // Rethrow the original error for proper error handling
@@ -425,7 +452,9 @@ class HttpApiService {
 
       if (!isLoggedIn) {
         AppLogger.i(
-            'HTTP', 'Skipping force logout as user is already logged out');
+          'HTTP',
+          'Skipping force logout as user is already logged out',
+        );
         // Still clear local state just to be safe
         _retryCount = 0;
         _headers.remove(kAuthorizationHeader);
@@ -437,7 +466,9 @@ class HttpApiService {
           await secureStorage
               .clearUserEmail(); // Clear email too for consistency
           AppLogger.d(
-              'HTTP', 'Cleared tokens during skipped force logout check');
+            'HTTP',
+            'Cleared tokens during skipped force logout check',
+          );
         } catch (e) {
           AppLogger.e(
             'HTTP',
@@ -463,13 +494,17 @@ class HttpApiService {
         await secureStorage.clearRefreshToken();
         AppLogger.i('HTTP', 'Cleared refresh token and email from storage');
       } catch (e) {
-        AppLogger.e('HTTP',
-            'Error clearing tokens from storage during force logout', e);
+        AppLogger.e(
+          'HTTP',
+          'Error clearing tokens from storage during force logout',
+          e,
+        );
       }
 
       // Add debug log for force logout
       await _addHttpDebugLog(
-          'FORCE LOGOUT triggered by HttpApiService - Reason: $reason');
+        'FORCE LOGOUT triggered by HttpApiService - Reason: $reason',
+      );
 
       // Notify listeners that a force logout has occurred
       _notifyAuthEvent(AuthEvent.forceLogout);
@@ -522,8 +557,10 @@ class HttpApiService {
 
     if (_headers.containsKey(kAuthorizationHeader)) {
       var token = _headers[kAuthorizationHeader]!;
-      diagnosticInfo['auth_header_prefix'] =
-          token.substring(0, min(20, token.length));
+      diagnosticInfo['auth_header_prefix'] = token.substring(
+        0,
+        min(20, token.length),
+      );
     }
 
     try {
@@ -538,8 +575,10 @@ class HttpApiService {
       diagnosticInfo['refresh_token_exists'] = refreshToken != null;
       if (refreshToken != null) {
         diagnosticInfo['refresh_token_length'] = refreshToken.length;
-        diagnosticInfo['refresh_token_prefix'] =
-            refreshToken.substring(0, min(10, refreshToken.length));
+        diagnosticInfo['refresh_token_prefix'] = refreshToken.substring(
+          0,
+          min(10, refreshToken.length),
+        );
       }
 
       // Log comprehensive diagnostic info
@@ -557,17 +596,24 @@ class HttpApiService {
     // Wait if a refresh is already in progress
     if (_isRefreshingToken) {
       AppLogger.i(
-          'HTTP', 'Token refresh already in progress, waiting for completion');
+        'HTTP',
+        'Token refresh already in progress, waiting for completion',
+      );
       await _addHttpDebugLog(
-          'Token refresh already in progress, waiting for results');
+        'Token refresh already in progress, waiting for results',
+      );
       try {
         await _refreshTokenCompleter.future;
         AppLogger.i(
-            'HTTP', 'Using result of already in-progress token refresh');
+          'HTTP',
+          'Using result of already in-progress token refresh',
+        );
         return;
       } catch (e, _) {
         AppLogger.w(
-            'HTTP', 'Previous token refresh failed, will attempt new refresh');
+          'HTTP',
+          'Previous token refresh failed, will attempt new refresh',
+        );
         // Previous refresh failed, we'll try again
       }
     }
@@ -578,16 +624,22 @@ class HttpApiService {
 
     String? refreshToken;
     try {
-      AppLogger.i('HTTP',
-          'Starting token refresh through auth service, instance #$_instanceId');
+      AppLogger.i(
+        'HTTP',
+        'Starting token refresh through auth service, instance #$_instanceId',
+      );
       await _addHttpDebugLog('Beginning token refresh through auth service');
 
       // Run diagnostic to track what's happening
       try {
         await diagnoseSecurity();
       } catch (e, stackTrace) {
-        AppLogger.e('HTTP', 'Failed to run diagnostics during token refresh', e,
-            stackTrace);
+        AppLogger.e(
+          'HTTP',
+          'Failed to run diagnostics during token refresh',
+          e,
+          stackTrace,
+        );
       }
 
       // First check if user is marked as logged in
@@ -597,17 +649,25 @@ class HttpApiService {
             prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false;
 
         if (!isLoggedIn) {
-          AppLogger.w('HTTP',
-              'User is not logged in (prefs), no need to refresh token');
+          AppLogger.w(
+            'HTTP',
+            'User is not logged in (prefs), no need to refresh token',
+          );
           await _addHttpDebugLog(
-              'User not logged in (prefs), skipping token refresh');
+            'User not logged in (prefs), skipping token refresh',
+          );
           // Throw RefreshTokenError because functionally the user needs to sign in again
           throw const RefreshTokenError(
-              message: 'User not marked as logged in');
+            message: 'User not marked as logged in',
+          );
         }
       } catch (e, stackTrace) {
-        AppLogger.e('HTTP', 'Error checking login state during token refresh',
-            e, stackTrace);
+        AppLogger.e(
+          'HTTP',
+          'Error checking login state during token refresh',
+          e,
+          stackTrace,
+        );
         // Continue anyway, as we'll check the refresh token next
       }
 
@@ -617,46 +677,67 @@ class HttpApiService {
       // If token is null (but read didn't error), it means it's missing.
       if (refreshToken == null) {
         AppLogger.w(
-            'HTTP', 'No refresh token found in storage - skipping refresh');
+          'HTTP',
+          'No refresh token found in storage - skipping refresh',
+        );
         await _addHttpDebugLog(
-            'No refresh token found in storage - skipping refresh');
+          'No refresh token found in storage - skipping refresh',
+        );
         // Treat missing token as functionally equivalent to an invalid one
         throw const RefreshTokenError(
-            message: 'Refresh token not found in storage');
+          message: 'Refresh token not found in storage',
+        );
       }
 
-      AppLogger.i('HTTP',
-          'Got refresh token (length ${refreshToken.length}), attempting server refresh');
+      AppLogger.i(
+        'HTTP',
+        'Got refresh token (length ${refreshToken.length}), attempting server refresh',
+      );
       await _addHttpDebugLog(
-          'Using refresh token of length ${refreshToken.length}');
+        'Using refresh token of length ${refreshToken.length}',
+      );
 
       // Attempt the actual refresh with the server
       // This might throw RefreshTokenError if server rejects it
       final tokens = await _authService.refreshToken(refreshToken);
 
-      AppLogger.i('HTTP',
-          'Token refresh successful, updating auth header. Instance: $_instanceId');
+      AppLogger.i(
+        'HTTP',
+        'Token refresh successful, updating auth header. Instance: $_instanceId',
+      );
       setAuthHeader(tokens.accessToken);
       await _addHttpDebugLog('Auth header updated successfully with new token');
       _refreshTokenCompleter.complete();
     } on StorageReadError catch (e, stackTrace) {
       // Explicitly catch StorageReadError - means we couldn't read the token
       AppLogger.e(
-          'HTTP', 'StorageReadError during token retrieval', e, stackTrace);
+        'HTTP',
+        'StorageReadError during token retrieval',
+        e,
+        stackTrace,
+      );
       await _addHttpDebugLog('StorageReadError: ${e.message}');
       _refreshTokenCompleter.completeError(e);
       rethrow; // Rethrow so _handleUnauthorizedResponse can handle it
     } on RefreshTokenError catch (e, stackTrace) {
       // Catch RefreshTokenError - means token was missing or server rejected it
-      AppLogger.e('HTTP', 'RefreshTokenError during token refresh process', e,
-          stackTrace);
+      AppLogger.e(
+        'HTTP',
+        'RefreshTokenError during token refresh process',
+        e,
+        stackTrace,
+      );
       await _addHttpDebugLog('RefreshTokenError: ${e.message}');
       _refreshTokenCompleter.completeError(e);
       rethrow; // Rethrow so _handleUnauthorizedResponse can handle it
     } catch (e, stackTrace) {
       // Catch any other unexpected errors
-      AppLogger.e('HTTP', 'Unexpected error in _refreshTokenThroughAuthService',
-          e, stackTrace);
+      AppLogger.e(
+        'HTTP',
+        'Unexpected error in _refreshTokenThroughAuthService',
+        e,
+        stackTrace,
+      );
       await _addHttpDebugLog('Unexpected refresh error: ${e.runtimeType}');
       _refreshTokenCompleter.completeError(e);
       rethrow;

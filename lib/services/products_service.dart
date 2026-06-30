@@ -19,7 +19,8 @@ class ProductsService {
       final response = await http.get(Uri.parse(_productsFeedUrl));
 
       dev.log(
-          'ProductsService: Received response with status ${response.statusCode}');
+        'ProductsService: Received response with status ${response.statusCode}',
+      );
 
       if (response.statusCode != 200) {
         dev.log('ProductsService: Error status code: ${response.statusCode}');
@@ -29,15 +30,18 @@ class ProductsService {
       dev.log('ProductsService: Response body length: ${response.body.length}');
       final productResponse = _parseRssResponse(response.body);
       dev.log(
-          'ProductsService: Parsed ${productResponse.products.length} products');
+        'ProductsService: Parsed ${productResponse.products.length} products',
+      );
 
       // Update product cache and set firstSeenDate using copyWith
       await _updateProductCacheAndSetFirstSeen(productResponse.products);
 
       return productResponse;
     } catch (e) {
-      dev.log('ProductsService: Error fetching products: ${e.toString()}',
-          error: e);
+      dev.log(
+        'ProductsService: Error fetching products: ${e.toString()}',
+        error: e,
+      );
       if (e is AppError) rethrow;
       throw ServerError(message: 'Error fetching products: ${e.toString()}');
     }
@@ -58,7 +62,8 @@ class ProductsService {
       // Extract items from RSS feed with the correct structure
       final channelData = jsonData['rss']['channel'];
       dev.log(
-          'ProductsService: Channel data has keys: ${channelData.keys.toList()}');
+        'ProductsService: Channel data has keys: ${channelData.keys.toList()}',
+      );
 
       // Handle empty response
       if (!channelData.containsKey('item')) {
@@ -76,17 +81,21 @@ class ProductsService {
 
       // Filter out empty items and malformed data
       final filteredItems = itemsList
-          .where((item) =>
-              item is Map<String, dynamic> &&
-              item.containsKey('g\$id') &&
-              item.containsKey('g\$title'))
+          .where(
+            (item) =>
+                item is Map<String, dynamic> &&
+                item.containsKey('g\$id') &&
+                item.containsKey('g\$title'),
+          )
           .toList();
       dev.log(
-          'ProductsService: After filtering, ${filteredItems.length} valid items');
+        'ProductsService: After filtering, ${filteredItems.length} valid items',
+      );
 
       if (filteredItems.isNotEmpty) {
         dev.log(
-            'ProductsService: Sample item keys: ${filteredItems.first.keys.toList()}');
+          'ProductsService: Sample item keys: ${filteredItems.first.keys.toList()}',
+        );
       }
 
       // Add proper g: prefix mappings for our model
@@ -144,21 +153,27 @@ class ProductsService {
       dev.log('ProductsService: Final product count: ${products.length}');
       if (products.isNotEmpty) {
         dev.log(
-            'ProductsService: First product: ${products.first.name}, price: ${products.first.price}');
+          'ProductsService: First product: ${products.first.name}, price: ${products.first.price}',
+        );
       }
 
       return ProductsResponse(products: products);
     } catch (e) {
-      dev.log('ProductsService: Error parsing data: ${e.toString()}',
-          error: e, stackTrace: StackTrace.current);
+      dev.log(
+        'ProductsService: Error parsing data: ${e.toString()}',
+        error: e,
+        stackTrace: StackTrace.current,
+      );
       throw UnknownError(
-          message: 'Error parsing products data: ${e.toString()}');
+        message: 'Error parsing products data: ${e.toString()}',
+      );
     }
   }
 
   // Updated method to handle caching and set firstSeenDate
   Future<void> _updateProductCacheAndSetFirstSeen(
-      List<ProductModel> currentProducts) async {
+    List<ProductModel> currentProducts,
+  ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final cachedDataJson = prefs.getString(_cachedProductDataKey);
@@ -168,13 +183,16 @@ class ProductsService {
         try {
           final Map<String, dynamic> decodedData = json.decode(cachedDataJson);
           // Ensure values are strings before casting
-          cachedData =
-              decodedData.map((key, value) => MapEntry(key, value.toString()));
+          cachedData = decodedData.map(
+            (key, value) => MapEntry(key, value.toString()),
+          );
           dev.log(
-              'ProductsService: Loaded ${cachedData.length} cached product entries');
+            'ProductsService: Loaded ${cachedData.length} cached product entries',
+          );
         } catch (e) {
           dev.log(
-              'ProductsService: Error decoding cached data: $e, resetting cache.');
+            'ProductsService: Error decoding cached data: $e, resetting cache.',
+          );
           await prefs.remove(_cachedProductDataKey); // Clear corrupted cache
         }
       }
@@ -198,7 +216,8 @@ class ProductsService {
           } catch (e) {
             // Handle potential parse error, treat as new
             dev.log(
-                'ProductsService: Error parsing cached date for $productId: $e. Treating as new.');
+              'ProductsService: Error parsing cached date for $productId: $e. Treating as new.',
+            );
             currentProducts[i] = product.copyWith(firstSeenDate: now);
             newCacheData[productId] = nowString;
           }
@@ -213,10 +232,14 @@ class ProductsService {
       final newCachedDataJson = json.encode(newCacheData);
       await prefs.setString(_cachedProductDataKey, newCachedDataJson);
       dev.log(
-          'ProductsService: Updated cache with ${newCacheData.length} product entries');
+        'ProductsService: Updated cache with ${newCacheData.length} product entries',
+      );
     } catch (e) {
-      dev.log('ProductsService: Error updating product cache: $e',
-          error: e, stackTrace: StackTrace.current);
+      dev.log(
+        'ProductsService: Error updating product cache: $e',
+        error: e,
+        stackTrace: StackTrace.current,
+      );
       // Log and continue without cache update on error
     }
   }

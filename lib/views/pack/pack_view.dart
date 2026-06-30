@@ -90,10 +90,7 @@ class _PackViewState extends ConsumerState<PackView>
     setState(() => {});
   }
 
-  RefreshIndicator _buildScaffoldWithData(
-    PackModel pack,
-    WidgetRef ref,
-  ) {
+  RefreshIndicator _buildScaffoldWithData(PackModel pack, WidgetRef ref) {
     return RefreshIndicator(
       onRefresh: () async {
         if (widget.id == 'favorites') {
@@ -129,24 +126,15 @@ class _PackViewState extends ConsumerState<PackView>
     return pack.items
         .map(
           (packItem) => GestureDetector(
-            onTap: () => _onListItemTap(
-              packItem.id,
-              packItem.type,
-              ref.context,
-            ),
-            child: _buildListTile(
-              packItem,
-              pack.items.last == packItem,
-            ),
+            onTap: () =>
+                _onListItemTap(packItem.id, packItem.type, ref.context),
+            child: _buildListTile(packItem, pack.items.last == packItem),
           ),
         )
         .toList();
   }
 
-  Widget _buildListTile(
-    PackItemsModel item,
-    bool isLast,
-  ) {
+  Widget _buildListTile(PackItemsModel item, bool isLast) {
     return Column(
       children: [
         InkWell(
@@ -190,8 +178,9 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   Widget _markAllButton(PackModel pack) {
-    final trackItems =
-        pack.items.where((item) => item.type == TypeConstants.track).toList();
+    final trackItems = pack.items
+        .where((item) => item.type == TypeConstants.track)
+        .toList();
     if (trackItems.isEmpty) return const SizedBox.shrink();
 
     final l10n = AppLocalizations.of(context)!;

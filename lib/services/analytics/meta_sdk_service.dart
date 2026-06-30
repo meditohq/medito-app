@@ -16,8 +16,9 @@ class MetaSdkService {
   static final MetaSdkService instance = MetaSdkService._();
   bool _initialised = false;
   FacebookAppEvents? _events;
-  static const MethodChannel _channel =
-      MethodChannel('com.medito.app/facebook');
+  static const MethodChannel _channel = MethodChannel(
+    'com.medito.app/facebook',
+  );
 
   Future<void> init() async {
     if (_initialised) {
@@ -82,8 +83,10 @@ class MetaSdkService {
       await _channel.invokeMethod('setAdvertiserTrackingEnabled', isAuthorized);
 
       if (kDebugMode) {
-        AppLogger.d('META',
-            'Set advertiser tracking enabled: $isAuthorized (ATT status: $status)');
+        AppLogger.d(
+          'META',
+          'Set advertiser tracking enabled: $isAuthorized (ATT status: $status)',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
@@ -116,8 +119,10 @@ class MetaSdkService {
 
       if (!isEnabled) {
         if (kDebugMode) {
-          AppLogger.d('META',
-              'Analytics disabled by user preference, skipping event: $name');
+          AppLogger.d(
+            'META',
+            'Analytics disabled by user preference, skipping event: $name',
+          );
         }
         return;
       }

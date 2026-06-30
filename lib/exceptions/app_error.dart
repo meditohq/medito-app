@@ -8,8 +8,9 @@ sealed class AppError implements Exception {
 
 // General Errors
 final class UnknownError extends AppError {
-  const UnknownError(
-      {super.message = 'Something went wrong, please try again'});
+  const UnknownError({
+    super.message = 'Something went wrong, please try again',
+  });
 }
 
 final class NetworkConnectionError extends AppError {
@@ -36,13 +37,15 @@ final class NotFoundError extends AppError {
 
 // Auth Errors
 final class UnauthorizedError extends AppError {
-  const UnauthorizedError(
-      {super.message = 'Session expired, please sign in again'});
+  const UnauthorizedError({
+    super.message = 'Session expired, please sign in again',
+  });
 }
 
 final class RefreshTokenError extends AppError {
-  const RefreshTokenError(
-      {super.message = 'Session expired, please sign in again'});
+  const RefreshTokenError({
+    super.message = 'Session expired, please sign in again',
+  });
 }
 
 final class RateLimitError extends AppError {
@@ -74,13 +77,15 @@ final class EmailMismatchError extends AppError {
 
 /// Error indicating an issue reading from local storage (SharedPreferences or SecureStorage).
 class StorageReadError extends AppError {
-  const StorageReadError(
-      {super.message = 'Failed to read data from local storage'});
+  const StorageReadError({
+    super.message = 'Failed to read data from local storage',
+  });
 }
 
 /// Error indicating that the email provided is associated with an inactive account.
 class InactiveEmailError extends AppError {
-  const InactiveEmailError(
-      {super.message =
-          'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.'});
+  const InactiveEmailError({
+    super.message =
+        'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.',
+  });
 }

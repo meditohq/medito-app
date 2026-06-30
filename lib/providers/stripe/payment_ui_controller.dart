@@ -43,8 +43,9 @@ class PaymentUIController extends _$PaymentUIController {
     try {
       final me = await ref.read(meProvider.future);
 
-      final oneTimeController =
-          ref.read(oneTimePaymentControllerProvider.notifier);
+      final oneTimeController = ref.read(
+        oneTimePaymentControllerProvider.notifier,
+      );
       final result = await oneTimeController.processOneTimePayment(
         amount: amount,
         currency: currency,
@@ -57,8 +58,17 @@ class PaymentUIController extends _$PaymentUIController {
       );
 
       if (context.mounted) {
-        await _handlePaymentResult(context, result, paywallId, 'onetime',
-            userId, paywallSource, variantId, experimentId, onSuccess);
+        await _handlePaymentResult(
+          context,
+          result,
+          paywallId,
+          'onetime',
+          userId,
+          paywallSource,
+          variantId,
+          experimentId,
+          onSuccess,
+        );
       }
 
       return result;
@@ -87,8 +97,9 @@ class PaymentUIController extends _$PaymentUIController {
     try {
       final me = await ref.read(meProvider.future);
 
-      final monthlyController =
-          ref.read(monthlySubscriptionControllerProvider.notifier);
+      final monthlyController = ref.read(
+        monthlySubscriptionControllerProvider.notifier,
+      );
       final result = await monthlyController.processMonthlySubscription(
         amount: amount,
         currency: currency,
@@ -101,14 +112,25 @@ class PaymentUIController extends _$PaymentUIController {
       );
 
       if (context.mounted) {
-        await _handlePaymentResult(context, result, paywallId, 'monthly',
-            userId, paywallSource, variantId, experimentId, onSuccess);
+        await _handlePaymentResult(
+          context,
+          result,
+          paywallId,
+          'monthly',
+          userId,
+          paywallSource,
+          variantId,
+          experimentId,
+          onSuccess,
+        );
       }
 
       return result;
     } catch (e, st) {
       AppLogger.e(
-          'PAYMENT_UI', 'Error initiating monthly subscription: $e\n$st');
+        'PAYMENT_UI',
+        'Error initiating monthly subscription: $e\n$st',
+      );
       final error = PaymentErrorHandler.handleStripeError(e);
       if (context.mounted) _showErrorSnackbar(context, error);
 
@@ -133,8 +155,9 @@ class PaymentUIController extends _$PaymentUIController {
     try {
       final me = await ref.read(meProvider.future);
 
-      final yearlyController =
-          ref.read(yearlySubscriptionControllerProvider.notifier);
+      final yearlyController = ref.read(
+        yearlySubscriptionControllerProvider.notifier,
+      );
       final result = await yearlyController.processYearlySubscription(
         amount: amount,
         currency: currency,
@@ -147,8 +170,17 @@ class PaymentUIController extends _$PaymentUIController {
       );
 
       if (context.mounted) {
-        await _handlePaymentResult(context, result, paywallId, 'yearly',
-            userId, paywallSource, variantId, experimentId, onSuccess);
+        await _handlePaymentResult(
+          context,
+          result,
+          paywallId,
+          'yearly',
+          userId,
+          paywallSource,
+          variantId,
+          experimentId,
+          onSuccess,
+        );
       }
 
       return result;
@@ -211,8 +243,8 @@ class PaymentUIController extends _$PaymentUIController {
         final donationEventName = frequency == 'monthly'
             ? AnalyticsEventConstants.donationMonthly
             : frequency == 'yearly'
-                ? AnalyticsEventConstants.donationYearly
-                : AnalyticsEventConstants.donationOnetime;
+            ? AnalyticsEventConstants.donationYearly
+            : AnalyticsEventConstants.donationOnetime;
 
         FirebaseAnalyticsService().logEvent(
           name: donationEventName,
@@ -242,24 +274,32 @@ class PaymentUIController extends _$PaymentUIController {
             .read(donationSnoozeProvider.notifier)
             .recordDonationSuccess(frequency)
             .catchError((e) {
-          AppLogger.e(
-              'PAYMENT_UI', 'Failed to record donation success for snooze', e);
-        });
+              AppLogger.e(
+                'PAYMENT_UI',
+                'Failed to record donation success for snooze',
+                e,
+              );
+            });
 
         onSuccess?.call(); // Notify screen
 
         final amountString = (amount / 100).toStringAsFixed(2);
-        AppLogger.d('PAYMENT_UI',
-            '✅ Showing success message: $amountString $currency (Intent: $paymentIntentId)');
+        AppLogger.d(
+          'PAYMENT_UI',
+          '✅ Showing success message: $amountString $currency (Intent: $paymentIntentId)',
+        );
         _showSuccessSnackbar(
           context,
-          AppLocalizations.of(context)!
-              .paymentSuccessMessage(amountString, currency),
+          AppLocalizations.of(
+            context,
+          )!.paymentSuccessMessage(amountString, currency),
         );
       },
       failure: (errorMessage, paymentIntentId) {
-        AppLogger.e('PAYMENT_UI',
-            '❌ Showing error message: $errorMessage (Intent: $paymentIntentId)');
+        AppLogger.e(
+          'PAYMENT_UI',
+          '❌ Showing error message: $errorMessage (Intent: $paymentIntentId)',
+        );
 
         final eventParams = {
           AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
@@ -267,8 +307,7 @@ class PaymentUIController extends _$PaymentUIController {
           AnalyticsEventConstants.paramPaywallSource:
               paywallSource ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
-          AnalyticsEventConstants.paramExperimentId:
-              experimentId ?? 'unknown',
+          AnalyticsEventConstants.paramExperimentId: experimentId ?? 'unknown',
           AnalyticsEventConstants.paramPaymentIntentId:
               paymentIntentId ?? 'unknown',
         };
@@ -286,13 +325,15 @@ class PaymentUIController extends _$PaymentUIController {
         );
 
         _showErrorSnackbar(
-            context,
-            PaymentError(
-              type: PaymentErrorType.genericError,
-              message: AppLocalizations.of(context)!
-                  .paymentFailedMessage(paymentIntentId ?? 'unknown'),
-              userFriendlyMessage: errorMessage,
-            ));
+          context,
+          PaymentError(
+            type: PaymentErrorType.genericError,
+            message: AppLocalizations.of(
+              context,
+            )!.paymentFailedMessage(paymentIntentId ?? 'unknown'),
+            userFriendlyMessage: errorMessage,
+          ),
+        );
       },
       cancelled: () {
         AppLogger.d('PAYMENT_UI', 'ℹ️ Showing cancellation message');
@@ -303,8 +344,7 @@ class PaymentUIController extends _$PaymentUIController {
           AnalyticsEventConstants.paramPaywallSource:
               paywallSource ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
-          AnalyticsEventConstants.paramExperimentId:
-              experimentId ?? 'unknown',
+          AnalyticsEventConstants.paramExperimentId: experimentId ?? 'unknown',
         };
 
         // Firebase Analytics
@@ -320,33 +360,26 @@ class PaymentUIController extends _$PaymentUIController {
         );
 
         _showInfoSnackbar(
-            context, AppLocalizations.of(context)!.paymentCancelledMessage);
+          context,
+          AppLocalizations.of(context)!.paymentCancelledMessage,
+        );
       },
     );
   }
 
   /// Shows a success snackbar
   void _showSuccessSnackbar(BuildContext context, String message) {
-    showSnackBar(
-      context,
-      message,
-    );
+    showSnackBar(context, message);
   }
 
   /// Shows an error snackbar with detailed error information
   void _showErrorSnackbar(BuildContext context, PaymentError error) {
-    showSnackBar(
-      context,
-      error.userFriendlyMessage,
-    );
+    showSnackBar(context, error.userFriendlyMessage);
   }
 
   /// Shows an info snackbar
   void _showInfoSnackbar(BuildContext context, String message) {
-    showSnackBar(
-      context,
-      message,
-    );
+    showSnackBar(context, message);
   }
 
   /// Resets the payment state
@@ -359,7 +392,8 @@ class PaymentUIController extends _$PaymentUIController {
 
   /// Checks if a payment method is available on the current device
   Future<bool> isPaymentMethodAvailable(
-      local_models.PaymentMethodType method) async {
+    local_models.PaymentMethodType method,
+  ) async {
     switch (method) {
       case local_models.PaymentMethodType.googlePay:
       case local_models.PaymentMethodType.card:
@@ -376,24 +410,29 @@ class PaymentUIController extends _$PaymentUIController {
     final methods = <local_models.PaymentMethod>[];
 
     // Check Apple Pay availability
-    final applePayAvailable =
-        await isPaymentMethodAvailable(local_models.PaymentMethodType.applePay);
+    final applePayAvailable = await isPaymentMethodAvailable(
+      local_models.PaymentMethodType.applePay,
+    );
     if (applePayAvailable) {
-      methods.add(local_models.PaymentMethod(
-        id: 'apple_pay',
-        type: local_models.PaymentMethodType.applePay,
-        displayName: 'Apple Pay',
-        isAvailable: true,
-      ));
+      methods.add(
+        local_models.PaymentMethod(
+          id: 'apple_pay',
+          type: local_models.PaymentMethodType.applePay,
+          displayName: 'Apple Pay',
+          isAvailable: true,
+        ),
+      );
     }
 
     // Card payments are always available as fallback
-    methods.add(local_models.PaymentMethod(
-      id: 'card',
-      type: local_models.PaymentMethodType.card,
-      displayName: 'Credit/Debit Card',
-      isAvailable: true,
-    ));
+    methods.add(
+      local_models.PaymentMethod(
+        id: 'card',
+        type: local_models.PaymentMethodType.card,
+        displayName: 'Credit/Debit Card',
+        isAvailable: true,
+      ),
+    );
 
     return methods;
   }

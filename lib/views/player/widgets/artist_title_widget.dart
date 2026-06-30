@@ -26,12 +26,7 @@ class ArtistTitleWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        _title(context),
-        _subtitle(context),
-      ],
-    );
+    return Column(children: [_title(context), _subtitle(context)]);
   }
 
   Widget _title(BuildContext context) {
@@ -42,11 +37,11 @@ class ArtistTitleWidget extends ConsumerWidget {
           trackTitle ?? '',
           textAlign: TextAlign.center,
           style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-                fontFamily: sourceSerif,
-                color: ColorConstants.white,
-                fontSize: trackTitleFontSize,
-                letterSpacing: 0.2,
-              ),
+            fontFamily: sourceSerif,
+            color: ColorConstants.white,
+            fontSize: trackTitleFontSize,
+            letterSpacing: 0.2,
+          ),
         ),
       ),
     );
@@ -54,11 +49,11 @@ class ArtistTitleWidget extends ConsumerWidget {
 
   Widget _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontFamily: dmMono,
-          fontSize: artistNameFontSize,
-          letterSpacing: 0,
-          color: ColorConstants.white,
-        );
+      fontFamily: dmMono,
+      fontSize: artistNameFontSize,
+      letterSpacing: 0,
+      color: ColorConstants.white,
+    );
 
     return SizedBox(
       height: 30, // Fixed height for subtitle
@@ -67,12 +62,7 @@ class ArtistTitleWidget extends ConsumerWidget {
         button: isPlayerScreen && artistUrlPath != null,
         child: InkWell(
           onTap: () => _handleArtistNameTap(),
-          child: Center(
-            child: Text(
-              artistName ?? '',
-              style: style,
-            ),
-          ),
+          child: Center(child: Text(artistName ?? '', style: style)),
         ),
       ),
     );
@@ -80,9 +70,7 @@ class ArtistTitleWidget extends ConsumerWidget {
 
   void _handleArtistNameTap() async {
     if (isPlayerScreen && artistUrlPath != null) {
-      await launchURLInBrowser(
-        artistUrlPath!,
-      );
+      await launchURLInBrowser(artistUrlPath!);
     }
   }
 }

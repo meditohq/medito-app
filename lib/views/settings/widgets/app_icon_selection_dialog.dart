@@ -22,16 +22,25 @@ enum AppIconOption {
   final bool androidOnly;
   final bool iosOnly;
 
-  const AppIconOption(this.iconName, {this.androidIconName, this.androidOnly = false, this.iosOnly = false});
+  const AppIconOption(
+    this.iconName, {
+    this.androidIconName,
+    this.androidOnly = false,
+    this.iosOnly = false,
+  });
 
   String? get effectiveIconName =>
       defaultTargetPlatform == TargetPlatform.android && androidIconName != null
-          ? androidIconName
-          : iconName;
+      ? androidIconName
+      : iconName;
 
   static List<AppIconOption> get availableOptions => values
-      .where((o) => (!o.androidOnly || defaultTargetPlatform == TargetPlatform.android) &&
-                    (!o.iosOnly || defaultTargetPlatform == TargetPlatform.iOS))
+      .where(
+        (o) =>
+            (!o.androidOnly ||
+                defaultTargetPlatform == TargetPlatform.android) &&
+            (!o.iosOnly || defaultTargetPlatform == TargetPlatform.iOS),
+      )
       .toList();
 
   String get previewAsset {
@@ -40,14 +49,23 @@ enum AppIconOption {
   }
 
   List<Color> get gradientColors => switch (this) {
-    AppIconOption.defaultIcon => [const Color(0xFFC86D8D), const Color(0xFFE9AEB6)],
+    AppIconOption.defaultIcon => [
+      const Color(0xFFC86D8D),
+      const Color(0xFFE9AEB6),
+    ],
     AppIconOption.purple => [const Color(0xFF917CF0), const Color(0xFF917CF0)],
     AppIconOption.classic => [const Color(0xFFFFFFFF), const Color(0xFFFFFFFF)],
-    AppIconOption.nearblack => [const Color(0xFF140116), const Color(0xFF2A1A2C)],
+    AppIconOption.nearblack => [
+      const Color(0xFF140116),
+      const Color(0xFF2A1A2C),
+    ],
     AppIconOption.ocean => [const Color(0xFF305A88), const Color(0xFF4A7CAE)],
     AppIconOption.forest => [const Color(0xFF67897B), const Color(0xFF3A6051)],
     AppIconOption.blush => [const Color(0xFFC86D8D), const Color(0xFFE9AEB6)],
-    AppIconOption.goldenHour => [const Color(0xFFEB6A7E), const Color(0xFFF7CE46)],
+    AppIconOption.goldenHour => [
+      const Color(0xFFEB6A7E),
+      const Color(0xFFF7CE46),
+    ],
   };
 
   String displayName(BuildContext context) {
@@ -79,11 +97,7 @@ class AppIconPreview extends StatelessWidget {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(size * 0.22),
-        child: Image.asset(
-          option.previewAsset,
-          width: size,
-          height: size,
-        ),
+        child: Image.asset(option.previewAsset, width: size, height: size),
       );
     }
 
@@ -146,7 +160,9 @@ class AppIconSelectionDialogState extends State<AppIconSelectionDialog> {
 
   Future<void> _setIcon(AppIconOption option) async {
     try {
-      await DynamicAppIconFlutterPlus.setAlternateIconName(option.effectiveIconName);
+      await DynamicAppIconFlutterPlus.setAlternateIconName(
+        option.effectiveIconName,
+      );
       setState(() => _currentIconName = option.effectiveIconName);
       if (mounted) {
         Navigator.of(context).pop();
@@ -225,20 +241,15 @@ class AppIconSelectionDialogState extends State<AppIconSelectionDialog> {
                 child: Text(
                   option.displayName(context),
                   style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurface,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
-                      ),
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
                 ),
               ),
               if (isSelected)
-                Icon(
-                  Icons.check,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
+                Icon(Icons.check, size: 20, color: theme.colorScheme.primary),
             ],
           ),
         ),

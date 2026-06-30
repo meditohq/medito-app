@@ -23,9 +23,7 @@ class EmptyStateWidget extends StatelessWidget {
             style: meditoTextTheme(context).titleMedium,
           ),
         ),
-        const Divider(
-          color: ColorConstants.softGrey,
-        ),
+        const Divider(color: ColorConstants.softGrey),
         Expanded(child: Center(child: image)),
       ],
     );

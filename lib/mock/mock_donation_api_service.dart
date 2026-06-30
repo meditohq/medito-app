@@ -24,10 +24,7 @@ class MockDonationApiService implements IDonationApiService {
   }
 
   @override
-  Future<Map<String, dynamic>> postRequest(
-    String path, {
-    dynamic body,
-  }) async {
+  Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async {
     await Future.delayed(const Duration(milliseconds: 100));
     AppLogger.d('MOCK_DONATION', 'POST $path');
     return _matchResponse(path);

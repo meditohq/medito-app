@@ -37,8 +37,9 @@ class HealthSyncTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final title =
-        Platform.isAndroid ? l10n.syncWithHealthConnect : l10n.syncWithHealth;
+    final title = Platform.isAndroid
+        ? l10n.syncWithHealthConnect
+        : l10n.syncWithHealth;
     return RowItemWidget(
       icon: MeditoIcon(
         assetName: MeditoIcons.health,

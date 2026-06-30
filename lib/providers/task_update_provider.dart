@@ -14,6 +14,7 @@ class TaskUpdateNotifier extends Notifier<List<TaskUpdate>> {
   }
 }
 
-final taskUpdateProvider = NotifierProvider<TaskUpdateNotifier, List<TaskUpdate>>(
-  TaskUpdateNotifier.new,
-); 
+final taskUpdateProvider =
+    NotifierProvider<TaskUpdateNotifier, List<TaskUpdate>>(
+      TaskUpdateNotifier.new,
+    );

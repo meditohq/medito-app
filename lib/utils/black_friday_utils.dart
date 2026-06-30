@@ -8,16 +8,26 @@ class BlackFridayUtils {
 
   static bool isBlackFridayWeek(DateTime now) {
     final currentYear = now.year;
-    final blackFridayStart =
-        DateTime(currentYear, blackFridayMonth, blackFridayStartDay);
-    final blackFridayEnd =
-        blackFridayStart.add(Duration(days: blackFridayDurationDays));
+    final blackFridayStart = DateTime(
+      currentYear,
+      blackFridayMonth,
+      blackFridayStartDay,
+    );
+    final blackFridayEnd = blackFridayStart.add(
+      Duration(days: blackFridayDurationDays),
+    );
 
     final today = DateTime(now.year, now.month, now.day);
     final startDate = DateTime(
-        blackFridayStart.year, blackFridayStart.month, blackFridayStart.day);
-    final endDate =
-        DateTime(blackFridayEnd.year, blackFridayEnd.month, blackFridayEnd.day);
+      blackFridayStart.year,
+      blackFridayStart.month,
+      blackFridayStart.day,
+    );
+    final endDate = DateTime(
+      blackFridayEnd.year,
+      blackFridayEnd.month,
+      blackFridayEnd.day,
+    );
 
     final effectiveStartDate = startDate.subtract(const Duration(days: 1));
     final effectiveEndDate = endDate.add(const Duration(days: 1));

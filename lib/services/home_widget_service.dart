@@ -82,16 +82,33 @@ class HomeWidgetService {
       final meditationDates = _extractMeditationDates(stats);
       final freezeDates = stats.freezeUsageDates.toList();
 
-      final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
+      final consistencyPercentage = (stats.consistencyScore * 100)
+          .round()
+          .clamp(0, 100);
       await Future.wait([
         HomeWidget.saveWidgetData<int>(_streakCurrentKey, stats.streakCurrent),
-        HomeWidget.saveWidgetData<String>(_meditationDatesKey, jsonEncode(meditationDates)),
-        HomeWidget.saveWidgetData<String>(_freezeDatesKey, jsonEncode(freezeDates)),
+        HomeWidget.saveWidgetData<String>(
+          _meditationDatesKey,
+          jsonEncode(meditationDates),
+        ),
+        HomeWidget.saveWidgetData<String>(
+          _freezeDatesKey,
+          jsonEncode(freezeDates),
+        ),
         HomeWidget.saveWidgetData<String>(_dayLabelKey, dayLabel),
         HomeWidget.saveWidgetData<String>(_daysLabelKey, daysLabel),
-        HomeWidget.saveWidgetData<int>(_lastUpdatedKey, DateTime.now().millisecondsSinceEpoch),
-        HomeWidget.saveWidgetData<int>(_totalTracksCompletedKey, stats.totalTracksCompleted),
-        HomeWidget.saveWidgetData<int>(_consistencyScoreKey, consistencyPercentage),
+        HomeWidget.saveWidgetData<int>(
+          _lastUpdatedKey,
+          DateTime.now().millisecondsSinceEpoch,
+        ),
+        HomeWidget.saveWidgetData<int>(
+          _totalTracksCompletedKey,
+          stats.totalTracksCompleted,
+        ),
+        HomeWidget.saveWidgetData<int>(
+          _consistencyScoreKey,
+          consistencyPercentage,
+        ),
       ]);
 
       await _triggerWidgetRefresh();
@@ -111,7 +128,9 @@ class HomeWidgetService {
 
       final meditationDates = _extractMeditationDates(stats);
       final freezeDates = stats.freezeUsageDates.toList();
-      final consistencyPercentage = (stats.consistencyScore * 100).round().clamp(0, 100);
+      final consistencyPercentage = (stats.consistencyScore * 100)
+          .round()
+          .clamp(0, 100);
 
       await Future.wait([
         _saveWithTimeout(_streakCurrentKey, stats.streakCurrent),
@@ -119,7 +138,10 @@ class HomeWidgetService {
         _saveWithTimeout(_freezeDatesKey, jsonEncode(freezeDates)),
         _saveWithTimeout(_dayLabelKey, 'day'),
         _saveWithTimeout(_daysLabelKey, 'days'),
-        _saveWithTimeout(_lastUpdatedKey, DateTime.now().millisecondsSinceEpoch),
+        _saveWithTimeout(
+          _lastUpdatedKey,
+          DateTime.now().millisecondsSinceEpoch,
+        ),
         _saveWithTimeout(_totalTracksCompletedKey, stats.totalTracksCompleted),
         _saveWithTimeout(_consistencyScoreKey, consistencyPercentage),
       ]);
@@ -145,7 +167,10 @@ class HomeWidgetService {
 
   static Future<void> _saveWithTimeout<T>(String key, T value) async {
     try {
-      await HomeWidget.saveWidgetData<T>(key, value).timeout(const Duration(seconds: 2));
+      await HomeWidget.saveWidgetData<T>(
+        key,
+        value,
+      ).timeout(const Duration(seconds: 2));
     } catch (e) {
       AppLogger.w('WIDGET', 'saveWidgetData timeout/error for $key: $e');
     }
@@ -186,15 +211,18 @@ class HomeWidgetService {
     _broadcastDebounce = Timer(_broadcastCoalesceWindow, () async {
       try {
         const platform = MethodChannel('medito.app/widget');
-        await platform.invokeMethod('updateWidget').timeout(
-              const Duration(seconds: 2),
-            );
+        await platform
+            .invokeMethod('updateWidget')
+            .timeout(const Duration(seconds: 2));
         AppLogger.d('WIDGET', 'Manual widget update broadcast sent');
       } on TimeoutException {
         AppLogger.w('WIDGET', 'Widget update broadcast timeout');
       } catch (e) {
         AppLogger.e(
-            'WIDGET', 'Failed to send manual widget update broadcast', e);
+          'WIDGET',
+          'Failed to send manual widget update broadcast',
+          e,
+        );
       }
     });
   }
@@ -240,10 +268,9 @@ class HomeWidgetService {
 
     try {
       const platform = MethodChannel('medito.app/widget');
-      final result = await platform.invokeMethod<bool>(
-        'pinWidget',
-        {'widgetType': widgetType},
-      );
+      final result = await platform.invokeMethod<bool>('pinWidget', {
+        'widgetType': widgetType,
+      });
       AppLogger.d('WIDGET', 'Widget pin request sent for type: $widgetType');
 
       return result ?? false;

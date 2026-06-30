@@ -39,16 +39,15 @@ class DropdownWidget<T> extends StatelessWidget {
       bottomRight: Radius.circular(bottomRight),
     );
     var textStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
-          fontFamily: dmMono,
-          fontWeight: FontWeight.w400,
-          fontSize: 16,
-          color: Theme.of(context).colorScheme.onSurface,
-        );
+      fontFamily: dmMono,
+      fontWeight: FontWeight.w400,
+      fontSize: 16,
+      color: Theme.of(context).colorScheme.onSurface,
+    );
 
-    final backgroundColor =
-        Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).cardColor
-            : Theme.of(context).colorScheme.surface;
+    final backgroundColor = Theme.of(context).brightness == Brightness.dark
+        ? Theme.of(context).cardColor
+        : Theme.of(context).colorScheme.surface;
 
     return SizedBox(
       height: isLandscape ? 56 : 48, // Set height to 48 in portrait mode
@@ -76,17 +75,9 @@ class DropdownWidget<T> extends StatelessWidget {
           child: Row(
             children: [
               if (iconData != null)
-                Icon(
-                  iconData,
-                  color: Theme.of(context).iconTheme.color,
-                ),
+                Icon(iconData, color: Theme.of(context).iconTheme.color),
               if (iconData != null) const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  _getDisplayValue(),
-                  style: textStyle,
-                ),
-              ),
+              Expanded(child: Text(_getDisplayValue(), style: textStyle)),
               if (_isClickable)
                 Icon(
                   Icons.keyboard_arrow_down,
@@ -141,9 +132,7 @@ class DropdownWidget<T> extends StatelessWidget {
         color: Theme.of(context).brightness == Brightness.dark
             ? Theme.of(context).cardColor
             : Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ).then((T? newValue) {
         if (newValue != null && onChanged != null) {
           onChanged!(newValue);

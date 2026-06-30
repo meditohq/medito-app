@@ -98,8 +98,7 @@ void main() {
       );
     });
 
-    test('dedups same (userId, email); appends when either differs',
-        () async {
+    test('dedups same (userId, email); appends when either differs', () async {
       final prefs = await SharedPreferences.getInstance();
 
       // Same anonymous id (email null) repeats — should only record once.

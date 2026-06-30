@@ -72,7 +72,8 @@ class LocalAllStats {
       totalTracksCompleted: stats.totalTracksCompleted,
       totalTimeListened: stats.totalTimeListened,
       tracksChecked: stats.tracksChecked ?? [],
-      audioCompleted: stats.audioCompleted
+      audioCompleted:
+          stats.audioCompleted
               ?.map((e) => LocalAudioCompleted.fromAudioCompleted(e))
               .toList() ??
           [],

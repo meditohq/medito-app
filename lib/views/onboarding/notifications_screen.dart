@@ -78,7 +78,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
     setState(() => _isProcessing = true);
     final handler = ref.read(firebaseMessagingProvider);
-    
+
     // Request notification permission if not already granted
     var status = await Permission.notification.status;
     if (!status.isGranted) {
@@ -113,8 +113,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
               .eventOnboardingNotificationsPermissionDenied,
           parameters: {
             ..._placementParams,
-            'permission_status':
-                status.isPermanentlyDenied ? 'permanently_denied' : 'denied',
+            'permission_status': status.isPermanentlyDenied
+                ? 'permanently_denied'
+                : 'denied',
           },
         );
       }
@@ -128,8 +129,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   Future<void> _setupRemindersAndAdvance() async {
     if (!mounted) return;
 
-    final accepted =
-        await PermissionHandler.requestNotificationPermission(context);
+    final accepted = await PermissionHandler.requestNotificationPermission(
+      context,
+    );
     if (!accepted || !mounted) {
       setState(() => _isProcessing = false);
       return;
@@ -148,8 +150,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     final now = DateTime.now();
     DateTime anchorLocal;
     if (savedHour != null && savedMinute != null) {
-      final candidate =
-          DateTime(now.year, now.month, now.day, savedHour, savedMinute);
+      final candidate = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        savedHour,
+        savedMinute,
+      );
       anchorLocal = candidate.isBefore(now)
           ? candidate.add(const Duration(days: 1))
           : candidate;
@@ -167,10 +174,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     );
 
     if (mounted) {
-      await ref.read(reminderTimeProvider.notifier).setTime(TimeOfDay(
-        hour: anchorLocal.hour,
-        minute: anchorLocal.minute,
-      ));
+      await ref
+          .read(reminderTimeProvider.notifier)
+          .setTime(
+            TimeOfDay(hour: anchorLocal.hour, minute: anchorLocal.minute),
+          );
       setState(() => _isProcessing = false);
       _navigateNext();
     }
@@ -218,7 +226,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
               padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
               physics: const ClampingScrollPhysics(),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 48,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -226,7 +236,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                       children: [
                         Text(
                           _notificationsTitle(AppLocalizations.of(context)!),
-                          style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                          style: Theme.of(context).textTheme.displayLarge
+                              ?.copyWith(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -235,10 +246,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                         const SizedBox(height: 24),
                         Text(
                           _notificationsBody(AppLocalizations.of(context)!),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 16,
-                                height: 1.5,
-                              ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontSize: 16, height: 1.5),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -253,10 +262,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                         else
                           _buildActionButton(
                             text: _notificationsGranted
-                                ? AppLocalizations.of(context)!.turnOnSmartReminders
+                                ? AppLocalizations.of(
+                                    context,
+                                  )!.turnOnSmartReminders
                                 : AppLocalizations.of(context)!.setReminderB,
-                            onPressed:
-                                _isProcessing ? null : _handleNotificationsPermission,
+                            onPressed: _isProcessing
+                                ? null
+                                : _handleNotificationsPermission,
                           ),
                         const SizedBox(height: 12),
                         SizedBox(
@@ -290,8 +302,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
   Widget _buildNotificationPreview(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final phoneBorder =
-        isDark ? Colors.white.withValues(alpha: 0.18) : Colors.black87;
+    final phoneBorder = isDark
+        ? Colors.white.withValues(alpha: 0.18)
+        : Colors.black87;
     const phoneWidth = 280.0;
     const cardOverhang = 36.0;
 
@@ -313,8 +326,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                   width: phoneWidth,
                   height: 560,
                   decoration: BoxDecoration(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(44)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(44),
+                    ),
                     border: Border.all(color: phoneBorder, width: 3),
                     color: isDark
                         ? Colors.white.withValues(alpha: 0.02)
@@ -331,13 +345,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                       curve: Curves.easeOutCubic,
                     ),
                     child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, -0.04),
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                        parent: _previewAnimation,
-                        curve: Curves.easeOutCubic,
-                      )),
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0, -0.04),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: _previewAnimation,
+                              curve: Curves.easeOutCubic,
+                            ),
+                          ),
                       child: _buildNotificationCard(),
                     ),
                   ),
@@ -468,10 +485,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white),
-        ),
+        child: Text(text, style: const TextStyle(color: Colors.white)),
       ),
     );
   }

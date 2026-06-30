@@ -151,30 +151,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         path: TypeConstants.theme,
       ),
       SettingsItem(
-          section: AppLocalizations.of(context)!.customizationSection,
-          type: TypeConstants.appIcon,
-          title: AppLocalizations.of(context)!.appIconTitle,
-          icon: Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Theme.of(context).colorScheme.onSurface,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(6),
+        section: AppLocalizations.of(context)!.customizationSection,
+        type: TypeConstants.appIcon,
+        title: AppLocalizations.of(context)!.appIconTitle,
+        icon: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface,
+              width: 1.5,
             ),
-            padding: const EdgeInsets.all(3),
-            child: SvgPicture.asset(
-              AssetConstants.icLogo,
-              colorFilter: ColorFilter.mode(
-                Theme.of(context).colorScheme.onSurface,
-                BlendMode.srcIn,
-              ),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          padding: const EdgeInsets.all(3),
+          child: SvgPicture.asset(
+            AssetConstants.icLogo,
+            colorFilter: ColorFilter.mode(
+              Theme.of(context).colorScheme.onSurface,
+              BlendMode.srcIn,
             ),
           ),
-          path: TypeConstants.appIcon,
         ),
+        path: TypeConstants.appIcon,
+      ),
       SettingsItem(
         section: AppLocalizations.of(context)!.customizationSection,
         type: TypeConstants.route,
@@ -219,22 +219,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ];
 
     return Scaffold(
-      body: SafeArea(
-        child: _buildMain(context, ref, settingsItems),
-      ),
+      body: SafeArea(child: _buildMain(context, ref, settingsItems)),
     );
   }
 
-  void handleItemPress(
-    BuildContext context,
-    SettingsItem item,
-  ) async {
+  void handleItemPress(BuildContext context, SettingsItem item) async {
     if (item.path == TypeConstants.addWidget) {
       try {
         final widgetManager = MeditoWidgetManager();
         final dialogShown = await widgetManager.pinWidget('consistency');
         unawaited(
-          ref.read(analyticsServiceProvider).logEvent(
+          ref
+              .read(analyticsServiceProvider)
+              .logEvent(
                 name: AnalyticsEventConstants.homeWidgetPinRequested,
                 parameters: {
                   AnalyticsEventConstants.paramWidgetType: 'consistency',
@@ -260,7 +257,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildMain(
-      BuildContext context, WidgetRef ref, List<SettingsItem> settingsItems) {
+    BuildContext context,
+    WidgetRef ref,
+    List<SettingsItem> settingsItems,
+  ) {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
@@ -274,12 +274,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           title: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onLongPress: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const DebugInfoScreen(),
-              ),
+              MaterialPageRoute<void>(builder: (_) => const DebugInfoScreen()),
             ),
             child: HomeHeaderWidget(
-                greeting: AppLocalizations.of(context)!.settings),
+              greeting: AppLocalizations.of(context)!.settings,
+            ),
           ),
         ),
         _buildSettingsListSlivers(context, ref, settingsItems),
@@ -295,7 +294,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }) {
     final isToggleItem = item.type == TypeConstants.toggle;
     final isDndToggle = isToggleItem && item.path == TypeConstants.toggleDnd;
-    final isZenModeToggle = isToggleItem && item.path == TypeConstants.toggleZenMode;
+    final isZenModeToggle =
+        isToggleItem && item.path == TypeConstants.toggleZenMode;
     final isThemeItem = item.type == TypeConstants.theme;
     final isWidgetItem = item.path == TypeConstants.addWidget;
 
@@ -361,9 +361,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontWeight: FontWeight.w600,
-            ),
+          color: Theme.of(context).colorScheme.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -378,11 +378,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isEffectivelySignedIn =
         user != null && user.email != null && user.email!.isNotEmpty;
 
-    final allCustomizationItems = _getItemsBySection(
-            settingsItems, AppLocalizations.of(context)!.customizationSection)
-        .where((item) =>
-            !item.path.contains(TypeConstants.toggleDnd) || _isDndSupported)
-        .toList();
+    final allCustomizationItems =
+        _getItemsBySection(
+              settingsItems,
+              AppLocalizations.of(context)!.customizationSection,
+            )
+            .where(
+              (item) =>
+                  !item.path.contains(TypeConstants.toggleDnd) ||
+                  _isDndSupported,
+            )
+            .toList();
 
     final widgetItem = allCustomizationItems
         .where((item) => item.path == TypeConstants.addWidget)
@@ -393,30 +399,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     // Items to group in the "other customization" card
     final otherCustomizationItems = allCustomizationItems
-        .where((item) =>
-            item.path != TypeConstants.addWidget &&
-            !inlineCardTypes.contains(item.type))
+        .where(
+          (item) =>
+              item.path != TypeConstants.addWidget &&
+              !inlineCardTypes.contains(item.type),
+        )
         .toList();
 
     // Support & Community card
     final communityItems = _getItemsBySection(
-        settingsItems, AppLocalizations.of(context)!.supportCommunitySection);
+      settingsItems,
+      AppLocalizations.of(context)!.supportCommunitySection,
+    );
 
     // Help & Legal card
     final helpItems = _getItemsBySection(
-        settingsItems, AppLocalizations.of(context)!.helpLegalSection);
+      settingsItems,
+      AppLocalizations.of(context)!.helpLegalSection,
+    );
 
     // Other customization card children
     final otherCustomizationChildren = <Widget>[
       if (widgetItem != null)
-        _buildMenuItemTile(context, ref, widgetItem,
-            isLast: otherCustomizationItems.isEmpty && !_isHealthSyncAvailable),
+        _buildMenuItemTile(
+          context,
+          ref,
+          widgetItem,
+          isLast: otherCustomizationItems.isEmpty && !_isHealthSyncAvailable,
+        ),
       for (var i = 0; i < otherCustomizationItems.length; i++)
         _buildMenuItemTile(
           context,
           ref,
           otherCustomizationItems[i],
-          isLast: i == otherCustomizationItems.length - 1 && !_isHealthSyncAvailable,
+          isLast:
+              i == otherCustomizationItems.length - 1 &&
+              !_isHealthSyncAvailable,
         ),
       if (_isHealthSyncAvailable) const HealthSyncTile(hasUnderline: false),
     ];
@@ -431,14 +449,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             _buildSectionCard([const AccountSectionWidget(inCard: true)]),
           ],
           _buildSectionTitle(
-              context, AppLocalizations.of(context)!.supportCommunity),
+            context,
+            AppLocalizations.of(context)!.supportCommunity,
+          ),
           _buildSectionCard([
             for (var i = 0; i < communityItems.length; i++)
-              _buildMenuItemTile(context, ref, communityItems[i],
-                  isLast: i == communityItems.length - 1),
+              _buildMenuItemTile(
+                context,
+                ref,
+                communityItems[i],
+                isLast: i == communityItems.length - 1,
+              ),
           ]),
           _buildSectionTitle(
-              context, AppLocalizations.of(context)!.customization),
+            context,
+            AppLocalizations.of(context)!.customization,
+          ),
           // Theme and App Icon render as their own cards
           ...allCustomizationItems
               .where((item) => inlineCardTypes.contains(item.type))
@@ -448,12 +474,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _buildSectionTitle(context, AppLocalizations.of(context)!.helpLegal),
           _buildSectionCard([
             for (var i = 0; i < helpItems.length; i++)
-              _buildMenuItemTile(context, ref, helpItems[i],
-                  isLast: i == helpItems.length - 1),
+              _buildMenuItemTile(
+                context,
+                ref,
+                helpItems[i],
+                isLast: i == helpItems.length - 1,
+              ),
           ]),
           if (isEffectivelySignedIn) ...[
-            _buildSectionTitle(
-                context, AppLocalizations.of(context)!.account),
+            _buildSectionTitle(context, AppLocalizations.of(context)!.account),
             _buildSectionCard([const AccountSectionWidget(inCard: true)]),
           ],
           const SizedBox(height: 16.0),
@@ -464,7 +493,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   List<SettingsItem> _getItemsBySection(
-      List<SettingsItem> items, String section) {
+    List<SettingsItem> items,
+    String section,
+  ) {
     return items.where((item) => item.section == section).toList();
   }
 }

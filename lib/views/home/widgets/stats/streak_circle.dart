@@ -15,10 +15,7 @@ import 'package:medito/utils/utils.dart';
 class StreakCircle extends ConsumerStatefulWidget {
   final VoidCallback onTap;
 
-  const StreakCircle({
-    super.key,
-    required this.onTap,
-  });
+  const StreakCircle({super.key, required this.onTap});
 
   @override
   ConsumerState<StreakCircle> createState() => StreakCircleState();
@@ -53,8 +50,9 @@ class StreakCircleState extends ConsumerState<StreakCircle>
           error: (error, stackTrace) {
             if (statsAsync.hasValue) {
               final stats = statsAsync.value!;
-              final isStreakDoneToday =
-                  _controller.isStreakDoneToday(stats.audioCompleted);
+              final isStreakDoneToday = _controller.isStreakDoneToday(
+                stats.audioCompleted,
+              );
 
               if (isZenModeEnabled) {
                 _controller.updateAnimation(isStreakDoneToday);
@@ -71,25 +69,30 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                   // Fallback to default behavior on error
                   final displayValue = _controller.getDisplayValue(stats);
                   final progressValue = _controller.getProgressValue(stats);
-                  final showConsistencyScore =
-                      _controller.shouldShowConsistencyScore(stats);
+                  final showConsistencyScore = _controller
+                      .shouldShowConsistencyScore(stats);
 
                   _controller.updateAnimation(isStreakDoneToday);
 
                   return AnimatedBuilder(
                     animation: _controller.animationController,
                     builder: (context, child) => _buildStreakCircle(
-                        isStreakDoneToday,
-                        displayValue,
-                        progressValue,
-                        showConsistencyScore),
+                      isStreakDoneToday,
+                      displayValue,
+                      progressValue,
+                      showConsistencyScore,
+                    ),
                   );
                 },
                 data: (displayType) {
-                  final displayValue =
-                      _controller.getDisplayValue(stats, displayType);
-                  final progressValue =
-                      _controller.getProgressValue(stats, displayType);
+                  final displayValue = _controller.getDisplayValue(
+                    stats,
+                    displayType,
+                  );
+                  final progressValue = _controller.getProgressValue(
+                    stats,
+                    displayType,
+                  );
                   final showConsistencyScore = _controller
                       .shouldShowConsistencyScore(stats, displayType);
 
@@ -98,10 +101,11 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                   return AnimatedBuilder(
                     animation: _controller.animationController,
                     builder: (context, child) => _buildStreakCircle(
-                        isStreakDoneToday,
-                        displayValue,
-                        progressValue,
-                        showConsistencyScore),
+                      isStreakDoneToday,
+                      displayValue,
+                      progressValue,
+                      showConsistencyScore,
+                    ),
                   );
                 },
               );
@@ -110,8 +114,9 @@ class StreakCircleState extends ConsumerState<StreakCircle>
             }
           },
           data: (stats) {
-            final isStreakDoneToday =
-                _controller.isStreakDoneToday(stats.audioCompleted);
+            final isStreakDoneToday = _controller.isStreakDoneToday(
+              stats.audioCompleted,
+            );
 
             if (isZenModeEnabled) {
               _controller.updateAnimation(isStreakDoneToday);
@@ -128,37 +133,43 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                 // Fallback to default behavior on error
                 final displayValue = _controller.getDisplayValue(stats);
                 final progressValue = _controller.getProgressValue(stats);
-                final showConsistencyScore =
-                    _controller.shouldShowConsistencyScore(stats);
+                final showConsistencyScore = _controller
+                    .shouldShowConsistencyScore(stats);
 
                 _controller.updateAnimation(isStreakDoneToday);
 
                 return AnimatedBuilder(
                   animation: _controller.animationController,
                   builder: (context, child) => _buildStreakCircle(
-                      isStreakDoneToday,
-                      displayValue,
-                      progressValue,
-                      showConsistencyScore),
+                    isStreakDoneToday,
+                    displayValue,
+                    progressValue,
+                    showConsistencyScore,
+                  ),
                 );
               },
               data: (displayType) {
-                final displayValue =
-                    _controller.getDisplayValue(stats, displayType);
-                final progressValue =
-                    _controller.getProgressValue(stats, displayType);
-                final showConsistencyScore =
-                    _controller.shouldShowConsistencyScore(stats, displayType);
+                final displayValue = _controller.getDisplayValue(
+                  stats,
+                  displayType,
+                );
+                final progressValue = _controller.getProgressValue(
+                  stats,
+                  displayType,
+                );
+                final showConsistencyScore = _controller
+                    .shouldShowConsistencyScore(stats, displayType);
 
                 _controller.updateAnimation(isStreakDoneToday);
 
                 return AnimatedBuilder(
                   animation: _controller.animationController,
                   builder: (context, child) => _buildStreakCircle(
-                      isStreakDoneToday,
-                      displayValue,
-                      progressValue,
-                      showConsistencyScore),
+                    isStreakDoneToday,
+                    displayValue,
+                    progressValue,
+                    showConsistencyScore,
+                  ),
                 );
               },
             );
@@ -192,10 +203,12 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
                 transform: GradientRotation(
-                    _controller.animationController.value * 2 * 3.14159),
+                  _controller.animationController.value * 2 * 3.14159,
+                ),
               ),
               borderRadius: BorderRadius.circular(
-                  StreakCircleConstants.borderRadius + 1.5),
+                StreakCircleConstants.borderRadius + 1.5,
+              ),
             )
           : null,
       child: Padding(
@@ -207,13 +220,15 @@ class StreakCircleState extends ConsumerState<StreakCircle>
             button: true,
             child: InkWell(
               onTap: widget.onTap,
-              borderRadius:
-                  BorderRadius.circular(StreakCircleConstants.borderRadius),
+              borderRadius: BorderRadius.circular(
+                StreakCircleConstants.borderRadius,
+              ),
               child: Ink(
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(
-                      StreakCircleConstants.borderRadius),
+                    StreakCircleConstants.borderRadius,
+                  ),
                 ),
                 child: Padding(
                   padding: StreakCircleConstants.padding,
@@ -228,10 +243,9 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                             height: StreakCircleConstants.iconSize,
                             child: CircularProgressIndicator(
                               value: progressValue,
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacityValue(0.2),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacityValue(0.2),
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 isStreakDoneToday
                                     ? context.brandPurple
@@ -249,8 +263,9 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                                 MeditoIcon(
                                   assetName: MeditoIcons.fire,
                                   size: StreakCircleConstants.iconSize,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
                                 ),
                               MeditoIcon(
                                 assetName: MeditoIcons.fire,
@@ -271,9 +286,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                                 ? FontWeight.w700
                                 : FontWeight.w500,
                             fontFamily: dmSans,
-                            fontFeatures: const [
-                              FontFeature.tabularFigures(),
-                            ],
+                            fontFeatures: const [FontFeature.tabularFigures()],
                             letterSpacing: -0.2,
                             height: StreakCircleConstants.lineHeight,
                           ),
@@ -330,10 +343,12 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                 ],
                 stops: const [0.1, 0.2, 0.5, 0.8, 0.9],
                 transform: GradientRotation(
-                    _controller.animationController.value * 2 * 3.14159),
+                  _controller.animationController.value * 2 * 3.14159,
+                ),
               ),
               borderRadius: BorderRadius.circular(
-                  StreakCircleConstants.borderRadius + 1.5),
+                StreakCircleConstants.borderRadius + 1.5,
+              ),
             )
           : null,
       child: Padding(
@@ -345,13 +360,15 @@ class StreakCircleState extends ConsumerState<StreakCircle>
             button: true,
             child: InkWell(
               onTap: widget.onTap,
-              borderRadius:
-                  BorderRadius.circular(StreakCircleConstants.borderRadius),
+              borderRadius: BorderRadius.circular(
+                StreakCircleConstants.borderRadius,
+              ),
               child: Ink(
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(
-                      StreakCircleConstants.borderRadius),
+                    StreakCircleConstants.borderRadius,
+                  ),
                 ),
                 child: Padding(
                   padding: StreakCircleConstants.padding,

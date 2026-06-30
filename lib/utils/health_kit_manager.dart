@@ -10,7 +10,8 @@ class HealthKitManager {
 
   static final HealthKitManager _instance = HealthKitManager._internal();
   final Health health = Health();
-  final MeditoHealthConnectManager _androidBridge = MeditoHealthConnectManager();
+  final MeditoHealthConnectManager _androidBridge =
+      MeditoHealthConnectManager();
   bool _configured = false;
 
   factory HealthKitManager() {

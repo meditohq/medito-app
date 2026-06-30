@@ -29,8 +29,9 @@ Future<void> removeDownloadedTrack(
   final fileName = '$trackId-$fileId${getAudioFileExtension(fileUrl)}';
 
   AppLogger.d('DOWNLOAD', 'removeDownloadedTrack: checking file $fileName');
-  final isDownloaded =
-      await ref.read(downloaderRepositoryProvider).isFileDownloaded(fileName);
+  final isDownloaded = await ref
+      .read(downloaderRepositoryProvider)
+      .isFileDownloaded(fileName);
 
   AppLogger.d('DOWNLOAD', 'removeDownloadedTrack: isDownloaded=$isDownloaded');
   if (isDownloaded) {
@@ -50,12 +51,15 @@ Future<void> deleteDownloadedTrackById(
     final downloadedTrackList = await ref.read(downloadedTracksProvider.future);
     if (!ref.mounted) return;
 
-    downloadedTrackList.removeWhere((track) => track.voices
-        .any((voice) => voice.audioFiles.any((f) => f.id == fileId)));
+    downloadedTrackList.removeWhere(
+      (track) => track.voices.any(
+        (voice) => voice.audioFiles.any((f) => f.id == fileId),
+      ),
+    );
 
-    await ref
-        .read(addTrackListInPreferenceProvider(tracks: downloadedTrackList)
-            .future);
+    await ref.read(
+      addTrackListInPreferenceProvider(tracks: downloadedTrackList).future,
+    );
     if (!ref.mounted) return;
 
     ref.invalidate(downloadedTracksProvider);

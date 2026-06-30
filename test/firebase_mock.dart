@@ -26,7 +26,7 @@ Future<T> testMethodChannelFirebase<T>({
           'projectId': 'test-project',
         },
         'pluginConstants': {},
-      }
+      },
     ],
     'Firebase#initializeApp': {
       'name': '[DEFAULT]',
@@ -46,14 +46,15 @@ Future<T> testMethodChannelFirebase<T>({
   if (emulate) {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(methodChannel, (MethodCall methodCall) async {
-      log.add(methodCall);
-      final response =
-          responses[methodCall.method] ?? defaultResponses[methodCall.method];
-      if (response is Exception) {
-        throw response;
-      }
-      return response;
-    });
+          log.add(methodCall);
+          final response =
+              responses[methodCall.method] ??
+              defaultResponses[methodCall.method];
+          if (response is Exception) {
+            throw response;
+          }
+          return response;
+        });
   }
 
   final result = await future();
@@ -88,7 +89,6 @@ class _TestFirebaseDelegate implements FirebasePlatform {
     // Using Mocktail should handle the interface verification
     return MockFirebaseAppPlatform(); // Use Mocktail mock with mixin
   }
-
 }
 
 // Minimal app implementing the platform interface using Mocktail and mixin

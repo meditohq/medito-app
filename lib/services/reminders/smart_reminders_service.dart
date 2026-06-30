@@ -30,8 +30,10 @@ class SmartRemindersService {
     final time = _computeDefaultTimeFromNow();
     final anchor = now.add(const Duration(days: 1));
 
-    final scheduler =
-        SmartRemindersScheduler(prefs: prefs, reminders: reminders);
+    final scheduler = SmartRemindersScheduler(
+      prefs: prefs,
+      reminders: reminders,
+    );
     await scheduler.scheduleSeriesFromAnchor(anchor);
 
     await _saveTime(time);
@@ -79,63 +81,90 @@ class SmartRemindersScheduler {
       streakCount = '${stats.streakCurrent}';
       consistencyPercentage = '${(stats.consistencyScore * 100).round()}';
     } catch (e) {
-      AppLogger.w('REMINDER',
-          'Failed to fetch stats for smart reminders, using defaults: $e');
+      AppLogger.w(
+        'REMINDER',
+        'Failed to fetch stats for smart reminders, using defaults: $e',
+      );
     }
 
     for (var i = 0; i < 15; i++) {
       final when = anchorLocal.add(Duration(days: i));
       final tzWhen = tz.TZDateTime.from(when, tz.local);
-      final copy = _copyForDay(i + 1,
-          l10n: localizations,
-          streakCount: streakCount,
-          consistencyPercentage: consistencyPercentage);
-      items.add(_SeriesItem(
-          id: smartBaseId + i, when: tzWhen, title: copy.$1, body: copy.$2));
+      final copy = _copyForDay(
+        i + 1,
+        l10n: localizations,
+        streakCount: streakCount,
+        consistencyPercentage: consistencyPercentage,
+      );
+      items.add(
+        _SeriesItem(
+          id: smartBaseId + i,
+          when: tzWhen,
+          title: copy.$1,
+          body: copy.$2,
+        ),
+      );
     }
 
     final day30When = anchorLocal.add(Duration(days: 29));
     final day30TzWhen = tz.TZDateTime.from(day30When, tz.local);
-    final day30Copy = _copyForDay(30,
-        l10n: localizations,
-        streakCount: streakCount,
-        consistencyPercentage: consistencyPercentage);
-    items.add(_SeriesItem(
+    final day30Copy = _copyForDay(
+      30,
+      l10n: localizations,
+      streakCount: streakCount,
+      consistencyPercentage: consistencyPercentage,
+    );
+    items.add(
+      _SeriesItem(
         id: smartBaseId + 15,
         when: day30TzWhen,
         title: day30Copy.$1,
-        body: day30Copy.$2));
+        body: day30Copy.$2,
+      ),
+    );
 
-    AppLogger.d('REMINDER',
-        'Scheduling smart reminder series from anchor: $anchorLocal');
+    AppLogger.d(
+      'REMINDER',
+      'Scheduling smart reminder series from anchor: $anchorLocal',
+    );
 
     try {
       await reminders.cancelSmartReminderSeries();
     } catch (e, s) {
-      AppLogger.e('REMINDER',
-          'Error cancelling smart reminder series before rescheduling: $e', s);
+      AppLogger.e(
+        'REMINDER',
+        'Error cancelling smart reminder series before rescheduling: $e',
+        s,
+      );
     }
 
     try {
       await reminders.cancelDailyNotification();
     } catch (e, s) {
-      AppLogger.e('REMINDER',
-          'Error cancelling daily notification before rescheduling: $e', s);
+      AppLogger.e(
+        'REMINDER',
+        'Error cancelling daily notification before rescheduling: $e',
+        s,
+      );
     }
 
     final scheduledReminders = items
-        .map((e) => ScheduledReminder(
-              id: e.id,
-              scheduledDate: e.when,
-              title: e.title,
-              body: e.body,
-            ))
+        .map(
+          (e) => ScheduledReminder(
+            id: e.id,
+            scheduledDate: e.when,
+            title: e.title,
+            body: e.body,
+          ),
+        )
         .toList();
 
     await reminders.scheduleSmartReminderSeries(scheduledReminders);
 
     AppLogger.d(
-        'REMINDER', 'Successfully scheduled ${items.length} smart reminders');
+      'REMINDER',
+      'Successfully scheduled ${items.length} smart reminders',
+    );
 
     final first = TimeOfDay(hour: anchorLocal.hour, minute: anchorLocal.minute);
     await prefs.setInt(SharedPreferenceConstants.savedHours, first.hour);
@@ -166,11 +195,11 @@ class SmartRemindersScheduler {
         final variants = <(String, String)>[
           (
             l10n.smartReminderDay1TitleVar1,
-            l10n.smartReminderDay1BodyVar1(streakCount)
+            l10n.smartReminderDay1BodyVar1(streakCount),
           ),
           (
             l10n.smartReminderDay1TitleVar2,
-            l10n.smartReminderDay1BodyVar2(consistencyPercentage)
+            l10n.smartReminderDay1BodyVar2(consistencyPercentage),
           ),
           (l10n.smartReminderDay1TitleVar3, l10n.smartReminderDay1BodyVar3),
           (l10n.smartReminderDay1TitleVar4, l10n.smartReminderDay1BodyVar4),
@@ -244,9 +273,10 @@ class _SeriesItem {
   final String title;
   final String body;
 
-  _SeriesItem(
-      {required this.id,
-      required this.when,
-      required this.title,
-      required this.body});
+  _SeriesItem({
+    required this.id,
+    required this.when,
+    required this.title,
+    required this.body,
+  });
 }

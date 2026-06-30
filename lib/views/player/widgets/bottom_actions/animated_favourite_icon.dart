@@ -115,23 +115,11 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
       parent: _entranceController,
       curve: Curves.easeOut,
     );
-    _entranceScale = Tween<double>(
-      begin: 0.92,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _entranceController,
-        curve: Curves.easeOutBack,
-      ),
+    _entranceScale = Tween<double>(begin: 0.92, end: 1).animate(
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeOutBack),
     );
-    _entranceRotationTurns = Tween<double>(
-      begin: 0.12,
-      end: 0,
-    ).animate(
-      CurvedAnimation(
-        parent: _entranceController,
-        curve: Curves.easeOutCubic,
-      ),
+    _entranceRotationTurns = Tween<double>(begin: 0.12, end: 0).animate(
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeOutCubic),
     );
     _entranceController.forward();
 
@@ -167,8 +155,7 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
     if (pending == _wasPending) return;
     _wasPending = pending;
     if (pending) {
-      _activeDirection =
-          controller?.direction ?? FavoriteToggleDirection.add;
+      _activeDirection = controller?.direction ?? FavoriteToggleDirection.add;
       _startSpin();
     } else {
       _startRelease();
@@ -233,8 +220,9 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
 
   @override
   Widget build(BuildContext context) {
-    final assetName =
-        widget.isFavorite ? MeditoIcons.starSolid : MeditoIcons.star;
+    final assetName = widget.isFavorite
+        ? MeditoIcons.starSolid
+        : MeditoIcons.star;
 
     final animatedIcon = AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
@@ -244,22 +232,13 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
           parent: animation,
           curve: Curves.easeOut,
         );
-        final scaleAnimation = Tween<double>(
-          begin: 0.72,
-          end: 1,
-        ).animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutBack,
-          ),
+        final scaleAnimation = Tween<double>(begin: 0.72, end: 1).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
         );
 
         return FadeTransition(
           opacity: fadeAnimation,
-          child: ScaleTransition(
-            scale: scaleAnimation,
-            child: child,
-          ),
+          child: ScaleTransition(scale: scaleAnimation, child: child),
         );
       },
       child: MeditoIcon(

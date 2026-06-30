@@ -26,7 +26,9 @@ class DeviceInfoRepositoryImpl extends DeviceAndAppInfoRepository {
     var deviceInfo = DeviceInfoPlugin();
     var packageInfo = await PackageInfo.fromPlatform();
     var languageCode = PlatformDispatcher.instance.locale.languageCode;
-    var currencyName = NumberFormat.simpleCurrency(locale: languageCode).currencyName;
+    var currencyName = NumberFormat.simpleCurrency(
+      locale: languageCode,
+    ).currencyName;
 
     appVersion = packageInfo.version;
     buildNumber = packageInfo.buildNumber;

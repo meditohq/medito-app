@@ -24,8 +24,10 @@ void main() {
 
       // Assert
       expect(result, false);
-      expect(prefs.getKeys().where((key) => key.startsWith('stats_backup_')),
-          isEmpty);
+      expect(
+        prefs.getKeys().where((key) => key.startsWith('stats_backup_')),
+        isEmpty,
+      );
     });
 
     test('should backup valid stats', () async {
@@ -51,8 +53,10 @@ void main() {
 
       // Assert
       expect(result, true);
-      expect(prefs.getKeys().where((key) => key.startsWith('stats_backup_')),
-          isNotEmpty);
+      expect(
+        prefs.getKeys().where((key) => key.startsWith('stats_backup_')),
+        isNotEmpty,
+      );
     });
 
     test('should retrieve latest backup', () async {

@@ -26,9 +26,9 @@ class ReportService {
       queryParams['guide_name'] = guideName;
     }
 
-    final uri = Uri.parse(_tallyFormBaseUrl).replace(
-      queryParameters: queryParams,
-    );
+    final uri = Uri.parse(
+      _tallyFormBaseUrl,
+    ).replace(queryParameters: queryParams);
 
     return uri.toString();
   }

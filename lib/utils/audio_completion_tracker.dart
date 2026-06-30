@@ -14,8 +14,9 @@ class AudioCompletionTracker {
     Duration dayBoundaryOffset = Duration.zero,
   }) {
     var endTime = DateTime.fromMillisecondsSinceEpoch(endTimestamp);
-    var startTime =
-        DateTime.fromMillisecondsSinceEpoch(endTimestamp - duration);
+    var startTime = DateTime.fromMillisecondsSinceEpoch(
+      endTimestamp - duration,
+    );
 
     final startDay = dayOf(startTime, dayBoundaryOffset);
     final endDay = dayOf(endTime, dayBoundaryOffset);

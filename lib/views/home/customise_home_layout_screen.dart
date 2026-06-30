@@ -64,8 +64,7 @@ class CustomiseHomeLayoutScreenState
                       title: Text(_getTitleForType(widgetType)),
                     );
                   },
-                  onReorder: (oldIndex, newIndex) {
-                    if (oldIndex < newIndex) newIndex -= 1;
+                  onReorderItem: (oldIndex, newIndex) {
                     var newOrder = List.of(order);
                     var item = newOrder.removeAt(oldIndex);
                     newOrder.insert(newIndex, item);
@@ -74,9 +73,7 @@ class CustomiseHomeLayoutScreenState
                 ),
               ),
             ),
-            SingleBackButtonActionBar(
-              onBackPressed: _logOrderAndPop,
-            ),
+            SingleBackButtonActionBar(onBackPressed: _logOrderAndPop),
           ],
         ),
       ),

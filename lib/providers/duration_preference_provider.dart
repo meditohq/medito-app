@@ -30,5 +30,5 @@ class DurationPreferenceNotifier extends Notifier<int?> {
 
 final durationPreferenceProvider =
     NotifierProvider<DurationPreferenceNotifier, int?>(
-  DurationPreferenceNotifier.new,
-);
+      DurationPreferenceNotifier.new,
+    );

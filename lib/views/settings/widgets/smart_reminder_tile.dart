@@ -22,8 +22,9 @@ class SmartReminderTile extends ConsumerWidget {
 
     Future<void> handleToggle(bool value) async {
       if (value) {
-        var accepted =
-            await PermissionHandler.requestNotificationPermission(context);
+        var accepted = await PermissionHandler.requestNotificationPermission(
+          context,
+        );
         if (!accepted) return;
 
         final prefs = ref.read(sharedPreferencesProvider);
@@ -37,13 +38,15 @@ class SmartReminderTile extends ConsumerWidget {
         await ref.read(reminderTimeProvider.notifier).setTime(time);
 
         unawaited(
-          ref.read(analyticsServiceProvider).logEvent(
-            name: AnalyticsEventConstants.notificationsEnabled,
-            parameters: {
-              AnalyticsEventConstants.paramSource:
-                  AnalyticsEventConstants.sourceSettings,
-            },
-          ),
+          ref
+              .read(analyticsServiceProvider)
+              .logEvent(
+                name: AnalyticsEventConstants.notificationsEnabled,
+                parameters: {
+                  AnalyticsEventConstants.paramSource:
+                      AnalyticsEventConstants.sourceSettings,
+                },
+              ),
         );
       } else {
         final prefs = ref.read(sharedPreferencesProvider);
@@ -55,13 +58,15 @@ class SmartReminderTile extends ConsumerWidget {
         await service.disable();
 
         unawaited(
-          ref.read(analyticsServiceProvider).logEvent(
-            name: AnalyticsEventConstants.notificationsDisabled,
-            parameters: {
-              AnalyticsEventConstants.paramSource:
-                  AnalyticsEventConstants.sourceSettings,
-            },
-          ),
+          ref
+              .read(analyticsServiceProvider)
+              .logEvent(
+                name: AnalyticsEventConstants.notificationsDisabled,
+                parameters: {
+                  AnalyticsEventConstants.paramSource:
+                      AnalyticsEventConstants.sourceSettings,
+                },
+              ),
         );
       }
     }
@@ -93,4 +98,3 @@ class SmartReminderTile extends ConsumerWidget {
     );
   }
 }
-

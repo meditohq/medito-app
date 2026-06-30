@@ -71,10 +71,10 @@ void main() {
 
     test('should keep local item when it is newer than server item', () {
       final local = [
-        createTestItem(id: '1', title: 'Local Newer', timestamp: 500)
+        createTestItem(id: '1', title: 'Local Newer', timestamp: 500),
       ];
       final server = [
-        createTestItem(id: '1', title: 'Server Older', timestamp: 300)
+        createTestItem(id: '1', title: 'Server Older', timestamp: 300),
       ];
       final result = mergeFavoriteLists(local, server);
 
@@ -86,10 +86,10 @@ void main() {
 
     test('should take server item when it is newer than local item', () {
       final local = [
-        createTestItem(id: '1', title: 'Local Older', timestamp: 300)
+        createTestItem(id: '1', title: 'Local Older', timestamp: 300),
       ];
       final server = [
-        createTestItem(id: '1', title: 'Server Newer', timestamp: 500)
+        createTestItem(id: '1', title: 'Server Newer', timestamp: 500),
       ];
       final result = mergeFavoriteLists(local, server);
 
@@ -103,10 +103,10 @@ void main() {
       // Based on the implementation, local items are added first,
       // and server items only overwrite if strictly newer (>)
       final local = [
-        createTestItem(id: '1', title: 'Local Same', timestamp: 500)
+        createTestItem(id: '1', title: 'Local Same', timestamp: 500),
       ];
       final server = [
-        createTestItem(id: '1', title: 'Server Same', timestamp: 500)
+        createTestItem(id: '1', title: 'Server Same', timestamp: 500),
       ];
       final result = mergeFavoriteLists(local, server);
 
@@ -157,11 +157,17 @@ void main() {
     test('should handle different types correctly', () {
       final local = [
         createTestItem(
-            id: 'track1', type: FavoriteItemType.track, timestamp: 100),
+          id: 'track1',
+          type: FavoriteItemType.track,
+          timestamp: 100,
+        ),
       ];
       final server = [
         createTestItem(
-            id: 'pack1', type: FavoriteItemType.pack, timestamp: 200),
+          id: 'pack1',
+          type: FavoriteItemType.pack,
+          timestamp: 200,
+        ),
       ];
       final result = mergeFavoriteLists(local, server);
 
@@ -176,7 +182,10 @@ void main() {
   test('should handle different types correctly and timestamps are equal', () {
     final local = [
       createTestItem(
-          id: 'track1', type: FavoriteItemType.track, timestamp: 100),
+        id: 'track1',
+        type: FavoriteItemType.track,
+        timestamp: 100,
+      ),
     ];
     final server = [
       createTestItem(id: 'pack1', type: FavoriteItemType.pack, timestamp: 100),

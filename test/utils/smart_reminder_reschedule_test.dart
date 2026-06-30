@@ -43,20 +43,19 @@ void main() {
     today = DateTime(2026, 4, 28);
     statsManager.setCurrentDateForTesting(today);
 
-    when(mockStatsService.postStats(any))
-        .thenAnswer((_) async => Future.value());
+    when(
+      mockStatsService.postStats(any),
+    ).thenAnswer((_) async => Future.value());
 
     statsManager.setStatsForTesting(
       LocalAllStats.empty().copyWith(streakCurrent: 0, streakLongest: 0),
     );
 
     calls = [];
-    smartReminderReschedulerOverride = ({
-      required int endMs,
-      required int durationMs,
-    }) async {
-      calls.add((endMs: endMs, durationMs: durationMs));
-    };
+    smartReminderReschedulerOverride =
+        ({required int endMs, required int durationMs}) async {
+          calls.add((endMs: endMs, durationMs: durationMs));
+        };
   });
 
   tearDown(() {
@@ -65,43 +64,47 @@ void main() {
   });
 
   group('Smart Reminder rescheduling on manual stats changes', () {
-    test('addManualSession reschedules with that session as the anchor',
-        () async {
-      final when = DateTime(2026, 4, 27, 14, 30);
-      final ok = await addManualSession(
-        dateTime: when,
-        durationMinutes: 10,
-        statsManager: statsManager,
-      );
-      expect(ok, isTrue);
-      expect(calls, hasLength(1));
-      expect(calls.single.endMs, when.millisecondsSinceEpoch);
-      expect(calls.single.durationMs, 10 * 60 * 1000);
-    });
+    test(
+      'addManualSession reschedules with that session as the anchor',
+      () async {
+        final when = DateTime(2026, 4, 27, 14, 30);
+        final ok = await addManualSession(
+          dateTime: when,
+          durationMinutes: 10,
+          statsManager: statsManager,
+        );
+        expect(ok, isTrue);
+        expect(calls, hasLength(1));
+        expect(calls.single.endMs, when.millisecondsSinceEpoch);
+        expect(calls.single.durationMs, 10 * 60 * 1000);
+      },
+    );
 
-    test('addManualSessions reschedules once with the latest day as anchor',
-        () async {
-      final dates = [
-        DateTime(2026, 4, 24),
-        DateTime(2026, 4, 26),
-        DateTime(2026, 4, 25),
-      ];
-      final added = await addManualSessions(
-        dates: dates,
-        durationMinutes: 10,
-        statsManager: statsManager,
-      );
-      expect(added, 3);
-      // Exactly one reschedule for the whole batch — same batching rule as
-      // postStats.
-      expect(calls, hasLength(1));
-      // Anchored at noon on the latest day in the batch (Apr 26).
-      expect(
-        calls.single.endMs,
-        DateTime(2026, 4, 26, manualSessionAnchorHour).millisecondsSinceEpoch,
-      );
-      expect(calls.single.durationMs, 10 * 60 * 1000);
-    });
+    test(
+      'addManualSessions reschedules once with the latest day as anchor',
+      () async {
+        final dates = [
+          DateTime(2026, 4, 24),
+          DateTime(2026, 4, 26),
+          DateTime(2026, 4, 25),
+        ];
+        final added = await addManualSessions(
+          dates: dates,
+          durationMinutes: 10,
+          statsManager: statsManager,
+        );
+        expect(added, 3);
+        // Exactly one reschedule for the whole batch — same batching rule as
+        // postStats.
+        expect(calls, hasLength(1));
+        // Anchored at noon on the latest day in the batch (Apr 26).
+        expect(
+          calls.single.endMs,
+          DateTime(2026, 4, 26, manualSessionAnchorHour).millisecondsSinceEpoch,
+        );
+        expect(calls.single.durationMs, 10 * 60 * 1000);
+      },
+    );
 
     test('addManualSessions with no past dates does not reschedule', () async {
       final added = await addManualSessions(
@@ -149,7 +152,9 @@ void main() {
       // Flip the pref back off for this one test.
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(
-          SharedPreferenceConstants.dailyReminderEnabled, false);
+        SharedPreferenceConstants.dailyReminderEnabled,
+        false,
+      );
 
       final ok = await addManualSession(
         dateTime: DateTime(2026, 4, 27, 14, 30),

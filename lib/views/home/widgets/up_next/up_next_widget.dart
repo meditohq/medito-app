@@ -126,22 +126,50 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                   borderRadius: _kCardBorderRadius,
                   borderWidth: 0.5,
                   child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(padding16),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          l10n.upNextTitle.toUpperCase(),
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(padding16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        l10n.upNextTitle.toUpperCase(),
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              fontFamily: teachers,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: 1.2,
+                                              color: onSurface.withOpacityValue(
+                                                0.7,
+                                              ),
+                                            ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '·',
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              fontFamily: teachers,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: onSurface.withOpacityValue(
+                                                0.7,
+                                              ),
+                                            ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          widget.data.pack.title,
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
                                                 fontFamily: teachers,
@@ -151,67 +179,41 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                                 color: onSurface
                                                     .withOpacityValue(0.7),
                                               ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '·',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                                fontFamily: teachers,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                                color: onSurface
-                                                    .withOpacityValue(0.7),
-                                              ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    nextSession.title,
+                                    style: theme.textTheme.headlineSmall
+                                        ?.copyWith(
+                                          fontFamily: sourceSerif,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w500,
+                                          height: 1.2,
+                                          color: onSurface,
                                         ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            widget.data.pack.title,
-                                            style: theme.textTheme.bodySmall
-                                                ?.copyWith(
-                                                  fontFamily: teachers,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  letterSpacing: 1.2,
-                                                  color: onSurface
-                                                      .withOpacityValue(0.7),
-                                                ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      nextSession.title,
-                                      style: theme.textTheme.headlineSmall
-                                          ?.copyWith(
-                                            fontFamily: sourceSerif,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w500,
-                                            height: 1.2,
-                                            color: onSurface,
-                                          ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: padding16),
-                              _PlayButton(onTap: () => _onTap(context)),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: padding16),
+                            _PlayButton(onTap: () => _onTap(context)),
+                          ],
                         ),
-                        if (widget.inlineStrip != null) widget.inlineStrip!,
-                      ],
-                    ),
+                      ),
+                      if (widget.inlineStrip != null) widget.inlineStrip!,
+                    ],
                   ),
                 ),
               ),
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 
   Widget _getSkipBackground(BuildContext context, AppLocalizations l10n) {
@@ -307,15 +309,20 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     final preferredDuration = ref.read(durationPreferenceProvider);
 
     if (guideName != null && preferredDuration != null) {
-      final track = await ref.read(tracksProvider(trackId: nextSession.id).future);
+      final track = await ref.read(
+        tracksProvider(trackId: nextSession.id).future,
+      );
       final selection = TrackVariantSelector.resolve(
         track,
         guideName: guideName,
         durationMs: preferredDuration,
       );
 
-      final request =
-          PlaybackRequest.fromTrack(track, selection.voice, selection.file);
+      final request = PlaybackRequest.fromTrack(
+        track,
+        selection.voice,
+        selection.file,
+      );
       try {
         await ref.read(playerProvider.notifier).play(request);
       } catch (e, st) {

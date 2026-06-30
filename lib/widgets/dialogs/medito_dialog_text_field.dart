@@ -53,10 +53,7 @@ class MeditoDialogTextField extends StatelessWidget {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       onChanged: onChanged,
-      style: TextStyle(
-        fontFamily: dmSans,
-        color: theme.colorScheme.onSurface,
-      ),
+      style: TextStyle(fontFamily: dmSans, color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,

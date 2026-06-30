@@ -19,8 +19,9 @@ final iosBackgroundPlayer = AudioPlayer()..setLoopMode(LoopMode.all);
 
 @riverpod
 Future<List<BackgroundSoundsModel>> backgroundSounds(Ref ref) {
-  final backgroundSoundsRepository =
-      ref.watch(backgroundSoundsRepositoryProvider);
+  final backgroundSoundsRepository = ref.watch(
+    backgroundSoundsRepositoryProvider,
+  );
   ref.keepAlive();
 
   return backgroundSoundsRepository.fetchBackgroundSounds();
@@ -30,8 +31,9 @@ Future<List<BackgroundSoundsModel>> backgroundSounds(Ref ref) {
 Future<List<BackgroundSoundsModel>?> fetchLocallySavedBackgroundSounds(
   Ref ref,
 ) {
-  final backgroundSoundsRepository =
-      ref.watch(backgroundSoundsRepositoryProvider);
+  final backgroundSoundsRepository = ref.watch(
+    backgroundSoundsRepositoryProvider,
+  );
   ref.watch(backgroundSoundsNotifierProvider);
   ref.keepAlive();
 
@@ -70,8 +72,8 @@ const _sentinel = Object();
 
 final backgroundSoundsNotifierProvider =
     NotifierProvider<BackgroundSoundsNotifier, BackgroundSoundsState>(
-  () => BackgroundSoundsNotifier(),
-);
+      () => BackgroundSoundsNotifier(),
+    );
 
 class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   StreamSubscription<Duration>? _fadeSubscription;
@@ -121,10 +123,7 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
             AppLogger.d('BG_SOUND', 'File not downloaded, downloading now');
             state = state.copyWith(downloadingBgSound: sound);
             downloadAudio
-                .downloadFile(
-                  sound.path,
-                  fileName: fileName,
-                )
+                .downloadFile(sound.path, fileName: fileName)
                 .then((_) {
                   AppLogger.d('BG_SOUND', 'Download completed');
                   state = state.copyWith(downloadingBgSound: null);
@@ -175,13 +174,15 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
         // Set new background sound
         var formattedUri = isUrl ? uri : 'file://$uri';
         AppLogger.d(
-            'BG_SOUND', 'Setting Android background sound: $formattedUri');
+          'BG_SOUND',
+          'Setting Android background sound: $formattedUri',
+        );
         await _api.setBackgroundSound(formattedUri);
 
         // Play the background sound
         AppLogger.d('BG_SOUND', 'Starting background playback');
         await _api.playBackgroundSound();
-        
+
         // Ensure volume is set after playback starts
         _api.setBackgroundSoundVolume(scaledVolume(state.volume));
       } catch (e, s) {
@@ -194,7 +195,9 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
           await iosBackgroundPlayer.setUrl(uri);
         } else {
           AppLogger.d(
-              'BG_SOUND', 'Setting iOS background sound with file path');
+            'BG_SOUND',
+            'Setting iOS background sound with file path',
+          );
           await iosBackgroundPlayer.setFilePath(uri);
         }
         AppLogger.d('BG_SOUND', 'Playing iOS background sound');
@@ -208,8 +211,10 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   }
 
   void togglePlayPause(bool isPlaying) {
-    AppLogger.d('BG_SOUND',
-        'Toggling background sound play/pause, current isPlaying: $isPlaying');
+    AppLogger.d(
+      'BG_SOUND',
+      'Toggling background sound play/pause, current isPlaying: $isPlaying',
+    );
 
     if (Platform.isAndroid) {
       if (isPlaying) {
@@ -266,29 +271,29 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
 
     var durationFromEnd = const Duration(seconds: 10).inMilliseconds;
 
-    _fadeSubscription = iosAudioHandler.positionStream.listen(
-      (currentPosition) {
-        var duration = iosAudioHandler.duration?.inMilliseconds ?? 0;
-        if (duration == 0) {
-          iosBackgroundPlayer.setVolume(scaledVolume(state.volume));
-          return;
-        }
+    _fadeSubscription = iosAudioHandler.positionStream.listen((
+      currentPosition,
+    ) {
+      var duration = iosAudioHandler.duration?.inMilliseconds ?? 0;
+      if (duration == 0) {
+        iosBackgroundPlayer.setVolume(scaledVolume(state.volume));
+        return;
+      }
 
-        var remainingTime = duration - currentPosition.inMilliseconds;
+      var remainingTime = duration - currentPosition.inMilliseconds;
 
-        if (remainingTime <= 0) {
-          // At or past the end: stay silent. Without this the fade would snap
-          // back to full volume on the final position update, causing an
-          // audible blip right before playback completes.
-          iosBackgroundPlayer.setVolume(0);
-        } else if (remainingTime <= durationFromEnd) {
-          var newVolume = state.volume * remainingTime / durationFromEnd;
-          iosBackgroundPlayer.setVolume(scaledVolume(newVolume));
-        } else {
-          iosBackgroundPlayer.setVolume(scaledVolume(state.volume));
-        }
-      },
-    );
+      if (remainingTime <= 0) {
+        // At or past the end: stay silent. Without this the fade would snap
+        // back to full volume on the final position update, causing an
+        // audible blip right before playback completes.
+        iosBackgroundPlayer.setVolume(0);
+      } else if (remainingTime <= durationFromEnd) {
+        var newVolume = state.volume * remainingTime / durationFromEnd;
+        iosBackgroundPlayer.setVolume(scaledVolume(newVolume));
+      } else {
+        iosBackgroundPlayer.setVolume(scaledVolume(state.volume));
+      }
+    });
   }
 
   double scaledVolume(double vol) {

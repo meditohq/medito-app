@@ -139,3 +139,6 @@ after-donation-next.png
 player-playing.png
 superwall-paywall.png
 /maestro-debug-ios/.maestro/tests
+/android/build
+/android/build/ios
+/android/build/ios/XCBuildData

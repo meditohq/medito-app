@@ -13,9 +13,7 @@ class ExploreInitialPageShimmerWidget extends StatelessWidget {
         left: padding16,
         right: padding16,
       ),
-      child: Column(
-        children: List.generate(8, (index) => _shimmerList()),
-      ),
+      child: Column(children: List.generate(8, (index) => _shimmerList())),
     );
   }
 
@@ -26,9 +24,7 @@ class ExploreInitialPageShimmerWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       padding: const EdgeInsets.all(padding16),
-      margin: const EdgeInsets.only(
-        bottom: padding16,
-      ),
+      margin: const EdgeInsets.only(bottom: padding16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,30 +34,18 @@ class ExploreInitialPageShimmerWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 height8,
-                BoxShimmerWidget(
-                  height: 16,
-                  width: 150,
-                ),
+                BoxShimmerWidget(height: 16, width: 150),
                 height8,
-                BoxShimmerWidget(
-                  height: 10,
-                  width: 260,
-                ),
+                BoxShimmerWidget(height: 10, width: 260),
                 height4,
-                BoxShimmerWidget(
-                  height: 10,
-                  width: 200,
-                ),
+                BoxShimmerWidget(height: 10, width: 200),
               ],
             ),
           ),
           width12,
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
-            child: const BoxShimmerWidget(
-              height: 80,
-              width: 80,
-            ),
+            child: const BoxShimmerWidget(height: 80, width: 80),
           ),
         ],
       ),

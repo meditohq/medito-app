@@ -19,7 +19,9 @@ class NextTrackNotifier extends AsyncNotifier<void> {
         guideName: ref.read(guideNamePreferenceProvider),
         durationMs: ref.read(durationPreferenceProvider),
       );
-      ref.read(playerProvider.notifier).prepare(
+      ref
+          .read(playerProvider.notifier)
+          .prepare(
             PlaybackRequest.fromTrack(track, selection.voice, selection.file),
           );
       state = const AsyncValue.data(null);

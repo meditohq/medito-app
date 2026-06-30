@@ -59,8 +59,9 @@ final productsProvider = FutureProvider<List<ProductGroupModel>>((ref) async {
           variants: [firstProduct],
           allImageUrls: allImages, // Pass the shuffled images
           // Set displayImageUrl to the first shuffled image, or fallback
-          displayImageUrl:
-              allImages.isNotEmpty ? allImages.first : firstProduct.imageUrl,
+          displayImageUrl: allImages.isNotEmpty
+              ? allImages.first
+              : firstProduct.imageUrl,
           // Keep other fields derived from the first product
           imageUrl: firstProduct.imageUrl,
           color: firstProduct.color,
@@ -81,8 +82,9 @@ final productsProvider = FutureProvider<List<ProductGroupModel>>((ref) async {
   }
 });
 
-final refreshProductsProvider =
-    FutureProvider<List<ProductGroupModel>>((ref) async {
+final refreshProductsProvider = FutureProvider<List<ProductGroupModel>>((
+  ref,
+) async {
   AppLogger.d('PRODUCTS_PROVIDER', 'Refreshing products');
   ref.invalidate(productsProvider);
   try {

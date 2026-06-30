@@ -53,9 +53,7 @@ extension OnboardingResultStateLabel on OnboardingResultState {
 ///   0 = Never tried it          → State A (learn from scratch)
 ///   1 = A little, here and there → State B (ease back in)
 ///   2 = I have a regular practice → State C (keep the practice going)
-OnboardingResultState deriveOnboardingState({
-  required int experienceIndex,
-}) {
+OnboardingResultState deriveOnboardingState({required int experienceIndex}) {
   switch (experienceIndex) {
     case 2:
       return OnboardingResultState.stateC;
@@ -103,24 +101,28 @@ class _OnboardingResultScreenState
     if (widget.showMeditation) {
       _priorStreak = ref.read(statsProvider).value?.streakCurrent ?? 0;
       unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.onboardingFirstMeditationShown,
-          parameters: {
-            AnalyticsEventConstants.paramExperimentName:
-                OnboardingMeditationExperiment.experimentName,
-            AnalyticsEventConstants.paramVariantId:
-                OnboardingMeditationExperiment.variantMeditation,
-          },
-        ),
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.onboardingFirstMeditationShown,
+              parameters: {
+                AnalyticsEventConstants.paramExperimentName:
+                    OnboardingMeditationExperiment.experimentName,
+                AnalyticsEventConstants.paramVariantId:
+                    OnboardingMeditationExperiment.variantMeditation,
+              },
+            ),
       );
     }
   }
 
   Future<void> _begin() async {
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.onboardingFirstMeditationBeginTap,
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.onboardingFirstMeditationBeginTap,
+          ),
     );
     setState(() {
       _started = true;
@@ -135,8 +137,11 @@ class _OnboardingResultScreenState
         guideName: OnboardingMeditationExperiment.guideName,
         durationMs: OnboardingMeditationExperiment.targetDurationMs,
       );
-      final request =
-          PlaybackRequest.fromTrack(track, selection.voice, selection.file);
+      final request = PlaybackRequest.fromTrack(
+        track,
+        selection.voice,
+        selection.file,
+      );
       await ref.read(playerProvider.notifier).play(request);
       if (!mounted) return;
       setState(() => _loading = false);
@@ -153,16 +158,20 @@ class _OnboardingResultScreenState
     // audio so it doesn't keep playing into the app.
     if (widget.showMeditation && _started && !_done) {
       unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.onboardingFirstMeditationSkipTap,
-        ),
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.onboardingFirstMeditationSkipTap,
+            ),
       );
       ref.read(playerProvider.notifier).stop();
     } else if (widget.showMeditation && !_started) {
       unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.onboardingFirstMeditationSkipTap,
-        ),
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.onboardingFirstMeditationSkipTap,
+            ),
       );
     }
     widget.onGetStarted();
@@ -175,8 +184,10 @@ class _OnboardingResultScreenState
     final l10n = AppLocalizations.of(context)!;
 
     // Flip to the streak reveal the moment the inline session completes.
-    ref.listen(audioStateProvider.select((s) => s.isCompleted),
-        (prev, isCompleted) {
+    ref.listen(audioStateProvider.select((s) => s.isCompleted), (
+      prev,
+      isCompleted,
+    ) {
       if (widget.showMeditation &&
           isCompleted &&
           _started &&
@@ -277,9 +288,7 @@ class _OnboardingResultScreenState
         color: onSurface.withOpacityValue(0.05),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: _done
-          ? _buildStreak(context, l10n)
-          : _buildPlayer(context, l10n),
+      child: _done ? _buildStreak(context, l10n) : _buildPlayer(context, l10n),
     );
   }
 
@@ -302,15 +311,18 @@ class _OnboardingResultScreenState
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.schedule,
-                  size: 15, color: onSurface.withOpacityValue(0.7)),
+              Icon(
+                Icons.schedule,
+                size: 15,
+                color: onSurface.withOpacityValue(0.7),
+              ),
               const SizedBox(width: 5),
               Text(
                 l10n.onboardingFirstMeditationDuration,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: onSurface.withOpacityValue(0.7),
-                    ),
+                  fontWeight: FontWeight.w600,
+                  color: onSurface.withOpacityValue(0.7),
+                ),
               ),
             ],
           ),
@@ -319,9 +331,9 @@ class _OnboardingResultScreenState
         Text(
           l10n.onboardingFirstMeditationSubtitle,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: onSurface.withOpacityValue(0.85),
-                height: 1.4,
-              ),
+            color: onSurface.withOpacityValue(0.85),
+            height: 1.4,
+          ),
           textAlign: TextAlign.center,
         ),
         if (_started) ...[
@@ -374,9 +386,9 @@ class _OnboardingResultScreenState
         Text(
           l10n.onboardingFirstMeditationDone,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: onSurface,
-              ),
+            fontWeight: FontWeight.w600,
+            color: onSurface,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
@@ -399,10 +411,10 @@ class _OnboardingResultScreenState
               Text(
                 '${value.round()}',
                 style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w700,
-                      color: onSurface,
-                    ),
+                  fontSize: 48,
+                  fontWeight: FontWeight.w700,
+                  color: onSurface,
+                ),
               ),
             ],
           ),
@@ -411,8 +423,8 @@ class _OnboardingResultScreenState
         Text(
           l10n.dayStreak,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: onSurface.withOpacityValue(0.9),
-              ),
+            color: onSurface.withOpacityValue(0.9),
+          ),
         ),
       ],
     );
@@ -490,10 +502,7 @@ class _GetStartedButtonState extends State<_GetStartedButton>
                 children: [
                   Positioned.fill(
                     child: Align(
-                      alignment: Alignment(
-                        -1.4 + (_breathe.value * 2.8),
-                        -1.0,
-                      ),
+                      alignment: Alignment(-1.4 + (_breathe.value * 2.8), -1.0),
                       child: FractionallySizedBox(
                         widthFactor: 0.4,
                         heightFactor: 1,

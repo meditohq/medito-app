@@ -51,8 +51,11 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 duration: const Duration(milliseconds: 500),
                 child: snoozeState.isSnoozed
                     ? _buildCompactThankYouWidget(context)
-                    : _buildDonationWidget(context, donationPageModel,
-                        isSnoozed: false),
+                    : _buildDonationWidget(
+                        context,
+                        donationPageModel,
+                        isSnoozed: false,
+                      ),
               ),
               height20,
               const FeedbackWidget(),
@@ -86,75 +89,77 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 20, 12, 20),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Text(
-                    donationPageModel.title ?? 'Support Medito',
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontFamily: sourceSerif,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w400,
-                          height: 1.2,
-                          color: Colors.white,
-                        ),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      donationPageModel.title ?? 'Support Medito',
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            fontFamily: sourceSerif,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w400,
+                            height: 1.2,
+                            color: Colors.white,
+                          ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: AppLocalizations.of(context)!.donationInfo,
+                  icon: MeditoIcon(
+                    assetName: MeditoIcons.help,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => _showDonationInfoDialog(context),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              donationPageModel.text ??
+                  AppLocalizations.of(
+                    context,
+                  )!.meditoReliesOnYourDonationsToSurvive,
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+                height: 1.4,
+                color: Colors.white.withValues(alpha: 0.9),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _buildButtonRow(donationPageModel.buttons, context),
+            ),
+            if (donationPageModel.footerText != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 14.0, right: 8),
+                child: Text(
+                  donationPageModel.footerText!,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                    color: footerColor,
                   ),
                 ),
               ),
-              IconButton(
-                tooltip: AppLocalizations.of(context)!.donationInfo,
-                icon: MeditoIcon(
-                  assetName: MeditoIcons.help,
-                  size: 20,
-                  color: Colors.white,
-                ),
-                onPressed: () => _showDonationInfoDialog(context),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                visualDensity: VisualDensity.compact,
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            donationPageModel.text ??
-                AppLocalizations.of(context)!
-                    .meditoReliesOnYourDonationsToSurvive,
-            textAlign: TextAlign.left,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  height: 1.4,
-                  color: Colors.white.withValues(alpha: 0.9),
-                ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: _buildButtonRow(donationPageModel.buttons, context),
-          ),
-          if (donationPageModel.footerText != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 14.0, right: 8),
-              child: Text(
-                donationPageModel.footerText!,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      height: 1.4,
-                      color: footerColor,
-                    ),
-              ),
-            ),
-        ],
+          ],
         ),
       ),
     );
@@ -166,61 +171,58 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
       borderRadius: 14,
       borderWidth: 0.5,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 16,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.thankYouForYourSupport,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontFamily: sourceSerif,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            AppLocalizations.of(context)!.donorSupportMessage,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  height: 1.4,
-                  color: Colors.white.withValues(alpha: 0.9),
-                ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () => handleNavigation(
-                TypeConstants.route,
-                [RouteConstants.donation],
-                context,
-                ref: ref,
-                sourceRouteName:
-                    FirebaseAnalyticsService.paywallSourceEndScreen,
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white, width: 1.5),
-                padding: const EdgeInsets.symmetric(vertical: 8),
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.donateAgain,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.thankYouForYourSupport,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontFamily: sourceSerif,
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                color: Colors.white,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 6),
+            Text(
+              AppLocalizations.of(context)!.donorSupportMessage,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                height: 1.4,
+                color: Colors.white.withValues(alpha: 0.9),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => handleNavigation(
+                  TypeConstants.route,
+                  [RouteConstants.donation],
+                  context,
+                  ref: ref,
+                  sourceRouteName:
+                      FirebaseAnalyticsService.paywallSourceEndScreen,
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white, width: 1.5),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.donateAgain,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -266,10 +268,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
       }
     } catch (e) {
       if (context.mounted) {
-        showSnackBar(
-          context,
-          AppLocalizations.of(context)!.anErrorOccurred,
-        );
+        showSnackBar(context, AppLocalizations.of(context)!.anErrorOccurred);
       }
     }
   }
@@ -304,10 +303,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
               child: Text(
                 button.title ?? AppLocalizations.of(context)!.donateNow,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
           ),

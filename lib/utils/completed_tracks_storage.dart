@@ -28,7 +28,9 @@ class CompletedTracksStorage {
       await _prefs.setStringList(completedTracksKey, currentList);
       final trackId = payload[TypeConstants.trackIdKey];
       AppLogger.d(
-          'STORAGE', 'Stored track completion for later processing: $trackId');
+        'STORAGE',
+        'Stored track completion for later processing: $trackId',
+      );
     } catch (e) {
       AppLogger.e('STORAGE', 'Error storing completed track', e);
     }

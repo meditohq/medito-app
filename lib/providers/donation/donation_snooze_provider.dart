@@ -71,8 +71,8 @@ class DonationSnooze extends _$DonationSnooze {
     final snoozeDays = frequency == 'onetime'
         ? 60
         : frequency == 'yearly'
-            ? 365
-            : 30; // monthly
+        ? 365
+        : 30; // monthly
     final snoozedUntil = now.add(Duration(days: snoozeDays));
 
     await prefs.setInt(
