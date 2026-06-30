@@ -12,7 +12,7 @@ The app is free, forever: no ads, no spam, no need to sign up or pay. Medito App
 - App Store: [Download on the App Store](https://apps.apple.com/us/app/medito/id1500780518)
 - APK:
 
-**NOTE:** If you install the Medito app using the APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](VERIFY_APK.md) for more information.
+**NOTE:** If you install the Medito app using the APK file, please make sure to verify that the APK file is signed by Medito Foundation. See [VERIFY_APK](docs/VERIFY_APK.md) for more information.
 
 ### Contributions (Running in Mock Mode (no keys required))
 

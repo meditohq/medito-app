@@ -170,7 +170,7 @@ class AnalyticsEventConstants {
   /// (close, switch track, navigate-away-while-paused, background-while-paused,
   /// or replayed on next launch after a force-quit). Carries
   /// [paramPercentCompleted] and [paramElapsedSeconds] for drop-off analysis.
-  /// See ANALYTICS_SESSION_EVENTS.md for exact fire conditions.
+  /// See docs/ANALYTICS_SESSION_EVENTS.md for exact fire conditions.
   static const String audioSessionAbandoned = 'audio_session_abandoned';
 
   /// Parameter name for audio file ID

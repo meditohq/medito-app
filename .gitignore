@@ -33,6 +33,8 @@
 .pub-cache/
 .pub/
 /build/
+**/android/build/
+/coverage/
 widgetbook/build/
 *.cache.dill.track.dill
 
@@ -109,7 +111,6 @@ android/app/local.properties
 *.bin
 /android/app/.cxx
 /ios/build
-/android/app/.cxx
 fastlane/keys
 android/fastlane/keys/
 android/fastlane/report.xml
@@ -133,8 +134,8 @@ firebase/functions/node_modules/
 
 # Maestro test debug output
 .maestro/debug/
+maestro-debug-ios/
 after-donation-next.png
 player-playing.png
 superwall-paywall.png
 /maestro-debug-ios/.maestro/tests
-*.lock

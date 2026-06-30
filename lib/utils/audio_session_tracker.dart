@@ -18,7 +18,7 @@ import 'logger.dart';
 /// This is the single source of truth for the started/abandoned events on both
 /// platforms — wiring points (player_provider, audio_state_provider, main.dart,
 /// player_view) just forward lifecycle signals here. See
-/// ANALYTICS_SESSION_EVENTS.md for the full spec and exact fire conditions.
+/// docs/ANALYTICS_SESSION_EVENTS.md for the full spec and exact fire conditions.
 ///
 /// Reliability: an in-progress record is persisted to SharedPreferences and the
 /// last playback position is kept up to date (throttled), so a force-quit that
@@ -31,8 +31,8 @@ class AudioSessionTracker {
   /// Sink for the analytics events. Defaults to Firebase; overridable in tests
   /// to capture what would be logged without touching a real analytics client.
   static Future<void> Function(String name, Map<String, Object> parameters)
-      logSink = (name, parameters) =>
-          FirebaseAnalyticsService().logEvent(name: name, parameters: parameters);
+  logSink = (name, parameters) =>
+      FirebaseAnalyticsService().logEvent(name: name, parameters: parameters);
 
   // Active session, or null when nothing is playing.
   _Session? _active;
@@ -65,14 +65,11 @@ class AudioSessionTracker {
     _lastPersistAt = null;
     await _persist(session);
 
-    await _log(
-      AnalyticsEventConstants.audioSessionStarted,
-      {
-        AnalyticsEventConstants.paramAudioFileId: session.fileId,
-        AnalyticsEventConstants.paramAudioFileGuide: session.guide,
-        AnalyticsEventConstants.paramAudioFileDuration: session.durationMs,
-      },
-    );
+    await _log(AnalyticsEventConstants.audioSessionStarted, {
+      AnalyticsEventConstants.paramAudioFileId: session.fileId,
+      AnalyticsEventConstants.paramAudioFileGuide: session.guide,
+      AnalyticsEventConstants.paramAudioFileDuration: session.durationMs,
+    });
     AppLogger.d('SESSION', 'audio_session_started: ${session.fileId}');
   }
 
@@ -144,18 +141,22 @@ class AudioSessionTracker {
   Future<void> replayIfAbandoned() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final raw =
-          prefs.getString(SharedPreferenceConstants.incompleteAudioSession);
+      final raw = prefs.getString(
+        SharedPreferenceConstants.incompleteAudioSession,
+      );
       if (raw == null || raw.isEmpty) return;
 
       // Clear first so a crash mid-replay can't loop on the same record.
       await prefs.remove(SharedPreferenceConstants.incompleteAudioSession);
 
       final session = _Session.fromJson(
-          Map<String, dynamic>.from(jsonDecode(raw) as Map));
+        Map<String, dynamic>.from(jsonDecode(raw) as Map),
+      );
       await _fireAbandoned(session, reason: 'launch_replay');
-      AppLogger.d('SESSION',
-          'replayed abandoned session from previous launch: ${session.fileId}');
+      AppLogger.d(
+        'SESSION',
+        'replayed abandoned session from previous launch: ${session.fileId}',
+      );
     } catch (e) {
       AppLogger.e('SESSION', 'Failed to replay abandoned session', e);
     }
@@ -187,26 +188,26 @@ class AudioSessionTracker {
     await _clearPersisted();
   }
 
-  Future<void> _fireAbandoned(_Session session,
-      {required String reason}) async {
-    final elapsedMs =
-        session.lastPositionMs < 0 ? 0 : session.lastPositionMs;
+  Future<void> _fireAbandoned(
+    _Session session, {
+    required String reason,
+  }) async {
+    final elapsedMs = session.lastPositionMs < 0 ? 0 : session.lastPositionMs;
     final elapsedSeconds = (elapsedMs / 1000).round();
     final percent = _bucketedPercent(elapsedMs, session.durationMs);
 
-    await _log(
-      AnalyticsEventConstants.audioSessionAbandoned,
-      {
-        AnalyticsEventConstants.paramAudioFileId: session.fileId,
-        AnalyticsEventConstants.paramAudioFileGuide: session.guide,
-        AnalyticsEventConstants.paramAudioFileDuration: session.durationMs,
-        AnalyticsEventConstants.paramPercentCompleted: percent,
-        AnalyticsEventConstants.paramElapsedSeconds: elapsedSeconds,
-        AnalyticsEventConstants.paramReason: reason,
-      },
+    await _log(AnalyticsEventConstants.audioSessionAbandoned, {
+      AnalyticsEventConstants.paramAudioFileId: session.fileId,
+      AnalyticsEventConstants.paramAudioFileGuide: session.guide,
+      AnalyticsEventConstants.paramAudioFileDuration: session.durationMs,
+      AnalyticsEventConstants.paramPercentCompleted: percent,
+      AnalyticsEventConstants.paramElapsedSeconds: elapsedSeconds,
+      AnalyticsEventConstants.paramReason: reason,
+    });
+    AppLogger.d(
+      'SESSION',
+      'audio_session_abandoned ($reason): ${session.fileId} @ $percent% / ${elapsedSeconds}s',
     );
-    AppLogger.d('SESSION',
-        'audio_session_abandoned ($reason): ${session.fileId} @ $percent% / ${elapsedSeconds}s');
   }
 
   /// Percent of [durationMs] reached, rounded to the nearest 10 and clamped to
@@ -272,18 +273,18 @@ class _Session {
   bool playerCompleted = false;
 
   Map<String, dynamic> toJson() => {
-        'fileId': fileId,
-        'guide': guide,
-        'durationMs': durationMs,
-        'startMs': startMs,
-        'lastPositionMs': lastPositionMs,
-      };
+    'fileId': fileId,
+    'guide': guide,
+    'durationMs': durationMs,
+    'startMs': startMs,
+    'lastPositionMs': lastPositionMs,
+  };
 
   factory _Session.fromJson(Map<String, dynamic> json) => _Session(
-        fileId: (json['fileId'] as String?) ?? 'unknown',
-        guide: (json['guide'] as String?) ?? 'unknown',
-        durationMs: (json['durationMs'] as num?)?.toInt() ?? 0,
-        startMs: (json['startMs'] as num?)?.toInt() ?? 0,
-        lastPositionMs: (json['lastPositionMs'] as num?)?.toInt() ?? 0,
-      );
+    fileId: (json['fileId'] as String?) ?? 'unknown',
+    guide: (json['guide'] as String?) ?? 'unknown',
+    durationMs: (json['durationMs'] as num?)?.toInt() ?? 0,
+    startMs: (json['startMs'] as num?)?.toInt() ?? 0,
+    lastPositionMs: (json['lastPositionMs'] as num?)?.toInt() ?? 0,
+  );
 }

@@ -42,11 +42,14 @@ class SharedPreferenceConstants {
 
   // Smart Reminders
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
-  static const String reminderPromptDismissedForever = 'reminder_prompt_dismissed_forever';
+  static const String reminderPromptDismissedForever =
+      'reminder_prompt_dismissed_forever';
   static const String notifPermissionFixNeeded = 'notif_permission_fix_needed';
+
   /// Epoch millis until which the post-session reminder prompt is suppressed.
   /// Set by a soft dismiss ("Not now") instead of the permanent dismiss.
-  static const String reminderPromptSnoozeUntil = 'reminder_prompt_snooze_until';
+  static const String reminderPromptSnoozeUntil =
+      'reminder_prompt_snooze_until';
 
   // Zen Mode
   static const String zenModeEnabled = 'zen_mode_enabled';
@@ -69,9 +72,12 @@ class SharedPreferenceConstants {
   static const String utmContent = 'utm_content';
 
   // Donation snooze tracking
-  static const String donationAskSnoozedUntilMs = 'donation_ask_snoozed_until_ms';
-  static const String lastSuccessfulDonationAtMs = 'last_successful_donation_at_ms';
-  static const String lastSuccessfulDonationFrequency = 'last_successful_donation_frequency';
+  static const String donationAskSnoozedUntilMs =
+      'donation_ask_snoozed_until_ms';
+  static const String lastSuccessfulDonationAtMs =
+      'last_successful_donation_at_ms';
+  static const String lastSuccessfulDonationFrequency =
+      'last_successful_donation_frequency';
 
   // Up Next pack preference
   static const String upNextPackId = 'up_next_pack_id';
@@ -101,7 +107,7 @@ class SharedPreferenceConstants {
   // {fileId, guide, durationMs, lastPositionMs, startMs}. Present only while a
   // session is playing/paused; cleared on completion or abandonment. Replayed
   // as an audio_session_abandoned event on next launch if a force-quit left it
-  // behind. See ANALYTICS_SESSION_EVENTS.md.
+  // behind. See docs/ANALYTICS_SESSION_EVENTS.md.
   static const String incompleteAudioSession = 'incompleteAudioSession';
 
   // The onboarding "experience" answer, persisted as an int index:
