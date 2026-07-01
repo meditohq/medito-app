@@ -143,12 +143,31 @@ jobs:
           KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
         run: printf '%s' "$KEYSTORE_FILE" | base64 -d > android/meditokey.jks
 
-      - name: Build APK
+      - name: Set up Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+
+      - name: Shorebird release (Android)
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
-          flutter build apk --flavor prod --release \
+          # Builds the store APK WITH the Shorebird engine so this release is
+          # patchable over-the-air. --artifact apk keeps the existing output path
+          # (build/app/outputs/apk/prod/release/app-prod-release.apk), so the
+          # "Upload APK artifact" + "Upload to Play Store" steps stay unchanged.
+          # Shorebird-level flags (flavor, obfuscation, flutter version) go BEFORE
+          # `--`; flutter build args go AFTER it. Obfuscation is auto-matched on
+          # patch, so pass --obfuscate/--split-debug-info on release only.
+          shorebird release android \
+            --flutter-version=3.41.6 \
+            --flavor prod \
+            --artifact apk \
+            --split-debug-info=./symbols --obfuscate \
+            -- \
             --dart-define-from-file=.prod.json \
-            --dart-define=MOCK_MODE=false \
-            --obfuscate --split-debug-info=./symbols
+            --dart-define=MOCK_MODE=false
+          # First-run sanity check: confirm the APK landed where the downstream
+          # "Upload APK artifact" + Play upload steps expect it.
+          ls -lh build/app/outputs/apk/prod/release/app-prod-release.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -883,19 +902,18 @@ jobs:
           plutil -lint ios/Runner/Runner.entitlements
           plutil -lint ios/Runner/RunnerRelease.entitlements
 
+      # Bundler-managed fastlane so the fastlane-plugin-shorebird plugin actually
+      # loads (bare `gem install` + a Pluginfile does NOT register a plugin with
+      # bare `fastlane`). Prereq: run `cd ios && fastlane add_plugin shorebird`
+      # locally and commit ios/Gemfile, ios/Gemfile.lock, ios/fastlane/Pluginfile.
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios
 
-      - name: Cache Fastlane gems
-        uses: actions/cache@v4
-        with:
-          path: ~/.gem
-          key: ${{ runner.os }}-gem-fastlane-${{ hashFiles('ios/Gemfile.lock') }}
-          restore-keys: ${{ runner.os }}-gem-fastlane-
-
-      - name: Install Fastlane
-        run: gem install fastlane --no-document
+      - name: Set up Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
 
       - name: Set release notes
         env:
@@ -942,14 +960,15 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-            fastlane release
+            bundle exec fastlane release
           else
             if [ "${{ inputs.ios_testflight }}" = "true" ]; then
-              fastlane beta
+              bundle exec fastlane beta
             fi
             if [ "${{ inputs.ios_appstore }}" = "true" ]; then
-              fastlane release
+              bundle exec fastlane release
             fi
           fi

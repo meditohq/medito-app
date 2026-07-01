@@ -2,3 +2,12 @@ source 'https://rubygems.org'
 
 gem 'cocoapods', '~> 1.16.2'
 gem 'xcodeproj', '1.27.0'
+# fastlane is bundler-managed here (was previously `gem install`d globally in CI)
+# so the fastlane-plugin-shorebird plugin loads via the Pluginfile below. Bare
+# `fastlane` does not load Pluginfile plugins — only `bundle exec fastlane` does.
+gem 'fastlane', '2.226.0'
+
+# Load fastlane plugins declared in ios/fastlane/Pluginfile (adds
+# fastlane-plugin-shorebird → shorebird_release / shorebird_patch actions).
+plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
+eval_gemfile(plugins_path) if File.exist?(plugins_path)

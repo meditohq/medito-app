@@ -8,6 +8,26 @@ def match_readonly?
   return value.strip.downcase != "false"
 end
 
+# Flutter version Shorebird builds with. MUST match the version pinned in
+# .github/workflows/release.yml (subosito/flutter-action) AND be a
+# Shorebird-supported version, or patches won't apply to releases built here.
+SHOREBIRD_FLUTTER_VERSION = "3.41.6"
+
+# Dart-defines forwarded to the underlying `flutter build`. Passed as
+# SHOREBIRD-LEVEL flags (shorebird release/patch accept --dart-define and
+# --dart-define-from-file directly and forward them to flutter) — deliberately
+# NOT after a `--` separator. Reason: the fastlane-plugin-shorebird
+# `shorebird_release` action APPENDS `--export-options-plist <path>` to the END
+# of `args`; with a `--` separator that appended flag would land in the
+# flutter-build section and break the build. No `--` = the plist flag stays a
+# valid shorebird arg. These MUST be byte-for-byte identical between `shorebird
+# release` and every later `shorebird patch`, or the patch diff drifts.
+SHOREBIRD_DART_DEFINES = [
+  "--dart-define-from-file=.prod.json",
+  "--dart-define=MOCK_MODE=false",
+  "--dart-define=ENABLE_DEVICE_PREVIEW=false",
+].join(" ")
+
 platform :ios do
 
   before_all do
@@ -17,7 +37,7 @@ platform :ios do
     # CI selects the required Xcode (26+, for Apple's now-mandatory iOS 26 SDK)
     # in the workflow's "Select Xcode" step via `xcode-select -s`. Hard-coding
     # `/Applications/Xcode.app` here overrode that and reset the toolchain to
-    # the runner's older default Xcode, so `build_app` archived against the
+    # the runner's older default Xcode, so the archive built against the
     # iOS 18.5 SDK and App Store Connect rejected the upload:
     #   "Validation failed (409) ... must be built with the iOS 26 SDK or
     #    later, included in Xcode 26 or later."
@@ -35,6 +55,8 @@ platform :ios do
     xcode_select(xcode_app)
   end
 
+  # TestFlight release. Shorebird builds the (patchable) signed .ipa in place of
+  # fastlane's build_app/gym; match + per-target manual signing are unchanged.
   lane :beta do |options|
     setup_keychain()
 
@@ -46,32 +68,7 @@ platform :ios do
       in_house: false
     )
 
-    widget_bundle_id = fetch_profiles()
-
-    Dir.chdir("..") do
-      sh(
-        "flutter build ios --release " \
-        "--dart-define-from-file=.prod.json " \
-        "--dart-define=MOCK_MODE=false " \
-        "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
-        "--no-codesign"
-      )
-    end
-
-    apply_code_signing(widget_bundle_id)
-
-    build_app(
-      workspace: "Runner.xcworkspace",
-      configuration: "Release",
-      scheme: "Runner",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"],
-          widget_bundle_id => ENV["sigh_#{widget_bundle_id}_appstore_profile-name"]
-        }
-      }
-    )
+    build_shorebird_release
 
     upload_to_testflight(
       skip_submission: true,
@@ -80,6 +77,7 @@ platform :ios do
     cleanup_keychain()
   end
 
+  # App Store release (draft; not auto-submitted for review).
   lane :release do |options|
     setup_keychain()
 
@@ -91,32 +89,7 @@ platform :ios do
       in_house: false
     )
 
-    widget_bundle_id = fetch_profiles()
-
-    Dir.chdir("..") do
-      sh(
-        "flutter build ios --release " \
-        "--dart-define-from-file=.prod.json " \
-        "--dart-define=MOCK_MODE=false " \
-        "--dart-define=ENABLE_DEVICE_PREVIEW=false " \
-        "--no-codesign"
-      )
-    end
-
-    apply_code_signing(widget_bundle_id)
-
-    build_app(
-      workspace: "Runner.xcworkspace",
-      configuration: "Release",
-      scheme: "Runner",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"],
-          widget_bundle_id => ENV["sigh_#{widget_bundle_id}_appstore_profile-name"]
-        }
-      }
-    )
+    build_shorebird_release
 
     notes = ENV["RELEASE_NOTES"] || ""
     upload_to_app_store(
@@ -131,6 +104,74 @@ platform :ios do
     )
     cleanup_keychain()
   end
+
+  # Dart-only over-the-air patch against an already-shipped release. Does NOT
+  # upload to the App Store — it uploads the patch to Shorebird's backend.
+  # `release_version` defaults to the most recently updated release; pass an
+  # explicit "<name>+<build>" (e.g. "2606.30.0+302422") to target a specific one.
+  #
+  # IMPORTANT: patches are DART-ONLY. Changes to native code, plugins, the
+  # MeditoWidgetExtension, permissions, or bundled assets are detected and
+  # rejected by default (shorebird patch blocks on native/asset diffs). Those
+  # require a full `fastlane beta`/`release` instead.
+  #
+  # [VERIFY] The demo `patch` lane omits match/signing; we keep them because
+  # `shorebird patch ios` re-runs `flutter build ipa` (to diff) and needs to
+  # produce a signed .ipa. Confirm with a `--dry-run` patch before relying on it.
+  lane :patch do |options|
+    setup_keychain()
+
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      is_key_content_base64: false,
+      in_house: false
+    )
+
+    widget_bundle_id = fetch_profiles()
+    apply_code_signing(widget_bundle_id)
+
+    release_version = options[:release_version] || "latest"
+    track = options[:track] || "staging"
+    shorebird_patch(
+      platform: "ios",
+      args: "--flutter-version=#{SHOREBIRD_FLUTTER_VERSION} --release-version=#{release_version} --track=#{track} #{SHOREBIRD_DART_DEFINES}"
+    )
+    cleanup_keychain()
+  end
+end
+
+# Builds and code-signs the .ipa via Shorebird, replacing `flutter build ios
+# --no-codesign` + fastlane `build_app`/gym.
+#
+# How signing works (Approach A, per docs.shorebird.dev/code-push/ci/fastlane):
+#   1. fetch_profiles() runs `match`, which populates the fastlane lane context
+#      value MATCH_PROVISIONING_PROFILE_MAPPING with BOTH bundle IDs (the app and
+#      the widget extension — see fetch_profiles).
+#   2. apply_code_signing() puts each target on manual signing in the pbxproj so
+#      the archive step matches.
+#   3. The fastlane-plugin-shorebird `shorebird_release` action reads that mapping,
+#      writes a signingStyle=manual ExportOptions.plist covering both targets, and
+#      runs `shorebird release ios --export-options-plist <generated>` — which wraps
+#      `flutter build ipa` with the Shorebird engine, so the release is patchable.
+#   4. The action sets IPA_OUTPUT_PATH (build/ios/ipa/*.ipa) so the subsequent
+#      upload_to_testflight/upload_to_app_store finds the ipa with no `ipa:` param.
+#
+# Arg ordering: the plugin appends `--export-options-plist <path>` to the END of
+# `args`, so we pass dart-defines as shorebird-level flags (NO `--` separator, see
+# SHOREBIRD_DART_DEFINES) to keep that appended flag valid.
+# [VERIFY on first TestFlight dry-run] if xcodebuild export complains about signing,
+# pass explicit keys via
+#   export_options: { teamID: ENV["DEVELOPER_PORTAL_TEAM_ID"], signingCertificate: "Apple Distribution" }
+def build_shorebird_release
+  widget_bundle_id = fetch_profiles()
+  apply_code_signing(widget_bundle_id)
+
+  shorebird_release(
+    platform: "ios",
+    args: "--flutter-version=#{SHOREBIRD_FLUTTER_VERSION} #{SHOREBIRD_DART_DEFINES}"
+  )
 end
 
 # Downloads provisioning profiles for the main app and widget extension.

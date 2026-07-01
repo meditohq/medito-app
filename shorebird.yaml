@@ -1,0 +1,23 @@
+# This file is used to configure the Shorebird updater used by your app.
+# Learn more at https://docs.shorebird.dev
+# This file does not contain any sensitive information and should be checked into version control.
+
+# Your app_id is the unique identifier assigned to your app.
+# It is used to identify your app when requesting patches from Shorebird's servers.
+# It is not a secret and can be shared publicly.
+# NOTE: the top-level app_id is what the FLAVORLESS iOS build (single "Runner"
+# scheme, released with no --flavor) resolves to. It is intentionally set to the
+# PROD flavor's app_id so iOS ships to the SAME Shorebird app as `--flavor prod`
+# on Android. `shorebird init` had defaulted this to a separate app
+# (c79ded37-7314-4464-a1e4-f32d19415fcb) — we repoint it at prod on purpose.
+# Do NOT revert. (The init-created c79ded37 app is now unused and can be deleted.)
+app_id: 38c6d29c-3ad4-4d0b-bc7e-b29a94177873
+flavors:
+  dev: 17ad57d5-7d13-4123-b587-d8f80a1113ff
+  prod: 38c6d29c-3ad4-4d0b-bc7e-b29a94177873
+
+# auto_update controls if Shorebird should automatically update in the background on launch.
+# If auto_update: false, you will need to use package:shorebird_code_push to trigger updates.
+# https://pub.dev/packages/shorebird_code_push
+# Uncomment the following line to disable automatic updates.
+# auto_update: false

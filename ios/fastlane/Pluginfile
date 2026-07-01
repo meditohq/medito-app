@@ -1,0 +1,8 @@
+# Fastlane plugins for the iOS lanes (ios/fastlane/Fastfile).
+#
+# fastlane-plugin-shorebird provides the `shorebird_release` and `shorebird_patch`
+# actions used in place of build_app/gym. Wire it in with:
+#     cd ios && bundle exec fastlane add_plugin shorebird
+# (that also updates ios/Gemfile). CI additionally `gem install`s it so the
+# globally-invoked `fastlane` can load it.
+gem 'fastlane-plugin-shorebird'
