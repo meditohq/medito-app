@@ -95,8 +95,9 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
   ReorderableListView _getDownloadList(List<Track> tracks) {
     return ReorderableListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      onReorderItem: (int oldIndex, int newIndex) {
+      onReorder: (int oldIndex, int newIndex) {
         setState(() {
+          if (oldIndex < newIndex) newIndex -= 1;
           var reorderedItem = tracks.removeAt(oldIndex);
           tracks.insert(newIndex, reorderedItem);
           ref.read(addTrackListInPreferenceProvider(tracks: tracks));

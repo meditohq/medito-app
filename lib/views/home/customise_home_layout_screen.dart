@@ -64,7 +64,8 @@ class CustomiseHomeLayoutScreenState
                       title: Text(_getTitleForType(widgetType)),
                     );
                   },
-                  onReorderItem: (oldIndex, newIndex) {
+                  onReorder: (oldIndex, newIndex) {
+                    if (oldIndex < newIndex) newIndex -= 1;
                     var newOrder = List.of(order);
                     var item = newOrder.removeAt(oldIndex);
                     newOrder.insert(newIndex, item);
