@@ -11,7 +11,7 @@ end
 # Flutter version Shorebird builds with. MUST match the version pinned in
 # .github/workflows/release.yml (subosito/flutter-action) AND be a
 # Shorebird-supported version, or patches won't apply to releases built here.
-SHOREBIRD_FLUTTER_VERSION = "3.41.6"
+SHOREBIRD_FLUTTER_VERSION = "3.44.1"
 
 # Dart-defines forwarded to the underlying `flutter build`. Passed as
 # SHOREBIRD-LEVEL flags (shorebird release/patch accept --dart-define and
