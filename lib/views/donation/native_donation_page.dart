@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
@@ -14,6 +15,7 @@ import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/widgets/medito_icon.dart';
 
 enum _Frequency {
   oneTime('oneTime', 'one_time', 'One-time'),
@@ -659,10 +661,16 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // No Icon() here: a new Material icon glyph = tree-shaken font
-            // change = unpatchable asset diff (see Apple Pay button above).
+            // Bundled SVG, not a Material icon: a new icon-font glyph is an
+            // unpatchable asset diff (see Apple Pay button above).
+            MeditoIcon(
+              assetName: MeditoIcons.shield,
+              color: faint,
+              size: 13,
+            ),
+            const SizedBox(width: 4),
             Text(
-              '🔒 $_stripeTrustCopy',
+              _stripeTrustCopy,
               style: TextStyle(color: faint, fontSize: 12),
             ),
           ],

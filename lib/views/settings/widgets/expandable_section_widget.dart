@@ -298,13 +298,13 @@ class _ExpandableSectionWidgetState
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                // chevron_right_rounded (not arrow_right_alt):
-                                // this row was debug-only dead code, so its
-                                // glyph isn't in the release's tree-shaken icon
-                                // font — a new glyph is an unpatchable asset
-                                // diff. This icon is already shipped.
-                                Icons.chevron_right_rounded,
+                              // Bundled SVG, not a Material icon: this row was
+                              // debug-only dead code, so any new icon-font
+                              // glyph would change the tree-shaken font — an
+                              // unpatchable asset diff. SVGs already in the
+                              // release bundle are safe.
+                              MeditoIcon(
+                                assetName: MeditoIcons.arrowRight,
                                 color: Theme.of(context).colorScheme.onSurface,
                                 size: 24.0,
                               ),
