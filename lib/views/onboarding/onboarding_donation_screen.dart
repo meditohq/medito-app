@@ -21,6 +21,11 @@ class OnboardingDonationScreen extends ConsumerStatefulWidget {
 }
 
 class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
+  // TODO(temp): remove before activating the real native-vs-webview
+  // experiment. Forces the native page on the internal-testing release so it
+  // can be validated on-device before any server config carries the flag.
+  static const _forceNativeForInternalTesting = true;
+
   static const _paywallConfigTimeout = Duration(seconds: 3);
 
   bool _hasAttemptedDonation = isSmokeTestMode;
@@ -124,7 +129,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
 
     if (_useNativePaywall == null) {
       if (config != null) {
-        _useNativePaywall = config.nativePaywallEnabled;
+        _useNativePaywall =
+            _forceNativeForInternalTesting || config.nativePaywallEnabled;
       } else if (paywallAsync.hasError || _configTimedOut) {
         _useNativePaywall = false;
       }

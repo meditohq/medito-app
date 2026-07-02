@@ -17,6 +17,10 @@ import 'package:medito/views/settings/widgets/day_boundary_offset_dialog.dart';
 import 'package:medito/widgets/medito_icon.dart';
 // removed unused snackbar import
 
+// TODO(temp): remove with the force-native flag in
+// onboarding_donation_screen.dart.
+const _showOnboardingEntryForInternalTesting = true;
+
 class ExpandableSectionWidget extends ConsumerStatefulWidget {
   const ExpandableSectionWidget({super.key});
 
@@ -274,7 +278,10 @@ class _ExpandableSectionWidgetState
                     ),
                   ),
                   // Onboarding Item (only in debug mode)
-                  if (kDebugMode)
+                  // TODO(temp): temporarily also shown on the internal-testing
+                  // release to reach the native donation page; restore to
+                  // kDebugMode with the force-native flag removal.
+                  if (kDebugMode || _showOnboardingEntryForInternalTesting)
                     InkWell(
                       onTap: () => _showOnboardingScreen(context),
                       child: Padding(
