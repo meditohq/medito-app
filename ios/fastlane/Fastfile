@@ -136,7 +136,9 @@ platform :ios do
     track = options[:track] || "staging"
     shorebird_patch(
       platform: "ios",
-      args: "--flutter-version=#{SHOREBIRD_FLUTTER_VERSION} --release-version=#{release_version} --track=#{track} #{SHOREBIRD_DART_DEFINES}"
+      # No --flutter-version: `shorebird patch` rejects it (exit 64) and always
+      # rebuilds with the Flutter version of the release it targets.
+      args: "--release-version=#{release_version} --track=#{track} #{SHOREBIRD_DART_DEFINES}"
     )
     cleanup_keychain()
   end

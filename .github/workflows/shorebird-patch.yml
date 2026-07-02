@@ -134,8 +134,9 @@ jobs:
           # (release.yml → "Shorebird release (Android)") or the diff drifts.
           # Do NOT pass --obfuscate/--split-debug-info here: Shorebird auto-matches
           # the release's obfuscation on patch; re-passing perturbs the diff.
+          # NOTE: no --flutter-version here — `shorebird patch` rejects it (exit 64)
+          # and always rebuilds with the Flutter version of the release it targets.
           shorebird patch android \
-            --flutter-version=3.44.1 \
             --flavor prod \
             --release-version="${{ steps.relver.outputs.value }}" \
             --track="${{ inputs.track }}" \
