@@ -299,7 +299,12 @@ class _ExpandableSectionWidgetState
                           child: Row(
                             children: [
                               Icon(
-                                Icons.arrow_right_alt,
+                                // chevron_right_rounded (not arrow_right_alt):
+                                // this row was debug-only dead code, so its
+                                // glyph isn't in the release's tree-shaken icon
+                                // font — a new glyph is an unpatchable asset
+                                // diff. This icon is already shipped.
+                                Icons.chevron_right_rounded,
                                 color: Theme.of(context).colorScheme.onSurface,
                                 size: 24.0,
                               ),
