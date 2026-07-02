@@ -9,7 +9,7 @@ class HomeHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      '$greeting ⚡',
+      '$greeting ☀️',
       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
         color: Theme.of(context).colorScheme.onSurface,
         height: 0,
