@@ -591,8 +591,15 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Icon(Icons.apple, size: 22),
-                  SizedBox(width: 2),
+                  // U+F8FF (Apple logo) instead of Icons.apple: a new Material
+                  // icon glyph changes the tree-shaken icon font, which is an
+                  // asset diff Shorebird patches cannot ship. iOS system fonts
+                  // render this correctly and the button is iOS-only.
+                  Text(
+                    '',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(width: 3),
                   Text(
                     'Pay',
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
@@ -652,10 +659,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.lock_outline, size: 13, color: faint),
-            const SizedBox(width: 4),
+            // No Icon() here: a new Material icon glyph = tree-shaken font
+            // change = unpatchable asset diff (see Apple Pay button above).
             Text(
-              _stripeTrustCopy,
+              '🔒 $_stripeTrustCopy',
               style: TextStyle(color: faint, fontSize: 12),
             ),
           ],
