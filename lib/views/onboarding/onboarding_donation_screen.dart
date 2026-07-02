@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/models/stripe/paywall_config_model.dart';
+import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/routes/routes.dart';
+import 'package:medito/views/donation/native_donation_page.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
   const OnboardingDonationScreen({super.key, this.onNext});
@@ -16,7 +21,34 @@ class OnboardingDonationScreen extends ConsumerStatefulWidget {
 }
 
 class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
+  static const _paywallConfigTimeout = Duration(seconds: 3);
+
   bool _hasAttemptedDonation = isSmokeTestMode;
+  // Decided once: true = native inline paywall, false = existing intro +
+  // webview flow, null = still waiting on paywall config.
+  bool? _useNativePaywall;
+  bool _configTimedOut = false;
+  Timer? _configTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Smoke tests drive the existing intro + webview flow; skip the server
+    // flag so they stay deterministic.
+    if (isSmokeTestMode) {
+      _useNativePaywall = false;
+      return;
+    }
+    _configTimer = Timer(_paywallConfigTimeout, () {
+      if (mounted) setState(() => _configTimedOut = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _configTimer?.cancel();
+    super.dispose();
+  }
 
   void _handleDonationAction(BuildContext context) async {
     if (!_hasAttemptedDonation) {
@@ -55,6 +87,53 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final config = _resolveNativeConfig();
+
+    if (_useNativePaywall == null) {
+      // Still waiting (< timeout) on the paywall config.
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_useNativePaywall == true && config != null) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
+          top: false,
+          child: NativeDonationPage(
+            config: config,
+            source: FirebaseAnalyticsService.paywallSourceOnboarding,
+            onNext: () => widget.onNext?.call(),
+          ),
+        ),
+      );
+    }
+
+    return _buildWebviewIntro(context);
+  }
+
+  /// Decides (once) between the native page and the existing webview flow:
+  /// native only when the config resolves in time AND its effective config
+  /// carries `nativePaywall: true`; any error, timeout, or absent/false flag
+  /// keeps the current behavior.
+  PaywallConfigModel? _resolveNativeConfig() {
+    final paywallAsync = ref.watch(paywallConfigProvider);
+    final config = paywallAsync.value;
+
+    if (_useNativePaywall == null) {
+      if (config != null) {
+        _useNativePaywall = config.nativePaywallEnabled;
+      } else if (paywallAsync.hasError || _configTimedOut) {
+        _useNativePaywall = false;
+      }
+    }
+
+    return _useNativePaywall == true ? config : null;
+  }
+
+  Widget _buildWebviewIntro(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(

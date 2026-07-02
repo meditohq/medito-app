@@ -172,6 +172,7 @@ class HTTPConstants {
 
   // STRIPE PAYMENT ENDPOINTS (using donation service)
   static const String paymentConfig = 'config';
+  static const String paywall = 'paywall';
   static const String createPaymentIntent = 'payment-intents';
   static const String confirmPaymentIntent = 'payment-intents/confirm';
 
