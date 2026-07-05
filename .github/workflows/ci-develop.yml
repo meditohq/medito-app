@@ -10,10 +10,15 @@ on:
     tags-ignore:
       - '*'
   pull_request:
+    # 'labeled' lets adding the auto-ready label kick off the checks + auto
+    # ready-for-review flow on a PR whose CI already ran.
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
 jobs:
   checks:
+    # Don't re-run the full CI when unrelated labels are added.
+    if: github.event.action != 'labeled' || github.event.label.name == 'auto-ready'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -119,3 +124,24 @@ jobs:
         with:
           name: flutter-artifacts
           path: build/
+
+  # Opt-in: open the PR as a draft and add the 'auto-ready' label, and it is
+  # marked ready for review automatically once the checks job passes. Same-repo
+  # PRs only — on fork PRs the workflow token is read-only.
+  ready-for-review:
+    name: Mark ready for review
+    runs-on: ubuntu-latest
+    needs: checks
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft &&
+      contains(github.event.pull_request.labels.*.name, 'auto-ready')
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Mark PR ready for review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_REPO: ${{ github.repository }}
+        run: gh pr ready "$PR_NUMBER" --repo "$GH_REPO"
