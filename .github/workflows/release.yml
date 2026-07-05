@@ -46,7 +46,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.6'
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 
@@ -424,7 +424,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.6'
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 
@@ -782,7 +782,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.41.6'
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 

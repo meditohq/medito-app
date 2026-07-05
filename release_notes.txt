@@ -1,5 +1,6 @@
 Unreleased
 - Removed the unnecessary notification prompt from the player screen
+- Fixed the end-of-session screen not appearing on Android when a meditation finishes
 
 2606.26.0
 - Fixed reminders not showing for some users

@@ -122,18 +122,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                     duration = primaryPlayer.duration,
                     isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
                     isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
-                    track = primaryPlayer.currentMediaItem?.let { mediaItem ->
-                        Track(
-                            id = mediaItem.mediaId,
-                            title = mediaItem.mediaMetadata.title?.toString() ?: "",
-                            fileId = mediaItem.mediaMetadata.extras?.getString(KEY_FILE_ID) ?: "",
-                            description = mediaItem.mediaMetadata.description?.toString()
-                                ?: "",
-                            imageUrl = mediaItem.mediaMetadata.artworkUri?.toString() ?: "",
-                            artist = mediaItem.mediaMetadata.artist?.toString() ?: "",
-                            artistUrl = mediaItem.mediaMetadata.extras?.getString(KEY_ARTIST_URL),
-                        )
-                    } ?: Track(id = "", title = "", fileId = "", description = "", imageUrl = "", artist = null, artistUrl = null)
+                    track = trackFromCurrentMediaItem()
                 )
             } ?: return
 
@@ -160,6 +149,47 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         } finally {
             isUpdatingPlaybackState = false
         }
+    }
+
+    private fun trackFromCurrentMediaItem(): Track {
+        return primaryPlayer.currentMediaItem?.let { mediaItem ->
+            Track(
+                id = mediaItem.mediaId,
+                title = mediaItem.mediaMetadata.title?.toString() ?: "",
+                fileId = mediaItem.mediaMetadata.extras?.getString(KEY_FILE_ID) ?: "",
+                description = mediaItem.mediaMetadata.description?.toString() ?: "",
+                imageUrl = mediaItem.mediaMetadata.artworkUri?.toString() ?: "",
+                artist = mediaItem.mediaMetadata.artist?.toString() ?: "",
+                artistUrl = mediaItem.mediaMetadata.extras?.getString(KEY_ARTIST_URL),
+            )
+        } ?: Track(id = "", title = "", fileId = "", description = "", imageUrl = "", artist = null, artistUrl = null)
+    }
+
+    // Sends the terminal isCompleted=true PlaybackState to Dart. Called from the
+    // native STATE_ENDED handler on the main thread, before finishPlayback()
+    // cancels the position poll — the poll would otherwise be the only sender of
+    // isCompleted and it never gets to run once the track ends.
+    private fun pushCompletedStateToDart() {
+        if (!::primaryPlayer.isInitialized) return
+        val api = meditoAudioApi ?: return
+
+        // Fall back to the playhead if ExoPlayer never resolved a duration —
+        // position must stay > 5s or PlayerView's end-screen guard rejects it.
+        val duration = primaryPlayer.duration.takeIf { it != C.TIME_UNSET }
+            ?: primaryPlayer.currentPosition
+        val state = PlaybackState(
+            isPlaying = false,
+            position = duration,
+            volume = primaryPlayer.volume.toLong(),
+            speed = Speed(primaryPlayer.playbackParameters.speed.toDouble()),
+            isBuffering = false,
+            duration = duration,
+            isSeeking = false,
+            isCompleted = true,
+            track = trackFromCurrentMediaItem()
+        )
+
+        api.updatePlaybackState(state) { /* fire-and-forget */ }
     }
 
     private fun handleTrackCompletion(state: PlaybackState) {
@@ -481,6 +511,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             // updateNotification() below avoids re-posting the stuck "ended" card.
             if (!isCompletionHandled) {
                 isCompletionHandled = true
+                // Push a final isCompleted=true state to Dart before teardown:
+                // finishPlayback() cancels the position poll before it can observe
+                // STATE_ENDED, and PlayerView opens the end screen off that flag.
+                pushCompletedStateToDart()
                 handleTrackCompletionFromPlayer()
             }
             return
