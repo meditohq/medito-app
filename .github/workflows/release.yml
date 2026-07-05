@@ -32,8 +32,38 @@ on:
         description: 'Submit builds to store review automatically (Play: production release publishes on approval; iOS: App Store version is submitted, released manually after approval)'
         type: boolean
         default: false
+      android_promote_to_production:
+        description: 'Promote the latest Android INTERNAL release to production — no new build; goes to Play review and publishes on approval. Standalone: other toggles can stay off.'
+        type: boolean
+        default: false
 
 jobs:
+  # Standalone promote path: ships the release already sitting on the internal
+  # track to production without rebuilding — that binary passed the build and
+  # smoke gates when it was uploaded. Exists so a release can be shipped from
+  # anywhere the Actions UI runs (e.g. the GitHub mobile app), where the Play
+  # Console's promote button isn't available.
+  android-promote:
+    name: Android – Promote internal to production
+    runs-on: ubuntu-latest
+    environment: prod
+    if: github.event_name == 'workflow_dispatch' && inputs.android_promote_to_production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: android
+
+      - name: Promote internal release to production
+        working-directory: android
+        env:
+          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        run: bundle exec fastlane android promote_internal
+
   android-build:
     name: Android – Build
     runs-on: ubuntu-latest
