@@ -83,6 +83,7 @@ platform :android do
     apk_path = options[:apk_path] || '../build/app/outputs/apk/prod/release/app-prod-release.apk'
     track = options[:track] || 'internal'
     promote_to = options[:promote_to]
+    submit_review = options[:submit_review].to_s == 'true'
 
     notes = ENV['RELEASE_NOTES'] || ''
     unless notes.empty?
@@ -112,6 +113,12 @@ platform :android do
     json_key_path = options[:json_key]
 
     final_track = promote_to || track
+    # Production uploads default to a DRAFT release (someone rolls it out by
+    # hand, which is what sends it to Play review). With submit_review:true the
+    # release is 'completed' instead: it enters Play review immediately and
+    # publishes on approval (unless managed publishing holds it). Non-production
+    # tracks have no review step and are always completed.
+    production_status = submit_review ? 'completed' : 'draft'
     upload_params = {
       track: track,
       apk: apk_path,
@@ -119,7 +126,7 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
       skip_upload_changelogs: notes.empty?,
-      release_status: final_track == 'production' ? 'draft' : 'completed',
+      release_status: final_track == 'production' ? production_status : 'completed',
     }
     upload_params[:track_promote_to] = promote_to if promote_to
 
