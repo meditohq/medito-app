@@ -173,7 +173,10 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         if (!::primaryPlayer.isInitialized) return
         val api = meditoAudioApi ?: return
 
-        val duration = primaryPlayer.duration.takeIf { it != C.TIME_UNSET } ?: 0L
+        // Fall back to the playhead if ExoPlayer never resolved a duration —
+        // position must stay > 5s or PlayerView's end-screen guard rejects it.
+        val duration = primaryPlayer.duration.takeIf { it != C.TIME_UNSET }
+            ?: primaryPlayer.currentPosition
         val state = PlaybackState(
             isPlaying = false,
             position = duration,
