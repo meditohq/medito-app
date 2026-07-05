@@ -1,4 +1,7 @@
 Unreleased
+-
+
+2607.5.0
 - Removed the unnecessary notification prompt from the player screen
 - Fixed the end-of-session screen not appearing on Android when a meditation finishes
 
