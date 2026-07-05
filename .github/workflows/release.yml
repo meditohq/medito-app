@@ -959,3 +959,35 @@ jobs:
               fastlane release submit_for_review:"${{ inputs.submit_for_review }}"
             fi
           fi
+
+  # After a successful deploy, tag the built commit with the pubspec version
+  # (bare semver, no v prefix — matches existing tags). Runs only when at
+  # least one deploy job actually deployed, and is a no-op if the tag already
+  # exists, so re-runs and manual tags don't conflict.
+  tag-release:
+    name: Tag release
+    runs-on: ubuntu-latest
+    needs: [android-deploy, ios-deploy]
+    if: >-
+      !failure() && !cancelled() &&
+      contains(needs.*.result, 'success')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag commit with pubspec version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not read version from pubspec.yaml"
+            exit 1
+          fi
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "Tag $VERSION already exists — nothing to do."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+          echo "Created tag $VERSION at $GITHUB_SHA"
