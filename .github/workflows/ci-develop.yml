@@ -14,11 +14,6 @@ on:
     # ready-for-review flow on a PR whose CI already ran.
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
-    inputs:
-      mark_ready_for_review:
-        description: "Mark this branch's draft PR ready for review after checks pass"
-        type: boolean
-        default: false
 
 jobs:
   checks:
@@ -130,29 +125,25 @@ jobs:
           name: flutter-artifacts
           path: build/
 
-  # Opt-in, two ways in: (1) open the PR as a draft and add the 'auto-ready'
-  # label, or (2) manually dispatch this workflow from the PR branch with
-  # mark_ready_for_review enabled. Either way the PR is marked ready for review
-  # once the checks job passes. Same-repo PRs only — on fork PRs the workflow
-  # token is read-only.
+  # Opt-in: open the PR as a draft and add the 'auto-ready' label, and it is
+  # marked ready for review automatically once the checks job passes. Same-repo
+  # PRs only — on fork PRs the workflow token is read-only. (For a manual
+  # equivalent, Build & Deploy has a mark_ready_for_review dispatch toggle.)
   ready-for-review:
     name: Mark ready for review
     runs-on: ubuntu-latest
     needs: checks
     if: >-
-      (github.event_name == 'pull_request' &&
+      github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.draft &&
-      contains(github.event.pull_request.labels.*.name, 'auto-ready')) ||
-      (github.event_name == 'workflow_dispatch' && inputs.mark_ready_for_review)
+      contains(github.event.pull_request.labels.*.name, 'auto-ready')
     permissions:
       pull-requests: write
     steps:
-      # On pull_request events the PR number is in the event payload; on manual
-      # dispatch gh resolves the open PR from the branch name instead.
       - name: Mark PR ready for review
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_SELECTOR: ${{ github.event.pull_request.number || github.ref_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           GH_REPO: ${{ github.repository }}
-        run: gh pr ready "$PR_SELECTOR" --repo "$GH_REPO"
+        run: gh pr ready "$PR_NUMBER" --repo "$GH_REPO"

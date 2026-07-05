@@ -28,6 +28,10 @@ on:
         required: false
         default: ''
         type: string
+      mark_ready_for_review:
+        description: "Mark this branch's draft PR ready for review after a successful run"
+        type: boolean
+        default: false
 
 jobs:
   android-build:
@@ -953,3 +957,24 @@ jobs:
               fastlane release
             fi
           fi
+
+  # Opt-in via the mark_ready_for_review dispatch toggle: once the selected
+  # build/deploy jobs finish without failure, mark the dispatched branch's
+  # draft PR ready for review. Platform chains toggled off are skipped, which
+  # doesn't block this.
+  ready-for-review:
+    name: Mark PR ready for review
+    runs-on: ubuntu-latest
+    needs: [android-deploy, ios-deploy]
+    if: >-
+      !failure() && !cancelled() &&
+      inputs.mark_ready_for_review
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Mark PR ready for review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_BRANCH: ${{ github.ref_name }}
+        run: gh pr ready "$PR_BRANCH" --repo "$GH_REPO"
