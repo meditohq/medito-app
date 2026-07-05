@@ -212,3 +212,54 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     visible: "00:[0-5][1-9]"
     timeout: 20000
 - takeScreenshot: player-playing
+
+# ── End screen after session ──
+# Let the session play for a few seconds first, then drag the seek bar to the
+# end so the track completes and the end screen must appear. (00:0X-00:5X only
+# — a minutes pattern would instantly match the always-visible total-duration
+# label instead of the elapsed timer.)
+- extendedWaitUntil:
+    visible: "00:0[5-9]|00:[1-5][0-9]"
+    timeout: 30000
+
+# The seek bar is a Flutter Slider centered vertically in the portrait player
+# (title above, transport buttons below), with the track spanning ~6%–94% of
+# the screen width. Material sliders jump the thumb to the touch-down point,
+# so pressing near the right end of the track and dragging off the edge
+# commits a seek to ~100% on release. The slider's exact y varies slightly
+# with title wrapping, so retry at nearby heights if the end screen doesn't
+# appear ("day streak" is always shown on it).
+- swipe:
+    start: 90%, 50%
+    end: 96%, 50%
+    duration: 2000
+- extendedWaitUntil:
+    visible: "(?s).*day streak.*"
+    timeout: 15000
+    optional: true
+- runFlow:
+    when:
+      notVisible: "(?s).*day streak.*"
+    commands:
+      - swipe:
+          start: 90%, 46%
+          end: 96%, 46%
+          duration: 2000
+      - extendedWaitUntil:
+          visible: "(?s).*day streak.*"
+          timeout: 15000
+          optional: true
+- runFlow:
+    when:
+      notVisible: "(?s).*day streak.*"
+    commands:
+      - swipe:
+          start: 90%, 54%
+          end: 96%, 54%
+          duration: 2000
+
+# The end screen must now be visible — this is the actual assertion.
+- extendedWaitUntil:
+    visible: "(?s).*day streak.*"
+    timeout: 30000
+- takeScreenshot: end-screen
