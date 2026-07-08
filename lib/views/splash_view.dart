@@ -324,7 +324,13 @@ class SplashViewState extends ConsumerState<SplashView>
         AppLogger.i('SPLASH', 'Initializing services for verified user...');
         // Try to initialize services, but don't fail if network is unavailable
         try {
-          await _initializeServices();
+          // Watchdog: services init is best-effort, so never let it pin the
+          // user to the splash screen. Individual SDK calls can stall far
+          // beyond their own timeouts on degraded networks (each HTTP
+          // attempt burns up to 30s and the auth-refresh retries stack), and
+          // a hung native call would otherwise block launch forever. On
+          // timeout we take the same offline fallback as any other failure.
+          await _initializeServices().timeout(const Duration(seconds: 20));
           AppLogger.i('SPLASH', 'Services initialized');
 
           if (!mounted) return;
@@ -421,7 +427,7 @@ class SplashViewState extends ConsumerState<SplashView>
         );
       }
 
-      await _initializeServices();
+      await _initializeServices().timeout(const Duration(seconds: 20));
       ref.read(meRefreshProvider)();
 
       if (!mounted) return;
