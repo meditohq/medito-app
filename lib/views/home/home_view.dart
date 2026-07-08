@@ -97,8 +97,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     final home = ref.watch(fetchHomeProvider);
 
     return home.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => const _HomeLoadingView(),
       error: (err, stack) {
         final error = err is AppError ? err : const UnknownError();
 
@@ -225,4 +224,64 @@ class _HomeViewState extends ConsumerState<HomeView>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+/// Loading state for the home tab. If loading drags on (offline or a bad
+/// connection can hold this spinner for up to the 30s request timeout), a
+/// subtle "Go to Downloads" escape hatch fades in so downloaded sessions
+/// stay reachable. A normal load resolves before the button ever appears.
+class _HomeLoadingView extends StatefulWidget {
+  const _HomeLoadingView();
+
+  @override
+  State<_HomeLoadingView> createState() => _HomeLoadingViewState();
+}
+
+class _HomeLoadingViewState extends State<_HomeLoadingView> {
+  var _showDownloadsButton = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _showDownloadsButton = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          const Center(child: CircularProgressIndicator()),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 32,
+            child: SafeArea(
+              child: Center(
+                child: AnimatedOpacity(
+                  opacity: _showDownloadsButton ? 1 : 0,
+                  duration: const Duration(milliseconds: 500),
+                  child: TextButton(
+                    onPressed: _showDownloadsButton
+                        ? () => handleNavigation(TypeConstants.flow, [
+                            TypeConstants.downloads,
+                          ], context)
+                        : null,
+                    child: Text(
+                      AppLocalizations.of(context)!.goToDownloads,
+                      style: TextStyle(
+                        color: context.brandPurple.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
