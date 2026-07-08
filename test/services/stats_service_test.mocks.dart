@@ -34,6 +34,28 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
   }
 
   @override
+  int get retryCountForTesting =>
+      (super.noSuchMethod(
+            Invocation.getter(#retryCountForTesting),
+            returnValue: 0,
+          )
+          as int);
+
+  @override
+  bool get isRefreshingTokenForTesting =>
+      (super.noSuchMethod(
+            Invocation.getter(#isRefreshingTokenForTesting),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  set retryCountForTesting(int? value) => super.noSuchMethod(
+    Invocation.setter(#retryCountForTesting, value),
+    returnValueForMissingStub: null,
+  );
+
+  @override
   void addAuthCallback(_i2.AuthStateCallback? callback) => super.noSuchMethod(
     Invocation.method(#addAuthCallback, [callback]),
     returnValueForMissingStub: null,
@@ -57,6 +79,15 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
     Invocation.method(#clearAuthHeader, []),
     returnValueForMissingStub: null,
   );
+
+  @override
+  _i3.Future<void> refreshTokenForTesting() =>
+      (super.noSuchMethod(
+            Invocation.method(#refreshTokenForTesting, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
 
   @override
   _i3.Future<Map<String, dynamic>> getRequest(
