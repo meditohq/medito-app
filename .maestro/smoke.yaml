@@ -112,9 +112,16 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # POST_NOTIFICATIONS up front via adb).
 # The reminder time-chips experiment (onboarding_reminder_time_chips) shows
 # "When will you meditate?" instead of the CTA button on the chips arm.
+# The scrolling hero image (2607.10) pushes the CTA/chips below the fold on
+# small simulators, so wait on the always-visible title and scroll the skip
+# link into view before asserting/tapping it.
 - extendedWaitUntil:
-    visible: "Remind Me Daily|Turn on Smart Reminders|When will you meditate?"
+    visible: "Stay on Track with Meditation Reminders"
     timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Skip for Now"
+    direction: DOWN
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Battery optimization (Android only, conditional) + ──
@@ -150,8 +157,12 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # quiet "Maybe later" skip — "Get started" there only appears AFTER the
 # session completes — so for the smoke run we skip the session via
 # "Maybe later". Tap whichever is present.
-- extendedWaitUntil:
-    visible: "Get started|Maybe later"
+# The scrolling hero image can leave the CTA below the fold on small
+# simulators — scroll it into view first.
+- scrollUntilVisible:
+    element:
+      text: "Get started|Maybe later"
+    direction: DOWN
     timeout: 30000
 - tapOn:
     text: "Get started|Maybe later"
