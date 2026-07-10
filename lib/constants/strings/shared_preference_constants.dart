@@ -86,6 +86,10 @@ class SharedPreferenceConstants {
   static const String onboardingMeditationVariant =
       'onboarding_meditation_variant';
 
+  // Onboarding reminder time-chips A/B test — sticky per-install variant.
+  static const String onboardingReminderVariant =
+      'onboarding_reminder_variant';
+
   // Your Path explainer strip — set to true once the strip has been dismissed
   static const String hasSeenYourPathExplainer = 'has_seen_your_path_explainer';
 

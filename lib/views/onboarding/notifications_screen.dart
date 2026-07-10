@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/providers/onboarding/onboarding_reminder_experiment.dart';
 import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -15,7 +18,15 @@ import 'package:medito/providers/shared_preference/shared_preference_provider.da
 import 'package:medito/services/reminders/smart_reminders_service.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
-  const NotificationsScreen({super.key, this.onNext, this.intentIndex});
+  const NotificationsScreen({
+    super.key,
+    this.headerImage,
+    this.onNext,
+    this.intentIndex,
+  });
+
+  /// Hero image rendered at the top of the page, scrolling with the content.
+  final String? headerImage;
 
   final VoidCallback? onNext;
 
@@ -35,12 +46,25 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   bool _isProcessing = false;
 
   late final AnimationController _previewAnimation;
+  late final String _reminderVariant;
+
+  /// Which time-of-day chip was picked (chips arm only); tagged on the
+  /// reminder-set event as paramReminderSlot.
+  String? _selectedSlot;
+
+  bool get _isChipsVariant =>
+      _reminderVariant == OnboardingReminderExperiment.variantChips;
 
   /// Tagged on every event fired from this screen so analytics can
   /// distinguish the post-donation placement (re-introduced 26.6) from the
-  /// pre-donation placement (removed 26.5.19).
-  static const Map<String, Object> _placementParams = {
+  /// pre-donation placement (removed 26.5.19), and segment the reminder
+  /// time-chips experiment (experiment_name + variant_id, same BigQuery
+  /// convention as the paywall experiments).
+  Map<String, Object> get _eventParams => {
     'placement': 'post_donation',
+    AnalyticsEventConstants.paramExperimentName:
+        OnboardingReminderExperiment.experimentName,
+    AnalyticsEventConstants.paramVariantId: _reminderVariant,
   };
 
   @override
@@ -54,9 +78,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       if (mounted) _previewAnimation.forward();
     });
     _checkNotificationPermission();
+    _reminderVariant = OnboardingReminderExperiment.resolveVariant(
+      ref.read(sharedPreferencesProvider),
+    );
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.onboardingExperimentExposure,
+      parameters: _eventParams,
+    );
     FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingNotificationsPreviewShown,
-      parameters: _placementParams,
+      parameters: _eventParams,
     );
   }
 
@@ -94,7 +125,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       await FirebaseAnalyticsService().logEvent(
         name: FirebaseAnalyticsService
             .eventOnboardingNotificationsPermissionGranted,
-        parameters: _placementParams,
+        parameters: _eventParams,
       );
 
       if (mounted) {
@@ -112,12 +143,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
           name: FirebaseAnalyticsService
               .eventOnboardingNotificationsPermissionDenied,
           parameters: {
-            ..._placementParams,
+            ..._eventParams,
             'permission_status': status.isPermanentlyDenied
                 ? 'permanently_denied'
                 : 'denied',
           },
         );
+      }
+
+      // iOS only asks once: when the permission is permanently denied the
+      // request() above returns instantly with no dialog, which used to leave
+      // the tap with no visible effect. Send the user to system settings so
+      // the tap always does something.
+      if (status.isPermanentlyDenied) {
+        await openAppSettings();
       }
 
       if (mounted) {
@@ -139,7 +178,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
-      parameters: _placementParams,
+      parameters: {
+        ..._eventParams,
+        AnalyticsEventConstants.paramReminderSlot: ?_selectedSlot,
+      },
     );
 
     final prefs = ref.read(sharedPreferencesProvider);
@@ -186,6 +228,28 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
   void _navigateNext() => widget.onNext?.call();
 
+  /// Chips arm: persist the chosen slot time so [_setupRemindersAndAdvance]
+  /// anchors the reminder series to it, then run the shared permission flow.
+  Future<void> _onSlotSelected(String slot, TimeOfDay time) async {
+    if (_isProcessing) return;
+    _selectedSlot = slot;
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setInt(SharedPreferenceConstants.savedHours, time.hour);
+    await prefs.setInt(SharedPreferenceConstants.savedMinutes, time.minute);
+    await _handleNotificationsPermission();
+  }
+
+  Future<void> _onCustomTimeTap() async {
+    if (_isProcessing) return;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 8, minute: 0),
+      initialEntryMode: TimePickerEntryMode.input,
+    );
+    if (picked == null || !mounted) return;
+    await _onSlotSelected('custom', picked);
+  }
+
   String _notificationsTitle(AppLocalizations l10n) {
     switch (widget.intentIndex) {
       case 0:
@@ -222,76 +286,104 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
+            final headerHeight = widget.headerImage != null
+                ? OnboardingHeaderImage.heightFor(context)
+                : 0.0;
+
             return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
               physics: const ClampingScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 48,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          _notificationsTitle(AppLocalizations.of(context)!),
-                          style: Theme.of(context).textTheme.displayLarge
-                              ?.copyWith(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (widget.headerImage != null)
+                    OnboardingHeaderImage(imagePath: widget.headerImage!),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(32, 24, 32, 32),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (constraints.maxHeight - 72 - headerHeight)
+                            .clamp(0.0, double.infinity),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              Text(
+                                _notificationsTitle(
+                                  AppLocalizations.of(context)!,
+                                ),
+                                style: Theme.of(context).textTheme.displayLarge
+                                    ?.copyWith(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                textAlign: TextAlign.center,
                               ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          _notificationsBody(AppLocalizations.of(context)!),
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontSize: 16, height: 1.5),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    _buildNotificationPreview(context),
-                    const SizedBox(height: 24),
-                    Column(
-                      children: [
-                        if (reminderTime != null)
-                          _buildSmartRemindersOnButton()
-                        else
-                          _buildActionButton(
-                            text: _notificationsGranted
-                                ? AppLocalizations.of(
-                                    context,
-                                  )!.turnOnSmartReminders
-                                : AppLocalizations.of(context)!.setReminderB,
-                            onPressed: _isProcessing
-                                ? null
-                                : _handleNotificationsPermission,
+                              // Chips arm: the body line is dropped — the
+                              // title plus the "When will you meditate?"
+                              // question above the chips carry the message,
+                              // one message per block instead of two.
+                              if (!_isChipsVariant || reminderTime != null) ...[
+                                const SizedBox(height: 16),
+                                Text(
+                                  _notificationsBody(
+                                    AppLocalizations.of(context)!,
+                                  ),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontSize: 16, height: 1.5),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ],
                           ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextButton(
-                            onPressed: () async {
-                              // Log analytics event for skip tap
-                              await FirebaseAnalyticsService().logEvent(
-                                name: FirebaseAnalyticsService
-                                    .eventOnboardingReminderSkipTap,
-                                parameters: _placementParams,
-                              );
-                              _navigateNext();
-                            },
-                            child: Text(
-                              AppLocalizations.of(context)!.skipForNow,
-                            ),
+                          const SizedBox(height: 24),
+                          _buildNotificationPreview(context),
+                          const SizedBox(height: 32),
+                          Column(
+                            children: [
+                              if (reminderTime != null)
+                                _buildSmartRemindersOnButton()
+                              else if (_isChipsVariant)
+                                _buildTimeChips(AppLocalizations.of(context)!)
+                              else
+                                _buildActionButton(
+                                  text: _notificationsGranted
+                                      ? AppLocalizations.of(
+                                          context,
+                                        )!.turnOnSmartReminders
+                                      : AppLocalizations.of(
+                                          context,
+                                        )!.setReminderB,
+                                  onPressed: _isProcessing
+                                      ? null
+                                      : _handleNotificationsPermission,
+                                ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: double.infinity,
+                                child: TextButton(
+                                  onPressed: () async {
+                                    // Log analytics event for skip tap
+                                    await FirebaseAnalyticsService().logEvent(
+                                      name: FirebaseAnalyticsService
+                                          .eventOnboardingReminderSkipTap,
+                                      parameters: _eventParams,
+                                    );
+                                    _navigateNext();
+                                  },
+                                  child: Text(
+                                    AppLocalizations.of(context)!.skipForNow,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },
@@ -458,6 +550,64 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     );
   }
 
+  /// Chips arm: "When will you meditate?" + three time-of-day chips and a
+  /// custom-time option. Picking one is an implementation intention — it
+  /// anchors the reminder series to the chosen slot instead of the silent
+  /// "same time tomorrow" default, and only then triggers the OS permission
+  /// prompt.
+  Widget _buildTimeChips(AppLocalizations l10n) {
+    final slots = <(String, String, TimeOfDay)>[
+      (
+        'morning',
+        l10n.reminderSlotMorning,
+        const TimeOfDay(hour: 8, minute: 0),
+      ),
+      (
+        'afternoon',
+        l10n.reminderSlotAfternoon,
+        const TimeOfDay(hour: 13, minute: 0),
+      ),
+      (
+        'evening',
+        l10n.reminderSlotEvening,
+        const TimeOfDay(hour: 20, minute: 0),
+      ),
+    ];
+
+    return Column(
+      children: [
+        Text(
+          l10n.reminderChipsQuestion,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontSize: 16, height: 1.5),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          children: [
+            for (final (slot, label, time) in slots)
+              ActionChip(
+                label: Text('$label · ${time.format(context)}'),
+                onPressed: _isProcessing
+                    ? null
+                    : () => _onSlotSelected(slot, time),
+              ),
+            // Same component as the slots so the screen has one choice
+            // style; only "Skip for Now" stays a text button.
+            ActionChip(
+              label: Text(l10n.reminderSlotCustom),
+              onPressed: _isProcessing ? null : _onCustomTimeTap,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildSmartRemindersOnButton() {
     return SizedBox(
       width: double.infinity,
@@ -465,7 +615,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         onPressed: () async {
           await FirebaseAnalyticsService().logEvent(
             name: FirebaseAnalyticsService.eventOnboardingReminderConfirmTap,
-            parameters: _placementParams,
+            parameters: _eventParams,
           );
           _navigateNext();
         },

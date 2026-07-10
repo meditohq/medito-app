@@ -119,6 +119,11 @@ class AnalyticsEventConstants {
   static const String onboardingFirstMeditationGated =
       'onboarding_first_meditation_gated';
 
+  /// Parameter on onboardingReminderSetTap (chips arm of the
+  /// onboarding_reminder_time_chips experiment): which time slot the user
+  /// picked — 'morning', 'afternoon', 'evening', or 'custom'.
+  static const String paramReminderSlot = 'reminder_slot';
+
   /// Event logged on the user's very first interactive tap after completing
   /// onboarding. Fires exactly once per install.
   /// Parameter: paramTarget — describes what they tapped (e.g. 'up_next',

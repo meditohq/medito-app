@@ -16,6 +16,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 
 /// The three possible outcome states for the onboarding result screen.
 enum OnboardingResultState {
@@ -73,10 +74,14 @@ OnboardingResultState deriveOnboardingState({required int experienceIndex}) {
 class OnboardingResultScreen extends ConsumerStatefulWidget {
   const OnboardingResultScreen({
     super.key,
+    this.headerImage,
     required this.state,
     required this.onGetStarted,
     this.showMeditation = false,
   });
+
+  /// Hero image rendered at the top of the page, scrolling with the content.
+  final String? headerImage;
 
   final OnboardingResultState state;
   final VoidCallback onGetStarted;
@@ -216,64 +221,73 @@ class _OnboardingResultScreenState
     };
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(
-        padding24,
-        padding16,
-        padding24,
-        padding24,
-      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            heading,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              height: 1.25,
+          if (widget.headerImage != null)
+            OnboardingHeaderImage(imagePath: widget.headerImage!),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              padding24,
+              padding16,
+              padding24,
+              padding24,
             ),
-          ),
-          // When the meditation card is shown the screen leads with action, not
-          // reading, so the longer personalised body is dropped — the card's
-          // own one-liner carries the reassurance.
-          if (!widget.showMeditation) ...[
-            const SizedBox(height: 12),
-            Text(
-              body,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(160),
-                height: 1.5,
-              ),
-            ),
-          ],
-          if (widget.showMeditation) ...[
-            const SizedBox(height: 24),
-            _buildMeditation(context, l10n),
-          ],
-          const SizedBox(height: 24),
-          // While the session is the focus (meditation shown, not yet finished)
-          // the play button is the hero, so "Get started" steps back to a quiet
-          // skip link. It returns as the prominent CTA once the session is done
-          // (or for the control arm, where there's no session to compete with).
-          if (!widget.showMeditation || _done)
-            _GetStartedButton(
-              label: l10n.onboardingResultCta,
-              onPressed: _handleGetStarted,
-            )
-          else
-            Center(
-              child: TextButton(
-                onPressed: _handleGetStarted,
-                child: Text(
-                  _started
-                      ? l10n.onboardingFirstMeditationSkipShort
-                      : l10n.onboardingFirstMeditationSkip,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: onSurface.withOpacityValue(0.55),
-                    fontWeight: FontWeight.w500,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  heading,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    height: 1.25,
                   ),
                 ),
-              ),
+                // When the meditation card is shown the screen leads with action, not
+                // reading, so the longer personalised body is dropped — the card's
+                // own one-liner carries the reassurance.
+                if (!widget.showMeditation) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    body,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(160),
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+                if (widget.showMeditation) ...[
+                  const SizedBox(height: 24),
+                  _buildMeditation(context, l10n),
+                ],
+                const SizedBox(height: 24),
+                // While the session is the focus (meditation shown, not yet finished)
+                // the play button is the hero, so "Get started" steps back to a quiet
+                // skip link. It returns as the prominent CTA once the session is done
+                // (or for the control arm, where there's no session to compete with).
+                if (!widget.showMeditation || _done)
+                  _GetStartedButton(
+                    label: l10n.onboardingResultCta,
+                    onPressed: _handleGetStarted,
+                  )
+                else
+                  Center(
+                    child: TextButton(
+                      onPressed: _handleGetStarted,
+                      child: Text(
+                        _started
+                            ? l10n.onboardingFirstMeditationSkipShort
+                            : l10n.onboardingFirstMeditationSkip,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: onSurface.withOpacityValue(0.55),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
     );

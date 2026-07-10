@@ -921,6 +921,21 @@ class AppLocalizationsEs extends AppLocalizations {
       'Tu respiración diaria te espera. Solo toca para empezar.';
 
   @override
+  String get reminderChipsQuestion => '¿Cuándo vas a meditar?';
+
+  @override
+  String get reminderSlotMorning => 'Mañana';
+
+  @override
+  String get reminderSlotAfternoon => 'Tarde';
+
+  @override
+  String get reminderSlotEvening => 'Noche';
+
+  @override
+  String get reminderSlotCustom => 'Elegir mi propia hora';
+
+  @override
   String get onboardingBatteryTitle =>
       'Mantén las Meditaciones Sin Interrupciones';
 

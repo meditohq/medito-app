@@ -110,8 +110,10 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # "Remind Me Daily" when notifications aren't granted yet, or
 # "Turn on Smart Reminders" when they already are (CI grants
 # POST_NOTIFICATIONS up front via adb).
+# The reminder time-chips experiment (onboarding_reminder_time_chips) shows
+# "When will you meditate?" instead of the CTA button on the chips arm.
 - extendedWaitUntil:
-    visible: "Remind Me Daily|Turn on Smart Reminders"
+    visible: "Remind Me Daily|Turn on Smart Reminders|When will you meditate?"
     timeout: 20000
 - tapOn: "Skip for Now"
 

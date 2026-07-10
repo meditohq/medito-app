@@ -130,6 +130,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
 
     return [
       OnboardingQuestionScreen(
+        headerImage: _images[0],
         question: l10n.onboardingExperienceQuestion,
         subtext: l10n.onboardingExperienceSubtext,
         options: [
@@ -139,11 +140,14 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
         ],
         onOptionSelected: _onExperienceSelected,
       ),
-      OnboardingDonationScreen(onNext: _nextPage),
-      NotificationsScreen(onNext: _nextPage),
-      if (_showBatteryScreen) BatteryOptimizationScreen(onNext: _nextPage),
-      if (Platform.isIOS) TrackingPermissionScreen(onNext: _nextPage),
+      OnboardingDonationScreen(headerImage: _images[1], onNext: _nextPage),
+      NotificationsScreen(headerImage: _images[2], onNext: _nextPage),
+      if (_showBatteryScreen)
+        BatteryOptimizationScreen(headerImage: _images[2], onNext: _nextPage),
+      if (Platform.isIOS)
+        TrackingPermissionScreen(headerImage: _images[2], onNext: _nextPage),
       OnboardingResultScreen(
+        headerImage: _images[2],
         state: resultState,
         onGetStarted: _onGetStarted,
         showMeditation: _showMeditationStep,
@@ -254,35 +258,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
         top: false,
         child: Column(
           children: [
-            Visibility(
-              visible:
-                  MediaQuery.of(context).size.height > 500 &&
-                  MediaQuery.of(context).orientation == Orientation.portrait,
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.3,
-                width: double.infinity,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                  child: Image.asset(
-                    _images[_currentPage < _images.length
-                        ? _currentPage
-                        : _images.length - 1],
-                    key: ValueKey<String>(
-                      _images[_currentPage < _images.length
-                          ? _currentPage
-                          : _images.length - 1],
-                    ),
-                    width: MediaQuery.of(context).size.width,
-                    fit: BoxFit.fitWidth,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
             Expanded(
               child: PageView.builder(
                 controller: _controller,

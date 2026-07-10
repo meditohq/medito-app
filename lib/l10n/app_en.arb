@@ -318,6 +318,26 @@
   "@notificationPreviewBodyB": {
     "description": "Body of the fake notification shown in the onboarding notifications screen preview"
   },
+  "reminderChipsQuestion": "When will you meditate?",
+  "@reminderChipsQuestion": {
+    "description": "Question above the time-of-day chips in the onboarding notifications screen (chips arm of the reminder experiment)"
+  },
+  "reminderSlotMorning": "Morning",
+  "@reminderSlotMorning": {
+    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 8:00 AM'"
+  },
+  "reminderSlotAfternoon": "Afternoon",
+  "@reminderSlotAfternoon": {
+    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Afternoon · 1:00 PM'"
+  },
+  "reminderSlotEvening": "Evening",
+  "@reminderSlotEvening": {
+    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Evening · 8:00 PM'"
+  },
+  "reminderSlotCustom": "Pick my own time",
+  "@reminderSlotCustom": {
+    "description": "Option below the time-of-day chips that opens a time picker"
+  },
   "onboardingBatteryTitle": "One Setting, Smoother Meditations",
   "onboardingBatteryBody": "Your phone can pause Medito mid-session. One quick change prevents this.",
   "onboardingBatteryOptimize": "Update Setting",

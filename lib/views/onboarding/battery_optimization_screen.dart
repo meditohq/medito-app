@@ -6,9 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 
 class BatteryOptimizationScreen extends StatefulWidget {
-  const BatteryOptimizationScreen({super.key, this.onNext});
+  const BatteryOptimizationScreen({super.key, this.headerImage, this.onNext});
+
+  /// Hero image rendered at the top of the page, scrolling with the content.
+  final String? headerImage;
 
   final VoidCallback? onNext;
 
@@ -71,66 +75,82 @@ class _BatteryOptimizationScreenState extends State<BatteryOptimizationScreen>
         top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
+            final headerHeight = widget.headerImage != null
+                ? OnboardingHeaderImage.heightFor(context)
+                : 0.0;
+
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(32),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 64,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        MeditoIcon(
-                          assetName: MeditoIcons.alert,
-                          size: 48,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          l10n.onboardingBatteryTitle,
-                          style: Theme.of(context).textTheme.displayLarge
-                              ?.copyWith(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (widget.headerImage != null)
+                    OnboardingHeaderImage(imagePath: widget.headerImage!),
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (constraints.maxHeight - 64 - headerHeight)
+                            .clamp(0.0, double.infinity),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              MeditoIcon(
+                                assetName: MeditoIcons.alert,
+                                size: 48,
+                                color: Colors.white,
                               ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.onboardingBatteryBody,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontSize: 16, height: 1.5),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _isProcessing ? null : _handleOptimize,
-                            child: Text(
-                              l10n.onboardingBatteryOptimize,
-                              style: const TextStyle(color: Colors.white),
-                            ),
+                              const SizedBox(height: 20),
+                              Text(
+                                l10n.onboardingBatteryTitle,
+                                style: Theme.of(context).textTheme.displayLarge
+                                    ?.copyWith(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                l10n.onboardingBatteryBody,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(fontSize: 16, height: 1.5),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextButton(
-                            onPressed: () => widget.onNext?.call(),
-                            child: Text(l10n.skipForNow),
+                          const SizedBox(height: 32),
+                          Column(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _isProcessing
+                                      ? null
+                                      : _handleOptimize,
+                                  child: Text(
+                                    l10n.onboardingBatteryOptimize,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: double.infinity,
+                                child: TextButton(
+                                  onPressed: () => widget.onNext?.call(),
+                                  child: Text(l10n.skipForNow),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },

@@ -1712,6 +1712,36 @@ abstract class AppLocalizations {
   /// **'Your daily breath is waiting. Just tap to begin.'**
   String get notificationPreviewBodyB;
 
+  /// Question above the time-of-day chips in the onboarding notifications screen (chips arm of the reminder experiment)
+  ///
+  /// In en, this message translates to:
+  /// **'When will you meditate?'**
+  String get reminderChipsQuestion;
+
+  /// Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 8:00 AM'
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get reminderSlotMorning;
+
+  /// Time-of-day chip label; shown with a concrete time, e.g. 'Afternoon · 1:00 PM'
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get reminderSlotAfternoon;
+
+  /// Time-of-day chip label; shown with a concrete time, e.g. 'Evening · 8:00 PM'
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get reminderSlotEvening;
+
+  /// Option below the time-of-day chips that opens a time picker
+  ///
+  /// In en, this message translates to:
+  /// **'Pick my own time'**
+  String get reminderSlotCustom;
+
   /// No description provided for @onboardingBatteryTitle.
   ///
   /// In en, this message translates to:

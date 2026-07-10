@@ -112,6 +112,14 @@ class HttpApiService {
     }
   }
 
+  /// Fire a force-logout notification so listeners (e.g. app root) navigate
+  /// the user to the splash screen. Used by involuntary-logout paths that
+  /// live outside this service (e.g. the auth repository's token-refresh
+  /// failure) so they route to splash the same way [_forceLogout] does.
+  void notifyForceLogout() {
+    _notifyAuthEvent(AuthEvent.forceLogout);
+  }
+
   void _initializeHeaders() {
     AppLogger.d('HTTP', 'Initializing headers for instance #$_instanceId');
     _headers[kContentTypeHeader] = ContentType.json.value;

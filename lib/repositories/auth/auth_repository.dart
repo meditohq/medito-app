@@ -460,6 +460,11 @@ class AuthRepositoryImpl extends AuthRepository {
           reason: 'AuthRepo: RefreshTokenError leading to auth reset',
         );
         await _resetAuth();
+        // Involuntary logout (dead refresh token). Notify so the app root
+        // routes the user to the splash screen to re-authenticate — the
+        // HttpApiService force-logout path does this via _forceLogout, but
+        // this repository path bypasses it.
+        _httpApiService.notifyForceLogout();
         rethrow;
       } catch (e, stackTrace) {
         dev.log('[AUTH_REPO] Error refreshing token', error: e, level: 800);
