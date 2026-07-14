@@ -9,7 +9,6 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/player/playback_request.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
-import 'package:medito/providers/onboarding/onboarding_meditation_experiment.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/logger.dart';
@@ -66,8 +65,8 @@ OnboardingResultState deriveOnboardingState({required int experienceIndex}) {
   }
 }
 
-/// The onboarding payoff screen. When [showMeditation] is true (the eligible
-/// arm of [OnboardingMeditationExperiment]) it also hosts a short guided
+/// The onboarding payoff screen. When [showMeditation] is true (beginners —
+/// never_tried / a_little) it also hosts a short guided
 /// meditation INLINE — play it right here, then a streak-up reveal — so there's
 /// a single screen rather than a redundant "Get started" page followed by a
 /// separate meditation. "Get started" is the one app-entry, after the session.
@@ -94,6 +93,15 @@ class OnboardingResultScreen extends ConsumerStatefulWidget {
 
 class _OnboardingResultScreenState
     extends ConsumerState<OnboardingResultScreen> {
+  // The 3-min "What is Mindfulness" (Will) — the best beginner first session in
+  // the data (~79% 2nd-session return). A/B `onboarding_first_meditation`
+  // concluded 2026-07-14: shipping it to beginners lifts first-session
+  // activation +6-7pp on both platforms, so it's now the default rather than an
+  // experiment arm. The selector picks the closest duration to the target.
+  static const _meditationTrackId = 'yz7XKNm0iaM4kkeI';
+  static const _meditationGuideName = 'Will';
+  static const _meditationTargetDurationMs = 180000; // ~3 min
+
   bool _started = false;
   bool _loading = false;
   bool _done = false;
@@ -110,12 +118,6 @@ class _OnboardingResultScreenState
             .read(analyticsServiceProvider)
             .logEvent(
               name: AnalyticsEventConstants.onboardingFirstMeditationShown,
-              parameters: {
-                AnalyticsEventConstants.paramExperimentName:
-                    OnboardingMeditationExperiment.experimentName,
-                AnalyticsEventConstants.paramVariantId:
-                    OnboardingMeditationExperiment.variantMeditation,
-              },
             ),
       );
     }
@@ -135,12 +137,12 @@ class _OnboardingResultScreenState
     });
     try {
       final track = await ref.read(
-        tracksProvider(trackId: OnboardingMeditationExperiment.trackId).future,
+        tracksProvider(trackId: _meditationTrackId).future,
       );
       final selection = TrackVariantSelector.resolve(
         track,
-        guideName: OnboardingMeditationExperiment.guideName,
-        durationMs: OnboardingMeditationExperiment.targetDurationMs,
+        guideName: _meditationGuideName,
+        durationMs: _meditationTargetDurationMs,
       );
       final request = PlaybackRequest.fromTrack(
         track,

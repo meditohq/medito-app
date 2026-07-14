@@ -82,10 +82,6 @@ class SharedPreferenceConstants {
   // Up Next pack preference
   static const String upNextPackId = 'up_next_pack_id';
 
-  // Onboarding "first meditation" A/B test — sticky per-install variant.
-  static const String onboardingMeditationVariant =
-      'onboarding_meditation_variant';
-
   // Onboarding reminder time-chips A/B test — sticky per-install variant.
   static const String onboardingReminderVariant =
       'onboarding_reminder_variant';

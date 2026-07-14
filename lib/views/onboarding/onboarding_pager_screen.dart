@@ -10,7 +10,6 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
-import 'package:medito/providers/onboarding/onboarding_meditation_experiment.dart';
 import 'package:medito/views/onboarding/onboarding_donation_screen.dart';
 import 'package:medito/views/onboarding/onboarding_question_screen.dart';
 import 'package:medito/views/onboarding/onboarding_result_screen.dart';
@@ -35,18 +34,15 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
 
   bool _showBatteryScreen = false;
 
-  // Sticky A/B arm for the "end onboarding with a meditation" experiment.
-  String _meditationVariant = OnboardingMeditationExperiment.variantControl;
-
   // The 3-min first-meditation step is gated to non-regular meditators.
   // Data: never_tried/a_little retain best on a short first session (~63-68%
   // at <=3min, falling with length), whereas regular_practice users retain
   // best on 4-6min+ and the beginner framing is a mismatch — so regulars skip
-  // the step and go straight to home (control behaviour). experienceIndex:
-  // 0 = never_tried, 1 = a_little, 2 = regular_practice.
+  // the step and go straight to home. experienceIndex: 0 = never_tried,
+  // 1 = a_little, 2 = regular_practice. (The A/B that gated this behind a
+  // variant concluded 2026-07-14 — meditation for beginners won, now default.)
   bool get _showMeditationStep =>
-      _meditationVariant == OnboardingMeditationExperiment.variantMeditation &&
-      (_experienceIndex == 0 || _experienceIndex == 1);
+      _experienceIndex == 0 || _experienceIndex == 1;
 
   final List<String> _images = [
     AssetConstants.onboardingImage1,
@@ -169,25 +165,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
             true,
           ),
     );
-    // The meditation now lives inline on the result screen (eligible arm), so
-    // there's no extra page to advance to. Log the gated case explicitly when
-    // a meditation-arm user was withheld the step (experienced meditator).
-    if (_meditationVariant ==
-            OnboardingMeditationExperiment.variantMeditation &&
-        !_showMeditationStep) {
-      unawaited(
-        ref
-            .read(analyticsServiceProvider)
-            .logEvent(
-              name: AnalyticsEventConstants.onboardingFirstMeditationGated,
-              parameters: {
-                AnalyticsEventConstants.paramExperimentName:
-                    OnboardingMeditationExperiment.experimentName,
-                AnalyticsEventConstants.paramVariantId: _meditationVariant,
-              },
-            ),
-      );
-    }
     await _finishToHome();
   }
 
@@ -222,24 +199,6 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
           .read(analyticsServiceProvider)
           .logEvent(
             name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
-          ),
-    );
-    // Resolve the sticky experiment arm and log a one-time exposure so the test
-    // is segmentable in BigQuery (experiment_name + variant_id), matching the
-    // paywall-experiment convention.
-    _meditationVariant = OnboardingMeditationExperiment.resolveVariant(
-      ref.read(sharedPreferencesProvider),
-    );
-    unawaited(
-      ref
-          .read(analyticsServiceProvider)
-          .logEvent(
-            name: AnalyticsEventConstants.onboardingExperimentExposure,
-            parameters: {
-              AnalyticsEventConstants.paramExperimentName:
-                  OnboardingMeditationExperiment.experimentName,
-              AnalyticsEventConstants.paramVariantId: _meditationVariant,
-            },
           ),
     );
     shouldShowBatteryOptimizationScreen().then((show) {
