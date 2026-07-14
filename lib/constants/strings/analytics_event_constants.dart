@@ -111,14 +111,6 @@ class AnalyticsEventConstants {
   static const String onboardingFirstMeditationSkipTap =
       'onboarding_first_meditation_skip_tap';
 
-  /// Meditation arm, but the step was withheld because the user is an
-  /// experienced meditator (regular_practice) — they go straight to home. Makes
-  /// the gating explicit (and verifiable in prod) rather than inferred from the
-  /// absence of a "shown" event. Carries paramExperimentName + paramVariantId;
-  /// the experience_level user property is attached automatically.
-  static const String onboardingFirstMeditationGated =
-      'onboarding_first_meditation_gated';
-
   /// Parameter on onboardingReminderSetTap (chips arm of the
   /// onboarding_reminder_time_chips experiment): which time slot the user
   /// picked — 'morning', 'afternoon', 'evening', or 'custom'.
