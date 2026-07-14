@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:io' show Platform;
-
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -12,25 +10,13 @@ class PermissionHandler {
   static Future<bool> requestNotificationPermission(
     BuildContext context,
   ) async {
-    if (Platform.isAndroid) {
-      final status = await Permission.notification.status;
-      if (status.isGranted) return true;
-      if (status.isPermanentlyDenied) {
-        await openAppSettings();
-        return false;
-      }
-      final result = await Permission.notification.request();
-      return result.isGranted;
-    } else if (Platform.isIOS) {
-      final status = await Permission.notification.status;
-      if (status.isGranted) return true;
-      if (status.isPermanentlyDenied) {
-        await openAppSettings();
-        return false;
-      }
-      final result = await Permission.notification.request();
-      return result.isGranted;
+    final status = await Permission.notification.status;
+    if (status.isGranted) return true;
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+      return false;
     }
-    return false;
+    final result = await Permission.notification.request();
+    return result.isGranted;
   }
 }

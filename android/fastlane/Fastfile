@@ -78,11 +78,38 @@ platform :android do
     )
   end
 
+  desc "Promote the latest internal release to production without uploading"
+  lane :promote_internal do
+    json_key_data = ENV['PLAY_STORE_CONFIG_JSON']
+    if json_key_data.nil? || json_key_data.empty?
+      UI.user_error!("No Google Play JSON key provided. Set PLAY_STORE_CONFIG_JSON env var.")
+    end
+
+    # No APK upload — the release being promoted already went through the
+    # build + smoke gates when it landed on internal. 'completed' sends the
+    # production release to Play review and publishes on approval (a draft
+    # promote would just recreate the can't-act-on-mobile problem this lane
+    # exists to solve).
+    upload_to_play_store(
+      track: 'internal',
+      track_promote_to: 'production',
+      track_promote_release_status: 'completed',
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true,
+      json_key_data: json_key_data,
+    )
+  end
+
   desc "Upload APK to Play Store with custom path and track"
   lane :upload_apk do |options|
     apk_path = options[:apk_path] || '../build/app/outputs/apk/prod/release/app-prod-release.apk'
     track = options[:track] || 'internal'
     promote_to = options[:promote_to]
+    submit_review = options[:submit_review].to_s == 'true'
 
     notes = ENV['RELEASE_NOTES'] || ''
     unless notes.empty?
@@ -112,6 +139,12 @@ platform :android do
     json_key_path = options[:json_key]
 
     final_track = promote_to || track
+    # Production uploads default to a DRAFT release (someone rolls it out by
+    # hand, which is what sends it to Play review). With submit_review:true the
+    # release is 'completed' instead: it enters Play review immediately and
+    # publishes on approval (unless managed publishing holds it). Non-production
+    # tracks have no review step and are always completed.
+    production_status = submit_review ? 'completed' : 'draft'
     upload_params = {
       track: track,
       apk: apk_path,
@@ -119,7 +152,7 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
       skip_upload_changelogs: notes.empty?,
-      release_status: final_track == 'production' ? 'draft' : 'completed',
+      release_status: final_track == 'production' ? production_status : 'completed',
     }
     upload_params[:track_promote_to] = promote_to if promote_to
 

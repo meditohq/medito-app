@@ -27,11 +27,22 @@ class HeaderService {
       return;
     }
     try {
-      _fcmToken = await FirebaseMessaging.instance.getToken();
+      // getToken can hang indefinitely on iOS when the device is offline
+      // (the SDK waits for an APNS token that never arrives). This runs in
+      // the splash screen's critical path, so bound it — app launch must
+      // never depend on push registration. The onTokenRefresh listener
+      // picks the token up later once connectivity returns.
+      _fcmToken = await FirebaseMessaging.instance.getToken().timeout(
+        const Duration(seconds: 8),
+      );
       if (_fcmToken == null) {
         // Force token creation if it's null
-        await FirebaseMessaging.instance.deleteToken();
-        _fcmToken = await FirebaseMessaging.instance.getToken();
+        await FirebaseMessaging.instance.deleteToken().timeout(
+          const Duration(seconds: 5),
+        );
+        _fcmToken = await FirebaseMessaging.instance.getToken().timeout(
+          const Duration(seconds: 5),
+        );
       }
     } catch (e) {
       // Handle error but continue execution

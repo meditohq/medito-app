@@ -91,9 +91,18 @@ platform :ios do
 
     build_shorebird_release
 
+    # submit_for_review:true sends the uploaded version straight to App Store
+    # review; the default keeps today's behaviour (draft version, submitted by
+    # hand). automatic_release stays false so an approved build still needs a
+    # manual "Release this version" — approval alone doesn't publish it.
+    # Export compliance is pre-answered via ITSAppUsesNonExemptEncryption in
+    # Info.plist, so the submission doesn't stall on that question.
+    submit = options[:submit_for_review].to_s == 'true'
+
     notes = ENV["RELEASE_NOTES"] || ""
     upload_to_app_store(
-      submit_for_review: false,
+      submit_for_review: submit,
+      automatic_release: false,
       force: true,
       run_precheck_before_submit: false,
       release_notes: {

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/widgets/onboarding/onboarding_option_button.dart';
 
 /// A single question screen in the onboarding question flow.
@@ -12,6 +13,7 @@ import 'package:medito/widgets/onboarding/onboarding_option_button.dart';
 class OnboardingQuestionScreen extends StatefulWidget {
   const OnboardingQuestionScreen({
     super.key,
+    this.headerImage,
     required this.question,
     required this.subtext,
     required this.options,
@@ -23,6 +25,9 @@ class OnboardingQuestionScreen extends StatefulWidget {
     this.freeTextLabel,
     this.onFreeTextSubmitted,
   });
+
+  /// Hero image rendered at the top of the page, scrolling with the content.
+  final String? headerImage;
 
   final String question;
   final String subtext;
@@ -112,54 +117,65 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(
-        padding24,
-        padding16,
-        padding24,
-        padding24,
-      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (widget.stepLabel != null && widget.stepLabel!.isNotEmpty) ...[
-            Text(
-              widget.stepLabel!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(120),
-                letterSpacing: 0.8,
-              ),
+          if (widget.headerImage != null)
+            OnboardingHeaderImage(imagePath: widget.headerImage!),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              padding24,
+              padding16,
+              padding24,
+              padding24,
             ),
-            const SizedBox(height: padding16),
-          ],
-          Text(
-            widget.question,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              height: 1.25,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.stepLabel != null &&
+                    widget.stepLabel!.isNotEmpty) ...[
+                  Text(
+                    widget.stepLabel!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(120),
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const SizedBox(height: padding16),
+                ],
+                Text(
+                  widget.question,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    height: 1.25,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.subtext,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withAlpha(160),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                ...List.generate(_displayOrder.length, (i) {
+                  final originalIndex = _displayOrder[i];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: OnboardingOptionButton(
+                      label: widget.options[originalIndex],
+                      selected: _selectedIndex == originalIndex,
+                      onTap: () => _onTap(originalIndex),
+                    ),
+                  );
+                }),
+                if (widget.freeTextHint != null &&
+                    widget.onFreeTextSubmitted != null)
+                  _buildFreeTextField(theme),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            widget.subtext,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(160),
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 32),
-          ...List.generate(_displayOrder.length, (i) {
-            final originalIndex = _displayOrder[i];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: OnboardingOptionButton(
-                label: widget.options[originalIndex],
-                selected: _selectedIndex == originalIndex,
-                onTap: () => _onTap(originalIndex),
-              ),
-            );
-          }),
-          if (widget.freeTextHint != null && widget.onFreeTextSubmitted != null)
-            _buildFreeTextField(theme),
         ],
       ),
     );

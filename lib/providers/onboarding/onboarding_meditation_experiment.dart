@@ -1,8 +1,4 @@
-import 'dart:math';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:medito/constants/strings/shared_preference_constants.dart';
 
 /// Client-side A/B test: does ending onboarding with a short guided meditation
 /// lift first-session completion (and downstream retention)?
@@ -25,20 +21,16 @@ class OnboardingMeditationExperiment {
   static const String guideName = 'Will';
   static const int targetDurationMs = 180000; // ~3 min; selector picks closest.
 
-  /// Returns the sticky variant for this install, assigning (50/50) and
-  /// persisting it on first call.
+  /// A/B CONCLUDED 2026-07-14: the meditation arm won decisively — beginners
+  /// (never_tried/a_little) gained +6-7pp first-session-within-24h on BOTH
+  /// platforms (Android z=8.2, iOS z=7.7, p≈1e-15) with no effect on regulars
+  /// (placebo). Shipped as the default: every install resolves to `meditation`,
+  /// so beginners always get the first-meditation step and regulars stay gated
+  /// to control behaviour in the pager. The 50/50 assignment is retired; the
+  /// exposure/gated events still fire (now 100% `meditation`) so rollout stays
+  /// verifiable in BigQuery. Scaffold (this class, the events, the sticky pref)
+  /// can be removed in a later cleanup once the default is confirmed in prod.
   static String resolveVariant(SharedPreferences prefs) {
-    final existing = prefs.getString(
-      SharedPreferenceConstants.onboardingMeditationVariant,
-    );
-    if (existing == variantControl || existing == variantMeditation) {
-      return existing!;
-    }
-    final assigned = Random().nextBool() ? variantMeditation : variantControl;
-    prefs.setString(
-      SharedPreferenceConstants.onboardingMeditationVariant,
-      assigned,
-    );
-    return assigned;
+    return variantMeditation;
   }
 }

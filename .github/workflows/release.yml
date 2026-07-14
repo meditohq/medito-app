@@ -28,8 +28,42 @@ on:
         required: false
         default: ''
         type: string
+      submit_for_review:
+        description: 'Submit builds to store review automatically (Play: production release publishes on approval; iOS: App Store version is submitted, released manually after approval)'
+        type: boolean
+        default: false
+      android_promote_to_production:
+        description: 'Promote the latest Android INTERNAL release to production — no new build; goes to Play review and publishes on approval. Standalone: other toggles can stay off.'
+        type: boolean
+        default: false
 
 jobs:
+  # Standalone promote path: ships the release already sitting on the internal
+  # track to production without rebuilding — that binary passed the build and
+  # smoke gates when it was uploaded. Exists so a release can be shipped from
+  # anywhere the Actions UI runs (e.g. the GitHub mobile app), where the Play
+  # Console's promote button isn't available.
+  android-promote:
+    name: Android – Promote internal to production
+    runs-on: ubuntu-latest
+    environment: prod
+    if: github.event_name == 'workflow_dispatch' && inputs.android_promote_to_production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: android
+
+      - name: Promote internal release to production
+        working-directory: android
+        env:
+          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        run: bundle exec fastlane android promote_internal
+
   android-build:
     name: Android – Build
     runs-on: ubuntu-latest
@@ -46,7 +80,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.44.1'
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 
@@ -415,11 +449,13 @@ jobs:
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
                 track:"internal" \
-                promote_to:"production"
+                promote_to:"production" \
+                submit_review:"${{ inputs.submit_for_review }}"
             elif [ "${{ inputs.android_production }}" = "true" ]; then
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
-                track:"production"
+                track:"production" \
+                submit_review:"${{ inputs.submit_for_review }}"
             elif [ "${{ inputs.android_internal }}" = "true" ]; then
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
@@ -443,7 +479,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.44.1'
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 
@@ -802,7 +838,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.44.1'
+          flutter-version: '3.44.4'
           channel: stable
           cache: true
 
@@ -970,6 +1006,38 @@ jobs:
               bundle exec fastlane beta
             fi
             if [ "${{ inputs.ios_appstore }}" = "true" ]; then
-              bundle exec fastlane release
+              bundle exec fastlane release submit_for_review:"${{ inputs.submit_for_review }}"
             fi
           fi
+
+  # After a successful deploy, tag the built commit with the pubspec version
+  # (bare semver, no v prefix — matches existing tags). Runs only when at
+  # least one deploy job actually deployed, and is a no-op if the tag already
+  # exists, so re-runs and manual tags don't conflict.
+  tag-release:
+    name: Tag release
+    runs-on: ubuntu-latest
+    needs: [android-deploy, ios-deploy]
+    if: >-
+      !failure() && !cancelled() &&
+      contains(needs.*.result, 'success')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag commit with pubspec version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not read version from pubspec.yaml"
+            exit 1
+          fi
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "Tag $VERSION already exists — nothing to do."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+          echo "Created tag $VERSION at $GITHUB_SHA"

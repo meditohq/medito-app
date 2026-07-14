@@ -9,9 +9,13 @@ import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/views/donation/native_donation_page.dart';
+import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
-  const OnboardingDonationScreen({super.key, this.onNext});
+  const OnboardingDonationScreen({super.key, this.headerImage, this.onNext});
+
+  /// Hero image rendered at the top of the page, scrolling with the content.
+  final String? headerImage;
 
   final VoidCallback? onNext;
 
@@ -146,63 +150,80 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
         top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
+            final headerHeight = widget.headerImage != null
+                ? OnboardingHeaderImage.heightFor(context)
+                : 0.0;
+
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(32),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 64,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.donationTitle,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          AppLocalizations.of(context)!.donationBody,
-                          style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.7),
-                            fontSize: 16,
-                            height: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    Column(
-                      children: [
-                        _buildActionButton(
-                          text: AppLocalizations.of(context)!.donationPrimerCta,
-                          onPressed: () => _handleDonationAction(context),
-                        ),
-                        if (_hasAttemptedDonation) ...[
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: TextButton(
-                              onPressed: _handleSkip,
-                              child: Text(
-                                AppLocalizations.of(context)!.skipForNow,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (widget.headerImage != null)
+                    OnboardingHeaderImage(imagePath: widget.headerImage!),
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (constraints.maxHeight - 64 - headerHeight)
+                            .clamp(0.0, double.infinity),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)!.donationTitle,
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                            ),
+                              const SizedBox(height: 24),
+                              Text(
+                                AppLocalizations.of(context)!.donationBody,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
+                                  fontSize: 16,
+                                  height: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
+                          Column(
+                            children: [
+                              _buildActionButton(
+                                text: AppLocalizations.of(
+                                  context,
+                                )!.donationPrimerCta,
+                                onPressed: () => _handleDonationAction(context),
+                              ),
+                              if (_hasAttemptedDonation) ...[
+                                const SizedBox(height: 12),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextButton(
+                                    onPressed: _handleSkip,
+                                    child: Text(
+                                      AppLocalizations.of(context)!.skipForNow,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ],
-                      ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },

@@ -112,14 +112,23 @@ fi
 echo "✓ Computed version: $NEW_VERSION"
 
 BUILD_NUMBER=$(grep "^version:" "$PUBSPEC" | sed 's/version: //' | cut -d'+' -f2)
-sed -i '' "s/^version: .*/version: $NEW_VERSION+$BUILD_NUMBER/" "$PUBSPEC"
+# GNU sed takes -i with no suffix argument; BSD/macOS sed requires -i ''
+if sed --version >/dev/null 2>&1; then
+    sed -i "s/^version: .*/version: $NEW_VERSION+$BUILD_NUMBER/" "$PUBSPEC"
+else
+    sed -i '' "s/^version: .*/version: $NEW_VERSION+$BUILD_NUMBER/" "$PUBSPEC"
+fi
 echo "✓ pubspec.yaml updated to $NEW_VERSION+$BUILD_NUMBER"
 
 VERSION="$NEW_VERSION"
 
-# Copy to clipboard
-echo -n "$VERSION" | pbcopy
-echo "✓ Version $VERSION copied to clipboard"
+# Copy to clipboard (best-effort — pbcopy only exists on macOS)
+if command -v pbcopy >/dev/null 2>&1; then
+    echo -n "$VERSION" | pbcopy
+    echo "✓ Version $VERSION copied to clipboard"
+else
+    echo "✓ Version $VERSION (no clipboard tool on this system — not copied)"
+fi
 
 # Reorganise release_notes.txt
 NOTES_FILE="$SCRIPT_DIR/release_notes.txt"

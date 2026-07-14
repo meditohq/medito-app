@@ -128,6 +128,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.input,
     );
 
     if (picked != null) {

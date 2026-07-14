@@ -69,6 +69,12 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
       );
 
   @override
+  void notifyForceLogout() => super.noSuchMethod(
+    Invocation.method(#notifyForceLogout, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
   void setAuthHeader(String? accessToken) => super.noSuchMethod(
     Invocation.method(#setAuthHeader, [accessToken]),
     returnValueForMissingStub: null,

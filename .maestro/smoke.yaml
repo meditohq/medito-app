@@ -110,9 +110,18 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # "Remind Me Daily" when notifications aren't granted yet, or
 # "Turn on Smart Reminders" when they already are (CI grants
 # POST_NOTIFICATIONS up front via adb).
+# The reminder time-chips experiment (onboarding_reminder_time_chips) shows
+# "When will you meditate?" instead of the CTA button on the chips arm.
+# The scrolling hero image (2607.10) pushes the CTA/chips below the fold on
+# small simulators, so wait on the always-visible title and scroll the skip
+# link into view before asserting/tapping it.
 - extendedWaitUntil:
-    visible: "Remind Me Daily|Turn on Smart Reminders"
+    visible: "Stay on Track with Meditation Reminders"
     timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: "Skip for Now"
+    direction: DOWN
 - tapOn: "Skip for Now"
 
 # ── Onboarding: Battery optimization (Android only, conditional) + ──
@@ -148,8 +157,12 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # quiet "Maybe later" skip — "Get started" there only appears AFTER the
 # session completes — so for the smoke run we skip the session via
 # "Maybe later". Tap whichever is present.
-- extendedWaitUntil:
-    visible: "Get started|Maybe later"
+# The scrolling hero image can leave the CTA below the fold on small
+# simulators — scroll it into view first.
+- scrollUntilVisible:
+    element:
+      text: "Get started|Maybe later"
+    direction: DOWN
     timeout: 30000
 - tapOn:
     text: "Get started|Maybe later"
@@ -212,3 +225,33 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     visible: "00:[0-5][1-9]"
     timeout: 20000
 - takeScreenshot: player-playing
+
+# ── End screen after session ──
+# Let the session play for a few seconds first, then skip to the end so the
+# track completes and the end screen must appear. (00:0X-00:5X only
+# — a minutes pattern would instantly match the always-visible total-duration
+# label instead of the elapsed timer.)
+- extendedWaitUntil:
+    visible: "00:0[5-9]|00:[1-5][0-9]"
+    timeout: 30000
+
+# Tap the skip-forward button (labelled "Skip forward 10 seconds", though it
+# skips 15s) until the track completes: the native seek clamps at the track
+# duration, which triggers completion and the end screen ("day streak" is
+# always shown on it). times caps the loop for safety (60 × 15s ≈ a 15-min
+# track); the tap is optional because the button disappears mid-loop once the
+# end screen starts animating in.
+- repeat:
+    times: 60
+    while:
+      notVisible: "(?s).*day streak.*"
+    commands:
+      - tapOn:
+          text: "Skip forward 10 seconds"
+          optional: true
+
+# The end screen must now be visible — this is the actual assertion.
+- extendedWaitUntil:
+    visible: "(?s).*day streak.*"
+    timeout: 30000
+- takeScreenshot: end-screen

@@ -159,12 +159,15 @@ class SmartRemindersScheduler {
         )
         .toList();
 
-    await reminders.scheduleSmartReminderSeries(scheduledReminders);
-
-    AppLogger.d(
-      'REMINDER',
-      'Successfully scheduled ${items.length} smart reminders',
-    );
+    try {
+      await reminders.scheduleSmartReminderSeries(scheduledReminders);
+      AppLogger.d(
+        'REMINDER',
+        'Successfully scheduled ${items.length} smart reminders',
+      );
+    } catch (e, s) {
+      AppLogger.e('REMINDER', 'Error scheduling smart reminder series: $e', s);
+    }
 
     final first = TimeOfDay(hour: anchorLocal.hour, minute: anchorLocal.minute);
     await prefs.setInt(SharedPreferenceConstants.savedHours, first.hour);

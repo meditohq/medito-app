@@ -10,9 +10,13 @@ import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 
 class TrackingPermissionScreen extends ConsumerWidget {
-  const TrackingPermissionScreen({super.key, this.onNext});
+  const TrackingPermissionScreen({super.key, this.headerImage, this.onNext});
+
+  /// Hero image rendered at the top of the page, scrolling with the content.
+  final String? headerImage;
 
   final VoidCallback? onNext;
 
@@ -64,56 +68,70 @@ class TrackingPermissionScreen extends ConsumerWidget {
         top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
+            final headerHeight = headerImage != null
+                ? OnboardingHeaderImage.heightFor(context)
+                : 0.0;
+
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(32),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 64,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        MeditoIcon(
-                          assetName: MeditoIcons.shield,
-                          size: 48,
-                          color: onSurface,
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          l10n.trackingPermissionTitle,
-                          style: Theme.of(context).textTheme.displayLarge
-                              ?.copyWith(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (headerImage != null)
+                    OnboardingHeaderImage(imagePath: headerImage!),
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (constraints.maxHeight - 64 - headerHeight)
+                            .clamp(0.0, double.infinity),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              MeditoIcon(
+                                assetName: MeditoIcons.shield,
+                                size: 48,
                                 color: onSurface,
                               ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.trackingPermissionBody,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                fontSize: 16,
-                                height: 1.5,
-                                color: onSurface.withOpacityValue(0.9),
+                              const SizedBox(height: 20),
+                              Text(
+                                l10n.trackingPermissionTitle,
+                                style: Theme.of(context).textTheme.displayLarge
+                                    ?.copyWith(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w600,
+                                      color: onSurface,
+                                    ),
+                                textAlign: TextAlign.center,
                               ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildPrivacyNote(context, l10n),
-                      ],
+                              const SizedBox(height: 16),
+                              Text(
+                                l10n.trackingPermissionBody,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      fontSize: 16,
+                                      height: 1.5,
+                                      color: onSurface.withOpacityValue(0.9),
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 12),
+                              _buildPrivacyNote(context, l10n),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
+                          _buildActionButton(
+                            text: l10n.trackingPermissionAllow,
+                            onPressed: () async =>
+                                await _handleContinue(context, ref),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 32),
-                    _buildActionButton(
-                      text: l10n.trackingPermissionAllow,
-                      onPressed: () async =>
-                          await _handleContinue(context, ref),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },
