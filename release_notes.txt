@@ -1,6 +1,9 @@
 Unreleased
 -
 
+2607.20.3
+- Onboarding fixes: the donation step is now easier to skip
+
 2607.20.2
 - New in-app donation page during onboarding
 - All beginners now get a short guided first meditation in onboarding
