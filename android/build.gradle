@@ -8,6 +8,26 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
+// Some plugin modules (e.g. home_widget) still default to JVM target 1.8,
+// which fails against dependencies compiled for JVM 11 under Flutter 3.44's
+// toolchain. Force a consistent target across every module.
+subprojects {
+    def forceJvmTarget = { project ->
+        if (project.plugins.hasPlugin('com.android.library')) {
+            project.android.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+            project.android.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+        }
+        project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions.jvmTarget = '17'
+        }
+    }
+    if (project.state.executed) {
+        forceJvmTarget(project)
+    } else {
+        project.afterEvaluate { p -> forceJvmTarget(p) }
+    }
+}
+
 allprojects {
     repositories {
         google()
