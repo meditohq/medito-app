@@ -28,7 +28,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
   // TODO(temp): remove before activating the real native-vs-webview
   // experiment. Forces the native page on the internal-testing release so it
   // can be validated on-device before any server config carries the flag.
-  static const _forceNativeForInternalTesting = true;
+  static const _forceNativeForInternalTesting = false;
 
   static const _paywallConfigTimeout = Duration(seconds: 3);
 

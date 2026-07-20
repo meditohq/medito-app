@@ -87,10 +87,6 @@ class NativeDonationPage extends ConsumerStatefulWidget {
 class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   static const _logTag = 'NATIVE_DONATION';
   static const _paywallId = 'paywall_native';
-  // Matches the webview page's delayed close affordance, so users read the
-  // page before the escape hatch appears.
-  static const _skipDelay = Duration(seconds: 5);
-
   late final List<_Frequency> _offeredFrequencies;
   late _Frequency _selectedFrequency;
   int _selectedAmount = 0;
@@ -98,9 +94,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   bool _didDonate = false;
   bool _dismissLogged = false;
   bool _donateTapLogged = false;
-  bool _showSkip = false;
   String? _capturedUserId;
-  Timer? _skipTimer;
 
   String get _variantId => widget.config.experiment?.variant ?? 'unknown';
 
@@ -130,16 +124,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               : _Frequency.monthly);
     _selectedAmount = _suggestedAmountFor(_selectedFrequency);
 
-    _skipTimer = Timer(_skipDelay, () {
-      if (mounted) setState(() => _showSkip = true);
-    });
-
     _logPageShown();
   }
 
   @override
   void dispose() {
-    _skipTimer?.cancel();
     // Parent pager may advance past this tab without an explicit skip tap.
     if (!_didDonate) _logPaywallDismissedNoPayment();
     super.dispose();
@@ -680,16 +669,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }
 
   Widget _buildSkip(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: _showSkip ? 1 : 0,
-      duration: const Duration(milliseconds: 400),
-      child: IgnorePointer(
-        ignoring: !_showSkip,
-        child: TextButton(
-          onPressed: _handleSkip,
-          child: Text(AppLocalizations.of(context)!.skipForNow),
-        ),
-      ),
+    return TextButton(
+      onPressed: _handleSkip,
+      child: Text(AppLocalizations.of(context)!.skipForNow),
     );
   }
 }
