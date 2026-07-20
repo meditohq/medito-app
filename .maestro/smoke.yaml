@@ -52,17 +52,34 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # donation primer — no second question to answer.
 
 # ── Onboarding: Donation ──
-# iOS smoke builds enable SMOKE_TEST_MODE, which adds a deterministic close
-# control to the webview route and reveals the skip button after returning.
-# That still verifies the webview opens, without waiting on a remote page close
-# affordance that is slow and flaky on iOS CI.
+# Two variants can render here:
+#   - NATIVE donation page — forced on 2607.20+ internal builds via
+#     _forceNativeForInternalTesting (TODO(temp)), otherwise server-flagged.
+#     It reveals "Skip for Now" ~5s after load and has no webview.
+#   - WEBVIEW intro — the previous default ("See how to help" CTA); returns
+#     when the temp force-native flag is reverted.
+# Wait for whichever appears, then branch on the webview CTA.
+- extendedWaitUntil:
+    visible: "See how to help|Skip for Now"
+    timeout: 30000
+
+# Native page path: nothing to drive without charging a card — screenshot, skip.
 - runFlow:
     when:
+      notVisible: "See how to help"
+    commands:
+      - takeScreenshot: paywall-native
+      - tapOn: "Skip for Now"
+
+# Webview intro path, iOS: smoke builds enable SMOKE_TEST_MODE, which adds a
+# deterministic close control to the webview route and reveals the skip button
+# after returning. That still verifies the webview opens, without waiting on a
+# remote page close affordance that is slow and flaky on iOS CI.
+- runFlow:
+    when:
+      visible: "See how to help"
       platform: iOS
     commands:
-      - extendedWaitUntil:
-          visible: "See how to help"
-          timeout: 20000
       - tapOn: "See how to help"
 
       - extendedWaitUntil:
@@ -76,15 +93,14 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           timeout: 20000
       - tapOn: "Skip for Now"
 
-# Android release smoke uses the deployable APK, so it keeps the real production
-# build settings and drives the donation webview before skipping.
+# Webview intro path, Android: release smoke uses the deployable APK, so it
+# keeps the real production build settings and drives the donation webview
+# before skipping.
 - runFlow:
     when:
+      visible: "See how to help"
       platform: Android
     commands:
-      - extendedWaitUntil:
-          visible: "See how to help"
-          timeout: 20000
       - tapOn: "See how to help"
 
       # Dismiss the webview. The webpage shows an x close glyph (aria-label

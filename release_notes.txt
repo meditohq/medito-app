@@ -1,7 +1,7 @@
 Unreleased
 -
 
-2607.20.1
+2607.20.2
 - New in-app donation page during onboarding
 - All beginners now get a short guided first meditation in onboarding
 
