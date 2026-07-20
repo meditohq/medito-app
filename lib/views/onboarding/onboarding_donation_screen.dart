@@ -109,8 +109,10 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     if (_useNativePaywall == true && config != null) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        // Unlike the webview intro (which bleeds a header image to the top
+        // edge), the native page leads with text, so it must respect the top
+        // inset or the eyebrow renders under the status bar / Dynamic Island.
         body: SafeArea(
-          top: false,
           child: NativeDonationPage(
             config: config,
             source: FirebaseAnalyticsService.paywallSourceOnboarding,
