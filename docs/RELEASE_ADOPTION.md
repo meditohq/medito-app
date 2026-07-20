@@ -4,7 +4,7 @@
 
 > **Why this exists:** the deploy pipeline ships to the Play **production** track and the App Store with **no rollout fraction in code** ([`release.yml`](./.github/workflows/release.yml)). The staged-rollout % lives only in Play Console / App Store Connect and is not version-controlled. So the *real* rollout curve — the share of live traffic on each version per day — is reconstructed from analytics here. For A/B work this is what you actually want: not the planned %, but the share of the experiment population that was running each build.
 
-> ⚠️ **This is a dated SNAPSHOT.** Numbers below were computed **2026-07-08** over the window **2026-04-15 → 2026-07-07**. Current-share figures use **2026-07-07 (CUR)** — the most recent day clean on both platforms. They go stale. The query at the bottom is the source of truth — re-run it to refresh. (Per the timeline doc's philosophy: trust the query, not cached numbers.)
+> ⚠️ **This is a dated SNAPSHOT.** Numbers below were computed **2026-07-20** over the window **2026-04-15 → 2026-07-18**. Current-share figures use **2026-07-18 (CUR)** — the most recent day clean on both platforms. They go stale. The query at the bottom is the source of truth — re-run it to refresh. (Per the timeline doc's philosophy: trust the query, not cached numbers.)
 
 > **🔑 FUNNEL BOUNDARY — the iOS ATT analytics fix (2026-06-23).** `2606.23.0` (cut 06-23) is the **first build with the iOS ATT analytics fix** (keeps first-party analytics on when ATT is denied; commit `31a676db`). Before it, iOS ATT-deniers were invisible in GA4 → all iOS funnel/onboarding/paywall metrics were biased toward the ~17% who allow tracking. **iOS analytics are only trustworthy from ~2026-06-23 onward**, ramping to full as `2606.23.0`/`2606.26.0` reach 100%. Confirmed recovering: iOS back-half onboarding completion went 16–18% (pre-fix builds) → ~79% (fixed builds), matching Android. **Treat 06-23 as a hard cohort cut for any iOS or pooled A/B read — do not pool pre- and post-06-23 iOS data.**
 
@@ -16,50 +16,50 @@
 
 - **iOS ramps fast** — a release crosses 50% of iOS DAU in **~2–3 days** (App Store phased release + fast iOS update behaviour).
 - **Android ramps slow** — **~6+ days** to 50%, and a Play *staged rollout* can hold a build at a low % for weeks.
-- **Net effect right now (CUR 2026-07-07):**
-  - **Android**: 87% on `2606.26.0`; long tail of sub-2% builds (`26.5.19` 2%, `2606.17.0` 1.7%, `2606.23.0` 1.1%).
-  - **iOS**: 92% on `2606.30.0`, with `2606.26.0` (2.2%) the only other build above 2%.
+- **Net effect right now (CUR 2026-07-18):**
+  - **Android**: 85% on `2607.5.0`; long tail of sub-6% builds (`2606.26.0` 5.0%, `26.5.19` 1.5%, `2606.17.0` 0.8%, `2606.30.0` 0.7%).
+  - **iOS**: 96% on `2606.30.0`, with no other build above 1% (`2606.26.0` 0.8%).
 
-  → The platforms have **diverged again**: Android sits at 87% on `2606.26.0` while iOS has already moved on to `2606.30.0` (92%) — iOS is a full build ahead. This is the normal iOS-ramps-fast / Android-lags pattern. Split A/B cohorts by `platform` **and** `app_info.version`, never by calendar date alone.
+  → The platforms have **diverged again — this time in the opposite direction**: Android has already rolled forward to `2607.5.0` (85%) while iOS is still fully on `2606.30.0` (96%) and has **not** started adopting the `2607.x` line at all (`2607.5.0`/`2607.10.0` are ~0% on iOS). So Android is a full build *ahead* of iOS here — the `2607.x` builds reached Android first, breaking the usual iOS-fast / Android-lags pattern. Split A/B cohorts by `platform` **and** `app_info.version`, never by calendar date alone.
 
-**⚠️ Versions newer than the timeline doc exist.** The timeline doc's table stops at `26.5.19`. BigQuery shows the version scheme switched to `YYMM.build.patch` and many newer builds have since carried traffic (`2605.21.0`, `2606.5.0`, `2606.11.0`, `2606.17.0`, `2606.23.0`, `2606.26.0`, `2606.30.0`). The two **currently-dominant builds are undocumented in the timeline doc**: **`2606.26.0`** (Android, ~87%) and **`2606.30.0`** (iOS, ~92%). The earlier ATT-fix build **`2606.23.0`** is also undocumented (now sub-2% on both). **The timeline doc needs a catch-up entry** — their paywall/analytics deltas (notably the ATT fix in `2606.23.0`) aren't recorded yet.
+**⚠️ Versions newer than the timeline doc exist.** The timeline doc's table stops at `26.5.19`. BigQuery shows the version scheme switched to `YYMM.build.patch` and many newer builds have since carried traffic (`2605.21.0`, `2606.5.0`, `2606.11.0`, `2606.17.0`, `2606.23.0`, `2606.26.0`, `2606.30.0`, `2607.5.0`, `2607.10.0`). The **currently-dominant builds are undocumented in the timeline doc**: **`2607.5.0`** (Android, ~85%) and **`2606.30.0`** (iOS, ~96%); **`2606.26.0`** is still live on Android (~5%). The ATT-fix build **`2606.23.0`** is also undocumented (now sub-1% on both). **The timeline doc needs a catch-up entry** — their paywall/analytics deltas (notably the ATT fix in `2606.23.0`) aren't recorded yet.
 
-**⚠️ 2026-06-08 Android is a data anomaly — do not use it.** Android DAU that day = **92,577** vs a ~16.5k daily median (iOS normal). Almost certainly a backfill / bot / duplicate-processing artefact in that daily table. It is the only anomalous day detected this run. Current-share figures below are computed on **2026-07-07** (CUR — a clean day, Android 16,430 / iOS 4,871 DAU). Exclude 2026-06-08 Android from any analysis until explained.
+**⚠️ 2026-06-08 Android is a data anomaly — do not use it.** Android DAU that day = **92,577** vs a ~15.5k daily median (iOS normal; 06-09 was also mildly elevated at ~31k but not flagged). Almost certainly a backfill / bot / duplicate-processing artefact in that daily table. It is the only anomalous day detected this run. Current-share figures below are computed on **2026-07-18** (CUR — a clean day, Android 14,170 / iOS 4,497 DAU). Exclude 2026-06-08 Android from any analysis until explained.
 
 ---
 
 ## Modern releases — arrival & rollout speed
 
-`hit 10%` / `hit 50%` = first day the version reached that share of its platform's DAU. `—` = never reached it within the window (still ramping or held on staged rollout). `share 07-07` = share of platform DAU on the last clean day (CUR).
+`hit 10%` / `hit 50%` = first day the version reached that share of its platform's DAU. `—` = never reached it within the window (still ramping or held on staged rollout). `share 07-18` = share of platform DAU on the last clean day (CUR).
 
 ### Android
 
-| Version     | First seen | hit 10%    | hit 50%    | Peak share (day)   | share 07-07 |
+| Version     | First seen | hit 10%    | hit 50%    | Peak share (day)   | share 07-18 |
 | ----------- | ---------- | ---------- | ---------- | ------------------ | ----------- |
-| `26.5.13`   | 2026-05-10 | 2026-05-14 | 2026-05-15 | 83% (05-19)        | 0.5%        |
-| `26.5.19`   | 2026-05-18 | 2026-05-23 | 2026-05-24 | 87% (06-02)        | 2.0%        |
-| `2605.21.0` | 2026-05-22 | 2026-06-06 | 2026-06-12 | 77% (06-15)        | 0.8%        |
-| `2606.11.0` | 2026-06-11 | 2026-06-16 | 2026-06-17 | 53% (06-17)        | 0.3%        |
-| `2606.17.0` | 2026-06-14 | 2026-06-18 | 2026-06-19 | 80% (06-22)        | 1.7%        |
-| `2606.23.0` ⭐ | 2026-06-21 | 2026-06-24 | 2026-06-25 | 61% (06-26)        | 1.1%        |
-| `2606.26.0` | 2026-06-23 | 2026-06-27 | 2026-06-28 | 87% (07-07)        | **86.9%**   |
+| `26.5.19`   | 2026-05-18 | 2026-05-23 | 2026-05-24 | 87% (06-02)        | 1.5%        |
+| `2605.21.0` | 2026-05-22 | 2026-06-06 | 2026-06-12 | 77% (06-15)        | 0.4%        |
+| `2606.11.0` | 2026-06-11 | 2026-06-16 | 2026-06-17 | 53% (06-17)        | 0.2%        |
+| `2606.17.0` | 2026-06-14 | 2026-06-18 | 2026-06-19 | 80% (06-22)        | 0.8%        |
+| `2606.23.0` ⭐ | 2026-06-21 | 2026-06-24 | 2026-06-25 | 61% (06-26)        | 0.4%        |
+| `2606.26.0` | 2026-06-23 | 2026-06-27 | 2026-06-28 | 86% (07-06)        | 5.0%        |
+| `2606.30.0` | 2026-06-30 | 2026-07-09 | —          | 41% (07-09)        | 0.7%        |
+| `2607.5.0`  | 2026-07-05 | 2026-07-10 | 2026-07-11 | 85% (07-18)        | **85.3%**   |
 
-⭐ = first build with the iOS ATT analytics fix (matters for iOS; Android was never affected, listed here for the rollout record). Android takes ~6 days to 50% (`26.5.19`: first 05-18 → 50% on 05-24). `2605.21.0` was a slow/held Play staged rollout — first seen 05-22 but didn't cross 50% until 06-12 — then superseded by `2606.11.0` → `2606.17.0` → `2606.23.0` → `2606.26.0`, which is now dominant at ~87% and still the newest build Android has broadly adopted (iOS has already moved to `2606.30.0`).
+⭐ = first build with the iOS ATT analytics fix (matters for iOS; Android was never affected, listed here for the rollout record). Android takes ~6 days to 50% (`26.5.19`: first 05-18 → 50% on 05-24). `2605.21.0` was a slow/held Play staged rollout — first seen 05-22 but didn't cross 50% until 06-12 — then superseded by `2606.11.0` → `2606.17.0` → `2606.23.0` → `2606.26.0`. `2606.30.0` never fully took over on Android (peaked ~41% on 07-09) — it was leapfrogged by `2607.5.0`, which is now dominant at ~85% and is the newest build Android has broadly adopted while iOS is still on `2606.30.0`.
 
 ### iOS
 
-| Version     | First seen | hit 10%    | hit 50%    | Peak share (day)   | share 07-07 |
+| Version     | First seen | hit 10%    | hit 50%    | Peak share (day)   | share 07-18 |
 | ----------- | ---------- | ---------- | ---------- | ------------------ | ----------- |
-| `26.5.13`   | 2026-05-13 | 2026-05-14 | 2026-05-15 | 90% (05-18)        | 0.2%        |
-| `26.5.19`   | 2026-05-18 | 2026-05-19 | 2026-05-21 | 93% (06-01)        | 0.5%        |
-| `2605.21.0` | 2026-05-26 | 2026-06-03 | 2026-06-05 | 88% (06-07)        | 0.1%        |
-| `2606.5.0`  | 2026-06-05 | 2026-06-08 | 2026-06-10 | 92% (06-16)        | 0.7%        |
-| `2606.11.0` | 2026-06-11 | 2026-06-18 | 2026-06-19 | 90% (06-23)        | 0.9%        |
-| `2606.23.0` ⭐ | 2026-06-23 | 2026-06-24 | 2026-06-25 | 83% (06-26)        | 0.8%        |
-| `2606.26.0` | 2026-06-26 | 2026-06-27 | 2026-06-28 | 89% (06-30)        | 2.2%        |
-| `2606.30.0` | 2026-06-30 | 2026-07-02 | 2026-07-03 | 92% (07-07)        | **92.3%**   |
+| `26.5.19`   | 2026-05-18 | 2026-05-19 | 2026-05-21 | 93% (06-01)        | 0.2%        |
+| `2605.21.0` | 2026-05-26 | 2026-06-03 | 2026-06-05 | 88% (06-07)        | 0.2%        |
+| `2606.5.0`  | 2026-06-05 | 2026-06-08 | 2026-06-10 | 92% (06-16)        | 0.4%        |
+| `2606.11.0` | 2026-06-11 | 2026-06-18 | 2026-06-19 | 90% (06-23)        | 0.4%        |
+| `2606.23.0` ⭐ | 2026-06-23 | 2026-06-24 | 2026-06-25 | 83% (06-26)        | 0.4%        |
+| `2606.26.0` | 2026-06-26 | 2026-06-27 | 2026-06-28 | 89% (06-30)        | 0.8%        |
+| `2606.30.0` | 2026-06-30 | 2026-07-02 | 2026-07-03 | 96% (07-17)        | **95.6%**   |
 
-⭐ = first build with the iOS ATT analytics fix (commit `31a676db`) — see the funnel-boundary callout up top. iOS takes ~2–3 days to 50% (`26.5.19`: first 05-18 → 50% on 05-21). The June–July cadence was rapid: `2606.5.0` → `2606.11.0` → `2606.23.0` → `2606.26.0` → `2606.30.0`, each displacing the last within ~1 week; `2606.30.0` is at 92% by 07-07.
+⭐ = first build with the iOS ATT analytics fix (commit `31a676db`) — see the funnel-boundary callout up top. iOS takes ~2–3 days to 50% (`26.5.19`: first 05-18 → 50% on 05-21). The June–July cadence was rapid: `2606.5.0` → `2606.11.0` → `2606.23.0` → `2606.26.0` → `2606.30.0`, each displacing the last within ~1 week; `2606.30.0` reached 92%+ by early July and is still at ~96% on 07-18 — iOS has **not** yet picked up the `2607.x` builds that Android has already moved to.
 
 ---
 
@@ -71,7 +71,6 @@ Quickest way to pick a clean A/B window: find the week, read off which build the
 
 | Week of    | #1                | #2                 | #3            |
 | ---------- | ----------------- | ------------------ | ------------- |
-| 2026-04-20 | `3.6.17` 35%      | `3.6.20` 26%       | `3.6.15` 26%  |
 | 2026-04-27 | `3.6.20` 61%      | `26.4.28` 24%      | `3.6.15` 3%   |
 | 2026-05-04 | `26.4.28` 72%     | `26.5.9` 11%       | `3.6.20` 5%   |
 | 2026-05-11 | `26.5.13` 32%     | `26.5.10` 30%      | `26.5.9` 18%  |
@@ -82,13 +81,13 @@ Quickest way to pick a clean A/B window: find the week, read off which build the
 | 2026-06-15 | `2606.17.0` 34%   | `2605.21.0` 29%    | `2606.11.0` 21% |
 | 2026-06-22 | `2606.17.0` 42%   | `2606.23.0` 29%    | `2606.26.0` 14% |
 | 2026-06-29 | `2606.26.0` 82%   | `2606.17.0` 4%     | `2606.23.0` 3% |
-| 2026-07-06 | `2606.26.0` 87%   | `26.5.19` 2%       | `2606.17.0` 2% |
+| 2026-07-06 | `2606.26.0` 52%   | `2607.5.0` 20%     | `2606.30.0` 17% |
+| 2026-07-13 | `2607.5.0` 82%    | `2606.26.0` 7%     | `2606.30.0` 2% |
 
 ### iOS
 
 | Week of    | #1                | #2                 | #3            |
 | ---------- | ----------------- | ------------------ | ------------- |
-| 2026-04-20 | `3.6.17` 69%      | `3.6.21` 21%       | `3.6.15` 3%   |
 | 2026-04-27 | `26.4.28` 46%     | `3.6.21` 45%       | `3.6.17` 2%   |
 | 2026-05-04 | `26.4.28` 90%     | `26.5.9` 2%        | `3.6.21` 2%   |
 | 2026-05-11 | `26.5.13` 32%     | `26.5.9` 27%       | `26.5.10` 22% |
@@ -99,9 +98,10 @@ Quickest way to pick a clean A/B window: find the week, read off which build the
 | 2026-06-15 | `2606.5.0` 54%    | `2606.11.0` 39%    | `26.5.19` 1% |
 | 2026-06-22 | `2606.11.0` 43%   | `2606.23.0` 36%    | `2606.26.0` 13% |
 | 2026-06-29 | `2606.26.0` 51%   | `2606.30.0` 40%    | `2606.23.0` 3% |
-| 2026-07-06 | `2606.30.0` 91%   | `2606.26.0` 3%     | `2606.23.0` 1% |
+| 2026-07-06 | `2606.30.0` 93%   | `2606.26.0` 2%     | `2606.23.0` 1% |
+| 2026-07-13 | `2606.30.0` 95%   | `2606.26.0` 1%     | `2606.23.0` 0% |
 
-> Read the divergence: week of 06-01, Android is 83% `26.5.19` while iOS is split `26.5.19` 53% / `2605.21.0` 41% — mid-transition on iOS, not yet on Android. Same calendar week, different code mix per platform. By the week of 07-06 the split is stark: Android is 87% on `2606.26.0` but iOS has already rolled forward to `2606.30.0` (91%) — a whole build apart on the same calendar week. The week of 06-22 also straddles the 06-23 ATT-fix boundary (`2606.23.0`) — split it by version, don't read it as one cohort.
+> Read the divergence: week of 06-01, Android is 83% `26.5.19` while iOS is split `26.5.19` 53% / `2605.21.0` 41% — mid-transition on iOS, not yet on Android. Same calendar week, different code mix per platform. By the week of 07-13 the split has flipped: Android is 82% on `2607.5.0` while iOS is still 95% on `2606.30.0` — a whole build apart, but with **Android now ahead** (the `2607.x` line reached Android first and iOS hasn't picked it up yet). The week of 06-22 also straddles the 06-23 ATT-fix boundary (`2606.23.0`) — split it by version, don't read it as one cohort.
 
 ---
 
@@ -144,7 +144,7 @@ WITH daily AS (
     app_info.version AS app_version,
     COUNT(DISTINCT user_pseudo_id) AS users
   FROM `medito-9165c.analytics_451310720.events_*`
-  WHERE _TABLE_SUFFIX BETWEEN '20260415' AND '20260707'
+  WHERE _TABLE_SUFFIX BETWEEN '20260415' AND '20260718'
     AND platform IN ('IOS', 'ANDROID')
     AND app_info.version IS NOT NULL
   GROUP BY 1, 2, 3
