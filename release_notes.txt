@@ -1,6 +1,10 @@
 Unreleased
 -
 
+2607.20.0
+- New in-app donation page during onboarding
+- All beginners now get a short guided first meditation in onboarding
+
 2607.10.0
 - Fixed the app getting stuck on the splash screen when opened without an internet connection
 - Setting a custom time now starts with quick number entry instead of the clock dial
