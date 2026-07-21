@@ -620,24 +620,38 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         SizedBox(
           width: double.infinity,
           height: 48,
+          // With a wallet button present it is the primary action — card drops
+          // to an outlined secondary. Without one, card stays the filled CTA.
           child: ElevatedButton(
             onPressed: _isProcessingPayment
                 ? null
                 : () => _handlePay(payment_models.PaymentMethodType.card),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.brandPurple,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            style: hasApplePay
+                ? ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: context.brandPurple,
+                    elevation: 0,
+                    side: BorderSide(
+                      color: context.brandPurple.withValues(alpha: 0.6),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  )
+                : ElevatedButton.styleFrom(
+                    backgroundColor: context.brandPurple,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
             child: _isProcessingPayment
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: hasApplePay ? context.brandPurple : Colors.white,
                     ),
                   )
                 : Text(
