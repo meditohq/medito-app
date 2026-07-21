@@ -94,6 +94,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   bool _didDonate = false;
   bool _dismissLogged = false;
   bool _donateTapLogged = false;
+  // Skip is visible from the start but only unlocks after a short countdown
+  // (shown as a filling progress line). The webview arm's close affordance
+  // appears after ~5s, so both experiment arms keep a comparable escape-hatch
+  // delay without hiding that skipping is possible.
+  static const _skipUnlockDelay = Duration(seconds: 4);
+  bool _skipUnlocked = false;
   String? _capturedUserId;
 
   String get _variantId => widget.config.experiment?.variant ?? 'unknown';
@@ -207,9 +213,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     }
   }
 
-  void _handleSkip() {
+  void _handleSkip(String method) {
     FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingDonationSkipTap,
+      parameters: {'method': method},
     );
     if (!_didDonate) _logPaywallDismissedNoPayment();
     widget.onNext();
@@ -304,8 +311,16 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
+    // The page is a pager tab, not a pushed route, so on Android the system
+    // back button would otherwise pop the root route and close the app.
+    // Treat back as skip instead (webview-arm parity: its route pops back).
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _handleSkip('back');
+      },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: ConstrainedBox(
@@ -333,7 +348,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             ),
           ),
         );
-      },
+        },
+      ),
     );
   }
 
@@ -669,9 +685,45 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }
 
   Widget _buildSkip(BuildContext context) {
-    return TextButton(
-      onPressed: _handleSkip,
-      child: Text(AppLocalizations.of(context)!.skipForNow),
+    final label = AppLocalizations.of(context)!.skipForNow;
+    final faint = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4);
+
+    if (_skipUnlocked) {
+      return TextButton(
+        onPressed: () => _handleSkip('button'),
+        child: Text(label),
+      );
+    }
+
+    // Locked state: same label, dimmed, with a thin progress line filling
+    // over the countdown so it reads as "available in a moment", not hidden.
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: _skipUnlockDelay,
+      onEnd: () {
+        if (mounted) setState(() => _skipUnlocked = true);
+      },
+      builder: (context, progress, _) {
+        return TextButton(
+          onPressed: null,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: TextStyle(color: faint)),
+              const SizedBox(height: 3),
+              SizedBox(
+                width: 88,
+                height: 2,
+                child: LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: faint.withValues(alpha: 0.15),
+                  color: faint,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
