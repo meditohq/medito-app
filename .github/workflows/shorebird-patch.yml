@@ -233,7 +233,11 @@ jobs:
       - name: Shorebird patch (iOS)
         working-directory: ios
         env:
-          MATCH_READONLY: 'true'
+          # readonly=false until MATCH_GIT_TOKEN gets write access to the
+          # cert repo: the widget-extension profile exists in the Apple portal
+          # but was never persisted to the match repo (403 on push), so
+          # readonly match can never find it.
+          MATCH_READONLY: 'false'
           FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: '120'
           FASTLANE_XCODEBUILD_SETTINGS_RETRIES: '8'
           MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
