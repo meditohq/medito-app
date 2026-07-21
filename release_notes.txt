@@ -1,6 +1,9 @@
 Unreleased
 -
 
+2607.21.0
+- Clearer donation page: Apple Pay donations in one tap and a gentler way to skip
+
 2607.20.3
 - Onboarding fixes: the donation step is now easier to skip
 
