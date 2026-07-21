@@ -159,7 +159,13 @@ platform :ios do
       platform: "ios",
       # No --flutter-version: `shorebird patch` rejects it (exit 64) and always
       # rebuilds with the Flutter version of the release it targets.
-      args: "--release-version=#{release_version} --track=#{track} #{SHOREBIRD_DART_DEFINES} --export-options-plist #{export_options_plist_path}"
+      # --allow-asset-diffs: actool embeds a fresh UUID in the app-icon
+      # rendition name on every build, so Assets.car never hashes identically
+      # across machines. Shorebird flags that as an asset diff and aborts;
+      # patches can't ship assets anyway and the icon is byte-identical in
+      # content. If the asset-diff log ever lists MORE than the AppIcon
+      # rendition, stop and cut a release instead.
+      args: "--release-version=#{release_version} --track=#{track} #{SHOREBIRD_DART_DEFINES} --export-options-plist #{export_options_plist_path} --allow-asset-diffs"
     )
     cleanup_keychain()
   end
