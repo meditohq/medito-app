@@ -141,13 +141,25 @@ platform :ios do
     widget_bundle_id = fetch_profiles()
     apply_code_signing(widget_bundle_id)
 
+    # `shorebird patch ios` re-runs `flutter build ipa` (to diff against the
+    # release), so it needs the same manual-signing ExportOptions.plist that
+    # the release lane gets. Unlike shorebird_release, the shorebird_patch
+    # plugin action does NOT generate one — without it exportArchive fails
+    # with "requires a provisioning profile with the App Groups, Apple Pay,
+    # ... features". Reuse the plugin's helper directly.
+    export_options_plist_path =
+      Fastlane::Helper::ExportOptionsPlist.generate_export_options_plist(
+        nil,
+        lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
+      )
+
     release_version = options[:release_version] || "latest"
     track = options[:track] || "staging"
     shorebird_patch(
       platform: "ios",
       # No --flutter-version: `shorebird patch` rejects it (exit 64) and always
       # rebuilds with the Flutter version of the release it targets.
-      args: "--release-version=#{release_version} --track=#{track} #{SHOREBIRD_DART_DEFINES}"
+      args: "--release-version=#{release_version} --track=#{track} #{SHOREBIRD_DART_DEFINES} --export-options-plist #{export_options_plist_path}"
     )
     cleanup_keychain()
   end
