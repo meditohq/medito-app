@@ -325,26 +325,38 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildHero(context, onSurface),
-                const SizedBox(height: 24),
-                Column(
+            // On phones the column fills the viewport (spaceBetween pins the
+            // hero up top, controls at the bottom). On large/tablet screens
+            // that stretches into a huge dead gap — cap the content block and
+            // center it instead.
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 520,
+                  maxHeight: 880,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (_offeredFrequencies.length > 1) ...[
-                      _buildFrequencyToggle(context, onSurface),
-                      const SizedBox(height: 20),
-                    ],
-                    _buildAmountGrid(context, onSurface),
+                    _buildHero(context, onSurface),
                     const SizedBox(height: 24),
-                    _buildPaymentButtons(context),
-                    const SizedBox(height: 16),
-                    _buildDisclosure(context, onSurface),
-                    _buildSkip(context),
+                    Column(
+                      children: [
+                        if (_offeredFrequencies.length > 1) ...[
+                          _buildFrequencyToggle(context, onSurface),
+                          const SizedBox(height: 20),
+                        ],
+                        _buildAmountGrid(context, onSurface),
+                        const SizedBox(height: 24),
+                        _buildPaymentButtons(context),
+                        const SizedBox(height: 16),
+                        _buildDisclosure(context, onSurface),
+                        _buildSkip(context),
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         );
