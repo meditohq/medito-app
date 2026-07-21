@@ -38,7 +38,7 @@ const _defaultSubcopy =
     'No ads, no paywalls — funded entirely by donors like you.';
 const _mostPopularLabel = 'Most popular';
 const _supportCta = 'Support Medito';
-const _cardCta = 'Pay with card';
+const _cardCta = 'Donate with card';
 const _disclosureCopy =
     'Your donation helps keep Medito free for everyone — no ads, no paywalls. '
     'You will receive an email confirmation shortly.\n'
@@ -588,9 +588,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   ? null
                   : () =>
                         _handlePay(payment_models.PaymentMethodType.applePay),
+              // White button per Apple Pay HIG for dark backgrounds; the
+              // "Donate with (apple) Pay" label is Apple's official variant
+              // for nonprofits.
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -598,6 +601,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
+                  Text(
+                    'Donate with',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(width: 6),
                   // U+F8FF (Apple logo) instead of Icons.apple: a new Material
                   // icon glyph changes the tree-shaken icon font, which is an
                   // asset diff Shorebird patches cannot ship. iOS system fonts
