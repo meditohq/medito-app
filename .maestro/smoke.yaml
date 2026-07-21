@@ -53,22 +53,27 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # ── Onboarding: Donation ──
 # Two variants can render here:
-#   - NATIVE donation page — forced on 2607.20+ internal builds via
+#   - NATIVE donation page — forced on internal builds via
 #     _forceNativeForInternalTesting (TODO(temp)), otherwise server-flagged.
-#     It reveals "Skip for Now" ~5s after load and has no webview.
+#     Its donate CTA renders immediately; the close X (labelled "Skip for
+#     Now") fades in top-right ~5s after load, mirroring the webview arm.
 #   - WEBVIEW intro — the previous default ("See how to help" CTA); returns
 #     when the temp force-native flag is reverted.
 # Wait for whichever appears, then branch on the webview CTA.
 - extendedWaitUntil:
-    visible: "See how to help|Skip for Now"
+    visible: "See how to help|.*Donate.*"
     timeout: 30000
 
-# Native page path: nothing to drive without charging a card — screenshot, skip.
+# Native page path: nothing to drive without charging a card — screenshot,
+# wait out the close-X delay, dismiss.
 - runFlow:
     when:
       notVisible: "See how to help"
     commands:
       - takeScreenshot: paywall-native
+      - extendedWaitUntil:
+          visible: "Skip for Now"
+          timeout: 15000
       - tapOn: "Skip for Now"
 
 # Webview intro path, iOS: smoke builds enable SMOKE_TEST_MODE, which adds a

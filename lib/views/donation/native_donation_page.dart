@@ -37,7 +37,7 @@ const _defaultSubcopy =
     '4.1 million people meditate with Medito for free. '
     'No ads, no paywalls — funded entirely by donors like you.';
 const _mostPopularLabel = 'Most popular';
-const _supportCta = 'Support Medito';
+const _supportCta = 'Donate';
 const _cardCta = 'Donate with card';
 const _disclosureCopy =
     'Your donation helps keep Medito free for everyone — no ads, no paywalls. '
@@ -94,12 +94,13 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   bool _didDonate = false;
   bool _dismissLogged = false;
   bool _donateTapLogged = false;
-  // Skip is visible from the start but only unlocks after a short countdown
-  // (shown as a filling progress line). The webview arm's close affordance
-  // appears after ~5s, so both experiment arms keep a comparable escape-hatch
-  // delay without hiding that skipping is possible.
-  static const _skipUnlockDelay = Duration(seconds: 4);
-  bool _skipUnlocked = false;
+  // Escape hatch mirrors the webview arm exactly: an X in the top-right
+  // corner that fades in ~5s after the page loads. No skip button — keeping
+  // the exit affordance identical means the experiment measures the page,
+  // not the escape hatch.
+  static const _closeDelay = Duration(seconds: 5);
+  bool _showClose = false;
+  Timer? _closeTimer;
   String? _capturedUserId;
 
   String get _variantId => widget.config.experiment?.variant ?? 'unknown';
@@ -130,11 +131,16 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               : _Frequency.monthly);
     _selectedAmount = _suggestedAmountFor(_selectedFrequency);
 
+    _closeTimer = Timer(_closeDelay, () {
+      if (mounted) setState(() => _showClose = true);
+    });
+
     _logPageShown();
   }
 
   @override
   void dispose() {
+    _closeTimer?.cancel();
     // Parent pager may advance past this tab without an explicit skip tap.
     if (!_didDonate) _logPaywallDismissedNoPayment();
     super.dispose();
@@ -319,56 +325,71 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) _handleSkip('back');
       },
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
-            // On phones the column fills the viewport (spaceBetween pins the
-            // hero up top, controls at the bottom). On large/tablet screens
-            // that stretches into a huge dead gap — cap the content block and
-            // center it instead.
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 520,
-                  maxHeight: 880,
+      child: Stack(
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 24,
                 ),
-                // Hero + payment controls travel together so no dead gap
-                // splits the page; spaceBetween pushes the disclosure + skip
-                // block to the bottom edge, keeping skip below the fold on
-                // phones.
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        _buildHero(context, onSurface),
-                        const SizedBox(height: 32),
-                        if (_offeredFrequencies.length > 1) ...[
-                          _buildFrequencyToggle(context, onSurface),
-                          const SizedBox(height: 20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - 48,
+                  ),
+                  // Content is one centered block, capped so tablets don't
+                  // stretch it edge-to-edge.
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 520),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildHero(context, onSurface),
+                          const SizedBox(height: 32),
+                          if (_offeredFrequencies.length > 1) ...[
+                            _buildFrequencyToggle(context, onSurface),
+                            const SizedBox(height: 20),
+                          ],
+                          _buildAmountGrid(context, onSurface),
+                          const SizedBox(height: 24),
+                          _buildPaymentButtons(context),
+                          const SizedBox(height: 24),
+                          _buildDisclosure(context, onSurface),
                         ],
-                        _buildAmountGrid(context, onSurface),
-                        const SizedBox(height: 24),
-                        _buildPaymentButtons(context),
-                      ],
+                      ),
                     ),
-                    Column(
-                      children: [
-                        const SizedBox(height: 24),
-                        _buildDisclosure(context, onSurface),
-                        _buildSkip(context),
-                      ],
-                    ),
-                  ],
+                  ),
+                ),
+              );
+            },
+          ),
+          // Delayed close affordance — same position and ~5s fade-in as the
+          // X on the webview paywall. Only inserted once active so its
+          // semantics don't exist while it can't be tapped (keeps UI tests
+          // honest too).
+          if (_showClose)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: const Duration(milliseconds: 400),
+                builder: (context, opacity, child) =>
+                    Opacity(opacity: opacity, child: child),
+                child: IconButton(
+                  onPressed: () => _handleSkip('close'),
+                  icon: Icon(
+                    Icons.close,
+                    size: 22,
+                    color: onSurface.withValues(alpha: 0.6),
+                  ),
+                  tooltip: AppLocalizations.of(context)!.skipForNow,
                 ),
               ),
             ),
-          ),
-        );
-        },
+        ],
       ),
     );
   }
@@ -726,46 +747,4 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     );
   }
 
-  Widget _buildSkip(BuildContext context) {
-    final label = AppLocalizations.of(context)!.skipForNow;
-    final faint = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4);
-
-    if (_skipUnlocked) {
-      return TextButton(
-        onPressed: () => _handleSkip('button'),
-        child: Text(label),
-      );
-    }
-
-    // Locked state: same label, dimmed, with a thin progress line filling
-    // over the countdown so it reads as "available in a moment", not hidden.
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: _skipUnlockDelay,
-      onEnd: () {
-        if (mounted) setState(() => _skipUnlocked = true);
-      },
-      builder: (context, progress, _) {
-        return TextButton(
-          onPressed: null,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(label, style: TextStyle(color: faint)),
-              const SizedBox(height: 3),
-              SizedBox(
-                width: 88,
-                height: 2,
-                child: LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: faint.withValues(alpha: 0.15),
-                  color: faint,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 }
