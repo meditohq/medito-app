@@ -335,13 +335,17 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   maxWidth: 520,
                   maxHeight: 880,
                 ),
+                // Hero + payment controls travel together so no dead gap
+                // splits the page; spaceBetween pushes the disclosure + skip
+                // block to the bottom edge, keeping skip below the fold on
+                // phones.
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildHero(context, onSurface),
-                    const SizedBox(height: 24),
                     Column(
                       children: [
+                        _buildHero(context, onSurface),
+                        const SizedBox(height: 32),
                         if (_offeredFrequencies.length > 1) ...[
                           _buildFrequencyToggle(context, onSurface),
                           const SizedBox(height: 20),
@@ -349,7 +353,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                         _buildAmountGrid(context, onSurface),
                         const SizedBox(height: 24),
                         _buildPaymentButtons(context),
-                        const SizedBox(height: 16),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        const SizedBox(height: 24),
                         _buildDisclosure(context, onSurface),
                         _buildSkip(context),
                       ],
