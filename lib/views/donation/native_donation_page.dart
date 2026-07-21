@@ -357,6 +357,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                           _buildPaymentButtons(context),
                           const SizedBox(height: 24),
                           _buildDisclosure(context, onSurface),
+                          const SizedBox(height: 12),
+                          _buildNotNow(context, onSurface),
                         ],
                       ),
                     ),
@@ -747,4 +749,25 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     );
   }
 
+  /// Quiet skip: footnote-sized "Not now" under the disclosure, styled like
+  /// the surrounding small print rather than a button.
+  Widget _buildNotNow(BuildContext context, Color onSurface) {
+    final faint = onSurface.withValues(alpha: 0.5);
+    return GestureDetector(
+      onTap: () => _handleSkip('not_now'),
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Text(
+          'Not now',
+          style: TextStyle(
+            color: faint,
+            fontSize: 12,
+            decoration: TextDecoration.underline,
+            decorationColor: faint,
+          ),
+        ),
+      ),
+    );
+  }
 }
