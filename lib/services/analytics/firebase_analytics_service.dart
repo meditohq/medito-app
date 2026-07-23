@@ -417,6 +417,7 @@ class FirebaseAnalyticsService {
       AnalyticsEventConstants.paramPaywallSource: paywallSource ?? 'unknown',
       AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
       AnalyticsEventConstants.paramExperimentId: experimentId ?? 'unknown',
+      AnalyticsEventConstants.paramExperimentName: experimentId ?? 'unknown',
     };
     await Future.wait([
       logEvent(name: event, parameters: params),

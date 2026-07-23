@@ -258,6 +258,10 @@ class PaymentUIController extends _$PaymentUIController {
             AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
             AnalyticsEventConstants.paramExperimentId:
                 experimentId ?? 'unknown',
+            // Same slug under the legacy key so existing BigQuery readout
+            // queries keyed on experiment_name keep working across arms.
+            AnalyticsEventConstants.paramExperimentName:
+                experimentId ?? 'unknown',
           },
         );
 
@@ -308,6 +312,8 @@ class PaymentUIController extends _$PaymentUIController {
               paywallSource ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
           AnalyticsEventConstants.paramExperimentId: experimentId ?? 'unknown',
+          AnalyticsEventConstants.paramExperimentName:
+              experimentId ?? 'unknown',
           AnalyticsEventConstants.paramPaymentIntentId:
               paymentIntentId ?? 'unknown',
         };
@@ -345,6 +351,8 @@ class PaymentUIController extends _$PaymentUIController {
               paywallSource ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: variantId ?? 'unknown',
           AnalyticsEventConstants.paramExperimentId: experimentId ?? 'unknown',
+          AnalyticsEventConstants.paramExperimentName:
+              experimentId ?? 'unknown',
         };
 
         // Firebase Analytics

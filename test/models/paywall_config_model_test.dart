@@ -45,8 +45,10 @@ void main() {
       expect(model.experiment?.id, 'donate6');
       expect(model.experiment?.variant, 'B');
       expect(model.nativePaywallEnabled, isTrue);
-      expect(model.effectiveLadder('monthly'), [300, 600, 1200]);
-      expect(model.effectiveSuggested('monthly'), 600);
+      // Top-level config ladders are raw base USD cents (the API folds them
+      // into the localized `pricing` block) — amounts must come from pricing.
+      expect(model.effectiveLadder('monthly'), [500, 1000, 2000]);
+      expect(model.effectiveSuggested('monthly'), 1000);
       // Experiment declares ladders → undeclared frequencies are not offered.
       expect(model.isFrequencyOffered('monthly'), isTrue);
       expect(model.isFrequencyOffered('oneTime'), isFalse);
@@ -93,7 +95,9 @@ void main() {
         model.effectiveLadder('monthly', source: 'onboarding'),
         [100, 200, 400],
       );
-      expect(model.effectiveLadder('monthly'), [500, 1000]);
+      // Without a source override, amounts come from localized pricing (the
+      // raw base-cent config ladder only gates offered frequencies).
+      expect(model.effectiveLadder('monthly'), [500, 1000, 2000]);
       expect(model.effectiveSuggested('monthly', source: 'onboarding'), 200);
       // Source override arrays count as experiment-declared frequencies.
       expect(model.isFrequencyOffered('oneTime', source: 'onboarding'), isTrue);

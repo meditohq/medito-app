@@ -173,6 +173,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           AnalyticsEventConstants.paramVariantId: _variantId,
           AnalyticsEventConstants.paramPaywallSource: widget.source,
           AnalyticsEventConstants.paramExperimentId: _experimentId,
+          AnalyticsEventConstants.paramExperimentName: _experimentId,
         },
       );
       FirebaseAnalyticsService().logEvent(
@@ -184,6 +185,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           AnalyticsEventConstants.paramPaywallSource: widget.source,
           AnalyticsEventConstants.paramVariantId: _variantId,
           AnalyticsEventConstants.paramExperimentId: _experimentId,
+          AnalyticsEventConstants.paramExperimentName: _experimentId,
         },
       );
     } catch (e) {
