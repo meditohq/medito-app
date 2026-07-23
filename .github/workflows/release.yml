@@ -80,7 +80,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.44.4'
+          flutter-version: '3.44.7'
           channel: stable
           cache: true
 
@@ -192,7 +192,7 @@ jobs:
           # `--`; flutter build args go AFTER it. Obfuscation is auto-matched on
           # patch, so pass --obfuscate/--split-debug-info on release only.
           shorebird release android \
-            --flutter-version=3.44.1 \
+            --flutter-version=3.44.7 \
             --flavor prod \
             --artifact apk \
             --split-debug-info=./symbols --obfuscate \
@@ -479,7 +479,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.44.4'
+          flutter-version: '3.44.7'
           channel: stable
           cache: true
 
@@ -838,7 +838,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.44.4'
+          flutter-version: '3.44.7'
           channel: stable
           cache: true
 
