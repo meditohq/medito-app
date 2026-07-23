@@ -447,6 +447,9 @@ class OneTimePaymentController extends _$OneTimePaymentController {
         'user_id': ?userId,
         'email': ?userEmail,
         'experiment_id': ?experimentId,
+        // Duplicate slug under the legacy key so Stripe exports/joins keyed
+        // on experiment_name keep working.
+        'experiment_name': ?experimentId,
         'experiment_variant': ?experimentVariant,
         'paywall_source': ?paywallSource,
         ...utmParams,
@@ -520,6 +523,9 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
         'user_id': ?userId,
         'email': ?userEmail,
         'experiment_id': ?experimentId,
+        // Duplicate slug under the legacy key so Stripe exports/joins keyed
+        // on experiment_name keep working.
+        'experiment_name': ?experimentId,
         'experiment_variant': ?experimentVariant,
         'paywall_source': ?paywallSource,
         ...utmParams,
@@ -595,6 +601,9 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
         'user_id': ?userId,
         'email': ?userEmail,
         'experiment_id': ?experimentId,
+        // Duplicate slug under the legacy key so Stripe exports/joins keyed
+        // on experiment_name keep working.
+        'experiment_name': ?experimentId,
         'experiment_variant': ?experimentVariant,
         'paywall_source': ?paywallSource,
         ...utmParams,

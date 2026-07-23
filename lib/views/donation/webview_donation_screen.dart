@@ -129,6 +129,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
               widget.source ?? 'unknown',
           AnalyticsEventConstants.paramVariantId: _variantId,
           AnalyticsEventConstants.paramExperimentId: _experimentId,
+          AnalyticsEventConstants.paramExperimentName: _experimentId,
         },
       );
     } catch (e) {
@@ -330,6 +331,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         AnalyticsEventConstants.paramVariantId: _variantId,
         AnalyticsEventConstants.paramPaywallSource: widget.source ?? 'unknown',
         AnalyticsEventConstants.paramExperimentId: _experimentId,
+        AnalyticsEventConstants.paramExperimentName: _experimentId,
       },
     );
     _logPaywallPresented();

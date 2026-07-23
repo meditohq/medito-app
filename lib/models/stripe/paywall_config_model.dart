@@ -51,20 +51,28 @@ abstract class PaywallConfigModel with _$PaywallConfigModel {
   }
 
   /// Effective ladder for a frequency key ('oneTime' | 'monthly' | 'yearly'):
-  /// source override, else effective config ladder, else resolved pricing.
+  /// source override, else resolved pricing.
+  ///
+  /// The top-level ladders in `experiment.config` / `defaults.config` are
+  /// deliberately NOT read for amounts: the API returns them as raw base USD
+  /// cents (only `config.sources[*]` and the `pricing` block are localized —
+  /// the top-level override is folded into `pricing` server-side). The webview
+  /// uses them only to gate which frequencies are offered; reading them here
+  /// as amounts showed/charged raw cents in the local currency (e.g. ₹25
+  /// instead of ₹2500) — below Stripe's minimum, so subscriptions activated
+  /// with no PaymentIntent and no money collected.
   List<int> effectiveLadder(String freqKey, {String? source}) {
     return _intList(sourceOverride(source)?[freqKey]) ??
-        _intList(effectiveConfig?[freqKey]) ??
         _pricingLadder(freqKey);
   }
 
   /// Effective suggested ("Most popular") amount for a frequency key, with
-  /// the same precedence as [effectiveLadder].
+  /// the same precedence as [effectiveLadder] (source override is localized
+  /// server-side; the top-level config suggested is raw USD cents, so it is
+  /// skipped — its value reaches us via the localized `pricing` block).
   int? effectiveSuggested(String freqKey, {String? source}) {
     final fromOverride = _suggestedIn(sourceOverride(source), freqKey);
     if (fromOverride != null) return fromOverride;
-    final fromConfig = _suggestedIn(effectiveConfig, freqKey);
-    if (fromConfig != null) return fromConfig;
     return _pricingSuggested(freqKey);
   }
 
