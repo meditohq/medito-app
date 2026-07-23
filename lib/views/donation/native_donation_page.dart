@@ -47,8 +47,22 @@ const _stripeTrustCopy = 'Secure payment powered by Stripe';
 
 // Stripe zero-decimal currencies: amounts are already in whole units.
 const _zeroDecimalCurrencies = {
-  'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga',
-  'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf',
+  'bif',
+  'clp',
+  'djf',
+  'gnf',
+  'jpy',
+  'kmf',
+  'krw',
+  'mga',
+  'pyg',
+  'rwf',
+  'ugx',
+  'vnd',
+  'vuv',
+  'xaf',
+  'xof',
+  'xpf',
 };
 
 String _formatAmount(int amount, String currency) {
@@ -80,8 +94,7 @@ class NativeDonationPage extends ConsumerStatefulWidget {
   final String source;
 
   @override
-  ConsumerState<NativeDonationPage> createState() =>
-      _NativeDonationPageState();
+  ConsumerState<NativeDonationPage> createState() => _NativeDonationPageState();
 }
 
 class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
@@ -235,7 +248,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       final authRepository = ref.read(authRepositorySyncProvider);
       final userId = authRepository.currentUser?.id ?? 'unknown';
       _capturedUserId ??= authRepository.currentUser?.id;
-      final userEmail = widget.config.email ?? authRepository.currentUser?.email;
+      final userEmail =
+          widget.config.email ?? authRepository.currentUser?.email;
       final currency = widget.config.currencyCode;
       final amount = _selectedAmount;
 
@@ -488,10 +502,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final accent = context.brandPurple;
     final label = _formatAmount(amount, widget.config.currencyCode);
 
+    // No explicit label: the child Text already provides it — an explicit one
+    // would merge with it and be announced twice ("$5 $5").
     return Semantics(
       button: true,
       selected: isSelected,
-      label: label,
       child: GestureDetector(
         onTap: () => setState(() => _selectedAmount = amount),
         child: Stack(
@@ -505,9 +520,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                     ? accent.withValues(alpha: 0.08)
                     : Colors.transparent,
                 border: Border.all(
-                  color: isSelected
-                      ? accent
-                      : onSurface.withValues(alpha: 0.2),
+                  color: isSelected ? accent : onSurface.withValues(alpha: 0.2),
                   width: isSelected ? 1.5 : 1,
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -558,9 +571,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final methods = methodsAsync.value ?? const [];
     final hasApplePay =
         Platform.isIOS &&
-        methods.any(
-          (m) => m.type == payment_models.PaymentMethodType.applePay,
-        );
+        methods.any((m) => m.type == payment_models.PaymentMethodType.applePay);
 
     return Column(
       children: [
@@ -572,8 +583,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             child: ElevatedButton(
               onPressed: _isProcessingPayment
                   ? null
-                  : () =>
-                        _handlePay(payment_models.PaymentMethodType.applePay),
+                  : () => _handlePay(payment_models.PaymentMethodType.applePay),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 foregroundColor: Colors.white,
@@ -581,23 +591,36 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  // U+F8FF (Apple logo) instead of Icons.apple: a new Material
-                  // icon glyph changes the tree-shaken icon font, which is an
-                  // asset diff Shorebird patches cannot ship. iOS system fonts
-                  // render this correctly and the button is iOS-only.
-                  Text(
-                    '',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(width: 3),
-                  Text(
-                    'Pay',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
-                  ),
-                ],
+              // Screen readers can't speak the U+F8FF glyph below, which
+              // would leave this announced as just "Pay" — indistinguishable
+              // from the card button under it.
+              child: Semantics(
+                label: 'Apple Pay',
+                excludeSemantics: true,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    // U+F8FF (Apple logo) instead of Icons.apple: a new Material
+                    // icon glyph changes the tree-shaken icon font, which is an
+                    // asset diff Shorebird patches cannot ship. iOS system fonts
+                    // render this correctly and the button is iOS-only.
+                    Text(
+                      '',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(width: 3),
+                    Text(
+                      'Pay',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -654,10 +677,14 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           children: [
             // Bundled SVG, not a Material icon: a new icon-font glyph is an
             // unpatchable asset diff (see Apple Pay button above).
-            MeditoIcon(
-              assetName: MeditoIcons.shield,
-              color: faint,
-              size: 13,
+            // Decorative — without the exclusion it's an unlabeled "Image"
+            // stop for screen readers.
+            ExcludeSemantics(
+              child: MeditoIcon(
+                assetName: MeditoIcons.shield,
+                color: faint,
+                size: 13,
+              ),
             ),
             const SizedBox(width: 4),
             Text(

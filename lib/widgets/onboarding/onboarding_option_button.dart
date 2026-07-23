@@ -21,31 +21,39 @@ class OnboardingOptionButton extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: padding20,
-          vertical: 18,
-        ),
-        decoration: BoxDecoration(
-          color: selected ? colorScheme.primary.withAlpha(25) : theme.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected
-                ? colorScheme.primary
-                : colorScheme.outline.withAlpha(80),
-            width: selected ? 1.5 : 1,
+    // Without this, screen readers announce the label as plain text — no
+    // button role and no selection state.
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(
+            horizontal: padding20,
+            vertical: 18,
           ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-            color: selected ? colorScheme.primary : colorScheme.onSurface,
+          decoration: BoxDecoration(
+            color: selected
+                ? colorScheme.primary.withAlpha(25)
+                : theme.cardColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: selected
+                  ? colorScheme.primary
+                  : colorScheme.outline.withAlpha(80),
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Text(
+            label,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+              color: selected ? colorScheme.primary : colorScheme.onSurface,
+            ),
           ),
         ),
       ),

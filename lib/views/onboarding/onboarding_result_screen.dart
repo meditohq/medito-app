@@ -501,54 +501,62 @@ class _GetStartedButtonState extends State<_GetStartedButton>
         final scale = 1.0 - _press.value;
         return Transform.scale(
           scale: scale,
-          child: GestureDetector(
-            onTapDown: _handleTapDown,
-            onTapCancel: _handleTapCancel,
-            onTapUp: _handleTapUp,
-            onTap: _handleTap,
-            child: Container(
-              width: double.infinity,
-              height: 56,
-              decoration: BoxDecoration(
-                color: bg,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Align(
-                      alignment: Alignment(-1.4 + (_breathe.value * 2.8), -1.0),
-                      child: FractionallySizedBox(
-                        widthFactor: 0.4,
-                        heightFactor: 1,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Colors.white.withValues(alpha: 0.0),
-                                Colors.white.withValues(alpha: 0.14),
-                                Colors.white.withValues(alpha: 0.0),
-                              ],
+          // Custom-drawn button: without this, screen readers announce the
+          // label as plain text with no button role.
+          child: Semantics(
+            button: true,
+            child: GestureDetector(
+              onTapDown: _handleTapDown,
+              onTapCancel: _handleTapCancel,
+              onTapUp: _handleTapUp,
+              onTap: _handleTap,
+              child: Container(
+                width: double.infinity,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: bg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment(
+                          -1.4 + (_breathe.value * 2.8),
+                          -1.0,
+                        ),
+                        child: FractionallySizedBox(
+                          widthFactor: 0.4,
+                          heightFactor: 1,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.0),
+                                  Colors.white.withValues(alpha: 0.14),
+                                  Colors.white.withValues(alpha: 0.0),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  Center(
-                    child: Text(
-                      widget.label,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                    Center(
+                      child: Text(
+                        widget.label,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -30,7 +30,13 @@ class OnboardingHeaderImage extends StatelessWidget {
     return SizedBox(
       height: height,
       width: double.infinity,
-      child: Image.asset(imagePath, fit: BoxFit.cover),
+      // Decorative — excluded so screen readers don't stop on an unlabeled
+      // "Image" node at the top of every page.
+      child: Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        excludeFromSemantics: true,
+      ),
     );
   }
 }

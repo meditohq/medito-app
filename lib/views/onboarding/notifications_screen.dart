@@ -400,58 +400,63 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     const phoneWidth = 280.0;
     const cardOverhang = 36.0;
 
-    return SizedBox(
-      height: 170,
-      child: ClipRect(
-        clipper: _BottomOnlyClipper(),
-        child: OverflowBox(
-          maxHeight: 600,
-          maxWidth: double.infinity,
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-            width: phoneWidth,
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topCenter,
-              children: [
-                Container(
-                  width: phoneWidth,
-                  height: 560,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(44),
+    // Decorative illustration: without the exclusion, screen readers read the
+    // mock card ("MEDITO", timestamp, title, body) as if a real notification
+    // had arrived mid-screen.
+    return ExcludeSemantics(
+      child: SizedBox(
+        height: 170,
+        child: ClipRect(
+          clipper: _BottomOnlyClipper(),
+          child: OverflowBox(
+            maxHeight: 600,
+            maxWidth: double.infinity,
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: phoneWidth,
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.topCenter,
+                children: [
+                  Container(
+                    width: phoneWidth,
+                    height: 560,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(44),
+                      ),
+                      border: Border.all(color: phoneBorder, width: 3),
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.02)
+                          : Colors.white,
                     ),
-                    border: Border.all(color: phoneBorder, width: 3),
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.02)
-                        : Colors.white,
                   ),
-                ),
-                Positioned(
-                  top: 56,
-                  left: -cardOverhang,
-                  right: -cardOverhang,
-                  child: FadeTransition(
-                    opacity: CurvedAnimation(
-                      parent: _previewAnimation,
-                      curve: Curves.easeOutCubic,
-                    ),
-                    child: SlideTransition(
-                      position:
-                          Tween<Offset>(
-                            begin: const Offset(0, -0.04),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: _previewAnimation,
-                              curve: Curves.easeOutCubic,
+                  Positioned(
+                    top: 56,
+                    left: -cardOverhang,
+                    right: -cardOverhang,
+                    child: FadeTransition(
+                      opacity: CurvedAnimation(
+                        parent: _previewAnimation,
+                        curve: Curves.easeOutCubic,
+                      ),
+                      child: SlideTransition(
+                        position:
+                            Tween<Offset>(
+                              begin: const Offset(0, -0.04),
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: _previewAnimation,
+                                curve: Curves.easeOutCubic,
+                              ),
                             ),
-                          ),
-                      child: _buildNotificationCard(),
+                        child: _buildNotificationCard(),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
