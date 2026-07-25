@@ -105,10 +105,16 @@ platform :ios do
       automatic_release: false,
       force: true,
       run_precheck_before_submit: false,
+      # Every locale enabled on the App Store listing needs a What's New value,
+      # or ASC rejects the review submission ("appStoreVersions ... is not in
+      # valid state") — bit the 2607.24.0 release via empty en-CA/fr-FR/de-DE.
       release_notes: {
         "en-US" => notes,
         "en-GB" => notes,
-        "es-MX" => notes
+        "en-CA" => notes,
+        "es-MX" => notes,
+        "fr-FR" => notes,
+        "de-DE" => notes
       }
     )
     cleanup_keychain()
