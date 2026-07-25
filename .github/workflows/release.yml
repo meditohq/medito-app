@@ -1006,7 +1006,20 @@ jobs:
               bundle exec fastlane beta
             fi
             if [ "${{ inputs.ios_appstore }}" = "true" ]; then
-              bundle exec fastlane release submit_for_review:"${{ inputs.submit_for_review }}"
+              if [ "${{ inputs.ios_testflight }}" = "true" ]; then
+                # The beta lane above already built this version and uploaded
+                # it to App Store Connect. Building again is guaranteed to fail
+                # (`shorebird release ios` exits 70 on an existing release), so
+                # point the release lane at the build beta just uploaded and
+                # let deliver attach it instead of rebuilding.
+                version=$(grep '^version:' ../pubspec.yaml | sed 's/version: *//')
+                bundle exec fastlane release \
+                  submit_for_review:"${{ inputs.submit_for_review }}" \
+                  app_version:"${version%+*}" \
+                  build_number:"${version#*+}"
+              else
+                bundle exec fastlane release submit_for_review:"${{ inputs.submit_for_review }}"
+              fi
             fi
           fi
 
