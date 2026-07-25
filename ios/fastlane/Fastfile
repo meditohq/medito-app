@@ -78,8 +78,17 @@ platform :ios do
   end
 
   # App Store release (draft; not auto-submitted for review).
+  #
+  # Pass app_version + build_number to attach a build that is ALREADY on App
+  # Store Connect (e.g. the one the beta lane just uploaded in the same
+  # workflow run) instead of building again. `shorebird release ios` hard-fails
+  # (exit 70, "existing ios release") when a release for the version already
+  # exists, so rebuilding after a beta run of the same version can never work.
+  # With no build_number the lane builds & uploads exactly as before.
   lane :release do |options|
-    setup_keychain()
+    use_existing_build = options[:build_number].to_s != ''
+
+    setup_keychain() unless use_existing_build
 
     app_store_connect_api_key(
       key_id: ENV["ASC_KEY_ID"],
@@ -89,7 +98,7 @@ platform :ios do
       in_house: false
     )
 
-    build_shorebird_release
+    build_shorebird_release unless use_existing_build
 
     # submit_for_review:true sends the uploaded version straight to App Store
     # review; the default keeps today's behaviour (draft version, submitted by
@@ -100,7 +109,7 @@ platform :ios do
     submit = options[:submit_for_review].to_s == 'true'
 
     notes = ENV["RELEASE_NOTES"] || ""
-    upload_to_app_store(
+    upload_options = {
       submit_for_review: submit,
       automatic_release: false,
       force: true,
@@ -116,8 +125,23 @@ platform :ios do
         "fr-FR" => notes,
         "de-DE" => notes
       }
-    )
-    cleanup_keychain()
+    }
+
+    if use_existing_build
+      # No ipa to read the version from, so deliver needs both explicitly.
+      # Build selection happens at submission time: with submit_for_review:true
+      # deliver picks the build with this build_number (the beta lane's
+      # upload_to_testflight has already waited for it to finish processing);
+      # with submit_for_review:false the version stays a draft and the build is
+      # attached by hand in ASC — same as the build-and-upload path, where
+      # uploading the binary doesn't attach it to the version either.
+      upload_options[:skip_binary_upload] = true
+      upload_options[:app_version] = options[:app_version]
+      upload_options[:build_number] = options[:build_number]
+    end
+
+    upload_to_app_store(**upload_options)
+    cleanup_keychain() unless use_existing_build
   end
 
   # Dart-only over-the-air patch against an already-shipped release. Does NOT
