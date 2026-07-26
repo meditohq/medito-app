@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -14,6 +13,7 @@ import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
@@ -44,24 +44,6 @@ const _disclosureCopy =
     'You will receive an email confirmation shortly.\n'
     'Stichting Medito · Non-profit registered in the Netherlands · KvK 75284251';
 const _stripeTrustCopy = 'Secure payment powered by Stripe';
-
-// Stripe zero-decimal currencies: amounts are already in whole units.
-const _zeroDecimalCurrencies = {
-  'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga',
-  'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf',
-};
-
-String _formatAmount(int amount, String currency) {
-  final code = currency.toLowerCase();
-  final isZeroDecimal = _zeroDecimalCurrencies.contains(code);
-  final value = isZeroDecimal ? amount.toDouble() : amount / 100;
-  final wholeNumber = value == value.roundToDouble();
-  final format = NumberFormat.simpleCurrency(
-    name: code.toUpperCase(),
-    decimalDigits: (isZeroDecimal || wholeNumber) ? 0 : 2,
-  );
-  return format.format(value);
-}
 
 /// Native (Dart) rendering of the onboarding donation paywall — an inline
 /// pager-tab body, not a pushed route. Renders the same server-resolved
@@ -545,7 +527,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }) {
     final isSelected = amount == _selectedAmount;
     final accent = context.brandPurple;
-    final label = _formatAmount(amount, widget.config.currencyCode);
+    final label = formatCurrencyAmount(amount, widget.config.currencyCode);
 
     return Semantics(
       button: true,

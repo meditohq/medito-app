@@ -6,6 +6,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -341,12 +342,19 @@ class ApplePayService implements PaymentMethodService {
     paymentState.setStatus(PaymentStatus.presentingPaymentSheet);
 
     try {
-      AppLogger.d(
-        'PAYMENT',
-        'Presenting Apple Pay sheet for ${paymentIntent.id}, amount: ${(paymentIntent.amount / 100).toStringAsFixed(2)} ${paymentIntent.currency}',
+      // Apple Pay wants the amount in major units as a plain string, and the
+      // currency it is denominated in comes from `currencyCode` below. An
+      // unconditional /100 here showed a zero-decimal amount (¥, ₩, ₫ …) as a
+      // hundredth of the real charge on the sheet the user approves.
+      final amountString = currencyAmountToUnitsString(
+        paymentIntent.amount,
+        paymentIntent.currency,
       );
 
-      final amountString = (paymentIntent.amount / 100).toStringAsFixed(2);
+      AppLogger.d(
+        'PAYMENT',
+        'Presenting Apple Pay sheet for ${paymentIntent.id}, amount: $amountString ${paymentIntent.currency}',
+      );
       final paymentLabel = _getPaymentLabel(paymentIntent);
 
       await Stripe.instance.confirmPlatformPayPaymentIntent(
@@ -387,7 +395,7 @@ class ApplePayService implements PaymentMethodService {
 
       AppLogger.d(
         'PAYMENT',
-        '✅ Apple Pay payment complete: ${(paymentIntent.amount / 100).toStringAsFixed(2)} ${paymentIntent.currency}',
+        '✅ Apple Pay payment complete: $amountString ${paymentIntent.currency}',
       );
 
       return result;
