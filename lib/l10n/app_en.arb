@@ -61,7 +61,7 @@
   "unauthorizedRequest": "Session expired - please sign in again",
   "accessForbidden": "Access forbidden",
   "apiNotFound": "Api not found",
-  "anErrorOccurred": "An unkown error occurred. Either we're having issues or you're offline.",
+  "anErrorOccurred": "An unknown error occurred. Either we're having issues or you're offline.",
   "unableToLoadAudio": "Unable to load audio. Please go back and try again",
   "loadingError": "It looks like you're offline or there was little hiccup from our end",
   "timeout": "Oops! It seems like there was an error. If the problem persists, Close the app and try again.",
@@ -630,7 +630,7 @@
   "@timeoutErrorMessage": {
     "description": "Error message for timeout errors"
   },
-  "anErrorOccurredMessage": "An unkown error occurred. Either we're having issues or you're offline.",
+  "anErrorOccurredMessage": "An unknown error occurred. Either we're having issues or you're offline.",
   "@anErrorOccurredMessage": {
     "description": "Generic error message for unknown errors"
   },

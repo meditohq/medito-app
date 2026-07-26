@@ -18,7 +18,7 @@ final meditoErrorWidgetProvider =
       } catch (e) {
         return MeditoErrorWidgetUIState(
           false,
-          "An unkown error occurred. Either we're having issues or you're offline.",
+'An unknown error occurred. Either we\'re having issues or you\'re offline.'
         );
       }
     });
