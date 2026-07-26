@@ -49,12 +49,11 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
       return;
     }
     _configTimer = Timer(_paywallConfigTimeout, () {
-      // The arm may already be latched — from a config that arrived in time, or
-      // from an error. The wait did not expire for those users, so logging a
-      // timeout would inflate the metric with the very traffic it exists to be
-      // measured against. Cancelled on latch too; this guard covers the race.
+      // Nothing to do if the arm is already latched, from a config that arrived
+      // in time or from an error; the rebuild would be wasted. The timeout is
+      // recorded where the fallback is committed, not here — see
+      // [_resolveNativeConfig].
       if (!mounted || _useNativePaywall != null) return;
-      _logConfigTimeout();
       setState(() => _configTimedOut = true);
     });
   }
@@ -187,6 +186,11 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
         // arrived and specified the webview arm" — only the former loses an
         // assignment, and only the former can see a late arrival.
         _fellBackWithoutConfig = true;
+        // Logged here rather than in the timer callback so the event means
+        // exactly "a timeout caused a fallback". The arm is latched only in
+        // build, so a config landing between the timer firing and the next
+        // frame would otherwise log a timeout for a user who never fell back.
+        if (_configTimedOut) _logConfigTimeout();
       }
     }
 
