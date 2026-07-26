@@ -1,7 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:medito/utils/currency.dart';
 
 void main() {
+  final previousLocale = Intl.getCurrentLocale();
+  setUpAll(() => Intl.defaultLocale = 'en_US');
+  tearDownAll(() => Intl.defaultLocale = previousLocale);
+
   group('isZeroDecimalCurrency', () {
     test('identifies zero-decimal currencies regardless of case or padding', () {
       expect(isZeroDecimalCurrency('jpy'), isTrue);
