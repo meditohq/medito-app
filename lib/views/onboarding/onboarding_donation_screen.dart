@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
@@ -25,11 +26,6 @@ class OnboardingDonationScreen extends ConsumerStatefulWidget {
 }
 
 class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
-  // TODO(temp): remove before activating the real native-vs-webview
-  // experiment. Forces the native page on the internal-testing release so it
-  // can be validated on-device before any server config carries the flag.
-  static const _forceNativeForInternalTesting = false;
-
   static const _paywallConfigTimeout = Duration(seconds: 3);
 
   bool _hasAttemptedDonation = isSmokeTestMode;
@@ -38,6 +34,10 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
   bool? _useNativePaywall;
   bool _configTimedOut = false;
   Timer? _configTimer;
+  // Instrumentation latches; each event fires at most once per screen.
+  bool _timeoutLogged = false;
+  bool _lateArrivalLogged = false;
+  bool _fellBackWithoutConfig = false;
 
   @override
   void initState() {
@@ -49,7 +49,12 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
       return;
     }
     _configTimer = Timer(_paywallConfigTimeout, () {
-      if (mounted) setState(() => _configTimedOut = true);
+      // Nothing to do if the arm is already latched, from a config that arrived
+      // in time or from an error; the rebuild would be wasted. The timeout is
+      // recorded where the fallback is committed, not here — see
+      // [_resolveNativeConfig].
+      if (!mounted || _useNativePaywall != null) return;
+      setState(() => _configTimedOut = true);
     });
   }
 
@@ -84,6 +89,42 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     }
 
     setState(() => _hasAttemptedDonation = true);
+  }
+
+  /// The wait elapsed with no config, so this user gets the webview arm no
+  /// matter what the server would have assigned. Records that the fallback
+  /// happened; [_logLateArrival] later records which arm was lost, if the
+  /// config turns up at all.
+  void _logConfigTimeout() {
+    if (_timeoutLogged) return;
+    _timeoutLogged = true;
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.paywallConfigTimeout,
+      parameters: {
+        AnalyticsEventConstants.paramPaywallSource:
+            AnalyticsEventConstants.paywallSourceOnboarding,
+        AnalyticsEventConstants.paramDurationMs:
+            _paywallConfigTimeout.inMilliseconds,
+      },
+    );
+  }
+
+  /// The config arrived after the arm was already latched to the webview. Its
+  /// `nativePaywall` value is the assignment this user should have received, so
+  /// logging it is what lets the native arm's denominator be corrected.
+  void _logLateArrival(PaywallConfigModel config) {
+    if (_lateArrivalLogged) return;
+    _lateArrivalLogged = true;
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.paywallConfigLateArrival,
+      parameters: {
+        AnalyticsEventConstants.paramPaywallSource:
+            AnalyticsEventConstants.paywallSourceOnboarding,
+        AnalyticsEventConstants.paramWouldBeVariant: config.nativePaywallEnabled
+            ? 'native'
+            : 'webview',
+      },
+    );
   }
 
   void _handleSkip() async {
@@ -135,11 +176,27 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
 
     if (_useNativePaywall == null) {
       if (config != null) {
-        _useNativePaywall =
-            _forceNativeForInternalTesting || config.nativePaywallEnabled;
+        _useNativePaywall = config.nativePaywallEnabled;
+        // Config beat the deadline: disarm so the pending timer cannot fire a
+        // timeout for a user who never waited one out.
+        _configTimer?.cancel();
       } else if (paywallAsync.hasError || _configTimedOut) {
         _useNativePaywall = false;
+        // Distinguishes "fell back because no config arrived" from "config
+        // arrived and specified the webview arm" — only the former loses an
+        // assignment, and only the former can see a late arrival.
+        _fellBackWithoutConfig = true;
+        // Logged here rather than in the timer callback so the event means
+        // exactly "a timeout caused a fallback". The arm is latched only in
+        // build, so a config landing between the timer firing and the next
+        // frame would otherwise log a timeout for a user who never fell back.
+        if (_configTimedOut) _logConfigTimeout();
       }
+    }
+
+    // The assignment this user should have had, arriving too late to honour.
+    if (_fellBackWithoutConfig && config != null) {
+      _logLateArrival(config);
     }
 
     return _useNativePaywall == true ? config : null;

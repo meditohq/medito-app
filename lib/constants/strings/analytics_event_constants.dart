@@ -299,6 +299,26 @@ class AnalyticsEventConstants {
   /// error or load timeout). Includes `duration_ms` and `reason`.
   static const String paywallWebviewLoadFailed = 'paywall_webview_load_failed';
 
+  /// Event logged when the paywall config does not arrive before the onboarding
+  /// donation screen's wait expires, so the user is served the webview arm
+  /// regardless of the arm the server would have assigned. Without this event
+  /// those users are indistinguishable from genuine variant-A traffic, and
+  /// because the trigger is a slow config fetch they skew slow-network — which
+  /// biases conversion, not just arm volume. Includes `duration_ms` (the wait
+  /// that elapsed) and `paywall_source`.
+  static const String paywallConfigTimeout = 'paywall_config_timeout';
+
+  /// Event logged when the paywall config arrives *after* the screen already
+  /// fell back to the webview arm. Carries `would_be_variant` — the arm the
+  /// config actually specified — which is what makes the native_paywall
+  /// denominator correctable: it reports how many fallback users the server
+  /// had assigned to the native arm. Also includes `paywall_source`.
+  static const String paywallConfigLateArrival = 'paywall_config_late_arrival';
+
+  /// Parameter carrying the arm a late-arriving paywall config specified, for
+  /// users already committed to the webview fallback ('native' or 'webview').
+  static const String paramWouldBeVariant = 'would_be_variant';
+
   /// Parameter for elapsed load time in milliseconds (paywall webview events)
   static const String paramDurationMs = 'duration_ms';
 
