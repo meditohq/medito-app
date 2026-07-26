@@ -49,7 +49,11 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
       return;
     }
     _configTimer = Timer(_paywallConfigTimeout, () {
-      if (!mounted) return;
+      // The arm may already be latched — from a config that arrived in time, or
+      // from an error. The wait did not expire for those users, so logging a
+      // timeout would inflate the metric with the very traffic it exists to be
+      // measured against. Cancelled on latch too; this guard covers the race.
+      if (!mounted || _useNativePaywall != null) return;
       _logConfigTimeout();
       setState(() => _configTimedOut = true);
     });
@@ -174,6 +178,9 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     if (_useNativePaywall == null) {
       if (config != null) {
         _useNativePaywall = config.nativePaywallEnabled;
+        // Config beat the deadline: disarm so the pending timer cannot fire a
+        // timeout for a user who never waited one out.
+        _configTimer?.cancel();
       } else if (paywallAsync.hasError || _configTimedOut) {
         _useNativePaywall = false;
         // Distinguishes "fell back because no config arrived" from "config
