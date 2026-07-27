@@ -197,7 +197,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get anErrorOccurred =>
-      'An unkown error occurred. Either we\'re having issues or you\'re offline.';
+      'An unknown error occurred. Either we\'re having issues or you\'re offline.';
 
   @override
   String get unableToLoadAudio =>
@@ -1554,7 +1554,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get anErrorOccurredMessage =>
-      'An unkown error occurred. Either we\'re having issues or you\'re offline.';
+      'An unknown error occurred. Either we\'re having issues or you\'re offline.';
 
   @override
   String get helpLegalSection => 'Help';
