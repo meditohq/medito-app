@@ -18,10 +18,11 @@ void main() {
   });
 
   group('currencyAmountToUnitsString', () {
-    test('divides decimal currencies by 100', () {
+    test('divides non-zero-decimal currencies by their minor unit exponent', () {
       expect(currencyAmountToUnitsString(1000, 'usd'), '10.00');
-      expect(currencyAmountToUnitsString(70000, 'ngn'), '700.00');
       expect(currencyAmountToUnitsString(1050, 'eur'), '10.50');
+      expect(currencyAmountToUnitsString(1050, 'kwd'), '1.050');
+      expect(currencyAmountToUnitsString(70000, 'ngn'), '700.00');
     });
 
     test('leaves zero-decimal amounts as whole units', () {
