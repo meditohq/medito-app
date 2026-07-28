@@ -17,12 +17,39 @@ void main() {
     });
   });
 
+  group('minorUnitDigits', () {
+    test('takes three-decimal currencies from Intl', () {
+      for (final code in ['kwd', 'bhd', 'jod', 'omr', 'tnd']) {
+        expect(minorUnitDigits(code), 3, reason: code);
+      }
+    });
+
+    test('keeps Stripe as the authority where Intl disagrees', () {
+      // Iceland dropped the aurar so Intl reports 0 digits, but Stripe still
+      // sends ISK in hundredths — trusting Intl would overstate it 100x.
+      expect(minorUnitDigits('isk'), 2);
+      expect(minorUnitDigits('ISK'), 2);
+    });
+
+    test('uses the Stripe set for zero-decimal currencies', () {
+      for (final code in zeroDecimalCurrencies) {
+        expect(minorUnitDigits(code), 0, reason: code);
+      }
+    });
+
+    test('falls back to two digits for unknown codes', () {
+      expect(minorUnitDigits('zzz'), 2);
+      expect(minorUnitDigits(''), 2);
+    });
+  });
+
   group('currencyAmountToUnitsString', () {
     test('divides non-zero-decimal currencies by their minor unit exponent', () {
       expect(currencyAmountToUnitsString(1000, 'usd'), '10.00');
       expect(currencyAmountToUnitsString(1050, 'eur'), '10.50');
       expect(currencyAmountToUnitsString(1050, 'kwd'), '1.050');
       expect(currencyAmountToUnitsString(70000, 'ngn'), '700.00');
+      expect(currencyAmountToUnitsString(1000, 'isk'), '10.00');
     });
 
     test('leaves zero-decimal amounts as whole units', () {

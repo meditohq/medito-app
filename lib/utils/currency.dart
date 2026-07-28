@@ -15,13 +15,29 @@ const zeroDecimalCurrencies = {
 bool isZeroDecimalCurrency(String currency) =>
     zeroDecimalCurrencies.contains(currency.trim().toLowerCase());
 
-/// The amount in major units — ¥1000 stays 1000, $10.00 becomes 10.0.
-double currencyAmountToUnits(int amount, String currency) {
+/// How many minor-unit digits Stripe sends for [currency] — the single source
+/// of truth for every conversion below, so they cannot drift apart.
+///
+/// Stripe only has 0-, 2- and 3-decimal currencies. Intl knows the 3-decimal
+/// ones (KWD, BHD, JOD, OMR, TND — thousandths, not hundredths), but its data
+/// is ISO-based and disagrees with Stripe on ISK: Iceland dropped the aurar, so
+/// Intl reports 0 digits, while Stripe still sends ISK in hundredths. Trusting
+/// Intl there would overstate every ISK amount a hundredfold. Hence
+/// [zeroDecimalCurrencies] decides the 0 case and Intl only picks between 2
+/// and 3.
+int minorUnitDigits(String currency) {
+  if (isZeroDecimalCurrency(currency)) return 0;
   final code = currency.trim().toUpperCase();
+  // Unknown codes fall back to 2 rather than throwing.
   final digits = NumberFormat.simpleCurrency(name: code).decimalDigits ?? 2;
 
+  return digits < 2 ? 2 : digits;
+}
+
+/// The amount in major units — ¥1000 stays 1000, $10.00 becomes 10.0.
+double currencyAmountToUnits(int amount, String currency) {
   var divisor = 1;
-  for (var i = 0; i < digits; i++) {
+  for (var i = 0; i < minorUnitDigits(currency); i++) {
     divisor *= 10;
   }
 
@@ -33,22 +49,21 @@ double currencyAmountToUnits(int amount, String currency) {
 /// For places that need the bare number because something else supplies the
 /// currency: Apple Pay's `ApplePayCartSummaryItem.amount`, and localized strings
 /// that take the amount and the currency code as separate placeholders.
-String currencyAmountToUnitsString(int amount, String currency) {
-  final code = currency.trim().toUpperCase();
-  final digits = NumberFormat.simpleCurrency(name: code).decimalDigits ?? 2;
-  final value = currencyAmountToUnits(amount, currency);
-  return value.toStringAsFixed(digits);
-}
+String currencyAmountToUnitsString(int amount, String currency) =>
+    currencyAmountToUnits(
+      amount,
+      currency,
+    ).toStringAsFixed(minorUnitDigits(currency));
 
 /// Human-readable amount with its currency symbol, e.g. `¥1,000` or `$10.50`.
 String formatCurrencyAmount(int amount, String currency) {
   final code = currency.trim().toLowerCase();
-  final zeroDecimal = isZeroDecimalCurrency(code);
   final value = currencyAmountToUnits(amount, code);
   final wholeNumber = value == value.roundToDouble();
   final format = NumberFormat.simpleCurrency(
     name: code.toUpperCase(),
-    decimalDigits: (zeroDecimal || wholeNumber) ? 0 : 2,
+    // A round amount reads better without trailing zeros ($10, not $10.00).
+    decimalDigits: wholeNumber ? 0 : minorUnitDigits(code),
   );
 
   return format.format(value);
