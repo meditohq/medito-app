@@ -16,8 +16,17 @@ bool isZeroDecimalCurrency(String currency) =>
     zeroDecimalCurrencies.contains(currency.trim().toLowerCase());
 
 /// The amount in major units — ¥1000 stays 1000, $10.00 becomes 10.0.
-double currencyAmountToUnits(int amount, String currency) =>
-    isZeroDecimalCurrency(currency) ? amount.toDouble() : amount / 100;
+double currencyAmountToUnits(int amount, String currency) {
+  final code = currency.trim().toUpperCase();
+  final digits = NumberFormat.simpleCurrency(name: code).decimalDigits ?? 2;
+
+  var divisor = 1;
+  for (var i = 0; i < digits; i++) {
+    divisor *= 10;
+  }
+
+  return amount / divisor;
+}
 
 /// Plain numeric string in major units, no symbol and no grouping separators.
 ///
