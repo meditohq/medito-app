@@ -34,9 +34,10 @@ double currencyAmountToUnits(int amount, String currency) {
 /// currency: Apple Pay's `ApplePayCartSummaryItem.amount`, and localized strings
 /// that take the amount and the currency code as separate placeholders.
 String currencyAmountToUnitsString(int amount, String currency) {
-  final zeroDecimal = isZeroDecimalCurrency(currency);
+  final code = currency.trim().toUpperCase();
+  final digits = NumberFormat.simpleCurrency(name: code).decimalDigits ?? 2;
   final value = currencyAmountToUnits(amount, currency);
-  return zeroDecimal ? value.toStringAsFixed(0) : value.toStringAsFixed(2);
+  return value.toStringAsFixed(digits);
 }
 
 /// Human-readable amount with its currency symbol, e.g. `¥1,000` or `$10.50`.
