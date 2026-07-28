@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @anErrorOccurred.
   ///
   /// In en, this message translates to:
-  /// **'An unkown error occurred. Either we\'re having issues or you\'re offline.'**
+  /// **'An unknown error occurred. Either we\'re having issues or you\'re offline.'**
   String get anErrorOccurred;
 
   /// No description provided for @unableToLoadAudio.
@@ -2915,7 +2915,7 @@ abstract class AppLocalizations {
   /// Generic error message for unknown errors
   ///
   /// In en, this message translates to:
-  /// **'An unkown error occurred. Either we\'re having issues or you\'re offline.'**
+  /// **'An unknown error occurred. Either we\'re having issues or you\'re offline.'**
   String get anErrorOccurredMessage;
 
   /// Section title for help settings
