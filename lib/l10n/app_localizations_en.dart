@@ -1054,6 +1054,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setReminderB => 'Remind Me Daily';
 
   @override
+  String get donationEmailLabel => 'Email address';
+
+  @override
+  String get donationEmailHelper =>
+      'For your receipt and to manage your donation.';
+
+  @override
+  String get donationEmailRequired =>
+      'Enter your email so we can send a receipt.';
+
+  @override
+  String get donationEmailInvalid => 'That email address does not look right.';
+
+  @override
   String get donationThankYouTitle => 'Thank You for Your Support!';
 
   @override
