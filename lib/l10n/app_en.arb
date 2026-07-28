@@ -385,6 +385,10 @@
   "@setReminderB": {
     "description": "CTA on the onboarding notifications screen"
   },
+  "donationEmailLabel": "Email address",
+  "donationEmailHelper": "For your receipt and to manage your donation.",
+  "donationEmailRequired": "Enter your email so we can send a receipt.",
+  "donationEmailInvalid": "That email address does not look right.",
   "donationThankYouTitle": "Thank You for Your Support!",
   "donationThankYouBody": "Your generosity helps keep Medito free and accessible to everyone. We're deeply grateful for your contribution to spreading mindfulness worldwide.",
   "donationVisitFoundation": "Visit Medito Foundation",

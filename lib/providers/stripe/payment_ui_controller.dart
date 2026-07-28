@@ -4,6 +4,7 @@ import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart' as local_models;
 import 'package:medito/providers/stripe/payment_providers.dart';
+import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -287,7 +288,10 @@ class PaymentUIController extends _$PaymentUIController {
 
         onSuccess?.call(); // Notify screen
 
-        final amountString = (amount / 100).toStringAsFixed(2);
+        // paymentSuccessMessage takes the amount and the currency as separate
+        // placeholders, so this is the bare number — but it still has to be in
+        // the right units: /100 would thank a ¥1000 donor for ¥10.
+        final amountString = currencyAmountToUnitsString(amount, currency);
         AppLogger.d(
           'PAYMENT_UI',
           '✅ Showing success message: $amountString $currency (Intent: $paymentIntentId)',

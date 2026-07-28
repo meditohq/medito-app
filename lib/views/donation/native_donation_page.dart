@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -14,7 +13,10 @@ import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/secure_storage_service.dart';
+import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 enum _Frequency {
@@ -44,24 +46,6 @@ const _disclosureCopy =
     'You will receive an email confirmation shortly.\n'
     'Stichting Medito · Non-profit registered in the Netherlands · KvK 75284251';
 const _stripeTrustCopy = 'Secure payment powered by Stripe';
-
-// Stripe zero-decimal currencies: amounts are already in whole units.
-const _zeroDecimalCurrencies = {
-  'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga',
-  'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf',
-};
-
-String _formatAmount(int amount, String currency) {
-  final code = currency.toLowerCase();
-  final isZeroDecimal = _zeroDecimalCurrencies.contains(code);
-  final value = isZeroDecimal ? amount.toDouble() : amount / 100;
-  final wholeNumber = value == value.roundToDouble();
-  final format = NumberFormat.simpleCurrency(
-    name: code.toUpperCase(),
-    decimalDigits: (isZeroDecimal || wholeNumber) ? 0 : 2,
-  );
-  return format.format(value);
-}
 
 /// Native (Dart) rendering of the onboarding donation paywall — an inline
 /// pager-tab body, not a pushed route. Renders the same server-resolved
@@ -103,6 +87,53 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   Timer? _closeTimer;
   String? _capturedUserId;
 
+  // Anonymous donors have no account email, so without asking here the Stripe
+  // Customer is created with none: no receipt, and no way into the hosted
+  // billing portal (it authenticates by emailing a magic link) — i.e. a
+  // recurring charge the donor cannot cancel themselves. Only shown when we
+  // have no email already; the webview arm has always collected one.
+  final _emailController = TextEditingController();
+  String? _emailError;
+
+  /// Resolved in [initState]: paywall config → auth user (incl. tokens) →
+  /// SharedPreferences/secure storage. Null means we have to ask.
+  String? _knownEmail;
+
+  bool get _needsEmail => _knownEmail == null;
+
+  void _resolveKnownEmail() {
+    final authRepository = ref.read(authRepositorySyncProvider);
+    // getUserEmail() also covers the token-carried address, which currentUser
+    // may not have picked up yet.
+    for (final candidate in [
+      widget.config.email,
+      authRepository.getUserEmail(),
+    ]) {
+      if (candidate.isNotNullAndNotEmpty()) {
+        _knownEmail = candidate;
+        return;
+      }
+    }
+    // Its storage fallback is fire-and-forget and returns before the read
+    // lands, so a returning donor still looks anonymous here — read directly.
+    unawaited(_prefillEmailFromStorage());
+  }
+
+  Future<void> _prefillEmailFromStorage() async {
+    try {
+      final stored = await SecureStorageService().getUserEmail();
+      if (stored.isNullOrEmpty() || !mounted) return;
+      // Never clobber an address the donor has already started typing.
+      if (_emailController.text.trim().isNotEmpty) return;
+      setState(() {
+        _knownEmail = stored;
+        _emailError = null;
+      });
+    } catch (e) {
+      AppLogger.w(_logTag, 'Could not prefill donor email from storage: $e');
+    }
+  }
+
   String get _variantId => widget.config.experiment?.variant ?? 'unknown';
 
   String get _experimentId {
@@ -114,6 +145,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   void initState() {
     super.initState();
     _capturedUserId = ref.read(authRepositorySyncProvider).currentUser?.id;
+    _resolveKnownEmail();
 
     _offeredFrequencies = _Frequency.values
         .where(
@@ -140,6 +172,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
   @override
   void dispose() {
+    _emailController.dispose();
     _closeTimer?.cancel();
     // Parent pager may advance past this tab without an explicit skip tap.
     if (!_didDonate) _logPaywallDismissedNoPayment();
@@ -233,6 +266,22 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   Future<void> _handlePay(payment_models.PaymentMethodType method) async {
     if (_isProcessingPayment || _selectedAmount <= 0) return;
 
+    // Block before the sheet opens: the Customer is created upstream of it, so
+    // an email captured later would never reach the Customer record.
+    final typedEmail = _emailController.text.trim();
+    if (_needsEmail) {
+      if (!_emailPattern.hasMatch(typedEmail)) {
+        final l10n = AppLocalizations.of(context)!;
+        setState(
+          () => _emailError = typedEmail.isEmpty
+              ? l10n.donationEmailRequired
+              : l10n.donationEmailInvalid,
+        );
+        return;
+      }
+      if (_emailError != null) setState(() => _emailError = null);
+    }
+
     if (!_donateTapLogged) {
       _donateTapLogged = true;
       unawaited(
@@ -248,7 +297,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       final authRepository = ref.read(authRepositorySyncProvider);
       final userId = authRepository.currentUser?.id ?? 'unknown';
       _capturedUserId ??= authRepository.currentUser?.id;
-      final userEmail = widget.config.email ?? authRepository.currentUser?.email;
+      final userEmail = _knownEmail ?? typedEmail;
       final currency = widget.config.currencyCode;
       final amount = _selectedAmount;
 
@@ -356,6 +405,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                           ],
                           _buildAmountGrid(context, onSurface),
                           const SizedBox(height: 24),
+                          if (_needsEmail) ...[
+                            _buildEmailField(context, onSurface),
+                            const SizedBox(height: 24),
+                          ],
                           _buildPaymentButtons(context),
                           const SizedBox(height: 24),
                           _buildDisclosure(context, onSurface),
@@ -545,7 +598,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }) {
     final isSelected = amount == _selectedAmount;
     final accent = context.brandPurple;
-    final label = _formatAmount(amount, widget.config.currencyCode);
+    final label = formatCurrencyAmount(amount, widget.config.currencyCode);
 
     return Semantics(
       button: true,
@@ -611,6 +664,54 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       ),
     );
   }
+
+  // Deliberately no leading icon: a new Material glyph changes the tree-shaken
+  // icon font, which is an asset diff Shorebird patches cannot ship.
+  Widget _buildEmailField(BuildContext context, Color onSurface) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.done,
+          autocorrect: false,
+          enabled: !_isProcessingPayment,
+          style: TextStyle(color: onSurface, fontSize: 16),
+          decoration: InputDecoration(
+            labelText: l10n.donationEmailLabel,
+            helperText: l10n.donationEmailHelper,
+            helperMaxLines: 2,
+            errorText: _emailError,
+            labelStyle: TextStyle(color: onSurface.withValues(alpha: 0.7)),
+            helperStyle: TextStyle(
+              color: onSurface.withValues(alpha: 0.6),
+              fontSize: 12,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: onSurface.withValues(alpha: 0.4)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: context.brandPurple),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onChanged: (_) {
+            if (_emailError != null) setState(() => _emailError = null);
+          },
+        ),
+      ],
+    );
+  }
+
+  // Intentionally permissive: this gates a donation, so a false reject costs
+  // more than a typo reaching Stripe.
+  static final _emailPattern = RegExp(r'^[^@\s]+@[^@\s.]+\.[^@\s]+$');
 
   Widget _buildPaymentButtons(BuildContext context) {
     final methodsAsync = ref.watch(availablePaymentMethodsProvider);
