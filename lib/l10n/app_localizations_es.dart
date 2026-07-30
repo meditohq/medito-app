@@ -31,6 +31,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get home => 'Inicio';
 
   @override
+  String get backgroundSoundDownloadFailed =>
+      'No se pudo descargar. Toca para reintentar.';
+
+  @override
   String get none => 'Ninguno';
 
   @override

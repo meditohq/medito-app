@@ -45,16 +45,23 @@ class BackgroundSoundsState {
   final BackgroundSoundsModel? selectedBgSound;
   final BackgroundSoundsModel? downloadingBgSound;
 
+  /// Sound that could not be downloaded or played. Drives the retry affordance
+  /// on its row — without it a failure is completely silent: the row looks
+  /// selected and nothing ever plays.
+  final BackgroundSoundsModel? failedBgSound;
+
   const BackgroundSoundsState({
     this.volume = 50,
     this.selectedBgSound,
     this.downloadingBgSound,
+    this.failedBgSound,
   });
 
   BackgroundSoundsState copyWith({
     double? volume,
     Object? selectedBgSound = _sentinel,
     Object? downloadingBgSound = _sentinel,
+    Object? failedBgSound = _sentinel,
   }) {
     return BackgroundSoundsState(
       volume: volume ?? this.volume,
@@ -64,6 +71,9 @@ class BackgroundSoundsState {
       downloadingBgSound: downloadingBgSound == _sentinel
           ? this.downloadingBgSound
           : downloadingBgSound as BackgroundSoundsModel?,
+      failedBgSound: failedBgSound == _sentinel
+          ? this.failedBgSound
+          : failedBgSound as BackgroundSoundsModel?,
     );
   }
 }
@@ -106,46 +116,124 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
 
   void handleOnChangeSound(BackgroundSoundsModel? sound) {
     AppLogger.d('BG_SOUND', 'Changing sound to: ${sound?.title}');
-    state = state.copyWith(selectedBgSound: sound);
-    var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
+    // Any new selection clears a previous failure: the retry affordance belongs
+    // to the row the user is actually on.
+    state = state.copyWith(selectedBgSound: sound, failedBgSound: null);
 
-    if (sound != null) {
-      bgSoundRepoProvider.saveSelectedBgSoundToSharedPreferences(sound);
-      _updateItemsInSavedBgSoundList(sound);
-
-      if (sound.title != 'None') {
-        // This will be localized in the UI layer
-        var fileName = '${sound.title}.mp3';
-        AppLogger.d('BG_SOUND', 'File name: $fileName');
-        final downloadAudio = ref.read(downloaderRepositoryProvider);
-        downloadAudio.getDownloadedFile(fileName).then((url) {
-          if (url == null) {
-            AppLogger.d('BG_SOUND', 'File not downloaded, downloading now');
-            state = state.copyWith(downloadingBgSound: sound);
-            downloadAudio
-                .downloadFile(sound.path, fileName: fileName)
-                .then((_) {
-                  AppLogger.d('BG_SOUND', 'Download completed');
-                  state = state.copyWith(downloadingBgSound: null);
-                })
-                .then((_) => downloadAudio.getDownloadedFile(fileName))
-                .then((path) {
-                  AppLogger.d('BG_SOUND', 'Downloaded file path: $path');
-                  return _play(path);
-                });
-          } else {
-            AppLogger.d('BG_SOUND', 'File already downloaded at: $url');
-            _play(url);
-          }
-        });
-      }
-    } else {
+    if (sound == null) {
       AppLogger.d('BG_SOUND', 'Stopping background sound');
       stopBackgroundSound();
+
+      return;
+    }
+
+    var bgSoundRepoProvider = ref.read(backgroundSoundsRepositoryProvider);
+    bgSoundRepoProvider.saveSelectedBgSoundToSharedPreferences(sound);
+    _updateItemsInSavedBgSoundList(sound);
+
+    if (sound.id == kNoneBackgroundSoundId) {
+      AppLogger.d('BG_SOUND', 'None selected, stopping background sound');
+      stopBackgroundSound();
+
+      return;
+    }
+
+    unawaited(_downloadAndPlay(sound));
+  }
+
+  /// Re-fetches [sound] from scratch after a failure, discarding whatever is
+  /// cached for it. Backs the retry affordance on a failed row.
+  void retryDownload(BackgroundSoundsModel sound) {
+    AppLogger.d('BG_SOUND', 'Retrying download for: ${sound.title}');
+    state = state.copyWith(selectedBgSound: sound, failedBgSound: null);
+    unawaited(_downloadAndPlay(sound, forceRedownload: true));
+  }
+
+  /// Resolves [sound] to a local file — downloading it first if needed — and
+  /// plays it.
+  ///
+  /// Every failure is handled here. The previous `.then` chain had no error
+  /// handler, so a failed download became an unhandled async error, which
+  /// `PlatformDispatcher.onError` records in Crashlytics as a *fatal* — a
+  /// dropped connection showed up as an app crash. It also left
+  /// `downloadingBgSound` set, so the tile's spinner never stopped.
+  Future<void> _downloadAndPlay(
+    BackgroundSoundsModel sound, {
+    bool forceRedownload = false,
+  }) async {
+    var fileName = '${sound.title}.mp3';
+    AppLogger.d('BG_SOUND', 'File name: $fileName');
+    final downloadAudio = ref.read(downloaderRepositoryProvider);
+
+    try {
+      if (forceRedownload) {
+        await downloadAudio.deleteDownloadedFile(fileName);
+      }
+
+      var played = await _fetchAndPlay(sound, fileName, downloadAudio);
+
+      if (!played) {
+        // A file that downloaded but won't play is corrupt — most likely a
+        // truncated fragment written by an older build, before downloads
+        // became atomic. Those are cached on devices already and no amount of
+        // re-selecting the sound would ever get past them, so bin the file and
+        // fetch it once more rather than making the user find the retry button.
+        AppLogger.d('BG_SOUND', 'Playback failed, re-fetching $fileName');
+        await downloadAudio.deleteDownloadedFile(fileName);
+        played = await _fetchAndPlay(sound, fileName, downloadAudio);
+      }
+
+      state = state.copyWith(failedBgSound: played ? null : sound);
+    } catch (e, s) {
+      AppLogger.e(
+        'BG_SOUND',
+        'Failed to prepare background sound ${sound.title}',
+        e,
+        s,
+      );
+      state = state.copyWith(failedBgSound: sound);
+    } finally {
+      if (state.downloadingBgSound?.id == sound.id) {
+        state = state.copyWith(downloadingBgSound: null);
+      }
     }
   }
 
-  Future<void> _play(String? uri) async {
+  /// Downloads [sound] if it isn't cached and starts playing it. Returns
+  /// whether the sound is now playing (a superseded selection counts as
+  /// success — nothing failed, the user just moved on).
+  Future<bool> _fetchAndPlay(
+    BackgroundSoundsModel sound,
+    String fileName,
+    DownloaderRepository downloadAudio,
+  ) async {
+    var path = await downloadAudio.getDownloadedFile(fileName);
+
+    if (path == null) {
+      AppLogger.d('BG_SOUND', 'File not downloaded, downloading now');
+      state = state.copyWith(downloadingBgSound: sound);
+      await downloadAudio.downloadFile(sound.path, fileName: fileName);
+      AppLogger.d('BG_SOUND', 'Download completed');
+      path = await downloadAudio.getDownloadedFile(fileName);
+    } else {
+      AppLogger.d('BG_SOUND', 'File already downloaded at: $path');
+    }
+
+    // The user can pick another sound (or None) while this downloads; don't
+    // let a slow download start playing over whatever they chose since.
+    if (state.selectedBgSound?.id != sound.id) {
+      AppLogger.d('BG_SOUND', 'Selection changed during download, not playing');
+
+      return true;
+    }
+
+    return _play(path);
+  }
+
+  /// Starts playback of [uri], returning whether it actually started. The
+  /// result matters: a cached-but-corrupt file fails here, and the caller uses
+  /// that to re-fetch it instead of leaving the user with silence.
+  Future<bool> _play(String? uri) async {
     if (uri == null) {
       AppLogger.e('BG_SOUND', 'URI is null, cannot play');
       if (Platform.isAndroid) {
@@ -154,7 +242,7 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
         unawaited(iosBackgroundPlayer.stop());
       }
 
-      return;
+      return false;
     }
 
     AppLogger.d('BG_SOUND', 'Playing sound with URI: $uri');
@@ -185,8 +273,12 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
 
         // Ensure volume is set after playback starts
         _api.setBackgroundSoundVolume(scaledVolume(state.volume));
+
+        return true;
       } catch (e, s) {
         AppLogger.e('BG_SOUND', 'Error playing Android background sound', e, s);
+
+        return false;
       }
     } else {
       try {
@@ -204,8 +296,12 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
         iosBackgroundPlayer.setVolume(scaledVolume(state.volume));
         unawaited(iosBackgroundPlayer.play());
         _handleFadeAtEndForIos();
+
+        return true;
       } catch (e, s) {
         AppLogger.e('BG_SOUND', 'Error playing iOS background sound', e, s);
+
+        return false;
       }
     }
   }

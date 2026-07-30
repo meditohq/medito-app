@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// No description provided for @backgroundSoundDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t download. Tap to try again.'**
+  String get backgroundSoundDownloadFailed;
+
   /// No description provided for @none.
   ///
   /// In en, this message translates to:
