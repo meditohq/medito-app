@@ -753,6 +753,10 @@ class StatsManager {
     return _allStats?.audioCompleted?.isNotEmpty == true;
   }
 
+  // ⚠️ KEEP IN SYNC: ported to Kotlin in
+  // android/app/src/main/kotlin/meditofoundation/medito/widget/ConsistencyWidget.kt
+  // (calculateConsistencyScore) so the Android home-screen widget can recompute
+  // the percentage on-device. If this algorithm changes, update that copy too.
   double calculateConsistencyScore(LocalAllStats allStats) {
     var now = _getCurrentDate();
     var today = DateTime(now.year, now.month, now.day);
