@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
@@ -90,17 +91,20 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   // Anonymous donors have no account email, so without asking here the Stripe
   // Customer is created with none: no receipt, and no way into the hosted
   // billing portal (it authenticates by emailing a magic link) — i.e. a
-  // recurring charge the donor cannot cancel themselves. Only shown when we
-  // have no email already; the webview arm has always collected one.
+  // recurring charge the donor cannot cancel themselves. Always shown (even
+  // when known) to match the webview arm, which always collects one.
   final _emailController = TextEditingController();
   String? _emailError;
 
+  // Custom "other amount" field — mirrors the webview arm's input, which the
+  // native page lacked. Mutually exclusive with the preset ladder: picking a
+  // preset clears this, typing a valid custom value deselects the presets.
+  final _customAmountController = TextEditingController();
+  String? _customAmountError;
+
   /// Resolved in [initState]: paywall config → auth user (incl. tokens) →
-  /// SharedPreferences/secure storage. Null means we have to ask.
-  String? _knownEmail;
-
-  bool get _needsEmail => _knownEmail == null;
-
+  /// SharedPreferences/secure storage — prefills the (always-visible) email
+  /// field so a known donor doesn't have to retype it.
   void _resolveKnownEmail() {
     final authRepository = ref.read(authRepositorySyncProvider);
     // getUserEmail() also covers the token-carried address, which currentUser
@@ -110,7 +114,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       authRepository.getUserEmail(),
     ]) {
       if (candidate.isNotNullAndNotEmpty()) {
-        _knownEmail = candidate;
+        _emailController.text = candidate!;
         return;
       }
     }
@@ -126,7 +130,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       // Never clobber an address the donor has already started typing.
       if (_emailController.text.trim().isNotEmpty) return;
       setState(() {
-        _knownEmail = stored;
+        _emailController.text = stored!;
         _emailError = null;
       });
     } catch (e) {
@@ -173,6 +177,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   @override
   void dispose() {
     _emailController.dispose();
+    _customAmountController.dispose();
     _closeTimer?.cancel();
     // Parent pager may advance past this tab without an explicit skip tap.
     if (!_didDonate) _logPaywallDismissedNoPayment();
@@ -208,6 +213,59 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final ladder = _ladderFor(frequency);
     if (ladder.isEmpty) return 0;
     return ladder[_suggestedIndexFor(frequency)];
+  }
+
+  // Mirrors the webview's Math.min(...) over the current ladder (minor units).
+  int _minimumAmountFor(_Frequency frequency) {
+    final ladder = _ladderFor(frequency);
+    if (ladder.isEmpty) return 1;
+    return ladder.reduce((a, b) => a < b ? a : b);
+  }
+
+  void _selectPresetAmount(int amount) {
+    setState(() {
+      _selectedAmount = amount;
+      _customAmountController.clear();
+      _customAmountError = null;
+    });
+  }
+
+  // The field takes a whole number in major units (dollars, not cents) — same
+  // as the website's <input type="number" step="1">, which multiplies by the
+  // currency's minor-unit factor via unitsToCents before submitting.
+  void _onCustomAmountChanged(String raw) {
+    final minimum = _minimumAmountFor(_selectedFrequency);
+    if (raw.isEmpty) {
+      setState(() {
+        _customAmountError = null;
+        _selectedAmount = 0;
+      });
+      return;
+    }
+    final majorUnits = int.tryParse(raw) ?? 0;
+    final factor = _minorUnitFactor(widget.config.currencyCode);
+    final minorAmount = majorUnits * factor;
+    if (minorAmount < minimum) {
+      setState(() {
+        _customAmountError =
+            'Minimum amount is '
+            '${formatCurrencyAmount(minimum, widget.config.currencyCode)}';
+        _selectedAmount = 0;
+      });
+      return;
+    }
+    setState(() {
+      _customAmountError = null;
+      _selectedAmount = minorAmount;
+    });
+  }
+
+  int _minorUnitFactor(String currency) {
+    var factor = 1;
+    for (var i = 0; i < minorUnitDigits(currency); i++) {
+      factor *= 10;
+    }
+    return factor;
   }
 
   void _logPageShown() {
@@ -269,18 +327,16 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     // Block before the sheet opens: the Customer is created upstream of it, so
     // an email captured later would never reach the Customer record.
     final typedEmail = _emailController.text.trim();
-    if (_needsEmail) {
-      if (!_emailPattern.hasMatch(typedEmail)) {
-        final l10n = AppLocalizations.of(context)!;
-        setState(
-          () => _emailError = typedEmail.isEmpty
-              ? l10n.donationEmailRequired
-              : l10n.donationEmailInvalid,
-        );
-        return;
-      }
-      if (_emailError != null) setState(() => _emailError = null);
+    if (!_emailPattern.hasMatch(typedEmail)) {
+      final l10n = AppLocalizations.of(context)!;
+      setState(
+        () => _emailError = typedEmail.isEmpty
+            ? l10n.donationEmailRequired
+            : l10n.donationEmailInvalid,
+      );
+      return;
     }
+    if (_emailError != null) setState(() => _emailError = null);
 
     if (!_donateTapLogged) {
       _donateTapLogged = true;
@@ -297,7 +353,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       final authRepository = ref.read(authRepositorySyncProvider);
       final userId = authRepository.currentUser?.id ?? 'unknown';
       _capturedUserId ??= authRepository.currentUser?.id;
-      final userEmail = _knownEmail ?? typedEmail;
+      final userEmail = typedEmail;
       final currency = widget.config.currencyCode;
       final amount = _selectedAmount;
 
@@ -360,6 +416,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     setState(() {
       _selectedFrequency = frequency;
       _selectedAmount = _suggestedAmountFor(frequency);
+      _customAmountController.clear();
+      _customAmountError = null;
     });
   }
 
@@ -404,11 +462,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                             const SizedBox(height: 20),
                           ],
                           _buildAmountGrid(context, onSurface),
+                          const SizedBox(height: 12),
+                          _buildCustomAmountField(context, onSurface),
                           const SizedBox(height: 24),
-                          if (_needsEmail) ...[
-                            _buildEmailField(context, onSurface),
-                            const SizedBox(height: 24),
-                          ],
+                          _buildEmailField(context, onSurface),
+                          const SizedBox(height: 24),
                           _buildPaymentButtons(context),
                           const SizedBox(height: 24),
                           _buildDisclosure(context, onSurface),
@@ -596,7 +654,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     required int amount,
     required bool isSuggested,
   }) {
-    final isSelected = amount == _selectedAmount;
+    final isSelected =
+        amount == _selectedAmount && _customAmountController.text.isEmpty;
     final accent = context.brandPurple;
     final label = formatCurrencyAmount(amount, widget.config.currencyCode);
 
@@ -605,7 +664,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       selected: isSelected,
       label: label,
       child: GestureDetector(
-        onTap: () => setState(() => _selectedAmount = amount),
+        onTap: () => _selectPresetAmount(amount),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -662,6 +721,37 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           ],
         ),
       ),
+    );
+  }
+
+  // Mirrors the webview's "other amount" input: whole major units, digit-only,
+  // with the same "Minimum amount is X" validation copy.
+  Widget _buildCustomAmountField(BuildContext context, Color onSurface) {
+    final minimum = _minimumAmountFor(_selectedFrequency);
+    return TextField(
+      controller: _customAmountController,
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.done,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      enabled: !_isProcessingPayment,
+      style: TextStyle(color: onSurface, fontSize: 16),
+      decoration: InputDecoration(
+        hintText:
+            'Other amount (min '
+            '${formatCurrencyAmount(minimum, widget.config.currencyCode)})',
+        hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.5)),
+        errorText: _customAmountError,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: onSurface.withValues(alpha: 0.2)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: context.brandPurple),
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      onChanged: _onCustomAmountChanged,
     );
   }
 
