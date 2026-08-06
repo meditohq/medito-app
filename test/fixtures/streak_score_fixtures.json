@@ -1,0 +1,155 @@
+{
+  "_comment": "Shared parity fixture for the streak algorithm. Consumed identically by test/stats_manager/streak_parity_test.dart (Dart, source of truth: calculateStreak in lib/utils/stats_manager.dart) and android/app/src/test/kotlin/.../StreakCalculatorParityTest.kt (Kotlin, on-device widget port in StreakCalculator.kt). All offsets are hours relative to referenceInstant. nowOffsetHours positions the simulated 'now'; dayBoundaryOffsetHours is the user's configurable day-boundary offset (both 'today' and every activity date are bucketed via the same offset-aware dayOf). If you change calculateStreak, add/update cases here and re-verify both suites pass before touching StreakCalculator.kt.",
+  "referenceInstant": "2024-03-15T00:00:00Z",
+  "cases": [
+    {
+      "name": "no_sessions",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 0
+    },
+    {
+      "name": "session_today_only",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [
+        0
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 1
+    },
+    {
+      "name": "session_yesterday_only_grace",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [
+        -12
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 1
+    },
+    {
+      "name": "five_consecutive_ending_today",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [
+        0,
+        -24,
+        -48,
+        -72,
+        -96
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 5
+    },
+    {
+      "name": "five_consecutive_ending_yesterday",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [
+        -12,
+        -36,
+        -60,
+        -84,
+        -108
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 5
+    },
+    {
+      "name": "gap_breaks_streak",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [
+        0,
+        -48
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 1
+    },
+    {
+      "name": "freeze_day_extends_streak",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [
+        0
+      ],
+      "freezeOffsetHours": [
+        -24
+      ],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 2
+    },
+    {
+      "name": "future_ignored",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [
+        0,
+        24
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 1
+    },
+    {
+      "name": "thirty_day_streak",
+      "nowOffsetHours": 12,
+      "meditationOffsetHours": [
+        0,
+        -24,
+        -48,
+        -72,
+        -96,
+        -120,
+        -144,
+        -168,
+        -192,
+        -216,
+        -240,
+        -264,
+        -288,
+        -312,
+        -336,
+        -360,
+        -384,
+        -408,
+        -432,
+        -456,
+        -480,
+        -504,
+        -528,
+        -552,
+        -576,
+        -600,
+        -624,
+        -648,
+        -672,
+        -696
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 0,
+      "expectedStreak": 30
+    },
+    {
+      "name": "offset_shifts_today_backward_with_matching_activity",
+      "nowOffsetHours": 1,
+      "meditationOffsetHours": [
+        -23
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 4,
+      "expectedStreak": 1
+    },
+    {
+      "name": "offset_excludes_session_pushed_past_shifted_today",
+      "nowOffsetHours": 2,
+      "meditationOffsetHours": [
+        5
+      ],
+      "freezeOffsetHours": [],
+      "dayBoundaryOffsetHours": 4,
+      "expectedStreak": 0
+    }
+  ]
+}

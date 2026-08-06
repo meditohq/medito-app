@@ -7,6 +7,8 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../constants/strings/shared_preference_constants.dart';
 import '../utils/logger.dart';
 
 class HomeWidgetService {
@@ -34,6 +36,7 @@ class HomeWidgetService {
   static const String _upNextCompletedKey = 'up_next_completed';
   static const String _upNextTotalKey = 'up_next_total';
   static const String _upNextTrackIdKey = 'up_next_track_id';
+  static const String _dayBoundaryOffsetHoursKey = 'day_boundary_offset_hours';
 
   static Future<void> _configure() async {
     if (Platform.isIOS) {
@@ -81,6 +84,7 @@ class HomeWidgetService {
 
       final meditationDates = _extractMeditationDates(stats);
       final freezeDates = stats.freezeUsageDates.toList();
+      final dayBoundaryOffsetHours = await _readDayBoundaryOffsetHours();
 
       final consistencyPercentage = (stats.consistencyScore * 100)
           .round()
@@ -109,6 +113,10 @@ class HomeWidgetService {
           _consistencyScoreKey,
           consistencyPercentage,
         ),
+        HomeWidget.saveWidgetData<int>(
+          _dayBoundaryOffsetHoursKey,
+          dayBoundaryOffsetHours,
+        ),
       ]);
 
       await _triggerWidgetRefresh();
@@ -131,6 +139,7 @@ class HomeWidgetService {
       final consistencyPercentage = (stats.consistencyScore * 100)
           .round()
           .clamp(0, 100);
+      final dayBoundaryOffsetHours = await _readDayBoundaryOffsetHours();
 
       await Future.wait([
         _saveWithTimeout(_streakCurrentKey, stats.streakCurrent),
@@ -144,6 +153,7 @@ class HomeWidgetService {
         ),
         _saveWithTimeout(_totalTracksCompletedKey, stats.totalTracksCompleted),
         _saveWithTimeout(_consistencyScoreKey, consistencyPercentage),
+        _saveWithTimeout(_dayBoundaryOffsetHoursKey, dayBoundaryOffsetHours),
       ]);
 
       await _triggerWidgetRefresh();
@@ -152,17 +162,28 @@ class HomeWidgetService {
     }
   }
 
-  static List<int> _extractMeditationDates(LocalAllStats stats) {
-    final dates = <int>[];
-    if (stats.audioCompleted != null) {
-      for (final audio in stats.audioCompleted!) {
-        final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-        final dayStart = DateTime(date.year, date.month, date.day);
-        dates.add(dayStart.millisecondsSinceEpoch);
-      }
+  static Future<int> _readDayBoundaryOffsetHours() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getInt(SharedPreferenceConstants.dayBoundaryOffsetHours) ??
+          0;
+    } catch (e) {
+      AppLogger.w('WIDGET', 'Failed to read day boundary offset: $e');
+      return 0;
     }
+  }
 
-    return dates.toSet().toList();
+  // Raw (not day-bucketed) so the widget can bucket by day itself — the
+  // consistency widget uses plain calendar days, the streak widget honours
+  // the user's day-boundary offset, and neither can do that correctly from a
+  // timestamp that's already been truncated to midnight here.
+  static List<int> _extractMeditationDates(LocalAllStats stats) {
+    if (stats.audioCompleted == null) return [];
+
+    return stats.audioCompleted!
+        .map((audio) => audio.timestamp)
+        .toSet()
+        .toList();
   }
 
   static Future<void> _saveWithTimeout<T>(String key, T value) async {

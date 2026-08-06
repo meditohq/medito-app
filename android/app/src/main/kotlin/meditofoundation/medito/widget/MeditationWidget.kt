@@ -61,18 +61,27 @@ class MeditationWidget : GlanceAppWidget() {
     @Composable
     private fun WidgetContent(context: Context) {
         val prefs = currentState<HomeWidgetGlanceState>().preferences
-        val streakCurrent = prefs.getInt("streak_current", 0)
         val totalTracksCompleted = prefs.getInt("total_tracks_completed", 0)
         val meditationDatesJson = prefs.getString("meditation_dates", "[]") ?: "[]"
         val freezeDatesJson = prefs.getString("freeze_dates", "[]") ?: "[]"
+        val dayBoundaryOffsetHours = prefs.getInt("day_boundary_offset_hours", 0)
         val dayLabel = prefs.getString("day_label", "day") ?: "day"
         val daysLabel = prefs.getString("days_label", "days") ?: "days"
-        // Use singular "day" if streak is 1, plural "days" otherwise
-        val label = if (streakCurrent == 1) dayLabel else daysLabel
 
         val meditationDates = parseDateTimestamps(meditationDatesJson)
         val freezeDates = parseDateTimestamps(freezeDatesJson)
         val allActivityDates = (meditationDates + freezeDates).toSet()
+
+        // Computed on-device (not read from the cached "streak_current" pref) so
+        // the streak stays live between app opens instead of only updating when
+        // Dart last pushed a snapshot.
+        val streakCurrent = StreakCalculator.calculate(
+            parseRawTimestamps(meditationDatesJson),
+            parseRawTimestamps(freezeDatesJson),
+            dayBoundaryOffsetHours,
+        )
+        // Use singular "day" if streak is 1, plural "days" otherwise
+        val label = if (streakCurrent == 1) dayLabel else daysLabel
 
         val today = Calendar.getInstance()
         today.set(Calendar.HOUR_OF_DAY, 0)
@@ -226,6 +235,18 @@ class MeditationWidget : GlanceAppWidget() {
                 }
 
             }
+        }
+    }
+
+    // Unlike parseDateTimestamps (which truncates to local midnight for the
+    // calendar-strip display), StreakCalculator needs the raw timestamps so it
+    // can apply the day-boundary offset itself before bucketing.
+    private fun parseRawTimestamps(jsonString: String): List<Long> {
+        return try {
+            val jsonArray = JSONArray(jsonString)
+            (0 until jsonArray.length()).map { jsonArray.getLong(it) }
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 
