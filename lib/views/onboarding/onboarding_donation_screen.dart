@@ -38,6 +38,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
   bool _timeoutLogged = false;
   bool _lateArrivalLogged = false;
   bool _fellBackWithoutConfig = false;
+  bool _impressionLogged = false;
 
   @override
   void initState() {
@@ -127,6 +128,30 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     );
   }
 
+  /// The ask's own impression, fired once the arm is settled so it can be
+  /// attributed to 'native' or 'webview'. This is the denominator for the
+  /// onboarding donation funnel; deferred to a post-frame callback because it
+  /// is triggered from build.
+  void _logImpression({required bool isNative}) {
+    if (_impressionLogged) return;
+    _impressionLogged = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(
+        FirebaseAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.onboardingDonationScreenShown,
+          parameters: {
+            AnalyticsEventConstants.paramPaywallSource:
+                FirebaseAnalyticsService.paywallSourceOnboarding,
+            AnalyticsEventConstants.paramWouldBeVariant: isNative
+                ? 'native'
+                : 'webview',
+          },
+        ),
+      );
+    });
+  }
+
   void _handleSkip() async {
     await FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingDonationSkipTap,
@@ -148,6 +173,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     }
 
     if (_useNativePaywall == true && config != null) {
+      _logImpression(isNative: true);
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         // Unlike the webview intro (which bleeds a header image to the top
@@ -162,6 +188,8 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
         ),
       );
     }
+
+    _logImpression(isNative: false);
 
     return _buildWebviewIntro(context);
   }

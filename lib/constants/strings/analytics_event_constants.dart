@@ -82,6 +82,18 @@ class AnalyticsEventConstants {
   static const String onboardingReminderCancelTap =
       'onboarding_reminder_cancel_tap';
 
+  /// Event logged when the onboarding donation step first becomes visible —
+  /// the true top of the onboarding donation funnel.
+  ///
+  /// Without it the earliest measurable event was [onboardingDonateNowTap]
+  /// (webview arm) or the paywall itself, so the ask's own impression count had
+  /// to be proxied by [onboardingQuestionFlowCompleted]. Parameter
+  /// [paramWouldBeVariant] records which arm rendered ('native' / 'webview'),
+  /// since the two have different downstream funnels — the native page has no
+  /// intro-tap step at all.
+  static const String onboardingDonationScreenShown =
+      'onboarding_donation_screen_shown';
+
   /// Event logged when user taps donate now during onboarding
   static const String onboardingDonateNowTap = 'onboarding_donate_now_tap';
 
@@ -423,6 +435,56 @@ class AnalyticsEventConstants {
   /// Parameter: paramAnswer ('google_ad', 'social_ad', 'friend', 'therapist', 'app_store', 'play_store', 'other')
   static const String onboardingAttributionAnswered =
       'onboarding_attribution_answered';
+
+  /// Event logged when the end-screen donation card first becomes visible in
+  /// its ASK state (the amount/CTA card, not the post-donation thank-you).
+  ///
+  /// This is the denominator the end-screen donation funnel never had: the card
+  /// renders on every end screen unless snoozed, but [donationPageViewed] only
+  /// fires once the user taps through and the webview loads, so tap-through was
+  /// previously unmeasurable and had to be proxied by `audio_session_completed`
+  /// (which over-counts — one user sees the card many times).
+  /// Parameter: [paramPaywallSource] (always 'end_screen').
+  static const String endScreenDonationCardShown =
+      'end_screen_donation_card_shown';
+
+  /// Event logged when the end-screen donation card renders in its snoozed
+  /// thank-you state instead of the ask. Keeps [endScreenDonationCardShown] a clean
+  /// ask-impression count while still accounting for every render, so
+  /// suppression volume is visible rather than silently missing.
+  static const String endScreenDonationCardSuppressed =
+      'end_screen_donation_card_suppressed';
+
+  /// Event logged when the end-screen donation card fails to load its CMS
+  /// content (an impression that could never convert). Analogous to
+  /// [paywallWebviewLoadFailed] one step earlier in the funnel.
+  static const String endScreenDonationCardLoadFailed =
+      'end_screen_donation_card_load_failed';
+
+  /// Event logged when the user taps a donate CTA on the end-screen donation
+  /// card, BEFORE any navigation or webview load. Pairs with
+  /// [donationPageViewed] to split "tapped but the paywall never rendered"
+  /// from "saw the paywall and bounced".
+  /// Parameters: [paramPaywallSource], [paramButtonIndex], [paramCardState].
+  static const String endScreenDonationCardDonateTap =
+      'end_screen_donation_card_donate_tap';
+
+  /// Event logged when the user snoozes the donation ask for 30 days from the
+  /// card's info dialog ("Hide for now").
+  static const String endScreenDonationCardSnoozed =
+      'end_screen_donation_card_snoozed';
+
+  /// Event logged when the user opens the "?" info dialog on the donation card.
+  static const String endScreenDonationCardInfoOpened =
+      'end_screen_donation_card_info_opened';
+
+  /// Parameter naming which donate CTA was tapped when the CMS supplies more
+  /// than one button (0-based).
+  static const String paramButtonIndex = 'button_index';
+
+  /// Parameter distinguishing the donation card's render state: 'ask' (first
+  /// or repeat ask) vs 'thanks' (post-donation "Donate again").
+  static const String paramCardState = 'card_state';
 
   /// Event logged when the end-screen smart-reminders card first becomes
   /// visible to the user (i.e. shouldShowReminderPromptProvider is true).

@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/providers.dart';
 import '../../../services/analytics/firebase_analytics_service.dart';
 import '../../../widgets/dialogs/dialogs.dart';
 import '../../../widgets/medito_icon.dart';
@@ -26,6 +30,58 @@ class DonationWidget extends ConsumerStatefulWidget {
 }
 
 class DonationWidgetState extends ConsumerState<DonationWidget> {
+  // One impression latch per state object, i.e. per end-screen visit, so
+  // rebuilds (snooze changes, feedback widget, theme) cannot double-count.
+  // Mirrors the reminder card's latch in end_screen_view.dart.
+  bool _impressionLogged = false;
+  bool _loadFailureLogged = false;
+
+  void _logOnce(String event, {Map<String, Object>? parameters}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(name: event, parameters: parameters),
+      );
+    });
+  }
+
+  /// Fires the card's impression exactly once, tagged with which state the user
+  /// actually saw. Deferred to a post-frame callback because it is called from
+  /// build.
+  void _logImpression({required bool isSnoozed}) {
+    if (_impressionLogged) return;
+    _impressionLogged = true;
+    _logOnce(
+      isSnoozed
+          ? AnalyticsEventConstants.endScreenDonationCardSuppressed
+          : AnalyticsEventConstants.endScreenDonationCardShown,
+      parameters: {
+        AnalyticsEventConstants.paramPaywallSource:
+            FirebaseAnalyticsService.paywallSourceEndScreen,
+      },
+    );
+  }
+
+  void _logDonateTap({required int buttonIndex, required bool isSnoozed}) {
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.endScreenDonationCardDonateTap,
+            parameters: {
+              AnalyticsEventConstants.paramPaywallSource:
+                  FirebaseAnalyticsService.paywallSourceEndScreen,
+              AnalyticsEventConstants.paramButtonIndex: buttonIndex,
+              AnalyticsEventConstants.paramCardState: isSnoozed
+                  ? 'thanks'
+                  : 'ask',
+            },
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final donationPage = ref.watch(fetchDonationPageProvider);
@@ -36,6 +92,18 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
       child: donationPage.when(
         loading: () => _buildLoadingWidget(),
         error: (err, _) {
+          // An impression that could never convert — counted separately so the
+          // ask denominator stays honest instead of silently shrinking.
+          if (!_loadFailureLogged) {
+            _loadFailureLogged = true;
+            _logOnce(
+              AnalyticsEventConstants.endScreenDonationCardLoadFailed,
+              parameters: {
+                AnalyticsEventConstants.paramPaywallSource:
+                    FirebaseAnalyticsService.paywallSourceEndScreen,
+              },
+            );
+          }
           final error = err is AppError ? err : const UnknownError();
           return MeditoErrorWidget(
             error: error,
@@ -44,6 +112,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
           );
         },
         data: (DonationPageModel donationPageModel) {
+          _logImpression(isSnoozed: snoozeState.isSnoozed);
           return Column(
             children: [
               AnimatedOpacity(
@@ -200,14 +269,17 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
-                onPressed: () => handleNavigation(
-                  TypeConstants.route,
-                  [RouteConstants.donation],
-                  context,
-                  ref: ref,
-                  sourceRouteName:
-                      FirebaseAnalyticsService.paywallSourceEndScreen,
-                ),
+                onPressed: () {
+                  _logDonateTap(buttonIndex: 0, isSnoozed: true);
+                  handleNavigation(
+                    TypeConstants.route,
+                    [RouteConstants.donation],
+                    context,
+                    ref: ref,
+                    sourceRouteName:
+                        FirebaseAnalyticsService.paywallSourceEndScreen,
+                  );
+                },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: const BorderSide(color: Colors.white, width: 1.5),
@@ -229,6 +301,17 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
   }
 
   Future<void> _showDonationInfoDialog(BuildContext context) async {
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.endScreenDonationCardInfoOpened,
+            parameters: {
+              AnalyticsEventConstants.paramPaywallSource:
+                  FirebaseAnalyticsService.paywallSourceEndScreen,
+            },
+          ),
+    );
     await showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -260,6 +343,20 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
   Future<void> _snoozeDonationAsk(BuildContext context) async {
     try {
       await ref.read(donationSnoozeProvider.notifier).snoozeForDays(30);
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.endScreenDonationCardSnoozed,
+              parameters: {
+                AnalyticsEventConstants.paramPaywallSource:
+                    FirebaseAnalyticsService.paywallSourceEndScreen,
+                AnalyticsEventConstants.paramDurationMs: const Duration(
+                  days: 30,
+                ).inMilliseconds,
+              },
+            ),
+      );
       if (context.mounted) {
         showSnackBar(
           context,
@@ -287,14 +384,17 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
         children: [
           Expanded(
             child: ElevatedButton(
-              onPressed: () => handleNavigation(
-                TypeConstants.route,
-                [RouteConstants.donation],
-                context,
-                ref: ref,
-                sourceRouteName:
-                    FirebaseAnalyticsService.paywallSourceEndScreen,
-              ),
+              onPressed: () {
+                _logDonateTap(buttonIndex: 0, isSnoozed: false);
+                handleNavigation(
+                  TypeConstants.route,
+                  [RouteConstants.donation],
+                  context,
+                  ref: ref,
+                  sourceRouteName:
+                      FirebaseAnalyticsService.paywallSourceEndScreen,
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorConstants.white,
                 foregroundColor: context.brandPurple,
@@ -319,13 +419,20 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
         buttonWidgets.add(
           Expanded(
             child: ElevatedButton(
-              onPressed: () => handleNavigation(
-                TypeConstants.route,
-                [RouteConstants.donation],
-                context,
-                sourceRouteName:
-                    FirebaseAnalyticsService.paywallSourceEndScreen,
-              ),
+              // `ref` is required: handleDonationNavigation bails out and
+              // returns false when it is null, so omitting it here made every
+              // CTA in the multi-button layout a no-op.
+              onPressed: () {
+                _logDonateTap(buttonIndex: i, isSnoozed: false);
+                handleNavigation(
+                  TypeConstants.route,
+                  [RouteConstants.donation],
+                  context,
+                  ref: ref,
+                  sourceRouteName:
+                      FirebaseAnalyticsService.paywallSourceEndScreen,
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: context.brandPurple,
                 foregroundColor: Colors.white,
