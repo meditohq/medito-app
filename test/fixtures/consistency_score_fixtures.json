@@ -1,0 +1,66 @@
+{
+  "_comment": "Shared parity fixture for the consistency-score algorithm. Consumed identically by test/stats_manager/consistency_score_parity_test.dart (Dart, source of truth) and android/app/src/test/kotlin/.../ConsistencyScoreCalculatorParityTest.kt (Kotlin, on-device widget port). If you change lib/utils/stats_manager.dart's calculateConsistencyScore, add/update cases here and re-verify both suites pass before touching the Kotlin port in android/app/src/main/kotlin/meditofoundation/medito/widget/ConsistencyWidget.kt.",
+  "referenceDate": "2024-03-15",
+  "cases": [
+    {
+      "name": "no_sessions_returns_zero",
+      "audioOffsetDays": [],
+      "freezeOffsetDays": [],
+      "expectedPercent": 0
+    },
+    {
+      "name": "first_session_today",
+      "audioOffsetDays": [0],
+      "freezeOffsetDays": [],
+      "expectedPercent": 100
+    },
+    {
+      "name": "seven_of_ten_days",
+      "audioOffsetDays": [0, -2, -3, -5, -6, -8, -9],
+      "freezeOffsetDays": [],
+      "expectedPercent": 70
+    },
+    {
+      "name": "thirty_days_perfect",
+      "audioOffsetDays": [0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22, -23, -24, -25, -26, -27, -28, -29],
+      "freezeOffsetDays": [],
+      "expectedPercent": 100
+    },
+    {
+      "name": "single_session_40_days_ago",
+      "audioOffsetDays": [-40],
+      "freezeOffsetDays": [],
+      "expectedPercent": 1
+    },
+    {
+      "name": "gap_then_recovery",
+      "audioOffsetDays": [0, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22, -23, -24, -25, -26, -27, -28, -29, -30, -31, -32, -33, -34, -35, -36, -37, -38, -39, -40],
+      "freezeOffsetDays": [],
+      "expectedPercent": 48
+    },
+    {
+      "name": "freeze_day_counts",
+      "audioOffsetDays": [-1],
+      "freezeOffsetDays": [0],
+      "expectedPercent": 100
+    },
+    {
+      "name": "future_sessions_ignored",
+      "audioOffsetDays": [0, 1],
+      "freezeOffsetDays": [],
+      "expectedPercent": 100
+    },
+    {
+      "name": "ema_alternating_45_days",
+      "audioOffsetDays": [0, -2, -4, -6, -8, -10, -12, -14, -16, -18, -20, -22, -24, -26, -28, -30, -32, -34, -36, -38, -40, -42, -44],
+      "freezeOffsetDays": [],
+      "expectedPercent": 72
+    },
+    {
+      "name": "long_dormant_200_days",
+      "audioOffsetDays": [-200],
+      "freezeOffsetDays": [],
+      "expectedPercent": 0
+    }
+  ]
+}

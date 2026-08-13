@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// No description provided for @backgroundSoundDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t download. Tap to try again.'**
+  String get backgroundSoundDownloadFailed;
+
   /// No description provided for @none.
   ///
   /// In en, this message translates to:
@@ -1987,6 +1993,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remind Me Daily'**
   String get setReminderB;
+
+  /// No description provided for @donationEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get donationEmailLabel;
+
+  /// No description provided for @donationEmailHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'For your receipt and to manage your donation.'**
+  String get donationEmailHelper;
+
+  /// No description provided for @donationEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email so we can send a receipt.'**
+  String get donationEmailRequired;
+
+  /// No description provided for @donationEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That email address does not look right.'**
+  String get donationEmailInvalid;
 
   /// No description provided for @donationThankYouTitle.
   ///

@@ -48,7 +48,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
 
       final sounds = [
         const BackgroundSoundsModel(
-          id: '0',
+          id: kNoneBackgroundSoundId,
           title: 'None', // This will be localized in the UI layer
           duration: 0,
           path: '',
@@ -107,7 +107,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
     BackgroundSoundsModel sound,
   ) async {
     try {
-      if (sound.id == '0') {
+      if (sound.id == kNoneBackgroundSoundId) {
         return;
       } else {
         var pref = ref.read(sharedPreferencesProvider);

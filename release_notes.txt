@@ -1,6 +1,11 @@
 Unreleased
 -
 
+2607.28.0
+- You can now enter your email when donating, so you get a receipt and can manage your donation later
+- Fixed donation amounts displaying incorrectly in currencies without decimals, such as yen and won
+- Removed a leftover testing option from Advanced settings
+
 2607.21.0
 - Clearer donation page: Apple Pay donations in one tap and a gentler way to skip
 

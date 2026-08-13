@@ -378,6 +378,11 @@ class StatsManager {
     }
   }
 
+  // ⚠️ KEEP IN SYNC: ported to Kotlin in
+  // android/app/src/main/kotlin/meditofoundation/medito/widget/StreakCalculator.kt
+  // so the Android home-screen widget can recompute the current streak
+  // on-device (including the day-boundary offset). If this algorithm
+  // changes, update that copy too.
   LocalAllStats calculateStreak(LocalAllStats allStats) {
     final offset = _dayBoundaryOffset;
     final now = _getCurrentDate();
@@ -753,6 +758,10 @@ class StatsManager {
     return _allStats?.audioCompleted?.isNotEmpty == true;
   }
 
+  // ⚠️ KEEP IN SYNC: ported to Kotlin in
+  // android/app/src/main/kotlin/meditofoundation/medito/widget/ConsistencyWidget.kt
+  // (calculateConsistencyScore) so the Android home-screen widget can recompute
+  // the percentage on-device. If this algorithm changes, update that copy too.
   double calculateConsistencyScore(LocalAllStats allStats) {
     var now = _getCurrentDate();
     var today = DateTime(now.year, now.month, now.day);

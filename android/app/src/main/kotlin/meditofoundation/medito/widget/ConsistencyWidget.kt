@@ -61,7 +61,6 @@ class ConsistencyWidget : GlanceAppWidget() {
     @Composable
     private fun WidgetContent(context: Context) {
         val prefs = currentState<HomeWidgetGlanceState>().preferences
-        val consistencyScore = prefs.getInt("consistency_score", 0)
         val totalTracksCompleted = prefs.getInt("total_tracks_completed", 0)
         val meditationDatesJson = prefs.getString("meditation_dates", "[]") ?: "[]"
         val freezeDatesJson = prefs.getString("freeze_dates", "[]") ?: "[]"
@@ -69,6 +68,11 @@ class ConsistencyWidget : GlanceAppWidget() {
         val meditationDates = parseDateTimestamps(meditationDatesJson)
         val freezeDates = parseDateTimestamps(freezeDatesJson)
         val allActivityDates = (meditationDates + freezeDates).toSet()
+
+        // Computed on-device (not read from the cached "consistency_score" pref) so the
+        // percentage stays live between app opens instead of only updating when Dart
+        // last pushed a snapshot.
+        val consistencyScore = ConsistencyScoreCalculator.calculate(meditationDates, freezeDates)
 
         val today = Calendar.getInstance()
         today.set(Calendar.HOUR_OF_DAY, 0)

@@ -6,7 +6,7 @@ import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
-import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/models/background_sounds/background_sounds_model.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:medito/utils/logger.dart';
@@ -297,8 +297,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     return isPlaying &&
         bgSoundNotifier.selectedBgSound != null &&
-        bgSoundNotifier.selectedBgSound?.title !=
-            AppLocalizations.of(context)!.none;
+        bgSoundNotifier.selectedBgSound?.id != kNoneBackgroundSoundId;
   }
 
   void _handleClose({bool shouldPop = true}) {

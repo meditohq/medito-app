@@ -144,6 +144,16 @@ platform :ios do
     cleanup_keychain() unless use_existing_build
   end
 
+  # Uploads dSYMs for an archive that is already on disk, without rebuilding.
+  # Use when a release built but the upload step failed, or to symbolise a local
+  # archive: `fastlane ios upload_dsyms [archive:path/to/Runner.xcarchive]`.
+  lane :upload_dsyms do |options|
+    if options[:archive]
+      lane_context[SharedValues::XCODEBUILD_ARCHIVE] = options[:archive]
+    end
+    upload_dsyms_to_crashlytics
+  end
+
   # Dart-only over-the-air patch against an already-shipped release. Does NOT
   # upload to the App Store — it uploads the patch to Shorebird's backend.
   # `release_version` defaults to the most recently updated release; pass an
@@ -230,6 +240,53 @@ def build_shorebird_release
   shorebird_release(
     platform: "ios",
     args: "--flutter-version=#{SHOREBIRD_FLUTTER_VERSION} #{SHOREBIRD_DART_DEFINES}"
+  )
+
+  upload_dsyms_to_crashlytics
+end
+
+# Uploads the archive's dSYMs to Crashlytics.
+#
+# Why this exists in addition to the Runner target's "Crashlytics: upload dSYM"
+# build phase: Crashlytics cannot process an incoming iOS crash report without
+# matching symbols, and unprocessed reports never surface in the console at all.
+# Every 2607.x build shipped with no symbols uploaded (the phase used to call
+# `flutterfire upload-crashlytics-symbols`, which needs an
+# ios/firebase_app_id_file.json this repo has never had, so it uploaded nothing
+# and exited 0) — result: >20k iOS users on 2607.21.0 and zero crashes on
+# record, while 23 users on an old 3.5.x build reported 93.
+#
+# The archive folder carries the dSYMs for Flutter.framework and every plugin,
+# not just Runner, so uploading it covers the frames most crashes land in.
+# Bitcode is gone, so App Store Connect has no dSYMs of its own to fall back on
+# (`download_dsyms` returns nothing) — if this step does not run, the symbols
+# for that build are lost for good.
+def upload_dsyms_to_crashlytics
+  if ENV["SKIP_DSYM_UPLOAD"].to_s.strip.downcase == "true"
+    UI.important("SKIP_DSYM_UPLOAD=true — skipping Crashlytics dSYM upload")
+    return
+  end
+
+  # Lane runs from ios/; `flutter build ipa` (wrapped by shorebird) archives to
+  # <repo>/build/ios/archive/Runner.xcarchive.
+  archive = lane_context[SharedValues::XCODEBUILD_ARCHIVE] ||
+            "../build/ios/archive/Runner.xcarchive"
+  dsyms = Dir.glob(File.join(archive, "dSYMs", "*.dSYM")).sort
+
+  if dsyms.empty?
+    UI.user_error!(
+      "No dSYMs found in #{archive}/dSYMs. Crash reports from this build " \
+      "would never be processed by Crashlytics. Check that the Release " \
+      "config still sets DEBUG_INFORMATION_FORMAT=dwarf-with-dsym, or set " \
+      "SKIP_DSYM_UPLOAD=true to ship blind deliberately."
+    )
+  end
+
+  UI.message("Uploading #{dsyms.count} dSYM(s) to Crashlytics")
+  upload_symbols_to_crashlytics(
+    dsym_paths: dsyms,
+    gsp_path: "Runner/GoogleService-Info.plist",
+    binary_path: "Pods/FirebaseCrashlytics/upload-symbols"
   )
 end
 
