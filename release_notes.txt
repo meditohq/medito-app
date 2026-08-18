@@ -2,9 +2,10 @@ Unreleased
 -
 
 2608.18.0
-- Fixed the streak, Up Next and consistency widgets showing out-of-date information on Android
+- Android: your streak, Up Next and consistency widgets now update after a session instead of showing yesterday's numbers
+- Android: widgets now follow your custom day-start time, so late-night sessions count for the right day
 - Background sounds now tell you when a download fails, so you can tap to try again
-- Donation page: enter your own amount and see exactly what you'll be charged before you pay
+- You can enter your own donation amount and see exactly what you'll be charged before you pay
 - Bug fixes and reliability improvements
 
 2607.28.0
