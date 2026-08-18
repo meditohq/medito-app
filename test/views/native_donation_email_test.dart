@@ -20,7 +20,8 @@ import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/views/donation/native_donation_page.dart';
+import 'package:medito/views/donation/native_donation_page.dart'
+    show NativeDonationPage, donationEmailFieldKey;
 
 import '../helpers/firebase_analytics_test_helper.dart';
 
@@ -104,9 +105,17 @@ void main() {
     );
   });
 
-  testWidgets('does not ask when the email is already known', (tester) async {
+  // The field is deliberately always visible (see _resolveKnownEmail): a known
+  // donor gets it prefilled rather than hidden, so they can correct a stale
+  // address instead of being silently billed against it.
+  testWidgets('prefills a known config email instead of asking', (
+    tester,
+  ) async {
     await pump(tester, knownEmail: 'donor@example.com');
-    expect(find.text('Email address'), findsNothing);
+
+    expect(find.text('Email address'), findsOneWidget);
+    final field = tester.widget<TextField>(find.byKey(donationEmailFieldKey));
+    expect(field.controller!.text, 'donor@example.com');
   });
 
   testWidgets('blocks pay when the email is empty', (tester) async {
@@ -127,7 +136,7 @@ void main() {
   testWidgets('blocks pay when the email is malformed', (tester) async {
     await pump(tester);
 
-    await tester.enterText(find.byType(TextField), 'donor@example');
+    await tester.enterText(find.byKey(donationEmailFieldKey), 'donor@example');
     final payButton = find.widgetWithText(ElevatedButton, 'Donate');
     await tester.ensureVisible(payButton);
     await tester.pumpAndSettle();
@@ -155,7 +164,10 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.enterText(find.byType(TextField), 'donor@example.com');
+    await tester.enterText(
+      find.byKey(donationEmailFieldKey),
+      'donor@example.com',
+    );
     await tester.pumpAndSettle();
     expect(
       find.text('Enter your email so we can send a receipt.'),
@@ -163,10 +175,15 @@ void main() {
     );
   });
 
-  testWidgets('does not ask when auth has a stored email', (tester) async {
+  testWidgets('prefills an auth-resolved email instead of asking', (
+    tester,
+  ) async {
     // Mirrors a returning donor: nothing in the paywall config, but the auth
     // layer resolves an address out of tokens / SharedPreferences.
     await pump(tester, authRepository: _KnownEmailAuthRepository());
-    expect(find.text('Email address'), findsNothing);
+
+    expect(find.text('Email address'), findsOneWidget);
+    final field = tester.widget<TextField>(find.byKey(donationEmailFieldKey));
+    expect(field.controller!.text, 'returning@example.com');
   });
 }
