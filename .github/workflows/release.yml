@@ -822,8 +822,7 @@ jobs:
 
   ios-deploy:
     name: iOS – Build & Deploy
-    # TEMP BYPASS (Shorebird deploy validation only — MUST RESTORE before merge):
-    # needs: [ios-smoke-test, ios-upgrade-test]
+    needs: [ios-smoke-test, ios-upgrade-test]
     runs-on: macos-latest
     environment: prod
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
