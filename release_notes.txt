@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2608.18.0
+- Fixed the streak, Up Next and consistency widgets showing out-of-date information on Android
+- Background sounds now tell you when a download fails, so you can tap to try again
+- Donation page: enter your own amount and see exactly what you'll be charged before you pay
+- Bug fixes and reliability improvements
+
 2607.28.0
 - You can now enter your email when donating, so you get a receipt and can manage your donation later
 - Fixed donation amounts displaying incorrectly in currencies without decimals, such as yen and won
