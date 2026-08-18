@@ -32,6 +32,14 @@ enum _Frequency {
   final String label;
 }
 
+// Stable handles for the page's two text inputs. Both fields render
+// unconditionally, so a bare find.byType(TextField) is ambiguous in tests —
+// target these instead.
+@visibleForTesting
+const donationEmailFieldKey = Key('donation_email_field');
+@visibleForTesting
+const customAmountFieldKey = Key('donation_custom_amount_field');
+
 // Native fallback copy mirrors the paywall webview page (which is
 // English-only; localized copy arrives via the experiment config).
 const _defaultEyebrow = 'Help keep Medito free';
@@ -65,8 +73,7 @@ class NativeDonationPage extends ConsumerStatefulWidget {
   final String source;
 
   @override
-  ConsumerState<NativeDonationPage> createState() =>
-      _NativeDonationPageState();
+  ConsumerState<NativeDonationPage> createState() => _NativeDonationPageState();
 }
 
 class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
@@ -676,9 +683,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                     ? accent.withValues(alpha: 0.08)
                     : Colors.transparent,
                 border: Border.all(
-                  color: isSelected
-                      ? accent
-                      : onSurface.withValues(alpha: 0.2),
+                  color: isSelected ? accent : onSurface.withValues(alpha: 0.2),
                   width: isSelected ? 1.5 : 1,
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -728,7 +733,18 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   // with the same "Minimum amount is X" validation copy.
   Widget _buildCustomAmountField(BuildContext context, Color onSurface) {
     final minimum = _minimumAmountFor(_selectedFrequency);
+    // Live "= €50,000.00" echo of what the typed major-units digits resolve
+    // to, so a stray extra zero is obvious before Apple/Google Pay's own
+    // confirmation sheet is the first place the real amount shows up.
+    // formatCurrencyAmount/_selectedAmount are already currency-aware (zero-
+    // decimal JPY/KRW, 3-decimal KWD/BHD, etc.), so this needs no currency
+    // handling of its own — it only reuses that resolved amount.
+    final showPreview =
+        _customAmountError == null &&
+        _customAmountController.text.isNotEmpty &&
+        _selectedAmount > 0;
     return TextField(
+      key: customAmountFieldKey,
       controller: _customAmountController,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
@@ -741,6 +757,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             '${formatCurrencyAmount(minimum, widget.config.currencyCode)})',
         hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.5)),
         errorText: _customAmountError,
+        helperText: showPreview
+            ? '= ${formatCurrencyAmount(_selectedAmount, widget.config.currencyCode)}'
+            : null,
+        helperStyle: TextStyle(color: onSurface.withValues(alpha: 0.7)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: onSurface.withValues(alpha: 0.2)),
@@ -763,6 +783,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextField(
+          key: donationEmailFieldKey,
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.done,
@@ -787,9 +808,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: context.brandPurple),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
           onChanged: (_) {
             if (_emailError != null) setState(() => _emailError = null);
@@ -808,9 +827,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final methods = methodsAsync.value ?? const [];
     final hasApplePay =
         Platform.isIOS &&
-        methods.any(
-          (m) => m.type == payment_models.PaymentMethodType.applePay,
-        );
+        methods.any((m) => m.type == payment_models.PaymentMethodType.applePay);
 
     return Column(
       children: [
@@ -822,8 +839,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             child: ElevatedButton(
               onPressed: _isProcessingPayment
                   ? null
-                  : () =>
-                        _handlePay(payment_models.PaymentMethodType.applePay),
+                  : () => _handlePay(payment_models.PaymentMethodType.applePay),
               // White button per Apple Pay HIG for dark backgrounds; the
               // "Donate with (apple) Pay" label is Apple's official variant
               // for nonprofits.
@@ -926,11 +942,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           children: [
             // Bundled SVG, not a Material icon: a new icon-font glyph is an
             // unpatchable asset diff (see Apple Pay button above).
-            MeditoIcon(
-              assetName: MeditoIcons.shield,
-              color: faint,
-              size: 13,
-            ),
+            MeditoIcon(assetName: MeditoIcons.shield, color: faint, size: 13),
             const SizedBox(width: 4),
             Text(
               _stripeTrustCopy,
