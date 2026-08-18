@@ -948,6 +948,33 @@ jobs:
           bundler-cache: true
           working-directory: ios
 
+      # Both Crashlytics symbol paths resolve out of ios/Pods: the Runner's
+      # "Crashlytics: upload dSYM" build phase shells out to
+      # Pods/FirebaseCrashlytics/run, and upload_dsyms_to_crashlytics passes
+      # Pods/FirebaseCrashlytics/upload-symbols as its binary_path. Nothing in
+      # this job installed them - the flutter/shorebird archive runs its own
+      # `pod install` under SPM integration, which does not lay down
+      # FirebaseCrashlytics - so 2608.18.0+302441 failed the archive outright
+      # once that phase started failing loudly instead of silently exiting 0.
+      # ios-smoke-test already installs pods; ios-deploy has to as well.
+      - name: Install pods
+        working-directory: ios
+        run: |
+          echo "Xcode: $(xcodebuild -version | head -1)"
+          echo "System CocoaPods: $(pod --version)"
+          if ! pod --version | grep -q '^1\.16\.'; then
+            echo "Installing CocoaPods 1.16.x to match Podfile.lock..."
+            gem install cocoapods -v '~> 1.16.2' --no-document
+            echo "Installed CocoaPods: $(pod --version)"
+          fi
+          pod install
+          for tool in run upload-symbols; do
+            if [ ! -f "Pods/FirebaseCrashlytics/$tool" ]; then
+              echo "::error::Pods/FirebaseCrashlytics/$tool missing after pod install - the dSYM upload fails later in the archive."
+              exit 1
+            fi
+          done
+
       - name: Set up Shorebird
         uses: shorebirdtech/setup-shorebird@v1
 
