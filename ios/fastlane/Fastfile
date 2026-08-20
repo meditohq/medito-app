@@ -268,18 +268,25 @@ def upload_dsyms_to_crashlytics
   end
 
   # Lane runs from ios/; `flutter build ipa` (wrapped by shorebird) archives to
-  # <repo>/build/ios/archive/Runner.xcarchive.
+  # <repo>/build/ios/archive/. The bundle is named after the SCHEME, which here
+  # is Medito — not Runner. Hard-coding Runner.xcarchive is what failed
+  # 2608.18.0+302442 *after* a successful 580s build and published Shorebird
+  # release, so glob instead of guessing the product name.
   archive = lane_context[SharedValues::XCODEBUILD_ARCHIVE] ||
-            "../build/ios/archive/Runner.xcarchive"
-  dsyms = Dir.glob(File.join(archive, "dSYMs", "*.dSYM")).sort
+            Dir.glob("../build/ios/archive/*.xcarchive").sort.first
+  dsyms = archive ? Dir.glob(File.join(archive, "dSYMs", "*.dSYM")).sort : []
 
   if dsyms.empty?
-    UI.user_error!(
-      "No dSYMs found in #{archive}/dSYMs. Crash reports from this build " \
-      "would never be processed by Crashlytics. Check that the Release " \
-      "config still sets DEBUG_INFORMATION_FORMAT=dwarf-with-dsym, or set " \
-      "SKIP_DSYM_UPLOAD=true to ship blind deliberately."
+    # Deliberately not fatal. Three 2608.18.0 attempts died on crash tooling
+    # while the app itself built fine; a donor-facing release must not be held
+    # hostage to symbol upload. The build phase may also have uploaded already.
+    UI.important(
+      "No dSYMs found (archive: #{archive || 'none under ../build/ios/archive'}). " \
+      "Crashes from this build may not be symbolicated. Check that the Release " \
+      "config still sets DEBUG_INFORMATION_FORMAT=dwarf-with-dsym, then re-run " \
+      "`fastlane ios upload_dsyms archive:<path>` against the archive."
     )
+    return
   end
 
   # Firebase arrives via Swift Package Manager, not CocoaPods — Flutter's SPM
