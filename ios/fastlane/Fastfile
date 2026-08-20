@@ -282,11 +282,33 @@ def upload_dsyms_to_crashlytics
     )
   end
 
-  UI.message("Uploading #{dsyms.count} dSYM(s) to Crashlytics")
+  # Firebase arrives via Swift Package Manager, not CocoaPods — Flutter's SPM
+  # integration leaves only the non-SPM plugins as pods, so
+  # Pods/FirebaseCrashlytics/upload-symbols does not exist here. Hard-coding it
+  # is what made this lane unrunnable on 2608.18.0. Look in the SPM checkouts
+  # (DerivedData and the local .swiftpm/build dirs) and fall back to Pods.
+  binary = [
+    *Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/**/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols")),
+    *Dir.glob(File.expand_path("../build/**/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols")),
+    "Pods/FirebaseCrashlytics/upload-symbols",
+  ].find { |path| File.exist?(path) }
+
+  if binary.nil?
+    # Not fatal: shipping the release matters more than symbolising it, and the
+    # in-build phase may already have uploaded. Loud enough to notice.
+    UI.important(
+      "upload-symbols not found in the SPM checkout or Pods — skipping the " \
+      "archive dSYM upload. Crashes from this build may not be symbolicated; " \
+      "re-run `fastlane ios upload_dsyms` once the binary path is known."
+    )
+    return
+  end
+
+  UI.message("Uploading #{dsyms.count} dSYM(s) to Crashlytics via #{binary}")
   upload_symbols_to_crashlytics(
     dsym_paths: dsyms,
     gsp_path: "Runner/GoogleService-Info.plist",
-    binary_path: "Pods/FirebaseCrashlytics/upload-symbols"
+    binary_path: binary
   )
 end
 
