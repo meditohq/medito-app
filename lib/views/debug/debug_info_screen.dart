@@ -573,6 +573,13 @@ class DebugInfoScreen extends ConsumerWidget {
       fullInfo = '$fullInfo\n\nsignin_history_b64: $signInHistoryB64';
     }
 
+    // Surfaced in plaintext (not just inside stats_b64) so support can see the
+    // user's day-boundary offset without decoding — it drives how the streak
+    // buckets sessions into days.
+    final dayBoundaryOffsetHours =
+        prefs.getInt(SharedPreferenceConstants.dayBoundaryOffsetHours) ?? 0;
+    fullInfo = '$fullInfo\n\ndayBoundaryOffsetHours: $dayBoundaryOffsetHours';
+
     final statsBase64 = _buildStatsBase64(ref);
     if (statsBase64.isNotEmpty) {
       fullInfo = '$fullInfo\n\nstats_b64: $statsBase64';

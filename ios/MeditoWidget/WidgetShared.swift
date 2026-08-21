@@ -3,6 +3,18 @@ import SwiftUI
 
 private let appGroupId = "group.org.medito.widget"
 
+/// The user-perceived calendar day that contains [date], honouring the
+/// day-boundary offset. Mirrors Dart's `dayOf` and the Android
+/// StreakCalculator: shift the instant back by the offset, then take the
+/// local start-of-day. MUST match those so the widget buckets days the same
+/// way the in-app streak/calendar do — otherwise a session inside the offset
+/// window (e.g. just after midnight with a "day starts at 3am" setting) gets
+/// circled on a different day than the streak counts it.
+func logicalDayStart(_ date: Date, offsetHours: Int) -> Date {
+    let shifted = date.addingTimeInterval(-Double(offsetHours) * 3600)
+    return Calendar.current.startOfDay(for: shifted)
+}
+
 struct WidgetData {
     let streakCurrent: Int
     let consistencyScore: Int
@@ -11,6 +23,7 @@ struct WidgetData {
     let dayLabel: String
     let daysLabel: String
     let themePreference: String
+    let dayBoundaryOffsetHours: Int
 
     static var placeholder: WidgetData {
         WidgetData(
@@ -20,31 +33,40 @@ struct WidgetData {
             freezeDates: [],
             dayLabel: "day",
             daysLabel: "days",
-            themePreference: "system"
+            themePreference: "system",
+            dayBoundaryOffsetHours: 0
         )
     }
 
     static func load() -> WidgetData {
         let defaults = UserDefaults(suiteName: appGroupId)
+        let offsetHours = defaults?.integer(forKey: "day_boundary_offset_hours") ?? 0
         return WidgetData(
             streakCurrent: defaults?.integer(forKey: "streak_current") ?? 0,
             consistencyScore: defaults?.integer(forKey: "consistency_score") ?? 0,
-            meditationDates: parseDates(from: defaults?.string(forKey: "meditation_dates") ?? "[]"),
-            freezeDates: parseDates(from: defaults?.string(forKey: "freeze_dates") ?? "[]"),
+            meditationDates: parseDates(
+                from: defaults?.string(forKey: "meditation_dates") ?? "[]",
+                offsetHours: offsetHours
+            ),
+            freezeDates: parseDates(
+                from: defaults?.string(forKey: "freeze_dates") ?? "[]",
+                offsetHours: offsetHours
+            ),
             dayLabel: defaults?.string(forKey: "day_label") ?? "day",
             daysLabel: defaults?.string(forKey: "days_label") ?? "days",
-            themePreference: defaults?.string(forKey: "theme_preference") ?? "system"
+            themePreference: defaults?.string(forKey: "theme_preference") ?? "system",
+            dayBoundaryOffsetHours: offsetHours
         )
     }
 
-    private static func parseDates(from json: String) -> Set<Date> {
+    private static func parseDates(from json: String, offsetHours: Int) -> Set<Date> {
         guard
             let data = json.data(using: .utf8),
             let timestamps = try? JSONSerialization.jsonObject(with: data) as? [Double]
         else { return [] }
 
         return Set(timestamps.map {
-            Calendar.current.startOfDay(for: Date(timeIntervalSince1970: $0 / 1000))
+            logicalDayStart(Date(timeIntervalSince1970: $0 / 1000), offsetHours: offsetHours)
         })
     }
 }
@@ -74,10 +96,13 @@ struct CalendarStrip: View {
     let allActivityDates: Set<Date>
     let colors: WidgetColors
     var circleSize: CGFloat = 20
+    var dayBoundaryOffsetHours: Int = 0
 
     private var last5Days: [Date] {
         let cal = Calendar.current
-        let today = cal.startOfDay(for: Date())
+        // Logical "today" under the day-boundary offset, so the strip's day
+        // keys match the offset-bucketed `allActivityDates`.
+        let today = logicalDayStart(Date(), offsetHours: dayBoundaryOffsetHours)
         return (0 ..< 5).reversed().map { cal.date(byAdding: .day, value: -$0, to: today)! }
     }
 

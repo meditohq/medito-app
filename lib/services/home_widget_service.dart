@@ -173,10 +173,10 @@ class HomeWidgetService {
     }
   }
 
-  // Raw (not day-bucketed) so the widget can bucket by day itself — the
-  // consistency widget uses plain calendar days, the streak widget honours
-  // the user's day-boundary offset, and neither can do that correctly from a
-  // timestamp that's already been truncated to midnight here.
+  // Raw (not day-bucketed) so the widget can bucket by day itself — both the
+  // streak widget and the consistency widget honour the user's day-boundary
+  // offset when bucketing, and neither can do that correctly from a timestamp
+  // that's already been truncated to midnight here.
   static List<int> _extractMeditationDates(LocalAllStats stats) {
     if (stats.audioCompleted == null) return [];
 

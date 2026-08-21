@@ -42,6 +42,9 @@ import androidx.glance.appwidget.action.actionStartActivity
 import es.antonborri.home_widget.HomeWidgetGlanceState
 import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
 import org.json.JSONArray
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 
 class MeditationWidget : GlanceAppWidget() {
@@ -68,36 +71,42 @@ class MeditationWidget : GlanceAppWidget() {
         val dayLabel = prefs.getString("day_label", "day") ?: "day"
         val daysLabel = prefs.getString("days_label", "days") ?: "days"
 
-        val meditationDates = parseDateTimestamps(meditationDatesJson)
-        val freezeDates = parseDateTimestamps(freezeDatesJson)
-        val allActivityDates = (meditationDates + freezeDates).toSet()
+        // Raw (not truncated) timestamps so the streak, strip, and flame all
+        // bucket days by the day-boundary offset — truncating to midnight here
+        // would lose the sub-day info the offset needs, leaving the dots/flame
+        // on the old plain-local behaviour while the streak number is offset-aware.
+        val meditationRaw = parseRawTimestamps(meditationDatesJson)
+        val freezeRaw = parseRawTimestamps(freezeDatesJson)
 
         // Computed on-device (not read from the cached "streak_current" pref) so
         // the streak stays live between app opens instead of only updating when
         // Dart last pushed a snapshot.
         val streakCurrent = StreakCalculator.calculate(
-            parseRawTimestamps(meditationDatesJson),
-            parseRawTimestamps(freezeDatesJson),
+            meditationRaw,
+            freezeRaw,
             dayBoundaryOffsetHours,
         )
         // Use singular "day" if streak is 1, plural "days" otherwise
         val label = if (streakCurrent == 1) dayLabel else daysLabel
 
-        val today = Calendar.getInstance()
-        today.set(Calendar.HOUR_OF_DAY, 0)
-        today.set(Calendar.MINUTE, 0)
-        today.set(Calendar.SECOND, 0)
-        today.set(Calendar.MILLISECOND, 0)
+        // Bucket activity into logical days using the same day-boundary offset,
+        // so the strip and flame agree with the streak number.
+        val zone = ZoneId.systemDefault()
+        fun bucketDay(millis: Long): LocalDate =
+            Instant.ofEpochMilli(millis)
+                .minusSeconds(dayBoundaryOffsetHours * 3600L)
+                .atZone(zone)
+                .toLocalDate()
+        val activityDays = (meditationRaw + freezeRaw).map(::bucketDay).toSet()
+        val today = bucketDay(System.currentTimeMillis())
 
-        // Build calendar days - show last 7 days, newest first (today first)
+        // Build calendar days - show last 7 logical days, newest first (today first)
         val allCalendarDays = mutableListOf<CalendarDay>()
         for (i in 0 until 7) {
-            val day = Calendar.getInstance()
-            day.timeInMillis = today.timeInMillis
-            day.add(Calendar.DAY_OF_MONTH, -i)
-            val dayOfWeek = day.get(Calendar.DAY_OF_WEEK)
-            val dayAbbrev = getDayAbbreviation(dayOfWeek)
-            val hasActivity = allActivityDates.contains(day.timeInMillis)
+            val day = today.minusDays(i.toLong())
+            // java.time DayOfWeek (MON=1..SUN=7) -> Calendar constant (SUN=1..SAT=7)
+            val dayAbbrev = getDayAbbreviation((day.dayOfWeek.value % 7) + 1)
+            val hasActivity = activityDays.contains(day)
             allCalendarDays.add(CalendarDay(dayAbbrev, hasActivity))
         }
 
@@ -105,7 +114,7 @@ class MeditationWidget : GlanceAppWidget() {
         val daysToShow = 5
         val calendarDays = allCalendarDays.take(daysToShow).reversed() // Show newest days, oldest on left
 
-        val hasActivityToday = allActivityDates.contains(today.timeInMillis)
+        val hasActivityToday = activityDays.contains(today)
 
         // Get theme-aware colors based on app theme preference
         val themePreference = prefs.getString("theme_preference", "system") ?: "system"
@@ -238,33 +247,12 @@ class MeditationWidget : GlanceAppWidget() {
         }
     }
 
-    // Unlike parseDateTimestamps (which truncates to local midnight for the
-    // calendar-strip display), StreakCalculator needs the raw timestamps so it
-    // can apply the day-boundary offset itself before bucketing.
+    // Raw timestamps (not truncated to midnight) so the streak, strip, and
+    // flame can all bucket days by the day-boundary offset themselves.
     private fun parseRawTimestamps(jsonString: String): List<Long> {
         return try {
             val jsonArray = JSONArray(jsonString)
             (0 until jsonArray.length()).map { jsonArray.getLong(it) }
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
-    private fun parseDateTimestamps(jsonString: String): List<Long> {
-        return try {
-            val jsonArray = JSONArray(jsonString)
-            val dates = mutableListOf<Long>()
-            for (i in 0 until jsonArray.length()) {
-                val timestamp = jsonArray.getLong(i)
-                val calendar = Calendar.getInstance()
-                calendar.timeInMillis = timestamp
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                dates.add(calendar.timeInMillis)
-            }
-            dates
         } catch (e: Exception) {
             emptyList()
         }

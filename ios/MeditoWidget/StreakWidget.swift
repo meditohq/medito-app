@@ -43,7 +43,9 @@ struct StreakWidgetView: View {
     }
 
     private var hasActivityToday: Bool {
-        allActivityDates.contains(Calendar.current.startOfDay(for: Date()))
+        allActivityDates.contains(
+            logicalDayStart(Date(), offsetHours: entry.data.dayBoundaryOffsetHours)
+        )
     }
 
     private var streakLabel: String {
@@ -63,7 +65,7 @@ struct StreakWidgetView: View {
                     .font(.system(size: isMedium ? 18 : 14))
                     .foregroundStyle(colors.textColor)
             }
-            CalendarStrip(allActivityDates: allActivityDates, colors: colors, circleSize: isMedium ? 28 : 20)
+            CalendarStrip(allActivityDates: allActivityDates, colors: colors, circleSize: isMedium ? 28 : 20, dayBoundaryOffsetHours: entry.data.dayBoundaryOffsetHours)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .padding(12)

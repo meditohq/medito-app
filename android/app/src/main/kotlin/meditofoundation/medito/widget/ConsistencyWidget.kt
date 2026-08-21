@@ -245,21 +245,12 @@ class ConsistencyWidget : GlanceAppWidget() {
         }
     }
 
-    private fun parseDateTimestamps(jsonString: String): List<Long> {
+    // Raw timestamps (not truncated to midnight) so the score and the calendar
+    // strip can bucket days by the day-boundary offset themselves.
+    private fun parseRawTimestamps(jsonString: String): List<Long> {
         return try {
             val jsonArray = JSONArray(jsonString)
-            val dates = mutableListOf<Long>()
-            for (i in 0 until jsonArray.length()) {
-                val timestamp = jsonArray.getLong(i)
-                val calendar = Calendar.getInstance()
-                calendar.timeInMillis = timestamp
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                dates.add(calendar.timeInMillis)
-            }
-            dates
+            (0 until jsonArray.length()).map { jsonArray.getLong(it) }
         } catch (e: Exception) {
             emptyList()
         }

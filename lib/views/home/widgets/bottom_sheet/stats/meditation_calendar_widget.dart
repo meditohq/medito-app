@@ -91,7 +91,7 @@ class _MeditationCalendarWidgetState
   /// the offset window (e.g. just after midnight with a "day starts at 3am"
   /// setting) — a session gets circled on one day but counted on another.
   Duration get _dayOffset {
-    final hours = ref.read(dayBoundaryOffsetProvider).valueOrNull ?? 0;
+    final hours = ref.read(dayBoundaryOffsetProvider).value ?? 0;
     return Duration(hours: hours);
   }
 
