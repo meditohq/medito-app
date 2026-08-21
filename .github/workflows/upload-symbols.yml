@@ -1,0 +1,78 @@
+# Retroactive Crashlytics symbol upload for an iOS build already on App Store
+# Connect. Exists because 2608.18.0+302443 shipped unsymbolicated: the dSYM
+# lookup was pointing at a path that never existed, and the miss is non-fatal
+# by design, so the release completed without symbols.
+#
+# Pulls the dSYMs Apple retained from the original upload rather than
+# rebuilding — a rebuild produces different binary UUIDs and would not
+# symbolicate the shipped build. Crashlytics accepts symbols after the fact,
+# but only for reports that have not already been discarded, so run this
+# before the build ramps.
+name: Upload Crashlytics symbols
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: 'Marketing version, e.g. 2608.18.0'
+        required: true
+        type: string
+      build_number:
+        description: 'Build number, e.g. 302443'
+        required: true
+        type: string
+      firebase_version:
+        description: 'firebase-ios-sdk tag to take upload-symbols from'
+        required: false
+        default: '12.14.0'
+        type: string
+
+jobs:
+  upload-symbols:
+    name: Download dSYMs from ASC and upload to Crashlytics
+    runs-on: macos-latest
+    environment: prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios
+
+      # No app build happens here, so there is no SPM checkout to borrow
+      # upload-symbols from. Fetch just that tool at the version the app
+      # resolves (see Firebase in the SPM checkout of a real build).
+      - name: Fetch upload-symbols
+        run: |
+          git clone --depth 1 --branch "${{ inputs.firebase_version }}" \
+            https://github.com/firebase/firebase-ios-sdk.git /tmp/firebase-ios-sdk
+          BIN=/tmp/firebase-ios-sdk/Crashlytics/upload-symbols
+          if [ ! -f "$BIN" ]; then
+            echo "::error::upload-symbols not found at $BIN for tag ${{ inputs.firebase_version }}"
+            exit 1
+          fi
+          chmod +x "$BIN"
+          echo "FIREBASE_UPLOAD_SYMBOLS=$BIN" >> "$GITHUB_ENV"
+
+      # upload-symbols reads the Firebase app id out of this plist.
+      - name: Write GoogleService-Info.plist
+        env:
+          GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        run: printf '%s' "$GOOGLE_SERVICE_INFO_PLIST" | base64 -d > ios/Runner/GoogleService-Info.plist
+
+      - name: Upload symbols
+        working-directory: ios
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+          DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
+          APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+          DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
+        run: |
+          bundle exec fastlane ios symbols \
+            app_version:"${{ inputs.app_version }}" \
+            build_number:"${{ inputs.build_number }}"

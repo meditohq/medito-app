@@ -9,6 +9,7 @@ import 'package:medito/providers/day_boundary_offset_provider.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/calendar_range.dart';
+import 'package:medito/utils/day_boundary.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/track/track_view.dart';
@@ -84,16 +85,26 @@ class _MeditationCalendarWidgetState
     super.dispose();
   }
 
+  /// The user's configured day-boundary offset. MUST match the one
+  /// `StatsManager.calculateStreak`/`calculateConsistencyScore` use, otherwise
+  /// the calendar dots disagree with the streak for users who meditate inside
+  /// the offset window (e.g. just after midnight with a "day starts at 3am"
+  /// setting) — a session gets circled on one day but counted on another.
+  Duration get _dayOffset {
+    final hours = ref.read(dayBoundaryOffsetProvider).valueOrNull ?? 0;
+    return Duration(hours: hours);
+  }
+
   Set<DateTime> _getMeditationDates(LocalAllStats stats) {
     final dates = <DateTime>{};
-    final today = DateTime.now();
-    final todayStart = DateTime(today.year, today.month, today.day);
+    final offset = _dayOffset;
+    final todayStart = dayOf(DateTime.now(), offset);
 
     if (stats.audioCompleted != null && stats.audioCompleted!.isNotEmpty) {
       for (final audio in stats.audioCompleted!) {
         if (isFreezeSession(audio)) continue;
         final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-        final dayStart = DateTime(date.year, date.month, date.day);
+        final dayStart = dayOf(date, offset);
         if (!dayStart.isAfter(todayStart)) {
           dates.add(dayStart);
         }
@@ -105,14 +116,14 @@ class _MeditationCalendarWidgetState
 
   Set<DateTime> _getFreezeDates(LocalAllStats stats) {
     final dates = <DateTime>{};
-    final today = DateTime.now();
-    final todayStart = DateTime(today.year, today.month, today.day);
+    final offset = _dayOffset;
+    final todayStart = dayOf(DateTime.now(), offset);
     final meditationDates = _getMeditationDates(stats);
 
     // Legacy freeze dates stored in freezeUsageDates
     for (final timestamp in stats.freezeUsageDates) {
       final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-      final dayStart = DateTime(date.year, date.month, date.day);
+      final dayStart = dayOf(date, offset);
       if (!dayStart.isAfter(todayStart) &&
           !meditationDates.contains(dayStart)) {
         dates.add(dayStart);
@@ -124,7 +135,7 @@ class _MeditationCalendarWidgetState
       for (final audio in stats.audioCompleted!) {
         if (!isFreezeSession(audio)) continue;
         final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-        final dayStart = DateTime(date.year, date.month, date.day);
+        final dayStart = dayOf(date, offset);
         if (!dayStart.isAfter(todayStart) &&
             !meditationDates.contains(dayStart)) {
           dates.add(dayStart);
@@ -144,8 +155,10 @@ class _MeditationCalendarWidgetState
 
   List<LocalAudioCompleted> _getSessionsForDay(DateTime day) {
     final sessions = <LocalAudioCompleted>[];
+    final offset = _dayOffset;
+    // A cell represents the logical day `dayStart`; a session belongs to it
+    // when `dayOf(session, offset)` lands on that same logical day.
     final dayStart = DateTime(day.year, day.month, day.day);
-    final dayEnd = dayStart.add(const Duration(days: 1));
 
     if (widget.stats.audioCompleted != null &&
         widget.stats.audioCompleted!.isNotEmpty) {
@@ -153,10 +166,7 @@ class _MeditationCalendarWidgetState
         widget.stats.audioCompleted!.where((audio) {
           if (isFreezeSession(audio)) return false;
           final date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-          return date.isAfter(
-                dayStart.subtract(const Duration(milliseconds: 1)),
-              ) &&
-              date.isBefore(dayEnd);
+          return dayOf(date, offset).isAtSameMomentAs(dayStart);
         }),
       );
     }

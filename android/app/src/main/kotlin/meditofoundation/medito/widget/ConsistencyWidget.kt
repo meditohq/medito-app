@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.runtime.Composable
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,30 +68,43 @@ class ConsistencyWidget : GlanceAppWidget() {
         val meditationDatesJson = prefs.getString("meditation_dates", "[]") ?: "[]"
         val freezeDatesJson = prefs.getString("freeze_dates", "[]") ?: "[]"
 
-        val meditationDates = parseDateTimestamps(meditationDatesJson)
-        val freezeDates = parseDateTimestamps(freezeDatesJson)
-        val allActivityDates = (meditationDates + freezeDates).toSet()
+        // Raw (not truncated) timestamps so the score and the strip can bucket
+        // by the day-boundary offset themselves — truncating to midnight here
+        // would lose the sub-day info the offset needs.
+        val meditationRaw = parseRawTimestamps(meditationDatesJson)
+        val freezeRaw = parseRawTimestamps(freezeDatesJson)
 
         // Computed on-device (not read from the cached "consistency_score" pref) so the
         // percentage stays live between app opens instead of only updating when Dart
-        // last pushed a snapshot.
-        val consistencyScore = ConsistencyScoreCalculator.calculate(meditationDates, freezeDates)
+        // last pushed a snapshot. Honour the day-boundary offset so the score and the
+        // strip bucket days the same way the streak does (StreakCalculator) — otherwise
+        // they disagree for users with a nonzero offset.
+        val dayBoundaryOffsetHours = prefs.getInt("day_boundary_offset_hours", 0)
+        val zone = ZoneId.systemDefault()
+        fun bucketDay(millis: Long): LocalDate =
+            Instant.ofEpochMilli(millis)
+                .minusSeconds(dayBoundaryOffsetHours * 3600L)
+                .atZone(zone)
+                .toLocalDate()
 
-        val today = Calendar.getInstance()
-        today.set(Calendar.HOUR_OF_DAY, 0)
-        today.set(Calendar.MINUTE, 0)
-        today.set(Calendar.SECOND, 0)
-        today.set(Calendar.MILLISECOND, 0)
+        val consistencyToday = bucketDay(System.currentTimeMillis())
+        val consistencyScore = ConsistencyScoreCalculator.calculate(
+            meditationRaw,
+            freezeRaw,
+            today = consistencyToday,
+            zone = zone,
+            dayBoundaryOffsetHours = dayBoundaryOffsetHours,
+        )
 
-        // Build calendar days - show last 7 days, newest first (today first)
+        val activityDays = (meditationRaw + freezeRaw).map(::bucketDay).toSet()
+
+        // Build calendar days - show last 7 logical days, newest first (today first)
         val allCalendarDays = mutableListOf<CalendarDay>()
         for (i in 0 until 7) {
-            val day = Calendar.getInstance()
-            day.timeInMillis = today.timeInMillis
-            day.add(Calendar.DAY_OF_MONTH, -i)
-            val dayOfWeek = day.get(Calendar.DAY_OF_WEEK)
-            val dayAbbrev = getDayAbbreviation(dayOfWeek)
-            val hasActivity = allActivityDates.contains(day.timeInMillis)
+            val day = consistencyToday.minusDays(i.toLong())
+            // java.time DayOfWeek (MON=1..SUN=7) -> Calendar constant (SUN=1..SAT=7)
+            val dayAbbrev = getDayAbbreviation((day.dayOfWeek.value % 7) + 1)
+            val hasActivity = activityDays.contains(day)
             allCalendarDays.add(CalendarDay(dayAbbrev, hasActivity))
         }
 
@@ -96,7 +112,7 @@ class ConsistencyWidget : GlanceAppWidget() {
         val daysToShow = 5
         val calendarDays = allCalendarDays.take(daysToShow).reversed() // Show newest days, oldest on left
 
-        val hasActivityToday = allActivityDates.contains(today.timeInMillis)
+        val hasActivityToday = activityDays.contains(consistencyToday)
 
         // Get theme-aware colors based on app theme preference
         val themePreference = prefs.getString("theme_preference", "system") ?: "system"

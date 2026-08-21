@@ -763,8 +763,13 @@ class StatsManager {
   // (calculateConsistencyScore) so the Android home-screen widget can recompute
   // the percentage on-device. If this algorithm changes, update that copy too.
   double calculateConsistencyScore(LocalAllStats allStats) {
+    // MUST bucket days the same way `calculateStreak` does (via `dayOf` with
+    // the day-boundary offset), otherwise the score and the calendar disagree
+    // with the streak for users with a nonzero offset who meditate inside the
+    // offset window.
+    final offset = _dayBoundaryOffset;
     var now = _getCurrentDate();
-    var today = DateTime(now.year, now.month, now.day);
+    var today = dayOf(now, offset);
 
     if (allStats.audioCompleted == null || allStats.audioCompleted!.isEmpty) {
       return 0.0;
@@ -772,7 +777,7 @@ class StatsManager {
 
     var audioDates = allStats.audioCompleted!.map((audio) {
       var date = DateTime.fromMillisecondsSinceEpoch(audio.timestamp);
-      return DateTime(date.year, date.month, date.day);
+      return dayOf(date, offset);
     }).toList();
 
     audioDates = audioDates
@@ -782,7 +787,7 @@ class StatsManager {
 
     var freezeDates = allStats.freezeUsageDates.map((timestamp) {
       var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-      return DateTime(date.year, date.month, date.day);
+      return dayOf(date, offset);
     }).toList();
 
     freezeDates = freezeDates

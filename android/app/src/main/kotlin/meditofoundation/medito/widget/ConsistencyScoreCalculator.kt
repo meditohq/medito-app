@@ -21,9 +21,17 @@ object ConsistencyScoreCalculator {
         freezeDates: List<Long>,
         today: LocalDate = LocalDate.now(ZoneId.systemDefault()),
         zone: ZoneId = ZoneId.systemDefault(),
+        dayBoundaryOffsetHours: Int = 0,
     ): Int {
+        // Mirrors Dart's `dayOf` / StreakCalculator: shift the instant back by
+        // the day-boundary offset before taking the local date, so this score
+        // buckets days identically to the streak. Callers must pass an
+        // offset-adjusted `today` (see ConsistencyWidget).
         fun toLocalDate(millis: Long) =
-            Instant.ofEpochMilli(millis).atZone(zone).toLocalDate()
+            Instant.ofEpochMilli(millis)
+                .minusSeconds(dayBoundaryOffsetHours * 3600L)
+                .atZone(zone)
+                .toLocalDate()
 
         val audioDates = meditationDates
             .map(::toLocalDate)
