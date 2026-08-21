@@ -267,13 +267,21 @@ def upload_dsyms_to_crashlytics
     return
   end
 
-  # Lane runs from ios/; `flutter build ipa` (wrapped by shorebird) archives to
-  # <repo>/build/ios/archive/. The bundle is named after the SCHEME, which here
-  # is Medito — not Runner. Hard-coding Runner.xcarchive is what failed
-  # 2608.18.0+302442 *after* a successful 580s build and published Shorebird
-  # release, so glob instead of guessing the product name.
+  # `flutter build ipa` (wrapped by shorebird) archives to
+  # <repo>/build/ios/archive/, and the bundle is named after the SCHEME —
+  # Medito, not Runner.
+  #
+  # Anchor on __dir__ rather than a relative path. Fastfile-relative paths
+  # resolve from ios/fastlane/, so "../build/ios/archive" meant
+  # ios/build/ios/archive — a directory that has never existed. That is why
+  # 2608.18.0+302443 shipped unsymbolicated even though the archive was sitting
+  # right there: the earlier Runner->glob fix corrected the name but not the
+  # depth, and the miss is silent by design.
+  repo_root = File.expand_path("../..", __dir__)
+  archive_dir = File.join(repo_root, "build", "ios", "archive")
   archive = lane_context[SharedValues::XCODEBUILD_ARCHIVE] ||
-            Dir.glob("../build/ios/archive/*.xcarchive").sort.first
+            Dir.glob(File.join(archive_dir, "*.xcarchive"))
+               .max_by { |path| File.mtime(path) }
   dsyms = archive ? Dir.glob(File.join(archive, "dSYMs", "*.dSYM")).sort : []
 
   if dsyms.empty?
@@ -281,7 +289,7 @@ def upload_dsyms_to_crashlytics
     # while the app itself built fine; a donor-facing release must not be held
     # hostage to symbol upload. The build phase may also have uploaded already.
     UI.important(
-      "No dSYMs found (archive: #{archive || 'none under ../build/ios/archive'}). " \
+      "No dSYMs found (archive: #{archive || "none under #{archive_dir}"}). " \
       "Crashes from this build may not be symbolicated. Check that the Release " \
       "config still sets DEBUG_INFORMATION_FORMAT=dwarf-with-dsym, then re-run " \
       "`fastlane ios upload_dsyms archive:<path>` against the archive."
@@ -296,7 +304,7 @@ def upload_dsyms_to_crashlytics
   # (DerivedData and the local .swiftpm/build dirs) and fall back to Pods.
   binary = [
     *Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/**/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols")),
-    *Dir.glob(File.expand_path("../build/**/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols")),
+    *Dir.glob(File.join(repo_root, "build/**/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols")),
     "Pods/FirebaseCrashlytics/upload-symbols",
   ].find { |path| File.exist?(path) }
 
