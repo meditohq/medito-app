@@ -16,7 +16,10 @@ import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
@@ -52,6 +55,15 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   bool _showPriorStats = true;
   bool _reminderPromptImpressionLogged = false;
 
+  /// Whether the OS notification permission is already granted. When it is,
+  /// tapping the CTA raises no system dialog, so the soft-ask is skipped.
+  bool _notificationsGranted = false;
+
+  /// Permission is permanently denied, so no system prompt can be raised and
+  /// the phone's settings are the only way back. The card says so rather than
+  /// offering a button that silently bounces the user out to settings.
+  bool _notificationsBlocked = false;
+
   late AnimationController _statsAnimationController;
   late AnimationController _reminderAnimationController;
   late AnimationController _cardAnimationController;
@@ -68,6 +80,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     super.initState();
     _loadStats();
     _logScreenView();
+    _checkNotificationPermission();
 
     _statsAnimationController = AnimationController(
       vsync: this,
@@ -638,6 +651,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   child: Text(
                     isReminderEnabled
                         ? AppLocalizations.of(context)!.smartRemindersOn
+                        : _notificationsBlocked
+                        ? AppLocalizations.of(context)!.turnOnInSettings
                         : AppLocalizations.of(context)!.turnOnSmartReminders,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -663,6 +678,64 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     );
   }
 
+  Future<void> _checkNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (mounted) {
+      setState(() {
+        _notificationsGranted = status.isGranted;
+        _notificationsBlocked = status.isPermanentlyDenied;
+      });
+    }
+  }
+
+  /// Permission is permanently denied: explain, offer the phone's settings,
+  /// and if they come back having granted it, finish enabling the reminder so
+  /// they do not have to find this card and tap it a second time.
+  ///
+  /// Returns true if permission is now granted.
+  Future<bool> _recoverBlockedPermission() async {
+    final analytics = ref.read(analyticsServiceProvider);
+    const params = {
+      AnalyticsEventConstants.paramSource:
+          AnalyticsEventConstants.sourceEndScreen,
+    };
+
+    unawaited(
+      analytics.logEvent(
+        name: AnalyticsEventConstants.notificationSettingsPromptShown,
+        parameters: params,
+      ),
+    );
+
+    final go = await showNotificationsBlockedDialog(context);
+    if (!go) return false;
+
+    unawaited(
+      analytics.logEvent(
+        name: AnalyticsEventConstants.notificationSettingsOpened,
+        parameters: params,
+      ),
+    );
+
+    final granted = await openSettingsAndAwaitPermission();
+    if (!mounted) return false;
+
+    setState(() {
+      _notificationsGranted = granted;
+      _notificationsBlocked = !granted;
+    });
+
+    if (!granted) return false;
+
+    unawaited(
+      analytics.logEvent(
+        name: AnalyticsEventConstants.notificationPermissionRecovered,
+        parameters: params,
+      ),
+    );
+    return true;
+  }
+
   Future<void> _snoozeReminderPrompt() async {
     await ref.read(reminderPromptDismissedProvider.notifier).snooze();
     unawaited(
@@ -674,8 +747,43 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     );
   }
 
+  /// Logs the soft-ask funnel around [showNotificationPermissionPrimer].
+  Future<bool> _confirmPermissionPrompt() async {
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(name: AnalyticsEventConstants.endScreenReminderPrimerShown),
+    );
+
+    final proceed = await showNotificationPermissionPrimer(context);
+
+    if (!proceed) {
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.endScreenReminderPrimerDeclined,
+            ),
+      );
+      return false;
+    }
+    return true;
+  }
+
   Future<void> _enableReminders() async {
     try {
+      // No system prompt is coming for these users — route them to settings
+      // instead of raising a dialog that cannot appear.
+      if (_notificationsBlocked) {
+        final recovered = await _recoverBlockedPermission();
+        if (!recovered || !mounted) return;
+      } else if (!_notificationsGranted) {
+        // Only worth asking when a system dialog is actually coming; if
+        // permission is already granted this just adds a tap.
+        final proceed = await _confirmPermissionPrompt();
+        if (!proceed || !mounted) return;
+      }
+
       final accepted = await PermissionHandler.requestNotificationPermission(
         context,
       );
@@ -709,6 +817,12 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               parameters: {
                 AnalyticsEventConstants.paramSource:
                     AnalyticsEventConstants.sourceEndScreen,
+                // This path never asks for a time — enable() anchors the
+                // series to the moment the session ended. Logged with the same
+                // params as the onboarding set-tap so the time people actually
+                // get is comparable across both surfaces.
+                AnalyticsEventConstants.paramReminderHour: time.hour,
+                AnalyticsEventConstants.paramReminderMinute: time.minute,
               },
             ),
       );
@@ -716,8 +830,18 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       if (mounted) {
         setState(() {});
       }
-    } catch (e) {
-      // Error enabling reminders - silently fail
+    } catch (e, s) {
+      // Previously swallowed: the user tapped the button, granted permission,
+      // and got no reminder, no feedback and no event — invisible in both the
+      // UI and analytics.
+      AppLogger.e('END_SCREEN', 'Failed to enable smart reminders: $e', s);
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.endScreenReminderEnableFailed,
+            ),
+      );
     }
   }
 }

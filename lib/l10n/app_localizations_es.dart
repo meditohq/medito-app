@@ -937,7 +937,42 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reminderSlotEvening => 'Noche';
 
   @override
+  String get reminderSlotNight => 'Antes de dormir';
+
+  @override
   String get reminderSlotCustom => 'Elegir mi propia hora';
+
+  @override
+  String get notificationsBlockedTitle =>
+      'Las notificaciones están desactivadas';
+
+  @override
+  String get notificationsBlockedBody =>
+      'Medito no puede enviarte recordatorios porque las notificaciones están desactivadas para la aplicación en los ajustes de tu teléfono. Puedes volver a activarlas ahí.';
+
+  @override
+  String get openSettings => 'Abrir ajustes';
+
+  @override
+  String get turnOnInSettings => 'Activar en ajustes';
+
+  @override
+  String get notificationsBlockedSubtitle =>
+      'Desactivadas en los ajustes del teléfono';
+
+  @override
+  String get reminderPrimerTitle => 'Un momento';
+
+  @override
+  String get reminderPrimerBody =>
+      'Tu teléfono te pedirá permiso para enviarte notificaciones. Acéptalo para que podamos enviarte un recordatorio diario para meditar.';
+
+  @override
+  String get reminderPrimerContinue => 'Continuar';
+
+  @override
+  String get reminderCustomCancelled =>
+      'Aún no has elegido una hora: elige una arriba u omite por ahora.';
 
   @override
   String get onboardingBatteryTitle =>

@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -12,6 +14,7 @@ import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
+import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
@@ -113,6 +116,32 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     // Request notification permission if not already granted
     var status = await Permission.notification.status;
     if (!status.isGranted) {
+      // Soft-ask before the system prompt. Every iOS denial recorded here is
+      // permanently_denied — the prompt never reappears and the end-screen
+      // card can no longer recover that user — so a refusal caught in our own
+      // dialog is far cheaper than one spent on the system's. Only users who
+      // already tapped a chip or the CTA reach this, so it adds no step for
+      // the people who skip the screen.
+      unawaited(
+        FirebaseAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.onboardingReminderPrimerShown,
+          parameters: _eventParams,
+        ),
+      );
+      final proceed = await showNotificationPermissionPrimer(context);
+      if (!proceed) {
+        unawaited(
+          FirebaseAnalyticsService().logEvent(
+            name: AnalyticsEventConstants.onboardingReminderPrimerDeclined,
+            parameters: _eventParams,
+          ),
+        );
+        // Must clear _isProcessing or the chips and CTA stay disabled and the
+        // screen becomes the dead end this release is fixing.
+        if (mounted) setState(() => _isProcessing = false);
+        return;
+      }
+      if (!mounted) return;
       status = await Permission.notification.request();
     }
 
@@ -153,16 +182,58 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
       // iOS only asks once: when the permission is permanently denied the
       // request() above returns instantly with no dialog, which used to leave
-      // the tap with no visible effect. Send the user to system settings so
-      // the tap always does something.
-      if (status.isPermanentlyDenied) {
-        await openAppSettings();
+      // the tap with no visible effect. Explain that, offer settings, and if
+      // they come back having granted it, carry on and set the reminder up
+      // rather than dropping them back on an unchanged screen.
+      if (status.isPermanentlyDenied && mounted) {
+        final recovered = await _recoverBlockedPermission();
+        if (recovered && mounted) {
+          await handler.initialize(context, ref);
+          if (mounted) setState(() => _notificationsGranted = true);
+          await _setupRemindersAndAdvance();
+          return;
+        }
       }
 
       if (mounted) {
         setState(() => _isProcessing = false);
       }
     }
+  }
+
+  /// Permission is permanently denied, so no system prompt can be raised.
+  /// Explain, offer the phone's settings, and report whether they came back
+  /// having granted it. See [openSettingsAndAwaitPermission].
+  Future<bool> _recoverBlockedPermission() async {
+    const params = {AnalyticsEventConstants.paramSource: 'onboarding'};
+
+    unawaited(
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.notificationSettingsPromptShown,
+        parameters: {..._eventParams, ...params},
+      ),
+    );
+
+    final go = await showNotificationsBlockedDialog(context);
+    if (!go) return false;
+
+    unawaited(
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.notificationSettingsOpened,
+        parameters: {..._eventParams, ...params},
+      ),
+    );
+
+    final granted = await openSettingsAndAwaitPermission();
+    if (!granted) return false;
+
+    unawaited(
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.notificationPermissionRecovered,
+        parameters: {..._eventParams, ...params},
+      ),
+    );
+    return true;
   }
 
   Future<void> _setupRemindersAndAdvance() async {
@@ -175,14 +246,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       setState(() => _isProcessing = false);
       return;
     }
-
-    await FirebaseAnalyticsService().logEvent(
-      name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
-      parameters: {
-        ..._eventParams,
-        AnalyticsEventConstants.paramReminderSlot: ?_selectedSlot,
-      },
-    );
 
     final prefs = ref.read(sharedPreferencesProvider);
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
@@ -205,6 +268,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     } else {
       anchorLocal = now.add(const Duration(days: 1));
     }
+
+    // Logged after the anchor is resolved rather than on entry, so the hour
+    // reported is the one the reminder series is actually scheduled for. That
+    // makes the two arms comparable: the chips arm reports the slot the user
+    // chose, the control arm reports the silent "same time tomorrow" default.
+    await FirebaseAnalyticsService().logEvent(
+      name: FirebaseAnalyticsService.eventOnboardingReminderSetTap,
+      parameters: {
+        ..._eventParams,
+        AnalyticsEventConstants.paramReminderSlot: ?_selectedSlot,
+        AnalyticsEventConstants.paramReminderHour: anchorLocal.hour,
+        AnalyticsEventConstants.paramReminderMinute: anchorLocal.minute,
+      },
+    );
 
     final scheduler = SmartRemindersScheduler(
       prefs: prefs,
@@ -239,14 +316,43 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     await _handleNotificationsPermission();
   }
 
+  /// Dismissing the picker used to return silently — no event, no navigation,
+  /// an unchanged screen — so the tap looked like it had done nothing and the
+  /// drop-off was invisible. Both ends are now logged, and a dismissal gets
+  /// feedback pointing at the ways forward.
   Future<void> _onCustomTimeTap() async {
     if (_isProcessing) return;
+
+    unawaited(
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.onboardingReminderCustomTap,
+        parameters: _eventParams,
+      ),
+    );
+
     final picked = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 8, minute: 0),
       initialEntryMode: TimePickerEntryMode.input,
     );
-    if (picked == null || !mounted) return;
+
+    if (!mounted) return;
+
+    if (picked == null) {
+      unawaited(
+        FirebaseAnalyticsService().logEvent(
+          name: AnalyticsEventConstants.onboardingReminderCustomCancel,
+          parameters: _eventParams,
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.reminderCustomCancelled),
+        ),
+      );
+      return;
+    }
+
     await _onSlotSelected('custom', picked);
   }
 
@@ -556,6 +662,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   /// "same time tomorrow" default, and only then triggers the OS permission
   /// prompt.
   Widget _buildTimeChips(AppLocalizations l10n) {
+    // Afternoon was swapped for a bedtime slot: it was the least-picked preset
+    // by a wide margin while Custom outdrew every preset, so the presets were
+    // not covering what people wanted. Deliberately still three presets plus
+    // Custom rather than four — the screen already loses people to indecision,
+    // so this swaps an option instead of adding one. reminderSlotAfternoon is
+    // kept in the ARB so the swap is a one-line revert once paramReminderHour
+    // shows what the Custom pickers actually choose.
     final slots = <(String, String, TimeOfDay)>[
       (
         'morning',
@@ -563,15 +676,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         const TimeOfDay(hour: 8, minute: 0),
       ),
       (
-        'afternoon',
-        l10n.reminderSlotAfternoon,
-        const TimeOfDay(hour: 13, minute: 0),
-      ),
-      (
         'evening',
         l10n.reminderSlotEvening,
         const TimeOfDay(hour: 20, minute: 0),
       ),
+      ('night', l10n.reminderSlotNight, const TimeOfDay(hour: 22, minute: 0)),
     ];
 
     return Column(

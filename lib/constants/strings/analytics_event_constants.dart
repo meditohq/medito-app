@@ -125,8 +125,40 @@ class AnalyticsEventConstants {
 
   /// Parameter on onboardingReminderSetTap (chips arm of the
   /// onboarding_reminder_time_chips experiment): which time slot the user
-  /// picked — 'morning', 'afternoon', 'evening', or 'custom'.
+  /// picked — 'morning', 'evening', 'night', or 'custom'.
   static const String paramReminderSlot = 'reminder_slot';
+
+  /// Event logged when the pre-permission soft-ask is shown on the onboarding
+  /// reminder screen, and when the user declines it. This is where the
+  /// irreversible damage happens: every iOS denial recorded at this step is
+  /// permanently_denied, so the system prompt never returns and no later
+  /// surface can recover the user. A decline here leaves them askable.
+  /// Continues to the system prompt = shown - declined.
+  static const String onboardingReminderPrimerShown =
+      'onboarding_reminder_primer_shown';
+  static const String onboardingReminderPrimerDeclined =
+      'onboarding_reminder_primer_declined';
+
+  /// Event logged when the user taps the "Pick my own time" chip, BEFORE the
+  /// time picker opens. Only a successful pick used to fire an event, so
+  /// opening the picker and backing out left no trace; pairs with
+  /// [onboardingReminderCustomCancel] to measure that drop-off.
+  static const String onboardingReminderCustomTap =
+      'onboarding_reminder_custom_tap';
+
+  /// Event logged when the user dismisses the custom time picker without
+  /// choosing a time. See [onboardingReminderCustomTap].
+  static const String onboardingReminderCustomCancel =
+      'onboarding_reminder_custom_cancel';
+
+  /// Parameters on onboardingReminderSetTap carrying the hour (0-23) and
+  /// minute the reminder series was actually anchored to, for both arms — so
+  /// the control arm's implicit "same time tomorrow" default is comparable
+  /// with a deliberate pick. [paramReminderSlot] only names the chip, which
+  /// says nothing about what time the Custom pickers chose. Two ints rather
+  /// than a formatted string keeps GA4 cardinality low.
+  static const String paramReminderHour = 'reminder_hour';
+  static const String paramReminderMinute = 'reminder_minute';
 
   /// Event logged on the user's very first interactive tap after completing
   /// onboarding. Fires exactly once per install.
@@ -505,6 +537,36 @@ class AnalyticsEventConstants {
   /// permission dialog returns denied.
   static const String endScreenReminderOsDenied =
       'end_screen_reminder_os_denied';
+
+  /// Event logged when the pre-permission soft-ask is shown, and when the user
+  /// declines it. A decline never raises the system dialog, so these users
+  /// remain askable on a later session — unlike a system-level denial, which
+  /// is permanent on iOS. Continues to the system prompt = shown - declined.
+  static const String endScreenReminderPrimerShown =
+      'end_screen_reminder_primer_shown';
+  static const String endScreenReminderPrimerDeclined =
+      'end_screen_reminder_primer_declined';
+
+  /// The "permission is permanently denied, go to the phone's settings" flow,
+  /// shared by onboarding, the end-screen card and the settings tile — the
+  /// [paramSource] param says which. Sending someone to settings used to be a
+  /// one-way trip with no follow-up, so none of it was measurable:
+  /// [notificationSettingsPromptShown] is the ask, [notificationSettingsOpened]
+  /// is them going, and [notificationPermissionRecovered] is the payoff — a
+  /// user who came back with permission granted and had their reminder set up
+  /// for them rather than having to tap the control a second time.
+  static const String notificationSettingsPromptShown =
+      'notification_settings_prompt_shown';
+  static const String notificationSettingsOpened =
+      'notification_settings_opened';
+  static const String notificationPermissionRecovered =
+      'notification_permission_recovered';
+
+  /// Event logged when permission was granted but scheduling the reminder
+  /// series then threw. Without it this failure was silent in both the UI and
+  /// analytics: the user appears to have enabled reminders and never gets one.
+  static const String endScreenReminderEnableFailed =
+      'end_screen_reminder_enable_failed';
 
   /// Event logged when the user enables smart reminders/notifications.
   /// Parameter: paramSource ('end_screen', 'settings')

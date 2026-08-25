@@ -921,7 +921,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reminderSlotEvening => 'Evening';
 
   @override
+  String get reminderSlotNight => 'Night';
+
+  @override
   String get reminderSlotCustom => 'Pick my own time';
+
+  @override
+  String get notificationsBlockedTitle => 'Notifications are turned off';
+
+  @override
+  String get notificationsBlockedBody =>
+      'Medito can\'t send reminders because notifications are switched off for the app in your phone\'s settings. You can switch them back on there.';
+
+  @override
+  String get openSettings => 'Open Settings';
+
+  @override
+  String get turnOnInSettings => 'Turn On in Settings';
+
+  @override
+  String get notificationsBlockedSubtitle => 'Switched off in phone settings';
+
+  @override
+  String get reminderPrimerTitle => 'One quick thing';
+
+  @override
+  String get reminderPrimerBody =>
+      'Your phone will ask you to allow notifications next. Say yes so that we can send you a daily nudge to meditate.';
+
+  @override
+  String get reminderPrimerContinue => 'Continue';
+
+  @override
+  String get reminderCustomCancelled =>
+      'No time picked yet — choose one above, or skip for now.';
 
   @override
   String get onboardingBatteryTitle => 'One Setting, Smoother Meditations';

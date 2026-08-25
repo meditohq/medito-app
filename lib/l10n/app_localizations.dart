@@ -1730,7 +1730,7 @@ abstract class AppLocalizations {
   /// **'Morning'**
   String get reminderSlotMorning;
 
-  /// Time-of-day chip label; shown with a concrete time, e.g. 'Afternoon · 1:00 PM'
+  /// Time-of-day chip label; shown with a concrete time, e.g. 'Afternoon · 1:00 PM'. CURRENTLY UNUSED — the afternoon preset was swapped for reminderSlotNight, and is kept so that swap is a one-line revert.
   ///
   /// In en, this message translates to:
   /// **'Afternoon'**
@@ -1742,11 +1742,71 @@ abstract class AppLocalizations {
   /// **'Evening'**
   String get reminderSlotEvening;
 
+  /// Time-of-day chip label; shown with a concrete time, e.g. 'Night · 10:00 PM'
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get reminderSlotNight;
+
   /// Option below the time-of-day chips that opens a time picker
   ///
   /// In en, this message translates to:
   /// **'Pick my own time'**
   String get reminderSlotCustom;
+
+  /// Title of the dialog shown when notification permission is permanently denied, so no OS prompt can be raised and the phone's settings are the only route
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are turned off'**
+  String get notificationsBlockedTitle;
+
+  /// Body of the dialog shown when notification permission is permanently denied
+  ///
+  /// In en, this message translates to:
+  /// **'Medito can\'t send reminders because notifications are switched off for the app in your phone\'s settings. You can switch them back on there.'**
+  String get notificationsBlockedBody;
+
+  /// Button that opens the phone's settings app on the Medito page
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettings;
+
+  /// Call to action replacing 'Turn on Smart Reminders' when notification permission is permanently denied
+  ///
+  /// In en, this message translates to:
+  /// **'Turn On in Settings'**
+  String get turnOnInSettings;
+
+  /// Subtitle on the settings smart-reminder tile when notification permission is permanently denied
+  ///
+  /// In en, this message translates to:
+  /// **'Switched off in phone settings'**
+  String get notificationsBlockedSubtitle;
+
+  /// Title of the confirmation dialog shown before the OS notification permission prompt on the end-screen reminder card
+  ///
+  /// In en, this message translates to:
+  /// **'One quick thing'**
+  String get reminderPrimerTitle;
+
+  /// Body of the confirmation dialog shown before the OS notification permission prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone will ask you to allow notifications next. Say yes so that we can send you a daily nudge to meditate.'**
+  String get reminderPrimerBody;
+
+  /// Button on the pre-permission dialog that proceeds to the OS notification permission prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get reminderPrimerContinue;
+
+  /// Feedback shown when the user opens the custom time picker and dismisses it without choosing, so the tap is not a silent dead end
+  ///
+  /// In en, this message translates to:
+  /// **'No time picked yet — choose one above, or skip for now.'**
+  String get reminderCustomCancelled;
 
   /// No description provided for @onboardingBatteryTitle.
   ///

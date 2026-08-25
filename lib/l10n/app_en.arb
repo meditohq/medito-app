@@ -329,15 +329,55 @@
   },
   "reminderSlotAfternoon": "Afternoon",
   "@reminderSlotAfternoon": {
-    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Afternoon · 1:00 PM'"
+    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Afternoon · 1:00 PM'. CURRENTLY UNUSED — the afternoon preset was swapped for reminderSlotNight, and is kept so that swap is a one-line revert."
   },
   "reminderSlotEvening": "Evening",
   "@reminderSlotEvening": {
     "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Evening · 8:00 PM'"
   },
+  "reminderSlotNight": "Night",
+  "@reminderSlotNight": {
+    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Night · 10:00 PM'"
+  },
   "reminderSlotCustom": "Pick my own time",
   "@reminderSlotCustom": {
     "description": "Option below the time-of-day chips that opens a time picker"
+  },
+  "notificationsBlockedTitle": "Notifications are turned off",
+  "@notificationsBlockedTitle": {
+    "description": "Title of the dialog shown when notification permission is permanently denied, so no OS prompt can be raised and the phone's settings are the only route"
+  },
+  "notificationsBlockedBody": "Medito can't send reminders because notifications are switched off for the app in your phone's settings. You can switch them back on there.",
+  "@notificationsBlockedBody": {
+    "description": "Body of the dialog shown when notification permission is permanently denied"
+  },
+  "openSettings": "Open Settings",
+  "@openSettings": {
+    "description": "Button that opens the phone's settings app on the Medito page"
+  },
+  "turnOnInSettings": "Turn On in Settings",
+  "@turnOnInSettings": {
+    "description": "Call to action replacing 'Turn on Smart Reminders' when notification permission is permanently denied"
+  },
+  "notificationsBlockedSubtitle": "Switched off in phone settings",
+  "@notificationsBlockedSubtitle": {
+    "description": "Subtitle on the settings smart-reminder tile when notification permission is permanently denied"
+  },
+  "reminderPrimerTitle": "One quick thing",
+  "@reminderPrimerTitle": {
+    "description": "Title of the confirmation dialog shown before the OS notification permission prompt on the end-screen reminder card"
+  },
+  "reminderPrimerBody": "Your phone will ask you to allow notifications next. Say yes so that we can send you a daily nudge to meditate.",
+  "@reminderPrimerBody": {
+    "description": "Body of the confirmation dialog shown before the OS notification permission prompt"
+  },
+  "reminderPrimerContinue": "Continue",
+  "@reminderPrimerContinue": {
+    "description": "Button on the pre-permission dialog that proceeds to the OS notification permission prompt"
+  },
+  "reminderCustomCancelled": "No time picked yet — choose one above, or skip for now.",
+  "@reminderCustomCancelled": {
+    "description": "Feedback shown when the user opens the custom time picker and dismisses it without choosing, so the tap is not a silent dead end"
   },
   "onboardingBatteryTitle": "One Setting, Smoother Meditations",
   "onboardingBatteryBody": "Your phone can pause Medito mid-session. One quick change prevents this.",
