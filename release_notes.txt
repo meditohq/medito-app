@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2608.25.0
+- Reminders: if notifications are switched off for Medito, the app now tells you and takes you to the right settings page — and sets your reminder up as soon as you come back
+- Reminders: we now explain what your phone is about to ask before it asks, so a "no" doesn't lock you out of reminders for good
+- Onboarding: fixed the "Pick my own time" option doing nothing if you closed the time picker
+- Onboarding: added a bedtime reminder option
+
 2608.18.0
 - Android: your streak, Up Next and consistency widgets now update after a session instead of showing yesterday's numbers
 - Android: widgets now follow your custom day-start time, so late-night sessions count for the right day
