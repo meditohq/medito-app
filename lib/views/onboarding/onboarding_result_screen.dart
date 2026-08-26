@@ -9,6 +9,7 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/player/playback_request.dart';
 import 'package:medito/providers/meditation/track_provider.dart';
+import 'package:medito/providers/onboarding/onboarding_experienced_meditation_experiment.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/logger.dart';
@@ -108,6 +109,20 @@ class _OnboardingResultScreenState
   bool _completionHandled = false;
   int _priorStreak = 0;
 
+  /// Experiment tag for the first-meditation events; empty when not enrolled.
+  /// Reads the variant without assigning — assigning here would over-enrol.
+  Map<String, Object> get _meditationEventParams {
+    final variant = OnboardingExperiencedMeditationExperiment.assignedVariant(
+      ref.read(sharedPreferencesProvider),
+    );
+    if (variant == null) return const {};
+    return {
+      AnalyticsEventConstants.paramExperimentName:
+          OnboardingExperiencedMeditationExperiment.experimentName,
+      AnalyticsEventConstants.paramVariantId: variant,
+    };
+  }
+
   @override
   void initState() {
     super.initState();
@@ -118,6 +133,7 @@ class _OnboardingResultScreenState
             .read(analyticsServiceProvider)
             .logEvent(
               name: AnalyticsEventConstants.onboardingFirstMeditationShown,
+              parameters: _meditationEventParams,
             ),
       );
     }
@@ -129,6 +145,7 @@ class _OnboardingResultScreenState
           .read(analyticsServiceProvider)
           .logEvent(
             name: AnalyticsEventConstants.onboardingFirstMeditationBeginTap,
+            parameters: _meditationEventParams,
           ),
     );
     setState(() {
@@ -169,6 +186,7 @@ class _OnboardingResultScreenState
             .read(analyticsServiceProvider)
             .logEvent(
               name: AnalyticsEventConstants.onboardingFirstMeditationSkipTap,
+              parameters: _meditationEventParams,
             ),
       );
       ref.read(playerProvider.notifier).stop();
@@ -178,6 +196,7 @@ class _OnboardingResultScreenState
             .read(analyticsServiceProvider)
             .logEvent(
               name: AnalyticsEventConstants.onboardingFirstMeditationSkipTap,
+              parameters: _meditationEventParams,
             ),
       );
     }

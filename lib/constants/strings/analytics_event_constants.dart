@@ -49,20 +49,8 @@ class AnalyticsEventConstants {
   static const String paywallDismissedNoPayment =
       'paywall_dismissed_no_payment';
 
-  /// Event logged immediately before the Apple Pay / Google Pay / card sheet is
-  /// presented, once the PaymentIntent exists. This is the missing denominator
-  /// for the checkout funnel: without it, [paymentFailed] / [paymentCancelled] /
-  /// the donation success events have nothing to divide by, and a user who opens
-  /// the sheet and then backgrounds or kills the app emits nothing at all.
-  ///
-  /// The funnel closes as:
-  ///   payment_sheet_presented
-  ///     = donation_{onetime,monthly,yearly} + payment_failed + payment_cancelled
-  ///       + silent abandonment (the residual — previously invisible)
-  ///
-  /// Note [paywallPresented] is NOT a substitute: it counts donation-page views,
-  /// including everyone who never picked an amount, so it cannot separate
-  /// "never tried to pay" from "tried and bailed".
+  /// Fired just before the wallet/card sheet opens. The checkout denominator:
+  /// sheets = success + failed + cancelled + silent abandonment.
   static const String paymentSheetPresented = 'payment_sheet_presented';
 
   /// Event logged when a payment fails
@@ -327,14 +315,27 @@ class AnalyticsEventConstants {
   /// Parameter name for payment intent identifier
   static const String paramPaymentIntentId = 'payment_intent_id';
 
-  /// Parameter name for the payment method the sheet was opened with
-  /// ("apple_pay", "google_pay", "card"). Worth segmenting on: only iOS with a
-  /// configured wallet gets the one-tap Apple Pay confirm — everything else
-  /// falls through to `card`, which presents the full Stripe PaymentSheet.
+  /// Our own slug for a failure. Expect a lot of 'generic_error' — the
+  /// Stripe-native params below are what actually identify a cause.
+  static const String paramFailureReason = 'failure_reason';
+
+  /// Stripe FailureCode: "Failed" | "Canceled" | "Timeout" | "Unknown".
+  static const String paramStripeCode = 'stripe_code';
+
+  /// Stripe's API-level error code.
+  static const String paramStripeErrorCode = 'stripe_error_code';
+
+  /// Stripe's decline_code, e.g. "insufficient_funds".
+  static const String paramDeclineCode = 'decline_code';
+
+  /// Stripe's error type, e.g. "card_error".
+  static const String paramStripeErrorType = 'stripe_error_type';
+
+  /// 'apple_pay' | 'google_pay' | 'card'. Only iOS with a wallet gets the
+  /// one-tap confirm; everything else falls through to the full PaymentSheet.
   static const String paramPaymentMethod = 'payment_method';
 
-  /// Parameter name for the donation frequency the sheet was opened for
-  /// ("one_time", "monthly", "yearly").
+  /// 'one_time' | 'monthly' | 'yearly'.
   static const String paramPaymentFrequency = 'payment_frequency';
 
   /// Parameter name for donation page A/B test variant
@@ -409,23 +410,13 @@ class AnalyticsEventConstants {
   /// Event logged when user swipes to skip the Up Next session
   static const String upNextSkipped = 'up_next_skipped';
 
-  /// The completed state was shown because the pinned pack is finished. Before
-  /// this existed, pack completion was entirely invisible in analytics — the
-  /// pin was cleared silently and the card either reverted to the beginner
-  /// Basics pack or disappeared. Carries [paramPackId],
-  /// [paramPackSequencePosition] and [paramHasNextPack].
+  /// The pinned pack is finished and the completed state was shown.
   static const String upNextPackCompleted = 'up_next_pack_completed';
 
-  /// The user accepted the completed-state CTA and the next pack in the
-  /// sequence was pinned. Carries the finished pack as [paramPackId] and the
-  /// newly pinned one as [paramNextPackId] — the pair is what makes path
-  /// progression measurable step by step.
+  /// The completed-state CTA was accepted and the next pack pinned.
   static const String upNextNextPackPinned = 'up_next_next_pack_pinned';
 
-  /// The user finished the LAST pack in [PackSequence]. Logged alongside
-  /// [upNextPackCompleted] so we can size this cohort before deciding what the
-  /// end of the path should actually offer — that product decision is still
-  /// open, and this event is how we learn whether it is urgent.
+  /// The user finished the last pack on the path (or the megapack).
   static const String upNextPathCompleted = 'up_next_path_completed';
 
   /// Parameter name for the session/track ID in up next events
@@ -437,34 +428,22 @@ class AnalyticsEventConstants {
   /// The pack pinned by the completed-state CTA.
   static const String paramNextPackId = 'next_pack_id';
 
-  /// Path position of the pack being moved INTO, so progression reads as a
-  /// sequence of hops without resolving ids downstream.
+  /// Path position being moved into.
   static const String paramNextPackSequencePosition =
       'next_pack_sequence_position';
 
-  /// 1-based position of the pack within [PackSequence], or "none" for a pack
-  /// outside the curated path (Basics, the experienced-onboarder pack, or a
-  /// hand-pinned one). Lets drop-off be read per path step.
+  /// 1-based position on the path, or 'none' when off it.
   static const String paramPackSequencePosition = 'pack_sequence_position';
 
-  /// Whether the completed state had a next pack to offer. Separates the
-  /// end-of-path moment from an ordinary mid-path completion.
+  /// Whether the completed state had a next pack to offer.
   static const String paramHasNextPack = 'has_next_pack';
 
-  /// How the user's Up Next is configured: "megapack" (the pre-change cohort
-  /// still on the single concatenated pack), "sequence" (pinned onto the
-  /// curated path at onboarding), or "custom" (hand-pinned from Explore).
-  /// Reported on every Up Next event so listening behaviour can be compared
-  /// across the three — this is what tells us whether the stepped path beats
-  /// the megapack.
+  /// 'megapack' | 'sequence' | 'custom' — which Up Next cohort the user is in.
   static const String paramUpNextMode = 'up_next_mode';
 
-  /// 1-based index of the session within its pack (completed + 1), so drop-off
-  /// inside a pack is visible and not just drop-off between packs.
+  /// 1-based index of the session within its pack.
   static const String paramSessionIndexInPack = 'session_index_in_pack';
 
-  /// Total sessions in the pack, so [paramSessionIndexInPack] can be read as a
-  /// fraction without joining to the catalogue.
   static const String paramPackTotalSessions = 'pack_total_sessions';
 
   // Pin events

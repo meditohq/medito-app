@@ -58,7 +58,7 @@ void main() {
       expect(PackSequence.isLast(PackSequence.ordered.last), isTrue);
     });
 
-    test('packs outside the path have no successor and are not the last', () {
+    test('off-path packs have no successor and are not last', () {
       for (final id in [PackSequence.legacyMegapackId, 'not-a-real-pack']) {
         expect(PackSequence.nextPackAfter(id), isNull);
         expect(PackSequence.isLast(id), isFalse);
@@ -68,9 +68,6 @@ void main() {
     });
 
     test('the onboarding entry points sit on the path', () {
-      // Onboarding pins `regular_practice` users at position 4 ("Deepen your
-      // practice"), skipping the three beginner packs, and everyone else at the
-      // top. If either constant drifts off the sequence this catches it.
       expect(PackSequence.positionOf(PackSequence.experiencedEntryPackId), 4);
       expect(PackSequence.positionOf(PackSequence.beginnerEntryPackId), 1);
       expect(
@@ -81,8 +78,6 @@ void main() {
     });
 
     test('the legacy megapack is terminal but not on the path', () {
-      // It holds all eleven packs' content in one, so finishing it is finishing
-      // everything — but it must never be offered as a successor.
       expect(PackSequence.legacyMegapackId, ConfigConstants.basicsPackId);
       expect(PackSequence.isPathTerminal(PackSequence.legacyMegapackId), isTrue);
       expect(PackSequence.contains(PackSequence.legacyMegapackId), isFalse);
@@ -110,8 +105,6 @@ void main() {
     });
 
     test('modeFor separates the three Up Next cohorts', () {
-      // This is the dimension the megapack-vs-sequence comparison rests on, so
-      // a misclassification would silently pool the two arms.
       expect(PackSequence.modeFor(PackSequence.legacyMegapackId), 'megapack');
       for (final id in PackSequence.ordered) {
         expect(PackSequence.modeFor(id), 'sequence', reason: 'pack $id');
@@ -129,8 +122,6 @@ void main() {
 
   group('UpNextData completion', () {
     test('an empty pack is not treated as completed', () {
-      // Guards the regression where `0 >= 0` presented an unloaded pack as
-      // finished and rendered a bogus completion card.
       final data = _data(_pack(id: 'empty', total: 0, completed: 0));
       expect(data.isCompleted, isFalse);
       expect(data.nextPackId, isNull);
@@ -165,8 +156,6 @@ void main() {
     });
 
     test('completing the legacy megapack counts as the end of the path', () {
-      // Existing users left on the megapack still get a coherent ending rather
-      // than a bare no-successor card.
       final data = _data(
         _pack(id: PackSequence.legacyMegapackId, total: 2, completed: 2),
       );
@@ -176,8 +165,6 @@ void main() {
     });
 
     test('completing an unknown pack is a plain completion', () {
-      // A hand-pinned pack from Explore: acknowledge it, offer nothing, and do
-      // not claim the user finished the path.
       final data = _data(_pack(id: 'hand-pinned', total: 2, completed: 2));
       expect(data.isCompleted, isTrue);
       expect(data.nextPackId, isNull);

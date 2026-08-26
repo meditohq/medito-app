@@ -30,14 +30,8 @@ const _kCardBorderRadius = 24.0;
 const _kPlayButtonSize = 48.0;
 const _kPlayButtonBorderWidth = 0.5;
 
-/// Shared context for every Up Next event, so tap / skip / completion / pin all
-/// carry the same dimensions and can be compared on a common denominator.
-///
-/// The important one is [AnalyticsEventConstants.paramUpNextMode]: it separates
-/// the pre-change megapack cohort from users on the stepped sequence, which is
-/// how we find out whether splitting the megapack changed listening behaviour
-/// at all. Experience level is NOT included — it is a GA4 user property and so
-/// is already attached to every event automatically.
+/// Shared context for every Up Next event so the four are comparable.
+/// Experience level is omitted — it is a user property, already on every event.
 Map<String, Object> _upNextEventParams(UpNextData data) {
   final packId = data.pack.id;
   final position = PackSequence.positionOf(packId);
@@ -46,7 +40,6 @@ Map<String, Object> _upNextEventParams(UpNextData data) {
     AnalyticsEventConstants.paramUpNextMode: PackSequence.modeFor(packId),
     AnalyticsEventConstants.paramPackSequencePosition:
         position?.toString() ?? 'none',
-    // completedCount + 1 is the session about to be played, 1-based.
     AnalyticsEventConstants.paramSessionIndexInPack: data.completedCount + 1,
     AnalyticsEventConstants.paramPackTotalSessions: data.totalCount,
   };
@@ -68,9 +61,6 @@ class UpNextWidget extends ConsumerWidget {
       loading: () => const _UpNextShimmer(key: ValueKey('shimmer')),
       error: (_, _) => const SizedBox.shrink(key: ValueKey('error')),
       data: (upNextData) {
-        // Finishing the pinned pack used to fall through to the shrink below,
-        // so the card just vanished from home with no acknowledgement and no
-        // way forward. Render the completion instead.
         if (upNextData.isCompleted) {
           return _UpNextCompleted(
             key: ValueKey('completed_${upNextData.pack.id}'),
@@ -108,16 +98,8 @@ class UpNextWidget extends ConsumerWidget {
   }
 }
 
-/// Shown when every session in the pinned pack is complete.
-///
-/// Two variants: mid-path, where [UpNextData.nextPackId] holds the next pack in
-/// [PackSequence] and the CTA pins it; and end-of-path, where there is nothing
-/// left to offer. The end-of-path variant deliberately has no button — what it
-/// should ultimately do is an open product decision, and
-/// [AnalyticsEventConstants.upNextPathCompleted] is how we size that cohort
-/// before designing for it. The Explore tab remains reachable from the nav bar
-/// and any pack can still be pinned by hand from its pack view, so this is a
-/// resting state rather than a dead end.
+/// Shown when the pinned pack is fully complete. Mid-path the CTA pins the next
+/// pack; at the end of the path there is no CTA (still an open decision).
 class _UpNextCompleted extends ConsumerStatefulWidget {
   final UpNextData data;
 
@@ -133,9 +115,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
   @override
   void initState() {
     super.initState();
-    // Logged once per mount rather than per rebuild. The widget key includes the
-    // pack id, so moving on to the next pack remounts and logs that pack's own
-    // completion when it happens.
+    // Once per mount, not per rebuild; the key is keyed on the pack id.
     WidgetsBinding.instance.addPostFrameCallback((_) => _logShown());
   }
 
@@ -157,9 +137,6 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
       unawaited(
         analytics.logEvent(
           name: AnalyticsEventConstants.upNextPathCompleted,
-          // Same context as the rest: this fires for BOTH the last pack on the
-          // path and the legacy megapack, and up_next_mode is what tells them
-          // apart.
           parameters: _upNextEventParams(widget.data),
         ),
       );
@@ -178,16 +155,13 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
         parameters: {
           ..._upNextEventParams(widget.data),
           AnalyticsEventConstants.paramNextPackId: nextPackId,
-          // Position the user is moving INTO, so path progression reads as a
-          // sequence of hops rather than needing the id resolved downstream.
           AnalyticsEventConstants.paramNextPackSequencePosition:
               PackSequence.positionOf(nextPackId)?.toString() ?? 'none',
         },
       ),
     );
 
-    // Same key and invalidation the pack view's manual pin uses, so both paths
-    // stay consistent.
+    // Same key and invalidation as the pack view's manual pin.
     await ref.read(sharedPreferencesProvider).setString(
       SharedPreferenceConstants.upNextPackId,
       nextPackId,
@@ -216,10 +190,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
         ? l10n.upNextPackCompletedSubtitle(widget.data.completedCount)
         : l10n.upNextPathCompletedSubtitle;
 
-    // Name the pack the CTA will actually start. The title comes from the pack
-    // API rather than a hardcoded list, so it stays localised and in sync with
-    // the catalogue; until it resolves the generic label stands in, so the
-    // button is never blank.
+    // Title from the API, not a hardcoded list; generic label while it loads.
     var ctaLabel = l10n.upNextPackCompletedCta;
     if (hasNext) {
       final nextTitle = ref

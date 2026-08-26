@@ -78,7 +78,10 @@ class PaymentUIController extends _$PaymentUIController {
       final error = PaymentErrorHandler.handleStripeError(e);
       if (context.mounted) _showErrorSnackbar(context, error);
 
-      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
+      return PaymentResult.failure(
+        errorMessage: error.userFriendlyMessage,
+        error: error,
+      );
     }
   }
 
@@ -137,7 +140,10 @@ class PaymentUIController extends _$PaymentUIController {
       final error = PaymentErrorHandler.handleStripeError(e);
       if (context.mounted) _showErrorSnackbar(context, error);
 
-      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
+      return PaymentResult.failure(
+        errorMessage: error.userFriendlyMessage,
+        error: error,
+      );
     }
   }
 
@@ -192,7 +198,10 @@ class PaymentUIController extends _$PaymentUIController {
       final error = PaymentErrorHandler.handleStripeError(e);
       if (context.mounted) _showErrorSnackbar(context, error);
 
-      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
+      return PaymentResult.failure(
+        errorMessage: error.userFriendlyMessage,
+        error: error,
+      );
     }
   }
 
@@ -306,7 +315,7 @@ class PaymentUIController extends _$PaymentUIController {
           )!.paymentSuccessMessage(amountString, currency),
         );
       },
-      failure: (errorMessage, paymentIntentId) {
+      failure: (errorMessage, paymentIntentId, error) {
         AppLogger.e(
           'PAYMENT_UI',
           '❌ Showing error message: $errorMessage (Intent: $paymentIntentId)',
@@ -323,6 +332,15 @@ class PaymentUIController extends _$PaymentUIController {
               experimentId ?? 'unknown',
           AnalyticsEventConstants.paramPaymentIntentId:
               paymentIntentId ?? 'unknown',
+          AnalyticsEventConstants.paramFailureReason:
+              error?.type.analyticsSlug ?? 'unknown',
+          AnalyticsEventConstants.paramStripeCode: error?.stripeCode ?? 'none',
+          AnalyticsEventConstants.paramStripeErrorCode:
+              error?.stripeErrorCode ?? 'none',
+          AnalyticsEventConstants.paramDeclineCode:
+              error?.declineCode ?? 'none',
+          AnalyticsEventConstants.paramStripeErrorType:
+              error?.stripeErrorType ?? 'none',
         };
 
         // Firebase Analytics

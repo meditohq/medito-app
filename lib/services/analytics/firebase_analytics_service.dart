@@ -655,20 +655,10 @@ class FirebaseAnalyticsService {
   /// deep links (e.g., from Apple Ads) are properly attributed to the user
   /// Note: UTM parameters are kept in storage so they can be used by other analytics
   /// services (e.g., Meta) for attribution on subsequent events like donations
-  /// Re-asserts the `experience_level` user property from the answer persisted
-  /// at onboarding.
-  ///
-  /// It is set once, in the onboarding screen, at the moment the question is
-  /// answered — and [setUserProperty] is a no-op while analytics consent is
-  /// withheld. Anyone who onboarded during a window where consent was not yet
-  /// granted (notably every iOS user before the ATT consent-mode fix) answered
-  /// the question, had it written to prefs, and never got the property set. The
-  /// answer is therefore invisible on all their subsequent events even though
-  /// we know it.
-  ///
-  /// Re-asserting on launch closes that gap, and costs nothing when the property
-  /// is already correct. Mirrors [applyStoredUtmParameters], which exists for
-  /// the same reason.
+  /// Re-asserts `experience_level` from prefs. It is only set during onboarding,
+  /// where [setUserProperty] is a no-op if analytics consent is withheld — so
+  /// users who onboarded before granting consent never got it. Mirrors
+  /// [applyStoredUtmParameters].
   static Future<void> applyStoredExperienceLevel() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -677,8 +667,6 @@ class FirebaseAnalyticsService {
       );
       if (index == null) return;
 
-      // Index order is fixed by the onboarding question and matches the values
-      // logged on onboardingExperienceAnswered.
       const answers = ['never_tried', 'a_little', 'regular_practice'];
       if (index < 0 || index >= answers.length) {
         AppLogger.w(

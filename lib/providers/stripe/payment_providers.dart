@@ -286,7 +286,10 @@ class CardPaymentService implements PaymentMethodService {
       );
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
-      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
+      return PaymentResult.failure(
+        errorMessage: error.userFriendlyMessage,
+        error: error,
+      );
     }
   }
 
@@ -417,7 +420,10 @@ class ApplePayService implements PaymentMethodService {
       );
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
-      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
+      return PaymentResult.failure(
+        errorMessage: error.userFriendlyMessage,
+        error: error,
+      );
     }
   }
 
@@ -429,14 +435,8 @@ class ApplePayService implements PaymentMethodService {
 // PAYMENT CONTROLLERS
 // =============================================================================
 
-/// Logs [AnalyticsEventConstants.paymentSheetPresented] on the same parameter
-/// shape as the terminal payment events in `payment_ui_controller.dart`, so the
-/// four states join cleanly in BigQuery on paywall_source / variant_id /
-/// experiment_name.
-///
-/// Called after the PaymentIntent resolves and immediately before
-/// `processPayment` hands off to the platform sheet — an intent-creation failure
-/// therefore surfaces only as `payment_failed`, which keeps the funnel closed.
+/// Same parameter shape as the terminal payment events, so the four states join
+/// in BigQuery. Fired just before the platform sheet is presented.
 void _logPaymentSheetPresented({
   required local_models.PaymentMethodType paymentMethod,
   required String frequency,
@@ -462,7 +462,6 @@ void _logPaymentSheetPresented({
       AnalyticsEventConstants.paramPaywallSource: paywallSource ?? 'unknown',
       AnalyticsEventConstants.paramVariantId: experimentVariant ?? 'unknown',
       AnalyticsEventConstants.paramExperimentId: experimentId ?? 'unknown',
-      // Same slug under the legacy key, matching the terminal events.
       AnalyticsEventConstants.paramExperimentName: experimentId ?? 'unknown',
     },
   );
@@ -552,7 +551,10 @@ class OneTimePaymentController extends _$OneTimePaymentController {
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
       state = AsyncValue.error(error, StackTrace.current);
-      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
+      return PaymentResult.failure(
+        errorMessage: error.userFriendlyMessage,
+        error: error,
+      );
     }
   }
 }
@@ -643,7 +645,10 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
       state = AsyncValue.error(error, StackTrace.current);
-      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
+      return PaymentResult.failure(
+        errorMessage: error.userFriendlyMessage,
+        error: error,
+      );
     }
   }
 }
@@ -733,7 +738,10 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
       final error = PaymentErrorHandler.handleStripeError(e);
       paymentState.setError(error);
       state = AsyncValue.error(error, StackTrace.current);
-      return PaymentResult.failure(errorMessage: error.userFriendlyMessage);
+      return PaymentResult.failure(
+        errorMessage: error.userFriendlyMessage,
+        error: error,
+      );
     }
   }
 }

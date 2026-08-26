@@ -142,3 +142,4 @@ superwall-paywall.png
 /android/build
 /android/build/ios
 /android/build/ios/XCBuildData
+docs/experiments/*

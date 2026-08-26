@@ -7,6 +7,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/pack_sequence.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/providers/onboarding/onboarding_experienced_meditation_experiment.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
@@ -35,15 +36,22 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
 
   bool _showBatteryScreen = false;
 
-  // The 3-min first-meditation step is gated to non-regular meditators.
-  // Data: never_tried/a_little retain best on a short first session (~63-68%
-  // at <=3min, falling with length), whereas regular_practice users retain
-  // best on 4-6min+ and the beginner framing is a mismatch — so regulars skip
-  // the step and go straight to home. experienceIndex: 0 = never_tried,
-  // 1 = a_little, 2 = regular_practice. (The A/B that gated this behind a
-  // variant concluded 2026-07-14 — meditation for beginners won, now default.)
-  bool get _showMeditationStep =>
-      _experienceIndex == 0 || _experienceIndex == 1;
+  // onboarding_experienced_meditation arm; null unless `regular_practice`.
+  String? _experiencedMeditationVariant;
+
+  // The 3-min first-meditation step. never_tried/a_little retain best on a
+  // short first session (~63-68% at <=3min). experienceIndex: 0 = never_tried,
+  // 1 = a_little, 2 = regular_practice — regulars used to skip it
+  // unconditionally, now under test by
+  // OnboardingExperiencedMeditationExperiment.
+  bool get _showMeditationStep {
+    if (_experienceIndex == 0 || _experienceIndex == 1) return true;
+    if (_experienceIndex == 2) {
+      return _experiencedMeditationVariant ==
+          OnboardingExperiencedMeditationExperiment.variantOffered;
+    }
+    return false;
+  }
 
   final List<String> _images = [
     AssetConstants.onboardingImage1,
@@ -76,7 +84,29 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
         value: answers[index],
       ),
     );
-    setState(() => _experienceIndex = index);
+    // Enrol only `regular_practice`; anyone else would dilute the denominator.
+    var experiencedVariant = _experiencedMeditationVariant;
+    if (index == 2) {
+      experiencedVariant =
+          OnboardingExperiencedMeditationExperiment.resolveVariant(
+            ref.read(sharedPreferencesProvider),
+          );
+      unawaited(
+        analytics.logEvent(
+          name: AnalyticsEventConstants.onboardingExperimentExposure,
+          parameters: {
+            AnalyticsEventConstants.paramExperimentName:
+                OnboardingExperiencedMeditationExperiment.experimentName,
+            AnalyticsEventConstants.paramVariantId: experiencedVariant,
+          },
+        ),
+      );
+    }
+
+    setState(() {
+      _experienceIndex = index;
+      _experiencedMeditationVariant = experiencedVariant;
+    });
     // Persist the answer so it outlives onboarding — used to segment the
     // first-session experience (and its A/B test) and later personalisation.
     unawaited(
@@ -84,19 +114,9 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
           .read(sharedPreferencesProvider)
           .setInt(SharedPreferenceConstants.onboardingExperienceLevel, index),
     );
-    // Pin every new user explicitly onto the curated path: regular meditators
-    // at position 4 ("Deepen your practice"), which skips the three beginner
-    // packs, and everyone else at the top.
-    //
-    // Pinning *everyone* — not just experienced users — is also how the legacy
-    // megapack retires. PackSequence.legacyMegapackId is all eleven course
-    // packs concatenated, built so Up Next could cycle the whole catalogue
-    // without the app holding a list, which is precisely what stopped us
-    // dropping an experienced user in partway. It stays as the no-pin fallback
-    // in upNextPackIdProvider, so anyone who onboarded before this change keeps
-    // the megapack and keeps their place in it. Only users onboarding from here
-    // on get an explicit pin. That means no backfill, no migration flag, and no
-    // window where an existing user could be silently moved off their progress.
+    // Pin every new user onto the path — this is also how the legacy megapack
+    // retires: it stays the no-pin fallback, so pre-change users keep their
+    // place in it and no backfill is needed.
     final startingPackId = index == 2
         ? PackSequence.experiencedEntryPackId
         : PackSequence.beginnerEntryPackId;

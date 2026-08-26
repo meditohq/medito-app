@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:medito/models/stripe/payment_error_model.dart';
 
 part 'payment_intent_model.freezed.dart';
 part 'payment_intent_model.g.dart';
@@ -61,6 +62,9 @@ sealed class PaymentResult with _$PaymentResult {
   const factory PaymentResult.failure({
     required String errorMessage,
     String? paymentIntentId,
+
+    /// Structured cause, so `payment_failed` can report a stable reason.
+    PaymentError? error,
   }) = PaymentFailure;
 
   const factory PaymentResult.cancelled() = PaymentCancelled;

@@ -1,3 +1,6 @@
+// Scoped import: flutter_stripe also exports a `PaymentMethodType`, which
+// collides with our own in payment_method_model.dart.
+import 'package:flutter_stripe/flutter_stripe.dart' show StripeException;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:medito/models/stripe/payment_method_model.dart';
 
@@ -39,14 +42,53 @@ abstract class PaymentError with _$PaymentError {
     required String userFriendlyMessage,
     String? technicalDetails,
     String? suggestedAction,
+
+    // Straight from the SDK. [type] below is guessed by substring-matching
+    // toString(), so these are the fields that actually name a cause.
+    String? stripeCode,
+    String? stripeErrorCode,
+    String? declineCode,
+    String? stripeErrorType,
   }) = _PaymentError;
 
   factory PaymentError.fromJson(Map<String, Object?> json) =>
       _$PaymentErrorFromJson(json);
 }
 
+/// Stable slugs for analytics — not the user-facing message, which is localised.
+extension PaymentErrorTypeAnalytics on PaymentErrorType {
+  String get analyticsSlug => switch (this) {
+    PaymentErrorType.networkError => 'network_error',
+    PaymentErrorType.cardDeclined => 'card_declined',
+    PaymentErrorType.insufficientFunds => 'insufficient_funds',
+    PaymentErrorType.expiredCard => 'expired_card',
+    PaymentErrorType.invalidCard => 'invalid_card',
+    PaymentErrorType.paymentMethodNotSupported => 'payment_method_not_supported',
+    PaymentErrorType.googlePayNotAvailable => 'google_pay_not_available',
+    PaymentErrorType.applePayNotAvailable => 'apple_pay_not_available',
+    PaymentErrorType.paymentCancelled => 'payment_cancelled',
+    PaymentErrorType.amountTooSmall => 'amount_too_small',
+    PaymentErrorType.amountTooLarge => 'amount_too_large',
+    PaymentErrorType.genericError => 'generic_error',
+  };
+}
+
 class PaymentErrorHandler {
+  /// Classifies [error], then attaches Stripe's structured codes when present.
   static PaymentError handleStripeError(dynamic error) {
+    final classified = _classifyStripeError(error);
+    if (error is StripeException) {
+      return classified.copyWith(
+        stripeCode: error.error.code.name,
+        stripeErrorCode: error.error.stripeErrorCode,
+        declineCode: error.error.declineCode,
+        stripeErrorType: error.error.type,
+      );
+    }
+    return classified;
+  }
+
+  static PaymentError _classifyStripeError(dynamic error) {
     final errorString = error.toString().toLowerCase();
 
     if (errorString.contains('card_declined')) {
