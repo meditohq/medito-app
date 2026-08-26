@@ -49,6 +49,22 @@ class AnalyticsEventConstants {
   static const String paywallDismissedNoPayment =
       'paywall_dismissed_no_payment';
 
+  /// Event logged immediately before the Apple Pay / Google Pay / card sheet is
+  /// presented, once the PaymentIntent exists. This is the missing denominator
+  /// for the checkout funnel: without it, [paymentFailed] / [paymentCancelled] /
+  /// the donation success events have nothing to divide by, and a user who opens
+  /// the sheet and then backgrounds or kills the app emits nothing at all.
+  ///
+  /// The funnel closes as:
+  ///   payment_sheet_presented
+  ///     = donation_{onetime,monthly,yearly} + payment_failed + payment_cancelled
+  ///       + silent abandonment (the residual — previously invisible)
+  ///
+  /// Note [paywallPresented] is NOT a substitute: it counts donation-page views,
+  /// including everyone who never picked an amount, so it cannot separate
+  /// "never tried to pay" from "tried and bailed".
+  static const String paymentSheetPresented = 'payment_sheet_presented';
+
   /// Event logged when a payment fails
   static const String paymentFailed = 'payment_failed';
 
@@ -310,6 +326,16 @@ class AnalyticsEventConstants {
 
   /// Parameter name for payment intent identifier
   static const String paramPaymentIntentId = 'payment_intent_id';
+
+  /// Parameter name for the payment method the sheet was opened with
+  /// ("apple_pay", "google_pay", "card"). Worth segmenting on: only iOS with a
+  /// configured wallet gets the one-tap Apple Pay confirm — everything else
+  /// falls through to `card`, which presents the full Stripe PaymentSheet.
+  static const String paramPaymentMethod = 'payment_method';
+
+  /// Parameter name for the donation frequency the sheet was opened for
+  /// ("one_time", "monthly", "yearly").
+  static const String paramPaymentFrequency = 'payment_frequency';
 
   /// Parameter name for donation page A/B test variant
   static const String paramVariantId = 'variant_id';

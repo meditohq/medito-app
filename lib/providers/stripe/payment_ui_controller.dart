@@ -56,6 +56,7 @@ class PaymentUIController extends _$PaymentUIController {
         experimentId: experimentId,
         experimentVariant: variantId,
         paywallSource: paywallSource,
+        paywallId: paywallId,
       );
 
       if (context.mounted) {
@@ -110,6 +111,7 @@ class PaymentUIController extends _$PaymentUIController {
         experimentId: experimentId,
         experimentVariant: variantId,
         paywallSource: paywallSource,
+        paywallId: paywallId,
       );
 
       if (context.mounted) {
@@ -168,6 +170,7 @@ class PaymentUIController extends _$PaymentUIController {
         experimentId: experimentId,
         experimentVariant: variantId,
         paywallSource: paywallSource,
+        paywallId: paywallId,
       );
 
       if (context.mounted) {

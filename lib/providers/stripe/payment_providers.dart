@@ -5,7 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -427,6 +429,45 @@ class ApplePayService implements PaymentMethodService {
 // PAYMENT CONTROLLERS
 // =============================================================================
 
+/// Logs [AnalyticsEventConstants.paymentSheetPresented] on the same parameter
+/// shape as the terminal payment events in `payment_ui_controller.dart`, so the
+/// four states join cleanly in BigQuery on paywall_source / variant_id /
+/// experiment_name.
+///
+/// Called after the PaymentIntent resolves and immediately before
+/// `processPayment` hands off to the platform sheet — an intent-creation failure
+/// therefore surfaces only as `payment_failed`, which keeps the funnel closed.
+void _logPaymentSheetPresented({
+  required local_models.PaymentMethodType paymentMethod,
+  required String frequency,
+  required int amount,
+  required String currency,
+  String? paywallId,
+  String? userId,
+  String? paywallSource,
+  String? experimentVariant,
+  String? experimentId,
+}) {
+  FirebaseAnalyticsService().logEvent(
+    name: AnalyticsEventConstants.paymentSheetPresented,
+    parameters: {
+      AnalyticsEventConstants.paramAmount: amount.toDouble(),
+      AnalyticsEventConstants.paramDonationCurrency: currency,
+      AnalyticsEventConstants.paramPaymentMethod: _paymentMethodToString(
+        paymentMethod,
+      ),
+      AnalyticsEventConstants.paramPaymentFrequency: frequency,
+      AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
+      AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
+      AnalyticsEventConstants.paramPaywallSource: paywallSource ?? 'unknown',
+      AnalyticsEventConstants.paramVariantId: experimentVariant ?? 'unknown',
+      AnalyticsEventConstants.paramExperimentId: experimentId ?? 'unknown',
+      // Same slug under the legacy key, matching the terminal events.
+      AnalyticsEventConstants.paramExperimentName: experimentId ?? 'unknown',
+    },
+  );
+}
+
 @Riverpod(keepAlive: true)
 class OneTimePaymentController extends _$OneTimePaymentController {
   @override
@@ -441,6 +482,7 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     String? experimentId,
     String? experimentVariant,
     String? paywallSource,
+    String? paywallId,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -492,6 +534,18 @@ class OneTimePaymentController extends _$OneTimePaymentController {
       final paymentIntent = await paymentService.createPaymentIntent(request);
       state = AsyncValue.data(paymentIntent);
 
+      _logPaymentSheetPresented(
+        paymentMethod: paymentMethod,
+        frequency: 'one_time',
+        amount: amount,
+        currency: currency,
+        paywallId: paywallId,
+        userId: userId,
+        paywallSource: paywallSource,
+        experimentVariant: experimentVariant,
+        experimentId: experimentId,
+      );
+
       final result = await paymentService.processPayment(paymentIntent);
       return result;
     } catch (e) {
@@ -517,6 +571,7 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     String? experimentId,
     String? experimentVariant,
     String? paywallSource,
+    String? paywallId,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -569,6 +624,18 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
       final paymentIntent = await paymentService.createPaymentIntent(request);
       state = AsyncValue.data(paymentIntent);
 
+      _logPaymentSheetPresented(
+        paymentMethod: paymentMethod,
+        frequency: 'monthly',
+        amount: amount,
+        currency: currency,
+        paywallId: paywallId,
+        userId: userId,
+        paywallSource: paywallSource,
+        experimentVariant: experimentVariant,
+        experimentId: experimentId,
+      );
+
       final result = await paymentService.processPayment(paymentIntent);
       return result;
     } catch (e, st) {
@@ -595,6 +662,7 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     String? experimentId,
     String? experimentVariant,
     String? paywallSource,
+    String? paywallId,
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -646,6 +714,18 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
 
       final paymentIntent = await paymentService.createPaymentIntent(request);
       state = AsyncValue.data(paymentIntent);
+
+      _logPaymentSheetPresented(
+        paymentMethod: paymentMethod,
+        frequency: 'yearly',
+        amount: amount,
+        currency: currency,
+        paywallId: paywallId,
+        userId: userId,
+        paywallSource: paywallSource,
+        experimentVariant: experimentVariant,
+        experimentId: experimentId,
+      );
 
       final result = await paymentService.processPayment(paymentIntent);
       return result;
