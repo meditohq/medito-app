@@ -2049,6 +2049,41 @@ class AppLocalizationsEs extends AppLocalizations {
   String get upNextTitle => 'Your Path';
 
   @override
+  String upNextPackCompletedTitle(String packTitle) {
+    return 'You finished $packTitle';
+  }
+
+  @override
+  String upNextPackCompletedSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions complete',
+      one: '1 session complete',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get upNextPackCompletedCta => 'Start the next pack';
+
+  @override
+  String upNextPackCompletedCtaNamed(String packTitle) {
+    return 'Start $packTitle';
+  }
+
+  @override
+  String get upNextPathCompletedTitle => 'You\'ve completed your path';
+
+  @override
+  String get upNextPathCompletedSubtitle =>
+      'Every pack in your path is done. Explore the library to choose what\'s next.';
+
+  @override
+  String get upNextNextPackPinnedSnack =>
+      'Your next pack is ready in Your Path';
+
+  @override
   String upNextSessionCount(int current, int total) {
     return 'Session $current of $total';
   }

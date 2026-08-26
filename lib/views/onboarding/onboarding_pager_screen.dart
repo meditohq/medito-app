@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/pack_sequence.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
@@ -83,20 +84,28 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
           .read(sharedPreferencesProvider)
           .setInt(SharedPreferenceConstants.onboardingExperienceLevel, index),
     );
-    // Regular meditators (top experience level) start on a more advanced pack
-    // rather than the beginner-oriented default "Up Next".
-    if (index == 2) {
-      const experiencedPackId = 'J3DsFVgKjZdbDiif';
-      unawaited(
-        ref
-            .read(sharedPreferencesProvider)
-            .setString(
-              SharedPreferenceConstants.upNextPackId,
-              experiencedPackId,
-            ),
-      );
-      ref.invalidate(upNextPackIdProvider);
-    }
+    // Pin every new user explicitly onto the curated path: regular meditators
+    // at position 4 ("Deepen your practice"), which skips the three beginner
+    // packs, and everyone else at the top.
+    //
+    // Pinning *everyone* — not just experienced users — is also how the legacy
+    // megapack retires. PackSequence.legacyMegapackId is all eleven course
+    // packs concatenated, built so Up Next could cycle the whole catalogue
+    // without the app holding a list, which is precisely what stopped us
+    // dropping an experienced user in partway. It stays as the no-pin fallback
+    // in upNextPackIdProvider, so anyone who onboarded before this change keeps
+    // the megapack and keeps their place in it. Only users onboarding from here
+    // on get an explicit pin. That means no backfill, no migration flag, and no
+    // window where an existing user could be silently moved off their progress.
+    final startingPackId = index == 2
+        ? PackSequence.experiencedEntryPackId
+        : PackSequence.beginnerEntryPackId;
+    unawaited(
+      ref
+          .read(sharedPreferencesProvider)
+          .setString(SharedPreferenceConstants.upNextPackId, startingPackId),
+    );
+    ref.invalidate(upNextPackIdProvider);
     // Experience is now the only question in the onboarding flow — the
     // follow-up "intent" question was removed because its answer added a
     // screen of friction with almost no predictive value beyond this one.

@@ -1227,6 +1227,52 @@
   "@upNextTitle": {
     "description": "Title for the Your Path section on the home screen"
   },
+  "upNextPackCompletedTitle": "You finished {packTitle}",
+  "@upNextPackCompletedTitle": {
+    "description": "Headline on the Up Next card when every session in the pinned pack is complete",
+    "placeholders": {
+      "packTitle": {
+        "type": "String",
+        "description": "Title of the completed pack"
+      }
+    }
+  },
+  "upNextPackCompletedSubtitle": "{count, plural, =1{1 session complete} other{{count} sessions complete}}",
+  "@upNextPackCompletedSubtitle": {
+    "description": "Supporting line on the completed Up Next card",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of completed sessions"
+      }
+    }
+  },
+  "upNextPackCompletedCta": "Start the next pack",
+  "@upNextPackCompletedCta": {
+    "description": "Fallback button label on the completed Up Next card, used while the next pack's title is still loading"
+  },
+  "upNextPackCompletedCtaNamed": "Start {packTitle}",
+  "@upNextPackCompletedCtaNamed": {
+    "description": "Button on the completed Up Next card, naming the next pack it will pin",
+    "placeholders": {
+      "packTitle": {
+        "type": "String",
+        "description": "Title of the next pack in the sequence"
+      }
+    }
+  },
+  "upNextPathCompletedTitle": "You've completed your path",
+  "@upNextPathCompletedTitle": {
+    "description": "Headline shown when the user finishes the final pack in the curated sequence"
+  },
+  "upNextPathCompletedSubtitle": "Every pack in your path is done. Explore the library to choose what's next.",
+  "@upNextPathCompletedSubtitle": {
+    "description": "Supporting line shown when there is no next pack to offer"
+  },
+  "upNextNextPackPinnedSnack": "Your next pack is ready in Your Path",
+  "@upNextNextPackPinnedSnack": {
+    "description": "Snackbar confirming the next pack was pinned as Up Next"
+  },
   "upNextSessionCount": "Session {current} of {total}",
   "@upNextSessionCount": {
     "description": "Shows the current session number out of total sessions",

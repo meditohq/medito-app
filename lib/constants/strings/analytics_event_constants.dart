@@ -409,11 +409,63 @@ class AnalyticsEventConstants {
   /// Event logged when user swipes to skip the Up Next session
   static const String upNextSkipped = 'up_next_skipped';
 
+  /// The completed state was shown because the pinned pack is finished. Before
+  /// this existed, pack completion was entirely invisible in analytics — the
+  /// pin was cleared silently and the card either reverted to the beginner
+  /// Basics pack or disappeared. Carries [paramPackId],
+  /// [paramPackSequencePosition] and [paramHasNextPack].
+  static const String upNextPackCompleted = 'up_next_pack_completed';
+
+  /// The user accepted the completed-state CTA and the next pack in the
+  /// sequence was pinned. Carries the finished pack as [paramPackId] and the
+  /// newly pinned one as [paramNextPackId] — the pair is what makes path
+  /// progression measurable step by step.
+  static const String upNextNextPackPinned = 'up_next_next_pack_pinned';
+
+  /// The user finished the LAST pack in [PackSequence]. Logged alongside
+  /// [upNextPackCompleted] so we can size this cohort before deciding what the
+  /// end of the path should actually offer — that product decision is still
+  /// open, and this event is how we learn whether it is urgent.
+  static const String upNextPathCompleted = 'up_next_path_completed';
+
   /// Parameter name for the session/track ID in up next events
   static const String paramSessionId = 'session_id';
 
   /// Parameter name for the pack ID in up next events
   static const String paramPackId = 'pack_id';
+
+  /// The pack pinned by the completed-state CTA.
+  static const String paramNextPackId = 'next_pack_id';
+
+  /// Path position of the pack being moved INTO, so progression reads as a
+  /// sequence of hops without resolving ids downstream.
+  static const String paramNextPackSequencePosition =
+      'next_pack_sequence_position';
+
+  /// 1-based position of the pack within [PackSequence], or "none" for a pack
+  /// outside the curated path (Basics, the experienced-onboarder pack, or a
+  /// hand-pinned one). Lets drop-off be read per path step.
+  static const String paramPackSequencePosition = 'pack_sequence_position';
+
+  /// Whether the completed state had a next pack to offer. Separates the
+  /// end-of-path moment from an ordinary mid-path completion.
+  static const String paramHasNextPack = 'has_next_pack';
+
+  /// How the user's Up Next is configured: "megapack" (the pre-change cohort
+  /// still on the single concatenated pack), "sequence" (pinned onto the
+  /// curated path at onboarding), or "custom" (hand-pinned from Explore).
+  /// Reported on every Up Next event so listening behaviour can be compared
+  /// across the three — this is what tells us whether the stepped path beats
+  /// the megapack.
+  static const String paramUpNextMode = 'up_next_mode';
+
+  /// 1-based index of the session within its pack (completed + 1), so drop-off
+  /// inside a pack is visible and not just drop-off between packs.
+  static const String paramSessionIndexInPack = 'session_index_in_pack';
+
+  /// Total sessions in the pack, so [paramSessionIndexInPack] can be read as a
+  /// fraction without joining to the catalogue.
+  static const String paramPackTotalSessions = 'pack_total_sessions';
 
   // Pin events
   /// Event logged when user pins a pack as Up Next from the pack screen

@@ -3728,6 +3728,48 @@ abstract class AppLocalizations {
   /// **'Your Path'**
   String get upNextTitle;
 
+  /// Headline on the Up Next card when every session in the pinned pack is complete
+  ///
+  /// In en, this message translates to:
+  /// **'You finished {packTitle}'**
+  String upNextPackCompletedTitle(String packTitle);
+
+  /// Supporting line on the completed Up Next card
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 session complete} other{{count} sessions complete}}'**
+  String upNextPackCompletedSubtitle(int count);
+
+  /// Fallback button label on the completed Up Next card, used while the next pack's title is still loading
+  ///
+  /// In en, this message translates to:
+  /// **'Start the next pack'**
+  String get upNextPackCompletedCta;
+
+  /// Button on the completed Up Next card, naming the next pack it will pin
+  ///
+  /// In en, this message translates to:
+  /// **'Start {packTitle}'**
+  String upNextPackCompletedCtaNamed(String packTitle);
+
+  /// Headline shown when the user finishes the final pack in the curated sequence
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve completed your path'**
+  String get upNextPathCompletedTitle;
+
+  /// Supporting line shown when there is no next pack to offer
+  ///
+  /// In en, this message translates to:
+  /// **'Every pack in your path is done. Explore the library to choose what\'s next.'**
+  String get upNextPathCompletedSubtitle;
+
+  /// Snackbar confirming the next pack was pinned as Up Next
+  ///
+  /// In en, this message translates to:
+  /// **'Your next pack is ready in Your Path'**
+  String get upNextNextPackPinnedSnack;
+
   /// Shows the current session number out of total sessions
   ///
   /// In en, this message translates to:

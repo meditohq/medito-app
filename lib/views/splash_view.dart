@@ -313,6 +313,21 @@ class SplashViewState extends ConsumerState<SplashView>
         );
       }
 
+      // Re-assert the onboarding experience level as a user property. Set only
+      // at onboarding, it was silently dropped for anyone whose analytics
+      // consent was not yet granted at that moment — see
+      // applyStoredExperienceLevel.
+      try {
+        await FirebaseAnalyticsService.applyStoredExperienceLevel();
+      } catch (e, stackTrace) {
+        AppLogger.e(
+          'SPLASH',
+          'Error applying stored experience level',
+          e,
+          stackTrace,
+        );
+      }
+
       final currentUser = auth.currentUser;
       final isLoggedIn = await auth.isLoggedIn();
       AppLogger.i(

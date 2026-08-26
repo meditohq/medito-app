@@ -1119,5 +1119,12 @@
   "markAllComplete": "Marcar todo como completado",
   "markAllIncomplete": "Marcar todo como no completado",
   "markTrackComplete": "Marcar como completado",
-  "markTrackIncomplete": "Marcar como no completado"
+  "markTrackIncomplete": "Marcar como no completado",
+  "upNextPackCompletedTitle": "You finished {packTitle}",
+  "upNextPackCompletedSubtitle": "{count, plural, =1{1 session complete} other{{count} sessions complete}}",
+  "upNextPackCompletedCta": "Start the next pack",
+  "upNextPackCompletedCtaNamed": "Start {packTitle}",
+  "upNextPathCompletedTitle": "You've completed your path",
+  "upNextPathCompletedSubtitle": "Every pack in your path is done. Explore the library to choose what's next.",
+  "upNextNextPackPinnedSnack": "Your next pack is ready in Your Path"
 }
