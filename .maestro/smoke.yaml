@@ -117,11 +117,26 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           visible: "Close"
           timeout: 90000
       - takeScreenshot: paywall-webview
-      - tapOn: "Close"
 
-      - extendedWaitUntil:
-          visible: "Skip for Now"
-          timeout: 20000
+      # One tap is not enough: "Close is visible" is an accessibility-tree
+      # check, and the glyph sits in the tree from page load while it is still
+      # opacity:0 / pointer-events:none for its first 5s, so the wait above can
+      # clear while the tap is still a no-op. That cost two release runs
+      # (32850168903, 33071182758) on the same silent miss -- the webview was
+      # still open afterwards with the X exactly where the tree said it was.
+      # Retry until the app-side screen behind it comes back, which is the only
+      # thing that actually proves the dismiss landed.
+      - retry:
+          maxRetries: 2
+          commands:
+            - runFlow:
+                when:
+                  visible: "Close"
+                commands:
+                  - tapOn: "Close"
+            - extendedWaitUntil:
+                visible: "Skip for Now"
+                timeout: 15000
       - tapOn: "Skip for Now"
 
 # ── Onboarding: Notifications / smart reminders (re-added 26.6, sits
@@ -200,22 +215,27 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # ── Play a session via Your Path ──
 # The Your Path card's accessibility label is a merged multi-line string
-# like "Your Path: Medito's Journey — Welcome\nYOUR PATH\n·\nMedito's Journey\n...",
+# like "Your Path: Getting started — Welcome\nYOUR PATH\n·\nGetting started\n...",
 # so we use a regex with wildcards + DOTALL ((?s)) so "." matches newlines.
+# Match on "YOUR PATH" rather than a pack title: onboarding now pins new users
+# onto the pack sequence ("Getting started" for beginners, "Deepen your
+# practice" for regulars) instead of the megapack, so the title here depends on
+# who the account is. Pre-sequence installs with no pin still read
+# "Medito's Journey", and this matches those too.
 # On a fresh install, anonymous auth + home API can take up to 60s.
 - extendedWaitUntil:
-    visible: "(?s).*Medito's Journey.*"
+    visible: "(?si).*your path.*"
     timeout: 60000
 # On small screens the shortcut may be below the fold
 - scrollUntilVisible:
-    element: "(?s).*Medito's Journey.*"
+    element: "(?si).*your path.*"
     direction: DOWN
     timeout: 15000
     speed: 20
     waitToSettleTimeoutMs: 500
     centerElement: true
 - tapOn:
-    text: "(?s).*Medito's Journey.*"
+    text: "(?si).*your path.*"
 
 # Your Path may open a track (Play visible immediately) or a pack (list of sessions).
 # If it opened a pack, tap the first session in the list to reach a track view.
