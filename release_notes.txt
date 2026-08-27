@@ -1,10 +1,11 @@
 Unreleased
 -
 
-2608.25.0
-- Reminders: if notifications are switched off for Medito, the app now tells you and takes you to the right settings page — and sets your reminder up as soon as you come back
-- Reminders: we now explain what your phone is about to ask before it asks, so a "no" doesn't lock you out of reminders for good
-- Onboarding: fixed the "Pick my own time" option doing nothing if you closed the time picker
+2608.27.0
+- Your Path: finish a pack and Up Next offers the next one instead of stopping
+- Reminders: if notifications are switched off for Medito, the app now says so, takes you to the right settings page and sets your reminder up when you come back
+- Reminders: we explain what your phone is about to ask before it asks, so a "no" doesn't lock you out of reminders for good
+- Onboarding: fixed "Pick my own time" doing nothing if you closed the time picker
 - Onboarding: added a bedtime reminder option
 
 2608.18.0
