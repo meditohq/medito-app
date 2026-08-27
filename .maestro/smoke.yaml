@@ -290,6 +290,25 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       - tapOn:
           text: "Skip forward 10 seconds"
           optional: true
+      # A skip tap resolved against the player hierarchy but delivered after
+      # the end screen has taken over lands on that screen's reminder CTA
+      # instead, which raises the soft-ask dialog added in 2608.27. It is
+      # modal, so it hides the streak text from the hierarchy: the loop would
+      # spin out all 60 iterations and the assertion below would fail against
+      # an end screen that is in fact right there behind it (run 33077160666).
+      - runFlow:
+          when:
+            visible: "One quick thing"
+          commands:
+            - tapOn: "Not Now"
+
+# Same dialog, last-moment case: raised by the final skip tap, after the loop
+# has already exited on a visible streak.
+- runFlow:
+    when:
+      visible: "One quick thing"
+    commands:
+      - tapOn: "Not Now"
 
 # The end screen must now be visible — this is the actual assertion.
 - extendedWaitUntil:
