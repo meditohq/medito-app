@@ -100,7 +100,6 @@ flutter:
     - assets/images/
     - assets/images/app_icons/ios/
     - assets/images/app_icons/android/
-    - shorebird.yaml
   fonts:
     - family: Source Serif
       fonts:

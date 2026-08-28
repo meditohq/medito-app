@@ -177,29 +177,13 @@ jobs:
           KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
         run: printf '%s' "$KEYSTORE_FILE" | base64 -d > android/meditokey.jks
 
-      - name: Set up Shorebird
-        uses: shorebirdtech/setup-shorebird@v1
-
-      - name: Shorebird release (Android)
-        env:
-          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+      - name: Build APK
         run: |
-          # Builds the store APK WITH the Shorebird engine so this release is
-          # patchable over-the-air. --artifact apk keeps the existing output path
-          # (build/app/outputs/apk/prod/release/app-prod-release.apk), so the
-          # "Upload APK artifact" + "Upload to Play Store" steps stay unchanged.
-          # Shorebird-level flags (flavor, obfuscation, flutter version) go BEFORE
-          # `--`; flutter build args go AFTER it. Obfuscation is auto-matched on
-          # patch, so pass --obfuscate/--split-debug-info on release only.
-          shorebird release android \
-            --flutter-version=3.44.7 \
-            --flavor prod \
-            --artifact apk \
-            --split-debug-info=./symbols --obfuscate \
-            -- \
+          flutter build apk --flavor prod --release \
             --dart-define-from-file=.prod.json \
-            --dart-define=MOCK_MODE=false
-          # First-run sanity check: confirm the APK landed where the downstream
+            --dart-define=MOCK_MODE=false \
+            --obfuscate --split-debug-info=./symbols
+          # Sanity check: confirm the APK landed where the downstream
           # "Upload APK artifact" + Play upload steps expect it.
           ls -lh build/app/outputs/apk/prod/release/app-prod-release.apk
 
@@ -938,18 +922,13 @@ jobs:
           plutil -lint ios/Runner/Runner.entitlements
           plutil -lint ios/Runner/RunnerRelease.entitlements
 
-      # Bundler-managed fastlane so the fastlane-plugin-shorebird plugin actually
-      # loads (bare `gem install` + a Pluginfile does NOT register a plugin with
-      # bare `fastlane`). Prereq: run `cd ios && fastlane add_plugin shorebird`
-      # locally and commit ios/Gemfile, ios/Gemfile.lock, ios/fastlane/Pluginfile.
+      # Bundler-managed fastlane, so the fastlane version CI runs is the one
+      # pinned in ios/Gemfile.lock. Lanes are invoked as `bundle exec fastlane`.
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
           bundler-cache: true
           working-directory: ios
-
-      - name: Set up Shorebird
-        uses: shorebirdtech/setup-shorebird@v1
 
       - name: Set release notes
         env:
@@ -1005,7 +984,6 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
-          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             bundle exec fastlane release
@@ -1016,10 +994,10 @@ jobs:
             if [ "${{ inputs.ios_appstore }}" = "true" ]; then
               if [ "${{ inputs.ios_testflight }}" = "true" ]; then
                 # The beta lane above already built this version and uploaded
-                # it to App Store Connect. Building again is guaranteed to fail
-                # (`shorebird release ios` exits 70 on an existing release), so
-                # point the release lane at the build beta just uploaded and
-                # let deliver attach it instead of rebuilding.
+                # it to App Store Connect. App Store Connect rejects a second
+                # upload of the same build number, so point the release lane at
+                # the build beta just uploaded and let deliver attach it
+                # instead of rebuilding.
                 version=$(grep '^version:' ../pubspec.yaml | sed 's/version: *//')
                 bundle exec fastlane release \
                   submit_for_review:"${{ inputs.submit_for_review }}" \

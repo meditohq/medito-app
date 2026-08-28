@@ -775,8 +775,6 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     );
   }
 
-  // Deliberately no leading icon: a new Material glyph changes the tree-shaken
-  // icon font, which is an asset diff Shorebird patches cannot ship.
   Widget _buildEmailField(BuildContext context, Color onSurface) {
     final l10n = AppLocalizations.of(context)!;
     return Column(
@@ -858,10 +856,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
                   ),
                   SizedBox(width: 6),
-                  // U+F8FF (Apple logo) instead of Icons.apple: a new Material
-                  // icon glyph changes the tree-shaken icon font, which is an
-                  // asset diff Shorebird patches cannot ship. iOS system fonts
-                  // render this correctly and the button is iOS-only.
+                  // U+F8FF (Apple logo), drawn by the iOS system font — this
+                  // button is iOS-only.
                   Text(
                     '',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
