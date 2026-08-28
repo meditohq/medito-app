@@ -10,6 +10,9 @@ analyzer:
     - lib/**/*.g.dart
     - lib/**/*.freezed.dart
     - widgetbook/**
+    - build/**
+    - android/**
+    - ios/**
 
 linter:
   rules:

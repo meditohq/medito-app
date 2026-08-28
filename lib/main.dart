@@ -74,6 +74,13 @@ void main() async {
 
   AppLogger.d('MAIN', 'Starting app initialization');
 
+  // device_preview 3.0 simulates device metrics by installing its own
+  // WidgetsBinding, so it has to run before any other binding is created —
+  // ensureInitialized() below is then a no-op that returns this binding.
+  // No-op in release builds; the simulation is driven from the "device_preview"
+  // tab in Flutter DevTools, not from in-app UI.
+  DevicePreview.enable(enabled: DebugOptions.enableDevicePreview);
+
   WidgetsFlutterBinding.ensureInitialized();
 
   if (isMockMode) {
@@ -173,28 +180,25 @@ void main() async {
   _initCompleter?.complete();
 
   runApp(
-    DevicePreview(
-      enabled: DebugOptions.enableDevicePreview,
-      builder: (context) => ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-          if (isMockMode) ...[
-            donationServiceProvider.overrideWith(
-              (ref) => MockDonationApiService(),
-            ),
-            paymentServiceProvider.overrideWith(
-              (ref) => MockPaymentServiceImpl(),
-            ),
-            authRepositoryProvider.overrideWith((ref) async {
-              return AuthRepositoryImpl(
-                preferences: prefs,
-                authService: MockAuthApiService(),
-              );
-            }),
-          ],
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        if (isMockMode) ...[
+          donationServiceProvider.overrideWith(
+            (ref) => MockDonationApiService(),
+          ),
+          paymentServiceProvider.overrideWith(
+            (ref) => MockPaymentServiceImpl(),
+          ),
+          authRepositoryProvider.overrideWith((ref) async {
+            return AuthRepositoryImpl(
+              preferences: prefs,
+              authService: MockAuthApiService(),
+            );
+          }),
         ],
-        child: const ParentWidget(),
-      ),
+      ],
+      child: const ParentWidget(),
     ),
   );
 }

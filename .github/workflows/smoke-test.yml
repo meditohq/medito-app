@@ -30,7 +30,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.44.7'
+          flutter-version: '3.47.2'
           cache: true
 
       - name: Cache pub packages
@@ -207,7 +207,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2.12.0
         with:
-          flutter-version: '3.44.7'
+          flutter-version: '3.47.2'
           cache: true
 
       - name: Cache pub packages

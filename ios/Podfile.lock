@@ -411,7 +411,7 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 30564b85d2f81a96f9d312bd23acf8186ff092ae
   FirebaseRemoteConfigInterop: 4801ab93a543ef8fedfb40ae2f66d03e3fdcb864
   FirebaseSessions: 0e5f64cd99400275798fcb5e2b773dd000ca02c1
-  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
   flutter_local_notifications: 643a3eda1ce1c0599413ca31672536d423dee214
   flutter_secure_storage_darwin: acdb3f316ed05a3e68f856e0353b133eec373a23
   GoogleAdsOnDeviceConversion: 914d95386d0dd6815e8b1d70c465fe1d13312a1e
