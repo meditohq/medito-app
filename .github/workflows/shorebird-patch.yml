@@ -230,17 +230,26 @@ jobs:
       - name: Set up Shorebird
         uses: shorebirdtech/setup-shorebird@v1
 
+      # match reaches the certs repo over SSH with a deploy key, so the runner
+      # needs GitHub's host key up front or the clone fails host key
+      # verification instead of authenticating.
+      - name: Trust github.com for the match SSH clone
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 600 ~/.ssh/known_hosts
+
       - name: Shorebird patch (iOS)
         working-directory: ios
         env:
-          # readonly=false until MATCH_GIT_TOKEN gets write access to the
-          # cert repo: the widget-extension profile exists in the Apple portal
-          # but was never persisted to the match repo (403 on push), so
-          # readonly match can never find it.
+          # readonly=false for the first run after the deploy-key switch: the
+          # widget-extension profile exists in the Apple portal but was never
+          # persisted to the match repo (the old token could not push), so
+          # readonly match cannot find it until one writable run stores it.
           MATCH_READONLY: 'false'
           FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: '120'
           FASTLANE_XCODEBUILD_SETTINGS_RETRIES: '8'
-          MATCH_GIT_TOKEN: ${{ secrets.MATCH_GIT_TOKEN }}
+          MATCH_DEPLOY_KEY: ${{ secrets.MATCH_DEPLOY_KEY }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
           DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}

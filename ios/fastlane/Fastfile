@@ -1,5 +1,3 @@
-require 'base64'
-
 default_platform(:ios)
 
 def match_readonly?
@@ -400,8 +398,13 @@ def fetch_profiles
     type: 'appstore',
     readonly: match_readonly?,
     app_identifier: [ENV["DEVELOPER_APP_IDENTIFIER"], widget_bundle_id],
-    git_url: "https://github.com/meditohq/fastlane-certificates.git",
-    git_basic_authorization: Base64.strict_encode64("x-access-token:#{ENV['MATCH_GIT_TOKEN']}"),
+    # SSH with a write-enabled deploy key on the certs repo. The previous
+    # HTTPS + MATCH_GIT_TOKEN auth could read but not write, so every run
+    # re-fetched the widget profile from the portal and then failed to store
+    # it ("Write access to repository not granted", 403) — which is also why
+    # readonly mode could not work: the widget profile was never in the repo.
+    git_url: "git@github.com:meditohq/fastlane-certificates.git",
+    git_private_key: ENV["MATCH_DEPLOY_KEY"],
     keychain_name: ENV["TEMP_KEYCHAIN_USER"],
     keychain_password: ENV["TEMP_KEYCHAIN_PASSWORD"]
   )
