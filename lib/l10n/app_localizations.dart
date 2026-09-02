@@ -2723,19 +2723,19 @@ abstract class AppLocalizations {
   /// No description provided for @emailMismatchDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Device Linked to Another Account'**
+  /// **'Use a different email?'**
   String get emailMismatchDialogTitle;
 
   /// No description provided for @emailMismatchDialogMessage.
   ///
   /// In en, this message translates to:
-  /// **'This device is linked to an account with a different email address. Do you want to start a new account with this email? Any progress on this device will be cleared.'**
+  /// **'This phone was last signed in with a different email address. If you continue with this one, a new account will be created and any progress saved on this phone will be cleared. To keep your existing progress, sign in with the original email instead.'**
   String get emailMismatchDialogMessage;
 
   /// No description provided for @emailMismatchStartNewAccount.
   ///
   /// In en, this message translates to:
-  /// **'Start New Account'**
+  /// **'Create new account'**
   String get emailMismatchStartNewAccount;
 
   /// No description provided for @analyticsTrackingTitle.

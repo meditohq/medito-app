@@ -1494,14 +1494,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Iniciar sesión con Correo Electrónico';
 
   @override
-  String get emailMismatchDialogTitle => 'Dispositivo Vinculado a Otra Cuenta';
+  String get emailMismatchDialogTitle => '¿Usar otro correo?';
 
   @override
   String get emailMismatchDialogMessage =>
-      'Este dispositivo está vinculado a una cuenta con otra dirección de correo electrónico. ¿Quieres crear una cuenta nueva con este correo? El progreso en este dispositivo se borrará.';
+      'Este teléfono inició sesión por última vez con otra dirección de correo. Si continúas con esta, se creará una cuenta nueva y se borrará el progreso guardado en este teléfono. Para conservar tu progreso, inicia sesión con el correo original.';
 
   @override
-  String get emailMismatchStartNewAccount => 'Crear Cuenta Nueva';
+  String get emailMismatchStartNewAccount => 'Crear cuenta nueva';
 
   @override
   String get analyticsTrackingTitle => 'Recolección de Datos';
