@@ -1724,7 +1724,7 @@ abstract class AppLocalizations {
   /// **'When will you meditate?'**
   String get reminderChipsQuestion;
 
-  /// Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 8:00 AM'
+  /// Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 7:00 AM'
   ///
   /// In en, this message translates to:
   /// **'Morning'**
@@ -2719,6 +2719,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in with Email'**
   String get emailExistsSignInWithEmail;
+
+  /// No description provided for @emailMismatchDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Linked to Another Account'**
+  String get emailMismatchDialogTitle;
+
+  /// No description provided for @emailMismatchDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This device is linked to an account with a different email address. Do you want to start a new account with this email? Any progress on this device will be cleared.'**
+  String get emailMismatchDialogMessage;
+
+  /// No description provided for @emailMismatchStartNewAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Start New Account'**
+  String get emailMismatchStartNewAccount;
 
   /// No description provided for @analyticsTrackingTitle.
   ///

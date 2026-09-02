@@ -1464,6 +1464,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailExistsSignInWithEmail => 'Sign in with Email';
 
   @override
+  String get emailMismatchDialogTitle => 'Device Linked to Another Account';
+
+  @override
+  String get emailMismatchDialogMessage =>
+      'This device is linked to an account with a different email address. Do you want to start a new account with this email? Any progress on this device will be cleared.';
+
+  @override
+  String get emailMismatchStartNewAccount => 'Start New Account';
+
+  @override
   String get analyticsTrackingTitle => 'Data Collection';
 
   @override

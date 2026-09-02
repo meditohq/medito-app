@@ -10,6 +10,7 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
@@ -187,6 +188,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       if (!proceed) return;
     }
 
+    await _sendOtp();
+  }
+
+  /// Requests an OTP for the entered email. If the device's stored client ID is
+  /// linked to a different email, asks whether to start a new account on this
+  /// device (clearing the stored ID) and retries once if the user agrees.
+  Future<void> _sendOtp({bool allowNewAccount = true}) async {
     setState(() {
       _isLoading = true;
     });
@@ -208,9 +216,51 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     } on InactiveEmailError {
       showSnackBar(context, AppLocalizations.of(context)!.accountInactiveError);
     } on EmailMismatchError catch (e) {
-      // Device is linked to a different email; surface the server's message
-      // instead of silently creating a new account.
-      showSnackBar(context, e.message);
+      // The stored client ID belongs to an account with a different email and
+      // the entered email is not registered. Never mint a new client ID
+      // silently: ask first, and only then forget the old ID and retry.
+      if (!allowNewAccount || !mounted) {
+        showSnackBar(context, e.message);
+        return;
+      }
+      final startNew =
+          await showDialog<bool>(
+            context: context,
+            builder: (context) => MeditoDialog(
+              title: AppLocalizations.of(context)!.emailMismatchDialogTitle,
+              content: MeditoDialogBody(
+                AppLocalizations.of(context)!.emailMismatchDialogMessage,
+              ),
+              actions: [
+                MeditoDialogSecondaryButton(
+                  label: AppLocalizations.of(context)!.cancelAction,
+                  onPressed: () => Navigator.of(context).pop(false),
+                ),
+                MeditoDialogDestructiveButton(
+                  label: AppLocalizations.of(
+                    context,
+                  )!.emailMismatchStartNewAccount,
+                  onPressed: () => Navigator.of(context).pop(true),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+      if (!startNew || !mounted) return;
+
+      // Drop the old account's local footprint so it can't be merged into the
+      // new account, then let requestOtp generate a fresh client ID.
+      final statsManager = ref.read(statsManagerProvider);
+      await statsManager.initialize();
+      await statsManager.clearAllStats();
+      await ref
+          .read(sharedPreferencesProvider)
+          .remove(SharedPreferenceConstants.userId);
+      setState(() {
+        _isLoading = false;
+      });
+      await _sendOtp(allowNewAccount: false);
+      return;
     } catch (e) {
       showSnackBar(
         context,
@@ -253,8 +303,12 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       );
 
       // Remember which account this device was on, so we only wipe local
-      // stats when the server actually switches us to a different one.
-      final previousUserId = ref.read(userIdProvider);
+      // stats when the server actually switches us to a different one. Read
+      // SharedPreferences directly: userIdProvider is a plain Provider whose
+      // dependencies never change, so it would return a stale cached value.
+      final previousUserId = ref
+          .read(sharedPreferencesProvider)
+          .getString(SharedPreferenceConstants.userId);
 
       var success = await ref
           .read(authRepositorySyncProvider)
@@ -271,6 +325,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           level: 1000,
         );
         await _refreshUserInfo();
+        // userIdProvider caches its value; refresh it now that the server may
+        // have switched us to a different client ID.
+        ref.invalidate(userIdProvider);
 
         // Log the state of the auth repository after successful login
         final authRepo = ref.read(authRepositorySyncProvider);
@@ -313,7 +370,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         // without ever loading the home screen).
         final statsManager = ref.read(statsManagerProvider);
         await statsManager.initialize();
-        final newUserId = ref.read(userIdProvider);
+        final newUserId = authRepo.currentUser?.id;
         if (newUserId != previousUserId) {
           // Server moved us onto a different account: drop the local copy of
           // the old one before pulling the new account's stats.
