@@ -127,9 +127,9 @@ class AnalyticsEventConstants {
   static const String onboardingFirstMeditationSkipTap =
       'onboarding_first_meditation_skip_tap';
 
-  /// Parameter on onboardingReminderSetTap (chips arm of the
-  /// onboarding_reminder_time_chips experiment): which time slot the user
-  /// picked — 'morning', 'evening', 'night', or 'custom'.
+  /// Parameter on onboardingReminderSetTap: which time-of-day chip the user
+  /// picked — 'morning', 'evening', 'night', or 'custom'. (Chips shipped to
+  /// everyone after the onboarding_reminder_time_chips A/B concluded 2026-08-25.)
   static const String paramReminderSlot = 'reminder_slot';
 
   /// Event logged when the pre-permission soft-ask is shown on the onboarding

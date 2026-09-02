@@ -142,12 +142,9 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # ── Onboarding: Notifications / smart reminders (re-added 26.6, sits
 # between the donation primer and battery/tracking). Skip it for the
 # smoke run — the system permission dialog is OS-driven and would
-# otherwise stall the flow. The primary CTA varies by permission state:
-# "Remind Me Daily" when notifications aren't granted yet, or
-# "Turn on Smart Reminders" when they already are (CI grants
-# POST_NOTIFICATIONS up front via adb).
-# The reminder time-chips experiment (onboarding_reminder_time_chips) shows
-# "When will you meditate?" instead of the CTA button on the chips arm.
+# otherwise stall the flow. Since the time-chips A/B concluded (2026-08-25)
+# every user sees the "When will you meditate?" chips instead of a single
+# CTA button (CI grants POST_NOTIFICATIONS up front via adb).
 # The scrolling hero image (2607.10) pushes the CTA/chips below the fold on
 # small simulators, so wait on the always-visible title and scroll the skip
 # link into view before asserting/tapping it.

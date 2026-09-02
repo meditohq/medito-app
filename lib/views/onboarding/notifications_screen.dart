@@ -9,7 +9,6 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
-import 'package:medito/providers/onboarding/onboarding_reminder_experiment.dart';
 import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
@@ -45,30 +44,20 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     with SingleTickerProviderStateMixin {
-  bool _notificationsGranted = false;
   bool _isProcessing = false;
 
   late final AnimationController _previewAnimation;
-  late final String _reminderVariant;
 
-  /// Which time-of-day chip was picked (chips arm only); tagged on the
-  /// reminder-set event as paramReminderSlot.
+  /// Which time-of-day chip was picked; tagged on the reminder-set event as
+  /// paramReminderSlot.
   String? _selectedSlot;
-
-  bool get _isChipsVariant =>
-      _reminderVariant == OnboardingReminderExperiment.variantChips;
 
   /// Tagged on every event fired from this screen so analytics can
   /// distinguish the post-donation placement (re-introduced 26.6) from the
-  /// pre-donation placement (removed 26.5.19), and segment the reminder
-  /// time-chips experiment (experiment_name + variant_id, same BigQuery
-  /// convention as the paywall experiments).
-  Map<String, Object> get _eventParams => {
-    'placement': 'post_donation',
-    AnalyticsEventConstants.paramExperimentName:
-        OnboardingReminderExperiment.experimentName,
-    AnalyticsEventConstants.paramVariantId: _reminderVariant,
-  };
+  /// pre-donation placement (removed 26.5.19). The time-chips A/B
+  /// (onboarding_reminder_time_chips) concluded 2026-08-25 with chips shipped
+  /// to everyone, so the experiment tags are gone.
+  Map<String, Object> get _eventParams => {'placement': 'post_donation'};
 
   @override
   void initState() {
@@ -80,14 +69,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     Future.delayed(const Duration(milliseconds: 250), () {
       if (mounted) _previewAnimation.forward();
     });
-    _checkNotificationPermission();
-    _reminderVariant = OnboardingReminderExperiment.resolveVariant(
-      ref.read(sharedPreferencesProvider),
-    );
-    FirebaseAnalyticsService().logEvent(
-      name: AnalyticsEventConstants.onboardingExperimentExposure,
-      parameters: _eventParams,
-    );
     FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingNotificationsPreviewShown,
       parameters: _eventParams,
@@ -98,13 +79,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   void dispose() {
     _previewAnimation.dispose();
     super.dispose();
-  }
-
-  Future<void> _checkNotificationPermission() async {
-    final status = await Permission.notification.status;
-    if (mounted) {
-      setState(() => _notificationsGranted = status.isGranted);
-    }
   }
 
   Future<void> _handleNotificationsPermission() async {
@@ -157,12 +131,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         parameters: _eventParams,
       );
 
-      if (mounted) {
-        setState(() {
-          _notificationsGranted = true;
-        });
-      }
-
       // Automatically set up reminders and advance
       await _setupRemindersAndAdvance();
     } else {
@@ -189,7 +157,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         final recovered = await _recoverBlockedPermission();
         if (recovered && mounted) {
           await handler.initialize(context, ref);
-          if (mounted) setState(() => _notificationsGranted = true);
           await _setupRemindersAndAdvance();
           return;
         }
@@ -426,11 +393,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                                     ),
                                 textAlign: TextAlign.center,
                               ),
-                              // Chips arm: the body line is dropped — the
-                              // title plus the "When will you meditate?"
-                              // question above the chips carry the message,
-                              // one message per block instead of two.
-                              if (!_isChipsVariant || reminderTime != null) ...[
+                              // Before a reminder is set the body line is
+                              // dropped — the title plus the "When will you
+                              // meditate?" question above the chips carry the
+                              // message, one message per block instead of two.
+                              if (reminderTime != null) ...[
                                 const SizedBox(height: 16),
                                 Text(
                                   _notificationsBody(
@@ -450,21 +417,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                             children: [
                               if (reminderTime != null)
                                 _buildSmartRemindersOnButton()
-                              else if (_isChipsVariant)
-                                _buildTimeChips(AppLocalizations.of(context)!)
                               else
-                                _buildActionButton(
-                                  text: _notificationsGranted
-                                      ? AppLocalizations.of(
-                                          context,
-                                        )!.turnOnSmartReminders
-                                      : AppLocalizations.of(
-                                          context,
-                                        )!.setReminderB,
-                                  onPressed: _isProcessing
-                                      ? null
-                                      : _handleNotificationsPermission,
-                                ),
+                                _buildTimeChips(AppLocalizations.of(context)!),
                               const SizedBox(height: 12),
                               SizedBox(
                                 width: double.infinity,
@@ -732,19 +686,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
           AppLocalizations.of(context)!.smartRemindersOn,
           style: const TextStyle(color: Colors.white),
         ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required String text,
-    required VoidCallback? onPressed,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        child: Text(text, style: const TextStyle(color: Colors.white)),
       ),
     );
   }
