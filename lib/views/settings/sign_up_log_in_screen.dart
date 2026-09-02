@@ -207,6 +207,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       _startRetryTimer();
     } on InactiveEmailError {
       showSnackBar(context, AppLocalizations.of(context)!.accountInactiveError);
+    } on EmailMismatchError catch (e) {
+      // Device is linked to a different email; surface the server's message
+      // instead of silently creating a new account.
+      showSnackBar(context, e.message);
     } catch (e) {
       showSnackBar(
         context,
@@ -247,6 +251,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         '[SIGN_UP] OTP length: ${_otpController.text.trim().length}',
         level: 1000,
       );
+
+      // Remember which account this device was on, so we only wipe local
+      // stats when the server actually switches us to a different one.
+      final previousUserId = ref.read(userIdProvider);
 
       var success = await ref
           .read(authRepositorySyncProvider)
@@ -305,8 +313,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         // without ever loading the home screen).
         final statsManager = ref.read(statsManagerProvider);
         await statsManager.initialize();
-        await statsManager.clearAllStats();
-        // Force sync after clearing stats to ensure we fetch from server
+        final newUserId = ref.read(userIdProvider);
+        if (newUserId != previousUserId) {
+          // Server moved us onto a different account: drop the local copy of
+          // the old one before pulling the new account's stats.
+          await statsManager.clearAllStats();
+        }
+        // Force sync to fetch the (possibly different) account's stats
         await statsManager.sync(force: true);
         ref.read(statsProvider.notifier).refresh();
         ref.invalidate(packProvider);

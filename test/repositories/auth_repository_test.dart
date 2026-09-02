@@ -122,69 +122,64 @@ void main() {
     );
 
     test(
-      'signInAnonymously retries with new client ID on EmailExistsError',
+      'signInAnonymously rethrows EmailExistsError and keeps the client ID',
       () async {
         // Setup
-        final retryTokens = AuthTokens(
-          accessToken: 'test-access-retry',
-          refreshToken: 'test-refresh-retry',
-          expiresIn: 900,
-          clientId: 'new-client-id-from-server',
-        );
-
-        var callCount = 0;
-
         when(
           () => mockPreferences.getString(SharedPreferenceConstants.userId),
         ).thenReturn(clientId);
-        // First call throws EmailExistsError, subsequent calls succeed
         when(
-          () => mockAuthApiService.signIn(clientId: any(named: 'clientId')),
-        ).thenAnswer((invocation) {
-          callCount++;
-          final calledClientId = invocation.namedArguments[#clientId] as String;
-          // First call with original client ID throws
-          if (callCount == 1 && calledClientId == clientId) {
-            throw const EmailExistsError(email: email);
-          }
-          // Retry with new client ID succeeds
-          return Future.value(retryTokens);
-        });
+          () => mockAuthApiService.signIn(clientId: clientId),
+        ).thenThrow(const EmailExistsError(email: email));
         when(
           () => mockPreferences.setString(any(), any()),
         ).thenAnswer((_) async => true);
-        when(
-          () => mockPreferences.setBool(any(), any()),
-        ).thenAnswer((_) async => true);
-        when(
-          () => mockHttpApiService.setAuthHeader(any()),
-        ).thenAnswer((_) async {});
 
-        // Action
-        await authRepository.signInAnonymously();
+        // Action + Assert
+        await expectLater(
+          () => authRepository.signInAnonymously(),
+          throwsA(isA<EmailExistsError>()),
+        );
 
-        // Assert - verify signIn was called twice (first fails, retry succeeds)
-        expect(callCount, equals(2));
+        // Only the original client ID was tried; nothing was minted or stored
         verify(
-          () => mockAuthApiService.signIn(clientId: any(named: 'clientId')),
-        ).called(2);
-
-        // Assert - verify successful sign-in setup after retry
-        verify(
-          () => mockHttpApiService.setAuthHeader(retryTokens.accessToken),
+          () => mockAuthApiService.signIn(clientId: clientId),
         ).called(1);
-        verify(
+        verifyNever(
           () => mockPreferences.setString(
             SharedPreferenceConstants.userId,
-            retryTokens.clientId,
+            any(),
           ),
-        ).called(1);
-        verify(
-          () => mockPreferences.setBool(
-            SharedPreferenceConstants.isLoggedIn,
-            true,
+        );
+      },
+    );
+
+    test(
+      'requestOtp rethrows EmailMismatchError and keeps the client ID',
+      () async {
+        // Setup
+        when(
+          () => mockPreferences.getString(SharedPreferenceConstants.userId),
+        ).thenReturn(clientId);
+        when(
+          () => mockAuthApiService.requestOtp(email, clientId),
+        ).thenThrow(const EmailMismatchError());
+        when(
+          () => mockPreferences.setString(any(), any()),
+        ).thenAnswer((_) async => true);
+
+        // Action + Assert
+        await expectLater(
+          () => authRepository.requestOtp(email),
+          throwsA(isA<EmailMismatchError>()),
+        );
+        verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
+        verifyNever(
+          () => mockPreferences.setString(
+            SharedPreferenceConstants.userId,
+            any(),
           ),
-        ).called(1);
+        );
       },
     );
 

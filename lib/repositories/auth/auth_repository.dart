@@ -554,18 +554,10 @@ class AuthRepositoryImpl extends AuthRepository {
           _generateClientId();
       await _authService.requestOtp(email, clientId);
     } on EmailMismatchError {
-      // Client ID exists but is associated with different email
-      // Generate a new client ID and retry once
-      dev.log(
-        '[AUTH_REPO] EMAIL_MISMATCH detected, generating new client ID and retrying',
-        level: 500,
-      );
-      final newClientId = _generateClientId();
-      await _preferences.setString(
-        SharedPreferenceConstants.userId,
-        newClientId,
-      );
-      await _authService.requestOtp(email, newClientId);
+      // This device's client ID is linked to a different email. Do NOT mint a
+      // new client ID here (that silently orphans the existing account); let the
+      // UI show the server's message so the person can use the right address.
+      rethrow;
     } on RateLimitError catch (e) {
       _crashlyticsService.recordError(
         e,
@@ -754,60 +746,11 @@ class AuthRepositoryImpl extends AuthRepository {
 
       dev.log('[AUTH_REPO] Anonymous sign in successful');
     } on EmailExistsError {
-      dev.log(
-        '[AUTH_REPO] EMAIL_ASSOCIATED detected, generating new client ID and retrying',
-        level: 500,
-      );
-
-      // The existing client_id is associated with an email account
-      // Generate a new client_id and retry anonymous sign-in
-      final newClientId = _generateClientId();
-      await _preferences.setString(
-        SharedPreferenceConstants.userId,
-        newClientId,
-      );
-
-      try {
-        _tokens = await _authService.signIn(clientId: newClientId);
-
-        // Update user info
-        _currentUser = User(id: _tokens!.clientId);
-
-        // Update HTTP service with the new token
-        _httpApiService.setAuthHeader(_tokens!.accessToken);
-
-        // Save client ID
-        await _preferences.setString(
-          SharedPreferenceConstants.userId,
-          _tokens!.clientId,
-        );
-
-        // Mark user as logged in
-        await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, true);
-
-        try {
-          await AppHistoryService.recordSignIn(
-            _preferences,
-            userId: _tokens!.clientId,
-            email: null,
-          );
-        } catch (e) {
-          dev.log(
-            '[AUTH_REPO] Failed to record sign-in history: $e',
-            level: 800,
-          );
-        }
-
-        dev.log('[AUTH_REPO] Anonymous sign in successful with new client ID');
-      } catch (retryError) {
-        _crashlyticsService.recordError(
-          retryError,
-          StackTrace.current,
-          reason:
-              'AuthRepo: Error signing in anonymously after EMAIL_ASSOCIATED retry',
-        );
-        // Don't rethrow, this should not crash the app
-      }
+      // This client ID already belongs to an email account. Do NOT mint a new
+      // client ID and retry (that silently orphans the account and its stats).
+      // Rethrow so the splash screen can offer "Sign in with email" or
+      // "Continue with new account".
+      rethrow;
     } catch (e) {
       _crashlyticsService.recordError(
         e,
