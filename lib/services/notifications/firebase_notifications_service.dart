@@ -17,7 +17,9 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
+import '../../constants/strings/analytics_event_constants.dart';
 import '../../models/notification/notification_payload_model.dart';
+import '../analytics/firebase_analytics_service.dart';
 import '../../routes/routes.dart';
 import '../../views/bottom_navigation/bottom_navigation_bar_view.dart';
 
@@ -151,25 +153,84 @@ class FirebaseMessagingHandler {
     _flutterLocalNotificationsPlugin.initialize(
       settings: initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        final payload = response.payload;
-        if (payload != null && payload.isNotEmpty) {
-          try {
-            final data = json.decode(payload);
-            _navigate(context, ref, data);
-          } catch (e) {
-            if (kDebugMode) {
-              AppLogger.d(
-                'FIREBASE_NOTIFICATIONS',
-                "Error decoding notification payload: $e",
-              );
-            }
-          }
+        final data = _decodePayload(response.payload);
+        unawaited(_logNotificationOpen(data));
+
+        // Only deep-link when the payload actually asks for one. The smart
+        // reminder series carries no type/path, and routing it through
+        // _navigate would push a second home view on top of the current
+        // screen — the OS opening the app is already the whole intent.
+        if (data != null && data['type'] != null) {
+          _navigate(context, ref, data);
         }
       },
     );
 
+    // A reminder fires while the app is terminated, which is the normal case
+    // for a 7am notification. That tap never reaches the callback above — it
+    // only shows up in the launch details — so without this the taps that
+    // matter most were the ones we could not see.
+    unawaited(_logColdStartNotificationOpen());
+
     if (kDebugMode) {
       AppLogger.d('FIREBASE_NOTIFICATIONS', "Local notifications initialized");
+    }
+  }
+
+  /// Decodes a notification payload without ever throwing. Returns null for a
+  /// missing or malformed payload; the open is still logged, as
+  /// source='unknown', so a payload regression shows up as a shift in the mix
+  /// rather than as silence.
+  Map<String, dynamic>? _decodePayload(String? payload) {
+    if (payload == null || payload.isEmpty) return null;
+    try {
+      final decoded = json.decode(payload);
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.d(
+          'FIREBASE_NOTIFICATIONS',
+          'Error decoding notification payload: $e',
+        );
+      }
+      return null;
+    }
+  }
+
+  Future<void> _logNotificationOpen(
+    Map<String, dynamic>? data, {
+    String? sourceOverride,
+  }) async {
+    final source =
+        sourceOverride ??
+        (data?['source'] as String?) ??
+        (data == null ? 'unknown' : AnalyticsEventConstants.sourcePush);
+    final day = data?[AnalyticsEventConstants.paramNotificationDay];
+
+    await FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.notificationOpened,
+      parameters: {
+        AnalyticsEventConstants.paramSource: source,
+        if (day is int) AnalyticsEventConstants.paramNotificationDay: day,
+      },
+    );
+  }
+
+  Future<void> _logColdStartNotificationOpen() async {
+    try {
+      final details = await _flutterLocalNotificationsPlugin
+          .getNotificationAppLaunchDetails();
+      if (details?.didNotificationLaunchApp != true) return;
+
+      await _logNotificationOpen(
+        _decodePayload(details?.notificationResponse?.payload),
+      );
+    } catch (e, st) {
+      AppLogger.e(
+        'FIREBASE_NOTIFICATIONS',
+        'Error reading notification launch details: $e',
+        st,
+      );
     }
   }
 
@@ -244,6 +305,12 @@ class FirebaseMessagingHandler {
     BuildContext context,
     WidgetRef ref,
   ) async {
+    unawaited(
+      _logNotificationOpen(
+        message.data,
+        sourceOverride: AnalyticsEventConstants.sourcePush,
+      ),
+    );
     _navigate(context, ref, message.data);
     await ref.read(reminderProvider).clearBadge();
   }

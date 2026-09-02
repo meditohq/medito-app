@@ -94,7 +94,7 @@ class ReminderProvider {
     try {
       for (final item in items) {
         try {
-          final payload = item.scheduledDate.toIso8601String();
+          final payload = item.payload;
           AppLogger.d(
             'REMINDER',
             'Scheduling reminder ${item.id} with payload: $payload',
@@ -119,6 +119,10 @@ class ReminderProvider {
                 priority: Priority.high,
               ),
             ),
+            // Was omitted entirely: the payload was built and logged but never
+            // attached, so every tap arrived with null and the handler's
+            // null-guard skipped navigation and analytics alike.
+            payload: payload,
           );
           AppLogger.d(
             'XXXX',
@@ -269,10 +273,15 @@ class ScheduledReminder {
   final String title;
   final String body;
 
+  /// JSON handed back to the tap handler so the open can be attributed.
+  /// Must be valid JSON: the handler decodes it.
+  final String payload;
+
   ScheduledReminder({
     required this.id,
     required this.scheduledDate,
     required this.title,
     required this.body,
+    required this.payload,
   });
 }

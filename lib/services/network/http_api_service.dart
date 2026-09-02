@@ -393,7 +393,7 @@ class HttpApiService {
       AppLogger.i('HTTP', 'Request successful after token refresh');
       await _addHttpDebugLog('Request successful after token refresh');
       return content.isEmpty ? {} : _parseResponseContent(content);
-    } on NetworkConnectionError catch (e) {
+    } on NetworkConnectionError {
       // Don't log out on connection issues - let the user retry when connection is available
       AppLogger.w(
         'HTTP',

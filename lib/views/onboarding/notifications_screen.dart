@@ -299,7 +299,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
     final picked = await showTimePicker(
       context: context,
-      initialTime: const TimeOfDay(hour: 8, minute: 0),
+      initialTime: const TimeOfDay(hour: 7, minute: 0),
       initialEntryMode: TimePickerEntryMode.input,
     );
 
@@ -627,7 +627,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       (
         'morning',
         l10n.reminderSlotMorning,
-        const TimeOfDay(hour: 8, minute: 0),
+        const TimeOfDay(hour: 7, minute: 0),
       ),
       (
         'evening',

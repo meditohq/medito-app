@@ -325,7 +325,7 @@
   },
   "reminderSlotMorning": "Morning",
   "@reminderSlotMorning": {
-    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 8:00 AM'"
+    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 7:00 AM'"
   },
   "reminderSlotAfternoon": "Afternoon",
   "@reminderSlotAfternoon": {
