@@ -1494,6 +1494,19 @@ class AppLocalizationsEs extends AppLocalizations {
       'Iniciar sesión con Correo Electrónico';
 
   @override
+  String get emailMismatchDialogTitle => 'Otro correo';
+
+  @override
+  String get emailMismatchDialogMessage =>
+      'Este teléfono inició sesión antes con otra dirección de correo. Si esa es tu cuenta, vuelve atrás y usa ese correo. Si no, continúa para crear una cuenta nueva. Tu progreso actual se queda con el correo original.';
+
+  @override
+  String get emailMismatchStartNewAccount => 'Continuar';
+
+  @override
+  String get emailMismatchGoBack => 'Volver';
+
+  @override
   String get analyticsTrackingTitle => 'Recolección de Datos';
 
   @override
