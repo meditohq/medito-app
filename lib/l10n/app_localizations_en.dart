@@ -1464,14 +1464,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailExistsSignInWithEmail => 'Sign in with Email';
 
   @override
-  String get emailMismatchDialogTitle => 'Use a different email?';
+  String get emailMismatchDialogTitle => 'Different email';
 
   @override
   String get emailMismatchDialogMessage =>
-      'This phone was last signed in with a different email address. If you continue with this one, a new account will be created and any progress saved on this phone will be cleared. To keep your existing progress, sign in with the original email instead.';
+      'This phone was signed in with a different email address before. If that is your account, go back and use that email. Otherwise continue to create a new account. Your existing progress stays with the original email.';
 
   @override
-  String get emailMismatchStartNewAccount => 'Create new account';
+  String get emailMismatchStartNewAccount => 'Continue';
+
+  @override
+  String get emailMismatchGoBack => 'Go back';
 
   @override
   String get analyticsTrackingTitle => 'Data Collection';

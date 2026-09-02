@@ -219,7 +219,8 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       // The stored client ID belongs to an account with a different email and
       // the entered email is not registered. Never mint a new client ID
       // silently: ask first, and only then forget the old ID and retry.
-      if (!allowNewAccount || !mounted) {
+      if (!mounted) return;
+      if (!allowNewAccount) {
         showSnackBar(context, e.message);
         return;
       }
@@ -233,10 +234,10 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               ),
               actions: [
                 MeditoDialogSecondaryButton(
-                  label: AppLocalizations.of(context)!.cancelAction,
+                  label: AppLocalizations.of(context)!.emailMismatchGoBack,
                   onPressed: () => Navigator.of(context).pop(false),
                 ),
-                MeditoDialogDestructiveButton(
+                MeditoDialogPrimaryButton(
                   label: AppLocalizations.of(
                     context,
                   )!.emailMismatchStartNewAccount,
@@ -248,8 +249,11 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           false;
       if (!startNew || !mounted) return;
 
-      // Drop the old account's local footprint so it can't be merged into the
-      // new account, then let requestOtp generate a fresh client ID.
+      // Leave the device clean: the old account's local stats must not be
+      // merged into the new account (they stay on the server under the old
+      // email), and with no stored client ID both requestOtp and verifyOtp
+      // generate a fresh one. If the person abandons the flow here, splash
+      // "Continue" then creates a plain new anonymous account.
       final statsManager = ref.read(statsManagerProvider);
       await statsManager.initialize();
       await statsManager.clearAllStats();
