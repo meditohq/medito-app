@@ -137,7 +137,7 @@ void main() {
 
         // Action + Assert
         await expectLater(
-          () => authRepository.signInAnonymously(),
+          authRepository.signInAnonymously(),
           throwsA(isA<EmailExistsError>()),
         );
 
@@ -170,7 +170,7 @@ void main() {
 
         // Action + Assert
         await expectLater(
-          () => authRepository.requestOtp(email),
+          authRepository.requestOtp(email),
           throwsA(isA<EmailMismatchError>()),
         );
         verify(() => mockAuthApiService.requestOtp(email, clientId)).called(1);
@@ -219,7 +219,7 @@ void main() {
 
         // Action & Assert
         expect(
-          () => authRepository.requestOtp(email),
+          authRepository.requestOtp(email),
           throwsA(
             isA<RateLimitError>()
                 .having((e) => e.message, 'message', exceptionMessage)
