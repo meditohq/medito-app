@@ -250,7 +250,7 @@ class HttpApiService {
       );
 
       if (response.statusCode == HttpStatus.unauthorized) {
-        return _handleUnauthorizedResponse(
+        return await _handleUnauthorizedResponse(
           response.statusCode,
           requestBuilder,
           body,
@@ -393,7 +393,7 @@ class HttpApiService {
       AppLogger.i('HTTP', 'Request successful after token refresh');
       await _addHttpDebugLog('Request successful after token refresh');
       return content.isEmpty ? {} : _parseResponseContent(content);
-    } on NetworkConnectionError catch (e, _) {
+    } on NetworkConnectionError catch (e) {
       // Don't log out on connection issues - let the user retry when connection is available
       AppLogger.w(
         'HTTP',
@@ -617,7 +617,7 @@ class HttpApiService {
           'Using result of already in-progress token refresh',
         );
         return;
-      } catch (e, _) {
+      } catch (e) {
         AppLogger.w(
           'HTTP',
           'Previous token refresh failed, will attempt new refresh',
