@@ -975,6 +975,15 @@ class AppLocalizationsEs extends AppLocalizations {
       'Aún no has elegido una hora: elige una arriba u omite por ahora.';
 
   @override
+  String get reminderTitle => 'Recordatorio diario';
+
+  @override
+  String get reminderOff => 'Desactivado';
+
+  @override
+  String get reminderTurnOff => 'Desactivar recordatorios';
+
+  @override
   String get onboardingBatteryTitle =>
       'Mantén las Meditaciones Sin Interrupciones';
 
@@ -1349,6 +1358,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get zenModeEnabledMessage =>
       'Las estadísticas se ocultarán en toda la aplicación';
+
+  @override
+  String get zenModeDescription =>
+      'Oculta tu racha, estadísticas y puntuación de constancia en toda la app, para que practiques sin llevar la cuenta. Tu progreso se sigue registrando y reaparece al desactivar el Modo Zen.';
+
+  @override
+  String get zenModeOn => 'Activado';
+
+  @override
+  String get zenModeOff => 'Desactivado';
 
   @override
   String get mindClear => 'Mente Clara';

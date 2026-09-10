@@ -79,6 +79,34 @@ class SmartRemindersService {
     return time;
   }
 
+  /// Turn reminders on at a time the user chose (Settings bottom sheet /
+  /// onboarding chips), instead of the silent "same time tomorrow" default of
+  /// [enable]. The series is anchored to the next occurrence of [time].
+  Future<DateTime> enableAt(TimeOfDay time, {AppLocalizations? l10n}) async {
+    await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
+    await _saveTime(time);
+
+    final now = DateTime.now();
+    final candidate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
+    final anchor = candidate.isBefore(now)
+        ? candidate.add(const Duration(days: 1))
+        : candidate;
+
+    final scheduler = SmartRemindersScheduler(
+      prefs: prefs,
+      reminders: reminders,
+    );
+    await scheduler.scheduleSeriesFromAnchor(anchor, l10n: l10n);
+
+    return anchor;
+  }
+
   Future<void> disable() async {
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, false);
     await reminders.cancelDailyNotification();

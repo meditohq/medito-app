@@ -1808,6 +1808,24 @@ abstract class AppLocalizations {
   /// **'No time picked yet — choose one above, or skip for now.'**
   String get reminderCustomCancelled;
 
+  /// Title of the settings tile that opens the reminder time bottom sheet (replaced the Smart Reminders switch)
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder'**
+  String get reminderTitle;
+
+  /// Subtitle on the settings reminder tile when no daily reminder is scheduled
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get reminderOff;
+
+  /// Last row of the reminder time bottom sheet; cancels the scheduled reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off reminders'**
+  String get reminderTurnOff;
+
   /// No description provided for @onboardingBatteryTitle.
   ///
   /// In en, this message translates to:
@@ -2467,6 +2485,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stats will be hidden throughout the app'**
   String get zenModeEnabledMessage;
+
+  /// Explanatory text in the Zen Mode bottom sheet, above the On / Off buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Hides your streak, stats and consistency score everywhere in the app, so you can practise without keeping score. Your progress is still recorded and reappears when you turn Zen Mode off.'**
+  String get zenModeDescription;
+
+  /// Zen Mode state label; button in the sheet and subtitle on the settings row
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get zenModeOn;
+
+  /// Zen Mode state label; button in the sheet and subtitle on the settings row
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get zenModeOff;
 
   /// Message shown in zen mode after completing meditation
   ///

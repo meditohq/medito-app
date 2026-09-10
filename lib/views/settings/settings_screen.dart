@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,13 +17,13 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/debug/debug_info_screen.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
+import 'package:medito/views/settings/advanced_settings_screen.dart';
 import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
-import 'package:medito/views/settings/widgets/expandable_section_widget.dart';
-import 'package:medito/views/settings/widgets/smart_reminder_tile.dart';
-import 'package:medito/views/settings/widgets/app_icon_inline_selector.dart';
-import 'package:medito/views/settings/widgets/theme_inline_selector.dart';
+import 'package:medito/views/settings/widgets/reminder_tile.dart';
+import 'package:medito/views/settings/widgets/app_icon_tile.dart';
+import 'package:medito/views/settings/widgets/theme_tile.dart';
 import 'package:medito/views/settings/widgets/widget_option_tile.dart';
 import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -63,8 +64,11 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  static final _isHealthSyncAvailable = Platform.isIOS || Platform.isAndroid;
-  static final _isDndSupported = Platform.isAndroid;
+  // `kIsWeb` guards let the screen render in the web-based widget previewer
+  // (see previews/settings_previews.dart) where dart:io Platform throws.
+  static final _isHealthSyncAvailable =
+      !kIsWeb && (Platform.isIOS || Platform.isAndroid);
+  static final _isDndSupported = !kIsWeb && Platform.isAndroid;
   final _analytics = FirebaseAnalyticsService();
 
   @override
@@ -205,7 +209,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         path: TypeConstants.toggleZenMode,
       ),
-      if (Platform.isAndroid)
+      if (!kIsWeb && Platform.isAndroid)
         SettingsItem(
           section: AppLocalizations.of(context)!.customizationSection,
           type: TypeConstants.route,
@@ -316,11 +320,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     if (item.type == TypeConstants.appIcon) {
-      return const AppIconInlineSelector();
+      return AppIconTile(
+        icon: item.icon,
+        title: item.title,
+        hasUnderline: !isLast,
+      );
     }
 
     if (isThemeItem) {
-      return const ThemeInlineSelector();
+      return ThemeTile(
+        icon: item.icon,
+        title: item.title,
+        hasUnderline: !isLast,
+      );
     }
 
     if (isWidgetItem) {
@@ -394,16 +406,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         .where((item) => item.path == TypeConstants.addWidget)
         .firstOrNull;
 
-    // Items that render as their own inline cards
-    final inlineCardTypes = {TypeConstants.theme, TypeConstants.appIcon};
-
-    // Items to group in the "other customization" card
+    // Everything except the widget shortcut (which leads the card)
     final otherCustomizationItems = allCustomizationItems
-        .where(
-          (item) =>
-              item.path != TypeConstants.addWidget &&
-              !inlineCardTypes.contains(item.type),
-        )
+        .where((item) => item.path != TypeConstants.addWidget)
         .toList();
 
     // Support & Community card
@@ -443,7 +448,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       padding: const EdgeInsets.only(top: padding16),
       sliver: SliverList(
         delegate: SliverChildListDelegate([
-          const SmartReminderTile(),
+          const ReminderTile(),
           if (!isEffectivelySignedIn) ...[
             _buildSectionTitle(context, AppLocalizations.of(context)!.account),
             _buildSectionCard([const AccountSectionWidget(inCard: true)]),
@@ -465,28 +470,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             context,
             AppLocalizations.of(context)!.customization,
           ),
-          // Theme and App Icon render as their own cards
-          ...allCustomizationItems
-              .where((item) => inlineCardTypes.contains(item.type))
-              .map((item) => _buildMenuItemTile(context, ref, item)),
           if (otherCustomizationChildren.isNotEmpty)
             _buildSectionCard(otherCustomizationChildren),
           _buildSectionTitle(context, AppLocalizations.of(context)!.helpLegal),
           _buildSectionCard([
-            for (var i = 0; i < helpItems.length; i++)
-              _buildMenuItemTile(
-                context,
-                ref,
-                helpItems[i],
-                isLast: i == helpItems.length - 1,
+            for (final item in helpItems)
+              _buildMenuItemTile(context, ref, item),
+            RowItemWidget(
+              icon: MeditoIcon(
+                assetName: MeditoIcons.settings,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
+              title: AppLocalizations.of(context)!.advanced,
+              hasUnderline: false,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const AdvancedSettingsScreen(),
+                ),
+              ),
+            ),
           ]),
           if (isEffectivelySignedIn) ...[
             _buildSectionTitle(context, AppLocalizations.of(context)!.account),
             _buildSectionCard([const AccountSectionWidget(inCard: true)]),
           ],
-          const SizedBox(height: 16.0),
-          const ExpandableSectionWidget(),
+          const SizedBox(height: 32.0),
         ]),
       ),
     );
