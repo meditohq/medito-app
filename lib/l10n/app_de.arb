@@ -325,7 +325,7 @@
   },
   "reminderSlotMorning": "Morgens",
   "@reminderSlotMorning": {
-    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 8:00 AM'"
+    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 7:00 AM'"
   },
   "reminderSlotAfternoon": "Nachmittags",
   "@reminderSlotAfternoon": {
@@ -378,6 +378,18 @@
   "reminderCustomCancelled": "Noch keine Uhrzeit ausgewählt – wähle oben eine aus oder überspringe diesen Schritt vorerst.",
   "@reminderCustomCancelled": {
     "description": "Feedback shown when the user opens the custom time picker and dismisses it without choosing, so the tap is not a silent dead end"
+  },
+  "reminderTitle": "Tägliche Erinnerung",
+  "@reminderTitle": {
+    "description": "Title of the settings tile that opens the reminder time bottom sheet (replaced the Smart Reminders switch)"
+  },
+  "reminderOff": "Aus",
+  "@reminderOff": {
+    "description": "Subtitle on the settings reminder tile when no daily reminder is scheduled"
+  },
+  "reminderTurnOff": "Erinnerungen deaktivieren",
+  "@reminderTurnOff": {
+    "description": "Last row of the reminder time bottom sheet; cancels the scheduled reminders"
   },
   "onboardingBatteryTitle": "Eine Einstellung für ungestörte Meditationen",
   "onboardingBatteryBody": "Dein Smartphone kann Medito während einer Sitzung anhalten. Eine kleine Änderung an den Einstellungen verhindert das.",
@@ -504,6 +516,18 @@
   "@zenModeEnabledMessage": {
     "description": "Message shown when zen mode is enabled"
   },
+  "zenModeDescription": "Blendet deine Serie, deine Statistiken und deinen Beständigkeitswert überall in der App aus, sodass du trainieren kannst, ohne den Punktestand im Auge zu behalten. Deine Fortschritte werden weiterhin aufgezeichnet und wieder angezeigt, sobald du den Zen-Modus deaktivierst.",
+  "@zenModeDescription": {
+    "description": "Explanatory text in the Zen Mode bottom sheet, above the On / Off buttons"
+  },
+  "zenModeOn": "An",
+  "@zenModeOn": {
+    "description": "Zen Mode state label; button in the sheet and subtitle on the settings row"
+  },
+  "zenModeOff": "Aus",
+  "@zenModeOff": {
+    "description": "Zen Mode state label; button in the sheet and subtitle on the settings row"
+  },
   "mindClear": "Klarer Geist",
   "@mindClear": {
     "description": "Message shown in zen mode after completing meditation"
@@ -567,6 +591,10 @@
   "emailExistsDialogMessage": "Du scheinst dich schon einmal mit einer E-Mail-Adresse angemeldet zu haben. Möchtest du dich erneut mit deiner E-Mail-Adresse anmelden?",
   "emailExistsContinueNewAccount": "Weiter",
   "emailExistsSignInWithEmail": "Mit E-Mail anmelden",
+  "emailMismatchDialogTitle": "Andere E-Mail",
+  "emailMismatchDialogMessage": "Dieses Smartphone war zuvor mit einer anderen E-Mail-Adresse angemeldet. Falls es sich dabei um Ihr Konto handelt, kehren Sie zurück und verwenden Sie diese E-Mail-Adresse. Andernfalls fahren Sie fort, um ein neues Konto zu erstellen. Ihr bisheriger Meditationsfortschritt bleibt mit der ursprünglichen E-Mail-Adresse erhalten.",
+  "emailMismatchStartNewAccount": "Weiter",
+  "emailMismatchGoBack": "Zurück",
   "analyticsTrackingTitle": "Datenerfassung",
   "analyticsTrackingContent": "Wir erfassen Nutzungsdaten und bestimmte Kennungen (etwa eine Benutzer-ID und, soweit erlaubt, Geräte- oder Werbekennungen), um die App zu verbessern und zu verstehen, wie ihre Funktionen genutzt werden. Du kannst die Nutzungsanalyse jederzeit deaktivieren. Weitere Informationen findest du in unserer Datenschutzerklärung.",
   "turnOffAnalyticsText": "Nutzungsanalyse deaktivieren",

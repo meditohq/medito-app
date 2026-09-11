@@ -984,6 +984,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Noch keine Uhrzeit ausgewählt – wähle oben eine aus oder überspringe diesen Schritt vorerst.';
 
   @override
+  String get reminderTitle => 'Tägliche Erinnerung';
+
+  @override
+  String get reminderOff => 'Aus';
+
+  @override
+  String get reminderTurnOff => 'Erinnerungen deaktivieren';
+
+  @override
   String get onboardingBatteryTitle =>
       'Eine Einstellung für ungestörte Meditationen';
 
@@ -1363,6 +1372,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Statistiken werden in der gesamten App ausgeblendet';
 
   @override
+  String get zenModeDescription =>
+      'Blendet deine Serie, deine Statistiken und deinen Beständigkeitswert überall in der App aus, sodass du trainieren kannst, ohne den Punktestand im Auge zu behalten. Deine Fortschritte werden weiterhin aufgezeichnet und wieder angezeigt, sobald du den Zen-Modus deaktivierst.';
+
+  @override
+  String get zenModeOn => 'An';
+
+  @override
+  String get zenModeOff => 'Aus';
+
+  @override
   String get mindClear => 'Klarer Geist';
 
   @override
@@ -1503,6 +1522,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get emailExistsSignInWithEmail => 'Mit E-Mail anmelden';
+
+  @override
+  String get emailMismatchDialogTitle => 'Andere E-Mail';
+
+  @override
+  String get emailMismatchDialogMessage =>
+      'Dieses Smartphone war zuvor mit einer anderen E-Mail-Adresse angemeldet. Falls es sich dabei um Ihr Konto handelt, kehren Sie zurück und verwenden Sie diese E-Mail-Adresse. Andernfalls fahren Sie fort, um ein neues Konto zu erstellen. Ihr bisheriger Meditationsfortschritt bleibt mit der ursprünglichen E-Mail-Adresse erhalten.';
+
+  @override
+  String get emailMismatchStartNewAccount => 'Weiter';
+
+  @override
+  String get emailMismatchGoBack => 'Zurück';
 
   @override
   String get analyticsTrackingTitle => 'Datenerfassung';
