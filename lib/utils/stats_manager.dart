@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/stats_service.dart';
@@ -144,6 +145,10 @@ class StatsManager {
           _lastSyncedAt != null && now.difference(_lastSyncedAt!) < _syncTtl;
       if (!_dirty && withinTtl) {
         //dev.log'StatsManager: Skipping sync - within TTL and not dirty');
+        // Callers use sync() to populate _allStats. Skipping the network
+        // round-trip must not leave the in-memory copy empty, otherwise the
+        // next mutation starts from scratch and wipes the local history.
+        _allStats ??= await _loadLocalAllStats();
         return;
       }
     }
@@ -366,11 +371,43 @@ class StatsManager {
       var areRemoteStatsNewer = remoteStats.updated > localAllStats.updated;
       var baseStats = areRemoteStatsNewer ? remoteStats : localAllStats;
 
+      // Lifetime counters are monotonic, so never let a freshly-created copy
+      // (e.g. a completion recorded before the local history was loaded)
+      // win just because it has the newer `updated` stamp. Take the larger
+      // value from either side, and never report fewer completions than we
+      // actually hold in the merged history.
+      // Legacy streak-freeze entries and the manual-edit form's dummy entries
+      // live in the history but are not completed tracks, so they do not
+      // count toward the floor.
+      final realCompletions = deduplicatedAudioCompleted
+          .where(
+            (a) =>
+                a.id != TypeConstants.streakFreeze &&
+                !a.id.startsWith('dummy-track'),
+          )
+          .length;
+      final mergedTotalTracks = [
+        localAllStats.totalTracksCompleted,
+        remoteStats.totalTracksCompleted,
+        realCompletions,
+      ].reduce((a, b) => a > b ? a : b);
+      final mergedTimeListened =
+          localAllStats.totalTimeListened > remoteStats.totalTimeListened
+          ? localAllStats.totalTimeListened
+          : remoteStats.totalTimeListened;
+      final mergedLongestStreak =
+          localAllStats.streakLongest > remoteStats.streakLongest
+          ? localAllStats.streakLongest
+          : remoteStats.streakLongest;
+
       // Update with combined data
       _allStats = baseStats.copyWith(
         audioCompleted: deduplicatedAudioCompleted,
         freezeUsageDates: deduplicatedFreezeUsageDates,
         tracksChecked: combinedTracksChecked,
+        totalTracksCompleted: mergedTotalTracks,
+        totalTimeListened: mergedTimeListened,
+        streakLongest: mergedLongestStreak,
         updated: _getCurrentDate().millisecondsSinceEpoch,
       );
     } else {
@@ -468,6 +505,29 @@ class StatsManager {
     return LocalAllStats.empty();
   }
 
+  /// Makes sure [_allStats] holds the best copy we have *before* anything is
+  /// mutated. The on-disk copy is authoritative when the in-memory one is
+  /// missing (fresh engine, e.g. Android replaying a completion that
+  /// finished while the app was killed). Only if there is nothing on disk do
+  /// we fall back to a network sync. Previously this relied on `sync()`,
+  /// which can legitimately return without loading anything (TTL
+  /// short-circuit, or the sync lock held by a concurrent foreground sync);
+  /// a completion arriving in that window then started from an empty stats
+  /// object and overwrote a year of history locally and on the server.
+  Future<void> _ensureStatsLoaded() async {
+    if (_allStats != null) return;
+    final fromDisk = await _loadLocalAllStats();
+    final diskIsEmpty =
+        fromDisk.totalTracksCompleted == 0 &&
+        (fromDisk.audioCompleted?.isEmpty ?? true);
+    if (!diskIsEmpty) {
+      _allStats = fromDisk;
+      return;
+    }
+    await sync();
+    _allStats ??= fromDisk;
+  }
+
   Future<void> addAudioCompleted(
     LocalAudioCompleted audioCompleted,
     int duration, {
@@ -476,9 +536,7 @@ class StatsManager {
     if (!_isInitialized) {
       await initialize();
     }
-    if (_allStats == null) {
-      await sync();
-    }
+    await _ensureStatsLoaded();
 
     // Mark as dirty since we're about to modify stats
     _dirty = true;
@@ -588,9 +646,7 @@ class StatsManager {
     if (!_isInitialized) {
       await initialize();
     }
-    if (_allStats == null) {
-      await sync();
-    }
+    await _ensureStatsLoaded();
     if (_allStats == null) return;
 
     final currentList = _allStats!.audioCompleted ?? [];
@@ -636,9 +692,7 @@ class StatsManager {
     if (!_isInitialized) {
       await initialize();
     }
-    if (_allStats == null) {
-      await sync();
-    }
+    await _ensureStatsLoaded();
 
     // Mark as dirty since we're about to modify stats
     _dirty = true;
@@ -671,9 +725,7 @@ class StatsManager {
     if (!_isInitialized) {
       await initialize();
     }
-    if (_allStats == null) {
-      await sync();
-    }
+    await _ensureStatsLoaded();
 
     _dirty = true;
 
@@ -712,9 +764,7 @@ class StatsManager {
     if (!_isInitialized) {
       await initialize();
     }
-    if (_allStats == null) {
-      await sync();
-    }
+    await _ensureStatsLoaded();
 
     // Mark as dirty since we're about to modify stats
     _dirty = true;

@@ -5,6 +5,7 @@ import 'package:medito/services/stats_backup_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  _ringRegressionTests();
   late StatsBackupService backupService;
   late SharedPreferences prefs;
 
@@ -227,6 +228,67 @@ void main() {
 
       expect(user1Backups, isEmpty);
       expect(user2Backups, isNotEmpty);
+    });
+  });
+}
+
+void _ringRegressionTests() {
+  late StatsBackupService backupService;
+  late SharedPreferences prefs;
+
+  LocalAllStats statsWith(int total) => LocalAllStats.empty().copyWith(
+    totalTracksCompleted: total,
+    totalTimeListened: total * 60000,
+    audioCompleted: List.generate(
+      total,
+      (i) => LocalAudioCompleted(id: 't$i', timestamp: 1000 + i),
+    ),
+    updated: DateTime.now().millisecondsSinceEpoch,
+  );
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
+    backupService = StatsBackupService(prefs: prefs);
+  });
+
+  group('backup ring protection', () {
+    test('identical consecutive snapshots are not stored twice', () async {
+      expect(await backupService.backupStats(statsWith(1123), 'u'), true);
+      // Same content, only `updated` differs (restore/merge loop).
+      expect(await backupService.backupStats(statsWith(1123), 'u'), false);
+      expect(await backupService.backupStats(statsWith(1123), 'u'), false);
+
+      final all = await backupService.getAllBackups('u');
+      expect(all.length, 1);
+    });
+
+    test('the richest snapshot survives a flood of smaller ones', () async {
+      expect(await backupService.backupStats(statsWith(1353), 'u'), true);
+
+      // 40 distinct, collapsed snapshots: twice the ring size.
+      for (var i = 1; i <= 40; i++) {
+        await backupService.backupStats(statsWith(i), 'u');
+      }
+
+      final all = await backupService.getAllBackups('u');
+      expect(all.map((b) => b.stats.totalTracksCompleted), contains(1353));
+      expect(all.length, 20);
+    });
+
+    test('a richer snapshot may replace the protected slot', () async {
+      expect(await backupService.backupStats(statsWith(100), 'u'), true);
+      for (var i = 1; i <= 25; i++) {
+        await backupService.backupStats(statsWith(100 + i), 'u');
+      }
+      final all = await backupService.getAllBackups('u');
+      expect(all.length, 20);
+      expect(
+        all
+            .map((b) => b.stats.totalTracksCompleted)
+            .reduce((a, b) => a > b ? a : b),
+        125,
+      );
     });
   });
 }

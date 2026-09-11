@@ -805,7 +805,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         reminders: ref.read(reminderProvider),
       );
 
-      final time = await service.enable();
+      final time = await service.enable(l10n: AppLocalizations.of(context));
       await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
       await ref.read(reminderTimeProvider.notifier).setTime(time);
 
@@ -817,10 +817,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               parameters: {
                 AnalyticsEventConstants.paramSource:
                     AnalyticsEventConstants.sourceEndScreen,
-                // This path never asks for a time — enable() anchors the
-                // series to the moment the session ended. Logged with the same
-                // params as the onboarding set-tap so the time people actually
-                // get is comparable across both surfaces.
+                // This path never asks for a time — enable() keeps the hour
+                // chosen in onboarding/Settings, or falls back to the moment
+                // the session ended. Logged with the same params as the
+                // onboarding set-tap so both surfaces are comparable.
                 AnalyticsEventConstants.paramReminderHour: time.hour,
                 AnalyticsEventConstants.paramReminderMinute: time.minute,
               },

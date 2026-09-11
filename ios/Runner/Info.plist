@@ -196,7 +196,7 @@
 		<true/>
 	</dict>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Required by 3rd party audio library</string>
+	<string>Medito does not record audio. This entry is only required by the audio playback framework the app uses.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

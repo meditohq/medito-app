@@ -143,3 +143,5 @@ superwall-paywall.png
 /android/build/ios
 /android/build/ios/XCBuildData
 docs/experiments/*
+# Widget Preview related
+.widget_preview/

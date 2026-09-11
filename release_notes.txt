@@ -1,6 +1,15 @@
 Unreleased
 -
 
+2609.10.0
+- Settings: pick when your daily reminder arrives (morning, evening, night or your own time) instead of a simple on/off switch
+- Settings: theme and app icon now open a picker that shows your current choice
+- Settings: Zen Mode explains what it hides before you turn it on or off
+- Settings: Advanced options moved to their own screen
+- Onboarding: everyone now chooses a reminder time (morning, evening, night or your own time)
+- Fixed a session finishing right after launch occasionally wiping your stats history
+- Fixed signing in with your email sometimes starting a fresh account instead of restoring yours
+
 2608.27.0
 - Your Path: finish a pack and Up Next offers the next one instead of stopping
 - Reminders: if notifications are switched off for Medito, the app now says so, takes you to the right settings page and sets your reminder up when you come back

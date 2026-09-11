@@ -22,6 +22,8 @@ class StatsBackupService {
   static const int _maxBackups = 20;
   static const String _backupKeyPrefix = 'stats_backup_';
   static const String _backupIndexKey = 'stats_backup_index';
+  static const String _richestSlotKey = 'stats_backup_richest_slot';
+  static const String _richestTotalKey = 'stats_backup_richest_total';
 
   // Schema versioning
   static const int _currentVersion = 1;
@@ -37,6 +39,20 @@ class StatsBackupService {
       return false;
     }
 
+    // Every POST writes a snapshot, and a restore/merge loop can POST many
+    // times a minute with identical content. Without this guard those
+    // duplicates cycle the ring and evict the one snapshot the user actually
+    // needs (the pre-incident one).
+    // Only the most recently written slot is inspected, so this stays a
+    // single small JSON parse on the session-completion path.
+    final currentIndex = _prefs.getInt(_backupIndexKey) ?? 0;
+    final last = _readSlot(currentIndex);
+    if (last != null &&
+        last.userId == userId &&
+        _sameContent(last.stats, stats)) {
+      return false;
+    }
+
     final now = DateTime.now().millisecondsSinceEpoch;
     final backupData = {
       'version': _currentVersion,
@@ -45,9 +61,15 @@ class StatsBackupService {
       'stats': stats.toJson(),
     };
 
-    // Get the next backup index (circular buffer)
-    final currentIndex = _prefs.getInt(_backupIndexKey) ?? 0;
-    final nextIndex = (currentIndex + 1) % _maxBackups;
+    // Get the next backup index (circular buffer), but never evict the slot
+    // holding the richest snapshot in the ring: that is the one a "restore
+    // previous stats" recovery depends on when the live counters collapse.
+    var nextIndex = (currentIndex + 1) % _maxBackups;
+    final richestSlot = _richestSlotIndex();
+    final richestTotal = _prefs.getInt(_richestTotalKey) ?? 0;
+    if (richestSlot == nextIndex && richestTotal > stats.totalTracksCompleted) {
+      nextIndex = (nextIndex + 1) % _maxBackups;
+    }
 
     // Save backup
     final backupKey = _getBackupKey(nextIndex);
@@ -56,6 +78,15 @@ class StatsBackupService {
     if (success) {
       // Update index
       await _prefs.setInt(_backupIndexKey, nextIndex);
+      if (richestSlot == null ||
+          richestSlot == nextIndex ||
+          stats.totalTracksCompleted >= richestTotal) {
+        // Either we just overwrote the old richest slot (only possible when
+        // the new snapshot is at least as rich) or this one is the new
+        // maximum; both cases make this slot the richest.
+        await _prefs.setInt(_richestSlotKey, nextIndex);
+        await _prefs.setInt(_richestTotalKey, stats.totalTracksCompleted);
+      }
     }
 
     return success;
@@ -197,6 +228,63 @@ class StatsBackupService {
         }
       }
     }
+  }
+
+  bool _sameContent(LocalAllStats a, LocalAllStats b) =>
+      a.totalTracksCompleted == b.totalTracksCompleted &&
+      a.totalTimeListened == b.totalTimeListened &&
+      a.streakLongest == b.streakLongest &&
+      (a.audioCompleted?.length ?? 0) == (b.audioCompleted?.length ?? 0) &&
+      (a.tracksChecked?.length ?? 0) == (b.tracksChecked?.length ?? 0);
+
+  StatsBackup? _readSlot(int index) {
+    final json = _prefs.getString(_getBackupKey(index));
+    if (json == null) return null;
+    try {
+      final data = jsonDecode(json) as Map<String, dynamic>;
+      return StatsBackup(
+        timestamp: data['timestamp'] as int? ?? 0,
+        stats: LocalAllStats.fromJson(data['stats'] as Map<String, dynamic>),
+        userId: data['userId'] as String? ?? '',
+        slotIndex: index,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Index of the slot (any user) holding the most completed tracks.
+  ///
+  /// Tracked in two small prefs ints so the hot path never has to parse the
+  /// whole ring. The one-time scan below only runs for rings written before
+  /// this bookkeeping existed.
+  int? _richestSlotIndex() {
+    final cached = _prefs.getInt(_richestSlotKey);
+    if (cached != null && _prefs.containsKey(_getBackupKey(cached))) {
+      return cached;
+    }
+    int? best;
+    var bestTotal = -1;
+    for (var i = 0; i < _maxBackups; i++) {
+      final json = _prefs.getString(_getBackupKey(i));
+      if (json == null) continue;
+      try {
+        final data = jsonDecode(json) as Map<String, dynamic>;
+        final statsJson = data['stats'] as Map<String, dynamic>;
+        final total = (statsJson['totalTracksCompleted'] as num?)?.toInt() ?? 0;
+        if (total > bestTotal) {
+          bestTotal = total;
+          best = i;
+        }
+      } catch (_) {
+        // Skip invalid entries.
+      }
+    }
+    if (best != null) {
+      _prefs.setInt(_richestSlotKey, best);
+      _prefs.setInt(_richestTotalKey, bestTotal);
+    }
+    return best;
   }
 
   String _getBackupKey(int index) => '$_backupKeyPrefix$index';

@@ -1726,7 +1726,7 @@ abstract class AppLocalizations {
   /// **'When will you meditate?'**
   String get reminderChipsQuestion;
 
-  /// Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 8:00 AM'
+  /// Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 7:00 AM'
   ///
   /// In en, this message translates to:
   /// **'Morning'**
@@ -1809,6 +1809,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No time picked yet — choose one above, or skip for now.'**
   String get reminderCustomCancelled;
+
+  /// Title of the settings tile that opens the reminder time bottom sheet (replaced the Smart Reminders switch)
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder'**
+  String get reminderTitle;
+
+  /// Subtitle on the settings reminder tile when no daily reminder is scheduled
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get reminderOff;
+
+  /// Last row of the reminder time bottom sheet; cancels the scheduled reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off reminders'**
+  String get reminderTurnOff;
 
   /// No description provided for @onboardingBatteryTitle.
   ///
@@ -2470,6 +2488,24 @@ abstract class AppLocalizations {
   /// **'Stats will be hidden throughout the app'**
   String get zenModeEnabledMessage;
 
+  /// Explanatory text in the Zen Mode bottom sheet, above the On / Off buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Hides your streak, stats and consistency score everywhere in the app, so you can practise without keeping score. Your progress is still recorded and reappears when you turn Zen Mode off.'**
+  String get zenModeDescription;
+
+  /// Zen Mode state label; button in the sheet and subtitle on the settings row
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get zenModeOn;
+
+  /// Zen Mode state label; button in the sheet and subtitle on the settings row
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get zenModeOff;
+
   /// Message shown in zen mode after completing meditation
   ///
   /// In en, this message translates to:
@@ -2721,6 +2757,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in with Email'**
   String get emailExistsSignInWithEmail;
+
+  /// No description provided for @emailMismatchDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Different email'**
+  String get emailMismatchDialogTitle;
+
+  /// No description provided for @emailMismatchDialogMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone was signed in with a different email address before. If that is your account, go back and use that email. Otherwise continue to create a new account. Your existing progress stays with the original email.'**
+  String get emailMismatchDialogMessage;
+
+  /// No description provided for @emailMismatchStartNewAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get emailMismatchStartNewAccount;
+
+  /// No description provided for @emailMismatchGoBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get emailMismatchGoBack;
 
   /// No description provided for @analyticsTrackingTitle.
   ///

@@ -301,6 +301,9 @@
   "reminderPrimerBody": "Tu teléfono te pedirá permiso para enviarte notificaciones. Acéptalo para que podamos enviarte un recordatorio diario para meditar.",
   "reminderPrimerContinue": "Continuar",
   "reminderCustomCancelled": "Aún no has elegido una hora: elige una arriba u omite por ahora.",
+  "reminderTitle": "Recordatorio diario",
+  "reminderOff": "Desactivado",
+  "reminderTurnOff": "Desactivar recordatorios",
   "onboardingBatteryTitle": "Mantén las Meditaciones Sin Interrupciones",
   "onboardingBatteryBody": "Algunos dispositivos Android detienen apps en segundo plano, lo que puede interrumpir tus sesiones. Desactiva la optimización de batería para meditar sin interrupciones.",
   "onboardingBatteryOptimize": "Desactivar Optimización de Batería",
@@ -406,6 +409,9 @@
   "@zenModeEnabledMessage": {
     "description": "Message shown when zen mode is enabled"
   },
+  "zenModeDescription": "Oculta tu racha, estadísticas y puntuación de constancia en toda la app, para que practiques sin llevar la cuenta. Tu progreso se sigue registrando y reaparece al desactivar el Modo Zen.",
+  "zenModeOn": "Activado",
+  "zenModeOff": "Desactivado",
   "mindClear": "Mente Clara",
   "@mindClear": {
     "description": "Message shown in zen mode after completing meditation"
@@ -469,6 +475,10 @@
   "emailExistsDialogMessage": "Parece que has iniciado sesión con una dirección de correo electrónico antes. ¿Te gustaría iniciar sesión con tu dirección de correo electrónico otra vez?",
   "emailExistsContinueNewAccount": "Continuar",
   "emailExistsSignInWithEmail": "Iniciar sesión con Correo Electrónico",
+  "emailMismatchDialogTitle": "Otro correo",
+  "emailMismatchDialogMessage": "Este teléfono inició sesión antes con otra dirección de correo. Si esa es tu cuenta, vuelve atrás y usa ese correo. Si no, continúa para crear una cuenta nueva. Tu progreso actual se queda con el correo original.",
+  "emailMismatchStartNewAccount": "Continuar",
+  "emailMismatchGoBack": "Volver",
   "analyticsTrackingTitle": "Recolección de Datos",
   "analyticsTrackingContent": "Recopilamos datos de uso anónimos para ayudarnos a mejorar la aplicación. No se recopila información personal.",
   "turnOffAnalyticsText": "Desactivar Análisis",

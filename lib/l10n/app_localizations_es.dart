@@ -975,6 +975,15 @@ class AppLocalizationsEs extends AppLocalizations {
       'Aún no has elegido una hora: elige una arriba u omite por ahora.';
 
   @override
+  String get reminderTitle => 'Recordatorio diario';
+
+  @override
+  String get reminderOff => 'Desactivado';
+
+  @override
+  String get reminderTurnOff => 'Desactivar recordatorios';
+
+  @override
   String get onboardingBatteryTitle =>
       'Mantén las Meditaciones Sin Interrupciones';
 
@@ -1351,6 +1360,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'Las estadísticas se ocultarán en toda la aplicación';
 
   @override
+  String get zenModeDescription =>
+      'Oculta tu racha, estadísticas y puntuación de constancia en toda la app, para que practiques sin llevar la cuenta. Tu progreso se sigue registrando y reaparece al desactivar el Modo Zen.';
+
+  @override
+  String get zenModeOn => 'Activado';
+
+  @override
+  String get zenModeOff => 'Desactivado';
+
+  @override
   String get mindClear => 'Mente Clara';
 
   @override
@@ -1492,6 +1511,19 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get emailExistsSignInWithEmail =>
       'Iniciar sesión con Correo Electrónico';
+
+  @override
+  String get emailMismatchDialogTitle => 'Otro correo';
+
+  @override
+  String get emailMismatchDialogMessage =>
+      'Este teléfono inició sesión antes con otra dirección de correo. Si esa es tu cuenta, vuelve atrás y usa ese correo. Si no, continúa para crear una cuenta nueva. Tu progreso actual se queda con el correo original.';
+
+  @override
+  String get emailMismatchStartNewAccount => 'Continuar';
+
+  @override
+  String get emailMismatchGoBack => 'Volver';
 
   @override
   String get analyticsTrackingTitle => 'Recolección de Datos';

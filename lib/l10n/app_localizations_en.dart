@@ -957,6 +957,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'No time picked yet — choose one above, or skip for now.';
 
   @override
+  String get reminderTitle => 'Daily reminder';
+
+  @override
+  String get reminderOff => 'Off';
+
+  @override
+  String get reminderTurnOff => 'Turn off reminders';
+
+  @override
   String get onboardingBatteryTitle => 'One Setting, Smoother Meditations';
 
   @override
@@ -1325,6 +1334,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zenModeEnabledMessage => 'Stats will be hidden throughout the app';
 
   @override
+  String get zenModeDescription =>
+      'Hides your streak, stats and consistency score everywhere in the app, so you can practise without keeping score. Your progress is still recorded and reappears when you turn Zen Mode off.';
+
+  @override
+  String get zenModeOn => 'On';
+
+  @override
+  String get zenModeOff => 'Off';
+
+  @override
   String get mindClear => 'Mind Clear';
 
   @override
@@ -1462,6 +1481,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emailExistsSignInWithEmail => 'Sign in with Email';
+
+  @override
+  String get emailMismatchDialogTitle => 'Different email';
+
+  @override
+  String get emailMismatchDialogMessage =>
+      'This phone was signed in with a different email address before. If that is your account, go back and use that email. Otherwise continue to create a new account. Your existing progress stays with the original email.';
+
+  @override
+  String get emailMismatchStartNewAccount => 'Continue';
+
+  @override
+  String get emailMismatchGoBack => 'Go back';
 
   @override
   String get analyticsTrackingTitle => 'Data Collection';

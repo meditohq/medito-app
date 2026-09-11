@@ -325,7 +325,7 @@
   },
   "reminderSlotMorning": "Morning",
   "@reminderSlotMorning": {
-    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 8:00 AM'"
+    "description": "Time-of-day chip label; shown with a concrete time, e.g. 'Morning · 7:00 AM'"
   },
   "reminderSlotAfternoon": "Afternoon",
   "@reminderSlotAfternoon": {
@@ -378,6 +378,18 @@
   "reminderCustomCancelled": "No time picked yet — choose one above, or skip for now.",
   "@reminderCustomCancelled": {
     "description": "Feedback shown when the user opens the custom time picker and dismisses it without choosing, so the tap is not a silent dead end"
+  },
+  "reminderTitle": "Daily reminder",
+  "@reminderTitle": {
+    "description": "Title of the settings tile that opens the reminder time bottom sheet (replaced the Smart Reminders switch)"
+  },
+  "reminderOff": "Off",
+  "@reminderOff": {
+    "description": "Subtitle on the settings reminder tile when no daily reminder is scheduled"
+  },
+  "reminderTurnOff": "Turn off reminders",
+  "@reminderTurnOff": {
+    "description": "Last row of the reminder time bottom sheet; cancels the scheduled reminders"
   },
   "onboardingBatteryTitle": "One Setting, Smoother Meditations",
   "onboardingBatteryBody": "Your phone can pause Medito mid-session. One quick change prevents this.",
@@ -504,6 +516,18 @@
   "@zenModeEnabledMessage": {
     "description": "Message shown when zen mode is enabled"
   },
+  "zenModeDescription": "Hides your streak, stats and consistency score everywhere in the app, so you can practise without keeping score. Your progress is still recorded and reappears when you turn Zen Mode off.",
+  "@zenModeDescription": {
+    "description": "Explanatory text in the Zen Mode bottom sheet, above the On / Off buttons"
+  },
+  "zenModeOn": "On",
+  "@zenModeOn": {
+    "description": "Zen Mode state label; button in the sheet and subtitle on the settings row"
+  },
+  "zenModeOff": "Off",
+  "@zenModeOff": {
+    "description": "Zen Mode state label; button in the sheet and subtitle on the settings row"
+  },
   "mindClear": "Mind Clear",
   "@mindClear": {
     "description": "Message shown in zen mode after completing meditation"
@@ -567,6 +591,10 @@
   "emailExistsDialogMessage": "Looks like you have signed in with an email address before. Would you like to sign in with your email address again?",
   "emailExistsContinueNewAccount": "Continue",
   "emailExistsSignInWithEmail": "Sign in with Email",
+  "emailMismatchDialogTitle": "Different email",
+  "emailMismatchDialogMessage": "This phone was signed in with a different email address before. If that is your account, go back and use that email. Otherwise continue to create a new account. Your existing progress stays with the original email.",
+  "emailMismatchStartNewAccount": "Continue",
+  "emailMismatchGoBack": "Go back",
   "analyticsTrackingTitle": "Data Collection",
   "analyticsTrackingContent": "We collect usage data and limited identifiers (such as a user ID and, where permitted, device or advertising identifiers) to help us improve the app and understand feature usage. You can turn analytics off at any time. See our Privacy Policy for details.",
   "turnOffAnalyticsText": "Turn Off Analytics",

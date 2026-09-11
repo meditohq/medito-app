@@ -127,9 +127,9 @@ class AnalyticsEventConstants {
   static const String onboardingFirstMeditationSkipTap =
       'onboarding_first_meditation_skip_tap';
 
-  /// Parameter on onboardingReminderSetTap (chips arm of the
-  /// onboarding_reminder_time_chips experiment): which time slot the user
-  /// picked — 'morning', 'evening', 'night', or 'custom'.
+  /// Parameter on onboardingReminderSetTap: which time-of-day chip the user
+  /// picked — 'morning', 'evening', 'night', or 'custom'. (Chips shipped to
+  /// everyone after the onboarding_reminder_time_chips A/B concluded 2026-08-25.)
   static const String paramReminderSlot = 'reminder_slot';
 
   /// Event logged when the pre-permission soft-ask is shown on the onboarding
@@ -632,6 +632,26 @@ class AnalyticsEventConstants {
   /// Event logged when the user disables smart reminders/notifications.
   /// Parameter: paramSource ('settings')
   static const String notificationsDisabled = 'notifications_disabled';
+
+  /// Event logged when a notification is TAPPED. Nothing in the app logged
+  /// this before, and the smart-reminder series shipped a bare ISO date string
+  /// as its payload, which `json.decode` rejected — so the tap was swallowed,
+  /// never navigated and never measured. Every question about whether the
+  /// reminders work has had to be answered by inference instead.
+  ///
+  /// Params: [paramSource] ('smart_reminder' | 'push'), plus
+  /// [paramNotificationDay] for the reminder series so open rate can be read
+  /// per day of the sequence (the series escalates its copy by day).
+  static const String notificationOpened = 'notification_opened';
+
+  /// Which day of the smart-reminder series was tapped (1-15, or 30).
+  static const String paramNotificationDay = 'notification_day';
+
+  /// Source value for a tap on a locally-scheduled smart reminder.
+  static const String sourceSmartReminder = 'smart_reminder';
+
+  /// Source value for a tap on a remote push (FCM campaign).
+  static const String sourcePush = 'push';
 
   /// Parameter name for the source screen that triggered a notifications_enabled
   /// or notifications_disabled event

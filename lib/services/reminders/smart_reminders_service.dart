@@ -1,13 +1,51 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../constants/constants.dart';
+import '../../constants/strings/analytics_event_constants.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/app_localizations_en.dart';
 import '../../providers/notification/reminder_provider.dart';
 import '../../utils/logger.dart';
 import '../../utils/stats_manager.dart';
+
+/// Identifies a smart reminder to the notification tap handler. Deliberately
+/// carries no `type`/`path`, so a tap does not deep-link — the point is
+/// attribution, not routing. Must stay valid JSON: the handler decodes it, and
+/// a bare string (what the series used to build, and then never attached)
+/// decodes to nothing.
+String smartReminderPayload(int day) => json.encode({
+  AnalyticsEventConstants.paramSource:
+      AnalyticsEventConstants.sourceSmartReminder,
+  AnalyticsEventConstants.paramNotificationDay: day,
+});
+
+/// The series re-anchors after every session so the streak and consistency
+/// numbers baked into each day's copy stay current. That part is deliberate.
+/// Moving the TIME OF DAY was not: it overwrote an hour the user had chosen at
+/// onboarding with whenever they last happened to meditate, and then showed
+/// that new time back to them in Settings as if they had picked it.
+///
+/// Keep the date arithmetic, keep their hour. Falls back to the session-derived
+/// anchor only when the user has never chosen a time.
+DateTime anchorPreferringSavedTime(
+  DateTime sessionAnchor,
+  int? savedHour,
+  int? savedMinute,
+) {
+  if (savedHour == null || savedMinute == null) return sessionAnchor;
+
+  return DateTime(
+    sessionAnchor.year,
+    sessionAnchor.month,
+    sessionAnchor.day,
+    savedHour,
+    savedMinute,
+  );
+}
 
 class SmartRemindersService {
   final SharedPreferences prefs;
@@ -23,22 +61,42 @@ class SmartRemindersService {
     return TimeOfDay(hour: savedHour, minute: savedMinute);
   }
 
-  Future<TimeOfDay> enable() async {
+  /// Turn reminders on without asking for a time (end-of-session card,
+  /// permission repair on Home). Keeps the hour the user chose earlier
+  /// (onboarding chips or Settings); only when none was ever saved does it
+  /// fall back to "same time tomorrow". Returns the hour used.
+  Future<TimeOfDay> enable({AppLocalizations? l10n}) async {
+    final time = getSavedTime() ?? _computeDefaultTimeFromNow();
+    await enableAt(time, l10n: l10n);
+    return time;
+  }
+
+  /// Turn reminders on at a time the user chose (Settings bottom sheet /
+  /// onboarding chips), instead of the silent "same time tomorrow" default of
+  /// [enable]. The series is anchored to the next occurrence of [time].
+  Future<DateTime> enableAt(TimeOfDay time, {AppLocalizations? l10n}) async {
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
+    await _saveTime(time);
 
     final now = DateTime.now();
-    final time = _computeDefaultTimeFromNow();
-    final anchor = now.add(const Duration(days: 1));
+    final candidate = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
+    final anchor = candidate.isBefore(now)
+        ? candidate.add(const Duration(days: 1))
+        : candidate;
 
     final scheduler = SmartRemindersScheduler(
       prefs: prefs,
       reminders: reminders,
     );
-    await scheduler.scheduleSeriesFromAnchor(anchor);
+    await scheduler.scheduleSeriesFromAnchor(anchor, l10n: l10n);
 
-    await _saveTime(time);
-
-    return time;
+    return anchor;
   }
 
   Future<void> disable() async {
@@ -102,6 +160,7 @@ class SmartRemindersScheduler {
           when: tzWhen,
           title: copy.$1,
           body: copy.$2,
+          payload: smartReminderPayload(i + 1),
         ),
       );
     }
@@ -120,6 +179,7 @@ class SmartRemindersScheduler {
         when: day30TzWhen,
         title: day30Copy.$1,
         body: day30Copy.$2,
+        payload: smartReminderPayload(30),
       ),
     );
 
@@ -155,6 +215,7 @@ class SmartRemindersScheduler {
             scheduledDate: e.when,
             title: e.title,
             body: e.body,
+            payload: e.payload,
           ),
         )
         .toList();
@@ -181,9 +242,14 @@ class SmartRemindersScheduler {
   }) async {
     final end = DateTime.fromMillisecondsSinceEpoch(endMs);
     final start = end.subtract(Duration(milliseconds: durationMs));
-    final anchor = start
+    final sessionAnchor = start
         .add(const Duration(days: 1))
         .subtract(const Duration(minutes: 10));
+    final anchor = anchorPreferringSavedTime(
+      sessionAnchor,
+      prefs.getInt(SharedPreferenceConstants.savedHours),
+      prefs.getInt(SharedPreferenceConstants.savedMinutes),
+    );
     await scheduleSeriesFromAnchor(anchor, l10n: l10n);
   }
 
@@ -275,11 +341,13 @@ class _SeriesItem {
   final tz.TZDateTime when;
   final String title;
   final String body;
+  final String payload;
 
   _SeriesItem({
     required this.id,
     required this.when,
     required this.title,
     required this.body,
+    required this.payload,
   });
 }

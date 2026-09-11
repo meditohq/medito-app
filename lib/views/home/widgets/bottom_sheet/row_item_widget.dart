@@ -20,6 +20,7 @@ class RowItemWidget extends StatelessWidget {
     this.leadingIconSize = 24,
     this.iconColor,
     this.trailingIcon = Icons.chevron_right_rounded,
+    this.trailing,
   });
 
   final String title;
@@ -36,6 +37,10 @@ class RowItemWidget extends StatelessWidget {
   final double leadingIconSize;
   final double trailingIconSize;
   final IconData trailingIcon;
+
+  /// Optional widget shown before the trailing icon / switch, e.g. a preview
+  /// of the current selection (theme swatch, app icon).
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +96,7 @@ class RowItemWidget extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (trailing != null) ...[trailing!, width16],
                 if (isTrailingIcon && !isSwitch)
                   Icon(
                     trailingIcon,

@@ -135,7 +135,6 @@ gh workflow run release.yml \
   -f android_production=<true|false> \
   -f ios_testflight=<true|false> \
   -f ios_appstore=<true|false> \
-  -f paywall_env=live \
   -f match_readonly=true
 ```
 
