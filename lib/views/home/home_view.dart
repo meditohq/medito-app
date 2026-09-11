@@ -65,7 +65,7 @@ class _HomeViewState extends ConsumerState<HomeView>
         prefs: prefs,
         reminders: ref.read(reminderProvider),
       );
-      await service.enable();
+      await service.enable(l10n: AppLocalizations.of(context));
       await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
     } else {
       // They declined again — reset so the end-screen prompt can show later.
