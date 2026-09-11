@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/constants/theme/app_theme.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
-/// Settings row for the app theme: shows the current choice as subtitle plus a
-/// swatch of it, and opens [ThemeSheet] on tap.
+/// Settings row for the app theme: shows the current choice as subtitle and
+/// opens [ThemeSheet] on tap.
 class ThemeTile extends ConsumerWidget {
   const ThemeTile({
     super.key,
@@ -35,7 +34,6 @@ class ThemeTile extends ConsumerWidget {
         ThemeMode.dark => l10n.darkTheme,
       },
       hasUnderline: hasUnderline,
-      trailing: ThemeSwatch(mode: mode, size: 28),
       onTap: () => showModalBottomSheet<void>(
         context: context,
         showDragHandle: true,
@@ -44,68 +42,6 @@ class ThemeTile extends ConsumerWidget {
       ),
     );
   }
-}
-
-/// Small circle previewing a theme: dark or light background with a card-
-/// coloured inner disc; "system" is split diagonally between the two.
-class ThemeSwatch extends StatelessWidget {
-  const ThemeSwatch({super.key, required this.mode, required this.size});
-
-  final ThemeMode mode;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = appTheme(context, ThemeMode.dark);
-    final light = appTheme(context, ThemeMode.light);
-    final border = Theme.of(
-      context,
-    ).colorScheme.onSurface.withValues(alpha: .3);
-
-    Widget half(ThemeData t) => Container(
-      color: t.scaffoldBackgroundColor,
-      alignment: Alignment.center,
-      child: Container(
-        width: size * 0.5,
-        height: size * 0.5,
-        decoration: BoxDecoration(color: t.cardColor, shape: BoxShape.circle),
-      ),
-    );
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: border, width: 1),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: switch (mode) {
-        ThemeMode.dark => half(dark),
-        ThemeMode.light => half(light),
-        ThemeMode.system => Stack(
-          children: [
-            Positioned.fill(child: half(light)),
-            Positioned.fill(
-              child: ClipPath(clipper: _DiagonalClipper(), child: half(dark)),
-            ),
-          ],
-        ),
-      },
-    );
-  }
-}
-
-class _DiagonalClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) => Path()
-    ..moveTo(0, 0)
-    ..lineTo(size.width, 0)
-    ..lineTo(0, size.height)
-    ..close();
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
 /// Bottom sheet listing System / Light / Dark. Selecting one applies it and
@@ -145,7 +81,6 @@ class ThemeSheet extends ConsumerWidget {
               icon: MeditoIcon(assetName: asset, color: onSurface),
               title: label,
               hasUnderline: i < options.length - 1,
-              trailing: ThemeSwatch(mode: mode, size: 28),
               isTrailingIcon: mode == current,
               trailingIcon: Icons.check_rounded,
               onTap: () {
