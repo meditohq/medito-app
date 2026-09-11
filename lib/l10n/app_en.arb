@@ -592,6 +592,7 @@
   "selectLanguage": "Select Language",
   "systemLanguage": "System",
   "english": "English",
+  "german": "Deutsch",
   "spanish": "Español (beta)",
   "reportTrack": "Report Track",
   "@reportTrack": {
