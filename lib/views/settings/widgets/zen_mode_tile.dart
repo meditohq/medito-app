@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
+import 'package:medito/widgets/radio_option_card.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
 /// Settings row for Zen Mode: shows On / Off and opens [ZenModeSheet] on tap.
@@ -33,6 +34,8 @@ class ZenModeTile extends ConsumerWidget {
         await showModalBottomSheet<void>(
           context: context,
           showDragHandle: true,
+          // Two option cards plus the intro overflow the default 9/16 cap.
+          isScrollControlled: true,
           backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
           builder: (_) => const ZenModeSheet(),
         );
@@ -45,8 +48,8 @@ class ZenModeTile extends ConsumerWidget {
   }
 }
 
-/// Bottom sheet explaining Zen Mode with an On and an Off button. The current
-/// state is the filled button; tapping either applies it and closes the sheet.
+/// Bottom sheet explaining Zen Mode with an On and an Off option card.
+/// Tapping either applies it and closes the sheet.
 class ZenModeSheet extends ConsumerWidget {
   const ZenModeSheet({super.key});
 
@@ -62,22 +65,8 @@ class ZenModeSheet extends ConsumerWidget {
       if (context.mounted) Navigator.of(context).pop();
     }
 
-    Widget button(bool value, String label) {
-      final selected = enabled == value;
-      return Expanded(
-        // ElevatedButton and OutlinedButton share the app theme's 8px shape;
-        // FilledButton is unthemed and would render as a pill.
-        child: selected
-            ? ElevatedButton(onPressed: () => choose(value), child: Text(label))
-            : OutlinedButton(
-                onPressed: () => choose(value),
-                child: Text(label),
-              ),
-      );
-    }
-
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -90,21 +79,27 @@ class ZenModeSheet extends ConsumerWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.zenModeDescription,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: onSurface.withValues(alpha: 0.8),
-                height: 1.5,
-              ),
+            const SizedBox(height: 16),
+            RadioOptionCard(
+              title: l10n.zenModeOn,
+              description: l10n.zenModeOnDescription,
+              selected: enabled,
+              onTap: () => choose(true),
             ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                button(true, l10n.zenModeOn),
-                const SizedBox(width: 12),
-                button(false, l10n.zenModeOff),
-              ],
+            const SizedBox(height: 12),
+            RadioOptionCard(
+              title: l10n.zenModeOff,
+              description: l10n.zenModeOffDescription,
+              selected: !enabled,
+              onTap: () => choose(false),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.zenModeFootnote,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w400,
+                color: onSurface.withValues(alpha: 0.6),
+              ),
             ),
           ],
         ),
