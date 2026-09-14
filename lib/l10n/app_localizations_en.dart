@@ -1305,6 +1305,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorTimeoutMessage => 'Connection timed out';
 
   @override
+  String get errorHostLookupMessage =>
+      'Couldn\'t reach Medito\'s servers. Check for a VPN, ad blocker or Private DNS setting.';
+
+  @override
+  String get errorConnectTimeoutMessage =>
+      'Connection to Medito\'s servers timed out. Please try again.';
+
+  @override
+  String get errorServerUnreachableMessage =>
+      'Couldn\'t connect to Medito\'s servers. Please try again later.';
+
+  @override
   String get errorUnauthorizedMessage =>
       'Session expired, please sign in again';
 

@@ -2432,6 +2432,24 @@ abstract class AppLocalizations {
   /// **'Connection timed out'**
   String get errorTimeoutMessage;
 
+  /// No description provided for @errorHostLookupMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach Medito\'s servers. Check for a VPN, ad blocker or Private DNS setting.'**
+  String get errorHostLookupMessage;
+
+  /// No description provided for @errorConnectTimeoutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection to Medito\'s servers timed out. Please try again.'**
+  String get errorConnectTimeoutMessage;
+
+  /// No description provided for @errorServerUnreachableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t connect to Medito\'s servers. Please try again later.'**
+  String get errorServerUnreachableMessage;
+
   /// No description provided for @errorUnauthorizedMessage.
   ///
   /// In en, this message translates to:

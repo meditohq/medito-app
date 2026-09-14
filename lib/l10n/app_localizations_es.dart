@@ -1326,6 +1326,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorTimeoutMessage => 'Tiempo de conexión agotado';
 
   @override
+  String get errorHostLookupMessage =>
+      'No se pudo conectar con los servidores de Medito. Revisa si tienes una VPN, un bloqueador de anuncios o un DNS privado activado.';
+
+  @override
+  String get errorConnectTimeoutMessage =>
+      'Se agotó el tiempo de conexión con los servidores de Medito. Inténtalo de nuevo.';
+
+  @override
+  String get errorServerUnreachableMessage =>
+      'No se pudo conectar con los servidores de Medito. Inténtalo más tarde.';
+
+  @override
   String get errorUnauthorizedMessage =>
       'Sesión expirada, por favor inicia sesión de nuevo';
 

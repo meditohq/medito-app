@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/network_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/network/auth_api_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_manager.dart';
@@ -265,7 +266,14 @@ class HttpApiService {
       return content.isEmpty ? {} : _parseResponseContent(content);
     } on SocketException catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Network Error (SocketException)', e, stackTrace);
-      throw NetworkConnectionError(originalException: e);
+      final error = NetworkConnectionError.fromSocketException(e);
+      CrashlyticsService().recordNetworkFailure(
+        error,
+        stackTrace,
+        host: Uri.tryParse(contentBaseUrl)?.host,
+        source: 'HttpApi',
+      );
+      throw error;
     } on NetworkConnectionError catch (e, stackTrace) {
       AppLogger.e(
         'HTTP',

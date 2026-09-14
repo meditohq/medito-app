@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -284,6 +285,47 @@ class CrashlyticsService {
       // SDK can throw when offline (e.g. "No internet connection"); don't crash the app
     }
   }
+
+  /// Records a non-fatal breadcrumb for a request that never got an HTTP
+  /// response. [recordError] deliberately drops [NetworkConnectionError]
+  /// because plain "phone is offline" is noise; this path exists so failures
+  /// that happen with working internet (DNS filtering, blocked routes,
+  /// per-app network restrictions) still show up, with the OS error text
+  /// the app otherwise discards. Generic offline errors are skipped, and
+  /// host-lookup failures are sampled because airplane mode produces them too.
+  void recordNetworkFailure(
+    NetworkConnectionError error,
+    StackTrace? stack, {
+    String? host,
+    String? source,
+  }) {
+    if (!_analyticsEnabled) return;
+    if (error.kind == NetworkFailureKind.offline) return;
+    if (error.kind == NetworkFailureKind.hostLookup &&
+        _random.nextInt(hostLookupSampleDenominator) != 0) {
+      return;
+    }
+
+    try {
+      FirebaseCrashlytics.instance.recordError(
+        error.originalException ?? error,
+        stack,
+        fatal: false,
+        reason: '${source ?? 'Network'}: ${error.kind.name}',
+        information: [
+          'kind: ${error.kind.name}',
+          'host: ${host ?? 'unknown'}',
+          'detail: ${error.detail}',
+        ],
+      );
+    } catch (_) {
+      // SDK can throw when offline; don't crash the app
+    }
+  }
+
+  /// One in this many host-lookup failures is recorded.
+  static const hostLookupSampleDenominator = 10;
+  static final _random = Random();
 
   void recordFlutterError(FlutterErrorDetails details) {
     if (!_analyticsEnabled) return;

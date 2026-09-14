@@ -34,6 +34,12 @@ class MeditoErrorWidget extends ConsumerWidget {
 
   String _getErrorMessage(BuildContext context) {
     return switch (error) {
+      NetworkConnectionError(kind: NetworkFailureKind.hostLookup) =>
+        AppLocalizations.of(context)!.errorHostLookupMessage,
+      NetworkConnectionError(kind: NetworkFailureKind.connectTimeout) =>
+        AppLocalizations.of(context)!.errorConnectTimeoutMessage,
+      NetworkConnectionError(kind: NetworkFailureKind.connectionRefused) =>
+        AppLocalizations.of(context)!.errorServerUnreachableMessage,
       NetworkConnectionError() => AppLocalizations.of(
         context,
       )!.errorNoInternetMessage,
