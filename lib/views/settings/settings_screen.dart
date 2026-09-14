@@ -223,7 +223,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ];
 
     return Scaffold(
-      body: SafeArea(child: _buildMain(context, ref, settingsItems)),
+      // No bottom inset: the floating nav pill sits over the content, which
+      // scrolls underneath it. The list's trailing padding keeps the last
+      // card clear of the pill.
+      body: SafeArea(
+        bottom: false,
+        child: _buildMain(context, ref, settingsItems),
+      ),
     );
   }
 
@@ -494,7 +500,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             _buildSectionTitle(context, AppLocalizations.of(context)!.account),
             _buildSectionCard([const AccountSectionWidget(inCard: true)]),
           ],
-          const SizedBox(height: 32.0),
+          SizedBox(height: MediaQuery.paddingOf(context).bottom + padding16),
         ]),
       ),
     );
