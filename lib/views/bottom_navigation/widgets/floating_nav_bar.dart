@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
-import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class FloatingNavItem {
@@ -127,7 +126,10 @@ class FloatingNavBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Folds to zero width (and fades) while search is expanded.
+                // Clip only then: at rest the ClipRect would cut the pill's
+                // shadow into a rectangle.
                 ClipRect(
+                  clipBehavior: expanded ? Clip.hardEdge : Clip.none,
                   child: AnimatedAlign(
                     duration: _morphDuration,
                     curve: _morphCurve,
@@ -157,9 +159,11 @@ class FloatingNavBar extends StatelessWidget {
                         constraints.maxWidth - 2 * _hairline - cancelSlot,
                     child: expandedChild,
                   ),
-                // Unfolds from zero width as the field expands.
+                // Unfolds from zero width as the field expands; same clip
+                // rule as the pill, mirrored.
                 if (cancelSlot > 0)
                   ClipRect(
+                    clipBehavior: expanded ? Clip.none : Clip.hardEdge,
                     child: AnimatedAlign(
                       duration: _morphDuration,
                       curve: _morphCurve,
@@ -189,8 +193,15 @@ class FloatingNavBar extends StatelessWidget {
   }
 }
 
-/// Frosted, hairlined, softly shadowed capsule shared by the pill and the
-/// action capsule.
+/// Frosted, rimmed, softly shadowed capsule shared by the pill and the
+/// action capsules.
+///
+/// The fill deliberately avoids [ThemeData.cardColor]: the bar floats over
+/// pages made of cards (Explore, search results, Settings) and a
+/// card-coloured pill vanished against them. Dark mode sits between the page
+/// background and the cards, so it reads darker than cards and leans on the
+/// rim over bare background; light mode is a near-white glass. The rim is a
+/// white/black wash, not a tint of the fill.
 class _Glass extends StatelessWidget {
   const _Glass({required this.child});
 
@@ -200,30 +211,42 @@ class _Glass extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final surface = theme.cardColor.withValues(alpha: isDark ? 0.82 : 0.88);
+    final fill = isDark
+        ? Color.lerp(
+            theme.scaffoldBackgroundColor,
+            theme.cardColor,
+            0.35,
+          )!.withValues(alpha: 0.84)
+        : Colors.white.withValues(alpha: 0.86);
+    final rim = isDark
+        ? Colors.white.withValues(alpha: 0.14)
+        : Colors.black.withValues(alpha: 0.10);
+    final radius = BorderRadius.circular(FloatingNavBar.pillRadius);
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(FloatingNavBar.pillRadius),
+        borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.10),
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(FloatingNavBar.pillRadius),
+        borderRadius: radius,
         child: BackdropFilter(
           filter: ImageFilter.blur(
             sigmaX: FloatingNavBar._blurSigma,
             sigmaY: FloatingNavBar._blurSigma,
           ),
-          child: HomeGradientBorder(
-            backgroundColor: surface,
-            borderRadius: FloatingNavBar.pillRadius,
-            borderWidth: FloatingNavBar._hairline,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: fill,
+              borderRadius: radius,
+              border: Border.all(color: rim, width: FloatingNavBar._hairline),
+            ),
             child: child,
           ),
         ),
