@@ -302,19 +302,19 @@ class _CompletedCta extends StatelessWidget {
             height: 48,
             child: Center(
               child: busy
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: context.onBrandPurple,
                       ),
                     )
                   : ExcludeSemantics(
                       child: Text(
                         label,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.onBrandPurple,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -636,13 +636,13 @@ class _PlayButton extends StatelessWidget {
             shape: BoxShape.circle,
             color: context.brandPurple,
           ),
-          child: const SizedBox(
+          child: SizedBox(
             width: _kPlayButtonSize,
             height: _kPlayButtonSize,
             child: ExcludeSemantics(
               child: Icon(
                 Icons.play_arrow_rounded,
-                color: Colors.white,
+                color: context.onBrandPurple,
                 size: 28,
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/views/bottom_navigation/widgets/floating_nav_bar.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 /// The text field shown inside the expanded nav capsule: search glyph, the
@@ -25,7 +26,7 @@ class FloatingSearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final onSurface = theme.colorScheme.onSurface;
+    final onSurface = FloatingNavBar.colorsOf(context).foreground;
 
     return Row(
       children: [
@@ -38,13 +39,14 @@ class FloatingSearchField extends StatelessWidget {
             focusNode: focusNode,
             autofocus: true,
             textInputAction: TextInputAction.search,
+            cursorColor: onSurface,
             style: theme.textTheme.bodyLarge?.copyWith(
               fontSize: 16,
               color: onSurface,
             ),
             decoration: InputDecoration.collapsed(
               hintText: l10n.searchMeditations,
-              hintStyle: TextStyle(color: onSurface.withOpacityValue(0.55)),
+              hintStyle: TextStyle(color: onSurface.withOpacityValue(0.7)),
             ),
             onChanged: onChanged,
           ),
@@ -57,7 +59,7 @@ class FloatingSearchField extends StatelessWidget {
               tooltip: l10n.clearSearch,
               onPressed: onClear,
               iconSize: 20,
-              icon: Icon(Icons.cancel, color: onSurface.withOpacityValue(0.5)),
+              icon: Icon(Icons.cancel, color: onSurface.withOpacityValue(0.7)),
             );
           },
         ),

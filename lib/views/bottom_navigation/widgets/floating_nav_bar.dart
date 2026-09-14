@@ -2,7 +2,6 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
@@ -61,6 +60,9 @@ class FloatingNavBar extends StatelessWidget {
 
   static const pillRadius = 100.0;
   static const capsuleSize = 58.0;
+
+  /// Colours for everything drawn on the glass; see [GlassColors].
+  static GlassColors colorsOf(BuildContext context) => GlassColors.of(context);
   static const _blurSigma = 24.0;
   static const _hairline = 0.5;
   static const _duration = Duration(milliseconds: 260);
@@ -68,13 +70,13 @@ class FloatingNavBar extends StatelessWidget {
   static const _morphCurve = Curves.easeOutCubic;
   static const _cancelPadding = 20.0;
 
-  static TextStyle _cancelStyle(ThemeData theme) =>
-      theme.textTheme.labelMedium!.copyWith(
+  static TextStyle _cancelStyle(BuildContext context) =>
+      Theme.of(context).textTheme.labelMedium!.copyWith(
         fontSize: 15,
         fontWeight: FontWeight.w600,
         letterSpacing: 0,
         height: 1.2,
-        color: theme.colorScheme.onSurface,
+        color: GlassColors.of(context).foreground,
       );
 
   /// Width the Cancel capsule will take, so the field can leave room for it
@@ -83,7 +85,7 @@ class FloatingNavBar extends StatelessWidget {
     final label = cancelLabel;
     if (label == null || onCancel == null) return 0;
     final painter = TextPainter(
-      text: TextSpan(text: label, style: _cancelStyle(Theme.of(context))),
+      text: TextSpan(text: label, style: _cancelStyle(context)),
       textDirection: Directionality.of(context),
       textScaler: MediaQuery.textScalerOf(context),
     )..layout();
@@ -177,7 +179,7 @@ class FloatingNavBar extends StatelessWidget {
                           padding: const EdgeInsets.only(left: padding12),
                           child: _CancelCapsule(
                             label: cancelLabel!,
-                            style: _cancelStyle(Theme.of(context)),
+                            style: _cancelStyle(context),
                             onTap: onCancel!,
                           ),
                         ),
@@ -193,15 +195,62 @@ class FloatingNavBar extends StatelessWidget {
   }
 }
 
+/// Colours for the floating bar's glass and whatever sits on it. Kept in one
+/// place so the pill, the search capsule, the Cancel capsule and the search
+/// field agree.
+///
+/// Monochrome, after tickets.knit.amsterdam: near-black glass with off-white
+/// text and a white-10% rim in dark mode, white glass with near-black text in
+/// light mode. The selected tab is the inverted "button" of that system: a
+/// light chip with dark glyph and label (dark chip on light). The fill
+/// deliberately avoids [ThemeData.cardColor] so the bar still reads over
+/// pages made of cards.
+class GlassColors {
+  const GlassColors({
+    required this.fill,
+    required this.rim,
+    required this.shadow,
+    required this.foreground,
+    required this.mutedForeground,
+    required this.selectedForeground,
+    required this.selectedBackground,
+  });
+
+  factory GlassColors.of(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (isDark) {
+      return GlassColors(
+        fill: const Color(0xFF1A1A1A).withValues(alpha: 0.86),
+        rim: Colors.white.withValues(alpha: 0.10),
+        shadow: Colors.black.withValues(alpha: 0.55),
+        foreground: const Color(0xFFFAFAFA),
+        mutedForeground: const Color(0xFFA1A1A1),
+        selectedForeground: const Color(0xFF171717),
+        selectedBackground: const Color(0xFFE5E5E5),
+      );
+    }
+    return GlassColors(
+      fill: Colors.white.withValues(alpha: 0.92),
+      rim: Colors.black.withValues(alpha: 0.10),
+      shadow: Colors.black.withValues(alpha: 0.14),
+      foreground: const Color(0xFF0A0A0A),
+      mutedForeground: const Color(0xFF737373),
+      selectedForeground: const Color(0xFFFAFAFA),
+      selectedBackground: const Color(0xFF171717),
+    );
+  }
+
+  final Color fill;
+  final Color rim;
+  final Color shadow;
+  final Color foreground;
+  final Color mutedForeground;
+  final Color selectedForeground;
+  final Color selectedBackground;
+}
+
 /// Frosted, rimmed, softly shadowed capsule shared by the pill and the
 /// action capsules.
-///
-/// The fill deliberately avoids [ThemeData.cardColor]: the bar floats over
-/// pages made of cards (Explore, search results, Settings) and a
-/// card-coloured pill vanished against them. Dark mode sits between the page
-/// background and the cards, so it reads darker than cards and leans on the
-/// rim over bare background; light mode is a near-white glass. The rim is a
-/// white/black wash, not a tint of the fill.
 class _Glass extends StatelessWidget {
   const _Glass({required this.child});
 
@@ -209,18 +258,7 @@ class _Glass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final fill = isDark
-        ? Color.lerp(
-            theme.scaffoldBackgroundColor,
-            theme.cardColor,
-            0.35,
-          )!.withValues(alpha: 0.84)
-        : Colors.white.withValues(alpha: 0.86);
-    final rim = isDark
-        ? Colors.white.withValues(alpha: 0.14)
-        : Colors.black.withValues(alpha: 0.10);
+    final colors = GlassColors.of(context);
     final radius = BorderRadius.circular(FloatingNavBar.pillRadius);
 
     return DecoratedBox(
@@ -228,8 +266,8 @@ class _Glass extends StatelessWidget {
         borderRadius: radius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
-            blurRadius: 24,
+            color: colors.shadow,
+            blurRadius: 32,
             offset: const Offset(0, 8),
           ),
         ],
@@ -243,9 +281,12 @@ class _Glass extends StatelessWidget {
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: fill,
+              color: colors.fill,
               borderRadius: radius,
-              border: Border.all(color: rim, width: FloatingNavBar._hairline),
+              border: Border.all(
+                color: colors.rim,
+                width: FloatingNavBar._hairline,
+              ),
             ),
             child: child,
           ),
@@ -272,8 +313,6 @@ class _ActionCapsule extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onSurface = Theme.of(context).colorScheme.onSurface;
-
     return _Glass(
       child: AnimatedContainer(
         duration: FloatingNavBar._morphDuration,
@@ -300,7 +339,7 @@ class _ActionCapsule extends StatelessWidget {
                       child: ExcludeSemantics(
                         child: MeditoIcon(
                           assetName: action.icon,
-                          color: onSurface,
+                          color: GlassColors.of(context).foreground,
                           size: 22,
                         ),
                       ),
@@ -370,8 +409,10 @@ class _NavChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accent = context.brandPurple;
-    final iconColor = selected ? accent : theme.colorScheme.onSurfaceVariant;
+    final colors = GlassColors.of(context);
+    final iconColor = selected
+        ? colors.selectedForeground
+        : colors.mutedForeground;
 
     return Semantics(
       button: true,
@@ -389,9 +430,7 @@ class _NavChip extends StatelessWidget {
               vertical: padding12,
             ),
             decoration: BoxDecoration(
-              color: selected
-                  ? accent.withValues(alpha: 0.16)
-                  : Colors.transparent,
+              color: selected ? colors.selectedBackground : Colors.transparent,
               borderRadius: BorderRadius.circular(FloatingNavBar.pillRadius),
             ),
             child: Row(
@@ -412,7 +451,7 @@ class _NavChip extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0,
                               height: 1.2,
-                              color: accent,
+                              color: colors.selectedForeground,
                             ),
                           ),
                         )

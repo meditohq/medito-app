@@ -254,7 +254,7 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                   onPressed: () => _openShopUrl(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
                       vertical: 12,
@@ -267,7 +267,7 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                     AppLocalizations.of(context)!.blackFridaySeeAllButton,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ),

@@ -28,7 +28,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     colorScheme: isDark
         ? const ColorScheme.dark(
             primary: ColorConstants.lightPurple,
-            onPrimary: ColorConstants.white,
+            onPrimary: ColorConstants.onAccentDark,
             secondary: ColorConstants.white,
             onSecondary: ColorConstants.black,
             surface: ColorConstants.ebony,
@@ -38,7 +38,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
           )
         : const ColorScheme.light(
             primary: ColorConstants.lightPrimary,
-            onPrimary: ColorConstants.white,
+            onPrimary: ColorConstants.onAccentLight,
             secondary: ColorConstants.lightSecondary,
             onSecondary: ColorConstants.white,
             surface: ColorConstants.lightSurface,
@@ -72,7 +72,9 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
         backgroundColor: isDark
             ? ColorConstants.lightPurple
             : ColorConstants.lightPrimary,
-        foregroundColor: ColorConstants.white,
+        foregroundColor: isDark
+            ? ColorConstants.onAccentDark
+            : ColorConstants.onAccentLight,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
