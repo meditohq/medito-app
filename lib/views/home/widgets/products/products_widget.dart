@@ -14,6 +14,7 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/utils/black_friday_utils.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/constants/constants.dart';
+import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 
 class ProductsWidget extends ConsumerStatefulWidget {
@@ -259,7 +260,7 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                       vertical: 12,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   child: Text(
@@ -294,7 +295,7 @@ class ProductGroupCard extends ConsumerWidget {
   final ProductGroupModel productGroup;
   final double cardWidth = 150.0;
   static const _kCardBorderWidth = 0.5;
-  static const _kCardBorderRadius = 24.0;
+  static const _kCardBorderRadius = kHomeTileRadius;
 
   const ProductGroupCard({super.key, required this.productGroup});
 
@@ -421,7 +422,7 @@ class ProductGroupCard extends ConsumerWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(100),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.1),

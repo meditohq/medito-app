@@ -13,10 +13,11 @@ import 'package:medito/utils/utils.dart';
 
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/network_image_widget.dart';
+import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 
-const _kCardBorderRadius = 20.0;
-const _kBannerFontSize = 16.0;
+const _kCardBorderRadius = kHomeCardRadius;
+const _kChipFontSize = 11.0;
 const _kCarouselHeight = 180.0;
 
 class CarouselWidget extends ConsumerStatefulWidget {
@@ -274,16 +275,34 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
         ? parseColor(item.bannerColor!)
         : context.brandPurple;
 
-    return Banner(
-      message: item.bannerLabel ?? AppLocalizations.of(context)!.neww,
-      location: BannerLocation.topStart,
-      color: bannerColor,
-      textStyle: TextStyle(
-        color: parseColor(item.bannerLabelColor),
-        fontSize: _kBannerFontSize,
-        fontWeight: FontWeight.bold,
-      ),
-      child: child,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        child,
+        Positioned(
+          top: 10,
+          left: 10,
+          child: IgnorePointer(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: bannerColor,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Text(
+                item.bannerLabel ?? AppLocalizations.of(context)!.neww,
+                style: TextStyle(
+                  fontFamily: dmSans,
+                  fontSize: _kChipFontSize,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  color: parseColor(item.bannerLabelColor),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

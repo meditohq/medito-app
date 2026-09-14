@@ -14,6 +14,7 @@ import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/constants/constants.dart';
+import 'home_styles.dart';
 import 'widgets/announcement/home_announcement_section.dart';
 import 'widgets/editorial/carousel_widget.dart';
 import 'widgets/header_widget.dart';
@@ -112,6 +113,7 @@ class _HomeViewState extends ConsumerState<HomeView>
 
         return Scaffold(
           body: SafeArea(
+            bottom: false,
             child: RefreshIndicator(
               onRefresh: _onRefresh,
               edgeOffset: 150,
@@ -133,18 +135,11 @@ class _HomeViewState extends ConsumerState<HomeView>
                   ),
                   const SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.only(top: 20),
+                      padding: EdgeInsets.only(top: 12),
                       child: HomeAnnouncementSection(),
                     ),
                   ),
-                  SliverList.separated(
-                    separatorBuilder: (context, index) => Divider(
-                      height: 1,
-                      thickness: 0.5,
-                      indent: padding16,
-                      endIndent: padding16,
-                      color: context.brandPurple.withValues(alpha: 0.2),
-                    ),
+                  SliverList.builder(
                     itemBuilder: (context, index) {
                       var type = widgetOrder[index];
                       Widget child;
@@ -178,15 +173,17 @@ class _HomeViewState extends ConsumerState<HomeView>
                           break;
                       }
                       return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: padding16,
-                        ),
+                        padding: const EdgeInsets.only(bottom: kHomeSectionGap),
                         child: child,
                       );
                     },
                     itemCount: widgetOrder.length,
                   ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                  SliverPadding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.paddingOf(context).bottom + 8,
+                    ),
+                  ),
                 ],
               ),
             ),

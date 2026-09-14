@@ -24,11 +24,12 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'dart:async';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/providers/providers.dart';
+import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 
-const _kCardBorderRadius = 24.0;
-const _kPlayButtonSize = 48.0;
-const _kPlayButtonBorderWidth = 0.5;
+const _kCardBorderRadius = kHomeHeroRadius;
+const _kPlayButtonSize = 52.0;
+const _kProgressBarHeight = 3.0;
 
 /// Shared context for every Up Next event so the four are comparable.
 /// Experience level is omitted — it is a user property, already on every event.
@@ -150,22 +151,23 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
     setState(() => _pinning = true);
 
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.upNextNextPackPinned,
-        parameters: {
-          ..._upNextEventParams(widget.data),
-          AnalyticsEventConstants.paramNextPackId: nextPackId,
-          AnalyticsEventConstants.paramNextPackSequencePosition:
-              PackSequence.positionOf(nextPackId)?.toString() ?? 'none',
-        },
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.upNextNextPackPinned,
+            parameters: {
+              ..._upNextEventParams(widget.data),
+              AnalyticsEventConstants.paramNextPackId: nextPackId,
+              AnalyticsEventConstants.paramNextPackSequencePosition:
+                  PackSequence.positionOf(nextPackId)?.toString() ?? 'none',
+            },
+          ),
     );
 
     // Same key and invalidation as the pack view's manual pin.
-    await ref.read(sharedPreferencesProvider).setString(
-      SharedPreferenceConstants.upNextPackId,
-      nextPackId,
-    );
+    await ref
+        .read(sharedPreferencesProvider)
+        .setString(SharedPreferenceConstants.upNextPackId, nextPackId);
     ref.invalidate(upNextPackIdProvider);
 
     if (!mounted) return;
@@ -294,8 +296,8 @@ class _CompletedCta extends StatelessWidget {
         onTap: busy ? null : onTap,
         child: HomeGradientBorder(
           backgroundColor: context.brandPurple,
-          borderRadius: 12,
-          borderWidth: _kPlayButtonBorderWidth,
+          borderRadius: 14,
+          borderWidth: 0.5,
           child: SizedBox(
             height: 48,
             child: Center(
@@ -383,7 +385,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(padding16),
+                        padding: const EdgeInsets.all(padding20),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -449,6 +451,13 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                           color: onSurface,
                                         ),
                                   ),
+                                  if (widget.data.totalCount > 0) ...[
+                                    const SizedBox(height: 10),
+                                    _ProgressRow(
+                                      completed: widget.data.completedCount,
+                                      total: widget.data.totalCount,
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
@@ -622,10 +631,11 @@ class _PlayButton extends StatelessWidget {
       button: true,
       child: GestureDetector(
         onTap: onTap,
-        child: HomeGradientBorder(
-          backgroundColor: context.brandPurple,
-          borderRadius: _kPlayButtonSize / 2,
-          borderWidth: _kPlayButtonBorderWidth,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: context.brandPurple,
+          ),
           child: const SizedBox(
             width: _kPlayButtonSize,
             height: _kPlayButtonSize,
@@ -639,6 +649,47 @@ class _PlayButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Thin pack progress bar with a "3 of 7" caption in the eyebrow's voice.
+class _ProgressRow extends StatelessWidget {
+  final int completed;
+  final int total;
+
+  const _ProgressRow({required this.completed, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    return Row(
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_kProgressBarHeight / 2),
+            child: LinearProgressIndicator(
+              value: (completed / total).clamp(0.0, 1.0),
+              minHeight: _kProgressBarHeight,
+              backgroundColor: onSurface.withOpacityValue(0.1),
+              color: context.brandPurple,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          AppLocalizations.of(context)!.upNextProgress(completed, total),
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontFamily: teachers,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.6,
+            color: onSurface.withOpacityValue(0.7),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -657,16 +708,11 @@ class _UpNextShimmer extends StatelessWidget {
         right: padding16,
         bottom: padding16,
       ),
-      child: Container(
-        height: 112,
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(_kCardBorderRadius),
-          border: Border.all(
-            color: Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
-            width: 0.5,
-          ),
-        ),
+      child: HomeGradientBorder(
+        backgroundColor: cardColor,
+        borderRadius: _kCardBorderRadius,
+        borderWidth: 0.5,
+        child: const SizedBox(height: 128, width: double.infinity),
       ),
     );
   }

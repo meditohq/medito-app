@@ -12,13 +12,14 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/utils/utils.dart';
 
 import '../../../../widgets/medito_icon.dart';
+import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 
 class ShortcutsItemsWidget extends ConsumerWidget {
   const ShortcutsItemsWidget({super.key, required this.data});
 
   static const _kItemBorderWidth = 0.5;
-  static const _kItemBorderRadius = 24.0;
+  static const _kItemBorderRadius = kHomeTileRadius;
 
   final List<ShortcutsModel> data;
 
@@ -107,6 +108,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
           type: MaterialType.transparency,
           child: InkWell(
             onTap: () => _handleChipPress(context, ref, e),
+            borderRadius: BorderRadius.circular(_kItemBorderRadius),
             child: Center(
               child: MeditoRemoteIcon(
                 icon: e.icon ?? '',
@@ -132,7 +134,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
             GestureDetector(
               onTap: () => _handleChipPress(context, ref, e),
               child: Padding(
-                padding: const EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.only(top: 6),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(

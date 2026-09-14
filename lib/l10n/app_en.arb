@@ -29,6 +29,14 @@
   "x09": "x0.9",
   "x1": "x1",
   "searchMeditations": "Search meditations",
+  "search": "Search",
+  "@search": {
+    "description": "Label of the search button in the floating navigation bar"
+  },
+  "searchEmptyHint": "Find a pack or a session. Try sleep, anxiety or focus.",
+  "@searchEmptyHint": {
+    "description": "Shown on the search page before anything is typed"
+  },
   "share": "Share",
   "tapToShare": "Tap to share",
   "id": "id",
@@ -511,17 +519,9 @@
   "@zenMode": {
     "description": "Title for zen mode setting in customization section"
   },
-  "zenModeSubtitle": "Hide all stats, streak, scores app-wide",
-  "@zenModeSubtitle": {
-    "description": "Subtitle for zen mode setting in customization section"
-  },
   "zenModeEnabledMessage": "Stats will be hidden throughout the app",
   "@zenModeEnabledMessage": {
     "description": "Message shown when zen mode is enabled"
-  },
-  "zenModeDescription": "Hides your streak, stats and consistency score everywhere in the app, so you can practise without keeping score. Your progress is still recorded and reappears when you turn Zen Mode off.",
-  "@zenModeDescription": {
-    "description": "Explanatory text in the Zen Mode bottom sheet, above the On / Off buttons"
   },
   "zenModeOn": "On",
   "@zenModeOn": {
@@ -530,6 +530,18 @@
   "zenModeOff": "Off",
   "@zenModeOff": {
     "description": "Zen Mode state label; button in the sheet and subtitle on the settings row"
+  },
+  "zenModeOffDescription": "Show your streak, stats and consistency score.",
+  "@zenModeOffDescription": {
+    "description": "Description under the Off option in the Zen Mode sheet"
+  },
+  "zenModeOnDescription": "Hide your streak, stats and consistency score everywhere in the app.",
+  "@zenModeOnDescription": {
+    "description": "Description under the On option in the Zen Mode sheet"
+  },
+  "zenModeFootnote": "Your progress is recorded either way.",
+  "@zenModeFootnote": {
+    "description": "Small note under the Zen Mode options"
   },
   "mindClear": "Mind Clear",
   "@mindClear": {
@@ -785,6 +797,10 @@
   "systemTheme": "System",
   "@systemTheme": {
     "description": "System theme option that follows device settings"
+  },
+  "systemThemeDescription": "Follows your device setting",
+  "@systemThemeDescription": {
+    "description": "Description under the System option in the theme sheet"
   },
   "lightTheme": "Light",
   "@lightTheme": {
@@ -1257,6 +1273,14 @@
   "upNextTitle": "Your Path",
   "@upNextTitle": {
     "description": "Title for the Your Path section on the home screen"
+  },
+  "upNextProgress": "{completed} of {total}",
+  "@upNextProgress": {
+    "description": "Caption next to the pack progress bar on the Your Path card, e.g. 3 of 7",
+    "placeholders": {
+      "completed": {"type": "int"},
+      "total": {"type": "int"}
+    }
   },
   "upNextPackCompletedTitle": "You finished {packTitle}",
   "@upNextPackCompletedTitle": {

@@ -101,6 +101,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get searchMeditations => 'Buscar meditaciones';
 
   @override
+  String get search => 'Buscar';
+
+  @override
+  String get searchEmptyHint =>
+      'Encuentra un pack o una sesión. Prueba con dormir, ansiedad o concentración.';
+
+  @override
   String get share => 'Compartir';
 
   @override
@@ -1364,22 +1371,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get zenMode => 'Modo Zen';
 
   @override
-  String get zenModeSubtitle =>
-      'Ocultar todas las estadísticas, rachas y puntuaciones en toda la app';
-
-  @override
   String get zenModeEnabledMessage =>
       'Las estadísticas se ocultarán en toda la aplicación';
-
-  @override
-  String get zenModeDescription =>
-      'Oculta tu racha, estadísticas y puntuación de constancia en toda la app, para que practiques sin llevar la cuenta. Tu progreso se sigue registrando y reaparece al desactivar el Modo Zen.';
 
   @override
   String get zenModeOn => 'Activado';
 
   @override
   String get zenModeOff => 'Desactivado';
+
+  @override
+  String get zenModeOffDescription =>
+      'Muestra tu racha, estadísticas y puntuación de consistencia.';
+
+  @override
+  String get zenModeOnDescription =>
+      'Oculta tu racha, estadísticas y puntuación de consistencia en toda la app.';
+
+  @override
+  String get zenModeFootnote => 'Tu progreso se registra de todas formas.';
 
   @override
   String get mindClear => 'Mente Clara';
@@ -1732,6 +1742,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get systemTheme => 'Sistema';
+
+  @override
+  String get systemThemeDescription =>
+      'Sigue la configuración de tu dispositivo';
 
   @override
   String get lightTheme => 'Claro';
@@ -2091,6 +2105,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get upNextTitle => 'Your Path';
+
+  @override
+  String upNextProgress(int completed, int total) {
+    return '$completed de $total';
+  }
 
   @override
   String upNextPackCompletedTitle(String packTitle) {

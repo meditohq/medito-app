@@ -272,6 +272,18 @@ abstract class AppLocalizations {
   /// **'Search meditations'**
   String get searchMeditations;
 
+  /// Label of the search button in the floating navigation bar
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// Shown on the search page before anything is typed
+  ///
+  /// In en, this message translates to:
+  /// **'Find a pack or a session. Try sleep, anxiety or focus.'**
+  String get searchEmptyHint;
+
   /// No description provided for @share.
   ///
   /// In en, this message translates to:
@@ -2492,23 +2504,11 @@ abstract class AppLocalizations {
   /// **'Zen Mode'**
   String get zenMode;
 
-  /// Subtitle for zen mode setting in customization section
-  ///
-  /// In en, this message translates to:
-  /// **'Hide all stats, streak, scores app-wide'**
-  String get zenModeSubtitle;
-
   /// Message shown when zen mode is enabled
   ///
   /// In en, this message translates to:
   /// **'Stats will be hidden throughout the app'**
   String get zenModeEnabledMessage;
-
-  /// Explanatory text in the Zen Mode bottom sheet, above the On / Off buttons
-  ///
-  /// In en, this message translates to:
-  /// **'Hides your streak, stats and consistency score everywhere in the app, so you can practise without keeping score. Your progress is still recorded and reappears when you turn Zen Mode off.'**
-  String get zenModeDescription;
 
   /// Zen Mode state label; button in the sheet and subtitle on the settings row
   ///
@@ -2521,6 +2521,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Off'**
   String get zenModeOff;
+
+  /// Description under the Off option in the Zen Mode sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Show your streak, stats and consistency score.'**
+  String get zenModeOffDescription;
+
+  /// Description under the On option in the Zen Mode sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Hide your streak, stats and consistency score everywhere in the app.'**
+  String get zenModeOnDescription;
+
+  /// Small note under the Zen Mode options
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress is recorded either way.'**
+  String get zenModeFootnote;
 
   /// Message shown in zen mode after completing meditation
   ///
@@ -3164,6 +3182,12 @@ abstract class AppLocalizations {
   /// **'System'**
   String get systemTheme;
 
+  /// Description under the System option in the theme sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Follows your device setting'**
+  String get systemThemeDescription;
+
   /// Light theme option
   ///
   /// In en, this message translates to:
@@ -3805,6 +3829,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Path'**
   String get upNextTitle;
+
+  /// Caption next to the pack progress bar on the Your Path card, e.g. 3 of 7
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total}'**
+  String upNextProgress(int completed, int total);
 
   /// Headline on the Up Next card when every session in the pinned pack is complete
   ///

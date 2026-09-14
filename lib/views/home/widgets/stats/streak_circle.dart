@@ -207,12 +207,15 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                 ),
               ),
               borderRadius: BorderRadius.circular(
-                StreakCircleConstants.borderRadius + 1.5,
+                StreakCircleConstants.borderRadius +
+                    StreakCircleConstants.ringWidth,
               ),
             )
           : null,
       child: Padding(
-        padding: isStreakDoneToday ? const EdgeInsets.all(2) : EdgeInsets.zero,
+        padding: isStreakDoneToday
+            ? const EdgeInsets.all(StreakCircleConstants.ringWidth)
+            : EdgeInsets.zero,
         child: Material(
           color: Colors.transparent,
           child: Semantics(
@@ -347,12 +350,15 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                 ),
               ),
               borderRadius: BorderRadius.circular(
-                StreakCircleConstants.borderRadius + 1.5,
+                StreakCircleConstants.borderRadius +
+                    StreakCircleConstants.ringWidth,
               ),
             )
           : null,
       child: Padding(
-        padding: isStreakDoneToday ? const EdgeInsets.all(2) : EdgeInsets.zero,
+        padding: isStreakDoneToday
+            ? const EdgeInsets.all(StreakCircleConstants.ringWidth)
+            : EdgeInsets.zero,
         child: Material(
           color: Colors.transparent,
           child: Semantics(

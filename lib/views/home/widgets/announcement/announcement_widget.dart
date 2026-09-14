@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
+import 'package:medito/views/home/home_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -87,13 +88,13 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
           child: Container(
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(kHomeCardRadius),
             ),
             padding: const EdgeInsets.only(
-              left: padding16,
-              right: padding16,
+              left: padding20,
+              right: padding20,
               bottom: padding12,
-              top: padding24,
+              top: padding20,
             ),
             child: Column(
               children: [
