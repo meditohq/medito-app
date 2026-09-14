@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
@@ -7,6 +8,7 @@ import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class CustomiseHomeLayoutScreen extends ConsumerStatefulWidget {
@@ -19,6 +21,19 @@ class CustomiseHomeLayoutScreen extends ConsumerStatefulWidget {
 
 class CustomiseHomeLayoutScreenState
     extends ConsumerState<CustomiseHomeLayoutScreen> {
+  /// Order when the screen opened, so leaving without dragging anything is
+  /// not reported as a change.
+  late final List<HomeWidgetType> _initialOrder;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialOrder = List.of(ref.read(homeWidgetOrderProvider));
+    FirebaseAnalyticsService().logScreenView(
+      screenName: 'CustomiseHomeLayoutScreen',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var order = ref.watch(homeWidgetOrderProvider);
@@ -81,16 +96,21 @@ class CustomiseHomeLayoutScreenState
   }
 
   void _logOrderAndPop() {
-    var order = ref.read(homeWidgetOrderProvider);
-    var analytics = ref.read(analyticsServiceProvider);
+    final order = ref.read(homeWidgetOrderProvider);
 
-    analytics.logEvent(
-      name: AnalyticsEventConstants.homeWidgetOrderChanged,
-      parameters: {
-        'order': HomeWidgetType.toStringList(order),
-        'desc': AnalyticsEventConstants.homeWidgetOrderChangedDesc,
-      },
-    );
+    if (!listEquals(order, _initialOrder)) {
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.homeWidgetOrderChanged,
+            parameters: {
+              AnalyticsEventConstants.paramHomeWidgetOrder:
+                  HomeWidgetType.toStringList(order).join(','),
+              AnalyticsEventConstants.paramHomeWidgetFirst: order.first.name,
+              'desc': AnalyticsEventConstants.homeWidgetOrderChangedDesc,
+            },
+          );
+    }
     ref.read(refreshHomeAPIsProvider);
     Navigator.pop(context);
   }

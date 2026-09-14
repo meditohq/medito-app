@@ -9,8 +9,16 @@ class AnalyticsEventConstants {
   /// Event name for Firebase Analytics when a product is clicked in the shop section
   static const String productClicked = 'product_clicked';
 
-  /// Event name for when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen
+  /// Event name for when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen.
+  /// Only sent when the order actually differs from the one the screen opened with.
   static const String homeWidgetOrderChanged = 'home_widget_order_changed';
+
+  /// Comma-joined section names in their new order, e.g. `upNext,shortcuts,carousel,quote,products`.
+  /// Firebase only accepts string/number parameter values; a List is dropped (Android drops the whole event).
+  static const String paramHomeWidgetOrder = 'order';
+
+  /// Name of the section now at the top of the home screen (the one the hero lays over its image).
+  static const String paramHomeWidgetFirst = 'first';
 
   /// Description for the analytics event when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen
   static const String homeWidgetOrderChangedDesc =
