@@ -5,20 +5,21 @@ import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 /// The text field shown inside the expanded nav capsule: search glyph, the
-/// input, and a close button that collapses search.
+/// input, and a clear (x) glyph that only appears once there is text.
+/// Leaving search is the separate Cancel capsule beside the field.
 class FloatingSearchField extends StatelessWidget {
   const FloatingSearchField({
     super.key,
     required this.controller,
     required this.focusNode,
     required this.onChanged,
-    required this.onClose,
+    required this.onClear,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
   final ValueChanged<String> onChanged;
-  final VoidCallback onClose;
+  final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
@@ -48,12 +49,18 @@ class FloatingSearchField extends StatelessWidget {
             onChanged: onChanged,
           ),
         ),
-        IconButton(
-          tooltip: l10n.close,
-          onPressed: onClose,
-          icon: Icon(Icons.close_rounded, color: onSurface),
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: controller,
+          builder: (context, value, _) {
+            if (value.text.isEmpty) return const SizedBox(width: 18);
+            return IconButton(
+              tooltip: l10n.clearSearch,
+              onPressed: onClear,
+              iconSize: 20,
+              icon: Icon(Icons.cancel, color: onSurface.withOpacityValue(0.5)),
+            );
+          },
         ),
-        const SizedBox(width: 4),
       ],
     );
   }

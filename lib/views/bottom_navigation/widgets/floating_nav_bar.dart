@@ -43,6 +43,8 @@ class FloatingNavBar extends StatelessWidget {
     this.action,
     this.expanded = false,
     this.expandedChild,
+    this.cancelLabel,
+    this.onCancel,
   });
 
   final List<FloatingNavItem> items;
@@ -51,9 +53,12 @@ class FloatingNavBar extends StatelessWidget {
   final FloatingNavAction? action;
 
   /// When true the pill collapses and the action capsule stretches across
-  /// the bar showing [expandedChild] (the search field).
+  /// the bar showing [expandedChild] (the search field), with a labelled
+  /// Cancel capsule beside it that calls [onCancel].
   final bool expanded;
   final Widget? expandedChild;
+  final String? cancelLabel;
+  final VoidCallback? onCancel;
 
   static const pillRadius = 100.0;
   static const capsuleSize = 58.0;
@@ -62,6 +67,29 @@ class FloatingNavBar extends StatelessWidget {
   static const _duration = Duration(milliseconds: 260);
   static const _morphDuration = Duration(milliseconds: 340);
   static const _morphCurve = Curves.easeOutCubic;
+  static const _cancelPadding = 20.0;
+
+  static TextStyle _cancelStyle(ThemeData theme) =>
+      theme.textTheme.labelMedium!.copyWith(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0,
+        height: 1.2,
+        color: theme.colorScheme.onSurface,
+      );
+
+  /// Width the Cancel capsule will take, so the field can leave room for it
+  /// while both animate together.
+  double _cancelSlotWidth(BuildContext context) {
+    final label = cancelLabel;
+    if (label == null || onCancel == null) return 0;
+    final painter = TextPainter(
+      text: TextSpan(text: label, style: _cancelStyle(Theme.of(context))),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    return painter.width + 2 * _cancelPadding + 2 * _hairline + padding12;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +122,7 @@ class FloatingNavBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: padding24),
         child: LayoutBuilder(
           builder: (context, constraints) {
+            final cancelSlot = _cancelSlotWidth(context);
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -124,8 +153,32 @@ class FloatingNavBar extends StatelessWidget {
                     action: action!,
                     expanded: expanded,
                     // The glass hairline sits outside the animated box.
-                    expandedWidth: constraints.maxWidth - 2 * _hairline,
+                    expandedWidth:
+                        constraints.maxWidth - 2 * _hairline - cancelSlot,
                     child: expandedChild,
+                  ),
+                // Unfolds from zero width as the field expands.
+                if (cancelSlot > 0)
+                  ClipRect(
+                    child: AnimatedAlign(
+                      duration: _morphDuration,
+                      curve: _morphCurve,
+                      alignment: Alignment.centerLeft,
+                      heightFactor: 1,
+                      widthFactor: expanded ? 1 : 0,
+                      child: AnimatedOpacity(
+                        duration: _duration,
+                        opacity: expanded ? 1 : 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: padding12),
+                          child: _CancelCapsule(
+                            label: cancelLabel!,
+                            style: _cancelStyle(Theme.of(context)),
+                            onTap: onCancel!,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
               ],
             );
@@ -231,6 +284,49 @@ class _ActionCapsule extends StatelessWidget {
                     ),
                   ),
                 ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Labelled glass capsule that collapses search.
+class _CancelCapsule extends StatelessWidget {
+  const _CancelCapsule({
+    required this.label,
+    required this.style,
+    required this.onTap,
+  });
+
+  final String label;
+  final TextStyle style;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: _Glass(
+          child: SizedBox(
+            height: FloatingNavBar.capsuleSize,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: FloatingNavBar._cancelPadding,
+              ),
+              child: Center(
+                child: ExcludeSemantics(
+                  child: Text(label, style: style, maxLines: 1),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

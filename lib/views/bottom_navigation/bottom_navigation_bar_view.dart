@@ -123,8 +123,10 @@ class _BottomNavigationBarViewState
               controller: _searchController,
               focusNode: _searchFocusNode,
               onChanged: _onSearchChanged,
-              onClose: _closeSearch,
+              onClear: _clearSearch,
             ),
+            cancelLabel: l10n.cancel,
+            onCancel: _closeSearch,
           ),
           body: Stack(
             children: [
@@ -162,6 +164,14 @@ class _BottomNavigationBarViewState
     );
     unawaited(FirebaseAnalyticsService().logScreenView(screenName: 'Search'));
     setState(() => _searchOpen = true);
+  }
+
+  /// Empties the field but stays in search.
+  void _clearSearch() {
+    _searchDebounceTimer?.cancel();
+    _searchController.clear();
+    setState(() => _searchQuery = '');
+    _searchFocusNode.requestFocus();
   }
 
   void _closeSearch() {
