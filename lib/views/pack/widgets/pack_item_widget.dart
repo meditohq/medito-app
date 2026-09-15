@@ -185,15 +185,19 @@ class _CompletionToggleState extends State<_CompletionToggle> {
                     border: Border.all(
                       color: _shown
                           ? context.brandPurple
-                          : ColorConstants.graphite,
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.4),
                       width: 2,
                     ),
                   ),
+                  // Glyph in the accent's own foreground: the accent is
+                  // near-white in dark mode, so plain white disappeared.
                   child: _shown
-                      ? const Icon(
+                      ? Icon(
                           Icons.check,
                           size: 16,
-                          color: ColorConstants.white,
+                          color: context.onBrandPurple,
                         )
                       : null,
                 ),

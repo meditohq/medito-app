@@ -73,7 +73,9 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
     final effectiveColor = _isPressed
         ? backgroundColor?.withValues(alpha: 0.8)
         : backgroundColor;
-    final textColor = (isCompleted || widget.isFirstUncompleted)
+    final textColor = isCompleted
+        ? context.onBrandPurple
+        : widget.isFirstUncompleted
         ? Colors.white
         : Colors.grey[300];
     final text = (isCompleted || widget.isFirstUncompleted)
@@ -136,7 +138,7 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
                     padding: EdgeInsets.only(right: 8),
                     child: MeditoIcon(
                       assetName: MeditoIcons.check,
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: context.onBrandPurple,
                       size: 24,
                     ),
                   ),
