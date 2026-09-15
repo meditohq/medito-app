@@ -5,7 +5,7 @@ import 'package:medito/utils/utils.dart';
 
 /// Text field used inside Medito dialogs.
 ///
-/// Matches the explore-screen [SearchBox] visually: filled with [cardColor],
+/// Matches the search field visually: filled with [cardColor],
 /// 0.5px outline at 30% onSurface, 12px rounded corners, and a consistent
 /// hint/text color derived from the theme.
 class MeditoDialogTextField extends StatelessWidget {

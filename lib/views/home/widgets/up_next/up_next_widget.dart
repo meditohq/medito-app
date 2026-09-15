@@ -24,11 +24,12 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'dart:async';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/providers/providers.dart';
+import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 
-const _kCardBorderRadius = 24.0;
-const _kPlayButtonSize = 48.0;
-const _kPlayButtonBorderWidth = 0.5;
+const _kCardBorderRadius = kHomeHeroRadius;
+const _kPlayButtonSize = 52.0;
+const _kProgressBarHeight = 3.0;
 
 /// Shared context for every Up Next event so the four are comparable.
 /// Experience level is omitted — it is a user property, already on every event.
@@ -45,26 +46,92 @@ Map<String, Object> _upNextEventParams(UpNextData data) {
   };
 }
 
+/// How the Up Next content is presented.
+enum UpNextStyle {
+  /// Its own card in the home list.
+  card,
+
+  /// Laid over the home hero image: no surface, white text, white play button.
+  hero,
+}
+
+/// Colours for the Up Next content in either [UpNextStyle].
+class _UpNextPalette {
+  const _UpNextPalette({
+    required this.foreground,
+    required this.muted,
+    required this.track,
+    required this.buttonBackground,
+    required this.buttonForeground,
+    required this.skipBackground,
+  });
+
+  factory _UpNextPalette.of(BuildContext context, UpNextStyle style) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    if (style == UpNextStyle.hero) {
+      // The hero's lower half fades toward the page colour: near-black in
+      // dark mode, white in light mode. Text goes the opposite way and the
+      // play button is the theme's inverted accent.
+      final fg = isDark ? Colors.white : const Color(0xFF0A0A0A);
+      return _UpNextPalette(
+        foreground: fg,
+        muted: fg.withValues(alpha: 0.78),
+        track: fg.withValues(alpha: isDark ? 0.25 : 0.15),
+        buttonBackground: isDark ? Colors.white : const Color(0xFF171717),
+        buttonForeground: isDark ? const Color(0xFF171717) : Colors.white,
+        skipBackground: (isDark ? Colors.black : Colors.white).withValues(
+          alpha: 0.35,
+        ),
+      );
+    }
+    final onSurface = theme.colorScheme.onSurface;
+    return _UpNextPalette(
+      foreground: onSurface,
+      muted: onSurface.withOpacityValue(0.7),
+      track: onSurface.withOpacityValue(0.1),
+      buttonBackground: context.brandPurple,
+      buttonForeground: context.onBrandPurple,
+      skipBackground: theme.scaffoldBackgroundColor,
+    );
+  }
+
+  final Color foreground;
+  final Color muted;
+  final Color track;
+  final Color buttonBackground;
+  final Color buttonForeground;
+  final Color skipBackground;
+}
+
 class UpNextWidget extends ConsumerWidget {
   /// Optional widget rendered inside the card below the main content (e.g. the
   /// explainer strip). When provided it collapses inside the card so the
-  /// rounded corners are always intact.
+  /// rounded corners are always intact. Ignored in [UpNextStyle.hero].
   final Widget? inlineStrip;
 
-  const UpNextWidget({super.key, this.inlineStrip});
+  final UpNextStyle style;
+
+  const UpNextWidget({
+    super.key,
+    this.inlineStrip,
+    this.style = UpNextStyle.card,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final upNextAsync = ref.watch(upNextProvider);
 
     final child = upNextAsync.when(
-      loading: () => const _UpNextShimmer(key: ValueKey('shimmer')),
+      loading: () =>
+          _UpNextShimmer(key: const ValueKey('shimmer'), style: style),
       error: (_, _) => const SizedBox.shrink(key: ValueKey('error')),
       data: (upNextData) {
         if (upNextData.isCompleted) {
           return _UpNextCompleted(
             key: ValueKey('completed_${upNextData.pack.id}'),
             data: upNextData,
+            style: style,
           );
         }
 
@@ -75,7 +142,8 @@ class UpNextWidget extends ConsumerWidget {
         return _UpNextContent(
           key: ValueKey(upNextData.nextSession!.id),
           data: upNextData,
-          inlineStrip: inlineStrip,
+          inlineStrip: style == UpNextStyle.hero ? null : inlineStrip,
+          style: style,
         );
       },
     );
@@ -102,8 +170,13 @@ class UpNextWidget extends ConsumerWidget {
 /// pack; at the end of the path there is no CTA (still an open decision).
 class _UpNextCompleted extends ConsumerStatefulWidget {
   final UpNextData data;
+  final UpNextStyle style;
 
-  const _UpNextCompleted({super.key, required this.data});
+  const _UpNextCompleted({
+    super.key,
+    required this.data,
+    this.style = UpNextStyle.card,
+  });
 
   @override
   ConsumerState<_UpNextCompleted> createState() => _UpNextCompletedState();
@@ -150,22 +223,23 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
     setState(() => _pinning = true);
 
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.upNextNextPackPinned,
-        parameters: {
-          ..._upNextEventParams(widget.data),
-          AnalyticsEventConstants.paramNextPackId: nextPackId,
-          AnalyticsEventConstants.paramNextPackSequencePosition:
-              PackSequence.positionOf(nextPackId)?.toString() ?? 'none',
-        },
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.upNextNextPackPinned,
+            parameters: {
+              ..._upNextEventParams(widget.data),
+              AnalyticsEventConstants.paramNextPackId: nextPackId,
+              AnalyticsEventConstants.paramNextPackSequencePosition:
+                  PackSequence.positionOf(nextPackId)?.toString() ?? 'none',
+            },
+          ),
     );
 
     // Same key and invalidation as the pack view's manual pin.
-    await ref.read(sharedPreferencesProvider).setString(
-      SharedPreferenceConstants.upNextPackId,
-      nextPackId,
-    );
+    await ref
+        .read(sharedPreferencesProvider)
+        .setString(SharedPreferenceConstants.upNextPackId, nextPackId);
     ref.invalidate(upNextPackIdProvider);
 
     if (!mounted) return;
@@ -179,7 +253,9 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface;
+    final palette = _UpNextPalette.of(context, widget.style);
+    final onSurface = palette.foreground;
+    final isHero = widget.style == UpNextStyle.hero;
     final l10n = AppLocalizations.of(context)!;
     final hasNext = widget.data.nextPackId != null;
 
@@ -202,73 +278,76 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: padding16),
-      child: Semantics(
-        label: '$title. $subtitle',
-        child: HomeGradientBorder(
-          backgroundColor: theme.cardColor,
-          borderRadius: _kCardBorderRadius,
-          borderWidth: 0.5,
-          child: Padding(
-            padding: const EdgeInsets.all(padding16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle_rounded,
-                      size: 18,
-                      color: context.brandPurple,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        l10n.upNextTitle.toUpperCase(),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontFamily: teachers,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.2,
-                          color: onSurface.withOpacityValue(0.7),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  title,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontFamily: sourceSerif,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    height: 1.2,
-                    color: onSurface,
+    final body = Padding(
+      padding: EdgeInsets.all(isHero ? padding16 : padding20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.check_circle_rounded,
+                size: 18,
+                color: isHero ? palette.foreground : context.brandPurple,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  l10n.upNextTitle.toUpperCase(),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontFamily: teachers,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.2,
+                    color: palette.muted,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: onSurface.withOpacityValue(0.7),
-                  ),
-                ),
-                if (hasNext) ...[
-                  const SizedBox(height: padding16),
-                  _CompletedCta(
-                    label: ctaLabel,
-                    busy: _pinning,
-                    onTap: _onStartNextPack,
-                  ),
-                ],
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontFamily: sourceSerif,
+              fontSize: isHero ? 28 : 22,
+              fontWeight: isHero ? FontWeight.w700 : FontWeight.w500,
+              height: 1.2,
+              color: onSurface,
             ),
           ),
-        ),
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            style: theme.textTheme.bodyMedium?.copyWith(color: palette.muted),
+          ),
+          if (hasNext) ...[
+            const SizedBox(height: padding16),
+            _CompletedCta(
+              label: ctaLabel,
+              busy: _pinning,
+              onTap: _onStartNextPack,
+              palette: palette,
+            ),
+          ],
+        ],
       ),
+    );
+
+    return Semantics(
+      label: '$title. $subtitle',
+      child: isHero
+          ? body
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: padding16),
+              child: HomeGradientBorder(
+                backgroundColor: theme.cardColor,
+                borderRadius: _kCardBorderRadius,
+                borderWidth: 0.5,
+                child: body,
+              ),
+            ),
     );
   }
 }
@@ -277,11 +356,13 @@ class _CompletedCta extends StatelessWidget {
   final String label;
   final bool busy;
   final VoidCallback onTap;
+  final _UpNextPalette palette;
 
   const _CompletedCta({
     required this.label,
     required this.busy,
     required this.onTap,
+    required this.palette,
   });
 
   @override
@@ -293,26 +374,26 @@ class _CompletedCta extends StatelessWidget {
       child: GestureDetector(
         onTap: busy ? null : onTap,
         child: HomeGradientBorder(
-          backgroundColor: context.brandPurple,
-          borderRadius: 12,
-          borderWidth: _kPlayButtonBorderWidth,
+          backgroundColor: palette.buttonBackground,
+          borderRadius: 14,
+          borderWidth: 0.5,
           child: SizedBox(
             height: 48,
             child: Center(
               child: busy
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: palette.buttonForeground,
                       ),
                     )
                   : ExcludeSemantics(
                       child: Text(
                         label,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: palette.buttonForeground,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -329,8 +410,14 @@ class _CompletedCta extends StatelessWidget {
 class _UpNextContent extends ConsumerStatefulWidget {
   final UpNextData data;
   final Widget? inlineStrip;
+  final UpNextStyle style;
 
-  const _UpNextContent({super.key, required this.data, this.inlineStrip});
+  const _UpNextContent({
+    super.key,
+    required this.data,
+    this.inlineStrip,
+    this.style = UpNextStyle.card,
+  });
 
   @override
   ConsumerState<_UpNextContent> createState() => _UpNextContentState();
@@ -344,7 +431,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     final nextSession = widget.data.nextSession!;
     final theme = Theme.of(context);
     final cardColor = theme.cardColor;
-    final onSurface = theme.colorScheme.onSurface;
+    final palette = _UpNextPalette.of(context, widget.style);
+    final isHero = widget.style == UpNextStyle.hero;
     final l10n = AppLocalizations.of(context)!;
 
     final borderRadius = BorderRadius.circular(_kCardBorderRadius);
@@ -353,13 +441,13 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
       opacity: _skipping ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 150),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: padding16),
+        padding: EdgeInsets.symmetric(horizontal: isHero ? 0 : padding16),
         child: ClipRRect(
           borderRadius: borderRadius,
           child: Dismissible(
             key: Key('up_next_${nextSession.id}'),
             direction: DismissDirection.endToStart,
-            background: _getSkipBackground(context, l10n),
+            background: _getSkipBackground(context, l10n, palette),
             movementDuration: const Duration(milliseconds: 1),
             confirmDismiss: (_) async {
               await _onSkip(context);
@@ -373,17 +461,22 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                 CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
               },
               child: GestureDetector(
+                // The hero style has no card surface behind the content, so
+                // without this only the painted text and the play circle
+                // would take taps; the space beside the title fell through
+                // to the image (smoke run 34957204808 tapped the card centre
+                // and nothing happened).
+                behavior: HitTestBehavior.opaque,
                 onTap: () => _onTap(context),
-                child: HomeGradientBorder(
-                  backgroundColor: cardColor,
-                  borderRadius: _kCardBorderRadius,
-                  borderWidth: 0.5,
+                child: _Surface(
+                  style: widget.style,
+                  color: cardColor,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(padding16),
+                        padding: EdgeInsets.all(isHero ? padding16 : padding20),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -401,9 +494,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
                                               letterSpacing: 1.2,
-                                              color: onSurface.withOpacityValue(
-                                                0.7,
-                                              ),
+                                              color: palette.muted,
                                             ),
                                       ),
                                       const SizedBox(width: 4),
@@ -414,9 +505,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                               fontFamily: teachers,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              color: onSurface.withOpacityValue(
-                                                0.7,
-                                              ),
+                                              color: palette.muted,
                                             ),
                                       ),
                                       const SizedBox(width: 4),
@@ -429,8 +518,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                                 letterSpacing: 1.2,
-                                                color: onSurface
-                                                    .withOpacityValue(0.7),
+                                                color: palette.muted,
                                               ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -443,17 +531,30 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                     style: theme.textTheme.headlineSmall
                                         ?.copyWith(
                                           fontFamily: sourceSerif,
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.w500,
+                                          fontSize: isHero ? 28 : 22,
+                                          fontWeight: isHero
+                                              ? FontWeight.w700
+                                              : FontWeight.w500,
                                           height: 1.2,
-                                          color: onSurface,
+                                          color: palette.foreground,
                                         ),
                                   ),
+                                  if (widget.data.totalCount > 0) ...[
+                                    const SizedBox(height: 10),
+                                    _ProgressRow(
+                                      completed: widget.data.completedCount,
+                                      total: widget.data.totalCount,
+                                      palette: palette,
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
                             const SizedBox(width: padding16),
-                            _PlayButton(onTap: () => _onTap(context)),
+                            _PlayButton(
+                              onTap: () => _onTap(context),
+                              palette: palette,
+                            ),
                           ],
                         ),
                       ),
@@ -469,12 +570,16 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     );
   }
 
-  Widget _getSkipBackground(BuildContext context, AppLocalizations l10n) {
+  Widget _getSkipBackground(
+    BuildContext context,
+    AppLocalizations l10n,
+    _UpNextPalette palette,
+  ) {
     final theme = Theme.of(context);
-    final iconColor = theme.colorScheme.onSurface;
+    final iconColor = palette.foreground;
 
     return Container(
-      color: theme.scaffoldBackgroundColor,
+      color: palette.skipBackground,
       child: Padding(
         padding: const EdgeInsets.all(padding16),
         child: Row(
@@ -612,8 +717,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
 
 class _PlayButton extends StatelessWidget {
   final VoidCallback onTap;
+  final _UpNextPalette palette;
 
-  const _PlayButton({required this.onTap});
+  const _PlayButton({required this.onTap, required this.palette});
 
   @override
   Widget build(BuildContext context) {
@@ -622,17 +728,18 @@ class _PlayButton extends StatelessWidget {
       button: true,
       child: GestureDetector(
         onTap: onTap,
-        child: HomeGradientBorder(
-          backgroundColor: context.brandPurple,
-          borderRadius: _kPlayButtonSize / 2,
-          borderWidth: _kPlayButtonBorderWidth,
-          child: const SizedBox(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: palette.buttonBackground,
+          ),
+          child: SizedBox(
             width: _kPlayButtonSize,
             height: _kPlayButtonSize,
             child: ExcludeSemantics(
               child: Icon(
                 Icons.play_arrow_rounded,
-                color: Colors.white,
+                color: palette.buttonForeground,
                 size: 28,
               ),
             ),
@@ -643,13 +750,87 @@ class _PlayButton extends StatelessWidget {
   }
 }
 
+/// Card surface in [UpNextStyle.card]; nothing at all in [UpNextStyle.hero],
+/// where the hero image and its scrim are the surface.
+class _Surface extends StatelessWidget {
+  const _Surface({
+    required this.style,
+    required this.color,
+    required this.child,
+  });
+
+  final UpNextStyle style;
+  final Color color;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (style == UpNextStyle.hero) return child;
+    return HomeGradientBorder(
+      backgroundColor: color,
+      borderRadius: _kCardBorderRadius,
+      borderWidth: 0.5,
+      child: child,
+    );
+  }
+}
+
+/// Thin pack progress bar with a "3 of 7" caption in the eyebrow's voice.
+class _ProgressRow extends StatelessWidget {
+  final int completed;
+  final int total;
+  final _UpNextPalette palette;
+
+  const _ProgressRow({
+    required this.completed,
+    required this.total,
+    required this.palette,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_kProgressBarHeight / 2),
+            child: LinearProgressIndicator(
+              value: (completed / total).clamp(0.0, 1.0),
+              minHeight: _kProgressBarHeight,
+              backgroundColor: palette.track,
+              color: palette.buttonBackground,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          AppLocalizations.of(context)!.upNextProgress(completed, total),
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontFamily: teachers,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.6,
+            color: palette.muted,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _UpNextShimmer extends StatelessWidget {
-  const _UpNextShimmer({super.key});
+  const _UpNextShimmer({super.key, this.style = UpNextStyle.card});
+
+  final UpNextStyle style;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cardColor = theme.cardColor;
+    // Over the hero the image is the loading state.
+    if (style == UpNextStyle.hero) return const SizedBox(height: 96);
 
     return Padding(
       padding: const EdgeInsets.only(
@@ -657,16 +838,11 @@ class _UpNextShimmer extends StatelessWidget {
         right: padding16,
         bottom: padding16,
       ),
-      child: Container(
-        height: 112,
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(_kCardBorderRadius),
-          border: Border.all(
-            color: Color.lerp(cardColor, Colors.white, 0.3) ?? cardColor,
-            width: 0.5,
-          ),
-        ),
+      child: HomeGradientBorder(
+        backgroundColor: cardColor,
+        borderRadius: _kCardBorderRadius,
+        borderWidth: 0.5,
+        child: const SizedBox(height: 128, width: double.infinity),
       ),
     );
   }

@@ -17,7 +17,6 @@ import '../../../models/events/donation/donation_page_model.dart';
 import '../../../providers/donation/donation_page_provider.dart';
 import '../../../providers/donation/donation_snooze_provider.dart';
 import '../../../routes/routes.dart';
-import '../../../utils/utils.dart';
 import '../../../widgets/errors/medito_error_widget.dart';
 import '../../home/widgets/home_gradient_border.dart';
 import 'feedback_widget.dart';
@@ -147,9 +146,9 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
     DonationPageModel donationPageModel, {
     required bool isSnoozed,
   }) {
-    final footerColor = donationPageModel.cardTextColor != null
-        ? parseColor(donationPageModel.cardTextColor!)
-        : Colors.white.withValues(alpha: 0.85);
+    // The backend's cardTextColor was tuned for the old purple card; the card
+    // colour is theme-driven now, so the foreground must follow the theme too.
+    final footerColor = context.onBrandPurple.withValues(alpha: 0.85);
 
     return HomeGradientBorder(
       backgroundColor: context.brandPurple,
@@ -176,7 +175,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                             fontSize: 22,
                             fontWeight: FontWeight.w400,
                             height: 1.2,
-                            color: Colors.white,
+                            color: context.onBrandPurple,
                           ),
                     ),
                   ),
@@ -186,7 +185,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                   icon: MeditoIcon(
                     assetName: MeditoIcons.help,
                     size: 20,
-                    color: Colors.white,
+                    color: context.onBrandPurple,
                   ),
                   onPressed: () => _showDonationInfoDialog(context),
                   padding: EdgeInsets.zero,
@@ -206,7 +205,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 height: 1.4,
-                color: Colors.white.withValues(alpha: 0.9),
+                color: context.onBrandPurple.withValues(alpha: 0.9),
               ),
             ),
             const SizedBox(height: 20),
@@ -251,7 +250,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 fontFamily: sourceSerif,
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
-                color: Colors.white,
+                color: context.onBrandPurple,
               ),
             ),
             const SizedBox(height: 6),
@@ -262,7 +261,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 height: 1.4,
-                color: Colors.white.withValues(alpha: 0.9),
+                color: context.onBrandPurple.withValues(alpha: 0.9),
               ),
             ),
             const SizedBox(height: 12),
@@ -281,15 +280,19 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                   );
                 },
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.white, width: 1.5),
+                  foregroundColor: context.onBrandPurple,
+                  side: BorderSide(color: context.onBrandPurple, width: 1.5),
                   padding: const EdgeInsets.symmetric(vertical: 8),
                 ),
                 child: Text(
                   AppLocalizations.of(context)!.donateAgain,
+                  // headlineMedium carries the page foreground colour, which
+                  // would override the button's foreground and leave white
+                  // text on the light accent card in dark mode.
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
+                    color: context.onBrandPurple,
                   ),
                 ),
               ),
@@ -396,7 +399,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorConstants.white,
+                backgroundColor: context.onBrandPurple,
                 foregroundColor: context.brandPurple,
                 padding: const EdgeInsets.symmetric(vertical: 8),
               ),
@@ -405,7 +408,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: context.brandPurple,
                 ),
               ),
             ),
@@ -434,8 +437,8 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: context.brandPurple,
-                foregroundColor: Colors.white,
+                backgroundColor: context.onBrandPurple,
+                foregroundColor: context.brandPurple,
                 padding: const EdgeInsets.symmetric(vertical: 8),
               ),
               child: Text(

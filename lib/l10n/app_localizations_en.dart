@@ -100,6 +100,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchMeditations => 'Search meditations';
 
   @override
+  String get search => 'Search';
+
+  @override
+  String get searchEmptyHint =>
+      'Find a pack or a session. Try sleep, anxiety or focus.';
+
+  @override
   String get share => 'Share';
 
   @override
@@ -1305,6 +1312,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorTimeoutMessage => 'Connection timed out';
 
   @override
+  String get errorHostLookupMessage =>
+      'Couldn\'t reach Medito\'s servers. Check for a VPN, ad blocker or Private DNS setting.';
+
+  @override
+  String get errorConnectTimeoutMessage =>
+      'Connection to Medito\'s servers timed out. Please try again.';
+
+  @override
+  String get errorServerUnreachableMessage =>
+      'Couldn\'t connect to Medito\'s servers. Please try again later.';
+
+  @override
   String get errorUnauthorizedMessage =>
       'Session expired, please sign in again';
 
@@ -1328,20 +1347,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zenMode => 'Zen Mode';
 
   @override
-  String get zenModeSubtitle => 'Hide all stats, streak, scores app-wide';
-
-  @override
   String get zenModeEnabledMessage => 'Stats will be hidden throughout the app';
-
-  @override
-  String get zenModeDescription =>
-      'Hides your streak, stats and consistency score everywhere in the app, so you can practise without keeping score. Your progress is still recorded and reappears when you turn Zen Mode off.';
 
   @override
   String get zenModeOn => 'On';
 
   @override
   String get zenModeOff => 'Off';
+
+  @override
+  String get zenModeOffDescription =>
+      'Show your streak, stats and consistency score.';
+
+  @override
+  String get zenModeOnDescription =>
+      'Hide your streak, stats and consistency score everywhere in the app.';
+
+  @override
+  String get zenModeFootnote => 'Your progress is recorded either way.';
+
+  @override
+  String get dndOn => 'On';
+
+  @override
+  String get dndOff => 'Off';
+
+  @override
+  String get dndOnDescription =>
+      'Turn on Do Not Disturb while a session plays and turn it off again when it ends. Alarms still sound.';
+
+  @override
+  String get dndOffDescription =>
+      'Leave your phone\'s notifications as they are during sessions.';
+
+  @override
+  String get dndFootnote =>
+      'Needs Do Not Disturb access on Android. Medito only changes it during a session.';
+
+  @override
+  String get dndAccessTitle => 'Allow Do Not Disturb access';
+
+  @override
+  String get dndAccessBody =>
+      'To silence your phone during meditation, Android needs to give Medito Do Not Disturb access. On the next screen, find Medito in the list and turn it on, then come back to the app.';
 
   @override
   String get mindClear => 'Mind Clear';
@@ -1692,6 +1740,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get systemTheme => 'System';
+
+  @override
+  String get systemThemeDescription => 'Follows your device setting';
 
   @override
   String get lightTheme => 'Light';
@@ -2049,6 +2100,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get upNextTitle => 'Your Path';
+
+  @override
+  String upNextProgress(int completed, int total) {
+    return '$completed of $total';
+  }
 
   @override
   String upNextPackCompletedTitle(String packTitle) {

@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// The app's flat card surface: a solid fill with a 0.5px hairline tinted
+/// from the fill itself, so it works on the card colour, on brand purple
+/// (donation card) and on images alike.
+///
+/// The name predates the flat look — this used to paint a vertical
+/// light-to-dark gradient rim. The class and constructor are unchanged so the
+/// call sites across home, settings, explore, track and end screen all moved
+/// to the flat surface together.
 class HomeGradientBorder extends StatelessWidget {
   const HomeGradientBorder({
     required this.backgroundColor,
@@ -7,8 +15,8 @@ class HomeGradientBorder extends StatelessWidget {
     required this.borderWidth,
     required this.child,
     super.key,
-    this.lightBlend = 0.26,
-    this.darkBlend = 0.88,
+    @Deprecated('No longer used; the surface is flat.') this.lightBlend = 0.26,
+    @Deprecated('No longer used; the surface is flat.') this.darkBlend = 0.88,
   });
 
   final Color backgroundColor;
@@ -18,45 +26,24 @@ class HomeGradientBorder extends StatelessWidget {
   final double lightBlend;
   final double darkBlend;
 
+  static const _hairlineBlendDark = 0.14;
+  static const _hairlineBlendLight = 0.10;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Tone the bezel down in light mode — the same blends that read as a soft
-    // inner glow on dark surfaces look like a heavy 3D edge on white.
-    final effectiveLightBlend = isDark ? lightBlend : lightBlend * 0.55;
-    final effectiveDarkBlend = isDark ? darkBlend : darkBlend * 0.18;
-    final lightColor =
-        Color.lerp(backgroundColor, Colors.white, effectiveLightBlend) ??
-        backgroundColor;
-    final darkColor =
-        Color.lerp(backgroundColor, Colors.black, effectiveDarkBlend) ??
-        backgroundColor;
-    final innerRadius = (borderRadius - borderWidth).clamp(0.0, borderRadius);
+    final hairline = isDark
+        ? Color.lerp(backgroundColor, Colors.white, _hairlineBlendDark)!
+        : Color.lerp(backgroundColor, Colors.black, _hairlineBlendLight)!;
 
-    // Vertical gradient (top → bottom) rather than diagonal: diagonals only
-    // land the light/dark at opposite corners, so on wide-short cards the
-    // top and bottom edges end up flat mid-tone. A pure vertical gradient
-    // highlights the top rim and shadows the bottom rim consistently for
-    // any aspect ratio.
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [lightColor, darkColor],
-            stops: const [0.0, 1.0],
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(borderWidth),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(innerRadius),
-            child: ColoredBox(color: backgroundColor, child: child),
-          ),
-        ),
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: hairline, width: borderWidth),
       ),
+      child: child,
     );
   }
 }

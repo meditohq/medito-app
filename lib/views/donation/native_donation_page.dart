@@ -896,7 +896,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   )
                 : ElevatedButton.styleFrom(
                     backgroundColor: context.brandPurple,
-                    foregroundColor: Colors.white,
+                    foregroundColor: context.onBrandPurple,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -907,7 +907,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: hasApplePay ? context.brandPurple : Colors.white,
+                      color: hasApplePay
+                          ? context.brandPurple
+                          : context.onBrandPurple,
                     ),
                   )
                 : Text(

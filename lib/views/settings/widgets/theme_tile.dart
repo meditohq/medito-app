@@ -5,6 +5,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/widgets/radio_option_card.dart';
 
 /// Settings row for the app theme: shows the current choice as subtitle and
 /// opens [ThemeSheet] on tap.
@@ -37,6 +38,7 @@ class ThemeTile extends ConsumerWidget {
       onTap: () => showModalBottomSheet<void>(
         context: context,
         showDragHandle: true,
+        isScrollControlled: true,
         backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
         builder: (_) => const ThemeSheet(),
       ),
@@ -44,8 +46,8 @@ class ThemeTile extends ConsumerWidget {
   }
 }
 
-/// Bottom sheet listing System / Light / Dark. Selecting one applies it and
-/// closes the sheet.
+/// Bottom sheet listing System / Light / Dark as radio option cards.
+/// Selecting one applies it and closes the sheet.
 class ThemeSheet extends ConsumerWidget {
   const ThemeSheet({super.key});
 
@@ -53,43 +55,55 @@ class ThemeSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final current = ref.watch(themeProvider);
-    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
 
-    final options = <(ThemeMode, String, String)>[
-      (ThemeMode.system, l10n.systemTheme, MeditoIcons.settings),
-      (ThemeMode.light, l10n.lightTheme, MeditoIcons.sun),
-      (ThemeMode.dark, l10n.darkTheme, MeditoIcons.moon),
+    final options = <(ThemeMode, String, String?, String)>[
+      (
+        ThemeMode.system,
+        l10n.systemTheme,
+        l10n.systemThemeDescription,
+        MeditoIcons.settings,
+      ),
+      (ThemeMode.light, l10n.lightTheme, null, MeditoIcons.sun),
+      (ThemeMode.dark, l10n.darkTheme, null, MeditoIcons.moon),
     ];
 
     return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Text(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
               l10n.selectTheme,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: theme.textTheme.titleMedium?.copyWith(
                 color: onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
-          ),
-          for (final (i, (mode, label, asset)) in options.indexed)
-            RowItemWidget(
-              icon: MeditoIcon(assetName: asset, color: onSurface),
-              title: label,
-              hasUnderline: i < options.length - 1,
-              isTrailingIcon: mode == current,
-              trailingIcon: Icons.check_rounded,
-              onTap: () {
-                ref.read(themeProvider.notifier).setTheme(mode);
-                Navigator.of(context).pop();
-              },
-            ),
-          const SizedBox(height: 8),
-        ],
+            const SizedBox(height: 16),
+            for (final (i, (mode, label, description, asset))
+                in options.indexed) ...[
+              if (i > 0) const SizedBox(height: 12),
+              RadioOptionCard(
+                title: label,
+                description: description,
+                selected: mode == current,
+                trailing: MeditoIcon(
+                  assetName: asset,
+                  color: onSurface.withValues(alpha: 0.7),
+                  size: 22,
+                ),
+                onTap: () {
+                  ref.read(themeProvider.notifier).setTheme(mode);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

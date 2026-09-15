@@ -32,7 +32,7 @@ class MeditoDialogPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = backgroundColor ?? context.brandPurple;
-    final fg = foregroundColor ?? Colors.white;
+    final fg = foregroundColor ?? context.onBrandPurple;
 
     return SizedBox(
       height: _buttonHeight,

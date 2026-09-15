@@ -31,9 +31,16 @@ name: Upgrade Verification – Lands on Home After In-Place Update
 - tapOn:
     text: "(?s).*Medito's Journey.*"
 
+# Leave Home before looking for Play: the Up Next card on Home has its own
+# "Play" control, which the smoke flow once tapped mid-transition. Wait for
+# the track view's bottom bar or the pack list instead (see smoke.yaml).
+- extendedWaitUntil:
+    visible: "Share Track|(?i)\\d+ - \\d+ min"
+    timeout: 20000
+
 - runFlow:
     when:
-      notVisible: "Play"
+      notVisible: "Share Track"
     commands:
       - extendedWaitUntil:
           visible: "(?i)\\d+ - \\d+ min"
@@ -47,6 +54,9 @@ name: Upgrade Verification – Lands on Home After In-Place Update
           text: "(?i)\\d+ - \\d+ min"
           index: 0
 
+- extendedWaitUntil:
+    visible: "Share Track"
+    timeout: 15000
 - extendedWaitUntil:
     visible: "Play"
     timeout: 15000

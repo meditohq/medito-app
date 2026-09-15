@@ -29,6 +29,8 @@
   "x09": "x0.9",
   "x1": "x1",
   "searchMeditations": "Buscar meditaciones",
+  "search": "Buscar",
+  "searchEmptyHint": "Encuentra un pack o una sesión. Prueba con dormir, ansiedad o concentración.",
   "share": "Compartir",
   "tapToShare": "Toca para compartir",
   "id": "id",
@@ -391,6 +393,9 @@
   "errorNetworkMessage": "No se puede conectar al servidor",
   "errorNoInternetMessage": "Sin conexión a internet",
   "errorTimeoutMessage": "Tiempo de conexión agotado",
+  "errorHostLookupMessage": "No se pudo conectar con los servidores de Medito. Revisa si tienes una VPN, un bloqueador de anuncios o un DNS privado activado.",
+  "errorConnectTimeoutMessage": "Se agotó el tiempo de conexión con los servidores de Medito. Inténtalo de nuevo.",
+  "errorServerUnreachableMessage": "No se pudo conectar con los servidores de Medito. Inténtalo más tarde.",
   "errorUnauthorizedMessage": "Sesión expirada, por favor inicia sesión de nuevo",
   "errorNotFoundMessage": "Contenido no encontrado",
   "errorServerMessage": "Error del servidor, por favor inténtalo más tarde",
@@ -401,17 +406,22 @@
   "@zenMode": {
     "description": "Title for zen mode setting in customization section"
   },
-  "zenModeSubtitle": "Ocultar todas las estadísticas, rachas y puntuaciones en toda la app",
-  "@zenModeSubtitle": {
-    "description": "Subtitle for zen mode setting in customization section"
-  },
   "zenModeEnabledMessage": "Las estadísticas se ocultarán en toda la aplicación",
   "@zenModeEnabledMessage": {
     "description": "Message shown when zen mode is enabled"
   },
-  "zenModeDescription": "Oculta tu racha, estadísticas y puntuación de constancia en toda la app, para que practiques sin llevar la cuenta. Tu progreso se sigue registrando y reaparece al desactivar el Modo Zen.",
   "zenModeOn": "Activado",
   "zenModeOff": "Desactivado",
+  "zenModeOffDescription": "Muestra tu racha, estadísticas y puntuación de consistencia.",
+  "zenModeOnDescription": "Oculta tu racha, estadísticas y puntuación de consistencia en toda la app.",
+  "zenModeFootnote": "Tu progreso se registra de todas formas.",
+  "dndOn": "Activado",
+  "dndOff": "Desactivado",
+  "dndOnDescription": "Activa No molestar mientras se reproduce una sesión y lo desactiva al terminar. Las alarmas siguen sonando.",
+  "dndOffDescription": "Deja las notificaciones de tu teléfono como están durante las sesiones.",
+  "dndFootnote": "Requiere acceso a No molestar en Android. Medito solo lo cambia durante una sesión.",
+  "dndAccessTitle": "Permitir acceso a No molestar",
+  "dndAccessBody": "Para silenciar tu teléfono durante la meditación, Android debe dar a Medito acceso a No molestar. En la siguiente pantalla, busca Medito en la lista y actívalo; después vuelve a la app.",
   "mindClear": "Mente Clara",
   "@mindClear": {
     "description": "Message shown in zen mode after completing meditation"
@@ -602,6 +612,7 @@
   "@systemTheme": {
     "description": "System theme option that follows device settings"
   },
+  "systemThemeDescription": "Sigue la configuración de tu dispositivo",
   "lightTheme": "Claro",
   "@lightTheme": {
     "description": "Light theme option"
@@ -1131,6 +1142,7 @@
   "markAllIncomplete": "Marcar todo como no completado",
   "markTrackComplete": "Marcar como completado",
   "markTrackIncomplete": "Marcar como no completado",
+  "upNextProgress": "{completed} de {total}",
   "upNextPackCompletedTitle": "You finished {packTitle}",
   "upNextPackCompletedSubtitle": "{count, plural, =1{1 session complete} other{{count} sessions complete}}",
   "upNextPackCompletedCta": "Start the next pack",

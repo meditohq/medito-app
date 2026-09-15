@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/views/home/home_styles.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -33,7 +34,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
         color: Colors.transparent,
         child: InkWell(
           onTap: widget.data == null ? null : _shareQuote,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(kHomeCardRadius),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
             child: _buildQuoteContent(),
@@ -106,7 +107,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
               ),
               const SizedBox(width: 8),
               MeditoIcon(
-                assetName: Platform.isIOS
+                assetName: defaultTargetPlatform == TargetPlatform.iOS
                     ? MeditoIcons.shareIos
                     : MeditoIcons.shareAndroid,
                 size: 14,

@@ -133,7 +133,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     // Only enable DND if permission is already granted and toggle is on
     if (Platform.isAndroid) {
       final dndNotifier = ref.read(dndProvider.notifier);
-      final hasAccess = await dndNotifier.checkNotificationPolicyAccess();
+      final hasAccess = await dndNotifier.hasAccess();
       if (hasAccess) {
         await dndNotifier.setDndMode(true);
       }

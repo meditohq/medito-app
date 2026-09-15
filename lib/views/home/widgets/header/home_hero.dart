@@ -1,0 +1,206 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/constants/styles/widget_styles.dart';
+import 'package:medito/providers/home/up_next_provider.dart';
+import 'package:medito/widgets/network_image_widget.dart';
+
+import '../stats/streak_circle.dart';
+
+/// Cover of the pinned pack, or null while it loads or has none. Shared by
+/// [HomeHero] and the home list, which hands its first section to the hero
+/// whenever there is an image to lay it over.
+final homeHeroCoverProvider = Provider.autoDispose<String?>((ref) {
+  final cover = ref
+      .watch(upNextProvider)
+      .whenOrNull(data: (data) => data.pack.coverUrl);
+  return (cover == null || cover.isEmpty) ? null : cover;
+});
+
+/// Home's top section: the pinned pack's cover as a full-bleed image that
+/// runs under the status bar, with the streak pill top right.
+///
+/// With a [child] (Your Path or the quote, when the user put it first) the
+/// image takes at least half the screen and the section is laid over its
+/// lower part. Without one the image is a short banner behind the pill only,
+/// and the first section renders below it on the page as usual. With no
+/// cover at all it is just the pill row.
+class HomeHero extends ConsumerWidget {
+  const HomeHero({super.key, required this.onStatsButtonTap, this.child});
+
+  final VoidCallback onStatsButtonTap;
+
+  /// The section laid over the image. Rendered inside an on-image theme:
+  /// white text, dark translucent cards, no page-coloured fades.
+  final Widget? child;
+
+  /// Space reserved for the status bar and streak pill above [child].
+  static const _headerReserve = 72.0;
+
+  /// Banner mode: pill row plus room for the fade into the page.
+  static const _bannerHeight = 92.0;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final size = MediaQuery.sizeOf(context);
+    final topInset = MediaQuery.paddingOf(context).top;
+    final coverUrl = ref.watch(homeHeroCoverProvider);
+
+    final header = Padding(
+      padding: EdgeInsets.fromLTRB(
+        padding16,
+        topInset + padding12,
+        padding16,
+        0,
+      ),
+      // Just the streak pill, top right; the section title carries the hero.
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: StreakCircle(onTap: onStatsButtonTap),
+      ),
+    );
+
+    if (coverUrl == null) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: header,
+        ),
+      );
+    }
+
+    final overlay = child != null;
+    final minHeight = overlay
+        ? (size.height * 0.5).clamp(380.0, 480.0)
+        : topInset + _bannerHeight;
+
+    // Status bar glyphs follow the theme: the top of the image is darkened
+    // in dark mode and whitened in light mode, so the tab scaffold's own
+    // style already reads on both.
+    return SliverToBoxAdapter(
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Positioned.fill(
+            child: _HeroBackdrop(coverUrl: coverUrl, banner: !overlay),
+          ),
+          // Floor for the stack height: with an overlay a short section
+          // still gets a big image; as a banner this is the whole height.
+          SizedBox(height: minHeight, width: double.infinity),
+          if (overlay)
+            Padding(
+              padding: EdgeInsets.only(
+                top: topInset + _headerReserve,
+                bottom: padding8,
+              ),
+              child: _OnImageTheme(child: child!),
+            ),
+          Positioned(top: 0, left: 0, right: 0, child: header),
+        ],
+      ),
+    );
+  }
+}
+
+/// The cover plus its scrims, tinted toward the page colour at both ends:
+/// near-black in dark mode (white text on it), white in light mode (dark text
+/// on it). The top carries the status bar and streak pill, the bottom the
+/// section, and the image dissolves into the page instead of a dark band
+/// meeting a white one. A short seam finishes the edge.
+class _HeroBackdrop extends StatelessWidget {
+  const _HeroBackdrop({required this.coverUrl, required this.banner});
+
+  final String coverUrl;
+
+  /// Short banner behind the pill only: one even scrim, shorter seam.
+  final bool banner;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final page = theme.scaffoldBackgroundColor;
+    final isDark = theme.brightness == Brightness.dark;
+    // What both ends fade toward: the page itself.
+    final base = isDark ? Colors.black : page;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        NetworkImageWidget(url: coverUrl, shouldCache: true),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: banner
+                ? LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      base.withValues(alpha: 0.55),
+                      base.withValues(alpha: 0.35),
+                    ],
+                  )
+                : LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.0, 0.28, 0.5, 1.0],
+                    colors: [
+                      base.withValues(alpha: 0.55),
+                      base.withValues(alpha: 0.08),
+                      base.withValues(alpha: isDark ? 0.5 : 0.6),
+                      base.withValues(alpha: isDark ? 0.8 : 0.96),
+                    ],
+                  ),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: banner ? 36 : 56,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [page.withValues(alpha: 0), page],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Re-themes a home section for life on the lower half of the hero, which
+/// fades toward the page colour: white text and near-opaque dark cards in
+/// dark mode, near-black text and near-opaque white cards in light mode. The
+/// page colour is made transparent so edge fades (the carousel's) disappear
+/// instead of drawing bars across the image.
+class _OnImageTheme extends StatelessWidget {
+  const _OnImageTheme({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final foreground = isDark ? Colors.white : const Color(0xFF0A0A0A);
+    final card = isDark
+        ? const Color(0xFF1A1A1A).withValues(alpha: 0.72)
+        : Colors.white.withValues(alpha: 0.86);
+    return Theme(
+      data: theme.copyWith(
+        cardColor: card,
+        scaffoldBackgroundColor: Colors.transparent,
+        colorScheme: theme.colorScheme.copyWith(
+          onSurface: foreground,
+          onSurfaceVariant: foreground.withValues(alpha: 0.75),
+        ),
+        textTheme: theme.textTheme.apply(
+          bodyColor: foreground,
+          displayColor: foreground,
+        ),
+      ),
+      child: child,
+    );
+  }
+}

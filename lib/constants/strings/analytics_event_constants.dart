@@ -9,8 +9,16 @@ class AnalyticsEventConstants {
   /// Event name for Firebase Analytics when a product is clicked in the shop section
   static const String productClicked = 'product_clicked';
 
-  /// Event name for when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen
+  /// Event name for when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen.
+  /// Only sent when the order actually differs from the one the screen opened with.
   static const String homeWidgetOrderChanged = 'home_widget_order_changed';
+
+  /// Comma-joined section names in their new order, e.g. `upNext,shortcuts,carousel,quote,products`.
+  /// Firebase only accepts string/number parameter values; a List is dropped (Android drops the whole event).
+  static const String paramHomeWidgetOrder = 'order';
+
+  /// Name of the section now at the top of the home screen (the one the hero lays over its image).
+  static const String paramHomeWidgetFirst = 'first';
 
   /// Description for the analytics event when the user changes the order of home screen widgets in CustomiseHomeLayoutScreen
   static const String homeWidgetOrderChangedDesc =
@@ -662,6 +670,28 @@ class AnalyticsEventConstants {
 
   /// Source value for notifications enabled from the settings screen
   static const String sourceSettings = 'settings';
+
+  // "Silence phone during meditation" (Android Do Not Disturb) setting.
+  /// The user picked On or Off in the settings sheet and the value actually
+  /// changed. Params: [paramEnabled] ('true' | 'false'), [paramSource]
+  /// ('settings').
+  static const String dndSettingChanged = 'dnd_setting_changed';
+
+  /// The user chose On without Android's Do Not Disturb access, so the
+  /// explanation dialog offering the system page was shown. Param:
+  /// [paramSource] ('settings').
+  static const String dndAccessPromptShown = 'dnd_access_prompt_shown';
+
+  /// The user accepted that dialog and the system access page was opened.
+  static const String dndAccessSettingsOpened = 'dnd_access_settings_opened';
+
+  /// The user came back from the system page with access granted (the
+  /// setting was then turned on for them) or without it.
+  static const String dndAccessGranted = 'dnd_access_granted';
+  static const String dndAccessDenied = 'dnd_access_denied';
+
+  /// Parameter: new value of a boolean setting, as 'true' / 'false'.
+  static const String paramEnabled = 'enabled';
 
   // Shortcut events
   /// Event logged when the user taps a shortcut chip on the home screen.
