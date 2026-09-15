@@ -231,4 +231,52 @@ void main() {
       expect(result.streakCurrent, 2);
     });
   });
+
+  group('StatsManager.setDayBoundaryOffset - immediate recalculation', () {
+    // A night owl whose sessions straddle midnight. At the legacy midnight
+    // boundary the 00:30 sessions land on the following day, leaving Apr 25
+    // and Apr 27 empty; under a +3h boundary every day is covered.
+    List<LocalAudioCompleted> nightOwl() => [
+      LocalAudioCompleted(id: 'a', timestamp: ms(DateTime(2026, 4, 24, 23, 0))),
+      LocalAudioCompleted(id: 'b', timestamp: ms(DateTime(2026, 4, 26, 0, 30))),
+      LocalAudioCompleted(id: 'c', timestamp: ms(DateTime(2026, 4, 26, 23, 0))),
+      LocalAudioCompleted(id: 'd', timestamp: ms(DateTime(2026, 4, 28, 0, 30))),
+    ];
+
+    test('changing the offset recomputes the stored streak straight away',
+        () async {
+      await statsManager.initializeForTesting();
+      statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
+      statsManager.setStatsForTesting(
+        statsManager.calculateStreak(statsFrom(audio: nightOwl())),
+      );
+      expect((await statsManager.localAllStats).streakCurrent, 1);
+
+      await statsManager.setDayBoundaryOffset(const Duration(hours: 3));
+
+      final stats = await statsManager.localAllStats;
+      expect(stats.streakCurrent, 4);
+      expect(stats.streakLongest, 4);
+    });
+
+    test('setting the same offset again leaves the stored stats untouched',
+        () async {
+      await statsManager.initializeForTesting();
+      statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
+      final seeded = statsFrom(audio: nightOwl()).copyWith(streakCurrent: 99);
+      statsManager.setStatsForTesting(seeded);
+
+      await statsManager.setDayBoundaryOffset(Duration.zero);
+
+      expect((await statsManager.localAllStats).streakCurrent, 99);
+    });
+
+    test('does nothing when no stats are loaded yet', () async {
+      await statsManager.initializeForTesting();
+
+      await statsManager.setDayBoundaryOffset(const Duration(hours: 3));
+
+      expect(statsManager.dayBoundaryOffset, const Duration(hours: 3));
+    });
+  });
 }

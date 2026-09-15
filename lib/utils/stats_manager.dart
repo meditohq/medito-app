@@ -939,7 +939,13 @@ class StatsManager {
 
   /// Sets the day-boundary offset used by `calculateStreak` and persists it.
   /// `Duration.zero` (default) preserves legacy midnight behaviour.
+  ///
+  /// If stats are already loaded and the offset actually changed, the streak
+  /// and consistency score are recomputed straight away. The calendar
+  /// re-buckets from the raw sessions as soon as the offset changes, so
+  /// leaving the stored streak until the next sync made the two disagree.
   Future<void> setDayBoundaryOffset(Duration offset) async {
+    final changed = offset != _dayBoundaryOffset;
     _dayBoundaryOffset = offset;
     try {
       await _prefs.setInt(
@@ -949,6 +955,14 @@ class StatsManager {
     } catch (e) {
       AppLogger.e('STATS_MANAGER', 'Failed to persist day boundary offset', e);
     }
+
+    if (!changed || _allStats == null) return;
+
+    _dirty = true;
+    _allStats = calculateStreak(_allStats!);
+    final newConsistencyScore = calculateConsistencyScore(_allStats!);
+    _allStats = _allStats!.copyWith(consistencyScore: newConsistencyScore);
+    await _saveLocalAllStatsToSharedPrefs();
   }
 
   void _loadDayBoundaryOffset(SharedPreferences prefs) {
