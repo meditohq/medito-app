@@ -68,6 +68,7 @@ class FloatingNavBar extends StatelessWidget {
   static const _duration = Duration(milliseconds: 260);
   static const _morphDuration = Duration(milliseconds: 340);
   static const _morphCurve = Curves.easeOutCubic;
+  static const _keyboardDuration = Duration(milliseconds: 180);
   static const _cancelPadding = 20.0;
 
   static TextStyle _cancelStyle(BuildContext context) =>
@@ -116,79 +117,94 @@ class FloatingNavBar extends StatelessWidget {
 
     // A Row, not Center: the Scaffold offers this slot the full screen height
     // as its max constraint and Center would expand to fill it.
-    return SafeArea(
-      top: false,
-      minimum: const EdgeInsets.only(bottom: padding12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: padding24),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final cancelSlot = _cancelSlotWidth(context);
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Folds to zero width (and fades) while search is expanded.
-                // Clip only then: at rest the ClipRect would cut the pill's
-                // shadow into a rectangle.
-                ClipRect(
-                  clipBehavior: expanded ? Clip.hardEdge : Clip.none,
-                  child: AnimatedAlign(
-                    duration: _morphDuration,
-                    curve: _morphCurve,
-                    alignment: Alignment.centerRight,
-                    // heightFactor keeps the Align hugging the pill; without
-                    // it the Align fills the slot's full-screen max height.
-                    heightFactor: 1,
-                    widthFactor: expanded ? 0 : 1,
-                    child: AnimatedOpacity(
-                      duration: _duration,
-                      opacity: expanded ? 0 : 1,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          right: action != null ? padding12 : 0,
-                        ),
-                        child: pill,
-                      ),
-                    ),
-                  ),
-                ),
-                if (action != null)
-                  _ActionCapsule(
-                    action: action!,
-                    expanded: expanded,
-                    // The glass hairline sits outside the animated box.
-                    expandedWidth:
-                        constraints.maxWidth - 2 * _hairline - cancelSlot,
-                    child: expandedChild,
-                  ),
-                // Unfolds from zero width as the field expands; same clip
-                // rule as the pill, mirrored.
-                if (cancelSlot > 0)
+    //
+    // The Scaffold keeps its bottomNavigationBar slot pinned to the screen
+    // edge whatever the keyboard does, so when the in-place search field has
+    // focus the pill would sit under the keyboard. Lift it by the keyboard
+    // inset ourselves; SafeArea's bottom padding already collapses to zero
+    // while the keyboard is up, so the gap above the keys is just `minimum`.
+    //
+    // Animated because Android reports the inset in one step; iOS updates it
+    // every frame, where the short tween just trails the system animation.
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    return AnimatedPadding(
+      duration: _keyboardDuration,
+      curve: Curves.easeOutCubic,
+      padding: EdgeInsets.only(bottom: keyboardInset),
+      child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: padding12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: padding24),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final cancelSlot = _cancelSlotWidth(context);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Folds to zero width (and fades) while search is expanded.
+                  // Clip only then: at rest the ClipRect would cut the pill's
+                  // shadow into a rectangle.
                   ClipRect(
-                    clipBehavior: expanded ? Clip.none : Clip.hardEdge,
+                    clipBehavior: expanded ? Clip.hardEdge : Clip.none,
                     child: AnimatedAlign(
                       duration: _morphDuration,
                       curve: _morphCurve,
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.centerRight,
+                      // heightFactor keeps the Align hugging the pill; without
+                      // it the Align fills the slot's full-screen max height.
                       heightFactor: 1,
-                      widthFactor: expanded ? 1 : 0,
+                      widthFactor: expanded ? 0 : 1,
                       child: AnimatedOpacity(
                         duration: _duration,
-                        opacity: expanded ? 1 : 0,
+                        opacity: expanded ? 0 : 1,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: padding12),
-                          child: _CancelCapsule(
-                            label: cancelLabel!,
-                            style: _cancelStyle(context),
-                            onTap: onCancel!,
+                          padding: EdgeInsets.only(
+                            right: action != null ? padding12 : 0,
+                          ),
+                          child: pill,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (action != null)
+                    _ActionCapsule(
+                      action: action!,
+                      expanded: expanded,
+                      // The glass hairline sits outside the animated box.
+                      expandedWidth:
+                          constraints.maxWidth - 2 * _hairline - cancelSlot,
+                      child: expandedChild,
+                    ),
+                  // Unfolds from zero width as the field expands; same clip
+                  // rule as the pill, mirrored.
+                  if (cancelSlot > 0)
+                    ClipRect(
+                      clipBehavior: expanded ? Clip.none : Clip.hardEdge,
+                      child: AnimatedAlign(
+                        duration: _morphDuration,
+                        curve: _morphCurve,
+                        alignment: Alignment.centerLeft,
+                        heightFactor: 1,
+                        widthFactor: expanded ? 1 : 0,
+                        child: AnimatedOpacity(
+                          duration: _duration,
+                          opacity: expanded ? 1 : 0,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: padding12),
+                            child: _CancelCapsule(
+                              label: cancelLabel!,
+                              style: _cancelStyle(context),
+                              onTap: onCancel!,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
