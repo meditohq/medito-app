@@ -393,17 +393,17 @@ class _OnboardingResultScreenState
             ),
             onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
             child: busy
-                ? const SizedBox(
+                ? SizedBox(
                     width: 22,
                     height: 22,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: context.onBrandPurple,
                     ),
                   )
                 : Icon(
                     isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: Colors.white,
+                    color: context.onBrandPurple,
                     size: 32,
                   ),
           ),

@@ -538,12 +538,14 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               : _requestOtp,
           style: _getButtonStyle(),
           child: _isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      context.onBrandPurple,
+                    ),
                   ),
                 )
               : _isRateLimited
@@ -597,12 +599,14 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           onPressed: (_isLoading || !_isOtpValid) ? null : _verifyOtp,
           style: _getButtonStyle(),
           child: _isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      context.onBrandPurple,
+                    ),
                   ),
                 )
               : Text(AppLocalizations.of(context)!.verifyOtpButtonText),
@@ -749,7 +753,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     return ElevatedButton.styleFrom(
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
       backgroundColor: context.brandPurple,
-      disabledForegroundColor: Colors.white60,
+      disabledForegroundColor: context.onBrandPurple.withValues(alpha: 0.6),
       disabledBackgroundColor: context.brandPurple.withOpacityValue(0.5),
       minimumSize: const Size(double.infinity, 48),
     );

@@ -218,19 +218,19 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
                   onPressed: _sharing ? null : _share,
                   style: FilledButton.styleFrom(
                     backgroundColor: context.brandPurple,
-                    foregroundColor: Colors.white,
+                    foregroundColor: context.onBrandPurple,
                     padding: const EdgeInsets.symmetric(vertical: padding16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   child: _sharing
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.onBrandPurple,
                           ),
                         )
                       : const Text(

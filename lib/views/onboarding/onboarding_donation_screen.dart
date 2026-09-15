@@ -329,7 +329,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: context.brandPurple,
-          foregroundColor: Colors.white,
+          foregroundColor: context.onBrandPurple,
           padding: const EdgeInsets.symmetric(vertical: 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),

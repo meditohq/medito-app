@@ -286,9 +286,13 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
                 ),
                 child: Text(
                   AppLocalizations.of(context)!.donateAgain,
+                  // headlineMedium carries the page foreground colour, which
+                  // would override the button's foreground and leave white
+                  // text on the light accent card in dark mode.
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
+                    color: context.onBrandPurple,
                   ),
                 ),
               ),
