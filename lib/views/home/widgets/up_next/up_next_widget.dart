@@ -461,6 +461,12 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                 CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
               },
               child: GestureDetector(
+                // The hero style has no card surface behind the content, so
+                // without this only the painted text and the play circle
+                // would take taps; the space beside the title fell through
+                // to the image (smoke run 34957204808 tapped the card centre
+                // and nothing happened).
+                behavior: HitTestBehavior.opaque,
                 onTap: () => _onTap(context),
                 child: _Surface(
                   style: widget.style,
