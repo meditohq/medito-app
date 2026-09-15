@@ -40,6 +40,22 @@ void main() {
       expect(controller.animationController.isAnimating, false);
     });
 
+    test('updateAnimation never starts the ring under reduced motion', () {
+      controller.reduceMotion = true;
+      controller.updateAnimation(true);
+      expect(controller.isAnimating, false);
+      expect(controller.animationController.isAnimating, false);
+    });
+
+    test('reduced motion turning on stops a ring that is already running', () {
+      controller.updateAnimation(true);
+      expect(controller.isAnimating, true);
+      controller.reduceMotion = true;
+      controller.updateAnimation(true);
+      expect(controller.isAnimating, false);
+      expect(controller.animationController.isAnimating, false);
+    });
+
     test('isStreakDoneToday returns false for empty audio completed list', () {
       expect(controller.isStreakDoneToday(null), false);
       expect(controller.isStreakDoneToday([]), false);

@@ -20,6 +20,15 @@ class StreakCircleController extends ChangeNotifier {
 
   bool get isAnimating => _isAnimating;
 
+  /// Mirrors the platform's reduced-motion setting
+  /// (`MediaQuery.disableAnimations`, which Android raises when its animator
+  /// scale is 0). While set, [updateAnimation] never starts the ring: the
+  /// travelling glow repaints a blurred sweep every frame for as long as Home
+  /// is on screen, which is exactly the kind of decoration reduced motion asks
+  /// us to drop, and on a software-rendered emulator it was enough to take the
+  /// whole emulator process down (CI upgrade test, 2026-09-15).
+  bool reduceMotion = false;
+
   bool shouldShowConsistencyScore(
     LocalAllStats stats, [
     StreakCircleDisplayType? displayType,
@@ -55,6 +64,7 @@ class StreakCircleController extends ChangeNotifier {
   }
 
   void updateAnimation(bool shouldAnimate) {
+    if (reduceMotion) shouldAnimate = false;
     if (shouldAnimate && !_isAnimating) {
       animationController.repeat();
       _isAnimating = true;
