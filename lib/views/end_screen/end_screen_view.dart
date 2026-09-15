@@ -658,7 +658,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: context.onBrandPurple,
                     ),
                   ),
                 ),
