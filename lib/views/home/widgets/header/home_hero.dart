@@ -9,6 +9,12 @@ import '../stats/streak_circle.dart';
 /// Cover of the pinned pack, or null while it loads or has none. Shared by
 /// [HomeHero] and the home list, which hands its first section to the hero
 /// whenever there is an image to lay it over.
+/// How far the hero image bleeds above its box. At rest this sits above the
+/// viewport (clipped); on pull-to-refresh the scroll view offsets down and
+/// this pre-painted band fills the gap with more image instead of the page
+/// background.
+const double _kOverscrollBleed = 260.0;
+
 final homeHeroCoverProvider = Provider.autoDispose<String?>((ref) {
   final cover = ref
       .watch(upNextProvider)
@@ -78,6 +84,8 @@ class HomeHero extends ConsumerWidget {
     // style already reads on both.
     return SliverToBoxAdapter(
       child: Stack(
+        // The backdrop image bleeds above the box; don't clip it here.
+        clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
           Positioned.fill(
@@ -123,8 +131,17 @@ class _HeroBackdrop extends StatelessWidget {
     final base = isDark ? Colors.black : page;
     return Stack(
       fit: StackFit.expand,
+      clipBehavior: Clip.none,
       children: [
-        NetworkImageWidget(url: coverUrl, shouldCache: true),
+        // Extends above the box so pull-to-refresh reveals more image; the
+        // scrims below stay anchored to the box.
+        Positioned(
+          top: -_kOverscrollBleed,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: NetworkImageWidget(url: coverUrl, shouldCache: true),
+        ),
         DecoratedBox(
           decoration: BoxDecoration(
             gradient: banner
