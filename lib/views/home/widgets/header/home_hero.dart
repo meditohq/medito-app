@@ -127,45 +127,69 @@ class _HeroBackdrop extends StatelessWidget {
     final theme = Theme.of(context);
     final page = theme.scaffoldBackgroundColor;
     final isDark = theme.brightness == Brightness.dark;
+    final topInset = MediaQuery.paddingOf(context).top;
     // What both ends fade toward: the page itself.
     final base = isDark ? Colors.black : page;
+
     return Stack(
       fit: StackFit.expand,
       clipBehavior: Clip.none,
       children: [
-        // Extends above the box so pull-to-refresh reveals more image; the
-        // scrims below stay anchored to the box.
+        // Image AND the top darkening bleed above the box together, so a
+        // pull-to-refresh reveals more of the darkened image with no seam
+        // where a box-anchored scrim would have ended.
         Positioned(
           top: -_kOverscrollBleed,
           left: 0,
           right: 0,
           bottom: 0,
-          child: NetworkImageWidget(url: coverUrl, shouldCache: true),
-        ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: banner
-                ? LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      base.withValues(alpha: 0.55),
-                      base.withValues(alpha: 0.35),
-                    ],
-                  )
-                : LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: const [0.0, 0.28, 0.5, 1.0],
-                    colors: [
-                      base.withValues(alpha: 0.55),
-                      base.withValues(alpha: 0.08),
-                      base.withValues(alpha: isDark ? 0.5 : 0.6),
-                      base.withValues(alpha: isDark ? 0.8 : 0.96),
-                    ],
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              NetworkImageWidget(url: coverUrl, shouldCache: true),
+              // Pixel-anchored to the top of the bleed: dark across the whole
+              // bleed and the status-bar/pill area, then faded to nothing.
+              Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  height: _kOverscrollBleed + topInset + 130,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: const [0.0, 0.72, 1.0],
+                        colors: [
+                          base.withValues(alpha: 0.55),
+                          base.withValues(alpha: 0.4),
+                          base.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
                   ),
+                ),
+              ),
+            ],
           ),
         ),
+        // Box-anchored lower scrim: transparent at the top (the bleed layer
+        // handles that), darkening toward the section in overlay mode.
+        if (!banner)
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: const [0.0, 0.45, 1.0],
+                colors: [
+                  base.withValues(alpha: 0.0),
+                  base.withValues(alpha: isDark ? 0.5 : 0.6),
+                  base.withValues(alpha: isDark ? 0.8 : 0.96),
+                ],
+              ),
+            ),
+          ),
+        // Page seam so the image never ends on a hard edge.
         Positioned(
           left: 0,
           right: 0,
