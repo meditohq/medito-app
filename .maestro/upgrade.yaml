@@ -13,23 +13,44 @@ name: Upgrade Verification – Lands on Home After In-Place Update
 # home never appears and this times out — the failure screenshot will show
 # exactly the splash/onboarding screen a real user would be stuck on.
 #
+# Match the Your Path card, not a pack title: onboarding pins the seeded user
+# onto the pack sequence ("Getting started"), so "Medito's Journey" is not on
+# Home and the assertion failed against a perfectly good Home screen (run
+# 34475590317). Same selector as smoke.yaml.
+#
 # Anonymous auth is already done (no network round-trip), but keep a
 # generous timeout for CI emulator cold-start variability.
+#
+# On a software-rendered emulator straight after a cold boot, SystemUI or
+# the launcher can raise an "isn't responding" dialog over the app a few
+# seconds after launch. It hides Home from the hierarchy even though Home is
+# right there behind it (local probe, 2026-09-15). Wait for either, dismiss
+# the dialog with "Wait", then assert Home for real.
 - extendedWaitUntil:
-    visible: "(?s).*Medito's Journey.*"
+    visible: "(?si).*your path.*|(?i).*isn't responding.*"
+    timeout: 30000
+- runFlow:
+    when:
+      visible: "(?i).*isn't responding.*"
+    commands:
+      - tapOn:
+          text: "Wait"
+          optional: true
+- extendedWaitUntil:
+    visible: "(?si).*your path.*"
     timeout: 30000
 - takeScreenshot: post-upgrade-home
 
 # Confirm audio/pigeon layer still works after an in-place update.
 - scrollUntilVisible:
-    element: "(?s).*Medito's Journey.*"
+    element: "(?si).*your path.*"
     direction: DOWN
     timeout: 15000
     speed: 20
     waitToSettleTimeoutMs: 500
     centerElement: true
 - tapOn:
-    text: "(?s).*Medito's Journey.*"
+    text: "(?si).*your path.*"
 
 # Leave Home before looking for Play: the Up Next card on Home has its own
 # "Play" control, which the smoke flow once tapped mid-transition. Wait for

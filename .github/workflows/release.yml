@@ -339,9 +339,21 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Upgrade test on emulator
+      # Two emulator sessions on the SAME AVD. The seed and the upgrade used to
+      # share one boot, and the emulator process itself died ~70s after the
+      # new APK was launched on it, three runs out of three on 2026-09-15
+      # ("Device server died", then the console port refused connections). The
+      # same APK launches fine on a fresh boot in the smoke job, so give the
+      # upgrade its own boot. The AVD's userdata disk persists between the two
+      # steps (only the quickboot snapshot is disabled), which is exactly what
+      # an in-place update followed by a reboot looks like on a real phone.
+      #
+      # NOTE: android-emulator-runner executes each line in its own shell, so
+      # env vars don't persist across lines and `\` continuations break. Keep
+      # each command on a single line and inline the app id.
+      - name: Seed old version on emulator
         if: steps.gate.outputs.run == 'true'
-        timeout-minutes: 20
+        timeout-minutes: 15
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -351,17 +363,31 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
-          # NOTE: android-emulator-runner executes each line in its own shell,
-          # so env vars don't persist across lines and `\` continuations break.
-          # Keep each command on a single line and inline the app id.
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
             mkdir -p /tmp/maestro-debug/seed /tmp/maestro-debug/upgrade
             adb install /tmp/old/app-prod-release.apk
             adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
-            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-seed.yaml --no-ansi --debug-output /tmp/maestro-debug/seed
+            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-seed.yaml --no-ansi --debug-output /tmp/maestro-debug/seed || (echo "Seed failed once (usually the donation webview not loading in time); clearing app data and retrying" && adb shell pm clear meditofoundation.medito && adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS && $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-seed.yaml --no-ansi --debug-output /tmp/maestro-debug/seed-retry)
+
+      - name: Install new version and verify on a fresh boot
+        if: steps.gate.outputs.run == 'true'
+        timeout-minutes: 12
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            adb shell pm list packages | grep -q meditofoundation.medito || (echo "Seeded install did not survive the emulator restart" && exit 1)
+            adb shell 'sleep 20'   # let SystemUI and the launcher finish their cold-boot work before the app competes with them
             adb install -r /tmp/new/app-prod-release.apk
+            adb shell am force-stop com.google.android.apps.nexuslauncher || true
             $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/upgrade.yaml --no-ansi --debug-output /tmp/maestro-debug/upgrade
 
       - name: Upload upgrade-test debug output

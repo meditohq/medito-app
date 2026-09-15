@@ -16,7 +16,10 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     commands:
       - runFlow:
           when:
-            visible: "(?i)isn't responding"
+            # Maestro regexes must match the WHOLE text ("System UI isn't
+            # responding", "Pixel Launcher isn't responding"), so the pattern
+            # needs the wildcards; without them this handler never fired.
+            visible: "(?i).*isn't responding.*"
           commands:
             - tapOn:
                 text: "Wait"
