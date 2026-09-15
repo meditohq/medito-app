@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
+import 'package:medito/providers/onboarding/onboarding_picker_mode_experiment.dart';
 import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
@@ -17,7 +19,9 @@ import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/services/reminders/reminder_slots.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/widgets/medito_icon.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({
@@ -57,11 +61,24 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   /// pre-donation placement (removed 26.5.19). The time-chips A/B
   /// (onboarding_reminder_time_chips) concluded 2026-08-25 with chips shipped
   /// to everyone, so the experiment tags are gone.
-  Map<String, Object> get _eventParams => {'placement': 'post_donation'};
+  /// Sticky arm of the custom-picker entry-mode A/B
+  /// (onboarding_reminder_picker_mode). Resolved in [initState] so every event
+  /// from this screen carries it.
+  late final String _pickerModeVariant;
+
+  Map<String, Object> get _eventParams => {
+    'placement': 'post_donation',
+    AnalyticsEventConstants.paramExperimentName:
+        OnboardingPickerModeExperiment.experimentName,
+    AnalyticsEventConstants.paramVariantId: _pickerModeVariant,
+  };
 
   @override
   void initState() {
     super.initState();
+    _pickerModeVariant = OnboardingPickerModeExperiment.resolveVariant(
+      ref.read(sharedPreferencesProvider),
+    );
     _previewAnimation = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -72,6 +89,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     FirebaseAnalyticsService().logEvent(
       name: FirebaseAnalyticsService.eventOnboardingNotificationsPreviewShown,
       parameters: _eventParams,
+    );
+    // Tagged at screen level, not at picker-open: only ~27% open the picker,
+    // and the guardrail that matters (onboarding completion) has to be
+    // comparable across the whole screen audience.
+    unawaited(
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.onboardingExperimentExposure,
+        parameters: _eventParams,
+      ),
     );
   }
 
@@ -297,10 +323,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       ),
     );
 
+    // A/B: `input` is the mode that has always shipped and half of the people
+    // who opened it backed out; `dial` is the Material default and needs no
+    // typing. See OnboardingPickerModeExperiment.
     final picked = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 7, minute: 0),
-      initialEntryMode: TimePickerEntryMode.input,
+      initialEntryMode:
+          _pickerModeVariant == OnboardingPickerModeExperiment.variantDial
+          ? TimePickerEntryMode.dial
+          : TimePickerEntryMode.input,
     );
 
     if (!mounted) return;
@@ -615,28 +647,24 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   /// anchors the reminder series to the chosen slot instead of the silent
   /// "same time tomorrow" default, and only then triggers the OS permission
   /// prompt.
+  /// Three time presets on ONE row, plus a full-width "pick my own time"
+  /// button underneath.
+  ///
+  /// This was four ActionChips in a Wrap. Chips inherit `labelLarge`, which
+  /// this app's text theme overrides to 20sp with 0.8 letter-spacing (it is
+  /// meant for shortcut titles), so a single chip came out ~270pt wide and the
+  /// Wrap put every one on its own line — four stacked rows, in every locale
+  /// and at every text scale, which is what pushed the screen into scrolling.
+  /// Equal-width cards with the label above the time are immune to that: the
+  /// layout is the same three columns whether the time reads "7:00 AM" or
+  /// "07:00", and a long label (es: "Antes de dormir") wraps inside its own
+  /// card instead of reflowing the row.
+  ///
+  /// Custom is deliberately NOT a fourth card. It opens a different kind of
+  /// interaction, and giving it the full width both reflects that and keeps
+  /// the presets visually a set of three. Icons match the Settings reminder
+  /// sheet so the two surfaces read as the same control.
   Widget _buildTimeChips(AppLocalizations l10n) {
-    // Afternoon was swapped for a bedtime slot: it was the least-picked preset
-    // by a wide margin while Custom outdrew every preset, so the presets were
-    // not covering what people wanted. Deliberately still three presets plus
-    // Custom rather than four — the screen already loses people to indecision,
-    // so this swaps an option instead of adding one. reminderSlotAfternoon is
-    // kept in the ARB so the swap is a one-line revert once paramReminderHour
-    // shows what the Custom pickers actually choose.
-    final slots = <(String, String, TimeOfDay)>[
-      (
-        'morning',
-        l10n.reminderSlotMorning,
-        const TimeOfDay(hour: 7, minute: 0),
-      ),
-      (
-        'evening',
-        l10n.reminderSlotEvening,
-        const TimeOfDay(hour: 20, minute: 0),
-      ),
-      ('night', l10n.reminderSlotNight, const TimeOfDay(hour: 22, minute: 0)),
-    ];
-
     return Column(
       children: [
         Text(
@@ -647,27 +675,87 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          alignment: WrapAlignment.center,
-          children: [
-            for (final (slot, label, time) in slots)
-              ActionChip(
-                label: Text('$label · ${time.format(context)}'),
-                onPressed: _isProcessing
-                    ? null
-                    : () => _onSlotSelected(slot, time),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final slot in ReminderSlot.values) ...[
+                if (slot != ReminderSlot.values.first) const SizedBox(width: 8),
+                Expanded(child: _buildSlotCard(l10n, slot)),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _isProcessing ? null : _onCustomTimeTap,
+            icon: const Icon(Icons.schedule_rounded, size: 20),
+            label: Text(
+              l10n.reminderSlotCustom,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
               ),
-            // Same component as the slots so the screen has one choice
-            // style; only "Skip for Now" stays a text button.
-            ActionChip(
-              label: Text(l10n.reminderSlotCustom),
-              onPressed: _isProcessing ? null : _onCustomTimeTap,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSlotCard(AppLocalizations l10n, ReminderSlot slot) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: _isProcessing
+          ? null
+          : () => _onSlotSelected(slot.analyticsId, slot.time),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: onSurface.withValues(alpha: 0.24)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MeditoIcon(
+              assetName: switch (slot) {
+                ReminderSlot.morning => MeditoIcons.sun,
+                ReminderSlot.evening => MeditoIcons.bell,
+                ReminderSlot.night => MeditoIcons.moon,
+              },
+              color: onSurface,
+              size: 20,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              slot.label(l10n),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              slot.time.format(context),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 13,
+                height: 1.2,
+                color: onSurface.withValues(alpha: 0.7),
+              ),
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 

@@ -142,6 +142,8 @@ class PreviewShell extends StatelessWidget {
     this.themeMode = ThemeMode.dark,
     this.padded = false,
     this.overrides = const [],
+    this.locale,
+    this.alwaysUse24HourFormat = false,
   });
 
   final Widget child;
@@ -154,6 +156,14 @@ class PreviewShell extends StatelessWidget {
 
   /// Extra provider overrides layered on top of prefs and auth.
   final List<Override> overrides;
+
+  /// App locale; null uses the previewer's. Times and copy are locale
+  /// sensitive, so screens that show a time want both en and es previews.
+  final Locale? locale;
+
+  /// Mirrors the device's 24-hour clock setting, which is what
+  /// [TimeOfDay.format] actually keys off — not the locale.
+  final bool alwaysUse24HourFormat;
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +188,13 @@ class PreviewShell extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('en'), Locale('es')],
+          locale: locale,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(alwaysUse24HourFormat: alwaysUse24HourFormat),
+            child: child!,
+          ),
           home: padded
               ? Scaffold(
                   body: SafeArea(
