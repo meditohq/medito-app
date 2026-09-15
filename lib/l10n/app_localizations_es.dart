@@ -1392,6 +1392,31 @@ class AppLocalizationsEs extends AppLocalizations {
   String get zenModeFootnote => 'Tu progreso se registra de todas formas.';
 
   @override
+  String get dndOn => 'Activado';
+
+  @override
+  String get dndOff => 'Desactivado';
+
+  @override
+  String get dndOnDescription =>
+      'Activa No molestar mientras se reproduce una sesión y lo desactiva al terminar. Las alarmas siguen sonando.';
+
+  @override
+  String get dndOffDescription =>
+      'Deja las notificaciones de tu teléfono como están durante las sesiones.';
+
+  @override
+  String get dndFootnote =>
+      'Requiere acceso a No molestar en Android. Medito solo lo cambia durante una sesión.';
+
+  @override
+  String get dndAccessTitle => 'Permitir acceso a No molestar';
+
+  @override
+  String get dndAccessBody =>
+      'Para silenciar tu teléfono durante la meditación, Android debe dar a Medito acceso a No molestar. En la siguiente pantalla, busca Medito en la lista y actívalo; después vuelve a la app.';
+
+  @override
   String get mindClear => 'Mente Clara';
 
   @override

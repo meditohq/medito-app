@@ -1367,6 +1367,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zenModeFootnote => 'Your progress is recorded either way.';
 
   @override
+  String get dndOn => 'On';
+
+  @override
+  String get dndOff => 'Off';
+
+  @override
+  String get dndOnDescription =>
+      'Turn on Do Not Disturb while a session plays and turn it off again when it ends. Alarms still sound.';
+
+  @override
+  String get dndOffDescription =>
+      'Leave your phone\'s notifications as they are during sessions.';
+
+  @override
+  String get dndFootnote =>
+      'Needs Do Not Disturb access on Android. Medito only changes it during a session.';
+
+  @override
+  String get dndAccessTitle => 'Allow Do Not Disturb access';
+
+  @override
+  String get dndAccessBody =>
+      'To silence your phone during meditation, Android needs to give Medito Do Not Disturb access. On the next screen, find Medito in the list and turn it on, then come back to the app.';
+
+  @override
   String get mindClear => 'Mind Clear';
 
   @override

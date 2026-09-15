@@ -2540,6 +2540,48 @@ abstract class AppLocalizations {
   /// **'Your progress is recorded either way.'**
   String get zenModeFootnote;
 
+  /// State label for 'Silence phone during meditation'; option in the sheet and subtitle on the settings row
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get dndOn;
+
+  /// State label for 'Silence phone during meditation'; option in the sheet and subtitle on the settings row
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get dndOff;
+
+  /// Description under the On option in the silence-phone sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on Do Not Disturb while a session plays and turn it off again when it ends. Alarms still sound.'**
+  String get dndOnDescription;
+
+  /// Description under the Off option in the silence-phone sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Leave your phone\'s notifications as they are during sessions.'**
+  String get dndOffDescription;
+
+  /// Small note under the silence-phone options explaining the Android permission
+  ///
+  /// In en, this message translates to:
+  /// **'Needs Do Not Disturb access on Android. Medito only changes it during a session.'**
+  String get dndFootnote;
+
+  /// Title of the dialog shown when the user turns on silence-phone without the Android permission
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Do Not Disturb access'**
+  String get dndAccessTitle;
+
+  /// Body of the dialog explaining the Android Do Not Disturb access permission before opening system settings
+  ///
+  /// In en, this message translates to:
+  /// **'To silence your phone during meditation, Android needs to give Medito Do Not Disturb access. On the next screen, find Medito in the list and turn it on, then come back to the app.'**
+  String get dndAccessBody;
+
   /// Message shown in zen mode after completing meditation
   ///
   /// In en, this message translates to:

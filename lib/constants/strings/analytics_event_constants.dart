@@ -671,6 +671,28 @@ class AnalyticsEventConstants {
   /// Source value for notifications enabled from the settings screen
   static const String sourceSettings = 'settings';
 
+  // "Silence phone during meditation" (Android Do Not Disturb) setting.
+  /// The user picked On or Off in the settings sheet and the value actually
+  /// changed. Params: [paramEnabled] ('true' | 'false'), [paramSource]
+  /// ('settings').
+  static const String dndSettingChanged = 'dnd_setting_changed';
+
+  /// The user chose On without Android's Do Not Disturb access, so the
+  /// explanation dialog offering the system page was shown. Param:
+  /// [paramSource] ('settings').
+  static const String dndAccessPromptShown = 'dnd_access_prompt_shown';
+
+  /// The user accepted that dialog and the system access page was opened.
+  static const String dndAccessSettingsOpened = 'dnd_access_settings_opened';
+
+  /// The user came back from the system page with access granted (the
+  /// setting was then turned on for them) or without it.
+  static const String dndAccessGranted = 'dnd_access_granted';
+  static const String dndAccessDenied = 'dnd_access_denied';
+
+  /// Parameter: new value of a boolean setting, as 'true' / 'false'.
+  static const String paramEnabled = 'enabled';
+
   // Shortcut events
   /// Event logged when the user taps a shortcut chip on the home screen.
   /// Parameters: paramShortcutId, paramShortcutTitle, paramShortcutType

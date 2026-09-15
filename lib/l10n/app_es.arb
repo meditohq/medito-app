@@ -415,6 +415,13 @@
   "zenModeOffDescription": "Muestra tu racha, estadísticas y puntuación de consistencia.",
   "zenModeOnDescription": "Oculta tu racha, estadísticas y puntuación de consistencia en toda la app.",
   "zenModeFootnote": "Tu progreso se registra de todas formas.",
+  "dndOn": "Activado",
+  "dndOff": "Desactivado",
+  "dndOnDescription": "Activa No molestar mientras se reproduce una sesión y lo desactiva al terminar. Las alarmas siguen sonando.",
+  "dndOffDescription": "Deja las notificaciones de tu teléfono como están durante las sesiones.",
+  "dndFootnote": "Requiere acceso a No molestar en Android. Medito solo lo cambia durante una sesión.",
+  "dndAccessTitle": "Permitir acceso a No molestar",
+  "dndAccessBody": "Para silenciar tu teléfono durante la meditación, Android debe dar a Medito acceso a No molestar. En la siguiente pantalla, busca Medito en la lista y actívalo; después vuelve a la app.",
   "mindClear": "Mente Clara",
   "@mindClear": {
     "description": "Message shown in zen mode after completing meditation"
