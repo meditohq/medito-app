@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
+import 'package:medito/views/home/widgets/stats/streak_circle_constants.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 
 void main() {
@@ -21,7 +22,7 @@ void main() {
       expect(controller.animationController, isNotNull);
       expect(
         controller.animationController.duration,
-        const Duration(seconds: 3),
+        StreakCircleConstants.animationDuration,
       );
       expect(controller.isAnimating, false);
     });

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
+import 'package:medito/views/home/widgets/stats/streak_circle_constants.dart';
 
 class StreakCircleController extends ChangeNotifier {
   final TickerProvider vsync;
@@ -13,7 +14,7 @@ class StreakCircleController extends ChangeNotifier {
   StreakCircleController({required this.vsync}) {
     animationController = AnimationController(
       vsync: vsync,
-      duration: const Duration(seconds: 3),
+      duration: StreakCircleConstants.animationDuration,
     );
   }
 
