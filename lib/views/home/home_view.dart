@@ -17,7 +17,7 @@ import 'package:medito/constants/constants.dart';
 import 'home_styles.dart';
 import 'widgets/announcement/home_announcement_section.dart';
 import 'widgets/editorial/carousel_widget.dart';
-import 'widgets/header_widget.dart';
+import 'widgets/header/home_hero.dart';
 import 'widgets/products/home_products_section.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
@@ -109,30 +109,59 @@ class _HomeViewState extends ConsumerState<HomeView>
         );
       },
       data: (HomeModel homeData) {
-        final widgetOrder = ref.watch(homeWidgetOrderProvider);
+        // With a cover to lay it over, Your Path or the quote move into the
+        // hero when they are first in the user's order, and the list starts
+        // from the second section. Anything else on top stays in the list
+        // under a short image banner.
+        final hasHero = ref.watch(homeHeroCoverProvider) != null;
+        final fullOrder = ref.watch(homeWidgetOrderProvider);
+        final first = fullOrder.firstOrNull;
+        final heroType =
+            hasHero &&
+                (first == HomeWidgetType.upNext ||
+                    first == HomeWidgetType.quote)
+            ? first
+            : null;
+        final widgetOrder = heroType == null ? fullOrder : fullOrder.sublist(1);
 
         return Scaffold(
+          // No top inset either: the hero image runs under the status bar
+          // and positions the greeting itself.
           body: SafeArea(
+            top: false,
             bottom: false,
             child: RefreshIndicator(
               onRefresh: _onRefresh,
-              edgeOffset: 150,
+              edgeOffset: MediaQuery.paddingOf(context).top + padding16,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
-                  SliverAppBar(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    floating: false,
-                    pinned: false,
-                    elevation: 0.0,
-                    toolbarHeight: 56.0,
-                    title: HeaderWidget(
-                      greeting:
-                          homeData.greeting ??
-                          AppLocalizations.of(context)!.welcome,
-                      onStatsButtonTap: () => _onStatsButtonTapped(context),
-                    ),
+                  HomeHero(
+                    onStatsButtonTap: () => _onStatsButtonTapped(context),
+                    child: heroType == null
+                        ? null
+                        : _buildSection(heroType, homeData, inHero: true),
                   ),
+                  // First-run explainer; lives inside the Up Next card when
+                  // that card is in the list, stands alone under the hero
+                  // otherwise. Collapses itself once dismissed.
+                  if (heroType == HomeWidgetType.upNext)
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          padding16,
+                          padding8,
+                          padding16,
+                          0,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(kHomeTileRadius),
+                          ),
+                          child: YourPathExplainerStrip(),
+                        ),
+                      ),
+                    ),
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.only(top: 12),
@@ -141,40 +170,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                   ),
                   SliverList.builder(
                     itemBuilder: (context, index) {
-                      var type = widgetOrder[index];
-                      Widget child;
-                      switch (type) {
-                        case HomeWidgetType.shortcuts:
-                          child = ShortcutsItemsWidget(
-                            key: ValueKey(type.name),
-                            data: homeData.shortcuts,
-                          );
-                          break;
-                        case HomeWidgetType.carousel:
-                          child = CarouselWidget(
-                            key: ValueKey(type.name),
-                            carouselItems: homeData.carousel,
-                          );
-                          break;
-                        case HomeWidgetType.quote:
-                          child = QuoteWidget(
-                            key: ValueKey(type.name),
-                            data: homeData.todayQuote,
-                          );
-                          break;
-                        case HomeWidgetType.products:
-                          child = const HomeProductsSection();
-                          break;
-                        case HomeWidgetType.upNext:
-                          child = UpNextWidget(
-                            key: ValueKey(type.name),
-                            inlineStrip: const YourPathExplainerStrip(),
-                          );
-                          break;
-                      }
                       return Padding(
                         padding: const EdgeInsets.only(bottom: kHomeSectionGap),
-                        child: child,
+                        child: _buildSection(widgetOrder[index], homeData),
                       );
                     },
                     itemCount: widgetOrder.length,
@@ -191,6 +189,33 @@ class _HomeViewState extends ConsumerState<HomeView>
         );
       },
     );
+  }
+
+  /// One home section. [inHero] lays it over the hero image: Up Next drops
+  /// its card and explainer strip; the others are re-themed by the hero.
+  Widget _buildSection(
+    HomeWidgetType type,
+    HomeModel homeData, {
+    bool inHero = false,
+  }) {
+    final key = ValueKey('${type.name}${inHero ? '_hero' : ''}');
+    return switch (type) {
+      HomeWidgetType.shortcuts => ShortcutsItemsWidget(
+        key: key,
+        data: homeData.shortcuts,
+      ),
+      HomeWidgetType.carousel => CarouselWidget(
+        key: key,
+        carouselItems: homeData.carousel,
+      ),
+      HomeWidgetType.quote => QuoteWidget(key: key, data: homeData.todayQuote),
+      HomeWidgetType.products => HomeProductsSection(key: key),
+      HomeWidgetType.upNext => UpNextWidget(
+        key: key,
+        style: inHero ? UpNextStyle.hero : UpNextStyle.card,
+        inlineStrip: inHero ? null : const YourPathExplainerStrip(),
+      ),
+    };
   }
 
   Future<void> _onRefresh() async {

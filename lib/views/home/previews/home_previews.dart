@@ -53,6 +53,35 @@ const Map<String, Object> homePrefsFirstRun = {
   SharedPreferenceConstants.themePreference: 'dark',
 };
 
+/// Zen mode hides the streak number: icon-only pill over the hero.
+const Map<String, Object> homePrefsZen = {
+  ...homePrefsDark,
+  SharedPreferenceConstants.zenModeEnabled: true,
+};
+
+/// Layouts where another section sits first and moves into the hero.
+const Map<String, Object> homePrefsShortcutsFirst = {
+  ...homePrefsDark,
+  SharedPreferenceConstants.homeWidgetOrder: [
+    'shortcuts',
+    'upNext',
+    'carousel',
+    'quote',
+    'products',
+  ],
+};
+
+const Map<String, Object> homePrefsFeaturedFirst = {
+  ...homePrefsDark,
+  SharedPreferenceConstants.homeWidgetOrder: [
+    'carousel',
+    'upNext',
+    'shortcuts',
+    'quote',
+    'products',
+  ],
+};
+
 /// Icon keys must exist in MeditoRemoteIcon's asset map — the mock-mode
 /// shortcuts use emoji strings and would render blank.
 final previewHome = HomeModel(
@@ -136,6 +165,53 @@ final previewUpNext = UpNextData(
   totalCount: previewPack.items.length,
 );
 
+/// Nothing done yet: first session up, empty progress bar.
+final previewUpNextFresh = () {
+  final pack = previewPack.copyWith(
+    items: [
+      for (final item in previewPack.items) item.copyWith(isCompleted: false),
+    ],
+  );
+  return UpNextData(
+    pack: pack,
+    nextSession: pack.items.first,
+    completedCount: 0,
+    totalCount: pack.items.length,
+  );
+}();
+
+final _previewPackDone = previewPack.copyWith(
+  items: [
+    for (final item in previewPack.items) item.copyWith(isCompleted: true),
+  ],
+);
+
+/// Pack finished, another one waits: completed state with its CTA.
+final previewUpNextCompletedNext = UpNextData(
+  pack: _previewPackDone,
+  nextSession: null,
+  completedCount: _previewPackDone.items.length,
+  totalCount: _previewPackDone.items.length,
+  nextPackId: 'pack-2',
+);
+
+/// Whole path finished: completed state, no CTA.
+final previewUpNextCompletedEnd = UpNextData(
+  pack: _previewPackDone,
+  nextSession: null,
+  completedCount: _previewPackDone.items.length,
+  totalCount: _previewPackDone.items.length,
+  isEndOfPath: true,
+);
+
+/// Pack without artwork: no hero, plain header and the card in the list.
+final previewUpNextNoCover = UpNextData(
+  pack: previewPack.copyWith(coverUrl: ''),
+  nextSession: previewPack.items[3],
+  completedCount: 3,
+  totalCount: previewPack.items.length,
+);
+
 LocalAllStats _stats({required bool doneToday}) {
   final now = DateTime.now();
   return LocalAllStats(
@@ -161,7 +237,7 @@ LocalAllStats _stats({required bool doneToday}) {
           ],
     updated: now.millisecondsSinceEpoch,
     freezeUsageDates: const [],
-    consistencyScore: 82,
+    consistencyScore: 0.82,
   );
 }
 
@@ -209,9 +285,10 @@ class _PreviewStatsNotifier extends StatsNotifier {
 List<Override> _homeOverrides({
   required LocalAllStats stats,
   AnnouncementModel? announcement,
+  AsyncValue<UpNextData>? upNext,
 }) => [
   fetchHomeProvider.overrideWith((ref) async => previewHome),
-  upNextProvider.overrideWith((ref) => AsyncData(previewUpNext)),
+  upNextProvider.overrideWith((ref) => upNext ?? AsyncData(previewUpNext)),
   statsProvider.overrideWith(() => _PreviewStatsNotifier(stats)),
   fetchLatestAnnouncementProvider.overrideWith((ref) async => announcement),
   productsProvider.overrideWith((ref) async => previewProducts),
@@ -249,6 +326,45 @@ Widget wrapHomeStreakDone(Widget child) => PreviewShell(
 
 Widget wrapHomeFirstRun(Widget child) => PreviewShell(
   prefs: homePrefsFirstRun,
+  overrides: _homeOverrides(stats: previewStats),
+  child: child,
+);
+
+Widget _wrapPath(Widget child, AsyncValue<UpNextData> upNext) => PreviewShell(
+  prefs: homePrefsDark,
+  overrides: _homeOverrides(stats: previewStats, upNext: upNext),
+  child: child,
+);
+
+Widget wrapPathFresh(Widget child) =>
+    _wrapPath(child, AsyncData(previewUpNextFresh));
+
+Widget wrapPathCompletedNext(Widget child) =>
+    _wrapPath(child, AsyncData(previewUpNextCompletedNext));
+
+Widget wrapPathCompletedEnd(Widget child) =>
+    _wrapPath(child, AsyncData(previewUpNextCompletedEnd));
+
+Widget wrapPathNoCover(Widget child) =>
+    _wrapPath(child, AsyncData(previewUpNextNoCover));
+
+Widget wrapPathLoading(Widget child) =>
+    _wrapPath(child, const AsyncLoading<UpNextData>());
+
+Widget wrapHomeZen(Widget child) => PreviewShell(
+  prefs: homePrefsZen,
+  overrides: _homeOverrides(stats: previewStats),
+  child: child,
+);
+
+Widget wrapHomeShortcutsFirst(Widget child) => PreviewShell(
+  prefs: homePrefsShortcutsFirst,
+  overrides: _homeOverrides(stats: previewStats),
+  child: child,
+);
+
+Widget wrapHomeFeaturedFirst(Widget child) => PreviewShell(
+  prefs: homePrefsFeaturedFirst,
   overrides: _homeOverrides(stats: previewStats),
   child: child,
 );
@@ -326,6 +442,106 @@ Widget homeLargeText() => const HomeView();
   wrapper: wrapHomeDark,
 )
 Widget homeSmall() => const HomeView();
+
+// ---------------------------------------------------------------------------
+// Your Path hero, every state
+// ---------------------------------------------------------------------------
+
+@Preview(
+  group: 'Your Path hero',
+  name: '1 · In progress (3 of 7)',
+  size: phoneSize,
+  wrapper: wrapHomeDark,
+)
+Widget pathInProgress() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '2 · Not started (0 of 7)',
+  size: phoneSize,
+  wrapper: wrapPathFresh,
+)
+Widget pathFresh() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '3 · Pack completed, next available',
+  size: phoneSize,
+  wrapper: wrapPathCompletedNext,
+)
+Widget pathCompletedNext() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '4 · Path completed (end)',
+  size: phoneSize,
+  wrapper: wrapPathCompletedEnd,
+)
+Widget pathCompletedEnd() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '5 · Loading',
+  size: phoneSize,
+  wrapper: wrapPathLoading,
+)
+Widget pathLoading() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '6 · No cover (falls back to card)',
+  size: phoneSize,
+  wrapper: wrapPathNoCover,
+)
+Widget pathNoCover() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '7 · First run (explainer strip)',
+  size: phoneSize,
+  wrapper: wrapHomeFirstRun,
+)
+Widget pathFirstRun() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '8 · Streak done today',
+  size: phoneSize,
+  wrapper: wrapHomeStreakDone,
+)
+Widget pathStreakDone() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '9 · Zen mode',
+  size: phoneSize,
+  wrapper: wrapHomeZen,
+)
+Widget pathZen() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '10 · Light theme',
+  size: phoneSize,
+  wrapper: wrapHomeLight,
+)
+Widget pathLight() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '11 · Shortcuts on top',
+  size: phoneSize,
+  wrapper: wrapHomeShortcutsFirst,
+)
+Widget heroShortcutsFirst() => const HomeView();
+
+@Preview(
+  group: 'Your Path hero',
+  name: '12 · Featured on top',
+  size: phoneSize,
+  wrapper: wrapHomeFeaturedFirst,
+)
+Widget heroFeaturedFirst() => const HomeView();
 
 // ---------------------------------------------------------------------------
 // Sections
