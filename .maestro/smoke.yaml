@@ -234,11 +234,22 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn:
     text: "(?si).*your path.*"
 
-# Your Path may open a track (Play visible immediately) or a pack (list of sessions).
-# If it opened a pack, tap the first session in the list to reach a track view.
+# Make sure we have actually left Home before looking for Play. The Up Next
+# card on Home carries its own circular "Play" control right next to the Your
+# Path label, so checking for "Play" straight after the tap matched Home while
+# the push transition was still running and the tap landed on the wrong
+# screen (run 34955197941: tapped at (969,1028) on the card's play circle, the
+# track view opened underneath it, playback never started). Wait for something
+# only the track view ("Share Track") or the pack list ("N - M min") shows.
+- extendedWaitUntil:
+    visible: "Share Track|(?i)\\d+ - \\d+ min"
+    timeout: 20000
+
+# Your Path may open a track (Share Track in the bottom bar) or a pack (list of
+# sessions). If it opened a pack, tap the first session to reach a track view.
 - runFlow:
     when:
-      notVisible: "Play"
+      notVisible: "Share Track"
     commands:
       - extendedWaitUntil:
           visible: "(?i)\\d+ - \\d+ min"
@@ -252,7 +263,11 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           text: "(?i)\\d+ - \\d+ min"
           index: 0
 
-# Track view loads with a play button
+# Track view loads with a play button. Wait for the bottom bar first so the
+# "Play" we tap is the track view's, never a card left behind on Home.
+- extendedWaitUntil:
+    visible: "Share Track"
+    timeout: 15000
 - extendedWaitUntil:
     visible: "Play"
     timeout: 15000
