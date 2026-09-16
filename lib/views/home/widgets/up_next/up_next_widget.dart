@@ -105,18 +105,9 @@ class _UpNextPalette {
 }
 
 class UpNextWidget extends ConsumerWidget {
-  /// Optional widget rendered inside the card below the main content (e.g. the
-  /// explainer strip). When provided it collapses inside the card so the
-  /// rounded corners are always intact. Ignored in [UpNextStyle.hero].
-  final Widget? inlineStrip;
-
   final UpNextStyle style;
 
-  const UpNextWidget({
-    super.key,
-    this.inlineStrip,
-    this.style = UpNextStyle.card,
-  });
+  const UpNextWidget({super.key, this.style = UpNextStyle.card});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -142,7 +133,6 @@ class UpNextWidget extends ConsumerWidget {
         return _UpNextContent(
           key: ValueKey(upNextData.nextSession!.id),
           data: upNextData,
-          inlineStrip: style == UpNextStyle.hero ? null : inlineStrip,
           style: style,
         );
       },
@@ -409,13 +399,11 @@ class _CompletedCta extends StatelessWidget {
 
 class _UpNextContent extends ConsumerStatefulWidget {
   final UpNextData data;
-  final Widget? inlineStrip;
   final UpNextStyle style;
 
   const _UpNextContent({
     super.key,
     required this.data,
-    this.inlineStrip,
     this.style = UpNextStyle.card,
   });
 
@@ -558,7 +546,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                           ],
                         ),
                       ),
-                      if (widget.inlineStrip != null) widget.inlineStrip!,
                     ],
                   ),
                 ),

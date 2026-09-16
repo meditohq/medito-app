@@ -22,7 +22,6 @@ import 'widgets/products/home_products_section.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
 import 'widgets/up_next/up_next_widget.dart';
-import 'widgets/up_next/your_path_explainer_strip.dart';
 
 import '../../providers/home/announcement_provider.dart';
 import 'package:medito/providers/providers.dart';
@@ -143,26 +142,6 @@ class _HomeViewState extends ConsumerState<HomeView>
                         ? null
                         : _buildSection(heroType, homeData, inHero: true),
                   ),
-                  // First-run explainer; lives inside the Up Next card when
-                  // that card is in the list, stands alone under the hero
-                  // otherwise. Collapses itself once dismissed.
-                  if (heroType == HomeWidgetType.upNext)
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          padding16,
-                          padding8,
-                          padding16,
-                          0,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(kHomeTileRadius),
-                          ),
-                          child: YourPathExplainerStrip(),
-                        ),
-                      ),
-                    ),
                   // Banner / no-hero mode only: with an overlaid section the
                   // hero shows the announcement above it instead.
                   if (heroType == null)
@@ -217,7 +196,6 @@ class _HomeViewState extends ConsumerState<HomeView>
       HomeWidgetType.upNext => UpNextWidget(
         key: key,
         style: inHero ? UpNextStyle.hero : UpNextStyle.card,
-        inlineStrip: inHero ? null : const YourPathExplainerStrip(),
       ),
     };
   }

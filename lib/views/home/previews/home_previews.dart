@@ -39,13 +39,11 @@ import 'package:medito/views/previews/preview_support.dart';
 const Map<String, Object> homePrefsDark = {
   SharedPreferenceConstants.themePreference: 'dark',
   SharedPreferenceConstants.streakCircleDisplayPreference: 'currentStreak',
-  SharedPreferenceConstants.hasSeenYourPathExplainer: true,
 };
 
 const Map<String, Object> homePrefsLight = {
   SharedPreferenceConstants.themePreference: 'light',
   SharedPreferenceConstants.streakCircleDisplayPreference: 'currentStreak',
-  SharedPreferenceConstants.hasSeenYourPathExplainer: true,
 };
 
 /// First run: explainer strip visible, consistency score in the pill.

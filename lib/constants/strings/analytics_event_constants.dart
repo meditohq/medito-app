@@ -477,18 +477,6 @@ class AnalyticsEventConstants {
   /// the link as coming from a home-screen widget tap.
   static const String widgetDeepLinkSource = 'home_widget';
 
-  // Your Path explainer strip events
-  /// Event logged when the Your Path explainer strip is shown to the user
-  static const String yourPathExplainerShown = 'your_path_explainer_shown';
-
-  /// Event logged when the Your Path explainer strip is dismissed
-  /// Parameter: dismissMethod — 'got_it' (tapped button) or 'auto' (timed out)
-  static const String yourPathExplainerDismissed =
-      'your_path_explainer_dismissed';
-
-  /// Parameter for how the explainer was dismissed ('got_it' or 'auto')
-  static const String paramDismissMethod = 'dismiss_method';
-
   // Onboarding question/result events
   /// Event logged when the new onboarding question flow is started
   static const String onboardingQuestionFlowStarted =
