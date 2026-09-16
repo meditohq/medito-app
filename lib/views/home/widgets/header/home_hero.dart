@@ -86,8 +86,11 @@ class HomeHero extends ConsumerWidget {
     }
 
     final overlay = child != null;
+    // Overlay covers sit a little under half the screen: enough for a large
+    // image, without leaving a big empty band above the section on sparse
+    // covers.
     final minHeight = overlay
-        ? (size.height * 0.5).clamp(380.0, 480.0)
+        ? (size.height * 0.42).clamp(340.0, 420.0)
         : topInset + _bannerHeight;
 
     // Status bar glyphs follow the theme: the top of the image is darkened
