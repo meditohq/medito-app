@@ -1,12 +1,13 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/views/home/home_styles.dart';
-import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -81,10 +82,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
             right: padding16,
             bottom: padding16,
           ),
-          child: HomeGradientBorder(
-            backgroundColor: Theme.of(context).cardColor,
-            borderRadius: kHomeCardRadius,
-            borderWidth: 0.5,
+          child: _GlassCard(
             child: Padding(
               padding: const EdgeInsets.only(
                 left: padding20,
@@ -194,6 +192,40 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       sourceRouteName: isDonation
           ? FirebaseAnalyticsService.paywallSourceAnnouncement
           : null,
+    );
+  }
+}
+
+/// Frosted, translucent card for the announcement, so the hero image shows
+/// softly through it instead of a solid block.
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final radius = BorderRadius.circular(kHomeCardRadius);
+    return ClipRRect(
+      borderRadius: radius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.cardColor.withValues(alpha: 0.72),
+            borderRadius: radius,
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.08),
+              width: 0.5,
+            ),
+          ),
+          child: child,
+        ),
+      ),
     );
   }
 }
