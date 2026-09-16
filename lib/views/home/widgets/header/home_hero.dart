@@ -54,7 +54,7 @@ class HomeHero extends ConsumerWidget {
   static const _headerReserve = 72.0;
 
   /// Banner mode: pill row plus room for the fade into the page.
-  static const _bannerHeight = 92.0;
+  static const _bannerHeight = 132.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -203,11 +203,12 @@ class _HeroBackdrop extends StatelessWidget {
                 ? LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    stops: const [0.0, 0.45, 0.75, 1.0],
+                    stops: const [0.0, 0.3, 0.55, 0.78, 1.0],
                     colors: [
                       page.withValues(alpha: 0.0),
-                      page.withValues(alpha: 0.35),
-                      page.withValues(alpha: 0.85),
+                      page.withValues(alpha: 0.12),
+                      page.withValues(alpha: 0.4),
+                      page.withValues(alpha: 0.78),
                       page,
                     ],
                   )
