@@ -1,6 +1,7 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
 import 'package:medito/views/home/home_styles.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -65,14 +66,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       return const SizedBox.shrink();
     }
 
-    final rawBgColor = ColorConstants.getColorFromString(
-      widget.announcement.colorBackground,
-    );
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark
-        ? rawBgColor
-        : Color.lerp(rawBgColor, Colors.black, 0.08) ?? rawBgColor;
-
+    // The retheme uses one flat card surface everywhere; the announcement
+    // follows it instead of the server-supplied colours, which read as a
+    // heavy block against the rest of the home screen.
     return SizeTransition(
       sizeFactor: _sizeAnimation,
       alignment: AlignmentDirectional.topStart,
@@ -85,26 +81,27 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
             right: padding16,
             bottom: padding16,
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(kHomeCardRadius),
-            ),
-            padding: const EdgeInsets.only(
-              left: padding20,
-              right: padding20,
-              bottom: padding12,
-              top: padding20,
-            ),
-            child: Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [_text(context)],
-                ),
-                height16,
-                _actionBtn(context),
-              ],
+          child: HomeGradientBorder(
+            backgroundColor: Theme.of(context).cardColor,
+            borderRadius: kHomeCardRadius,
+            borderWidth: 0.5,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: padding20,
+                right: padding20,
+                bottom: padding12,
+                top: padding20,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [_text(context)],
+                  ),
+                  height16,
+                  _actionBtn(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -113,35 +110,27 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
   }
 
   Row _actionBtn(BuildContext context) {
-    var textColor = ColorConstants.getColorFromString(
-      widget.announcement.colorText,
-    );
-    var bgColor = ColorConstants.getColorFromString(
-      widget.announcement.colorBackground,
-    );
+    final theme = Theme.of(context);
 
     var actionWidgets = <Widget>[
       TextButton(
         onPressed: _handleDismiss,
         child: Text(
           AppLocalizations.of(context)!.dismiss,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(color: textColor),
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ),
       ),
       width4,
     ];
 
     if (widget.announcement.ctaPath != null) {
+      // Themed ElevatedButton: accent fill with the accent's own foreground.
       actionWidgets.add(
         ElevatedButton(
           onPressed: () => _handleCtaTitlePress(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: textColor,
-            foregroundColor: bgColor,
-            padding: const EdgeInsets.all(8),
-          ),
+          style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(8)),
           child: Text(widget.announcement.ctaTitle ?? ''),
         ),
       );
@@ -154,13 +143,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
   }
 
   Flexible _text(BuildContext context) {
-    var textColor = ColorConstants.getColorFromString(
-      widget.announcement.colorText,
+    var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      color: Theme.of(context).colorScheme.onSurface,
     );
-
-    var markDownTheme = Theme.of(
-      context,
-    ).textTheme.bodyMedium?.copyWith(color: textColor);
 
     return Flexible(
       child: MarkdownWidget(
