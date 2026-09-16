@@ -6,15 +6,15 @@ import 'package:medito/widgets/network_image_widget.dart';
 
 import '../stats/streak_circle.dart';
 
-/// Cover of the pinned pack, or null while it loads or has none. Shared by
-/// [HomeHero] and the home list, which hands its first section to the hero
-/// whenever there is an image to lay it over.
 /// How far the hero image bleeds above its box. At rest this sits above the
 /// viewport (clipped); on pull-to-refresh the scroll view offsets down and
 /// this pre-painted band fills the gap with more image instead of the page
 /// background.
 const double _kOverscrollBleed = 260.0;
 
+/// Cover of the pinned pack, or null while it loads or has none. Shared by
+/// [HomeHero] and the home list, which hands its first section to the hero
+/// whenever there is an image to lay it over.
 final homeHeroCoverProvider = Provider.autoDispose<String?>((ref) {
   final cover = ref
       .watch(upNextProvider)
@@ -31,13 +31,24 @@ final homeHeroCoverProvider = Provider.autoDispose<String?>((ref) {
 /// and the first section renders below it on the page as usual. With no
 /// cover at all it is just the pill row.
 class HomeHero extends ConsumerWidget {
-  const HomeHero({super.key, required this.onStatsButtonTap, this.child});
+  const HomeHero({
+    super.key,
+    required this.onStatsButtonTap,
+    this.child,
+    this.announcement,
+  });
 
   final VoidCallback onStatsButtonTap;
 
   /// The section laid over the image. Rendered inside an on-image theme:
   /// white text, dark translucent cards, no page-coloured fades.
   final Widget? child;
+
+  /// Announcement card, shown above [child] over the image (below the streak
+  /// pill). Only used when there is an overlaid section; in banner mode the
+  /// home list places it under the hero instead. Collapses itself when there
+  /// is nothing to show.
+  final Widget? announcement;
 
   /// Space reserved for the status bar and streak pill above [child].
   static const _headerReserve = 72.0;
@@ -100,7 +111,15 @@ class HomeHero extends ConsumerWidget {
                 top: topInset + _headerReserve,
                 bottom: padding8,
               ),
-              child: _OnImageTheme(child: child!),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Own colours, so kept outside the on-image theme.
+                  ?announcement,
+                  _OnImageTheme(child: child!),
+                ],
+              ),
             ),
           Positioned(top: 0, left: 0, right: 0, child: header),
         ],

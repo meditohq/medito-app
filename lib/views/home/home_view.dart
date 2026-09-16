@@ -138,6 +138,7 @@ class _HomeViewState extends ConsumerState<HomeView>
                 slivers: [
                   HomeHero(
                     onStatsButtonTap: () => _onStatsButtonTapped(context),
+                    announcement: const HomeAnnouncementSection(),
                     child: heroType == null
                         ? null
                         : _buildSection(heroType, homeData, inHero: true),
@@ -162,12 +163,15 @@ class _HomeViewState extends ConsumerState<HomeView>
                         ),
                       ),
                     ),
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 12),
-                      child: HomeAnnouncementSection(),
+                  // Banner / no-hero mode only: with an overlaid section the
+                  // hero shows the announcement above it instead.
+                  if (heroType == null)
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 12),
+                        child: HomeAnnouncementSection(),
+                      ),
                     ),
-                  ),
                   SliverList.builder(
                     itemBuilder: (context, index) {
                       return Padding(
