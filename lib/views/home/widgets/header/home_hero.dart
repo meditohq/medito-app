@@ -194,39 +194,55 @@ class _HeroBackdrop extends StatelessWidget {
             ],
           ),
         ),
-        // Box-anchored lower scrim: transparent at the top (the bleed layer
-        // handles that), darkening toward the section in overlay mode.
-        if (!banner)
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: const [0.0, 0.45, 1.0],
-                colors: [
-                  base.withValues(alpha: 0.0),
-                  base.withValues(alpha: isDark ? 0.5 : 0.6),
-                  base.withValues(alpha: isDark ? 0.8 : 0.96),
-                ],
-              ),
-            ),
-          ),
-        // Page seam so the image never ends on a hard edge.
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: banner ? 36 : 56,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [page.withValues(alpha: 0), page],
-              ),
-            ),
+        // Box-anchored lower scrim.
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: banner
+                // Banner mode: the whole lower half eases the image into the
+                // page over a long, soft ramp rather than a short hard seam.
+                ? LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.0, 0.45, 0.75, 1.0],
+                    colors: [
+                      page.withValues(alpha: 0.0),
+                      page.withValues(alpha: 0.35),
+                      page.withValues(alpha: 0.85),
+                      page,
+                    ],
+                  )
+                // Overlay mode: transparent at the top (the bleed layer
+                // handles that), darkening toward the section.
+                : LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.0, 0.45, 1.0],
+                    colors: [
+                      base.withValues(alpha: 0.0),
+                      base.withValues(alpha: isDark ? 0.5 : 0.6),
+                      base.withValues(alpha: isDark ? 0.8 : 0.96),
+                    ],
+                  ),
           ),
         ),
+        // Overlay mode keeps a short seam so the image never ends on a hard
+        // edge; banner mode's full-height ramp already reaches the page.
+        if (!banner)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 56,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [page.withValues(alpha: 0), page],
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
