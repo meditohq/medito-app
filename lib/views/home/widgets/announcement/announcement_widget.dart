@@ -96,7 +96,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
                 children: [
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [_text(context)],
+                    children: [_iconBadge(context), width16, _text(context)],
                   ),
                   height16,
                   _actionBtn(context),
@@ -105,6 +105,25 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Leading badge that marks the card as an announcement.
+  Widget _iconBadge(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return Container(
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: onSurface.withValues(alpha: 0.08),
+      ),
+      child: Icon(
+        Icons.campaign_rounded,
+        size: 20,
+        color: onSurface.withValues(alpha: 0.85),
       ),
     );
   }
