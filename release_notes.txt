@@ -1,6 +1,13 @@
 Unreleased
 -
 
+2609.16.0
+- A fresh new look across the app: cleaner cards, a bolder theme and a redesigned home screen with a large image at the top
+- New floating navigation bar with a built-in search button that opens search from anywhere
+- Settings: theme, app icon and Zen Mode now open clearer pickers
+- Smoother streak animation that respects your reduced-motion setting
+- Fixes: completed sessions now read clearly, the streak updates at the right time, and reminders keep the time you chose
+
 2609.10.0
 - Settings: pick when your daily reminder arrives (morning, evening, night or your own time) instead of a simple on/off switch
 - Settings: theme and app icon now open a picker that shows your current choice
