@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
-class FloatingNavItem {
-  const FloatingNavItem({required this.icon, required this.label});
+class MeditoNavItem {
+  const MeditoNavItem({required this.icon, required this.label});
 
   /// SVG asset name, see [MeditoIcons].
   final String icon;
@@ -12,8 +12,8 @@ class FloatingNavItem {
 }
 
 /// A bar item that is not a tab (search): tapping it opens search.
-class FloatingNavAction {
-  const FloatingNavAction({
+class MeditoNavAction {
+  const MeditoNavAction({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -28,8 +28,8 @@ class FloatingNavAction {
 /// with a top hairline and the tabs (plus the search action) spread evenly
 /// across it, each icon over label. Search opens a floating field above the
 /// keyboard rather than living in this bar.
-class FloatingNavBar extends StatelessWidget {
-  const FloatingNavBar({
+class MeditoNavBar extends StatelessWidget {
+  const MeditoNavBar({
     super.key,
     required this.items,
     required this.selectedIndex,
@@ -38,10 +38,10 @@ class FloatingNavBar extends StatelessWidget {
     this.actionIndex,
   });
 
-  final List<FloatingNavItem> items;
+  final List<MeditoNavItem> items;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
-  final FloatingNavAction? action;
+  final MeditoNavAction? action;
 
   /// Where the [action] (search) sits among the tabs; appended at the end
   /// when null.
@@ -94,7 +94,7 @@ class FloatingNavBar extends StatelessWidget {
         at,
         Expanded(
           child: _NavTab(
-            item: FloatingNavItem(icon: action!.icon, label: action!.label),
+            item: MeditoNavItem(icon: action!.icon, label: action!.label),
             selected: false,
             colors: colors,
             onTap: () {
@@ -162,7 +162,7 @@ class _NavTab extends StatelessWidget {
     required this.onTap,
   });
 
-  final FloatingNavItem item;
+  final MeditoNavItem item;
   final bool selected;
   final GlassColors colors;
   final VoidCallback onTap;
