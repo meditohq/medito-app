@@ -11,8 +11,7 @@ class FloatingNavItem {
   final String label;
 }
 
-/// A bar item that is not a tab (search): tapping it opens the in-place
-/// search field ([FloatingNavBar.expanded]).
+/// A bar item that is not a tab (search): tapping it opens search.
 class FloatingNavAction {
   const FloatingNavAction({
     required this.icon,
@@ -25,12 +24,10 @@ class FloatingNavAction {
   final VoidCallback onTap;
 }
 
-/// Docked, full-width navigation bar anchored to the bottom edge. A frosted,
-/// hairlined bar with the tabs (and the search action) spread evenly across
-/// it. When [expanded] the row is replaced by the search field
-/// ([expandedChild]) and a Cancel button, and the whole bar lifts above the
-/// keyboard. Pair with `Scaffold(extendBody: true)` so content scrolls
-/// beneath the translucent bar.
+/// Docked, full-width navigation bar anchored to the bottom edge: a solid bar
+/// with a top hairline and the tabs (plus the search action) spread evenly
+/// across it, each icon over label. Search opens a floating field above the
+/// keyboard rather than living in this bar.
 class FloatingNavBar extends StatelessWidget {
   const FloatingNavBar({
     super.key,
@@ -39,10 +36,6 @@ class FloatingNavBar extends StatelessWidget {
     required this.onSelected,
     this.action,
     this.actionIndex,
-    this.expanded = false,
-    this.expandedChild,
-    this.cancelLabel,
-    this.onCancel,
   });
 
   final List<FloatingNavItem> items;
@@ -54,58 +47,28 @@ class FloatingNavBar extends StatelessWidget {
   /// when null.
   final int? actionIndex;
 
-  /// When true the tab row is replaced by [expandedChild] (the search field)
-  /// and a Cancel button that calls [onCancel].
-  final bool expanded;
-  final Widget? expandedChild;
-  final String? cancelLabel;
-  final VoidCallback? onCancel;
-
   static const _barHeight = 60.0;
   static const _hairline = 0.5;
-  static const _keyboardDuration = Duration(milliseconds: 180);
 
-  /// Colours for everything drawn on the bar; see [GlassColors].
+  /// Colours for the bar and the floating search field; see [GlassColors].
   static GlassColors colorsOf(BuildContext context) => GlassColors.of(context);
-
-  static bool isDark(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark;
 
   @override
   Widget build(BuildContext context) {
     final colors = GlassColors.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final barFill = isDark ? const Color(0xFF1A1A1A) : Colors.white;
 
-    // The Scaffold keeps its bottomNavigationBar slot pinned to the screen
-    // edge whatever the keyboard does, so when the search field has focus the
-    // bar would sit under the keyboard. Lift the whole bar by the keyboard
-    // inset ourselves. Animated because Android reports the inset in one step
-    // while iOS updates it per frame.
-    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-    final barFill = isDark(context) ? const Color(0xFF1A1A1A) : Colors.white;
-
-    return AnimatedPadding(
-      duration: _keyboardDuration,
-      curve: Curves.easeOutCubic,
-      padding: EdgeInsets.only(bottom: keyboardInset),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: barFill,
-          border: Border(
-            top: BorderSide(color: colors.rim, width: _hairline),
-          ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: barFill,
+        border: Border(
+          top: BorderSide(color: colors.rim, width: _hairline),
         ),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: _barHeight,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child: expanded && expandedChild != null
-                  ? _searchRow(context, colors)
-                  : _tabsRow(colors),
-            ),
-          ),
-        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(height: _barHeight, child: _tabsRow(colors)),
       ),
     );
   }
@@ -142,38 +105,12 @@ class FloatingNavBar extends StatelessWidget {
         ),
       );
     }
-    return Row(key: const ValueKey('tabs'), children: tabs);
-  }
-
-  Widget _searchRow(BuildContext context, GlassColors colors) {
-    return Padding(
-      key: const ValueKey('search'),
-      padding: const EdgeInsets.only(left: padding16, right: padding8),
-      child: Row(
-        children: [
-          Expanded(child: expandedChild!),
-          if (cancelLabel != null && onCancel != null)
-            TextButton(
-              onPressed: onCancel,
-              child: Text(
-                cancelLabel!,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0,
-                  height: 1.2,
-                  color: colors.foreground,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
+    return Row(children: tabs);
   }
 }
 
-/// Colours for the navigation bar and whatever sits on it. Kept in one place
-/// so the bar and the search field agree.
+/// Colours for the navigation bar and the floating search field. Kept in one
+/// place so they agree.
 ///
 /// Monochrome, after tickets.knit.amsterdam: near-black bar with off-white
 /// text and a white-10% rim in dark mode, white bar with near-black text and
@@ -186,31 +123,25 @@ class GlassColors {
     required this.shadow,
     required this.foreground,
     required this.mutedForeground,
-    required this.selectedForeground,
-    required this.selectedBackground,
   });
 
   factory GlassColors.of(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     if (isDark) {
       return GlassColors(
-        fill: const Color(0xFF1A1A1A).withValues(alpha: 0.86),
+        fill: const Color(0xFF1A1A1A).withValues(alpha: 0.92),
         rim: Colors.white.withValues(alpha: 0.10),
         shadow: Colors.black.withValues(alpha: 0.55),
         foreground: const Color(0xFFFAFAFA),
         mutedForeground: const Color(0xFFA1A1A1),
-        selectedForeground: const Color(0xFF171717),
-        selectedBackground: const Color(0xFFE5E5E5),
       );
     }
     return GlassColors(
-      fill: Colors.white.withValues(alpha: 0.92),
+      fill: Colors.white.withValues(alpha: 0.96),
       rim: Colors.black.withValues(alpha: 0.10),
-      shadow: Colors.black.withValues(alpha: 0.14),
+      shadow: Colors.black.withValues(alpha: 0.16),
       foreground: const Color(0xFF0A0A0A),
       mutedForeground: const Color(0xFF737373),
-      selectedForeground: const Color(0xFFFAFAFA),
-      selectedBackground: const Color(0xFF171717),
     );
   }
 
@@ -219,8 +150,6 @@ class GlassColors {
   final Color shadow;
   final Color foreground;
   final Color mutedForeground;
-  final Color selectedForeground;
-  final Color selectedBackground;
 }
 
 /// A standard tab: icon over label, full-height, filling its slot. Selected

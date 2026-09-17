@@ -10,7 +10,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/bottom_navigation/widgets/floating_nav_bar.dart';
-import 'package:medito/views/bottom_navigation/widgets/floating_search_field.dart';
+import 'package:medito/views/bottom_navigation/widgets/floating_search_bar.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
 import 'package:medito/views/path/path_view.dart';
@@ -106,32 +106,35 @@ class _BottomNavigationBarViewState
           // Solid docked bar: content stops above it, and the bar reserves
           // room for the keyboard itself, so the Scaffold must not resize.
           resizeToAvoidBottomInset: false,
-          bottomNavigationBar: FloatingNavBar(
-            selectedIndex: selectedDestination >= 0 ? selectedDestination : 0,
-            onSelected: (index) =>
-                _onDestinationSelected(_pageIndexForDestination[index]),
-            items: [
-              FloatingNavItem(icon: MeditoIcons.home, label: l10n.home),
-              FloatingNavItem(icon: MeditoIcons.book, label: l10n.explore),
-              FloatingNavItem(icon: MeditoIcons.settings, label: l10n.settings),
-            ],
-            action: FloatingNavAction(
-              icon: MeditoIcons.search,
-              label: l10n.search,
-              onTap: _openSearch,
-            ),
-            // Search sits between Explore and Settings.
-            actionIndex: 2,
-            expanded: _searchOpen,
-            expandedChild: FloatingSearchField(
-              controller: _searchController,
-              focusNode: _searchFocusNode,
-              onChanged: _onSearchChanged,
-              onClear: _clearSearch,
-            ),
-            cancelLabel: l10n.cancel,
-            onCancel: _closeSearch,
-          ),
+          // Hidden while searching: the floating search field replaces it,
+          // sitting just above the keyboard.
+          bottomNavigationBar: _searchOpen
+              ? null
+              : FloatingNavBar(
+                  selectedIndex: selectedDestination >= 0
+                      ? selectedDestination
+                      : 0,
+                  onSelected: (index) =>
+                      _onDestinationSelected(_pageIndexForDestination[index]),
+                  items: [
+                    FloatingNavItem(icon: MeditoIcons.home, label: l10n.home),
+                    FloatingNavItem(
+                      icon: MeditoIcons.book,
+                      label: l10n.explore,
+                    ),
+                    FloatingNavItem(
+                      icon: MeditoIcons.settings,
+                      label: l10n.settings,
+                    ),
+                  ],
+                  action: FloatingNavAction(
+                    icon: MeditoIcons.search,
+                    label: l10n.search,
+                    onTap: _openSearch,
+                  ),
+                  // Search sits between Explore and Settings.
+                  actionIndex: 2,
+                ),
           body: Stack(
             children: [
               IndexedStack(index: _currentPageIndex, children: _pages),
@@ -143,10 +146,36 @@ class _BottomNavigationBarViewState
                         key: const ValueKey('search'),
                         color: theme.scaffoldBackgroundColor,
                         child: SafeArea(
-                          bottom: false,
-                          child: SearchResults(
-                            query: _searchQuery,
-                            onBeforeNavigate: _searchFocusNode.unfocus,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.viewInsetsOf(context).bottom,
+                            ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: SearchResults(
+                                    query: _searchQuery,
+                                    onBeforeNavigate: _searchFocusNode.unfocus,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    padding16,
+                                    padding8,
+                                    padding8,
+                                    padding8,
+                                  ),
+                                  child: FloatingSearchBar(
+                                    controller: _searchController,
+                                    focusNode: _searchFocusNode,
+                                    onChanged: _onSearchChanged,
+                                    onClear: _clearSearch,
+                                    onCancel: _closeSearch,
+                                    cancelLabel: l10n.cancel,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       )
