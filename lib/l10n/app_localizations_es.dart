@@ -441,7 +441,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get getStarted => 'Empezar';
 
   @override
-  String get alreadyHaveAccountSignIn => '¿Ya tienes una cuenta? Inicia sesión';
+  String get splashSignInOrSignUp => 'Iniciar sesión o registrarse';
 
   @override
   String get sendMeMyPasswordText => 'Continuar';

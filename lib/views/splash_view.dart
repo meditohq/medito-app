@@ -757,7 +757,7 @@ class SplashViewState extends ConsumerState<SplashView>
                                             child: Text(
                                               AppLocalizations.of(
                                                 context,
-                                              )!.alreadyHaveAccountSignIn,
+                                              )!.splashSignInOrSignUp,
                                               style: TextStyle(
                                                 color: Colors.white.withValues(
                                                   alpha: 0.8,

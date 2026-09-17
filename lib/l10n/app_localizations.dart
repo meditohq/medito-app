@@ -908,11 +908,11 @@ abstract class AppLocalizations {
   /// **'Get started'**
   String get getStarted;
 
-  /// Secondary link on the splash screen to sign in
+  /// Secondary link on the splash screen to sign in or create an account
   ///
   /// In en, this message translates to:
-  /// **'Already have an account? Sign in'**
-  String get alreadyHaveAccountSignIn;
+  /// **'Sign in or sign up'**
+  String get splashSignInOrSignUp;
 
   /// No description provided for @sendMeMyPasswordText.
   ///

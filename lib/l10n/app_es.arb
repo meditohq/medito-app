@@ -135,7 +135,7 @@
   "createAccountButtonText": "Crear Cuenta",
   "createAccountLogInButtonText": "Iniciar sesión o Registrarse",
   "getStarted": "Empezar",
-  "alreadyHaveAccountSignIn": "¿Ya tienes una cuenta? Inicia sesión",
+  "splashSignInOrSignUp": "Iniciar sesión o registrarse",
   "sendMeMyPasswordText": "Continuar",
   "logInButtonText": "Iniciar Sesión",
   "authenticationFailed": "Autenticación fallida",

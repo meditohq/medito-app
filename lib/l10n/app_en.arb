@@ -144,9 +144,9 @@
   "@getStarted": {
     "description": "Primary button on the splash screen; starts the app as a guest"
   },
-  "alreadyHaveAccountSignIn": "Already have an account? Sign in",
-  "@alreadyHaveAccountSignIn": {
-    "description": "Secondary link on the splash screen to sign in"
+  "splashSignInOrSignUp": "Sign in or sign up",
+  "@splashSignInOrSignUp": {
+    "description": "Secondary link on the splash screen to sign in or create an account"
   },
   "sendMeMyPasswordText": "Continue",
   "logInButtonText": "Sign In",
