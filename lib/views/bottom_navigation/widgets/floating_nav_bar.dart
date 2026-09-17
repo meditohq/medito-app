@@ -1,5 +1,3 @@
-import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
@@ -13,9 +11,8 @@ class FloatingNavItem {
   final String label;
 }
 
-/// The detached round button beside the pill. Tapping it expands the button
-/// into a full-width field ([FloatingNavBar.expanded]) while the pill folds
-/// away, the way the iOS 26 tab bar search works.
+/// A bar item that is not a tab (search): tapping it opens the in-place
+/// search field ([FloatingNavBar.expanded]).
 class FloatingNavAction {
   const FloatingNavAction({
     required this.icon,
@@ -28,10 +25,12 @@ class FloatingNavAction {
   final VoidCallback onTap;
 }
 
-/// Frosted pill that floats above the page content instead of a full-width
-/// bar. The selected item expands into a tinted chip with its label; the
-/// others are icon-only. Pair with `Scaffold(extendBody: true)` so content
-/// scrolls underneath and the blur has something to blur.
+/// Docked, full-width navigation bar anchored to the bottom edge. A frosted,
+/// hairlined bar with the tabs (and the search action) spread evenly across
+/// it. When [expanded] the row is replaced by the search field
+/// ([expandedChild]) and a Cancel button, and the whole bar lifts above the
+/// keyboard. Pair with `Scaffold(extendBody: true)` so content scrolls
+/// beneath the translucent bar.
 class FloatingNavBar extends StatelessWidget {
   const FloatingNavBar({
     super.key,
@@ -39,6 +38,7 @@ class FloatingNavBar extends StatelessWidget {
     required this.selectedIndex,
     required this.onSelected,
     this.action,
+    this.actionIndex,
     this.expanded = false,
     this.expandedChild,
     this.cancelLabel,
@@ -50,177 +50,135 @@ class FloatingNavBar extends StatelessWidget {
   final ValueChanged<int> onSelected;
   final FloatingNavAction? action;
 
-  /// When true the pill collapses and the action capsule stretches across
-  /// the bar showing [expandedChild] (the search field), with a labelled
-  /// Cancel capsule beside it that calls [onCancel].
+  /// Where the [action] (search) sits among the tabs; appended at the end
+  /// when null.
+  final int? actionIndex;
+
+  /// When true the tab row is replaced by [expandedChild] (the search field)
+  /// and a Cancel button that calls [onCancel].
   final bool expanded;
   final Widget? expandedChild;
   final String? cancelLabel;
   final VoidCallback? onCancel;
 
-  static const pillRadius = 100.0;
-  static const capsuleSize = 58.0;
-
-  /// Colours for everything drawn on the glass; see [GlassColors].
-  static GlassColors colorsOf(BuildContext context) => GlassColors.of(context);
-  static const _blurSigma = 24.0;
+  static const _barHeight = 60.0;
   static const _hairline = 0.5;
-  static const _duration = Duration(milliseconds: 260);
-  static const _morphDuration = Duration(milliseconds: 340);
-  static const _morphCurve = Curves.easeOutCubic;
   static const _keyboardDuration = Duration(milliseconds: 180);
-  static const _cancelPadding = 20.0;
 
-  static TextStyle _cancelStyle(BuildContext context) =>
-      Theme.of(context).textTheme.labelMedium!.copyWith(
-        fontSize: 15,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0,
-        height: 1.2,
-        color: GlassColors.of(context).foreground,
-      );
+  /// Colours for everything drawn on the bar; see [GlassColors].
+  static GlassColors colorsOf(BuildContext context) => GlassColors.of(context);
 
-  /// Width the Cancel capsule will take, so the field can leave room for it
-  /// while both animate together.
-  double _cancelSlotWidth(BuildContext context) {
-    final label = cancelLabel;
-    if (label == null || onCancel == null) return 0;
-    final painter = TextPainter(
-      text: TextSpan(text: label, style: _cancelStyle(context)),
-      textDirection: Directionality.of(context),
-      textScaler: MediaQuery.textScalerOf(context),
-    )..layout();
-    return painter.width + 2 * _cancelPadding + 2 * _hairline + padding12;
-  }
+  static bool isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
 
   @override
   Widget build(BuildContext context) {
-    final pill = _Glass(
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = 0; i < items.length; i++)
-              _NavChip(
-                item: items[i],
-                selected: i == selectedIndex,
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  onSelected(i);
-                },
-              ),
-          ],
-        ),
-      ),
-    );
+    final colors = GlassColors.of(context);
 
-    // A Row, not Center: the Scaffold offers this slot the full screen height
-    // as its max constraint and Center would expand to fill it.
-    //
     // The Scaffold keeps its bottomNavigationBar slot pinned to the screen
-    // edge whatever the keyboard does, so when the in-place search field has
-    // focus the pill would sit under the keyboard. Lift it by the keyboard
-    // inset ourselves; SafeArea's bottom padding already collapses to zero
-    // while the keyboard is up, so the gap above the keys is just `minimum`.
-    //
-    // Animated because Android reports the inset in one step; iOS updates it
-    // every frame, where the short tween just trails the system animation.
+    // edge whatever the keyboard does, so when the search field has focus the
+    // bar would sit under the keyboard. Lift the whole bar by the keyboard
+    // inset ourselves. Animated because Android reports the inset in one step
+    // while iOS updates it per frame.
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final barFill = isDark(context) ? const Color(0xFF1A1A1A) : Colors.white;
+
     return AnimatedPadding(
       duration: _keyboardDuration,
       curve: Curves.easeOutCubic,
       padding: EdgeInsets.only(bottom: keyboardInset),
-      child: SafeArea(
-        top: false,
-        minimum: const EdgeInsets.only(bottom: padding12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: padding24),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final cancelSlot = _cancelSlotWidth(context);
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Folds to zero width (and fades) while search is expanded.
-                  // Clip only then: at rest the ClipRect would cut the pill's
-                  // shadow into a rectangle.
-                  ClipRect(
-                    clipBehavior: expanded ? Clip.hardEdge : Clip.none,
-                    child: AnimatedAlign(
-                      duration: _morphDuration,
-                      curve: _morphCurve,
-                      alignment: Alignment.centerRight,
-                      // heightFactor keeps the Align hugging the pill; without
-                      // it the Align fills the slot's full-screen max height.
-                      heightFactor: 1,
-                      widthFactor: expanded ? 0 : 1,
-                      child: AnimatedOpacity(
-                        duration: _duration,
-                        opacity: expanded ? 0 : 1,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            right: action != null ? padding12 : 0,
-                          ),
-                          child: pill,
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (action != null)
-                    _ActionCapsule(
-                      action: action!,
-                      expanded: expanded,
-                      // The glass hairline sits outside the animated box.
-                      expandedWidth:
-                          constraints.maxWidth - 2 * _hairline - cancelSlot,
-                      child: expandedChild,
-                    ),
-                  // Unfolds from zero width as the field expands; same clip
-                  // rule as the pill, mirrored.
-                  if (cancelSlot > 0)
-                    ClipRect(
-                      clipBehavior: expanded ? Clip.none : Clip.hardEdge,
-                      child: AnimatedAlign(
-                        duration: _morphDuration,
-                        curve: _morphCurve,
-                        alignment: Alignment.centerLeft,
-                        heightFactor: 1,
-                        widthFactor: expanded ? 1 : 0,
-                        child: AnimatedOpacity(
-                          duration: _duration,
-                          opacity: expanded ? 1 : 0,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: padding12),
-                            child: _CancelCapsule(
-                              label: cancelLabel!,
-                              style: _cancelStyle(context),
-                              onTap: onCancel!,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: barFill,
+          border: Border(
+            top: BorderSide(color: colors.rim, width: _hairline),
+          ),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SizedBox(
+            height: _barHeight,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: expanded && expandedChild != null
+                  ? _searchRow(context, colors)
+                  : _tabsRow(colors),
+            ),
           ),
         ),
       ),
     );
   }
+
+  Widget _tabsRow(GlassColors colors) {
+    final tabs = <Widget>[
+      for (var i = 0; i < items.length; i++)
+        Expanded(
+          child: _NavTab(
+            item: items[i],
+            selected: i == selectedIndex,
+            colors: colors,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              onSelected(i);
+            },
+          ),
+        ),
+    ];
+    if (action != null) {
+      final at = (actionIndex ?? tabs.length).clamp(0, tabs.length);
+      tabs.insert(
+        at,
+        Expanded(
+          child: _NavTab(
+            item: FloatingNavItem(icon: action!.icon, label: action!.label),
+            selected: false,
+            colors: colors,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              action!.onTap();
+            },
+          ),
+        ),
+      );
+    }
+    return Row(key: const ValueKey('tabs'), children: tabs);
+  }
+
+  Widget _searchRow(BuildContext context, GlassColors colors) {
+    return Padding(
+      key: const ValueKey('search'),
+      padding: const EdgeInsets.only(left: padding16, right: padding8),
+      child: Row(
+        children: [
+          Expanded(child: expandedChild!),
+          if (cancelLabel != null && onCancel != null)
+            TextButton(
+              onPressed: onCancel,
+              child: Text(
+                cancelLabel!,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0,
+                  height: 1.2,
+                  color: colors.foreground,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
-/// Colours for the floating bar's glass and whatever sits on it. Kept in one
-/// place so the pill, the search capsule, the Cancel capsule and the search
-/// field agree.
+/// Colours for the navigation bar and whatever sits on it. Kept in one place
+/// so the bar and the search field agree.
 ///
-/// Monochrome, after tickets.knit.amsterdam: near-black glass with off-white
-/// text and a white-10% rim in dark mode, white glass with near-black text in
-/// light mode. The selected tab is the inverted "button" of that system: a
-/// light chip with dark glyph and label (dark chip on light). The fill
-/// deliberately avoids [ThemeData.cardColor] so the bar still reads over
-/// pages made of cards.
+/// Monochrome, after tickets.knit.amsterdam: near-black bar with off-white
+/// text and a white-10% rim in dark mode, white bar with near-black text and
+/// a black-10% rim in light mode. The selected tab is the full-contrast
+/// foreground; unselected tabs are muted.
 class GlassColors {
   const GlassColors({
     required this.fill,
@@ -265,170 +223,24 @@ class GlassColors {
   final Color selectedBackground;
 }
 
-/// Frosted, rimmed, softly shadowed capsule shared by the pill and the
-/// action capsules.
-class _Glass extends StatelessWidget {
-  const _Glass({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = GlassColors.of(context);
-    final radius = BorderRadius.circular(FloatingNavBar.pillRadius);
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow,
-            blurRadius: 32,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: FloatingNavBar._blurSigma,
-            sigmaY: FloatingNavBar._blurSigma,
-          ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: colors.fill,
-              borderRadius: radius,
-              border: Border.all(
-                color: colors.rim,
-                width: FloatingNavBar._hairline,
-              ),
-            ),
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Round icon button that stretches into a full-width capsule holding
-/// [child] when [expanded].
-class _ActionCapsule extends StatelessWidget {
-  const _ActionCapsule({
-    required this.action,
-    required this.expanded,
-    required this.expandedWidth,
-    this.child,
-  });
-
-  final FloatingNavAction action;
-  final bool expanded;
-  final double expandedWidth;
-  final Widget? child;
-
-  @override
-  Widget build(BuildContext context) {
-    return _Glass(
-      child: AnimatedContainer(
-        duration: FloatingNavBar._morphDuration,
-        curve: FloatingNavBar._morphCurve,
-        width: expanded ? expandedWidth : FloatingNavBar.capsuleSize,
-        height: FloatingNavBar.capsuleSize,
-        child: AnimatedSwitcher(
-          duration: FloatingNavBar._duration,
-          switchInCurve: Curves.easeOut,
-          switchOutCurve: Curves.easeIn,
-          child: expanded && child != null
-              ? KeyedSubtree(key: const ValueKey('expanded'), child: child!)
-              : Semantics(
-                  key: const ValueKey('collapsed'),
-                  button: true,
-                  label: action.label,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      HapticFeedback.selectionClick();
-                      action.onTap();
-                    },
-                    child: Center(
-                      child: ExcludeSemantics(
-                        child: MeditoIcon(
-                          assetName: action.icon,
-                          color: GlassColors.of(context).foreground,
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Labelled glass capsule that collapses search.
-class _CancelCapsule extends StatelessWidget {
-  const _CancelCapsule({
-    required this.label,
-    required this.style,
-    required this.onTap,
-  });
-
-  final String label;
-  final TextStyle style;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        child: _Glass(
-          child: SizedBox(
-            height: FloatingNavBar.capsuleSize,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: FloatingNavBar._cancelPadding,
-              ),
-              child: Center(
-                child: ExcludeSemantics(
-                  child: Text(label, style: style, maxLines: 1),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavChip extends StatelessWidget {
-  const _NavChip({
+/// A standard tab: icon over label, full-height, filling its slot. Selected
+/// tabs use the full-contrast foreground; the rest are muted.
+class _NavTab extends StatelessWidget {
+  const _NavTab({
     required this.item,
     required this.selected,
+    required this.colors,
     required this.onTap,
   });
 
   final FloatingNavItem item;
   final bool selected;
+  final GlassColors colors;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = GlassColors.of(context);
-    final iconColor = selected
-        ? colors.selectedForeground
-        : colors.mutedForeground;
+    final color = selected ? colors.foreground : colors.mutedForeground;
 
     return Semantics(
       button: true,
@@ -438,43 +250,25 @@ class _NavChip extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: ExcludeSemantics(
-          child: AnimatedContainer(
-            duration: FloatingNavBar._duration,
-            curve: Curves.easeOutCubic,
-            padding: EdgeInsets.symmetric(
-              horizontal: selected ? padding16 : padding14,
-              vertical: padding12,
-            ),
-            decoration: BoxDecoration(
-              color: selected ? colors.selectedBackground : Colors.transparent,
-              borderRadius: BorderRadius.circular(FloatingNavBar.pillRadius),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                MeditoIcon(assetName: item.icon, color: iconColor, size: 22),
-                AnimatedSize(
-                  duration: FloatingNavBar._duration,
-                  curve: Curves.easeOutCubic,
-                  alignment: Alignment.centerLeft,
-                  child: selected
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Text(
-                            item.label,
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0,
-                              height: 1.2,
-                              color: colors.selectedForeground,
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              MeditoIcon(assetName: item.icon, color: color, size: 24),
+              const SizedBox(height: 4),
+              Text(
+                item.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: dmSans,
+                  fontSize: 11,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  height: 1.1,
+                  color: color,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

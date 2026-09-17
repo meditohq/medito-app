@@ -103,7 +103,9 @@ class _BottomNavigationBarViewState
         child: Scaffold(
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
-          extendBody: true,
+          // Solid docked bar: content stops above it, and the bar reserves
+          // room for the keyboard itself, so the Scaffold must not resize.
+          resizeToAvoidBottomInset: false,
           bottomNavigationBar: FloatingNavBar(
             selectedIndex: selectedDestination >= 0 ? selectedDestination : 0,
             onSelected: (index) =>
@@ -118,6 +120,8 @@ class _BottomNavigationBarViewState
               label: l10n.search,
               onTap: _openSearch,
             ),
+            // Search sits between Explore and Settings.
+            actionIndex: 2,
             expanded: _searchOpen,
             expandedChild: FloatingSearchField(
               controller: _searchController,
