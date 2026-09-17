@@ -140,6 +140,14 @@
   "invalidEmailError": "Please enter a valid email",
   "createAccountButtonText": "Create Account",
   "createAccountLogInButtonText": "Sign in or Sign up",
+  "getStarted": "Get started",
+  "@getStarted": {
+    "description": "Primary button on the splash screen; starts the app as a guest"
+  },
+  "alreadyHaveAccountSignIn": "Already have an account? Sign in",
+  "@alreadyHaveAccountSignIn": {
+    "description": "Secondary link on the splash screen to sign in"
+  },
   "sendMeMyPasswordText": "Continue",
   "logInButtonText": "Sign In",
   "authenticationFailed": "Authentication failed",
@@ -435,11 +443,12 @@
   "onboardingFirstMeditationDone": "That's it. You just meditated.",
   "onboardingFirstMeditationContinue": "Continue",
   "splashHeadline": "Meditation Made Simple",
-  "splashBenefit1Title": "Free for Everyone, Forever",
+  "splashSubtitle": "Free forever. No ads. Not-for-profit.",
+  "@splashSubtitle": {
+    "description": "One-line value proposition under the splash headline"
+  },
   "splashBenefit1Subtitle": "Explore hours of guided meditations, advanced courses, and more. No paywall.",
-  "splashBenefit2Title": "Challenges & Reminders",
   "splashBenefit2Subtitle": "Stay motivated daily, track progress, and build lasting habits.",
-  "splashBenefit3Title": "Not-for-profit & Ad-Free",
   "splashBenefit3Subtitle": "Donations keep us going so everyone can access mindfulness—no ads needed.",
   "continueText": "Continue",
   "setReminderB": "Remind Me Daily",

@@ -44,51 +44,17 @@ class SplashViewState extends ConsumerState<SplashView>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   var _showAccountButtons = false;
   var _isLoading = true;
-  var _currentTextIndex = 0;
   var _isSigningIn = false;
-  late AnimationController _textAnimationController;
-  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _setupTextAnimation();
     _initialiseApp();
-  }
-
-  void _setupTextAnimation() {
-    _textAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _textAnimationController,
-        curve: Curves.easeInOut,
-      ),
-    );
-    _textAnimationController.forward();
-    _startTextCycle();
-  }
-
-  void _startTextCycle() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      _textAnimationController.reverse().then((_) {
-        if (!mounted) return;
-        setState(() {
-          _currentTextIndex = (_currentTextIndex + 1) % 3;
-        });
-        _textAnimationController.forward();
-        _startTextCycle();
-      });
-    });
   }
 
   @override
   void dispose() {
-    _textAnimationController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -690,27 +656,22 @@ class SplashViewState extends ConsumerState<SplashView>
                                               ),
                                         ),
                                         const SizedBox(height: 16),
-                                        FadeTransition(
-                                          opacity: _fadeAnimation,
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            heightFactor: 1.0,
-                                            child: Text(
-                                              _getBenefitTitle(
-                                                _currentTextIndex,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .displayLarge
-                                                  ?.copyWith(
-                                                    fontSize: 28,
-                                                    fontWeight: FontWeight.bold,
-                                                    height: 1.0,
-                                                    color: Colors.white,
-                                                  ),
-                                            ),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.splashSubtitle,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium
+                                                ?.copyWith(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                  height: 1.35,
+                                                  color: Colors.white
+                                                      .withValues(alpha: 0.85),
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -728,66 +689,28 @@ class SplashViewState extends ConsumerState<SplashView>
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
+                                          // Primary: start straight away as a
+                                          // guest; the account choice can wait.
                                           SizedBox(
                                             width: double.infinity,
-                                            height: 48,
+                                            height: 52,
                                             child: ElevatedButton(
-                                              onPressed: () async {
-                                                // Log analytics event for signup button tap
-                                                await FirebaseAnalyticsService()
-                                                    .logEvent(
-                                                      name: FirebaseAnalyticsService
-                                                          .eventOnboardingSplashscreenSignupTap,
-                                                    );
-
-                                                await Navigator.of(context)
-                                                    .push(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const SignUpLogInPage(),
-                                                      ),
-                                                    )
-                                                    .then((value) {
-                                                      if (value == true) {
-                                                        _checkAuthAndInitialize();
-                                                      }
-                                                    });
-                                              },
-                                              child: Text(
-                                                AppLocalizations.of(
-                                                  context,
-                                                )!.createAccountLogInButtonText,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          SizedBox(
-                                            width: double.infinity,
-                                            height: 48,
-                                            child: OutlinedButton(
-                                              style: OutlinedButton.styleFrom(
-                                                backgroundColor: Theme.of(
-                                                  context,
-                                                ).colorScheme.surface,
-                                                foregroundColor: Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurface,
-                                                side: BorderSide(
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).colorScheme.outline,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.white,
+                                                foregroundColor: Colors.black,
+                                                textStyle: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                               onPressed: _isSigningIn
                                                   ? null
                                                   : () async {
-                                                      // Log analytics event for continue button tap
                                                       await FirebaseAnalyticsService()
                                                           .logEvent(
                                                             name: FirebaseAnalyticsService
                                                                 .eventOnboardingSplashscreenContinueTap,
                                                           );
-
                                                       await _handleAnonymousSignIn();
                                                     },
                                               child: _isSigningIn
@@ -802,8 +725,46 @@ class SplashViewState extends ConsumerState<SplashView>
                                                   : Text(
                                                       AppLocalizations.of(
                                                         context,
-                                                      )!.continueAsGuest,
+                                                      )!.getStarted,
                                                     ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          // Secondary: quiet link for returning
+                                          // users to sign in.
+                                          TextButton(
+                                            onPressed: _isSigningIn
+                                                ? null
+                                                : () async {
+                                                    await FirebaseAnalyticsService()
+                                                        .logEvent(
+                                                          name: FirebaseAnalyticsService
+                                                              .eventOnboardingSplashscreenSignupTap,
+                                                        );
+                                                    await Navigator.of(context)
+                                                        .push(
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const SignUpLogInPage(),
+                                                          ),
+                                                        )
+                                                        .then((value) {
+                                                          if (value == true) {
+                                                            _checkAuthAndInitialize();
+                                                          }
+                                                        });
+                                                  },
+                                            child: Text(
+                                              AppLocalizations.of(
+                                                context,
+                                              )!.alreadyHaveAccountSignIn,
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.8,
+                                                ),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -822,19 +783,6 @@ class SplashViewState extends ConsumerState<SplashView>
               ),
       ),
     );
-  }
-
-  String _getBenefitTitle(int index) {
-    switch (index) {
-      case 0:
-        return AppLocalizations.of(context)!.splashBenefit1Title;
-      case 1:
-        return AppLocalizations.of(context)!.splashBenefit2Title;
-      case 2:
-        return AppLocalizations.of(context)!.splashBenefit3Title;
-      default:
-        return '';
-    }
   }
 
   // Public method that can be called from outside the class

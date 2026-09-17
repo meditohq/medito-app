@@ -902,6 +902,18 @@ abstract class AppLocalizations {
   /// **'Sign in or Sign up'**
   String get createAccountLogInButtonText;
 
+  /// Primary button on the splash screen; starts the app as a guest
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get getStarted;
+
+  /// Secondary link on the splash screen to sign in
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get alreadyHaveAccountSignIn;
+
   /// No description provided for @sendMeMyPasswordText.
   ///
   /// In en, this message translates to:
@@ -2036,11 +2048,11 @@ abstract class AppLocalizations {
   /// **'Meditation Made Simple'**
   String get splashHeadline;
 
-  /// No description provided for @splashBenefit1Title.
+  /// One-line value proposition under the splash headline
   ///
   /// In en, this message translates to:
-  /// **'Free for Everyone, Forever'**
-  String get splashBenefit1Title;
+  /// **'Free forever. No ads. Not-for-profit.'**
+  String get splashSubtitle;
 
   /// No description provided for @splashBenefit1Subtitle.
   ///
@@ -2048,23 +2060,11 @@ abstract class AppLocalizations {
   /// **'Explore hours of guided meditations, advanced courses, and more. No paywall.'**
   String get splashBenefit1Subtitle;
 
-  /// No description provided for @splashBenefit2Title.
-  ///
-  /// In en, this message translates to:
-  /// **'Challenges & Reminders'**
-  String get splashBenefit2Title;
-
   /// No description provided for @splashBenefit2Subtitle.
   ///
   /// In en, this message translates to:
   /// **'Stay motivated daily, track progress, and build lasting habits.'**
   String get splashBenefit2Subtitle;
-
-  /// No description provided for @splashBenefit3Title.
-  ///
-  /// In en, this message translates to:
-  /// **'Not-for-profit & Ad-Free'**
-  String get splashBenefit3Title;
 
   /// No description provided for @splashBenefit3Subtitle.
   ///

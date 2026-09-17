@@ -432,6 +432,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createAccountLogInButtonText => 'Sign in or Sign up';
 
   @override
+  String get getStarted => 'Get started';
+
+  @override
+  String get alreadyHaveAccountSignIn => 'Already have an account? Sign in';
+
+  @override
   String get sendMeMyPasswordText => 'Continue';
 
   @override
@@ -1080,21 +1086,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashHeadline => 'Meditation Made Simple';
 
   @override
-  String get splashBenefit1Title => 'Free for Everyone, Forever';
+  String get splashSubtitle => 'Free forever. No ads. Not-for-profit.';
 
   @override
   String get splashBenefit1Subtitle =>
       'Explore hours of guided meditations, advanced courses, and more. No paywall.';
 
   @override
-  String get splashBenefit2Title => 'Challenges & Reminders';
-
-  @override
   String get splashBenefit2Subtitle =>
       'Stay motivated daily, track progress, and build lasting habits.';
-
-  @override
-  String get splashBenefit3Title => 'Not-for-profit & Ad-Free';
 
   @override
   String get splashBenefit3Subtitle =>
