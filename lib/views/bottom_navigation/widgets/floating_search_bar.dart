@@ -1,7 +1,7 @@
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:medito/views/bottom_navigation/widgets/floating_nav_bar.dart';
+import 'package:medito/views/bottom_navigation/widgets/medito_nav_bar.dart';
 import 'package:medito/views/bottom_navigation/widgets/floating_search_field.dart';
 
 /// Floating rounded search field with a Cancel button beside it, meant to sit
@@ -31,7 +31,7 @@ class FloatingSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = FloatingNavBar.colorsOf(context);
+    final colors = MeditoNavBar.colorsOf(context);
     final radius = BorderRadius.circular(_radius);
 
     final pill = DecoratedBox(

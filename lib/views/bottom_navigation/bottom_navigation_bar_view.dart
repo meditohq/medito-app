@@ -9,7 +9,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/views/bottom_navigation/widgets/floating_nav_bar.dart';
+import 'package:medito/views/bottom_navigation/widgets/medito_nav_bar.dart';
 import 'package:medito/views/bottom_navigation/widgets/floating_search_bar.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
@@ -110,24 +110,24 @@ class _BottomNavigationBarViewState
           // sitting just above the keyboard.
           bottomNavigationBar: _searchOpen
               ? null
-              : FloatingNavBar(
+              : MeditoNavBar(
                   selectedIndex: selectedDestination >= 0
                       ? selectedDestination
                       : 0,
                   onSelected: (index) =>
                       _onDestinationSelected(_pageIndexForDestination[index]),
                   items: [
-                    FloatingNavItem(icon: MeditoIcons.home, label: l10n.home),
-                    FloatingNavItem(
+                    MeditoNavItem(icon: MeditoIcons.home, label: l10n.home),
+                    MeditoNavItem(
                       icon: MeditoIcons.book,
                       label: l10n.explore,
                     ),
-                    FloatingNavItem(
+                    MeditoNavItem(
                       icon: MeditoIcons.settings,
                       label: l10n.settings,
                     ),
                   ],
-                  action: FloatingNavAction(
+                  action: MeditoNavAction(
                     icon: MeditoIcons.search,
                     label: l10n.search,
                     onTap: _openSearch,

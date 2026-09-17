@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:medito/views/bottom_navigation/widgets/floating_nav_bar.dart';
+import 'package:medito/views/bottom_navigation/widgets/medito_nav_bar.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 /// The text field shown inside the expanded nav capsule: search glyph, the
@@ -26,7 +26,7 @@ class FloatingSearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final onSurface = FloatingNavBar.colorsOf(context).foreground;
+    final onSurface = MeditoNavBar.colorsOf(context).foreground;
 
     return Row(
       children: [
