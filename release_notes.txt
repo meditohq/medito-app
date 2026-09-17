@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2609.17.0
+- Home: the announcement now sits up top with a cleaner, clearer card
+- Home: removed the "learn one minute at a time" tip from Your Path
+- Home: smoother image fades and tidier spacing on the redesigned home screen
+- Navigation: a cleaner bottom bar, with search that opens above the keyboard
+
 2609.16.0
 - A fresh new look across the app: cleaner cards, a bolder theme and a redesigned home screen with a large image at the top
 - New floating navigation bar with a built-in search button that opens search from anywhere
