@@ -1,6 +1,10 @@
 Unreleased
 -
 
+2609.18.0
+- After a session you can now save your progress by creating a free account, so your streak and stats are kept safe
+- A simpler welcome screen with one clear button to get started
+
 2609.17.0
 - Home: the announcement now sits up top with a cleaner, clearer card
 - Home: removed the "learn one minute at a time" tip from Your Path
