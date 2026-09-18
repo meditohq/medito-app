@@ -13,6 +13,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/review_service_provider.dart';
+import 'package:medito/providers/settings/account_prompt_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/reminders/smart_reminders_service.dart';
@@ -22,11 +23,13 @@ import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
+import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
+import 'widgets/account_prompt_card.dart';
 import 'widgets/donation_widget.dart';
 import 'widgets/zen_mode_animation.dart';
 
@@ -54,6 +57,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   // AnimatedSwitcher transition from old streak -> new streak.
   bool _showPriorStats = true;
   bool _reminderPromptImpressionLogged = false;
+  bool _accountPromptImpressionLogged = false;
 
   /// Whether the OS notification permission is already granted. When it is,
   /// tapping the CTA raises no system dialog, so the soft-ask is skipped.
@@ -247,7 +251,13 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 position: _reminderSlideAnimation,
                 child: FadeTransition(
                   opacity: _reminderFadeAnimation,
-                  child: _buildReminderPrompt(),
+                  // The reminder and account soft-asks are mutually exclusive
+                  // (see shouldShowAccountPromptProvider), so they share this
+                  // animation slot; only one ever renders.
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [_buildReminderPrompt(), _buildAccountPrompt()],
+                  ),
                 ),
               ),
               SlideTransition(
@@ -606,7 +616,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      AppLocalizations.of(context)!.smartReminders,
+                      AppLocalizations.of(context)!.dailyReminders,
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
@@ -650,10 +660,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   ),
                   child: Text(
                     isReminderEnabled
-                        ? AppLocalizations.of(context)!.smartRemindersOn
+                        ? AppLocalizations.of(context)!.remindersOn
                         : _notificationsBlocked
                         ? AppLocalizations.of(context)!.turnOnInSettings
-                        : AppLocalizations.of(context)!.turnOnSmartReminders,
+                        : AppLocalizations.of(context)!.turnOnReminders,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontSize: 18,
@@ -668,7 +678,13 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   width: double.infinity,
                   child: TextButton(
                     onPressed: _snoozeReminderPrompt,
-                    child: Text(AppLocalizations.of(context)!.notNow),
+                    child: Text(
+                      AppLocalizations.of(context)!.notNow,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -676,6 +692,78 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         ),
       ),
     );
+  }
+
+  /// End-screen soft-ask inviting an anonymous user to attach an email so their
+  /// streak and history survive a reinstall or a new phone. Gated by
+  /// [shouldShowAccountPromptProvider]; shares the reminder animation slot.
+  Widget _buildAccountPrompt() {
+    final shouldShow = ref.watch(shouldShowAccountPromptProvider);
+    if (!shouldShow) {
+      return const SizedBox.shrink();
+    }
+
+    if (!_accountPromptImpressionLogged) {
+      _accountPromptImpressionLogged = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          unawaited(
+            ref
+                .read(analyticsServiceProvider)
+                .logEvent(
+                  name: AnalyticsEventConstants.endScreenAccountPromptShown,
+                ),
+          );
+        }
+      });
+    }
+
+    return AccountPromptCard(
+      onSave: _openAccountConversion,
+      onSnooze: _snoozeAccountPrompt,
+      onDismiss: _dismissAccountPromptForever,
+    );
+  }
+
+  /// Opens the existing sign-in sheet to link an email to the current
+  /// (anonymous) account. Uses `fromSettings: true` so a successful link pops
+  /// back to this end screen instead of restarting onboarding. The account-
+  /// forking fix (deployed 2026-09-02) means the server reuses this client_id,
+  /// so local stats are preserved rather than wiped.
+  Future<void> _openAccountConversion() async {
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.endScreenAccountPromptTapped,
+          ),
+    );
+
+    // Make sure the session that just finished is on the server before we link
+    // the email, so nothing done pre-conversion is left behind.
+    unawaited(ref.read(statsManagerProvider).sync(force: true));
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SignUpLogInPage(
+          fromSettings: true,
+          source: AnalyticsEventConstants.sourceEndScreen,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+    // Refresh identity + stats so the card disappears once an email is attached.
+    ref.invalidate(meProvider);
+    ref.read(statsProvider.notifier).refresh();
+  }
+
+  Future<void> _snoozeAccountPrompt() async {
+    await ref.read(accountPromptDismissedProvider.notifier).snooze();
+  }
+
+  Future<void> _dismissAccountPromptForever() async {
+    await ref.read(accountPromptDismissedProvider.notifier).dismissForever();
   }
 
   Future<void> _checkNotificationPermission() async {

@@ -51,6 +51,14 @@ class SharedPreferenceConstants {
   static const String reminderPromptSnoozeUntil =
       'reminder_prompt_snooze_until';
 
+  // Account conversion (anonymous -> email) soft-ask on the end screen.
+  static const String accountPromptDismissedForever =
+      'account_prompt_dismissed_forever';
+
+  /// Epoch millis until which the post-session account-conversion prompt is
+  /// suppressed. Set by a soft dismiss ("Not now").
+  static const String accountPromptSnoozeUntil = 'account_prompt_snooze_until';
+
   // Zen Mode
   static const String zenModeEnabled = 'zen_mode_enabled';
 

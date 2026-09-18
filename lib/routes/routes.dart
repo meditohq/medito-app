@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/utils/logger.dart';
@@ -80,9 +81,13 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
     await _pushRoute(const DownloadsView(), ref);
   } else if (type == TypeConstants.account) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => const SignUpLogInPage()));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SignUpLogInPage(
+          source: AnalyticsEventConstants.sourceDeeplink,
+        ),
+      ),
+    );
   } else if (type == TypeConstants.journalEntry) {
     var id = ids.first ?? '';
     var content = ids.length > 1 ? ids[1] ?? '' : '';

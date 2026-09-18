@@ -1892,24 +1892,6 @@ abstract class AppLocalizations {
   /// **'This pack has been removed from the Your Path section'**
   String get packUnpinnedFromUpNext;
 
-  /// Label for the smart reminders feature toggle
-  ///
-  /// In en, this message translates to:
-  /// **'Smart Reminders'**
-  String get smartReminders;
-
-  /// Button text to enable smart reminders
-  ///
-  /// In en, this message translates to:
-  /// **'Turn on Smart Reminders'**
-  String get turnOnSmartReminders;
-
-  /// Status text when smart reminders are enabled
-  ///
-  /// In en, this message translates to:
-  /// **'Smart Reminders On'**
-  String get smartRemindersOn;
-
   /// No description provided for @donationTitle.
   ///
   /// In en, this message translates to:
@@ -3356,6 +3338,24 @@ abstract class AppLocalizations {
   /// **'Donation ask hidden for 30 days'**
   String get donationAskHiddenMessage;
 
+  /// Label for the daily reminders opt-in card on the end screen
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Reminders'**
+  String get dailyReminders;
+
+  /// Button text to enable daily reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on reminders'**
+  String get turnOnReminders;
+
+  /// Status text when daily reminders are enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders on'**
+  String get remindersOn;
+
   /// Message shown when user dismisses the reminder prompt on the end screen
   ///
   /// In en, this message translates to:
@@ -4363,6 +4363,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark incomplete'**
   String get markTrackIncomplete;
+
+  /// Title of the end-screen card that invites an anonymous user to add an email to their account
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your progress safe'**
+  String get accountPromptTitle;
+
+  /// Body of the end-screen account-conversion card
+  ///
+  /// In en, this message translates to:
+  /// **'Add your email so your streak and history follow you to a new phone.'**
+  String get accountPromptBody;
+
+  /// Primary button on the end-screen account-conversion card
+  ///
+  /// In en, this message translates to:
+  /// **'Save my progress'**
+  String get accountPromptCta;
 }
 
 class _AppLocalizationsDelegate

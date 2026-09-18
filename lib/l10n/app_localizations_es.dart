@@ -1022,15 +1022,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este paquete ha sido eliminado de la sección Tu Camino';
 
   @override
-  String get smartReminders => 'Recordatorios Inteligentes';
-
-  @override
-  String get turnOnSmartReminders => 'Activar Recordatorios Inteligentes';
-
-  @override
-  String get smartRemindersOn => 'Recordatorios Inteligentes Activados';
-
-  @override
   String get donationTitle =>
       'Millones encuentran calma aquí gratis. Ayuda a que siga así.';
 
@@ -1845,6 +1836,15 @@ class AppLocalizationsEs extends AppLocalizations {
       'Solicitud de donación oculta por 30 días';
 
   @override
+  String get dailyReminders => 'Recordatorios Diarios';
+
+  @override
+  String get turnOnReminders => 'Activar recordatorios';
+
+  @override
+  String get remindersOn => 'Recordatorios activados';
+
+  @override
   String get reminderPromptDismissedMessage =>
       'Puedes activar o desactivar los recordatorios en Configuración';
 
@@ -2407,4 +2407,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get markTrackIncomplete => 'Marcar como no completado';
+
+  @override
+  String get accountPromptTitle => 'Guarda tu progreso';
+
+  @override
+  String get accountPromptBody =>
+      'Añade tu correo para que tu racha y tu historial te acompañen en un teléfono nuevo.';
+
+  @override
+  String get accountPromptCta => 'Guardar mi progreso';
 }

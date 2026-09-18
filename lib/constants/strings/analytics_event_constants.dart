@@ -586,6 +586,17 @@ class AnalyticsEventConstants {
   static const String endScreenReminderPromptDismissed =
       'end_screen_reminder_prompt_dismissed';
 
+  /// Event logged when the end-screen "save your progress" account-conversion
+  /// card first becomes visible (shouldShowAccountPromptProvider is true).
+  static const String endScreenAccountPromptShown =
+      'end_screen_account_prompt_shown';
+
+  /// Event logged when the user taps the primary CTA on the account-conversion
+  /// card, opening the sign-in sheet. Pair with [onboardingSignupCompleted]
+  /// carrying [paramSource] = [sourceEndScreen] to measure conversion.
+  static const String endScreenAccountPromptTapped =
+      'end_screen_account_prompt_tapped';
+
   /// Event logged when the user taps "Turn on smart reminders" but the OS
   /// permission dialog returns denied.
   static const String endScreenReminderOsDenied =
@@ -658,6 +669,12 @@ class AnalyticsEventConstants {
 
   /// Source value for notifications enabled from the settings screen
   static const String sourceSettings = 'settings';
+
+  /// Source value for account creation started from the onboarding splash.
+  static const String sourceSplash = 'splash';
+
+  /// Source value for account creation reached via a magic-link / deep link.
+  static const String sourceDeeplink = 'deeplink';
 
   // "Silence phone during meditation" (Android Do Not Disturb) setting.
   /// The user picked On or Off in the settings sheet and the value actually

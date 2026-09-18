@@ -1003,15 +1003,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'This pack has been removed from the Your Path section';
 
   @override
-  String get smartReminders => 'Smart Reminders';
-
-  @override
-  String get turnOnSmartReminders => 'Turn on Smart Reminders';
-
-  @override
-  String get smartRemindersOn => 'Smart Reminders On';
-
-  @override
   String get donationTitle =>
       'Millions find calm here for free. Help keep it that way.';
 
@@ -1812,6 +1803,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get donationAskHiddenMessage => 'Donation ask hidden for 30 days';
 
   @override
+  String get dailyReminders => 'Daily Reminders';
+
+  @override
+  String get turnOnReminders => 'Turn on reminders';
+
+  @override
+  String get remindersOn => 'Reminders on';
+
+  @override
   String get reminderPromptDismissedMessage =>
       'You can turn reminders on or off in Settings';
 
@@ -2373,4 +2373,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get markTrackIncomplete => 'Mark incomplete';
+
+  @override
+  String get accountPromptTitle => 'Keep your progress safe';
+
+  @override
+  String get accountPromptBody =>
+      'Add your email so your streak and history follow you to a new phone.';
+
+  @override
+  String get accountPromptCta => 'Save my progress';
 }

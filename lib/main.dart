@@ -23,6 +23,7 @@ import 'package:medito/providers/theme_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -349,7 +350,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
               initialRoute: '/',
               routes: {
                 '/': (context) => const SplashView(),
-                SignUpLogInPage.routeName: (context) => const SignUpLogInPage(),
+                SignUpLogInPage.routeName: (context) => const SignUpLogInPage(
+                  source: AnalyticsEventConstants.sourceDeeplink,
+                ),
               },
             ),
           ),

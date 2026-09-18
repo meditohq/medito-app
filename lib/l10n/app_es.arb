@@ -315,9 +315,6 @@
   "skip": "Omitir",
   "packSetAsUpNext": "Este paquete ahora aparecerá en la sección Tu Camino en la página de inicio",
   "packUnpinnedFromUpNext": "Este paquete ha sido eliminado de la sección Tu Camino",
-  "smartReminders": "Recordatorios Inteligentes",
-  "turnOnSmartReminders": "Activar Recordatorios Inteligentes",
-  "smartRemindersOn": "Recordatorios Inteligentes Activados",
   "donationTitle": "Millones encuentran calma aquí gratis. Ayuda a que siga así.",
   "donationBody": "Medito es gestionado por un pequeño equipo sin fines de lucro. Sin anuncios, sin inversores, sin muros de pago — solo donaciones de personas que usan la app.",
   "donateNow": "Conviértete en colaborador",
@@ -712,17 +709,17 @@
   "@donationAskHiddenMessage": {
     "description": "Mensaje mostrado después de ocultar la solicitud de donación"
   },
-  "smartReminders": "Recordatorios Inteligentes",
-  "@smartReminders": {
-    "description": "Label for the smart reminders feature toggle"
+  "dailyReminders": "Recordatorios Diarios",
+  "@dailyReminders": {
+    "description": "Label for the daily reminders opt-in card on the end screen"
   },
-  "turnOnSmartReminders": "Activar Recordatorios Inteligentes",
-  "@turnOnSmartReminders": {
-    "description": "Button text to enable smart reminders"
+  "turnOnReminders": "Activar recordatorios",
+  "@turnOnReminders": {
+    "description": "Button text to enable daily reminders"
   },
-  "smartRemindersOn": "Recordatorios Inteligentes Activados",
-  "@smartRemindersOn": {
-    "description": "Status text when smart reminders are enabled"
+  "remindersOn": "Recordatorios activados",
+  "@remindersOn": {
+    "description": "Status text when daily reminders are enabled"
   },
   "reminderPromptDismissedMessage": "Puedes activar o desactivar los recordatorios en Configuración",
   "@reminderPromptDismissedMessage": {
@@ -1148,5 +1145,8 @@
   "upNextPackCompletedCtaNamed": "Start {packTitle}",
   "upNextPathCompletedTitle": "You've completed your path",
   "upNextPathCompletedSubtitle": "Every pack in your path is done. Explore the library to choose what's next.",
-  "upNextNextPackPinnedSnack": "Your next pack is ready in Your Path"
+  "upNextNextPackPinnedSnack": "Your next pack is ready in Your Path",
+  "accountPromptTitle": "Guarda tu progreso",
+  "accountPromptBody": "Añade tu correo para que tu racha y tu historial te acompañen en un teléfono nuevo.",
+  "accountPromptCta": "Guardar mi progreso"
 }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
@@ -33,9 +34,18 @@ import '../../providers/pack/pack_provider.dart';
 final dev = const AppLoggerAdapter('SIGN_UP');
 
 class SignUpLogInPage extends ConsumerWidget {
-  const SignUpLogInPage({super.key, this.fromSettings = false});
+  const SignUpLogInPage({
+    super.key,
+    this.fromSettings = false,
+    this.source = AnalyticsEventConstants.sourceSettings,
+  });
 
   final bool fromSettings;
+
+  /// Where this sign-in/sign-up was launched from. Tagged onto the
+  /// [onboardingSignupCompleted] event so we can see which surface drives
+  /// account creation. See [AnalyticsEventConstants] source values.
+  final String source;
   static const routeName = '/signup';
 
   @override
@@ -68,15 +78,20 @@ class SignUpLogInPage extends ConsumerWidget {
       ); // Show loading while popping
     } else {
       dev.log('[SIGN_UP] User has no email, showing sign-up form', level: 1000);
-      return SignUpLogInForm(fromSettings: fromSettings);
+      return SignUpLogInForm(fromSettings: fromSettings, source: source);
     }
   }
 }
 
 class SignUpLogInForm extends ConsumerStatefulWidget {
-  const SignUpLogInForm({super.key, required this.fromSettings});
+  const SignUpLogInForm({
+    super.key,
+    required this.fromSettings,
+    this.source = AnalyticsEventConstants.sourceSettings,
+  });
 
   final bool fromSettings;
+  final String source;
 
   @override
   ConsumerState<SignUpLogInForm> createState() => SignUpLogInFormState();
@@ -363,9 +378,12 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           );
         }
 
-        // Log analytics event for completed signup
+        // Log analytics event for completed signup. Tag the source so we can
+        // see which surface (splash, settings, end-screen prompt, deep link)
+        // actually drives account creation.
         await FirebaseAnalyticsService().logEvent(
           name: FirebaseAnalyticsService.eventOnboardingSignupCompleted,
+          parameters: {AnalyticsEventConstants.paramSource: widget.source},
         );
 
         // Initialize first — clearAllStats touches SharedPreferences and

@@ -414,9 +414,6 @@
   "skip": "Skip",
   "packSetAsUpNext": "This pack will now appear in the Your Path section on the homepage",
   "packUnpinnedFromUpNext": "This pack has been removed from the Your Path section",
-  "smartReminders": "Smart Reminders",
-  "turnOnSmartReminders": "Turn on Smart Reminders",
-  "smartRemindersOn": "Smart Reminders On",
   "donationTitle": "Millions find calm here for free. Help keep it that way.",
   "donationBody": "Medito is run by a small nonprofit team — no ads, no investors, no paywalls. It stays free because people like you choose to support it.",
   "donationPrimerCta": "See how to help",
@@ -939,17 +936,17 @@
   "@donationAskHiddenMessage": {
     "description": "Message shown after hiding the donation ask"
   },
-  "smartReminders": "Smart Reminders",
-  "@smartReminders": {
-    "description": "Label for the smart reminders feature toggle"
+  "dailyReminders": "Daily Reminders",
+  "@dailyReminders": {
+    "description": "Label for the daily reminders opt-in card on the end screen"
   },
-  "turnOnSmartReminders": "Turn on Smart Reminders",
-  "@turnOnSmartReminders": {
-    "description": "Button text to enable smart reminders"
+  "turnOnReminders": "Turn on reminders",
+  "@turnOnReminders": {
+    "description": "Button text to enable daily reminders"
   },
-  "smartRemindersOn": "Smart Reminders On",
-  "@smartRemindersOn": {
-    "description": "Status text when smart reminders are enabled"
+  "remindersOn": "Reminders on",
+  "@remindersOn": {
+    "description": "Status text when daily reminders are enabled"
   },
   "reminderPromptDismissedMessage": "You can turn reminders on or off in Settings",
   "@reminderPromptDismissedMessage": {
@@ -1682,5 +1679,17 @@
   "markTrackIncomplete": "Mark incomplete",
   "@markTrackIncomplete": {
     "description": "Accessibility label for the per-track toggle when the track is complete"
+  },
+  "accountPromptTitle": "Keep your progress safe",
+  "@accountPromptTitle": {
+    "description": "Title of the end-screen card that invites an anonymous user to add an email to their account"
+  },
+  "accountPromptBody": "Add your email so your streak and history follow you to a new phone.",
+  "@accountPromptBody": {
+    "description": "Body of the end-screen account-conversion card"
+  },
+  "accountPromptCta": "Save my progress",
+  "@accountPromptCta": {
+    "description": "Primary button on the end-screen account-conversion card"
   }
 }

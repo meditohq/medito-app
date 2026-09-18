@@ -173,7 +173,7 @@ class TrackingPermissionScreen extends ConsumerWidget {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        child: Text(text, style: const TextStyle(color: Colors.white)),
+        child: Text(text),
       ),
     );
   }

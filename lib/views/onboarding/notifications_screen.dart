@@ -448,7 +448,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                           Column(
                             children: [
                               if (reminderTime != null)
-                                _buildSmartRemindersOnButton()
+                                _buildConfirmReminderButton()
                               else
                                 _buildTimeChips(AppLocalizations.of(context)!),
                               const SizedBox(height: 12),
@@ -759,7 +759,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     );
   }
 
-  Widget _buildSmartRemindersOnButton() {
+  Widget _buildConfirmReminderButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -770,10 +770,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
           );
           _navigateNext();
         },
-        child: Text(
-          AppLocalizations.of(context)!.smartRemindersOn,
-          style: const TextStyle(color: Colors.white),
-        ),
+        child: Text(AppLocalizations.of(context)!.setReminderB),
       ),
     );
   }

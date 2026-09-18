@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -443,7 +444,11 @@ class SplashViewState extends ConsumerState<SplashView>
       if (shouldUseExistingAccount == true) {
         await Navigator.of(context)
             .push(
-              MaterialPageRoute(builder: (context) => const SignUpLogInPage()),
+              MaterialPageRoute(
+                builder: (context) => const SignUpLogInPage(
+                  source: AnalyticsEventConstants.sourceSplash,
+                ),
+              ),
             )
             .then((value) {
               if (value == true) {
@@ -745,7 +750,10 @@ class SplashViewState extends ConsumerState<SplashView>
                                                         .push(
                                                           MaterialPageRoute(
                                                             builder: (context) =>
-                                                                const SignUpLogInPage(),
+                                                                const SignUpLogInPage(
+                                                                  source: AnalyticsEventConstants
+                                                                      .sourceSplash,
+                                                                ),
                                                           ),
                                                         )
                                                         .then((value) {
