@@ -37,10 +37,12 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
             - tapOn: "Cancel"
 
 # ── Splash screen ──
+# The splash primary CTA was renamed "Continue" → "Get started" (16be42f4);
+# it still starts the app as a guest and advances to the experience question.
 - extendedWaitUntil:
-    visible: "Continue"
+    visible: "Get started"
     timeout: 180000
-- tapOn: "Continue"
+- tapOn: "Get started"
 
 # ── Onboarding: Experience question ──
 # First onboarding screen. Anonymous sign-in can take a while on first
