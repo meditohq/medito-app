@@ -7,10 +7,12 @@ import 'dart:io';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/background_sounds/background_sounds_model.dart';
+import 'package:medito/models/events/donation/donation_page_model.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/providers/donation/donation_page_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -45,11 +47,21 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   // AnimatedSwitcher actually animates from old streak -> new streak.
   LocalAllStats? _statsAtSessionStart;
 
+  // Holds the end-screen donation ask alive while the player is open so the
+  // fetch happens NOW, while the network is known to be up. When a session
+  // ends with the screen off, the end screen is pushed on the next resume and
+  // Android often hasn't restored connectivity yet — ~3.7% of those asks failed
+  // to load (Sep 2026, GA4). A successful prefetch is kept alive by the
+  // provider itself; a failed one is dropped when this subscription closes so
+  // the end screen retries fresh.
+  ProviderSubscription<AsyncValue<DonationPageModel>>? _donationAskWarmup;
+
   @override
   void initState() {
     super.initState();
     _statsAtSessionStart = ref.read(statsProvider).value;
     _logScreenView();
+    _donationAskWarmup = ref.listenManual(fetchDonationPageProvider, (_, _) {});
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializePlayer();
     });
@@ -67,6 +79,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     // paused session. No-op if it's still playing (continues in background) or
     // already completed/stopped.
     unawaited(AudioSessionTracker.instance.onPlayerClosed());
+    _donationAskWarmup?.close();
     super.dispose();
   }
 

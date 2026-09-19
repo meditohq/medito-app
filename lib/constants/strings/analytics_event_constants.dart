@@ -567,6 +567,12 @@ class AnalyticsEventConstants {
   /// than one button (0-based).
   static const String paramButtonIndex = 'button_index';
 
+  /// Parameter on [endScreenDonationCardLoadFailed]: the failure class, e.g.
+  /// 'network_offline', 'network_hostLookup', 'timeout', 'server',
+  /// 'unauthorized'. Added because the Android resume-time failure (Sep 2026)
+  /// could not be diagnosed from the bare event.
+  static const String paramErrorKind = 'error_kind';
+
   /// Parameter distinguishing the donation card's render state: 'ask' (first
   /// or repeat ask) vs 'thanks' (post-donation "Donate again").
   static const String paramCardState = 'card_state';

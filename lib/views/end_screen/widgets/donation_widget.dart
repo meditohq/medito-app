@@ -28,12 +28,58 @@ class DonationWidget extends ConsumerStatefulWidget {
   ConsumerState<DonationWidget> createState() => DonationWidgetState();
 }
 
-class DonationWidgetState extends ConsumerState<DonationWidget> {
+class DonationWidgetState extends ConsumerState<DonationWidget>
+    with WidgetsBindingObserver {
   // One impression latch per state object, i.e. per end-screen visit, so
   // rebuilds (snooze changes, feedback widget, theme) cannot double-count.
   // Mirrors the reminder card's latch in end_screen_view.dart.
   bool _impressionLogged = false;
   bool _loadFailureLogged = false;
+
+  // Recovery from a transient load failure. When a session ends with the
+  // screen off, this widget mounts on the next app resume, and on Android the
+  // radio is frequently not back yet, so the first request fails (~3.7% of
+  // resume-time asks, Sep 2026). Riverpod already retries a failed provider
+  // with backoff for ~40s; what was missing is a retry AFTER that budget is
+  // spent — typically the user locked the phone again on the error card and
+  // came back later — so we refetch on the next resume.
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    if (ref.read(fetchDonationPageProvider).hasError) {
+      _retryLoad();
+    }
+  }
+
+  void _retryLoad() {
+    if (!mounted) return;
+    ref.invalidate(fetchDonationPageProvider);
+  }
+
+  /// Compact, low-cardinality label for the failure event so the next readout
+  /// can tell "radio not up yet" from "server down".
+  static String _errorKind(Object err) => switch (err) {
+    NetworkConnectionError(:final kind) => 'network_${kind.name}',
+    TimeoutError() => 'timeout',
+    ServerError() => 'server',
+    UnauthorizedError() || RefreshTokenError() => 'unauthorized',
+    RateLimitError() => 'rate_limit',
+    NotFoundError() => 'not_found',
+    AppError() => 'app_error',
+    _ => 'unknown',
+  };
 
   void _logOnce(String event, {Map<String, Object>? parameters}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -92,21 +138,24 @@ class DonationWidgetState extends ConsumerState<DonationWidget> {
         loading: () => _buildLoadingWidget(),
         error: (err, _) {
           // An impression that could never convert — counted separately so the
-          // ask denominator stays honest instead of silently shrinking.
-          if (!_loadFailureLogged) {
+          // ask denominator stays honest instead of silently shrinking. Logged
+          // only once Riverpod's own retries have given up, so a blip that
+          // recovers on its own is not counted as a lost ask.
+          if (!_loadFailureLogged && !donationPage.retrying) {
             _loadFailureLogged = true;
             _logOnce(
               AnalyticsEventConstants.endScreenDonationCardLoadFailed,
               parameters: {
                 AnalyticsEventConstants.paramPaywallSource:
                     FirebaseAnalyticsService.paywallSourceEndScreen,
+                AnalyticsEventConstants.paramErrorKind: _errorKind(err),
               },
             );
           }
           final error = err is AppError ? err : const UnknownError();
           return MeditoErrorWidget(
             error: error,
-            onTap: () => ref.refresh(fetchDonationPageProvider),
+            onTap: _retryLoad,
             isScaffold: false,
           );
         },
