@@ -290,8 +290,14 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                       color: context.brandPurple,
                       borderRadius: BorderRadius.circular(4),
                     ),
+                    // Never wraps: at large text scales a two-line badge
+                    // covered the chip label underneath it.
                     child: Text(
                       badge,
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                      textScaler: TextScaler.noScaling,
                       style: TextStyle(
                         color: fg,
                         fontSize: 9,
@@ -323,6 +329,10 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
       cursorColor: fg,
       decoration: InputDecoration(
         isDense: true,
+        // The app's InputDecorationTheme fills fields with a surface colour
+        // that fights the purple card; keep the field see-through.
+        filled: true,
+        fillColor: Colors.transparent,
         hintText: l10n.donationEmailLabel,
         hintStyle: TextStyle(color: fg.withValues(alpha: 0.6), fontSize: 14),
         helperText: _emailError == null ? l10n.donationEmailHelper : null,
