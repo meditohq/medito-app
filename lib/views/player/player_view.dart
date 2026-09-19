@@ -12,7 +12,10 @@ import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/utils.dart';
+import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/providers/donation/donation_page_provider.dart';
+import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
+import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -55,6 +58,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   // provider itself; a failed one is dropped when this subscription closes so
   // the end screen retries fresh.
   ProviderSubscription<AsyncValue<DonationPageModel>>? _donationAskWarmup;
+  // Same idea for the localized end_screen ladder, only for installs already
+  // in the inline-pay arm (peek, never assign here — the card assigns).
+  ProviderSubscription<AsyncValue<PaywallConfigModel>>? _endScreenConfigWarmup;
 
   @override
   void initState() {
@@ -62,6 +68,29 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     _statsAtSessionStart = ref.read(statsProvider).value;
     _logScreenView();
     _donationAskWarmup = ref.listenManual(fetchDonationPageProvider, (_, _) {});
+    try {
+      if (EndScreenDonationExperiment.isInlineVariant(
+        ref.read(sharedPreferencesProvider),
+      )) {
+        _endScreenConfigWarmup = ref.listenManual(
+          endScreenPaywallConfigProvider,
+          (_, _) {},
+        );
+        // Also applies Stripe's publishable key, which the inline pay button
+        // needs before it can open a sheet (keepAlive provider: no handle).
+        unawaited(
+          ref
+              .read(paymentConfigProvider.future)
+              .then(
+                (_) {},
+                onError: (Object e) =>
+                    AppLogger.w('PLAYER', 'Payment config warm-up failed: $e'),
+              ),
+        );
+      }
+    } catch (e) {
+      AppLogger.w('PLAYER', 'End-screen config warm-up skipped: $e');
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializePlayer();
     });
@@ -80,6 +109,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     // already completed/stopped.
     unawaited(AudioSessionTracker.instance.onPlayerClosed());
     _donationAskWarmup?.close();
+    _endScreenConfigWarmup?.close();
     super.dispose();
   }
 

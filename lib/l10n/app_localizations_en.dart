@@ -2380,4 +2380,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountPromptCta => 'Save my progress';
+
+  @override
+  String donateAmountPerMonth(String amount) {
+    return 'Donate $amount/month';
+  }
+
+  @override
+  String get donateWithApplePayPrefix => 'Donate with';
+
+  @override
+  String get donateOtherAmount => 'Other amount';
+
+  @override
+  String get donateMostPopular => 'Most popular';
+
+  @override
+  String get donateMonthlyDisclosure =>
+      'Monthly, cancel any time. Secure payment via Stripe.';
 }

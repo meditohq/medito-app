@@ -4381,6 +4381,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save my progress'**
   String get accountPromptCta;
+
+  /// Primary pay button on the inline end-screen donation card
+  ///
+  /// In en, this message translates to:
+  /// **'Donate {amount}/month'**
+  String donateAmountPerMonth(String amount);
+
+  /// Text before the Apple Pay mark on the Apple Pay button
+  ///
+  /// In en, this message translates to:
+  /// **'Donate with'**
+  String get donateWithApplePayPrefix;
+
+  /// Link on the inline end-screen donation card that opens the full donation page
+  ///
+  /// In en, this message translates to:
+  /// **'Other amount'**
+  String get donateOtherAmount;
+
+  /// Badge on the suggested amount chip
+  ///
+  /// In en, this message translates to:
+  /// **'Most popular'**
+  String get donateMostPopular;
+
+  /// Small print under the inline pay button
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly, cancel any time. Secure payment via Stripe.'**
+  String get donateMonthlyDisclosure;
 }
 
 class _AppLocalizationsDelegate

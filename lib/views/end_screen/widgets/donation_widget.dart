@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
@@ -14,12 +15,21 @@ import '../../../widgets/medito_icon.dart';
 import '../../../widgets/snackbar_widget.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';
+import '../../../models/stripe/payment_method_model.dart' as payment_models;
+import '../../../models/stripe/paywall_config_model.dart';
 import '../../../providers/donation/donation_page_provider.dart';
 import '../../../providers/donation/donation_snooze_provider.dart';
+import '../../../providers/donation/end_screen_donation_experiment.dart';
+import '../../../providers/stripe/payment_providers.dart';
+import '../../../providers/stripe/payment_service_provider.dart';
+import '../../../providers/stripe/payment_ui_controller.dart';
+import '../../../repositories/auth/auth_repository.dart';
 import '../../../routes/routes.dart';
+import '../../../utils/logger.dart';
 import '../../../widgets/errors/medito_error_widget.dart';
 import '../../home/widgets/home_gradient_border.dart';
 import 'feedback_widget.dart';
+import 'inline_donation_pay.dart';
 
 class DonationWidget extends ConsumerStatefulWidget {
   const DonationWidget({super.key});
@@ -36,6 +46,25 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   bool _impressionLogged = false;
   bool _loadFailureLogged = false;
 
+  // `end_screen_inline_pay` A/B (see EndScreenDonationExperiment). Resolved
+  // once per card visit; falls back to control if prefs are unavailable so a
+  // storage hiccup can never blank the ask.
+  String _variant = EndScreenDonationExperiment.variantControl;
+  bool get _isInlineVariant =>
+      _variant == EndScreenDonationExperiment.variantInline;
+
+  // Variant B needs the localized end_screen ladder from /paywall. It is
+  // usually warm (the player prefetches it), but if it is not here within
+  // this cap the card degrades to the control CTA rather than holding the
+  // ask hostage to a slow request — logged as inline_rendered=false.
+  static const Duration _inlineConfigCap = Duration(seconds: 3);
+  Timer? _inlineCapTimer;
+  bool _inlineCapElapsed = false;
+  // Once the card has shown the control CTA it stays on it for this visit —
+  // a late config success must not swap the button under the user's thumb.
+  bool _inlineFellBack = false;
+  bool _isProcessingInlinePayment = false;
+
   // Recovery from a transient load failure. When a session ends with the
   // screen off, this widget mounts on the next app resume, and on Android the
   // radio is frequently not back yet, so the first request fails (~3.7% of
@@ -47,13 +76,34 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    try {
+      _variant = EndScreenDonationExperiment.resolveVariant(
+        ref.read(sharedPreferencesProvider),
+      );
+    } catch (e) {
+      AppLogger.w('DONATION', 'Could not resolve end-screen ask variant: $e');
+    }
+    if (_isInlineVariant) {
+      _inlineCapTimer = Timer(_inlineConfigCap, () {
+        if (mounted) setState(() => _inlineCapElapsed = true);
+      });
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _inlineCapTimer?.cancel();
     super.dispose();
   }
+
+  Map<String, Object> get _experimentParams => {
+    AnalyticsEventConstants.paramVariantId: _variant,
+    AnalyticsEventConstants.paramExperimentId:
+        EndScreenDonationExperiment.experimentName,
+    AnalyticsEventConstants.paramExperimentName:
+        EndScreenDonationExperiment.experimentName,
+  };
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -95,7 +145,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   /// Fires the card's impression exactly once, tagged with which state the user
   /// actually saw. Deferred to a post-frame callback because it is called from
   /// build.
-  void _logImpression({required bool isSnoozed}) {
+  void _logImpression({required bool isSnoozed, bool? inlineRendered}) {
     if (_impressionLogged) return;
     _impressionLogged = true;
     _logOnce(
@@ -105,11 +155,19 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
       parameters: {
         AnalyticsEventConstants.paramPaywallSource:
             FirebaseAnalyticsService.paywallSourceEndScreen,
+        ..._experimentParams,
+        if (inlineRendered != null)
+          AnalyticsEventConstants.paramInlineRendered: inlineRendered
+              .toString(),
       },
     );
   }
 
-  void _logDonateTap({required int buttonIndex, required bool isSnoozed}) {
+  void _logDonateTap({
+    required int buttonIndex,
+    required bool isSnoozed,
+    Map<String, Object> extra = const {},
+  }) {
     unawaited(
       ref
           .read(analyticsServiceProvider)
@@ -122,9 +180,99 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
               AnalyticsEventConstants.paramCardState: isSnoozed
                   ? 'thanks'
                   : 'ask',
+              ..._experimentParams,
+              ...extra,
             },
           ),
     );
+  }
+
+  /// Variant B: charge the selected monthly amount straight from the card.
+  /// Same controller + metadata path as the onboarding native page, so the
+  /// Stripe subscription carries experiment_name/variant/paywall_source and
+  /// the donation_monthly event fires with our variant. Success flips the
+  /// snooze state (recorded by the controller) and the card re-renders as the
+  /// thank-you state on its own.
+  Future<void> _payInline({
+    required PaywallConfigModel config,
+    required int amount,
+    required String email,
+    required payment_models.PaymentMethodType method,
+  }) async {
+    if (_isProcessingInlinePayment) return;
+    _logDonateTap(
+      buttonIndex: 0,
+      isSnoozed: false,
+      extra: {
+        AnalyticsEventConstants.paramPaymentMethod: switch (method) {
+          payment_models.PaymentMethodType.applePay => 'apple_pay',
+          _ => 'card',
+        },
+        AnalyticsEventConstants.paramAmount: amount,
+        AnalyticsEventConstants.paramDonationCurrency: config.currencyCode,
+      },
+    );
+    setState(() => _isProcessingInlinePayment = true);
+    try {
+      // Stripe's publishable key / merchant id are applied when
+      // paymentConfigProvider resolves (same preload the webview route does).
+      // Usually already warm from the player; bounded so a slow request can't
+      // hang the button.
+      try {
+        await ref
+            .read(paymentConfigProvider.future)
+            .timeout(const Duration(seconds: 5));
+      } catch (e) {
+        AppLogger.w('DONATION', 'Payment config not ready for inline pay: $e');
+      }
+      if (!mounted) return;
+      final userId = ref.read(authRepositorySyncProvider).currentUser?.id;
+      await ref
+          .read(paymentUIControllerProvider.notifier)
+          .initiateMonthlySubscription(
+            context: context,
+            amount: amount,
+            currency: config.currencyCode,
+            paymentMethod: method,
+            paywallId: AnalyticsEventConstants.paywallIdEndScreenInline,
+            userId: userId,
+            userEmail: email,
+            paywallSource: FirebaseAnalyticsService.paywallSourceEndScreen,
+            variantId: _variant,
+            experimentId: EndScreenDonationExperiment.experimentName,
+          );
+    } finally {
+      if (mounted) setState(() => _isProcessingInlinePayment = false);
+    }
+  }
+
+  /// Variant B's "Other amount": the control path (webview), tagged so the
+  /// readout can see how often B still needs the full page.
+  void _openWebviewFromInline() {
+    _logDonateTap(
+      buttonIndex: 0,
+      isSnoozed: false,
+      extra: {AnalyticsEventConstants.paramPaymentMethod: 'webview'},
+    );
+    handleNavigation(
+      TypeConstants.route,
+      [RouteConstants.donation],
+      context,
+      ref: ref,
+      sourceRouteName: FirebaseAnalyticsService.paywallSourceEndScreen,
+    );
+  }
+
+  String? _knownDonorEmail(PaywallConfigModel config) {
+    final fromConfig = config.email?.trim();
+    if (fromConfig != null && fromConfig.isNotEmpty) return fromConfig;
+    try {
+      final fromAuth = ref.read(authRepositorySyncProvider).getUserEmail();
+      if (fromAuth != null && fromAuth.trim().isNotEmpty) {
+        return fromAuth.trim();
+      }
+    } catch (_) {}
+    return null;
   }
 
   @override
@@ -160,7 +308,12 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
           );
         },
         data: (DonationPageModel donationPageModel) {
-          _logImpression(isSnoozed: snoozeState.isSnoozed);
+          if (!snoozeState.isSnoozed && _isInlineVariant) {
+            // Impression is logged from inside the B builder once it knows
+            // whether the inline body or the fallback CTA rendered.
+          } else {
+            _logImpression(isSnoozed: snoozeState.isSnoozed);
+          }
           return Column(
             children: [
               AnimatedOpacity(
@@ -260,7 +413,9 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: _buildButtonRow(donationPageModel.buttons, context),
+              child: _isInlineVariant
+                  ? _buildInlineOrFallback(donationPageModel, context)
+                  : _buildButtonRow(donationPageModel.buttons, context),
             ),
             if (donationPageModel.footerText != null)
               Padding(
@@ -277,6 +432,71 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Variant B body. Renders the inline chips + pay button when the
+  /// end_screen paywall config is here and offers a monthly ladder; otherwise
+  /// (error, or still loading past the cap) the control CTA, so the user is
+  /// never left with an empty card. The impression is logged at that decision
+  /// with `inline_rendered` so the two B experiences separate in the readout.
+  Widget _buildInlineOrFallback(
+    DonationPageModel donationPageModel,
+    BuildContext context,
+  ) {
+    final configAsync = ref.watch(endScreenPaywallConfigProvider);
+    const source = FirebaseAnalyticsService.paywallSourceEndScreen;
+
+    final config = configAsync.value;
+    final ladder = config?.effectiveLadder('monthly', source: source);
+    final canRenderInline =
+        config != null &&
+        ladder != null &&
+        ladder.isNotEmpty &&
+        config.isFrequencyOffered('monthly', source: source);
+
+    if (canRenderInline && !_inlineFellBack) {
+      _inlineCapTimer?.cancel();
+      _logImpression(isSnoozed: false, inlineRendered: true);
+      final applePayAvailable = Platform.isIOS
+          ? (ref.watch(applePayAvailableProvider).value ?? false)
+          : false;
+      return InlineDonationPay(
+        currencyCode: config.currencyCode,
+        ladder: ladder,
+        suggestedAmount: config.effectiveSuggested('monthly', source: source),
+        knownEmail: _knownDonorEmail(config),
+        applePayAvailable: applePayAvailable,
+        isProcessing: _isProcessingInlinePayment,
+        onPay: ({required amount, required email, required method}) =>
+            _payInline(
+              config: config,
+              amount: amount,
+              email: email,
+              method: method,
+            ),
+        onOtherAmount: _openWebviewFromInline,
+      );
+    }
+
+    final gaveUp =
+        configAsync.hasError || (configAsync.hasValue && !canRenderInline);
+    if (gaveUp || _inlineCapElapsed || _inlineFellBack) {
+      _inlineFellBack = true;
+      _logImpression(isSnoozed: false, inlineRendered: false);
+      return _buildButtonRow(donationPageModel.buttons, context);
+    }
+
+    // Still within the cap: hold the CTA slot at the fallback's height.
+    return const SizedBox(
+      height: 44,
+      child: Center(
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2),
         ),
       ),
     );

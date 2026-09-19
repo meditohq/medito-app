@@ -95,6 +95,11 @@ class SharedPreferenceConstants {
   static const String onboardingReminderPickerModeVariant =
       'onboarding_reminder_picker_mode_variant';
 
+  // End-screen donation card A/B test (webview CTA vs inline amount chips +
+  // pay sheet) — sticky per-install variant.
+  static const String endScreenDonationAskVariant =
+      'end_screen_donation_ask_variant';
+
   // First-meditation-for-experienced-users A/B test — sticky per-install
   // variant. Only assigned for users who answer `regular_practice`.
   static const String onboardingExperiencedMeditationVariant =

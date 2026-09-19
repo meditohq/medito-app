@@ -1691,5 +1691,15 @@
   "accountPromptCta": "Save my progress",
   "@accountPromptCta": {
     "description": "Primary button on the end-screen account-conversion card"
-  }
+  },
+  "donateAmountPerMonth": "Donate {amount}/month",
+  "@donateAmountPerMonth": {"description": "Primary pay button on the inline end-screen donation card", "placeholders": {"amount": {"type": "String", "example": "$5"}}},
+  "donateWithApplePayPrefix": "Donate with",
+  "@donateWithApplePayPrefix": {"description": "Text before the Apple Pay mark on the Apple Pay button"},
+  "donateOtherAmount": "Other amount",
+  "@donateOtherAmount": {"description": "Link on the inline end-screen donation card that opens the full donation page"},
+  "donateMostPopular": "Most popular",
+  "@donateMostPopular": {"description": "Badge on the suggested amount chip"},
+  "donateMonthlyDisclosure": "Monthly, cancel any time. Secure payment via Stripe.",
+  "@donateMonthlyDisclosure": {"description": "Small print under the inline pay button"}
 }

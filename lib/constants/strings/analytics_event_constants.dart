@@ -567,6 +567,18 @@ class AnalyticsEventConstants {
   /// than one button (0-based).
   static const String paramButtonIndex = 'button_index';
 
+  /// Parameter on [endScreenDonationCardShown] in the `end_screen_inline_pay`
+  /// experiment: 'true' when variant B actually rendered the inline chips +
+  /// pay button, 'false' when it fell back to the control CTA (paywall config
+  /// unavailable or no monthly ladder). Lets the readout separate "B as
+  /// designed" from "B degraded to A".
+  static const String paramInlineRendered = 'inline_rendered';
+
+  /// paywall_id for the inline end-screen pay flow (variant B), so its
+  /// donation_* / payment_failed events are distinguishable from the webview
+  /// ('paywall_webview') and onboarding native page ('paywall_native').
+  static const String paywallIdEndScreenInline = 'paywall_end_screen_inline';
+
   /// Parameter on [endScreenDonationCardLoadFailed]: the failure class, e.g.
   /// 'network_offline', 'network_hostLookup', 'timeout', 'server',
   /// 'unauthorized'. Added because the Android resume-time failure (Sep 2026)

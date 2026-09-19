@@ -1148,5 +1148,10 @@
   "upNextNextPackPinnedSnack": "Your next pack is ready in Your Path",
   "accountPromptTitle": "Guarda tu progreso",
   "accountPromptBody": "Añade tu correo para que tu racha y tu historial te acompañen en un teléfono nuevo.",
-  "accountPromptCta": "Guardar mi progreso"
+  "accountPromptCta": "Guardar mi progreso",
+  "donateAmountPerMonth": "Donar {amount}/mes",
+  "donateWithApplePayPrefix": "Donar con",
+  "donateOtherAmount": "Otra cantidad",
+  "donateMostPopular": "Más popular",
+  "donateMonthlyDisclosure": "Mensual, cancela cuando quieras. Pago seguro con Stripe."
 }
