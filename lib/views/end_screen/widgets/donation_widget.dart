@@ -155,6 +155,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
       parameters: {
         AnalyticsEventConstants.paramPaywallSource:
             FirebaseAnalyticsService.paywallSourceEndScreen,
+        if (isSnoozed)
+          AnalyticsEventConstants.paramSnoozeReason: ref
+              .read(donationSnoozeProvider)
+              .snoozeReason,
         ..._experimentParams,
         if (inlineRendered != null)
           AnalyticsEventConstants.paramInlineRendered: inlineRendered
@@ -180,6 +184,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
               AnalyticsEventConstants.paramCardState: isSnoozed
                   ? 'thanks'
                   : 'ask',
+              if (isSnoozed)
+                AnalyticsEventConstants.paramSnoozeReason: ref
+                    .read(donationSnoozeProvider)
+                    .snoozeReason,
               ..._experimentParams,
               ...extra,
             },

@@ -589,6 +589,13 @@ class AnalyticsEventConstants {
   /// or repeat ask) vs 'thanks' (post-donation "Donate again").
   static const String paramCardState = 'card_state';
 
+  /// On [endScreenDonationCardSuppressed] and 'thanks'-state donate taps:
+  /// why the ask is suppressed — 'donor' (this install completed a donation)
+  /// or 'hidden' ("Hide for now" from the info dialog, no donation on
+  /// record). Without it, repeat-donation rates among real donors were
+  /// diluted by snoozers (Sep 2026 read: 1,414 thanked users, mixed).
+  static const String paramSnoozeReason = 'snooze_reason';
+
   /// Event logged when the end-screen daily-reminders card first becomes
   /// visible to the user (i.e. shouldShowReminderPromptProvider is true).
   static const String endScreenReminderPromptShown =
