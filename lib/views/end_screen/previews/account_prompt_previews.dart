@@ -17,11 +17,8 @@ AccountPromptCard _card() =>
 
 Widget wrapDark(Widget child) => PreviewShell(prefs: prefsDark, child: child);
 
-Widget wrapLight(Widget child) => PreviewShell(
-  prefs: prefsLight,
-  themeMode: ThemeMode.light,
-  child: child,
-);
+Widget wrapLight(Widget child) =>
+    PreviewShell(prefs: prefsLight, themeMode: ThemeMode.light, child: child);
 
 Widget wrapEs(Widget child) =>
     PreviewShell(prefs: prefsDark, locale: const Locale('es'), child: child);

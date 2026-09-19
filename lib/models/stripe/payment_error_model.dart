@@ -63,7 +63,8 @@ extension PaymentErrorTypeAnalytics on PaymentErrorType {
     PaymentErrorType.insufficientFunds => 'insufficient_funds',
     PaymentErrorType.expiredCard => 'expired_card',
     PaymentErrorType.invalidCard => 'invalid_card',
-    PaymentErrorType.paymentMethodNotSupported => 'payment_method_not_supported',
+    PaymentErrorType.paymentMethodNotSupported =>
+      'payment_method_not_supported',
     PaymentErrorType.googlePayNotAvailable => 'google_pay_not_available',
     PaymentErrorType.applePayNotAvailable => 'apple_pay_not_available',
     PaymentErrorType.paymentCancelled => 'payment_cancelled',

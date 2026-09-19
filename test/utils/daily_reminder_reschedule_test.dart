@@ -10,14 +10,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../stats_manager_test.mocks.dart';
 
 /// Pins down the bug fix: when stats change via manual add / delete (or the
-/// real audio-completion path), the Smart Reminder series must be
+/// real audio-completion path), the Daily reminder series must be
 /// re-anchored. Otherwise the already-scheduled notifications keep referring
 /// to the *previous* most-recent session and the streak/consistency baked
 /// into the copy goes stale.
 ///
-/// We don't exercise the real [SmartRemindersScheduler] here (that would
+/// We don't exercise the real [DailyRemindersScheduler] here (that would
 /// require platform notification channels). Instead we install a test
-/// override on [smartReminderReschedulerOverride] and assert that the
+/// override on [reminderReschedulerOverride] and assert that the
 /// stats-updater hits it with the expected anchor.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -52,18 +52,18 @@ void main() {
     );
 
     calls = [];
-    smartReminderReschedulerOverride =
+    reminderReschedulerOverride =
         ({required int endMs, required int durationMs}) async {
           calls.add((endMs: endMs, durationMs: durationMs));
         };
   });
 
   tearDown(() {
-    smartReminderReschedulerOverride = null;
+    reminderReschedulerOverride = null;
     statsManager.resetForTesting();
   });
 
-  group('Smart Reminder rescheduling on manual stats changes', () {
+  group('Daily reminder rescheduling on manual stats changes', () {
     test(
       'addManualSession reschedules with that session as the anchor',
       () async {

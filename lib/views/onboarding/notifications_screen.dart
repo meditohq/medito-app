@@ -20,7 +20,7 @@ import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/services/reminders/reminder_slots.dart';
-import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
@@ -276,7 +276,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       },
     );
 
-    final scheduler = SmartRemindersScheduler(
+    final scheduler = DailyRemindersScheduler(
       prefs: prefs,
       reminders: ref.read(reminderProvider),
     );

@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart'
-    show reminderProvider, smartBaseId;
+    show reminderProvider, reminderSeriesBaseId;
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
@@ -335,8 +335,8 @@ class DebugInfoScreen extends ConsumerWidget {
       }
 
       if (scheduledDate == null &&
-          reminder.id >= smartBaseId &&
-          reminder.id <= smartBaseId + 15 &&
+          reminder.id >= reminderSeriesBaseId &&
+          reminder.id <= reminderSeriesBaseId + 15 &&
           savedHour != null &&
           savedMinute != null) {
         scheduledDate = _calculateScheduledDate(
@@ -400,7 +400,7 @@ class DebugInfoScreen extends ConsumerWidget {
 
     final result = <MapEntry<int, DateTime>>[];
     for (var i = 0; i <= 15; i++) {
-      final reminderId = smartBaseId + i;
+      final reminderId = reminderSeriesBaseId + i;
       final scheduledDate = _calculateScheduledDate(
         reminderId,
         savedHour,
@@ -420,7 +420,7 @@ class DebugInfoScreen extends ConsumerWidget {
     int savedHour,
     int savedMinute,
   ) {
-    final dayOffset = reminderId - smartBaseId;
+    final dayOffset = reminderId - reminderSeriesBaseId;
     final now = DateTime.now();
     var anchor = DateTime(now.year, now.month, now.day, savedHour, savedMinute);
     if (anchor.isBefore(now)) {

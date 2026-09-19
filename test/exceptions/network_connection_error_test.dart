@@ -27,20 +27,26 @@ void main() {
       expect(e.message, contains('timed out'));
     });
 
-    test('refused and reset connections are classified as connectionRefused',
-        () {
-      for (final se in [
-        const SocketException('Connection refused',
-            osError: OSError('Connection refused', 111)),
-        const SocketException('Connection reset by peer',
-            osError: OSError('Connection reset by peer', 104)),
-      ]) {
-        expect(
-          NetworkConnectionError.fromSocketException(se).kind,
-          NetworkFailureKind.connectionRefused,
-        );
-      }
-    });
+    test(
+      'refused and reset connections are classified as connectionRefused',
+      () {
+        for (final se in [
+          const SocketException(
+            'Connection refused',
+            osError: OSError('Connection refused', 111),
+          ),
+          const SocketException(
+            'Connection reset by peer',
+            osError: OSError('Connection reset by peer', 104),
+          ),
+        ]) {
+          expect(
+            NetworkConnectionError.fromSocketException(se).kind,
+            NetworkFailureKind.connectionRefused,
+          );
+        }
+      },
+    );
 
     test('network unreachable keeps the plain offline message', () {
       final e = NetworkConnectionError.fromSocketException(

@@ -12,14 +12,14 @@ import '../../providers/notification/reminder_provider.dart';
 import '../../utils/logger.dart';
 import '../../utils/stats_manager.dart';
 
-/// Identifies a smart reminder to the notification tap handler. Deliberately
+/// Identifies a daily reminder to the notification tap handler. Deliberately
 /// carries no `type`/`path`, so a tap does not deep-link — the point is
 /// attribution, not routing. Must stay valid JSON: the handler decodes it, and
 /// a bare string (what the series used to build, and then never attached)
 /// decodes to nothing.
-String smartReminderPayload(int day) => json.encode({
+String reminderPayload(int day) => json.encode({
   AnalyticsEventConstants.paramSource:
-      AnalyticsEventConstants.sourceSmartReminder,
+      AnalyticsEventConstants.sourceLocalReminder,
   AnalyticsEventConstants.paramNotificationDay: day,
 });
 
@@ -47,11 +47,11 @@ DateTime anchorPreferringSavedTime(
   );
 }
 
-class SmartRemindersService {
+class DailyRemindersService {
   final SharedPreferences prefs;
   final ReminderProvider reminders;
 
-  SmartRemindersService({required this.prefs, required this.reminders});
+  DailyRemindersService({required this.prefs, required this.reminders});
 
   TimeOfDay? getSavedTime() {
     final savedHour = prefs.getInt(SharedPreferenceConstants.savedHours);
@@ -90,7 +90,7 @@ class SmartRemindersService {
         ? candidate.add(const Duration(days: 1))
         : candidate;
 
-    final scheduler = SmartRemindersScheduler(
+    final scheduler = DailyRemindersScheduler(
       prefs: prefs,
       reminders: reminders,
     );
@@ -102,7 +102,7 @@ class SmartRemindersService {
   Future<void> disable() async {
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, false);
     await reminders.cancelDailyNotification();
-    await reminders.cancelSmartReminderSeries();
+    await reminders.cancelReminderSeries();
   }
 
   TimeOfDay _computeDefaultTimeFromNow() {
@@ -116,11 +116,11 @@ class SmartRemindersService {
   }
 }
 
-class SmartRemindersScheduler {
+class DailyRemindersScheduler {
   final SharedPreferences prefs;
   final ReminderProvider reminders;
 
-  SmartRemindersScheduler({required this.prefs, required this.reminders});
+  DailyRemindersScheduler({required this.prefs, required this.reminders});
 
   Future<void> scheduleSeriesFromAnchor(
     DateTime anchorLocal, {
@@ -141,7 +141,7 @@ class SmartRemindersScheduler {
     } catch (e) {
       AppLogger.w(
         'REMINDER',
-        'Failed to fetch stats for smart reminders, using defaults: $e',
+        'Failed to fetch stats for daily reminders, using defaults: $e',
       );
     }
 
@@ -156,11 +156,11 @@ class SmartRemindersScheduler {
       );
       items.add(
         _SeriesItem(
-          id: smartBaseId + i,
+          id: reminderSeriesBaseId + i,
           when: tzWhen,
           title: copy.$1,
           body: copy.$2,
-          payload: smartReminderPayload(i + 1),
+          payload: reminderPayload(i + 1),
         ),
       );
     }
@@ -175,25 +175,25 @@ class SmartRemindersScheduler {
     );
     items.add(
       _SeriesItem(
-        id: smartBaseId + 15,
+        id: reminderSeriesBaseId + 15,
         when: day30TzWhen,
         title: day30Copy.$1,
         body: day30Copy.$2,
-        payload: smartReminderPayload(30),
+        payload: reminderPayload(30),
       ),
     );
 
     AppLogger.d(
       'REMINDER',
-      'Scheduling smart reminder series from anchor: $anchorLocal',
+      'Scheduling daily reminder series from anchor: $anchorLocal',
     );
 
     try {
-      await reminders.cancelSmartReminderSeries();
+      await reminders.cancelReminderSeries();
     } catch (e, s) {
       AppLogger.e(
         'REMINDER',
-        'Error cancelling smart reminder series before rescheduling: $e',
+        'Error cancelling daily reminder series before rescheduling: $e',
         s,
       );
     }
@@ -221,13 +221,13 @@ class SmartRemindersScheduler {
         .toList();
 
     try {
-      await reminders.scheduleSmartReminderSeries(scheduledReminders);
+      await reminders.scheduleReminderSeries(scheduledReminders);
       AppLogger.d(
         'REMINDER',
-        'Successfully scheduled ${items.length} smart reminders',
+        'Successfully scheduled ${items.length} daily reminders',
       );
     } catch (e, s) {
-      AppLogger.e('REMINDER', 'Error scheduling smart reminder series: $e', s);
+      AppLogger.e('REMINDER', 'Error scheduling daily reminder series: $e', s);
     }
 
     final first = TimeOfDay(hour: anchorLocal.hour, minute: anchorLocal.minute);
@@ -262,68 +262,65 @@ class SmartRemindersScheduler {
     switch (day) {
       case 1:
         final variants = <(String, String)>[
+          (l10n.reminderDay1TitleVar1, l10n.reminderDay1BodyVar1(streakCount)),
           (
-            l10n.smartReminderDay1TitleVar1,
-            l10n.smartReminderDay1BodyVar1(streakCount),
+            l10n.reminderDay1TitleVar2,
+            l10n.reminderDay1BodyVar2(consistencyPercentage),
           ),
-          (
-            l10n.smartReminderDay1TitleVar2,
-            l10n.smartReminderDay1BodyVar2(consistencyPercentage),
-          ),
-          (l10n.smartReminderDay1TitleVar3, l10n.smartReminderDay1BodyVar3),
-          (l10n.smartReminderDay1TitleVar4, l10n.smartReminderDay1BodyVar4),
-          (l10n.smartReminderDay1TitleVar5, l10n.smartReminderDay1BodyVar5),
+          (l10n.reminderDay1TitleVar3, l10n.reminderDay1BodyVar3),
+          (l10n.reminderDay1TitleVar4, l10n.reminderDay1BodyVar4),
+          (l10n.reminderDay1TitleVar5, l10n.reminderDay1BodyVar5),
         ];
         final idx = DateTime.now().day % variants.length;
         return variants[idx];
       case 2:
         final variants = [
-          (l10n.smartReminderDay2TitleVar1, l10n.smartReminderDay2BodyVar1),
-          (l10n.smartReminderDay2TitleVar2, l10n.smartReminderDay2BodyVar2),
-          (l10n.smartReminderDay2TitleVar3, l10n.smartReminderDay2BodyVar3),
-          (l10n.smartReminderDay2TitleVar4, l10n.smartReminderDay2BodyVar4),
-          (l10n.smartReminderDay2TitleVar5, l10n.smartReminderDay2BodyVar5),
+          (l10n.reminderDay2TitleVar1, l10n.reminderDay2BodyVar1),
+          (l10n.reminderDay2TitleVar2, l10n.reminderDay2BodyVar2),
+          (l10n.reminderDay2TitleVar3, l10n.reminderDay2BodyVar3),
+          (l10n.reminderDay2TitleVar4, l10n.reminderDay2BodyVar4),
+          (l10n.reminderDay2TitleVar5, l10n.reminderDay2BodyVar5),
         ];
         final idx = (DateTime.now().day + 1) % variants.length;
         return variants[idx];
       case 3:
         final variants = [
-          (l10n.smartReminderDay3TitleVar1, l10n.smartReminderDay3BodyVar1),
-          (l10n.smartReminderDay3TitleVar2, l10n.smartReminderDay3BodyVar2),
-          (l10n.smartReminderDay3TitleVar3, l10n.smartReminderDay3BodyVar3),
-          (l10n.smartReminderDay3TitleVar4, l10n.smartReminderDay3BodyVar4),
-          (l10n.smartReminderDay3TitleVar5, l10n.smartReminderDay3BodyVar5),
+          (l10n.reminderDay3TitleVar1, l10n.reminderDay3BodyVar1),
+          (l10n.reminderDay3TitleVar2, l10n.reminderDay3BodyVar2),
+          (l10n.reminderDay3TitleVar3, l10n.reminderDay3BodyVar3),
+          (l10n.reminderDay3TitleVar4, l10n.reminderDay3BodyVar4),
+          (l10n.reminderDay3TitleVar5, l10n.reminderDay3BodyVar5),
         ];
         final idx = (DateTime.now().day + 2) % variants.length;
         return variants[idx];
       case 4:
-        return (l10n.smartReminderDay4Title, l10n.smartReminderDay4Body);
+        return (l10n.reminderDay4Title, l10n.reminderDay4Body);
       case 5:
-        return (l10n.smartReminderDay5Title, l10n.smartReminderDay5Body);
+        return (l10n.reminderDay5Title, l10n.reminderDay5Body);
       case 6:
-        return (l10n.smartReminderDay6Title, l10n.smartReminderDay6Body);
+        return (l10n.reminderDay6Title, l10n.reminderDay6Body);
       case 7:
-        return (l10n.smartReminderDay7Title, l10n.smartReminderDay7Body);
+        return (l10n.reminderDay7Title, l10n.reminderDay7Body);
       case 8:
-        return (l10n.smartReminderDay8Title, l10n.smartReminderDay8Body);
+        return (l10n.reminderDay8Title, l10n.reminderDay8Body);
       case 9:
-        return (l10n.smartReminderDay9Title, l10n.smartReminderDay9Body);
+        return (l10n.reminderDay9Title, l10n.reminderDay9Body);
       case 10:
-        return (l10n.smartReminderDay10Title, l10n.smartReminderDay10Body);
+        return (l10n.reminderDay10Title, l10n.reminderDay10Body);
       case 11:
-        return (l10n.smartReminderDay11Title, l10n.smartReminderDay11Body);
+        return (l10n.reminderDay11Title, l10n.reminderDay11Body);
       case 12:
-        return (l10n.smartReminderDay12Title, l10n.smartReminderDay12Body);
+        return (l10n.reminderDay12Title, l10n.reminderDay12Body);
       case 13:
-        return (l10n.smartReminderDay13Title, l10n.smartReminderDay13Body);
+        return (l10n.reminderDay13Title, l10n.reminderDay13Body);
       case 14:
-        return (l10n.smartReminderDay14Title, l10n.smartReminderDay14Body);
+        return (l10n.reminderDay14Title, l10n.reminderDay14Body);
       case 15:
-        return (l10n.smartReminderDay15Title, l10n.smartReminderDay15Body);
+        return (l10n.reminderDay15Title, l10n.reminderDay15Body);
       case 30:
-        return (l10n.smartReminderDay30Title, l10n.smartReminderDay30Body);
+        return (l10n.reminderDay30Title, l10n.reminderDay30Body);
       default:
-        return (l10n.smartReminderDay11Title, l10n.smartReminderDay11Body);
+        return (l10n.reminderDay11Title, l10n.reminderDay11Body);
     }
   }
 

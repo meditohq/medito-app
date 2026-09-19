@@ -83,13 +83,11 @@ class ReminderProvider {
     }
   }
 
-  Future<void> scheduleSmartReminderSeries(
-    List<ScheduledReminder> items,
-  ) async {
+  Future<void> scheduleReminderSeries(List<ScheduledReminder> items) async {
     await _initFuture;
     AppLogger.d(
       'XXXX',
-      'scheduleSmartReminderSeries called with ${items.length} items',
+      'scheduleReminderSeries called with ${items.length} items',
     );
     try {
       for (final item in items) {
@@ -142,7 +140,7 @@ class ReminderProvider {
             e,
             s,
             reason:
-                'Failed to schedule smart reminder ${item.id} at ${item.scheduledDate}',
+                'Failed to schedule daily reminder ${item.id} at ${item.scheduledDate}',
           );
         }
       }
@@ -162,59 +160,64 @@ class ReminderProvider {
         );
       }
     } catch (e, s) {
-      AppLogger.e('REMINDER', 'Error scheduling smart reminder series: $e', s);
-      AppLogger.e('XXXX', 'Error scheduling smart reminder series: $e');
+      AppLogger.e('REMINDER', 'Error scheduling daily reminder series: $e', s);
+      AppLogger.e('XXXX', 'Error scheduling daily reminder series: $e');
       CrashlyticsService().recordError(
         e,
         s,
         reason:
-            'Failed to schedule smart reminder series (${items.length} items)',
+            'Failed to schedule daily reminder series (${items.length} items)',
       );
       rethrow;
     }
   }
 
-  Future<void> cancelSmartReminderSeries() async {
+  Future<void> cancelReminderSeries() async {
     await _initFuture;
     try {
       var cancelledCount = 0;
-      for (var i = 0; i < smartSeriesCount; i++) {
+      for (var i = 0; i < reminderSeriesCount; i++) {
         try {
-          await _flutterLocalNotificationsPlugin.cancel(id: smartBaseId + i);
+          await _flutterLocalNotificationsPlugin.cancel(
+            id: reminderSeriesBaseId + i,
+          );
           cancelledCount++;
         } catch (e, s) {
           AppLogger.e(
             'REMINDER',
-            'Error cancelling smart reminder ${smartBaseId + i}: $e',
+            'Error cancelling daily reminder ${reminderSeriesBaseId + i}: $e',
             s,
           );
           CrashlyticsService().recordError(
             e,
             s,
-            reason: 'Failed to cancel smart reminder ${smartBaseId + i}',
+            reason:
+                'Failed to cancel daily reminder ${reminderSeriesBaseId + i}',
           );
         }
       }
       try {
-        await _flutterLocalNotificationsPlugin.cancel(id: smartBaseId + 15);
+        await _flutterLocalNotificationsPlugin.cancel(
+          id: reminderSeriesBaseId + 15,
+        );
         cancelledCount++;
       } catch (e, s) {
         AppLogger.e(
           'REMINDER',
-          'Error cancelling day 30 reminder ${smartBaseId + 15}: $e',
+          'Error cancelling day 30 reminder ${reminderSeriesBaseId + 15}: $e',
           s,
         );
       }
       AppLogger.d(
         'REMINDER',
-        'Cancelled $cancelledCount smart reminders (including day 30)',
+        'Cancelled $cancelledCount daily reminders (including day 30)',
       );
     } catch (e, s) {
-      AppLogger.e('REMINDER', 'Error cancelling smart reminder series: $e', s);
+      AppLogger.e('REMINDER', 'Error cancelling daily reminder series: $e', s);
       CrashlyticsService().recordError(
         e,
         s,
-        reason: 'Failed to cancel smart reminder series',
+        reason: 'Failed to cancel daily reminder series',
       );
     }
     try {
@@ -222,7 +225,7 @@ class ReminderProvider {
     } catch (e, s) {
       AppLogger.e(
         'REMINDER',
-        'Error clearing badge after cancelling smart reminders: $e',
+        'Error clearing badge after cancelling daily reminders: $e',
         s,
       );
     }
@@ -264,8 +267,8 @@ const androidNotificationChannelDescription =
     'Notification for meditation reminders';
 const dailyNotificationId = 10101024;
 
-const smartBaseId = 10102000;
-const smartSeriesCount = 15;
+const reminderSeriesBaseId = 10102000;
+const reminderSeriesCount = 15;
 
 class ScheduledReminder {
   final int id;

@@ -8,13 +8,16 @@ void main() {
   tearDownAll(() => Intl.defaultLocale = previousLocale);
 
   group('isZeroDecimalCurrency', () {
-    test('identifies zero-decimal currencies regardless of case or padding', () {
-      expect(isZeroDecimalCurrency('jpy'), isTrue);
-      expect(isZeroDecimalCurrency('JPY'), isTrue);
-      expect(isZeroDecimalCurrency(' krw '), isTrue);
-      expect(isZeroDecimalCurrency('usd'), isFalse);
-      expect(isZeroDecimalCurrency('ngn'), isFalse);
-    });
+    test(
+      'identifies zero-decimal currencies regardless of case or padding',
+      () {
+        expect(isZeroDecimalCurrency('jpy'), isTrue);
+        expect(isZeroDecimalCurrency('JPY'), isTrue);
+        expect(isZeroDecimalCurrency(' krw '), isTrue);
+        expect(isZeroDecimalCurrency('usd'), isFalse);
+        expect(isZeroDecimalCurrency('ngn'), isFalse);
+      },
+    );
   });
 
   group('minorUnitDigits', () {
@@ -44,13 +47,16 @@ void main() {
   });
 
   group('currencyAmountToUnitsString', () {
-    test('divides non-zero-decimal currencies by their minor unit exponent', () {
-      expect(currencyAmountToUnitsString(1000, 'usd'), '10.00');
-      expect(currencyAmountToUnitsString(1050, 'eur'), '10.50');
-      expect(currencyAmountToUnitsString(1050, 'kwd'), '1.050');
-      expect(currencyAmountToUnitsString(70000, 'ngn'), '700.00');
-      expect(currencyAmountToUnitsString(1000, 'isk'), '10.00');
-    });
+    test(
+      'divides non-zero-decimal currencies by their minor unit exponent',
+      () {
+        expect(currencyAmountToUnitsString(1000, 'usd'), '10.00');
+        expect(currencyAmountToUnitsString(1050, 'eur'), '10.50');
+        expect(currencyAmountToUnitsString(1050, 'kwd'), '1.050');
+        expect(currencyAmountToUnitsString(70000, 'ngn'), '700.00');
+        expect(currencyAmountToUnitsString(1000, 'isk'), '10.00');
+      },
+    );
 
     test('leaves zero-decimal amounts as whole units', () {
       // The bug this exists to prevent: /100 would put "10.00" on an Apple Pay

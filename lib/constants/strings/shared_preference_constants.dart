@@ -40,7 +40,7 @@ class SharedPreferenceConstants {
   // Theme preference - stores the user's preferred theme mode
   static const String themePreference = 'theme_preference';
 
-  // Smart Reminders
+  // Daily reminders
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
   static const String reminderPromptDismissedForever =
       'reminder_prompt_dismissed_forever';

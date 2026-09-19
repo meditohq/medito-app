@@ -171,10 +171,7 @@ class TrackingPermissionScreen extends ConsumerWidget {
   }) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        child: Text(text),
-      ),
+      child: ElevatedButton(onPressed: onPressed, child: Text(text)),
     );
   }
 }

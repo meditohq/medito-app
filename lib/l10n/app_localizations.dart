@@ -1796,13 +1796,13 @@ abstract class AppLocalizations {
   /// **'Open Settings'**
   String get openSettings;
 
-  /// Call to action replacing 'Turn on Smart Reminders' when notification permission is permanently denied
+  /// Call to action replacing 'Turn on Daily reminders' when notification permission is permanently denied
   ///
   /// In en, this message translates to:
   /// **'Turn On in Settings'**
   String get turnOnInSettings;
 
-  /// Subtitle on the settings smart-reminder tile when notification permission is permanently denied
+  /// Subtitle on the settings daily-reminder tile when notification permission is permanently denied
   ///
   /// In en, this message translates to:
   /// **'Switched off in phone settings'**
@@ -1832,7 +1832,7 @@ abstract class AppLocalizations {
   /// **'No time picked yet — choose one above, or skip for now.'**
   String get reminderCustomCancelled;
 
-  /// Title of the settings tile that opens the reminder time bottom sheet (replaced the Smart Reminders switch)
+  /// Title of the settings tile that opens the reminder time bottom sheet (replaced the Daily reminders switch)
   ///
   /// In en, this message translates to:
   /// **'Daily reminder'**
@@ -3362,341 +3362,341 @@ abstract class AppLocalizations {
   /// **'You can turn reminders on or off in Settings'**
   String get reminderPromptDismissedMessage;
 
-  /// Smart reminder day 1 title variant 1
+  /// Daily reminder day 1 title variant 1
   ///
   /// In en, this message translates to:
   /// **'Keep your streak going 🌱'**
-  String get smartReminderDay1TitleVar1;
+  String get reminderDay1TitleVar1;
 
-  /// Smart reminder day 1 body variant 1
+  /// Daily reminder day 1 body variant 1
   ///
   /// In en, this message translates to:
   /// **'You are on a {streak} day streak. Keep it going?'**
-  String smartReminderDay1BodyVar1(String streak);
+  String reminderDay1BodyVar1(String streak);
 
-  /// Smart reminder day 1 title variant 2
+  /// Daily reminder day 1 title variant 2
   ///
   /// In en, this message translates to:
   /// **'Strong step ✨'**
-  String get smartReminderDay1TitleVar2;
+  String get reminderDay1TitleVar2;
 
-  /// Smart reminder day 1 body variant 2
+  /// Daily reminder day 1 body variant 2
   ///
   /// In en, this message translates to:
   /// **'Consistency {consistency}%. Let’s keep it going.'**
-  String smartReminderDay1BodyVar2(String consistency);
+  String reminderDay1BodyVar2(String consistency);
 
-  /// Smart reminder day 1 title variant 3
+  /// Daily reminder day 1 title variant 3
   ///
   /// In en, this message translates to:
   /// **'Tiny wins add up 💜'**
-  String get smartReminderDay1TitleVar3;
+  String get reminderDay1TitleVar3;
 
-  /// Smart reminder day 1 body variant 3
+  /// Daily reminder day 1 body variant 3
   ///
   /// In en, this message translates to:
   /// **'A few minutes now keeps your momentum alive.'**
-  String get smartReminderDay1BodyVar3;
+  String get reminderDay1BodyVar3;
 
-  /// Smart reminder day 1 title variant 4
+  /// Daily reminder day 1 title variant 4
   ///
   /// In en, this message translates to:
   /// **'Your practice awaits 🌸'**
-  String get smartReminderDay1TitleVar4;
+  String get reminderDay1TitleVar4;
 
-  /// Smart reminder day 1 body variant 4
+  /// Daily reminder day 1 body variant 4
   ///
   /// In en, this message translates to:
   /// **'Take a moment to reconnect with yourself.'**
-  String get smartReminderDay1BodyVar4;
+  String get reminderDay1BodyVar4;
 
-  /// Smart reminder day 1 title variant 5
+  /// Daily reminder day 1 title variant 5
   ///
   /// In en, this message translates to:
   /// **'One breath at a time 🫧'**
-  String get smartReminderDay1TitleVar5;
+  String get reminderDay1TitleVar5;
 
-  /// Smart reminder day 1 body variant 5
+  /// Daily reminder day 1 body variant 5
   ///
   /// In en, this message translates to:
   /// **'Every session counts, no matter how short.'**
-  String get smartReminderDay1BodyVar5;
+  String get reminderDay1BodyVar5;
 
-  /// Smart reminder day 2 title variant 1
+  /// Daily reminder day 2 title variant 1
   ///
   /// In en, this message translates to:
   /// **'Keep the flow 🔁'**
-  String get smartReminderDay2TitleVar1;
+  String get reminderDay2TitleVar1;
 
-  /// Smart reminder day 2 body variant 1
+  /// Daily reminder day 2 body variant 1
   ///
   /// In en, this message translates to:
   /// **'Let’s get that streak going again. Just a few minutes can make a big difference.'**
-  String get smartReminderDay2BodyVar1;
+  String get reminderDay2BodyVar1;
 
-  /// Smart reminder day 2 title variant 2
+  /// Daily reminder day 2 title variant 2
   ///
   /// In en, this message translates to:
   /// **'Build your rhythm 🧘'**
-  String get smartReminderDay2TitleVar2;
+  String get reminderDay2TitleVar2;
 
-  /// Smart reminder day 2 body variant 2
+  /// Daily reminder day 2 body variant 2
   ///
   /// In en, this message translates to:
   /// **'Another gentle practice awaits.'**
-  String get smartReminderDay2BodyVar2;
+  String get reminderDay2BodyVar2;
 
-  /// Smart reminder day 2 title variant 3
+  /// Daily reminder day 2 title variant 3
   ///
   /// In en, this message translates to:
   /// **'You have got this 🌟'**
-  String get smartReminderDay2TitleVar3;
+  String get reminderDay2TitleVar3;
 
-  /// Smart reminder day 2 body variant 3
+  /// Daily reminder day 2 body variant 3
   ///
   /// In en, this message translates to:
   /// **'Return to your breath, one moment at a time.'**
-  String get smartReminderDay2BodyVar3;
+  String get reminderDay2BodyVar3;
 
-  /// Smart reminder day 2 title variant 4
+  /// Daily reminder day 2 title variant 4
   ///
   /// In en, this message translates to:
   /// **'Small steps forward 🚶'**
-  String get smartReminderDay2TitleVar4;
+  String get reminderDay2TitleVar4;
 
-  /// Smart reminder day 2 body variant 4
+  /// Daily reminder day 2 body variant 4
   ///
   /// In en, this message translates to:
   /// **'Consistency builds strength. Start with just a few minutes.'**
-  String get smartReminderDay2BodyVar4;
+  String get reminderDay2BodyVar4;
 
-  /// Smart reminder day 2 title variant 5
+  /// Daily reminder day 2 title variant 5
   ///
   /// In en, this message translates to:
   /// **'Gentle return 💚'**
-  String get smartReminderDay2TitleVar5;
+  String get reminderDay2TitleVar5;
 
-  /// Smart reminder day 2 body variant 5
+  /// Daily reminder day 2 body variant 5
   ///
   /// In en, this message translates to:
   /// **'Your mindful practice is here whenever you are ready.'**
-  String get smartReminderDay2BodyVar5;
+  String get reminderDay2BodyVar5;
 
-  /// Smart reminder day 3 title variant 1
+  /// Daily reminder day 3 title variant 1
   ///
   /// In en, this message translates to:
   /// **'Build the habit 📆'**
-  String get smartReminderDay3TitleVar1;
+  String get reminderDay3TitleVar1;
 
-  /// Smart reminder day 3 body variant 1
+  /// Daily reminder day 3 body variant 1
   ///
   /// In en, this message translates to:
   /// **'Momentum matters. You have got this.'**
-  String get smartReminderDay3BodyVar1;
+  String get reminderDay3BodyVar1;
 
-  /// Smart reminder day 3 title variant 2
+  /// Daily reminder day 3 title variant 2
   ///
   /// In en, this message translates to:
   /// **'Three day spark ✴️'**
-  String get smartReminderDay3TitleVar2;
+  String get reminderDay3TitleVar2;
 
-  /// Smart reminder day 3 body variant 2
+  /// Daily reminder day 3 body variant 2
   ///
   /// In en, this message translates to:
   /// **'Your practice is taking shape.'**
-  String get smartReminderDay3BodyVar2;
+  String get reminderDay3BodyVar2;
 
-  /// Smart reminder day 3 title variant 3
+  /// Daily reminder day 3 title variant 3
   ///
   /// In en, this message translates to:
   /// **'A gentle nudge 🤍'**
-  String get smartReminderDay3TitleVar3;
+  String get reminderDay3TitleVar3;
 
-  /// Smart reminder day 3 body variant 3
+  /// Daily reminder day 3 body variant 3
   ///
   /// In en, this message translates to:
   /// **'Two mindful minutes is enough.'**
-  String get smartReminderDay3BodyVar3;
+  String get reminderDay3BodyVar3;
 
-  /// Smart reminder day 3 title variant 4
+  /// Daily reminder day 3 title variant 4
   ///
   /// In en, this message translates to:
   /// **'Growing stronger 🌿'**
-  String get smartReminderDay3TitleVar4;
+  String get reminderDay3TitleVar4;
 
-  /// Smart reminder day 3 body variant 4
+  /// Daily reminder day 3 body variant 4
   ///
   /// In en, this message translates to:
   /// **'Each day you practice, you build something meaningful.'**
-  String get smartReminderDay3BodyVar4;
+  String get reminderDay3BodyVar4;
 
-  /// Smart reminder day 3 title variant 5
+  /// Daily reminder day 3 title variant 5
   ///
   /// In en, this message translates to:
   /// **'Find your calm 🕊️'**
-  String get smartReminderDay3TitleVar5;
+  String get reminderDay3TitleVar5;
 
-  /// Smart reminder day 3 body variant 5
+  /// Daily reminder day 3 body variant 5
   ///
   /// In en, this message translates to:
   /// **'A brief pause can reset your entire day.'**
-  String get smartReminderDay3BodyVar5;
+  String get reminderDay3BodyVar5;
 
-  /// Smart reminder day 4 title
+  /// Daily reminder day 4 title
   ///
   /// In en, this message translates to:
   /// **'Small steps 🪴'**
-  String get smartReminderDay4Title;
+  String get reminderDay4Title;
 
-  /// Smart reminder day 4 body
+  /// Daily reminder day 4 body
   ///
   /// In en, this message translates to:
   /// **'It has been 4 days since you meditated. Resume your practice with a short session.'**
-  String get smartReminderDay4Body;
+  String get reminderDay4Body;
 
-  /// Smart reminder day 5 title
+  /// Daily reminder day 5 title
   ///
   /// In en, this message translates to:
   /// **'Time to reconnect 💪'**
-  String get smartReminderDay5Title;
+  String get reminderDay5Title;
 
-  /// Smart reminder day 5 body
+  /// Daily reminder day 5 body
   ///
   /// In en, this message translates to:
   /// **'It has been 5 days. A calm pause now can help you get back on track.'**
-  String get smartReminderDay5Body;
+  String get reminderDay5Body;
 
-  /// Smart reminder day 6 title
+  /// Daily reminder day 6 title
   ///
   /// In en, this message translates to:
   /// **'Almost a week ⏰'**
-  String get smartReminderDay6Title;
+  String get reminderDay6Title;
 
-  /// Smart reminder day 6 body
+  /// Daily reminder day 6 body
   ///
   /// In en, this message translates to:
   /// **'It has been almost a week since you meditated. Close the loop with a mindful moment.'**
-  String get smartReminderDay6Body;
+  String get reminderDay6Body;
 
-  /// Smart reminder day 7 title
+  /// Daily reminder day 7 title
   ///
   /// In en, this message translates to:
   /// **'One week check in 📅'**
-  String get smartReminderDay7Title;
+  String get reminderDay7Title;
 
-  /// Smart reminder day 7 body
+  /// Daily reminder day 7 body
   ///
   /// In en, this message translates to:
   /// **'It has been a week since you meditated. Take a moment for yourself now.'**
-  String get smartReminderDay7Body;
+  String get reminderDay7Body;
 
-  /// Smart reminder day 8 title
+  /// Daily reminder day 8 title
   ///
   /// In en, this message translates to:
   /// **'Fresh start 🌤️'**
-  String get smartReminderDay8Title;
+  String get reminderDay8Title;
 
-  /// Smart reminder day 8 body
+  /// Daily reminder day 8 body
   ///
   /// In en, this message translates to:
   /// **'It has been over a week. A fresh start with just a few mindful minutes.'**
-  String get smartReminderDay8Body;
+  String get reminderDay8Body;
 
-  /// Smart reminder day 9 title
+  /// Daily reminder day 9 title
   ///
   /// In en, this message translates to:
   /// **'Find your centre 🎯'**
-  String get smartReminderDay9Title;
+  String get reminderDay9Title;
 
-  /// Smart reminder day 9 body
+  /// Daily reminder day 9 body
   ///
   /// In en, this message translates to:
   /// **'A short session can reset your day.'**
-  String get smartReminderDay9Body;
+  String get reminderDay9Body;
 
-  /// Smart reminder day 10 title
+  /// Daily reminder day 10 title
   ///
   /// In en, this message translates to:
   /// **'Double digits 🔟'**
-  String get smartReminderDay10Title;
+  String get reminderDay10Title;
 
-  /// Smart reminder day 10 body
+  /// Daily reminder day 10 body
   ///
   /// In en, this message translates to:
   /// **'It has been 10 days since you meditated. Pick up where you left off.'**
-  String get smartReminderDay10Body;
+  String get reminderDay10Body;
 
-  /// Smart reminder day 11 title
+  /// Daily reminder day 11 title
   ///
   /// In en, this message translates to:
   /// **'Gentle nudge 🤍'**
-  String get smartReminderDay11Title;
+  String get reminderDay11Title;
 
-  /// Smart reminder day 11 body
+  /// Daily reminder day 11 body
   ///
   /// In en, this message translates to:
   /// **'Pause, breathe, and notice how you feel.'**
-  String get smartReminderDay11Body;
+  String get reminderDay11Body;
 
-  /// Smart reminder day 12 title
+  /// Daily reminder day 12 title
   ///
   /// In en, this message translates to:
   /// **'Keep steady 🧭'**
-  String get smartReminderDay12Title;
+  String get reminderDay12Title;
 
-  /// Smart reminder day 12 body
+  /// Daily reminder day 12 body
   ///
   /// In en, this message translates to:
   /// **'A calm moment is waiting for you.'**
-  String get smartReminderDay12Body;
+  String get reminderDay12Body;
 
-  /// Smart reminder day 13 title
+  /// Daily reminder day 13 title
   ///
   /// In en, this message translates to:
   /// **'Approaching two weeks ⏳'**
-  String get smartReminderDay13Title;
+  String get reminderDay13Title;
 
-  /// Smart reminder day 13 body
+  /// Daily reminder day 13 body
   ///
   /// In en, this message translates to:
   /// **'It has been almost two weeks since you meditated. Try a two minute restart.'**
-  String get smartReminderDay13Body;
+  String get reminderDay13Body;
 
-  /// Smart reminder day 14 title
+  /// Daily reminder day 14 title
   ///
   /// In en, this message translates to:
   /// **'Two week check in 🔔'**
-  String get smartReminderDay14Title;
+  String get reminderDay14Title;
 
-  /// Smart reminder day 14 body
+  /// Daily reminder day 14 body
   ///
   /// In en, this message translates to:
   /// **'It has been 14 days since you meditated. Resume your practice now, gently.'**
-  String get smartReminderDay14Body;
+  String get reminderDay14Body;
 
-  /// Smart reminder day 15 title
+  /// Daily reminder day 15 title
   ///
   /// In en, this message translates to:
   /// **'Pausing reminders 🌿'**
-  String get smartReminderDay15Title;
+  String get reminderDay15Title;
 
-  /// Smart reminder day 15 body
+  /// Daily reminder day 15 body
   ///
   /// In en, this message translates to:
   /// **'We\'re pausing reminders for now. We are here whenever you are ready.'**
-  String get smartReminderDay15Body;
+  String get reminderDay15Body;
 
-  /// Smart reminder day 30 title
+  /// Daily reminder day 30 title
   ///
   /// In en, this message translates to:
   /// **'A gentle nudge 🤗'**
-  String get smartReminderDay30Title;
+  String get reminderDay30Title;
 
-  /// Smart reminder day 30 body
+  /// Daily reminder day 30 body
   ///
   /// In en, this message translates to:
   /// **'It\'s been a month since you meditated. Just 2 minutes can help you feel better. We\'re here when you\'re ready.'**
-  String get smartReminderDay30Body;
+  String get reminderDay30Body;
 
   /// Tooltip text for repeat mode when set to normal (no repeat)
   ///

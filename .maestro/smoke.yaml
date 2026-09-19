@@ -144,7 +144,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
                 timeout: 15000
       - tapOn: "Skip for Now"
 
-# ── Onboarding: Notifications / smart reminders (re-added 26.6, sits
+# ── Onboarding: Notifications / daily reminders (re-added 26.6, sits
 # between the donation primer and battery/tracking). Skip it for the
 # smoke run — the system permission dialog is OS-driven and would
 # otherwise stall the flow. Since the time-chips A/B concluded (2026-08-25)

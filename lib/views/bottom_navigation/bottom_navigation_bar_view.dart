@@ -118,10 +118,7 @@ class _BottomNavigationBarViewState
                       _onDestinationSelected(_pageIndexForDestination[index]),
                   items: [
                     MeditoNavItem(icon: MeditoIcons.home, label: l10n.home),
-                    MeditoNavItem(
-                      icon: MeditoIcons.book,
-                      label: l10n.explore,
-                    ),
+                    MeditoNavItem(icon: MeditoIcons.book, label: l10n.explore),
                     MeditoNavItem(
                       icon: MeditoIcons.settings,
                       label: l10n.settings,

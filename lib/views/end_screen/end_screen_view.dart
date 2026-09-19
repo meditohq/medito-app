@@ -16,7 +16,7 @@ import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/settings/account_prompt_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
@@ -734,9 +734,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     unawaited(
       ref
           .read(analyticsServiceProvider)
-          .logEvent(
-            name: AnalyticsEventConstants.endScreenAccountPromptTapped,
-          ),
+          .logEvent(name: AnalyticsEventConstants.endScreenAccountPromptTapped),
     );
 
     // Make sure the session that just finished is on the server before we link
@@ -888,7 +886,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       if (!mounted) return;
 
       final prefs = ref.read(sharedPreferencesProvider);
-      final service = SmartRemindersService(
+      final service = DailyRemindersService(
         prefs: prefs,
         reminders: ref.read(reminderProvider),
       );
@@ -922,7 +920,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       // Previously swallowed: the user tapped the button, granted permission,
       // and got no reminder, no feedback and no event — invisible in both the
       // UI and analytics.
-      AppLogger.e('END_SCREEN', 'Failed to enable smart reminders: $e', s);
+      AppLogger.e('END_SCREEN', 'Failed to enable daily reminders: $e', s);
       unawaited(
         ref
             .read(analyticsServiceProvider)

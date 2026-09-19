@@ -1816,196 +1816,193 @@ class AppLocalizationsEn extends AppLocalizations {
       'You can turn reminders on or off in Settings';
 
   @override
-  String get smartReminderDay1TitleVar1 => 'Keep your streak going 🌱';
+  String get reminderDay1TitleVar1 => 'Keep your streak going 🌱';
 
   @override
-  String smartReminderDay1BodyVar1(String streak) {
+  String reminderDay1BodyVar1(String streak) {
     return 'You are on a $streak day streak. Keep it going?';
   }
 
   @override
-  String get smartReminderDay1TitleVar2 => 'Strong step ✨';
+  String get reminderDay1TitleVar2 => 'Strong step ✨';
 
   @override
-  String smartReminderDay1BodyVar2(String consistency) {
+  String reminderDay1BodyVar2(String consistency) {
     return 'Consistency $consistency%. Let’s keep it going.';
   }
 
   @override
-  String get smartReminderDay1TitleVar3 => 'Tiny wins add up 💜';
+  String get reminderDay1TitleVar3 => 'Tiny wins add up 💜';
 
   @override
-  String get smartReminderDay1BodyVar3 =>
+  String get reminderDay1BodyVar3 =>
       'A few minutes now keeps your momentum alive.';
 
   @override
-  String get smartReminderDay1TitleVar4 => 'Your practice awaits 🌸';
+  String get reminderDay1TitleVar4 => 'Your practice awaits 🌸';
 
   @override
-  String get smartReminderDay1BodyVar4 =>
+  String get reminderDay1BodyVar4 =>
       'Take a moment to reconnect with yourself.';
 
   @override
-  String get smartReminderDay1TitleVar5 => 'One breath at a time 🫧';
+  String get reminderDay1TitleVar5 => 'One breath at a time 🫧';
 
   @override
-  String get smartReminderDay1BodyVar5 =>
+  String get reminderDay1BodyVar5 =>
       'Every session counts, no matter how short.';
 
   @override
-  String get smartReminderDay2TitleVar1 => 'Keep the flow 🔁';
+  String get reminderDay2TitleVar1 => 'Keep the flow 🔁';
 
   @override
-  String get smartReminderDay2BodyVar1 =>
+  String get reminderDay2BodyVar1 =>
       'Let’s get that streak going again. Just a few minutes can make a big difference.';
 
   @override
-  String get smartReminderDay2TitleVar2 => 'Build your rhythm 🧘';
+  String get reminderDay2TitleVar2 => 'Build your rhythm 🧘';
 
   @override
-  String get smartReminderDay2BodyVar2 => 'Another gentle practice awaits.';
+  String get reminderDay2BodyVar2 => 'Another gentle practice awaits.';
 
   @override
-  String get smartReminderDay2TitleVar3 => 'You have got this 🌟';
+  String get reminderDay2TitleVar3 => 'You have got this 🌟';
 
   @override
-  String get smartReminderDay2BodyVar3 =>
+  String get reminderDay2BodyVar3 =>
       'Return to your breath, one moment at a time.';
 
   @override
-  String get smartReminderDay2TitleVar4 => 'Small steps forward 🚶';
+  String get reminderDay2TitleVar4 => 'Small steps forward 🚶';
 
   @override
-  String get smartReminderDay2BodyVar4 =>
+  String get reminderDay2BodyVar4 =>
       'Consistency builds strength. Start with just a few minutes.';
 
   @override
-  String get smartReminderDay2TitleVar5 => 'Gentle return 💚';
+  String get reminderDay2TitleVar5 => 'Gentle return 💚';
 
   @override
-  String get smartReminderDay2BodyVar5 =>
+  String get reminderDay2BodyVar5 =>
       'Your mindful practice is here whenever you are ready.';
 
   @override
-  String get smartReminderDay3TitleVar1 => 'Build the habit 📆';
+  String get reminderDay3TitleVar1 => 'Build the habit 📆';
 
   @override
-  String get smartReminderDay3BodyVar1 =>
-      'Momentum matters. You have got this.';
+  String get reminderDay3BodyVar1 => 'Momentum matters. You have got this.';
 
   @override
-  String get smartReminderDay3TitleVar2 => 'Three day spark ✴️';
+  String get reminderDay3TitleVar2 => 'Three day spark ✴️';
 
   @override
-  String get smartReminderDay3BodyVar2 => 'Your practice is taking shape.';
+  String get reminderDay3BodyVar2 => 'Your practice is taking shape.';
 
   @override
-  String get smartReminderDay3TitleVar3 => 'A gentle nudge 🤍';
+  String get reminderDay3TitleVar3 => 'A gentle nudge 🤍';
 
   @override
-  String get smartReminderDay3BodyVar3 => 'Two mindful minutes is enough.';
+  String get reminderDay3BodyVar3 => 'Two mindful minutes is enough.';
 
   @override
-  String get smartReminderDay3TitleVar4 => 'Growing stronger 🌿';
+  String get reminderDay3TitleVar4 => 'Growing stronger 🌿';
 
   @override
-  String get smartReminderDay3BodyVar4 =>
+  String get reminderDay3BodyVar4 =>
       'Each day you practice, you build something meaningful.';
 
   @override
-  String get smartReminderDay3TitleVar5 => 'Find your calm 🕊️';
+  String get reminderDay3TitleVar5 => 'Find your calm 🕊️';
 
   @override
-  String get smartReminderDay3BodyVar5 =>
-      'A brief pause can reset your entire day.';
+  String get reminderDay3BodyVar5 => 'A brief pause can reset your entire day.';
 
   @override
-  String get smartReminderDay4Title => 'Small steps 🪴';
+  String get reminderDay4Title => 'Small steps 🪴';
 
   @override
-  String get smartReminderDay4Body =>
+  String get reminderDay4Body =>
       'It has been 4 days since you meditated. Resume your practice with a short session.';
 
   @override
-  String get smartReminderDay5Title => 'Time to reconnect 💪';
+  String get reminderDay5Title => 'Time to reconnect 💪';
 
   @override
-  String get smartReminderDay5Body =>
+  String get reminderDay5Body =>
       'It has been 5 days. A calm pause now can help you get back on track.';
 
   @override
-  String get smartReminderDay6Title => 'Almost a week ⏰';
+  String get reminderDay6Title => 'Almost a week ⏰';
 
   @override
-  String get smartReminderDay6Body =>
+  String get reminderDay6Body =>
       'It has been almost a week since you meditated. Close the loop with a mindful moment.';
 
   @override
-  String get smartReminderDay7Title => 'One week check in 📅';
+  String get reminderDay7Title => 'One week check in 📅';
 
   @override
-  String get smartReminderDay7Body =>
+  String get reminderDay7Body =>
       'It has been a week since you meditated. Take a moment for yourself now.';
 
   @override
-  String get smartReminderDay8Title => 'Fresh start 🌤️';
+  String get reminderDay8Title => 'Fresh start 🌤️';
 
   @override
-  String get smartReminderDay8Body =>
+  String get reminderDay8Body =>
       'It has been over a week. A fresh start with just a few mindful minutes.';
 
   @override
-  String get smartReminderDay9Title => 'Find your centre 🎯';
+  String get reminderDay9Title => 'Find your centre 🎯';
 
   @override
-  String get smartReminderDay9Body => 'A short session can reset your day.';
+  String get reminderDay9Body => 'A short session can reset your day.';
 
   @override
-  String get smartReminderDay10Title => 'Double digits 🔟';
+  String get reminderDay10Title => 'Double digits 🔟';
 
   @override
-  String get smartReminderDay10Body =>
+  String get reminderDay10Body =>
       'It has been 10 days since you meditated. Pick up where you left off.';
 
   @override
-  String get smartReminderDay11Title => 'Gentle nudge 🤍';
+  String get reminderDay11Title => 'Gentle nudge 🤍';
 
   @override
-  String get smartReminderDay11Body =>
-      'Pause, breathe, and notice how you feel.';
+  String get reminderDay11Body => 'Pause, breathe, and notice how you feel.';
 
   @override
-  String get smartReminderDay12Title => 'Keep steady 🧭';
+  String get reminderDay12Title => 'Keep steady 🧭';
 
   @override
-  String get smartReminderDay12Body => 'A calm moment is waiting for you.';
+  String get reminderDay12Body => 'A calm moment is waiting for you.';
 
   @override
-  String get smartReminderDay13Title => 'Approaching two weeks ⏳';
+  String get reminderDay13Title => 'Approaching two weeks ⏳';
 
   @override
-  String get smartReminderDay13Body =>
+  String get reminderDay13Body =>
       'It has been almost two weeks since you meditated. Try a two minute restart.';
 
   @override
-  String get smartReminderDay14Title => 'Two week check in 🔔';
+  String get reminderDay14Title => 'Two week check in 🔔';
 
   @override
-  String get smartReminderDay14Body =>
+  String get reminderDay14Body =>
       'It has been 14 days since you meditated. Resume your practice now, gently.';
 
   @override
-  String get smartReminderDay15Title => 'Pausing reminders 🌿';
+  String get reminderDay15Title => 'Pausing reminders 🌿';
 
   @override
-  String get smartReminderDay15Body =>
+  String get reminderDay15Body =>
       'We\'re pausing reminders for now. We are here whenever you are ready.';
 
   @override
-  String get smartReminderDay30Title => 'A gentle nudge 🤗';
+  String get reminderDay30Title => 'A gentle nudge 🤗';
 
   @override
-  String get smartReminderDay30Body =>
+  String get reminderDay30Body =>
       'It\'s been a month since you meditated. Just 2 minutes can help you feel better. We\'re here when you\'re ready.';
 
   @override

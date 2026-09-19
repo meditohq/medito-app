@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
-import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:medito/constants/enums/home_widget_type.dart';
@@ -61,7 +61,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     if (!mounted) return;
 
     if (status.isGranted) {
-      final service = SmartRemindersService(
+      final service = DailyRemindersService(
         prefs: prefs,
         reminders: ref.read(reminderProvider),
       );

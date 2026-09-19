@@ -79,7 +79,10 @@ void main() {
 
     test('the legacy megapack is terminal but not on the path', () {
       expect(PackSequence.legacyMegapackId, ConfigConstants.basicsPackId);
-      expect(PackSequence.isPathTerminal(PackSequence.legacyMegapackId), isTrue);
+      expect(
+        PackSequence.isPathTerminal(PackSequence.legacyMegapackId),
+        isTrue,
+      );
       expect(PackSequence.contains(PackSequence.legacyMegapackId), isFalse);
       expect(
         PackSequence.ordered.contains(PackSequence.legacyMegapackId),
@@ -113,10 +116,7 @@ void main() {
     });
 
     test('ids are unique — a duplicate would make the path loop', () {
-      expect(
-        PackSequence.ordered.toSet().length,
-        PackSequence.ordered.length,
-      );
+      expect(PackSequence.ordered.toSet().length, PackSequence.ordered.length);
     });
   });
 

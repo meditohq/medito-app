@@ -45,8 +45,7 @@ void main() {
       final name = testCase['name'] as String;
       final nowOffsetHours = testCase['nowOffsetHours'] as num;
       final meditationOffsets =
-          (testCase['meditationOffsetHours'] as List<dynamic>)
-              .cast<num>();
+          (testCase['meditationOffsetHours'] as List<dynamic>).cast<num>();
       final freezeOffsets = (testCase['freezeOffsetHours'] as List<dynamic>)
           .cast<num>();
       final dayBoundaryOffsetHours = testCase['dayBoundaryOffsetHours'] as int;

@@ -142,9 +142,7 @@ void main() {
         );
 
         // Only the original client ID was tried; nothing was minted or stored
-        verify(
-          () => mockAuthApiService.signIn(clientId: clientId),
-        ).called(1);
+        verify(() => mockAuthApiService.signIn(clientId: clientId)).called(1);
         verifyNever(
           () => mockPreferences.setString(
             SharedPreferenceConstants.userId,

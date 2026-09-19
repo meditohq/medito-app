@@ -8,8 +8,22 @@ import 'package:intl/intl.dart';
 /// to ¥1000 it yields 10.00, understating the figure a hundredfold — which on a
 /// payment sheet means showing someone a different price than they are charged.
 const zeroDecimalCurrencies = {
-  'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga',
-  'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf',
+  'bif',
+  'clp',
+  'djf',
+  'gnf',
+  'jpy',
+  'kmf',
+  'krw',
+  'mga',
+  'pyg',
+  'rwf',
+  'ugx',
+  'vnd',
+  'vuv',
+  'xaf',
+  'xof',
+  'xpf',
 };
 
 bool isZeroDecimalCurrency(String currency) =>

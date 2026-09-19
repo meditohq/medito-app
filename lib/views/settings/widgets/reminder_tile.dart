@@ -9,7 +9,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/reminders/reminder_slots.dart';
-import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
@@ -36,7 +36,7 @@ class ReminderChoiceOff extends ReminderChoice {
 }
 
 /// Settings card for the daily reminder. Shows the current time (or "Off") and
-/// opens [ReminderOptionsSheet] on tap. Replaced the old Smart Reminders
+/// opens [ReminderOptionsSheet] on tap. Replaced the old Daily reminders
 /// switch, which silently picked "same time tomorrow"; this offers the same
 /// Morning / Evening / Night / custom choice as the onboarding chips.
 class ReminderTile extends ConsumerStatefulWidget {
@@ -67,7 +67,7 @@ class _ReminderTileState extends ConsumerState<ReminderTile> {
     }
   }
 
-  SmartRemindersService _service() => SmartRemindersService(
+  DailyRemindersService _service() => DailyRemindersService(
     prefs: ref.read(sharedPreferencesProvider),
     reminders: ref.read(reminderProvider),
   );

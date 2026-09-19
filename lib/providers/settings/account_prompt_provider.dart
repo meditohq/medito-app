@@ -94,8 +94,7 @@ final shouldShowAccountPromptProvider = Provider<bool>((ref) {
   // Never stack two soft-asks; the reminder prompt takes precedence.
   if (ref.watch(shouldShowReminderPromptProvider)) return false;
 
-  final completed =
-      ref.watch(statsProvider).value?.totalTracksCompleted ?? 0;
+  final completed = ref.watch(statsProvider).value?.totalTracksCompleted ?? 0;
   if (completed < _minCompletedSessions) return false;
 
   final promptState = ref.watch(accountPromptDismissedProvider);

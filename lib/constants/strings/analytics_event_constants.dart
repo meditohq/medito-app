@@ -571,7 +571,7 @@ class AnalyticsEventConstants {
   /// or repeat ask) vs 'thanks' (post-donation "Donate again").
   static const String paramCardState = 'card_state';
 
-  /// Event logged when the end-screen smart-reminders card first becomes
+  /// Event logged when the end-screen daily-reminders card first becomes
   /// visible to the user (i.e. shouldShowReminderPromptProvider is true).
   static const String endScreenReminderPromptShown =
       'end_screen_reminder_prompt_shown';
@@ -597,7 +597,7 @@ class AnalyticsEventConstants {
   static const String endScreenAccountPromptTapped =
       'end_screen_account_prompt_tapped';
 
-  /// Event logged when the user taps "Turn on smart reminders" but the OS
+  /// Event logged when the user taps "Turn on daily reminders" but the OS
   /// permission dialog returns denied.
   static const String endScreenReminderOsDenied =
       'end_screen_reminder_os_denied';
@@ -632,30 +632,32 @@ class AnalyticsEventConstants {
   static const String endScreenReminderEnableFailed =
       'end_screen_reminder_enable_failed';
 
-  /// Event logged when the user enables smart reminders/notifications.
+  /// Event logged when the user enables daily reminders/notifications.
   /// Parameter: paramSource ('end_screen', 'settings')
   static const String notificationsEnabled = 'notifications_enabled';
 
-  /// Event logged when the user disables smart reminders/notifications.
+  /// Event logged when the user disables daily reminders/notifications.
   /// Parameter: paramSource ('settings')
   static const String notificationsDisabled = 'notifications_disabled';
 
   /// Event logged when a notification is TAPPED. Nothing in the app logged
-  /// this before, and the smart-reminder series shipped a bare ISO date string
+  /// this before, and the daily-reminder series shipped a bare ISO date string
   /// as its payload, which `json.decode` rejected — so the tap was swallowed,
   /// never navigated and never measured. Every question about whether the
   /// reminders work has had to be answered by inference instead.
   ///
-  /// Params: [paramSource] ('smart_reminder' | 'push'), plus
+  /// Params: [paramSource] ('smart_reminder' (legacy value, kept for analytics continuity) | 'push'), plus
   /// [paramNotificationDay] for the reminder series so open rate can be read
   /// per day of the sequence (the series escalates its copy by day).
   static const String notificationOpened = 'notification_opened';
 
-  /// Which day of the smart-reminder series was tapped (1-15, or 30).
+  /// Which day of the daily-reminder series was tapped (1-15, or 30).
   static const String paramNotificationDay = 'notification_day';
 
-  /// Source value for a tap on a locally-scheduled smart reminder.
-  static const String sourceSmartReminder = 'smart_reminder';
+  /// Source value for a tap on a locally-scheduled daily reminder. The
+  /// string is unchanged from the old "smart reminders" name so historical
+  /// BigQuery rows stay comparable.
+  static const String sourceLocalReminder = 'smart_reminder';
 
   /// Source value for a tap on a remote push (FCM campaign).
   static const String sourcePush = 'push';
