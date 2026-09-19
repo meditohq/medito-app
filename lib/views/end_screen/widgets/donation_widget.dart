@@ -169,9 +169,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
 
   void _logDonateTap({
     required int buttonIndex,
-    required bool isSnoozed,
     Map<String, Object> extra = const {},
   }) {
+    // Taps only exist in the 'ask' state now (the thank-you card has no CTA
+    // and snoozers see no card); card_state is kept for query continuity.
     unawaited(
       ref
           .read(analyticsServiceProvider)
@@ -181,13 +182,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
               AnalyticsEventConstants.paramPaywallSource:
                   FirebaseAnalyticsService.paywallSourceEndScreen,
               AnalyticsEventConstants.paramButtonIndex: buttonIndex,
-              AnalyticsEventConstants.paramCardState: isSnoozed
-                  ? 'thanks'
-                  : 'ask',
-              if (isSnoozed)
-                AnalyticsEventConstants.paramSnoozeReason: ref
-                    .read(donationSnoozeProvider)
-                    .snoozeReason,
+              AnalyticsEventConstants.paramCardState: 'ask',
               ..._experimentParams,
               ...extra,
             },
@@ -210,7 +205,6 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     if (_isProcessingInlinePayment) return;
     _logDonateTap(
       buttonIndex: 0,
-      isSnoozed: false,
       extra: {
         AnalyticsEventConstants.paramPaymentMethod: switch (method) {
           payment_models.PaymentMethodType.applePay => 'apple_pay',
@@ -259,7 +253,6 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   void _openWebviewFromInline() {
     _logDonateTap(
       buttonIndex: 0,
-      isSnoozed: false,
       extra: {AnalyticsEventConstants.paramPaymentMethod: 'webview'},
     );
     handleNavigation(
@@ -321,6 +314,12 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
             // whether the inline body or the fallback CTA rendered.
           } else {
             _logImpression(isSnoozed: snoozeState.isSnoozed);
+          }
+          // Someone who tapped "Hide for now" asked for silence: no card at
+          // all for the snooze window (the suppressed impression above still
+          // keeps the denominator honest). Donors get a thank-you instead.
+          if (snoozeState.isSnoozed && !snoozeState.isDonor) {
+            return const FeedbackWidget();
           }
           return Column(
             children: [
@@ -510,6 +509,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     );
   }
 
+  /// Donor-only thank-you for the snooze window after a completed donation.
+  /// Deliberately has NO call to action: the old "Donate again" button drew
+  /// ~7 repeat gifts a month (Aug-Sep 2026) and read as not noticing the
+  /// person already gives. The regular ask returns when the window ends.
   Widget _buildCompactThankYouWidget(BuildContext context) {
     return HomeGradientBorder(
       backgroundColor: context.brandPurple,
@@ -539,39 +542,6 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 fontWeight: FontWeight.w400,
                 height: 1.4,
                 color: context.onBrandPurple.withValues(alpha: 0.9),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  _logDonateTap(buttonIndex: 0, isSnoozed: true);
-                  handleNavigation(
-                    TypeConstants.route,
-                    [RouteConstants.donation],
-                    context,
-                    ref: ref,
-                    sourceRouteName:
-                        FirebaseAnalyticsService.paywallSourceEndScreen,
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: context.onBrandPurple,
-                  side: BorderSide(color: context.onBrandPurple, width: 1.5),
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.donateAgain,
-                  // headlineMedium carries the page foreground colour, which
-                  // would override the button's foreground and leave white
-                  // text on the light accent card in dark mode.
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: context.onBrandPurple,
-                  ),
-                ),
               ),
             ),
           ],
@@ -665,7 +635,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                _logDonateTap(buttonIndex: 0, isSnoozed: false);
+                _logDonateTap(buttonIndex: 0);
                 handleNavigation(
                   TypeConstants.route,
                   [RouteConstants.donation],
@@ -703,7 +673,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
               // returns false when it is null, so omitting it here made every
               // CTA in the multi-button layout a no-op.
               onPressed: () {
-                _logDonateTap(buttonIndex: i, isSnoozed: false);
+                _logDonateTap(buttonIndex: i);
                 handleNavigation(
                   TypeConstants.route,
                   [RouteConstants.donation],

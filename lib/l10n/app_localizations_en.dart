@@ -1787,9 +1787,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'We rely on donors like you to continue providing mindfulness to everyone.';
 
   @override
-  String get donateAgain => 'Donate Again';
-
-  @override
   String get donationInfoTitle => 'Why You Might See This';
 
   @override

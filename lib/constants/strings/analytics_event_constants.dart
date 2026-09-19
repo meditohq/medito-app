@@ -589,7 +589,7 @@ class AnalyticsEventConstants {
   /// or repeat ask) vs 'thanks' (post-donation "Donate again").
   static const String paramCardState = 'card_state';
 
-  /// On [endScreenDonationCardSuppressed] and 'thanks'-state donate taps:
+  /// On [endScreenDonationCardSuppressed]:
   /// why the ask is suppressed — 'donor' (this install completed a donation)
   /// or 'hidden' ("Hide for now" from the info dialog, no donation on
   /// record). Without it, repeat-donation rates among real donors were

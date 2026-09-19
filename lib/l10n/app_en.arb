@@ -916,10 +916,6 @@
   "@donorSupportMessage": {
     "description": "Message shown to existing donors explaining their importance"
   },
-  "donateAgain": "Donate Again",
-  "@donateAgain": {
-    "description": "Button text for donating again after a previous donation"
-  },
   "donationInfoTitle": "Why You Might See This",
   "@donationInfoTitle": {
     "description": "Title for the donation info dialog explaining why users might see the donation ask"

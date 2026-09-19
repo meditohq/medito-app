@@ -3308,12 +3308,6 @@ abstract class AppLocalizations {
   /// **'We rely on donors like you to continue providing mindfulness to everyone.'**
   String get donorSupportMessage;
 
-  /// Button text for donating again after a previous donation
-  ///
-  /// In en, this message translates to:
-  /// **'Donate Again'**
-  String get donateAgain;
-
   /// Title for the donation info dialog explaining why users might see the donation ask
   ///
   /// In en, this message translates to:
