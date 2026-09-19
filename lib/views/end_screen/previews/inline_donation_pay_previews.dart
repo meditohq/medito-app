@@ -125,7 +125,7 @@ Widget wrapEs(Widget child) =>
 @Preview(
   group: 'Inline donation pay',
   name: 'iOS · Apple Pay · known email · dark',
-  size: phoneSize,
+  size: inlineCardSize,
   wrapper: wrapDark,
 )
 Widget inlineApplePayDark() => _inline(applePay: true);
@@ -133,7 +133,7 @@ Widget inlineApplePayDark() => _inline(applePay: true);
 @Preview(
   group: 'Inline donation pay',
   name: 'Android · card button · known email · dark',
-  size: phoneSize,
+  size: inlineCardSize,
   wrapper: wrapDark,
 )
 Widget inlineCardDark() => _inline();
@@ -141,7 +141,7 @@ Widget inlineCardDark() => _inline();
 @Preview(
   group: 'Inline donation pay',
   name: 'Anonymous · email field · dark',
-  size: phoneSize,
+  size: inlineCardSize,
   wrapper: wrapDark,
 )
 Widget inlineAnonymousDark() => _inline(knownEmail: null);
@@ -149,7 +149,7 @@ Widget inlineAnonymousDark() => _inline(knownEmail: null);
 @Preview(
   group: 'Inline donation pay',
   name: 'Anonymous · Apple Pay · light',
-  size: phoneSize,
+  size: inlineCardSize,
   wrapper: wrapLight,
 )
 Widget inlineAnonymousLight() => _inline(knownEmail: null, applePay: true);
@@ -157,7 +157,7 @@ Widget inlineAnonymousLight() => _inline(knownEmail: null, applePay: true);
 @Preview(
   group: 'Inline donation pay',
   name: 'BRL · wide amounts · Apple Pay',
-  size: phoneSize,
+  size: inlineCardSize,
   wrapper: wrapDark,
 )
 Widget inlineBrl() => _inline(
@@ -170,7 +170,7 @@ Widget inlineBrl() => _inline(
 @Preview(
   group: 'Inline donation pay',
   name: 'JPY · zero-decimal',
-  size: phoneSize,
+  size: inlineCardSize,
   wrapper: wrapDark,
 )
 Widget inlineJpy() => _inline(
@@ -182,7 +182,7 @@ Widget inlineJpy() => _inline(
 @Preview(
   group: 'Inline donation pay',
   name: 'INR · Apple Pay · large text 1.4×',
-  size: phoneSize,
+  size: inlineCardSize,
   textScaleFactor: 1.4,
   wrapper: wrapDark,
 )
@@ -196,7 +196,7 @@ Widget inlineInrLargeText() => _inline(
 @Preview(
   group: 'Inline donation pay',
   name: 'Spanish · anonymous · dark',
-  size: phoneSize,
+  size: inlineCardSize,
   wrapper: wrapEs,
 )
 Widget inlineEs() => _inline(knownEmail: null);
@@ -204,7 +204,7 @@ Widget inlineEs() => _inline(knownEmail: null);
 @Preview(
   group: 'Inline donation pay',
   name: 'Processing state',
-  size: phoneSize,
+  size: inlineCardSize,
   wrapper: wrapDark,
 )
 Widget inlineProcessing() => _inline(processing: true, applePay: true);
@@ -212,6 +212,10 @@ Widget inlineProcessing() => _inline(processing: true, applePay: true);
 // ---------------------------------------------------------------------------
 // Donor thank-you state (no CTA). "Hide for now" snoozers see no card at all,
 // so there is nothing to preview for them.
+
+/// Canvas heights: phone width, just enough height for the card.
+const inlineCardSize = Size(390, 420);
+const thankYouCardSize = Size(390, 180);
 
 Widget _thankYou() => const Scaffold(
   body: SafeArea(
@@ -228,7 +232,7 @@ Widget _thankYou() => const Scaffold(
 @Preview(
   group: 'Donation thank-you',
   name: 'Donor · dark',
-  size: phoneSize,
+  size: thankYouCardSize,
   wrapper: wrapDark,
 )
 Widget thankYouDark() => _thankYou();
@@ -236,7 +240,7 @@ Widget thankYouDark() => _thankYou();
 @Preview(
   group: 'Donation thank-you',
   name: 'Donor · light',
-  size: phoneSize,
+  size: thankYouCardSize,
   wrapper: wrapLight,
 )
 Widget thankYouLight() => _thankYou();
@@ -244,7 +248,7 @@ Widget thankYouLight() => _thankYou();
 @Preview(
   group: 'Donation thank-you',
   name: 'Donor · Spanish',
-  size: phoneSize,
+  size: thankYouCardSize,
   wrapper: wrapEs,
 )
 Widget thankYouEs() => _thankYou();
@@ -252,7 +256,7 @@ Widget thankYouEs() => _thankYou();
 @Preview(
   group: 'Donation thank-you',
   name: 'Donor · large text 1.4×',
-  size: phoneSize,
+  size: thankYouCardSize,
   textScaleFactor: 1.4,
   wrapper: wrapDark,
 )

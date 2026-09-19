@@ -12,6 +12,9 @@ import 'package:medito/views/previews/preview_support.dart';
 
 void _noop() {}
 
+/// Phone width, card height — a full 390×844 canvas is mostly empty space.
+const accountPromptCardSize = Size(390, 220);
+
 AccountPromptCard _card() =>
     AccountPromptCard(onSave: _noop, onSnooze: _noop, onDismiss: _noop);
 
@@ -26,7 +29,7 @@ Widget wrapEs(Widget child) =>
 @Preview(
   group: 'Account prompt',
   name: '390×844 · dark',
-  size: phoneSize,
+  size: accountPromptCardSize,
   wrapper: wrapDark,
 )
 Widget accountPromptDark() => _card();
@@ -34,7 +37,7 @@ Widget accountPromptDark() => _card();
 @Preview(
   group: 'Account prompt',
   name: '390×844 · light',
-  size: phoneSize,
+  size: accountPromptCardSize,
   wrapper: wrapLight,
 )
 Widget accountPromptLight() => _card();
@@ -42,7 +45,7 @@ Widget accountPromptLight() => _card();
 @Preview(
   group: 'Account prompt',
   name: 'Spanish · dark',
-  size: phoneSize,
+  size: accountPromptCardSize,
   wrapper: wrapEs,
 )
 Widget accountPromptEs() => _card();
@@ -50,7 +53,7 @@ Widget accountPromptEs() => _card();
 @Preview(
   group: 'Account prompt',
   name: 'Large text 1.4× · dark',
-  size: phoneSize,
+  size: accountPromptCardSize,
   textScaleFactor: 1.4,
   wrapper: wrapDark,
 )
