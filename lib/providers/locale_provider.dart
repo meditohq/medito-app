@@ -1,9 +1,20 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import '../constants/strings/shared_preference_constants.dart';
 import '../constants/types/type_constants.dart';
 import 'shared_preference/shared_preference_provider.dart';
+
+/// The device's preferred languages, in the user's order of preference
+/// (Settings > Language & Region on iOS, Languages on Android). This is
+/// independent of [localeProvider], which is the in-app language and is
+/// currently pinned to English; use this to tailor content to what the
+/// phone says the user reads. Overridable in tests.
+final deviceLocalesProvider = Provider<List<Locale>>(
+  (_) => PlatformDispatcher.instance.locales,
+);
 
 final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(() {
   return LocaleNotifier();
