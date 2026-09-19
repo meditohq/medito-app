@@ -16,7 +16,9 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/secure_storage_service.dart';
 import 'package:medito/utils/currency.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
@@ -344,6 +346,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       return;
     }
     if (_emailError != null) setState(() => _emailError = null);
+    try {
+      await ReceiptEmail.save(ref.read(sharedPreferencesProvider), typedEmail);
+    } catch (e) {
+      AppLogger.w(_logTag, 'Could not store receipt email: $e');
+    }
+    if (!mounted) return;
 
     if (!_donateTapLogged) {
       _donateTapLogged = true;

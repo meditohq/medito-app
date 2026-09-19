@@ -13,6 +13,7 @@ import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -115,7 +116,21 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     super.initState();
     _emailController.addListener(_validateEmail);
     _otpController.addListener(_validateOtp);
+    _prefillReceiptEmail();
     _setupDeepLinkHandling();
+  }
+
+  /// A donor who typed an email for their Stripe receipt gets it offered
+  /// here, so "add your email" is one tap. It is only a suggestion: the
+  /// field stays editable and the account email may legitimately differ.
+  void _prefillReceiptEmail() {
+    if (_emailController.text.isNotEmpty) return;
+    try {
+      final stored = ReceiptEmail.read(ref.read(sharedPreferencesProvider));
+      if (stored != null) _emailController.text = stored;
+    } catch (e) {
+      dev.log('[SIGN_UP] Could not read receipt email: $e');
+    }
   }
 
   void _setupDeepLinkHandling() {

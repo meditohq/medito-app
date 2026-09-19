@@ -26,6 +26,7 @@ import '../../../providers/stripe/payment_ui_controller.dart';
 import '../../../repositories/auth/auth_repository.dart';
 import '../../../routes/routes.dart';
 import '../../../utils/logger.dart';
+import '../../../utils/receipt_email.dart';
 import '../../../widgets/errors/medito_error_widget.dart';
 import '../../home/widgets/home_gradient_border.dart';
 import 'donation_thank_you_card.dart';
@@ -204,6 +205,12 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     required payment_models.PaymentMethodType method,
   }) async {
     if (_isProcessingInlinePayment) return;
+    // Remember the receipt address so the account prompt can prefill it.
+    try {
+      await ReceiptEmail.save(ref.read(sharedPreferencesProvider), email);
+    } catch (e) {
+      AppLogger.w('DONATION', 'Could not store receipt email: $e');
+    }
     _logDonateTap(
       buttonIndex: 0,
       extra: {

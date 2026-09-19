@@ -87,6 +87,11 @@ class SharedPreferenceConstants {
   static const String lastSuccessfulDonationFrequency =
       'last_successful_donation_frequency';
 
+  // Email the donor typed for their Stripe receipt in a native donation
+  // flow. Separate from the account email (they need not match): only used
+  // to prefill the sign-up screen so "add your email" is one tap.
+  static const String emailAddressForReceipt = 'email_address_for_receipt';
+
   // Up Next pack preference
   static const String upNextPackId = 'up_next_pack_id';
 
