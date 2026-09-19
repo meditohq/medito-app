@@ -28,6 +28,7 @@ import '../../../routes/routes.dart';
 import '../../../utils/logger.dart';
 import '../../../widgets/errors/medito_error_widget.dart';
 import '../../home/widgets/home_gradient_border.dart';
+import 'donation_thank_you_card.dart';
 import 'feedback_widget.dart';
 import 'inline_donation_pay.dart';
 
@@ -327,7 +328,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 opacity: 1.0,
                 duration: const Duration(milliseconds: 500),
                 child: snoozeState.isSnoozed
-                    ? _buildCompactThankYouWidget(context)
+                    ? const DonationThankYouCard()
                     : _buildDonationWidget(
                         context,
                         donationPageModel,
@@ -504,47 +505,6 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
           width: 18,
           height: 18,
           child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      ),
-    );
-  }
-
-  /// Donor-only thank-you for the snooze window after a completed donation.
-  /// Deliberately has NO call to action: the old "Donate again" button drew
-  /// ~7 repeat gifts a month (Aug-Sep 2026) and read as not noticing the
-  /// person already gives. The regular ask returns when the window ends.
-  Widget _buildCompactThankYouWidget(BuildContext context) {
-    return HomeGradientBorder(
-      backgroundColor: context.brandPurple,
-      borderRadius: 14,
-      borderWidth: 0.5,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context)!.thankYouForYourSupport,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontFamily: sourceSerif,
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
-                color: context.onBrandPurple,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              AppLocalizations.of(context)!.donorSupportMessage,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                height: 1.4,
-                color: context.onBrandPurple.withValues(alpha: 0.9),
-              ),
-            ),
-          ],
         ),
       ),
     );

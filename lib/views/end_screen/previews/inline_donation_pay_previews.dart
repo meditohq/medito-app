@@ -14,6 +14,7 @@ import 'package:flutter/widget_previews.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/stripe/payment_method_model.dart';
+import 'package:medito/views/end_screen/widgets/donation_thank_you_card.dart';
 import 'package:medito/views/end_screen/widgets/inline_donation_pay.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/previews/preview_support.dart';
@@ -204,3 +205,48 @@ Widget inlineEs() => _inline(knownEmail: null);
   wrapper: wrapDark,
 )
 Widget inlineProcessing() => _inline(processing: true, applePay: true);
+
+// ---------------------------------------------------------------------------
+// Donor thank-you state (no CTA). "Hide for now" snoozers see no card at all,
+// so there is nothing to preview for them.
+
+Widget _thankYou() => const Material(
+  type: MaterialType.transparency,
+  child: Align(
+    alignment: Alignment.topCenter,
+    child: Padding(padding: EdgeInsets.all(16), child: DonationThankYouCard()),
+  ),
+);
+
+@Preview(
+  group: 'Donation thank-you',
+  name: 'Donor · dark',
+  size: phoneSize,
+  wrapper: wrapDark,
+)
+Widget thankYouDark() => _thankYou();
+
+@Preview(
+  group: 'Donation thank-you',
+  name: 'Donor · light',
+  size: phoneSize,
+  wrapper: wrapLight,
+)
+Widget thankYouLight() => _thankYou();
+
+@Preview(
+  group: 'Donation thank-you',
+  name: 'Donor · Spanish',
+  size: phoneSize,
+  wrapper: wrapEs,
+)
+Widget thankYouEs() => _thankYou();
+
+@Preview(
+  group: 'Donation thank-you',
+  name: 'Donor · large text 1.4×',
+  size: phoneSize,
+  textScaleFactor: 1.4,
+  wrapper: wrapDark,
+)
+Widget thankYouLargeText() => _thankYou();
