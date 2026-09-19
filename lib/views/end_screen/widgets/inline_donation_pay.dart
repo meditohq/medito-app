@@ -224,12 +224,14 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
         ),
       );
     }
-    return Padding(
-      // Headroom for the badge overflowing the top of the chips.
-      padding: const EdgeInsets.only(top: 8),
-      child: Row(children: cells),
-    );
+    return Row(crossAxisAlignment: CrossAxisAlignment.end, children: cells);
   }
+
+  // A fixed-height caption row sits ABOVE every chip (empty except for the
+  // suggested one) so the badge never overlaps a chip or shifts the row:
+  // an overlapping pill merged with the selected chip's fill and wrapped
+  // at large text scales.
+  static const double _badgeRowHeight = 16;
 
   Widget _buildChip(
     BuildContext context,
@@ -249,12 +251,34 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
         onTap: widget.isProcessing
             ? null
             : () => setState(() => _selectedAmount = amount),
-        child: Stack(
-          clipBehavior: Clip.none,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
+            SizedBox(
+              height: _badgeRowHeight,
+              child: isSuggested
+                  ? FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        badge,
+                        maxLines: 1,
+                        softWrap: false,
+                        style: TextStyle(
+                          color: fg,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(height: 2),
             Container(
               height: 44,
               alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
                 color: isSelected ? fg : Colors.transparent,
                 border: Border.all(
@@ -267,6 +291,8 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                 fit: BoxFit.scaleDown,
                 child: Text(
                   label,
+                  maxLines: 1,
+                  softWrap: false,
                   style: TextStyle(
                     color: isSelected ? context.brandPurple : fg,
                     fontSize: 15,
@@ -275,38 +301,6 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                 ),
               ),
             ),
-            if (isSuggested)
-              Positioned(
-                top: -8,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 1,
-                    ),
-                    decoration: BoxDecoration(
-                      color: context.brandPurple,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    // Never wraps: at large text scales a two-line badge
-                    // covered the chip label underneath it.
-                    child: Text(
-                      badge,
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      textScaler: TextScaler.noScaling,
-                      style: TextStyle(
-                        color: fg,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
           ],
         ),
       ),

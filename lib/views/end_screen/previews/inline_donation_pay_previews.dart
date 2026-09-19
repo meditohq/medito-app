@@ -36,43 +36,52 @@ class _CardFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     // Material ancestor: the real card sits under the end screen's Scaffold;
     // without it every Text gets the debug yellow double-underline.
+    // Top-aligned + shrink-wrapped like the real end screen's scroll view;
+    // a bare Scaffold body would stretch the card to the full phone height.
     return Material(
       type: MaterialType.transparency,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: HomeGradientBorder(
-          backgroundColor: context.brandPurple,
-          borderRadius: 14,
-          borderWidth: 0.5,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 12, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Support Medito',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontFamily: sourceSerif,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w400,
-                    height: 1.2,
-                    color: context.onBrandPurple,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: HomeGradientBorder(
+            backgroundColor: context.brandPurple,
+            borderRadius: 14,
+            borderWidth: 0.5,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 12, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Support Medito',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontFamily: sourceSerif,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w400,
+                      height: 1.2,
+                      color: context.onBrandPurple,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Medito is free because people like you choose to support '
-                  'it. No ads, no paywalls.',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w400,
-                    height: 1.4,
-                    color: context.onBrandPurple.withValues(alpha: 0.9),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Medito is free because people like you choose to support '
+                    'it. No ads, no paywalls.',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      height: 1.4,
+                      color: context.onBrandPurple.withValues(alpha: 0.9),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Padding(padding: const EdgeInsets.only(right: 8), child: child),
-              ],
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: child,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
