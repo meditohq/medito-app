@@ -1880,18 +1880,6 @@ abstract class AppLocalizations {
   /// **'Skip'**
   String get skip;
 
-  /// No description provided for @packSetAsUpNext.
-  ///
-  /// In en, this message translates to:
-  /// **'This pack will now appear in the Your Path section on the homepage'**
-  String get packSetAsUpNext;
-
-  /// No description provided for @packUnpinnedFromUpNext.
-  ///
-  /// In en, this message translates to:
-  /// **'This pack has been removed from the Your Path section'**
-  String get packUnpinnedFromUpNext;
-
   /// No description provided for @donationTitle.
   ///
   /// In en, this message translates to:
@@ -4292,23 +4280,65 @@ abstract class AppLocalizations {
   /// **'Add to favorites'**
   String get addToFavorites;
 
+  /// Snackbar after the star button adds a pack or track to Favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Added to Favorites'**
+  String get addedToFavorites;
+
+  /// Snackbar after the star button removes a pack or track from Favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from Favorites'**
+  String get removedFromFavorites;
+
   /// Accessibility label for the favorite button when the item is already favorited
   ///
   /// In en, this message translates to:
   /// **'Remove from favorites'**
   String get removeFromFavorites;
 
-  /// Accessibility label for the pin button when the pack is not pinned
+  /// Button on the pack screen that makes this pack the one shown in the Your Path section on the home screen
   ///
   /// In en, this message translates to:
-  /// **'Pin to Your Path'**
-  String get pinToUpNext;
+  /// **'Set as Your Path'**
+  String get setAsYourPath;
 
-  /// Accessibility label for the pin button when the pack is already pinned
+  /// Subtitle under the Set as Your Path row on the pack screen
   ///
   /// In en, this message translates to:
-  /// **'Unpin from Your Path'**
-  String get unpinFromUpNext;
+  /// **'Continue this pack from your home screen'**
+  String get setAsYourPathSubtitle;
+
+  /// Subtitle under the Your Path row on the pack screen when this pack is the current Your Path
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total} complete · shown on your home screen'**
+  String yourPathRowSubtitle(int completed, int total);
+
+  /// Title of the sheet opened from the Your Path button on the pack screen
+  ///
+  /// In en, this message translates to:
+  /// **'This pack is Your Path'**
+  String get yourPathSheetTitle;
+
+  /// Body of the sheet opened from the Your Path button, explaining what Your Path does
+  ///
+  /// In en, this message translates to:
+  /// **'Your next session from this pack shows on the home screen and in the home widget.'**
+  String get yourPathSheetBody;
+
+  /// Shown in the Your Path sheet for the default pack, which cannot be removed
+  ///
+  /// In en, this message translates to:
+  /// **'This is your starting path. To change it, open another pack and set it as Your Path.'**
+  String get yourPathDefaultNote;
+
+  /// Action in the Your Path sheet that stops showing this pack on the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from Your Path'**
+  String get removeFromYourPath;
 
   /// Title shown when the donation paywall webview fails to load
   ///

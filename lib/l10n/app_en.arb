@@ -412,8 +412,6 @@
   "onboardingBatteryOptimize": "Update Setting",
   "skipForNow": "Skip for Now",
   "skip": "Skip",
-  "packSetAsUpNext": "This pack will now appear in the Your Path section on the homepage",
-  "packUnpinnedFromUpNext": "This pack has been removed from the Your Path section",
   "donationTitle": "Millions find calm here for free. Help keep it that way.",
   "donationBody": "Medito is run by a small nonprofit team — no ads, no investors, no paywalls. It stays free because people like you choose to support it.",
   "donationPrimerCta": "See how to help",
@@ -1632,17 +1630,46 @@
   "@addToFavorites": {
     "description": "Accessibility label for the favorite button when the item is not yet favorited"
   },
+  "addedToFavorites": "Added to Favorites",
+  "@addedToFavorites": {
+    "description": "Snackbar after the star button adds a pack or track to Favorites"
+  },
+  "removedFromFavorites": "Removed from Favorites",
+  "@removedFromFavorites": {
+    "description": "Snackbar after the star button removes a pack or track from Favorites"
+  },
   "removeFromFavorites": "Remove from favorites",
   "@removeFromFavorites": {
     "description": "Accessibility label for the favorite button when the item is already favorited"
   },
-  "pinToUpNext": "Pin to Your Path",
-  "@pinToUpNext": {
-    "description": "Accessibility label for the pin button when the pack is not pinned"
+  "setAsYourPath": "Set as Your Path",
+  "@setAsYourPath": {
+    "description": "Button on the pack screen that makes this pack the one shown in the Your Path section on the home screen"
   },
-  "unpinFromUpNext": "Unpin from Your Path",
-  "@unpinFromUpNext": {
-    "description": "Accessibility label for the pin button when the pack is already pinned"
+  "setAsYourPathSubtitle": "Continue this pack from your home screen",
+  "@setAsYourPathSubtitle": {
+    "description": "Subtitle under the Set as Your Path row on the pack screen"
+  },
+  "yourPathRowSubtitle": "{completed} of {total} complete · shown on your home screen",
+  "@yourPathRowSubtitle": {
+    "description": "Subtitle under the Your Path row on the pack screen when this pack is the current Your Path",
+    "placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}
+  },
+  "yourPathSheetTitle": "This pack is Your Path",
+  "@yourPathSheetTitle": {
+    "description": "Title of the sheet opened from the Your Path button on the pack screen"
+  },
+  "yourPathSheetBody": "Your next session from this pack shows on the home screen and in the home widget.",
+  "@yourPathSheetBody": {
+    "description": "Body of the sheet opened from the Your Path button, explaining what Your Path does"
+  },
+  "yourPathDefaultNote": "This is your starting path. To change it, open another pack and set it as Your Path.",
+  "@yourPathDefaultNote": {
+    "description": "Shown in the Your Path sheet for the default pack, which cannot be removed"
+  },
+  "removeFromYourPath": "Remove from Your Path",
+  "@removeFromYourPath": {
+    "description": "Action in the Your Path sheet that stops showing this pack on the home screen"
   },
   "connectionErrorTitle": "Couldn't load paywall",
   "@connectionErrorTitle": {

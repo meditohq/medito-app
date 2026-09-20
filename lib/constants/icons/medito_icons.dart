@@ -39,8 +39,6 @@ class MeditoIcons {
   static const moon = AssetConstants.iconMoon;
   static const musicNote = AssetConstants.iconMusicNote;
   static const pause = AssetConstants.iconPause;
-  static const pin = AssetConstants.iconPin;
-  static const pinSolid = AssetConstants.iconPinSolid;
   static const play = AssetConstants.iconPlay;
   static const playSolid = AssetConstants.iconPlaySolid;
   static const pencil = AssetConstants.iconPencil;

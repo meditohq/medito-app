@@ -7,6 +7,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/pack/widgets/pack_item_widget.dart';
+import 'package:medito/views/pack/widgets/pack_path_button.dart';
 import 'package:medito/views/player/widgets/bottom_actions/pack_view_bottom_bar.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -111,7 +112,16 @@ class _PackViewState extends ConsumerState<PackView>
           ),
           SliverList(
             delegate: SliverChildListDelegate([
-              DescriptionWidget(description: pack.description ?? ''),
+              // One surface: description text plus the Your Path row.
+              Container(
+                color: Theme.of(context).cardColor,
+                child: Column(
+                  children: [
+                    DescriptionWidget(description: pack.description ?? ''),
+                    PackPathButton(pack: pack),
+                  ],
+                ),
+              ),
               ..._listItems(pack, ref),
               _markAllButton(pack),
               height32,

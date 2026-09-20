@@ -1014,14 +1014,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get skip => 'Omitir';
 
   @override
-  String get packSetAsUpNext =>
-      'Este paquete ahora aparecerá en la sección Tu Camino en la página de inicio';
-
-  @override
-  String get packUnpinnedFromUpNext =>
-      'Este paquete ha sido eliminado de la sección Tu Camino';
-
-  @override
   String get donationTitle =>
       'Millones encuentran calma aquí gratis. Ayuda a que siga así.';
 
@@ -2370,13 +2362,39 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addToFavorites => 'Agregar a favoritos';
 
   @override
+  String get addedToFavorites => 'Añadido a Favoritos';
+
+  @override
+  String get removedFromFavorites => 'Quitado de Favoritos';
+
+  @override
   String get removeFromFavorites => 'Quitar de favoritos';
 
   @override
-  String get pinToUpNext => 'Fijar en Tu Camino';
+  String get setAsYourPath => 'Elegir como Tu Camino';
 
   @override
-  String get unpinFromUpNext => 'Desfijar de Tu Camino';
+  String get setAsYourPathSubtitle =>
+      'Continúa este paquete desde tu pantalla de inicio';
+
+  @override
+  String yourPathRowSubtitle(int completed, int total) {
+    return '$completed de $total completadas · en tu inicio';
+  }
+
+  @override
+  String get yourPathSheetTitle => 'Este paquete es Tu Camino';
+
+  @override
+  String get yourPathSheetBody =>
+      'Tu próxima sesión de este paquete se muestra en la pantalla de inicio y en el widget.';
+
+  @override
+  String get yourPathDefaultNote =>
+      'Este es tu camino inicial. Para cambiarlo, abre otro paquete y elígelo como Tu Camino.';
+
+  @override
+  String get removeFromYourPath => 'Quitar de Tu Camino';
 
   @override
   String get connectionErrorTitle => 'No se pudo cargar el paywall';

@@ -995,14 +995,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skip => 'Skip';
 
   @override
-  String get packSetAsUpNext =>
-      'This pack will now appear in the Your Path section on the homepage';
-
-  @override
-  String get packUnpinnedFromUpNext =>
-      'This pack has been removed from the Your Path section';
-
-  @override
   String get donationTitle =>
       'Millions find calm here for free. Help keep it that way.';
 
@@ -2335,13 +2327,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addToFavorites => 'Add to favorites';
 
   @override
+  String get addedToFavorites => 'Added to Favorites';
+
+  @override
+  String get removedFromFavorites => 'Removed from Favorites';
+
+  @override
   String get removeFromFavorites => 'Remove from favorites';
 
   @override
-  String get pinToUpNext => 'Pin to Your Path';
+  String get setAsYourPath => 'Set as Your Path';
 
   @override
-  String get unpinFromUpNext => 'Unpin from Your Path';
+  String get setAsYourPathSubtitle =>
+      'Continue this pack from your home screen';
+
+  @override
+  String yourPathRowSubtitle(int completed, int total) {
+    return '$completed of $total complete · shown on your home screen';
+  }
+
+  @override
+  String get yourPathSheetTitle => 'This pack is Your Path';
+
+  @override
+  String get yourPathSheetBody =>
+      'Your next session from this pack shows on the home screen and in the home widget.';
+
+  @override
+  String get yourPathDefaultNote =>
+      'This is your starting path. To change it, open another pack and set it as Your Path.';
+
+  @override
+  String get removeFromYourPath => 'Remove from Your Path';
 
   @override
   String get connectionErrorTitle => 'Couldn\'t load paywall';

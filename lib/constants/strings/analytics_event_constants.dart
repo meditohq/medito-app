@@ -454,12 +454,17 @@ class AnalyticsEventConstants {
 
   static const String paramPackTotalSessions = 'pack_total_sessions';
 
-  // Pin events
-  /// Event logged when user pins a pack as Up Next from the pack screen
+  // Your Path (Up Next) pack selection from the pack screen
+  /// The user set a pack as Your Path via the pack screen button.
+  /// Params: [paramPackId], [paramPreviousPackId].
   static const String packPinned = 'pack_pinned';
 
-  /// Event logged when user unpins a pack from Up Next on the pack screen
+  /// The user removed the pack from Your Path via the pack screen sheet.
+  /// Params: [paramPackId].
   static const String packUnpinned = 'pack_unpinned';
+
+  /// Pack that was Your Path before this one replaced it.
+  static const String paramPreviousPackId = 'previous_pack_id';
 
   // Home-screen widget events (iOS + Android)
   /// Event logged when the user taps a home-screen widget. Detected via the
