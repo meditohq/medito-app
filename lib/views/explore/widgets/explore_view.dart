@@ -72,10 +72,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
               // Browse-by-tag strip. Renders nothing until GET /tags succeeds,
               // so an app build shipped before the API change looks unchanged.
               const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.only(top: padding8),
-                  child: ExploreTagChips(),
-                ),
+                child: ExploreTagChips(padding: EdgeInsets.only(top: padding8)),
               ),
               ..._buildPacks(),
               SliverPadding(

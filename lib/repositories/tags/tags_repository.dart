@@ -34,9 +34,11 @@ class TagsRepositoryImpl implements TagsRepository {
           (t) => TrackItem(
             id: t['id'] as String,
             title: t['title'] as String,
-            subtitle: t['subtitle'] as String? ?? '',
-            coverUrl: t['coverUrl'] as String? ?? '',
-            path: t['path'] as String? ?? '/tracks/${t['id']}',
+            subtitle: t['subtitle'] is String ? t['subtitle'] as String : '',
+            coverUrl: t['coverUrl'] is String ? t['coverUrl'] as String : '',
+            path: t['path'] is String
+                ? t['path'] as String
+                : '/tracks/${t['id']}',
           ),
         )
         .toList();

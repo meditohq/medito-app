@@ -141,11 +141,11 @@ class _PackViewState extends ConsumerState<PackView>
         .map((item) => item.id)
         .toList();
     if (trackIds.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: PackTagChips(trackIds: trackIds),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: PackTagChips(
+        trackIds: trackIds,
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       ),
     );
   }

@@ -18,10 +18,12 @@ class TagModel {
     if (json is! Map) return null;
     final id = json['id'];
     if (id is! String || id.isEmpty) return null;
+    final group = json['group'];
+    final description = json['description'];
     return TagModel(
       id: id,
-      group: json['group'] as String? ?? '',
-      description: json['description'] as String? ?? '',
+      group: group is String ? group : '',
+      description: description is String ? description : '',
     );
   }
 }
@@ -44,19 +46,19 @@ class TagCatalog {
   TagModel? tag(String id) => _byId[id];
 
   /// Tags for one track, strongest first. Empty when unknown.
-  List<TagModel> tagsForTrack(String trackId) => (trackTags[trackId] ?? const [])
-      .map(tag)
-      .whereType<TagModel>()
-      .toList();
+  List<TagModel> tagsForTrack(String trackId) =>
+      (trackTags[trackId] ?? const []).map(tag).whereType<TagModel>().toList();
 
   /// Tags shared by at least half of [trackIds], most common first. Used to
   /// describe a pack from its tracks without tagging packs server-side.
   List<TagModel> tagsForTracks(Iterable<String> trackIds) {
-    final ids = trackIds.where(trackTags.containsKey).toList();
+    // Every supplied track counts toward the denominator; a track missing from
+    // the catalog simply contributes no tags, so it cannot lower the threshold.
+    final ids = trackIds.toList();
     if (ids.isEmpty) return const [];
     final counts = <String, int>{};
     for (final id in ids) {
-      for (final tagId in trackTags[id]!) {
+      for (final tagId in (trackTags[id] ?? const <String>[])) {
         counts[tagId] = (counts[tagId] ?? 0) + 1;
       }
     }
@@ -84,7 +86,10 @@ class TagCatalog {
     final rawMap = json['trackTags'];
     if (rawTags is! List || rawMap is! Map) return empty;
 
-    final tags = rawTags.map(TagModel.tryFromJson).whereType<TagModel>().toList();
+    final tags = rawTags
+        .map(TagModel.tryFromJson)
+        .whereType<TagModel>()
+        .toList();
     final trackTags = <String, List<String>>{};
     for (final entry in rawMap.entries) {
       final key = entry.key;

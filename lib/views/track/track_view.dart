@@ -361,9 +361,9 @@ class _TrackViewState extends ConsumerState<TrackView>
 
   /// The track's tags as chips. Empty (zero height) when tags are unavailable.
   Widget _tags(Track track) {
-    return Padding(
+    return TrackTagChips(
+      trackId: track.id,
       padding: const EdgeInsets.only(top: 12),
-      child: TrackTagChips(trackId: track.id),
     );
   }
 

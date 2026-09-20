@@ -26,6 +26,36 @@ void main() {
     expect(c.isEmpty, isFalse);
   });
 
+  test(
+    'keeps a tag whose group/description are non-string, defaulting them',
+    () {
+      final c = TagCatalog.fromJson({
+        'tags': [
+          {'id': 'sleep', 'group': 7, 'description': false},
+        ],
+        'trackTags': {
+          'a': ['sleep'],
+        },
+      });
+      expect(c.tags.map((t) => t.id), ['sleep']);
+      expect(c.tag('sleep')!.group, '');
+      expect(c.tag('sleep')!.description, '');
+    },
+  );
+
+  test('tagsForTracks counts tracks missing from the catalog', () {
+    final c = TagCatalog.fromJson(json);
+    // one tagged track (a: sleep,calm) + one missing track → denominator 2,
+    // threshold 1, so a tag on the single known track no longer sweeps in.
+    expect(c.tagsForTracks(['a', 'missing']).map((t) => t.id), [
+      'sleep',
+      'calm',
+    ]);
+    // one tagged track + two missing → denominator 3, threshold 2, nothing
+    // reaches half.
+    expect(c.tagsForTracks(['a', 'missing1', 'missing2']), isEmpty);
+  });
+
   test('malformed top level yields the empty catalog', () {
     expect(TagCatalog.fromJson({}).isEmpty, isTrue);
     expect(TagCatalog.fromJson({'tags': 'x', 'trackTags': []}).isEmpty, isTrue);

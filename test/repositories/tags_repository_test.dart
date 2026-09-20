@@ -20,7 +20,9 @@ void main() {
         'tags': [
           {'id': 'sleep', 'group': 'goal', 'description': 'd'},
         ],
-        'trackTags': {'t1': ['sleep']},
+        'trackTags': {
+          't1': ['sleep'],
+        },
       },
     );
     final catalog = await repo.fetchCatalog();
@@ -33,30 +35,57 @@ void main() {
     expect(repo.fetchCatalog(), throwsException);
   });
 
-  test('fetchTracksForTag parses track cards and drops malformed rows', () async {
+  test(
+    'fetchTracksForTag parses track cards and drops malformed rows',
+    () async {
+      when(() => client.getRequest('tags/sleep')).thenAnswer(
+        (_) async => {
+          'tag': {'id': 'sleep', 'group': 'goal', 'description': 'd'},
+          'tracks': [
+            {
+              'id': 'a',
+              'title': 'Drift off',
+              'subtitle': '10 min',
+              'coverUrl': 'https://x/a.png',
+              'path': '/tracks/a',
+              'probability': 0.9,
+            },
+            {'id': 'b', 'title': 'Minimal'},
+            {'title': 'no id'},
+            'garbage',
+          ],
+        },
+      );
+      final tracks = await repo.fetchTracksForTag('sleep');
+      expect(tracks.map((t) => t.id), ['a', 'b']);
+      expect(tracks.first.subtitle, '10 min');
+      expect(tracks.last.path, '/tracks/b');
+      expect(tracks.last.coverUrl, '');
+    },
+  );
+
+  test('fetchTracksForTag normalises non-string optional fields', () async {
     when(() => client.getRequest('tags/sleep')).thenAnswer(
       (_) async => {
-        'tag': {'id': 'sleep', 'group': 'goal', 'description': 'd'},
         'tracks': [
           {
             'id': 'a',
-            'title': 'Drift off',
-            'subtitle': '10 min',
-            'coverUrl': 'https://x/a.png',
-            'path': '/tracks/a',
-            'probability': 0.9,
+            'title': 'Odd',
+            'subtitle': 3,
+            'coverUrl': false,
+            'path': 9,
           },
-          {'id': 'b', 'title': 'Minimal'},
-          {'title': 'no id'},
-          'garbage',
+          {'id': 'b', 'title': 'Fine', 'subtitle': '5 min'},
         ],
       },
     );
     final tracks = await repo.fetchTracksForTag('sleep');
+    // The malformed row is kept (not dropped) with defaulted optional fields.
     expect(tracks.map((t) => t.id), ['a', 'b']);
-    expect(tracks.first.subtitle, '10 min');
-    expect(tracks.last.path, '/tracks/b');
-    expect(tracks.last.coverUrl, '');
+    expect(tracks.first.subtitle, '');
+    expect(tracks.first.coverUrl, '');
+    expect(tracks.first.path, '/tracks/a');
+    expect(tracks[1].subtitle, '5 min');
   });
 
   test('fetchTracksForTag returns empty for an unexpected body', () async {

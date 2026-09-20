@@ -20,16 +20,17 @@ const hiddenTagIds = <String>{
 };
 
 void openTag(BuildContext context, TagModel tag) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => TagView(tag: tag)),
-  );
+  Navigator.push(context, MaterialPageRoute(builder: (_) => TagView(tag: tag)));
 }
 
 /// Horizontal strip of every browsable tag, most-used first. Renders nothing
 /// while the catalog is loading or when it is unavailable.
 class ExploreTagChips extends ConsumerWidget {
-  const ExploreTagChips({super.key});
+  const ExploreTagChips({super.key, this.padding = EdgeInsets.zero});
+
+  /// Applied only when chips actually render, so an unavailable catalog leaves
+  /// no gap.
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,27 +38,36 @@ class ExploreTagChips extends ConsumerWidget {
     if (catalog.isEmpty) return const SizedBox.shrink();
 
     final counts = catalog.trackCounts;
-    final tags = catalog.tags
-        .where((t) => !hiddenTagIds.contains(t.id) && (counts[t.id] ?? 0) > 0)
-        .toList()
-      ..sort((a, b) => (counts[b.id] ?? 0).compareTo(counts[a.id] ?? 0));
+    final tags =
+        catalog.tags
+            .where(
+              (t) => !hiddenTagIds.contains(t.id) && (counts[t.id] ?? 0) > 0,
+            )
+            .toList()
+          ..sort((a, b) => (counts[b.id] ?? 0).compareTo(counts[a.id] ?? 0));
     if (tags.isEmpty) return const SizedBox.shrink();
 
-    return SizedBox(
-      height: 52,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: padding16, vertical: padding8),
-        itemCount: tags.length,
-        separatorBuilder: (_, _) => const SizedBox(width: padding8),
-        itemBuilder: (context, index) {
-          final tag = tags[index];
-          return TagChip(
-            key: ValueKey('tag_chip_${tag.id}'),
-            label: tagLabel(context, tag.id),
-            onTap: () => openTag(context, tag),
-          );
-        },
+    return Padding(
+      padding: padding,
+      child: SizedBox(
+        height: 52,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(
+            horizontal: padding16,
+            vertical: padding8,
+          ),
+          itemCount: tags.length,
+          separatorBuilder: (_, _) => const SizedBox(width: padding8),
+          itemBuilder: (context, index) {
+            final tag = tags[index];
+            return TagChip(
+              key: ValueKey('tag_chip_${tag.id}'),
+              label: tagLabel(context, tag.id),
+              onTap: () => openTag(context, tag),
+            );
+          },
+        ),
       ),
     );
   }
@@ -65,26 +75,41 @@ class ExploreTagChips extends ConsumerWidget {
 
 /// Wrapping row of chips for a given list of tags; nothing when empty.
 class TagChipsWrap extends StatelessWidget {
-  const TagChipsWrap({super.key, required this.tags, this.max = 6});
+  const TagChipsWrap({
+    super.key,
+    required this.tags,
+    this.max = 6,
+    this.padding = EdgeInsets.zero,
+  });
 
   final List<TagModel> tags;
   final int max;
 
+  /// Applied only when there are chips to show, so an empty result leaves no
+  /// gap in the surrounding layout.
+  final EdgeInsetsGeometry padding;
+
   @override
   Widget build(BuildContext context) {
-    final visible = tags.where((t) => !hiddenTagIds.contains(t.id)).take(max).toList();
+    final visible = tags
+        .where((t) => !hiddenTagIds.contains(t.id))
+        .take(max)
+        .toList();
     if (visible.isEmpty) return const SizedBox.shrink();
-    return Wrap(
-      spacing: padding8,
-      runSpacing: padding8,
-      children: [
-        for (final tag in visible)
-          TagChip(
-            key: ValueKey('tag_chip_${tag.id}'),
-            label: tagLabel(context, tag.id),
-            onTap: () => openTag(context, tag),
-          ),
-      ],
+    return Padding(
+      padding: padding,
+      child: Wrap(
+        spacing: padding8,
+        runSpacing: padding8,
+        children: [
+          for (final tag in visible)
+            TagChip(
+              key: ValueKey('tag_chip_${tag.id}'),
+              label: tagLabel(context, tag.id),
+              onTap: () => openTag(context, tag),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -92,26 +117,42 @@ class TagChipsWrap extends StatelessWidget {
 /// A track's own tags, strongest first. Nothing when the track has none or
 /// the catalog is unavailable.
 class TrackTagChips extends ConsumerWidget {
-  const TrackTagChips({super.key, required this.trackId});
+  const TrackTagChips({
+    super.key,
+    required this.trackId,
+    this.padding = EdgeInsets.zero,
+  });
 
   final String trackId;
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return TagChipsWrap(tags: ref.watch(trackTagsProvider(trackId)));
+    return TagChipsWrap(
+      tags: ref.watch(trackTagsProvider(trackId)),
+      padding: padding,
+    );
   }
 }
 
 /// Tags shared by at least half of a pack's tracks. Packs are not tagged on
 /// the server; this is derived from the track map on the device.
 class PackTagChips extends ConsumerWidget {
-  const PackTagChips({super.key, required this.trackIds});
+  const PackTagChips({
+    super.key,
+    required this.trackIds,
+    this.padding = EdgeInsets.zero,
+  });
 
   final List<String> trackIds;
+  final EdgeInsetsGeometry padding;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final catalog = ref.watch(tagCatalogProvider);
-    return TagChipsWrap(tags: catalog.tagsForTracks(trackIds));
+    return TagChipsWrap(
+      tags: catalog.tagsForTracks(trackIds),
+      padding: padding,
+    );
   }
 }
