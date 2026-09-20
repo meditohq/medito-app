@@ -17,6 +17,7 @@ import 'package:medito/views/player/player_view.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/player/widgets/bottom_actions/track_view_bottom_bar.dart';
+import 'package:medito/views/tags/widgets/tag_chips.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -179,6 +180,7 @@ class _TrackViewState extends ConsumerState<TrackView>
                       _title(context, track.title),
                       const SizedBox(height: 8),
                       _getSubTitle(context, track.description),
+                      _tags(track),
                     ],
                   ),
                 ),
@@ -262,6 +264,7 @@ class _TrackViewState extends ConsumerState<TrackView>
         _title(context, track.title),
         const SizedBox(height: 8),
         _getSubTitle(context, track.description),
+        _tags(track),
         const SizedBox(height: 24),
         if (useCompactLayout && showGuideNameDropdown)
           _buildCompactPickers(track, activeVoice, activeFile, guideName)
@@ -353,6 +356,14 @@ class _TrackViewState extends ConsumerState<TrackView>
         color: Theme.of(context).colorScheme.onSurface,
         fontWeight: FontWeight.normal,
       ),
+    );
+  }
+
+  /// The track's tags as chips. Empty (zero height) when tags are unavailable.
+  Widget _tags(Track track) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: TrackTagChips(trackId: track.id),
     );
   }
 

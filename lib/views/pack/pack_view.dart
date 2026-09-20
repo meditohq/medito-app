@@ -10,6 +10,7 @@ import 'package:medito/views/pack/widgets/pack_item_widget.dart';
 import 'package:medito/views/pack/widgets/pack_path_button.dart';
 import 'package:medito/views/player/widgets/bottom_actions/pack_view_bottom_bar.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
+import 'package:medito/views/tags/widgets/tag_chips.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -118,6 +119,7 @@ class _PackViewState extends ConsumerState<PackView>
                 child: Column(
                   children: [
                     DescriptionWidget(description: pack.description ?? ''),
+                    _packTags(pack),
                     PackPathButton(pack: pack),
                   ],
                 ),
@@ -128,6 +130,22 @@ class _PackViewState extends ConsumerState<PackView>
             ]),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Tags shared by most of the pack's tracks; nothing when unavailable.
+  Widget _packTags(PackModel pack) {
+    final trackIds = pack.items
+        .where((item) => item.type == TypeConstants.track)
+        .map((item) => item.id)
+        .toList();
+    if (trackIds.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: PackTagChips(trackIds: trackIds),
       ),
     );
   }

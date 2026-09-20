@@ -100,6 +100,40 @@ class MockHttpApiService extends HttpApiService {
       return {'results': mockBackgroundSounds.map((s) => s.toJson()).toList()};
     }
 
+    // Tracks for one tag: tags/{id}
+    if (cleanPath.startsWith('${HTTPConstants.tags}/')) {
+      final id = cleanPath.split('/').last;
+      final trackIds = mockTrackTags.entries
+          .where((e) => e.value.contains(id))
+          .map((e) => e.key);
+      return {
+        'tag': {'id': id, 'group': 'goal', 'description': ''},
+        'tracks': [
+          for (final trackId in trackIds)
+            if (mockTracks[trackId] case final track?)
+              {
+                'id': track.id,
+                'title': track.title,
+                'subtitle': track.subtitle ?? '',
+                'coverUrl': track.coverUrl,
+                'path': '/tracks/${track.id}',
+                'probability': 0.9,
+              },
+        ],
+      };
+    }
+
+    // Tag catalog
+    if (cleanPath == HTTPConstants.tags) {
+      return {
+        'tags': [
+          for (final tag in mockTags)
+            {'id': tag, 'group': 'goal', 'description': ''},
+        ],
+        'trackTags': mockTrackTags,
+      };
+    }
+
     // Search tracks
     if (cleanPath.startsWith(HTTPConstants.searchTracks)) {
       return {'results': <Map<String, dynamic>>[]};

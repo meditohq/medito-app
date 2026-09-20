@@ -8,6 +8,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/views/explore/widgets/pack_grid_sliver.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
+import 'package:medito/views/tags/widgets/tag_chips.dart';
 import 'package:medito/widgets/widgets.dart';
 
 /// The Explore tab: every published pack in a masonry grid. Search lives on
@@ -66,6 +67,14 @@ class ExploreViewState extends ConsumerState<ExploreView> {
                   child: HomeHeaderWidget(
                     greeting: AppLocalizations.of(context)!.explore,
                   ),
+                ),
+              ),
+              // Browse-by-tag strip. Renders nothing until GET /tags succeeds,
+              // so an app build shipped before the API change looks unchanged.
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(top: padding8),
+                  child: ExploreTagChips(),
                 ),
               ),
               ..._buildPacks(),

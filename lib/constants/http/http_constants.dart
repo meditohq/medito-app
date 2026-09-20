@@ -155,6 +155,7 @@ class HTTPConstants {
   static const String allStats = 'stats';
   static const String me = 'me';
   static const String searchTracks = 'search/tracks';
+  static const String tags = 'tags';
 
   // AUTH END POINTS
   static const String authSignIn = 'signin';

@@ -2413,4 +2413,130 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get donateMonthlyDisclosure =>
       'Monthly, cancel any time. Secure payment via Stripe.';
+
+  @override
+  String get tagSleep => 'Sleep';
+
+  @override
+  String get tagStress => 'Stress';
+
+  @override
+  String get tagAnxiety => 'Anxiety';
+
+  @override
+  String get tagLowMood => 'Low mood';
+
+  @override
+  String get tagFocus => 'Focus';
+
+  @override
+  String get tagCalm => 'Calm';
+
+  @override
+  String get tagSelfCompassion => 'Self-compassion';
+
+  @override
+  String get tagGratitude => 'Gratitude';
+
+  @override
+  String get tagEmotions => 'Difficult emotions';
+
+  @override
+  String get tagPain => 'Pain';
+
+  @override
+  String get tagConfidence => 'Confidence';
+
+  @override
+  String get tagRelationships => 'Relationships';
+
+  @override
+  String get tagGrief => 'Grief';
+
+  @override
+  String get tagHabitBuilding => 'Habit building';
+
+  @override
+  String get tagBreathing => 'Breathing';
+
+  @override
+  String get tagBodyScan => 'Body scan';
+
+  @override
+  String get tagLovingKindness => 'Loving-kindness';
+
+  @override
+  String get tagOpenAwareness => 'Open awareness';
+
+  @override
+  String get tagVisualization => 'Visualisation';
+
+  @override
+  String get tagMantra => 'Mantra';
+
+  @override
+  String get tagWalking => 'Walking';
+
+  @override
+  String get tagReflection => 'Reflection';
+
+  @override
+  String get tagSound => 'Sound';
+
+  @override
+  String get tagGuidedMeditation => 'Guided meditation';
+
+  @override
+  String get tagTalk => 'Talks';
+
+  @override
+  String get tagSleepStory => 'Sleep stories';
+
+  @override
+  String get tagMusic => 'Music';
+
+  @override
+  String get tagNatureSounds => 'Nature sounds';
+
+  @override
+  String get tagCourseLesson => 'Course lessons';
+
+  @override
+  String get tagBeginners => 'For beginners';
+
+  @override
+  String get tagExperienced => 'Experienced';
+
+  @override
+  String get tagTeensStudents => 'Teens & students';
+
+  @override
+  String get tagTeachers => 'Teachers';
+
+  @override
+  String get tagWorkplace => 'Work';
+
+  @override
+  String get tagKids => 'Kids';
+
+  @override
+  String get tagMorning => 'Morning';
+
+  @override
+  String get tagEvening => 'Evening';
+
+  @override
+  String get tagSos => 'SOS';
+
+  @override
+  String get tagOnTheGo => 'On the go';
+
+  @override
+  String get tagCrisis => 'Times of crisis';
+
+  @override
+  String get tagSpanish => 'Español';
+
+  @override
+  String get tagNoTracks => 'No sessions with this tag yet';
 }
