@@ -1,6 +1,14 @@
 Unreleased
 -
 
+2609.21.0
+- Search now has its own tab for easier browsing.
+- Meditation sessions open immediately, with clearer loading and retry options.
+- Refreshed text and input fields throughout the app.
+- Choose a daily reminder time directly after a session.
+- Clearer onboarding progress and reminder choices.
+- Closing the donation page now continues onboarding automatically.
+
 2609.20.0
 - Pack screens: the pin icon is now a clear "Set as Your Path" row, showing your progress once set
 - Tapping the star now confirms "Added to Favorites" / "Removed from Favorites"
