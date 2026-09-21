@@ -1,6 +1,9 @@
 Unreleased
 -
 
+2609.21.1
+- The keyboard now opens automatically when creating an account during onboarding.
+
 2609.21.0
 - Search now has its own tab for easier browsing.
 - Meditation sessions open immediately, with clearer loading and retry options.
