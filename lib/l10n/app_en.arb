@@ -335,6 +335,13 @@
   "@notificationPreviewBodyB": {
     "description": "Body of the fake notification shown in the onboarding notifications screen preview"
   },
+  "onboardingReminderCurrentlySet": "Daily reminder set for {time}",
+  "@onboardingReminderCurrentlySet": {
+    "description": "Shown on the onboarding reminder screen when a reminder is already set, above the chips that let the user change it",
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "reminderChipsQuestion": "When will you meditate?",
   "@reminderChipsQuestion": {
     "description": "Question above the time-of-day chips in the onboarding notifications screen (chips arm of the reminder experiment)"

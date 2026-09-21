@@ -938,6 +938,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'Tu respiración diaria te espera. Solo toca para empezar.';
 
   @override
+  String onboardingReminderCurrentlySet(String time) {
+    return 'Recordatorio diario configurado para las $time';
+  }
+
+  @override
   String get reminderChipsQuestion => '¿Cuándo vas a meditar?';
 
   @override

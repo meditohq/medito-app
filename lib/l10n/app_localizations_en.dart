@@ -922,6 +922,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your daily breath is waiting. Just tap to begin.';
 
   @override
+  String onboardingReminderCurrentlySet(String time) {
+    return 'Daily reminder set for $time';
+  }
+
+  @override
   String get reminderChipsQuestion => 'When will you meditate?';
 
   @override

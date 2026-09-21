@@ -1742,6 +1742,12 @@ abstract class AppLocalizations {
   /// **'Your daily breath is waiting. Just tap to begin.'**
   String get notificationPreviewBodyB;
 
+  /// Shown on the onboarding reminder screen when a reminder is already set, above the chips that let the user change it
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder set for {time}'**
+  String onboardingReminderCurrentlySet(String time);
+
   /// Question above the time-of-day chips in the onboarding notifications screen (chips arm of the reminder experiment)
   ///
   /// In en, this message translates to:
