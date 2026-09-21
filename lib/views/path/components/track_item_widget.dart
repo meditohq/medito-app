@@ -32,27 +32,49 @@ class TrackItemWidget extends ConsumerStatefulWidget {
 
 class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
   bool _isPressed = false;
+  // True while the track is being fetched and playback is starting, before we
+  // push the player. Drives the trailing spinner and blocks a second tap.
+  bool _isStarting = false;
 
   Future<void> handleItemTap(BuildContext context, WidgetRef ref) async {
-    final guideName = ref.read(guideNamePreferenceProvider);
-    final preferredDuration = ref.read(durationPreferenceProvider);
+    if (_isStarting) return;
+    setState(() => _isStarting = true);
+    try {
+      final guideName = ref.read(guideNamePreferenceProvider);
+      final preferredDuration = ref.read(durationPreferenceProvider);
 
-    final track = await ref.read(
-      tracksProvider(trackId: widget.item.id).future,
-    );
-    final selection = TrackVariantSelector.resolve(
-      track,
-      guideName: guideName,
-      durationMs: preferredDuration,
-    );
+      final track = await ref.read(
+        tracksProvider(trackId: widget.item.id).future,
+      );
+      final selection = TrackVariantSelector.resolve(
+        track,
+        guideName: guideName,
+        durationMs: preferredDuration,
+      );
 
-    final request = PlaybackRequest.fromTrack(
-      track,
-      selection.voice,
-      selection.file,
-    );
-    await ref.read(playerProvider.notifier).play(request);
-    _navigateToPlayer(context);
+      final request = PlaybackRequest.fromTrack(
+        track,
+        selection.voice,
+        selection.file,
+      );
+      if (!mounted) return;
+      // Prepare + open the player immediately; PlayerView starts playback and
+      // shows its own loading state. The pill's spinner covers only the track
+      // fetch above.
+      ref.read(playerProvider.notifier).prepare(request);
+      _navigateToPlayer(context);
+    } catch (e) {
+      // The track fetch failed (offline / bad response) so we never reached
+      // the player — surface it here rather than leaving a dead tap.
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.unableToLoadAudio),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isStarting = false);
+    }
   }
 
   void _navigateToPlayer(BuildContext context) {
@@ -133,9 +155,23 @@ class _TrackItemWidgetState extends ConsumerState<TrackItemWidget> {
                           ),
                   ),
                 ),
-                if (isCompleted)
+                if (_isStarting)
                   Padding(
-                    padding: EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.only(right: 8),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          textColor ?? Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                else if (isCompleted)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
                     child: MeditoIcon(
                       assetName: MeditoIcons.check,
                       color: context.onBrandPurple,
