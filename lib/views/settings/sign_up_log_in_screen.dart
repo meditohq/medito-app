@@ -676,9 +676,13 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   Widget _buildEmailField(TextStyle inputTextStyle) {
     final l10n = AppLocalizations.of(context)!;
     final showError = !_isEmailValid && _emailController.text.isNotEmpty;
+    // In onboarding (opened from the splash) drop the keyboard straight in so
+    // the user can start typing; the Settings entry stays tap-to-focus.
+    final autofocus = widget.source == AnalyticsEventConstants.sourceSplash;
     return MeditoTextField(
       controller: _emailController,
       enabled: !_hasRequestedOtp,
+      autofocus: autofocus,
       hintText: l10n.emailLabel,
       errorText: showError ? l10n.invalidEmailError : null,
       keyboardType: TextInputType.emailAddress,
@@ -713,6 +717,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     final showError = !_isOtpValid && _otpController.text.isNotEmpty;
     return MeditoTextField(
       controller: _otpController,
+      autofocus: widget.source == AnalyticsEventConstants.sourceSplash,
       hintText: l10n.otpLabel,
       errorText: showError ? l10n.invalidOtpError : null,
       keyboardType: TextInputType.number,
