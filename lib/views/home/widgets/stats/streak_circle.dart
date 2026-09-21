@@ -246,7 +246,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                           fontWeight: isStreakDoneToday
                               ? FontWeight.w700
                               : FontWeight.w500,
-                          fontFamily: dmSans,
+                          fontFamily: googleSans,
                           fontFeatures: const [FontFeature.tabularFigures()],
                           letterSpacing: -0.2,
                           height: StreakCircleConstants.lineHeight,

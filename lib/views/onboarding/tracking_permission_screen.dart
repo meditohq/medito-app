@@ -155,7 +155,7 @@ class TrackingPermissionScreen extends ConsumerWidget {
           child: Text(
             l10n.trackingPermissionPrivacyNote,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontSize: 13,
+              fontSize: 14,
               height: 1.3,
               color: onSurface.withOpacityValue(0.85),
             ),

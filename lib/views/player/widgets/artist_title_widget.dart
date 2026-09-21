@@ -37,7 +37,7 @@ class ArtistTitleWidget extends ConsumerWidget {
           trackTitle ?? '',
           textAlign: TextAlign.center,
           style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-            fontFamily: sourceSerif,
+            fontFamily: googleSans,
             color: ColorConstants.white,
             fontSize: trackTitleFontSize,
             letterSpacing: 0.2,
@@ -49,7 +49,7 @@ class ArtistTitleWidget extends ConsumerWidget {
 
   Widget _subtitle(BuildContext context) {
     var style = Theme.of(context).textTheme.titleMedium?.copyWith(
-      fontFamily: dmMono,
+      fontFamily: googleSans,
       fontSize: artistNameFontSize,
       letterSpacing: 0,
       color: ColorConstants.white,

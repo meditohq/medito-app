@@ -388,7 +388,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                       textAlign: TextAlign.left,
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
-                            fontFamily: sourceSerif,
+                            fontFamily: googleSans,
                             fontSize: 22,
                             fontWeight: FontWeight.w400,
                             height: 1.2,
@@ -419,7 +419,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                   )!.meditoReliesOnYourDonationsToSurvive,
               textAlign: TextAlign.left,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w400,
                 height: 1.4,
                 color: context.onBrandPurple.withValues(alpha: 0.9),
@@ -439,7 +439,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                   donationPageModel.footerText!,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                     height: 1.4,
                     color: footerColor,

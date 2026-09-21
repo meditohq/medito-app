@@ -226,7 +226,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           child: Text(
             label,
             style: theme.textTheme.bodyMedium?.copyWith(
-              fontFamily: dmSans,
+              fontFamily: googleSans,
               color: isSelected ? selectedColor : unselectedColor,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             ),
@@ -275,7 +275,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           Text(
             l10n.cannotAddFutureSession,
             style: theme.textTheme.bodySmall?.copyWith(
-              fontFamily: dmSans,
+              fontFamily: googleSans,
               color: theme.colorScheme.error,
             ),
           ),
@@ -340,7 +340,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           Text(
             l10n.endDateBeforeStartError,
             style: theme.textTheme.bodySmall?.copyWith(
-              fontFamily: dmSans,
+              fontFamily: googleSans,
               color: theme.colorScheme.error,
             ),
           ),
@@ -473,7 +473,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
                   Text(
                     l10n.time,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      fontFamily: dmSans,
+                      fontFamily: googleSans,
                       color: theme.colorScheme.onSurface.withOpacityValue(0.75),
                     ),
                   ),
@@ -483,7 +483,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
                         ? _selectedTime!.format(context)
                         : l10n.selectTime,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      fontFamily: dmSans,
+                      fontFamily: googleSans,
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
@@ -528,7 +528,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
             Text(
               label,
               style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: dmSans,
+                fontFamily: googleSans,
                 color: theme.colorScheme.onSurface.withOpacityValue(0.75),
               ),
             ),
@@ -536,7 +536,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
             Text(
               fmt.format(value),
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
+                fontFamily: googleSans,
                 color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
@@ -568,14 +568,14 @@ class _PreviewRow extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: dmSans,
+            fontFamily: googleSans,
             color: theme.colorScheme.onSurface.withOpacityValue(0.75),
           ),
         ),
         Text(
           value,
           style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: dmSans,
+            fontFamily: googleSans,
             fontWeight: FontWeight.w700,
             color: emphasize
                 ? context.brandPurple

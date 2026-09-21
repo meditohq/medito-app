@@ -53,7 +53,7 @@ class MeditoDialogTextField extends StatelessWidget {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       onChanged: onChanged,
-      style: TextStyle(fontFamily: dmSans, color: theme.colorScheme.onSurface),
+      style: TextStyle(fontFamily: googleSans, color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
@@ -62,11 +62,11 @@ class MeditoDialogTextField extends StatelessWidget {
         filled: true,
         fillColor: theme.cardColor,
         labelStyle: TextStyle(
-          fontFamily: dmSans,
+          fontFamily: googleSans,
           color: theme.colorScheme.onSurface.withOpacityValue(0.69),
         ),
         hintStyle: TextStyle(
-          fontFamily: dmSans,
+          fontFamily: googleSans,
           color: theme.colorScheme.onSurface.withOpacityValue(0.69),
         ),
         border: border,

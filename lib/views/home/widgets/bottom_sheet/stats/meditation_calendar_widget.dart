@@ -569,12 +569,12 @@ class _MeditationCalendarWidgetState
           theme.textTheme.titleMedium?.copyWith(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: dmSans,
+            fontFamily: googleSans,
           ) ??
           TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: dmSans,
+            fontFamily: googleSans,
             color: theme.colorScheme.onSurface,
           ),
       leftChevronIcon: MeditoIcon(
@@ -611,7 +611,7 @@ class _MeditationCalendarWidgetState
   DaysOfWeekStyle _daysOfWeekStyle(BuildContext context) {
     final style = (Theme.of(context).textTheme.bodySmall ?? const TextStyle())
         .copyWith(
-          fontFamily: dmSans,
+          fontFamily: googleSans,
           color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
           fontSize: 12,
         );
@@ -756,7 +756,7 @@ class _MeditationCalendarWidgetState
   }) {
     final theme = Theme.of(context);
     return (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
-      fontFamily: dmSans,
+      fontFamily: googleSans,
       color: color ?? theme.colorScheme.onSurface,
       fontWeight: fontWeight,
     );
@@ -817,7 +817,7 @@ class _MeditationCalendarWidgetState
           ? AppLocalizations.of(context)!.daysSelected(rangeDays.length)
           : DateFormat('EEEE, MMMM d, y').format(_selectedDayForSessions),
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        fontFamily: dmSans,
+        fontFamily: googleSans,
         fontWeight: FontWeight.w600,
         color: Theme.of(context).colorScheme.onSurface,
       ),
@@ -834,7 +834,7 @@ class _MeditationCalendarWidgetState
       return Text(
         '${DateFormat('MMM d').format(_rangeStart!)} – ${DateFormat('MMM d, y').format(_rangeEnd!)}',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontFamily: dmSans,
+          fontFamily: googleSans,
           color: Theme.of(context).colorScheme.onSurface,
         ),
       );
@@ -852,7 +852,7 @@ class _MeditationCalendarWidgetState
           Text(
             l10n.streakFreezeUsed,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontFamily: dmSans,
+              fontFamily: googleSans,
               color: ColorConstants.lightBlue,
               fontWeight: FontWeight.w500,
             ),
@@ -864,7 +864,7 @@ class _MeditationCalendarWidgetState
     return Text(
       '${sessions.length} ${sessions.length == 1 ? l10n.session : l10n.sessions}',
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-        fontFamily: dmSans,
+        fontFamily: googleSans,
         color: Theme.of(context).colorScheme.onSurface,
       ),
     );
@@ -959,7 +959,7 @@ class _MeditationCalendarWidgetState
             label: Text(
               l10n.addSessionsToSelectedDays,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
+                fontFamily: googleSans,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -982,7 +982,7 @@ class _MeditationCalendarWidgetState
             child: Text(
               l10n.cancel,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
+                fontFamily: googleSans,
                 color: Theme.of(
                   context,
                 ).colorScheme.onSurface.withOpacityValue(0.7),
@@ -1007,7 +1007,7 @@ class _MeditationCalendarWidgetState
         label: Text(
           AppLocalizations.of(context)!.addSession,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontFamily: dmSans,
+            fontFamily: googleSans,
             color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
@@ -1077,7 +1077,7 @@ class _SessionItemWidget extends ConsumerWidget {
             child: Text(
               timeFormat.format(date),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontFamily: dmSans,
+                fontFamily: googleSans,
                 fontWeight: FontWeight.w600,
                 color: Theme.of(
                   context,
@@ -1104,7 +1104,7 @@ class _SessionItemWidget extends ConsumerWidget {
                       AppLocalizations.of(context)!,
                     ),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontFamily: dmSans,
+                      fontFamily: googleSans,
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
@@ -1113,7 +1113,7 @@ class _SessionItemWidget extends ConsumerWidget {
                     data: (track) => Text(
                       track.title,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: dmSans,
+                        fontFamily: googleSans,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
@@ -1121,7 +1121,7 @@ class _SessionItemWidget extends ConsumerWidget {
                     loading: () => Text(
                       'Loading...',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: dmSans,
+                        fontFamily: googleSans,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
@@ -1129,7 +1129,7 @@ class _SessionItemWidget extends ConsumerWidget {
                     error: (_, _) => Text(
                       'Track ${session.id}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontFamily: dmSans,
+                        fontFamily: googleSans,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
@@ -1192,14 +1192,14 @@ class _RangePreviewRow extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: dmSans,
+            fontFamily: googleSans,
             color: theme.colorScheme.onSurface.withOpacityValue(0.75),
           ),
         ),
         Text(
           value,
           style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: dmSans,
+            fontFamily: googleSans,
             fontWeight: FontWeight.w700,
             color: emphasize
                 ? context.brandPurple

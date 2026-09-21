@@ -176,7 +176,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                 l10n.donateMonthlyDisclosure,
                 style: TextStyle(
                   color: fg.withValues(alpha: 0.7),
-                  fontSize: 11,
+                  fontSize: 12,
                   height: 1.3,
                 ),
               ),
@@ -266,7 +266,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                         softWrap: false,
                         style: TextStyle(
                           color: fg,
-                          fontSize: 10,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.2,
                         ),
@@ -295,7 +295,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                   softWrap: false,
                   style: TextStyle(
                     color: isSelected ? context.brandPurple : fg,
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -330,9 +330,9 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
         hintText: l10n.donationEmailLabel,
         hintStyle: TextStyle(color: fg.withValues(alpha: 0.6), fontSize: 14),
         helperText: _emailError == null ? l10n.donationEmailHelper : null,
-        helperStyle: TextStyle(color: fg.withValues(alpha: 0.6), fontSize: 11),
+        helperStyle: TextStyle(color: fg.withValues(alpha: 0.6), fontSize: 12),
         errorText: _emailError,
-        errorStyle: TextStyle(color: fg, fontSize: 11),
+        errorStyle: TextStyle(color: fg, fontSize: 12),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: fg.withValues(alpha: 0.5)),
@@ -401,7 +401,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                     const Text(
                       '',
                       style: TextStyle(
-                        fontSize: 19,
+                        fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

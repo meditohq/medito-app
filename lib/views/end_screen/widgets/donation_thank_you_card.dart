@@ -32,7 +32,7 @@ class DonationThankYouCard extends StatelessWidget {
               l10n.thankYouForYourSupport,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontFamily: sourceSerif,
+                fontFamily: googleSans,
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
                 color: context.onBrandPurple,

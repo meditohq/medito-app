@@ -23,13 +23,13 @@ class DescriptionWidget extends StatelessWidget {
           selectable: true,
           textAlign: WrapAlignment.start,
           p: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontFamily: dmSans,
+            fontFamily: googleSans,
             fontSize: 14,
             fontWeight: FontWeight.w500,
             height: 1.5,
           ),
           a: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontFamily: dmSans,
+            fontFamily: googleSans,
             decoration: TextDecoration.underline,
             fontSize: 14,
             fontWeight: FontWeight.w500,

@@ -81,7 +81,7 @@ class _ZenModeAnimationState extends State<ZenModeAnimation>
               child: Text(
                 _selectedMessage,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontFamily: teachers,
+                  fontFamily: googleSans,
                   fontSize: 28,
                   fontWeight: FontWeight.w400,
                   height: 1.25,

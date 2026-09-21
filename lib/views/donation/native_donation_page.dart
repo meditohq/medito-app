@@ -536,7 +536,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           eyebrow.toUpperCase(),
           style: TextStyle(
             color: context.brandPurple,
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
             letterSpacing: 1.3,
           ),
@@ -547,7 +547,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           heading,
           style: TextStyle(
             color: onSurface,
-            fontSize: 26,
+            fontSize: 24,
             fontWeight: FontWeight.w600,
             height: 1.2,
           ),
@@ -558,7 +558,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           subcopy,
           style: TextStyle(
             color: onSurface.withValues(alpha: 0.7),
-            fontSize: 15,
+            fontSize: 16,
             height: 1.5,
           ),
           textAlign: TextAlign.center,
@@ -724,7 +724,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                       _mostPopularLabel,
                       style: TextStyle(
                         color: accent,
-                        fontSize: 10,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -861,7 +861,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                 children: const [
                   Text(
                     'Donate with',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   SizedBox(width: 6),
                   // U+F8FF (Apple logo), drawn by the iOS system font — this
@@ -873,7 +873,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   SizedBox(width: 3),
                   Text(
                     'Pay',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),

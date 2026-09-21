@@ -18,7 +18,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w800,
       height: 1.5,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     displayMedium: TextStyle(
       // btm bar text unselected
@@ -27,7 +27,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w700,
       height: 1.5,
       color: isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     displaySmall: TextStyle(
       // header of rows on homepage
@@ -36,7 +36,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w800,
       height: 1.3,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     headlineMedium: TextStyle(
       // packs title on home and packs screen
@@ -48,7 +48,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w600,
       height: 1.3,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     headlineSmall: TextStyle(
       // stats widget
@@ -57,7 +57,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w700,
       height: 1.2,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     titleMedium: TextStyle(
       // packs subtitle on home
@@ -67,7 +67,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w500,
       height: 1.5,
       color: isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     titleSmall: TextStyle(
       // shortcut title
@@ -76,16 +76,16 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w500,
       height: 1.5,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     bodySmall: TextStyle(
-      // shortcut title
+      // caption / overline / tag (12)
       fontSize: 12,
       letterSpacing: 0.8,
       fontWeight: FontWeight.w600,
       height: 1.5,
       color: isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     bodyMedium: TextStyle(
       // error widget
@@ -94,7 +94,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.normal,
       height: 1.3,
       color: isDark ? ColorConstants.graphite : ColorConstants.lightGraphite,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     bodyLarge: TextStyle(
       // daily text and quote
@@ -103,7 +103,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w400,
       height: 1.5,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     titleLarge: TextStyle(
       // onboarding option button label
@@ -112,16 +112,16 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w500,
       height: 1.3,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     labelLarge: TextStyle(
-      // shortcut title
+      // section header (20)
       fontSize: 20,
       letterSpacing: 0.8,
       fontWeight: FontWeight.w600,
       height: 1.5,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     labelMedium: TextStyle(
       // error widget
@@ -130,7 +130,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w500,
       height: 1.3,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     labelSmall: TextStyle(
       // daily text and quote
@@ -139,7 +139,7 @@ TextTheme meditoTextTheme(BuildContext context, [ThemeMode? themeMode]) {
       fontWeight: FontWeight.w400,
       height: 1.5,
       color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
   );
 }

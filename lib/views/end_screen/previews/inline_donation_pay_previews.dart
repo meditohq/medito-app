@@ -59,7 +59,7 @@ class _CardFrame extends StatelessWidget {
                       'Support Medito',
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
-                            fontFamily: sourceSerif,
+                            fontFamily: googleSans,
                             fontSize: 22,
                             fontWeight: FontWeight.w400,
                             height: 1.2,
@@ -72,7 +72,7 @@ class _CardFrame extends StatelessWidget {
                       'it. No ads, no paywalls.',
                       style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w400,
                             height: 1.4,
                             color: context.onBrandPurple.withValues(alpha: 0.9),

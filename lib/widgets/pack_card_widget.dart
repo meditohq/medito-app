@@ -73,7 +73,7 @@ class _PackCardWidgetState extends State<PackCardWidget> {
     return Text(
       title,
       style: textTheme.displayLarge?.copyWith(
-        fontFamily: dmSans,
+        fontFamily: googleSans,
         height: 1.2,
         color: color,
       ),

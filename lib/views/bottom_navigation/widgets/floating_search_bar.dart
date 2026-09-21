@@ -77,7 +77,7 @@ class FloatingSearchBar extends StatelessWidget {
           child: Text(
             cancelLabel,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               letterSpacing: 0,
               height: 1.2,

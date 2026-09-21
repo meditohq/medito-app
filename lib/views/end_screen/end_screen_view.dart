@@ -331,7 +331,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 child: Text(
                   streak.toString(),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontFamily: dmSerif,
+                    fontFamily: googleSans,
                     fontSize: 100,
                     fontWeight: FontWeight.w400,
                   ),
@@ -342,7 +342,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             Text(
               AppLocalizations.of(context)!.dayStreak,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontFamily: teachers,
+                fontFamily: googleSans,
                 fontSize: 40,
                 fontWeight: FontWeight.w400,
                 height: 1,
@@ -366,7 +366,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 AppLocalizations.of(context)!.dailyPracticeMessage,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontFamily: teachers,
+                  fontFamily: googleSans,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   height: 1.3,
@@ -478,7 +478,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               Text(
                 dayLetters[index],
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontFamily: teachers,
+                  fontFamily: googleSans,
                   fontSize: 14,
                   fontWeight: (isMeditated || isFreeze)
                       ? FontWeight.w600

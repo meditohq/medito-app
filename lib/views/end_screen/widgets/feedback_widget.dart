@@ -27,7 +27,7 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
               AppLocalizations.of(context)!.howDoYouFeel,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontFamily: teachers,
+                fontFamily: googleSans,
                 fontSize: 22,
                 fontWeight: FontWeight.normal,
               ),

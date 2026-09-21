@@ -80,7 +80,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          fontFamily: dmSans,
+          fontFamily: googleSans,
         ),
       ),
     ),
@@ -99,7 +99,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
         textStyle: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          fontFamily: dmSans,
+          fontFamily: googleSans,
         ),
       ),
     ),
@@ -112,7 +112,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
         textStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          fontFamily: dmSans,
+          fontFamily: googleSans,
         ),
       ),
     ),
@@ -125,13 +125,13 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
         color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        fontFamily: dmSans,
+        fontFamily: googleSans,
       ),
       contentTextStyle: TextStyle(
         color: isDark ? ColorConstants.white : ColorConstants.lightOnSurface,
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        fontFamily: dmSans,
+        fontFamily: googleSans,
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),

@@ -38,8 +38,7 @@ class PackItemWidget extends StatelessWidget {
                       if (item.title.isNotNullAndNotEmpty())
                         Text(
                           item.title,
-                          style: Theme.of(context).textTheme.headlineMedium
-                              ?.copyWith(fontFamily: dmSans, fontSize: 16),
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       if (hasSubtitle)
                         Flexible(
@@ -47,12 +46,7 @@ class PackItemWidget extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               item.subtitle ?? '',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
-                                    fontFamily: dmMono,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ),
                         ),

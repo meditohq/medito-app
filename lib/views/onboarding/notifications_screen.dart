@@ -597,7 +597,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                         'MEDITO',
                         style: TextStyle(
                           color: Colors.black54,
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.4,
                         ),
@@ -607,7 +607,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                       l10n.notificationPreviewTimestamp,
                       style: const TextStyle(
                         color: Colors.black45,
-                        fontSize: 11,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -617,7 +617,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                   title,
                   style: const TextStyle(
                     color: Colors.black,
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
@@ -695,7 +695,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
             label: Text(
               l10n.reminderSlotCustom,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -748,7 +748,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
               slot.time.format(context),
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 13,
+                fontSize: 14,
                 height: 1.2,
                 color: onSurface.withValues(alpha: 0.7),
               ),

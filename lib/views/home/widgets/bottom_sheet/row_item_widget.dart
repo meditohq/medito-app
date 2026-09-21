@@ -74,7 +74,7 @@ class RowItemWidget extends StatelessWidget {
                       Expanded(
                         child: Text.rich(
                           TextSpan(
-                            style: const TextStyle(fontSize: 18.0),
+                            style: const TextStyle(fontSize: 18),
                             children: [
                               TextSpan(
                                 text: title,
