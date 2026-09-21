@@ -3332,12 +3332,6 @@ abstract class AppLocalizations {
   /// **'Turn on reminders'**
   String get turnOnReminders;
 
-  /// Status text when daily reminders are enabled
-  ///
-  /// In en, this message translates to:
-  /// **'Reminders on'**
-  String get remindersOn;
-
   /// Message shown when user dismisses the reminder prompt on the end screen
   ///
   /// In en, this message translates to:

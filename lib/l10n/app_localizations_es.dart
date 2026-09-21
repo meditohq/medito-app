@@ -1831,9 +1831,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get turnOnReminders => 'Activar recordatorios';
 
   @override
-  String get remindersOn => 'Recordatorios activados';
-
-  @override
   String get reminderPromptDismissedMessage =>
       'Puedes activar o desactivar los recordatorios en Configuración';
 

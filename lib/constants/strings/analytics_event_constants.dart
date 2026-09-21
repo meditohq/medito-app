@@ -627,6 +627,17 @@ class AnalyticsEventConstants {
   static const String endScreenAccountPromptTapped =
       'end_screen_account_prompt_tapped';
 
+  /// Event logged when the user taps "Turn on reminders", the time-choice
+  /// sheet (or the custom time picker it leads to) opens, and they close it
+  /// without picking a time. Before this the card scheduled "same time
+  /// tomorrow" silently; now the sheet is a step the funnel can lose people at.
+  /// Continues = shown - dismissed. Successful picks arrive as
+  /// [notificationsEnabled] with [paramReminderSlot], same as Settings.
+  static const String endScreenReminderSheetShown =
+      'end_screen_reminder_sheet_shown';
+  static const String endScreenReminderSheetDismissed =
+      'end_screen_reminder_sheet_dismissed';
+
   /// Event logged when the user taps "Turn on daily reminders" but the OS
   /// permission dialog returns denied.
   static const String endScreenReminderOsDenied =
