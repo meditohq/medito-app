@@ -21,6 +21,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
     required this.onPlayPause,
     required this.onRepeat,
     this.isPortrait = true,
+    this.isLoading = false,
   });
 
   final Function() onSkip10SecondsBackward;
@@ -29,6 +30,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
   final Function() onPlayPause;
   final Function() onRepeat;
   final bool isPortrait;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,7 +41,11 @@ class PlayerButtonsWidget extends ConsumerWidget {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PlayPauseButtonWidget(isPlaying: isPlaying, onPlayPause: onPlayPause),
+          PlayPauseButtonWidget(
+            isPlaying: isPlaying,
+            onPlayPause: onPlayPause,
+            isLoading: isLoading,
+          ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -61,7 +67,11 @@ class PlayerButtonsWidget extends ConsumerWidget {
         children: [
           _rewindButton(l10n),
           const SizedBox(width: 32),
-          PlayPauseButtonWidget(isPlaying: isPlaying, onPlayPause: onPlayPause),
+          PlayPauseButtonWidget(
+            isPlaying: isPlaying,
+            onPlayPause: onPlayPause,
+            isLoading: isLoading,
+          ),
           const SizedBox(width: 32),
           _forwardButton(l10n),
           const SizedBox(width: 32),

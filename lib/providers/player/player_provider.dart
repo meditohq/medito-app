@@ -56,11 +56,15 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     );
   }
 
-  /// Warm-prepares the state without actually starting playback. Used for
-  /// preloading next-up tracks so the player screen has data immediately when
-  /// the user taps play.
+  /// Sets the current request WITHOUT starting playback, so the player screen
+  /// can be pushed immediately and render its title/cover/duration from this
+  /// request while the audio loads. [PlayerView] then calls [play] itself.
+  /// Also used to warm-prepare next-up tracks.
+  ///
+  /// Compares the whole request (not just trackId) so switching voice or
+  /// duration on the same track still updates the pending file.
   void prepare(PlaybackRequest request) {
-    if (state?.trackId == request.trackId) return;
+    if (state == request) return;
     state = request;
   }
 

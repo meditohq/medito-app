@@ -5,9 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
 
 class DurationIndicatorWidget extends ConsumerStatefulWidget {
-  const DurationIndicatorWidget({super.key, required this.onSeekEnd});
+  const DurationIndicatorWidget({
+    super.key,
+    required this.onSeekEnd,
+    this.fallbackDurationMs = 0,
+  });
 
   final void Function(int) onSeekEnd;
+
+  /// Shown as the total length until the native player reports its own
+  /// duration. Lets the right-hand time label read the real length from the
+  /// first frame instead of flicking 0:00 -> real when audio loads.
+  final int fallbackDurationMs;
 
   @override
   ConsumerState<DurationIndicatorWidget> createState() =>
@@ -28,8 +37,14 @@ class _DurationIndicatorWidgetState
       audioStateProvider.select((s) => s.position),
     );
 
+    // Fall back to the known request duration until native reports its own,
+    // so the total-time label doesn't jump 0:00 -> real once audio loads.
+    final effectiveTotal = totalDuration > 0
+        ? totalDuration
+        : widget.fallbackDurationMs;
+
     // clamp values to avoid negative slider values
-    final safeTotal = totalDuration < 0 ? 0 : totalDuration;
+    final safeTotal = effectiveTotal < 0 ? 0 : effectiveTotal;
     final safePosition = currentPosition < 0 ? 0 : currentPosition;
 
     return _durationBar(

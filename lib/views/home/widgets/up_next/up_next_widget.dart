@@ -413,6 +413,9 @@ class _UpNextContent extends ConsumerStatefulWidget {
 
 class _UpNextContentState extends ConsumerState<_UpNextContent> {
   bool _skipping = false;
+  // True while the track is being fetched and the player is opening. Shows a
+  // spinner in the play button and blocks a duplicate tap.
+  bool _isStarting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -542,6 +545,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                             _PlayButton(
                               onTap: () => _onTap(context),
                               palette: palette,
+                              isLoading: _isStarting,
                             ),
                           ],
                         ),
@@ -632,6 +636,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
   Future<void> _onTap(BuildContext context) async {
     final nextSession = widget.data.nextSession;
     if (nextSession == null) return;
+    if (_isStarting) return;
 
     unawaited(
       ref
@@ -654,26 +659,31 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     final preferredDuration = ref.read(durationPreferenceProvider);
 
     if (guideName != null && preferredDuration != null) {
-      final track = await ref.read(
-        tracksProvider(trackId: nextSession.id).future,
-      );
-      final selection = TrackVariantSelector.resolve(
-        track,
-        guideName: guideName,
-        durationMs: preferredDuration,
-      );
-
-      final request = PlaybackRequest.fromTrack(
-        track,
-        selection.voice,
-        selection.file,
-      );
+      setState(() => _isStarting = true);
       try {
-        await ref.read(playerProvider.notifier).play(request);
+        final track = await ref.read(
+          tracksProvider(trackId: nextSession.id).future,
+        );
+        final selection = TrackVariantSelector.resolve(
+          track,
+          guideName: guideName,
+          durationMs: preferredDuration,
+        );
+
+        final request = PlaybackRequest.fromTrack(
+          track,
+          selection.voice,
+          selection.file,
+        );
+        if (!context.mounted) return;
+        // Prepare + open the player immediately; PlayerView starts playback
+        // and shows its own loading state. The button spinner covers only the
+        // track fetch above.
+        ref.read(playerProvider.notifier).prepare(request);
+        _navigateToPlayer(context);
       } catch (e, st) {
-        // play() now propagates native playback failures (see P0-4 in the
-        // audit). Before this change, errors were swallowed and we'd
-        // navigate to a silent player. Show a snackbar instead.
+        // The track fetch failed (offline / bad response) so we never reached
+        // the player — surface it here rather than leaving a dead tap.
         AppLogger.e('UP_NEXT', 'Failed to start playback from Up Next', e, st);
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -681,9 +691,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
             content: Text(AppLocalizations.of(context)!.unableToLoadAudio),
           ),
         );
-        return;
+      } finally {
+        if (mounted) setState(() => _isStarting = false);
       }
-      _navigateToPlayer(context);
     } else {
       handleNavigation(
         TypeConstants.track,
@@ -705,14 +715,20 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
 class _PlayButton extends StatelessWidget {
   final VoidCallback onTap;
   final _UpNextPalette palette;
+  final bool isLoading;
 
-  const _PlayButton({required this.onTap, required this.palette});
+  const _PlayButton({
+    required this.onTap,
+    required this.palette,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Semantics(
-      label: AppLocalizations.of(context)!.play,
-      button: true,
+      label: isLoading ? l10n.loading : l10n.play,
+      button: !isLoading,
       child: GestureDetector(
         onTap: onTap,
         child: DecoratedBox(
@@ -724,11 +740,25 @@ class _PlayButton extends StatelessWidget {
             width: _kPlayButtonSize,
             height: _kPlayButtonSize,
             child: ExcludeSemantics(
-              child: Icon(
-                Icons.play_arrow_rounded,
-                color: palette.buttonForeground,
-                size: 28,
-              ),
+              // Same box size whether icon or spinner, so nothing shifts.
+              child: isLoading
+                  ? Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            palette.buttonForeground,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Icon(
+                      Icons.play_arrow_rounded,
+                      color: palette.buttonForeground,
+                      size: 28,
+                    ),
             ),
           ),
         ),

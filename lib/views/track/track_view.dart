@@ -1,6 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-import '../../../utils/logger.dart';
-
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -36,6 +34,11 @@ class _TrackViewState extends ConsumerState<TrackView>
 
   @override
   bool get wantKeepAlive => true;
+
+  // True while play() is loading the audio and we're about to push the player.
+  // Drives the button's spinner and disables it so a second tap can't fire a
+  // duplicate playback + navigation.
+  bool _isStarting = false;
 
   @override
   void initState() {
@@ -323,9 +326,13 @@ class _TrackViewState extends ConsumerState<TrackView>
       height: 56,
       width: isFullWidth ? double.infinity : null,
       child: ElevatedButton(
-        onPressed: () {
-          _handlePlay(ref, track, activeVoice, activeFile);
-        },
+        // Guarded so a rapid second tap can't push a second player route
+        // before the first navigation covers this button.
+        onPressed: _isStarting
+            ? null
+            : () {
+                _handlePlay(ref, track, activeVoice, activeFile);
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: isDark
               ? ColorConstants.white
@@ -415,26 +422,22 @@ class _TrackViewState extends ConsumerState<TrackView>
     Track track,
     TrackVoice voice,
     TrackAudioFile file,
-  ) async {
-    try {
-      final request = PlaybackRequest.fromTrack(track, voice, file);
-      await ref.read(playerProvider.notifier).play(request);
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const PlayerView()),
-      );
-    } catch (e, st) {
-      AppLogger.e('TRACK', 'Failed to start playback', e, st);
-      // Previously this swallowed the error AND navigated to PlayerView,
-      // giving users a silent broken-looking player. Now play() rethrows
-      // and navigation is skipped — show a snackbar so the failure is visible.
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.unableToLoadAudio),
-        ),
-      );
-    }
+  ) {
+    if (_isStarting) return;
+    setState(() => _isStarting = true);
+
+    // Prepare the request (sets player state synchronously) then open the
+    // player immediately. PlayerView starts playback and shows its own loading
+    // state, so there's no wait on this screen and no double-tap window.
+    final request = PlaybackRequest.fromTrack(track, voice, file);
+    ref.read(playerProvider.notifier).prepare(request);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PlayerView()),
+    ).whenComplete(() {
+      if (mounted) setState(() => _isStarting = false);
+    });
   }
 
   Widget _durationDropdown(

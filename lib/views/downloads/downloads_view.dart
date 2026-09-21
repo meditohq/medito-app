@@ -168,11 +168,13 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
   String _getDuration(String? length) => formatTrackLength(length);
 
-  void _openPlayer(WidgetRef ref, Track track) async {
+  void _openPlayer(WidgetRef ref, Track track) {
     final voice = track.voices.first;
     final file = voice.audioFiles.first;
     final request = PlaybackRequest.fromTrack(track, voice, file);
-    await ref.read(playerProvider.notifier).play(request);
+    // Prepare + open the player immediately; PlayerView starts playback and
+    // shows its own loading state (no wait on this screen).
+    ref.read(playerProvider.notifier).prepare(request);
     unawaited(
       Navigator.push(
         context,

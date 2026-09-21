@@ -19,7 +19,6 @@ import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/src/audio_pigeon.g.dart' as pigeon;
 import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/player_action_bar.dart';
@@ -44,6 +43,10 @@ class PlayerView extends ConsumerStatefulWidget {
 class _PlayerViewState extends ConsumerState<PlayerView> {
   bool _endScreenOpened = false;
   bool _isClosing = false;
+  // Set when play() throws (e.g. offline, native audio failed to start). The
+  // caller no longer awaits play() before navigating — we own starting
+  // playback here — so this is how a start failure surfaces to the user.
+  bool _startFailed = false;
   final _analytics = FirebaseAnalyticsService();
   // Snapshot of stats taken when the player opens, before the session can
   // affect them. EndScreenView uses this as the "before" value so its
@@ -92,8 +95,30 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       AppLogger.w('PLAYER', 'End-screen config warm-up skipped: $e');
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startPlayback();
       _initializePlayer();
     });
+  }
+
+  /// Starts playback for the request the caller prepared. Runs here (rather
+  /// than at the call site, awaited before navigation) so the screen opens
+  /// instantly and shows a loading state while the audio spins up. A failure
+  /// flips [_startFailed] so build() can show a retryable error instead of a
+  /// silent, stuck player.
+  Future<void> _startPlayback() async {
+    final request = ref.read(playerProvider);
+    if (request == null) return;
+    try {
+      await ref.read(playerProvider.notifier).play(request);
+    } catch (e, st) {
+      AppLogger.e('PLAYER', 'Failed to start playback', e, st);
+      if (mounted) setState(() => _startFailed = true);
+    }
+  }
+
+  void _retryPlayback() {
+    setState(() => _startFailed = false);
+    _startPlayback();
   }
 
   @override
@@ -228,9 +253,37 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
       );
     }
 
-    final track = ref.watch(audioStateProvider.select((s) => s.track));
+    if (_startFailed) {
+      return MeditoErrorWidget(
+        error: const UnknownError(),
+        onTap: _retryPlayback,
+      );
+    }
+
     final isPlaying = ref.watch(audioStateProvider.select((s) => s.isPlaying));
-    final imageUrl = track.imageUrl;
+
+    // Static metadata comes from the prepared request, which is populated the
+    // instant the screen opens. Sourcing it from audioState instead would show
+    // an empty title/cover for the ~1s until native reports back, then pop the
+    // real content in — the "jumping" we're avoiding.
+    final title = currentlyPlayingTrack.title;
+    final artistName = currentlyPlayingTrack.guideName;
+    final artistUrl = currentlyPlayingTrack.artist?.path;
+    final imageUrl = currentlyPlayingTrack.coverUrl;
+
+    // The transport (play/pause + progress) is genuinely loading until the
+    // native player reports it's playing or knows the duration. Everything
+    // else on screen is already final, so only the play button shows a spinner.
+    // Buffering (initial spin-up OR a mid-session re-buffer on a slow network)
+    // counts as loading too — the spinner in place of the play button is the
+    // right signal there, so we don't gate it to the start.
+    final audioState = ref.watch(audioStateProvider);
+    final isAudioLoading =
+        !audioState.isCompleted &&
+        (audioState.isBuffering ||
+            (!audioState.isPlaying &&
+                audioState.duration == 0 &&
+                audioState.position == 0));
 
     return PopScope<void>(
       onPopInvokedWithResult: (didPop, result) {
@@ -280,13 +333,23 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
                               ),
                               child: orientation == Orientation.portrait
                                   ? _PortraitPlayerLayout(
-                                      track: track,
+                                      title: title,
+                                      artistName: artistName,
+                                      artistUrl: artistUrl,
+                                      totalDurationMs:
+                                          currentlyPlayingTrack.duration,
                                       isPlaying: isPlaying,
+                                      isLoading: isAudioLoading,
                                       onPlayPause: onPlayPausePressed,
                                     )
                                   : _LandscapePlayerLayout(
-                                      track: track,
+                                      title: title,
+                                      artistName: artistName,
+                                      artistUrl: artistUrl,
+                                      totalDurationMs:
+                                          currentlyPlayingTrack.duration,
                                       isPlaying: isPlaying,
+                                      isLoading: isAudioLoading,
                                       onPlayPause: onPlayPausePressed,
                                     ),
                             ),
@@ -408,13 +471,21 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
 class _PortraitPlayerLayout extends ConsumerWidget {
   const _PortraitPlayerLayout({
-    required this.track,
+    required this.title,
+    required this.artistName,
+    required this.artistUrl,
+    required this.totalDurationMs,
     required this.isPlaying,
+    required this.isLoading,
     required this.onPlayPause,
   });
 
-  final pigeon.Track track;
+  final String title;
+  final String? artistName;
+  final String? artistUrl;
+  final int totalDurationMs;
   final bool isPlaying;
+  final bool isLoading;
   final VoidCallback onPlayPause;
 
   @override
@@ -424,13 +495,14 @@ class _PortraitPlayerLayout extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: track.title.isNotEmpty == true ? track.title : '',
-          artistName: track.artist?.isNotEmpty == true ? track.artist : '',
-          artistUrlPath: track.artistUrl,
+          trackTitle: title,
+          artistName: artistName ?? '',
+          artistUrlPath: artistUrl,
           isPlayerScreen: true,
         ),
         const SizedBox(height: 32),
         DurationIndicatorWidget(
+          fallbackDurationMs: totalDurationMs,
           onSeekEnd: (value) {
             ref.read(playerProvider.notifier).seekToPosition(value);
           },
@@ -438,6 +510,7 @@ class _PortraitPlayerLayout extends ConsumerWidget {
         const SizedBox(height: 24),
         PlayerButtonsWidget(
           isPlaying: isPlaying,
+          isLoading: isLoading,
           onPlayPause: onPlayPause,
           onSkip10SecondsBackward: () =>
               ref.read(playerProvider.notifier).skip10SecondsBackward(),
@@ -458,13 +531,21 @@ class _PortraitPlayerLayout extends ConsumerWidget {
 
 class _LandscapePlayerLayout extends ConsumerWidget {
   const _LandscapePlayerLayout({
-    required this.track,
+    required this.title,
+    required this.artistName,
+    required this.artistUrl,
+    required this.totalDurationMs,
     required this.isPlaying,
+    required this.isLoading,
     required this.onPlayPause,
   });
 
-  final pigeon.Track track;
+  final String title;
+  final String? artistName;
+  final String? artistUrl;
+  final int totalDurationMs;
   final bool isPlaying;
+  final bool isLoading;
   final VoidCallback onPlayPause;
 
   @override
@@ -474,18 +555,20 @@ class _LandscapePlayerLayout extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ArtistTitleWidget(
-          trackTitle: track.title.isNotEmpty == true ? track.title : '',
-          artistName: track.artist?.isNotEmpty == true ? track.artist : '',
-          artistUrlPath: track.artistUrl,
+          trackTitle: title,
+          artistName: artistName ?? '',
+          artistUrlPath: artistUrl,
           isPlayerScreen: true,
         ),
         DurationIndicatorWidget(
+          fallbackDurationMs: totalDurationMs,
           onSeekEnd: (value) {
             ref.read(playerProvider.notifier).seekToPosition(value);
           },
         ),
         PlayerButtonsWidget(
           isPlaying: isPlaying,
+          isLoading: isLoading,
           onPlayPause: onPlayPause,
           onSkip10SecondsBackward: () =>
               ref.read(playerProvider.notifier).skip10SecondsBackward(),
