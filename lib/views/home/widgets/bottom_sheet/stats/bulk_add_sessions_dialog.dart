@@ -4,6 +4,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
+import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:intl/intl.dart';
 
 /// Confirmation dialog for adding a session to every day in a selected range.
@@ -99,7 +100,7 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
             ),
           ),
           const SizedBox(height: 16),
-          MeditoDialogTextField(
+          MeditoTextField(
             controller: _durationController,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],

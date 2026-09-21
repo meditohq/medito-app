@@ -51,6 +51,45 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
         : ColorConstants.lightBackground,
     textTheme: meditoTextTheme(context, themeMode),
     inputDecorationTheme: inputDecorationTheme(),
+    // The time picker's hour/minute fields are Material's own TextFields, so
+    // match them to MeditoTextField by letting their InputDecoration own the
+    // box: cardColor fill, 12px rounded corners, a 0.5px outline, and — on the
+    // focused field — the same 4px translucent light ring (the "glow").
+    timePickerTheme: TimePickerThemeData(
+      backgroundColor: isDark
+          ? ColorConstants.ebony
+          : ColorConstants.lightSurface,
+      // Transparent so only the InputDecoration below paints the box.
+      hourMinuteColor: ColorConstants.transparent,
+      hourMinuteTextColor: isDark
+          ? ColorConstants.white
+          : ColorConstants.lightOnSurface,
+      hourMinuteShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: isDark ? ColorConstants.onyx : ColorConstants.lightCard,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color:
+                (isDark ? ColorConstants.white : ColorConstants.lightOnSurface)
+                    .withValues(alpha: 0.3),
+            width: 0.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color:
+                (isDark ? ColorConstants.white : ColorConstants.lightOnSurface)
+                    .withValues(alpha: 0.35),
+            width: 4,
+          ),
+        ),
+      ),
+    ),
     appBarTheme: AppBarTheme(
       systemOverlayStyle: SystemUiOverlayStyle(
         systemNavigationBarColor: isDark

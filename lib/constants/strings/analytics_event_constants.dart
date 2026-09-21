@@ -755,6 +755,22 @@ class AnalyticsEventConstants {
   /// Parameter name for the shortcut destination type (e.g. pack, track, link)
   static const String paramShortcutType = 'shortcut_type';
 
+  // Search events
+  /// Event logged once per settled (debounced) non-empty query on the Search
+  /// tab. Parameters: paramSearchTerm, paramSearchTermLength.
+  static const String searchPerformed = 'search_performed';
+
+  /// Event logged when a settled non-empty query returns zero packs and zero
+  /// tracks — i.e. a content/discovery gap. Parameters: paramSearchTerm.
+  static const String searchNoResults = 'search_no_results';
+
+  /// The query text the user searched for.
+  static const String paramSearchTerm = 'search_term';
+
+  /// The length of the query text (useful for spotting abandoned partial
+  /// searches independent of the term itself).
+  static const String paramSearchTermLength = 'search_term_length';
+
   // Favourite events
   /// Event logged when user adds a track to favourites from the track screen
   static const String trackFavourited = 'track_favourited';

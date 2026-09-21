@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
@@ -751,76 +752,40 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         _customAmountError == null &&
         _customAmountController.text.isNotEmpty &&
         _selectedAmount > 0;
-    return TextField(
-      key: customAmountFieldKey,
+    return MeditoTextField(
+      fieldKey: customAmountFieldKey,
       controller: _customAmountController,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       enabled: !_isProcessingPayment,
-      style: TextStyle(color: onSurface, fontSize: 16),
-      decoration: InputDecoration(
-        hintText:
-            'Other amount (min '
-            '${formatCurrencyAmount(minimum, widget.config.currencyCode)})',
-        hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.5)),
-        errorText: _customAmountError,
-        helperText: showPreview
-            ? '= ${formatCurrencyAmount(_selectedAmount, widget.config.currencyCode)}'
-            : null,
-        helperStyle: TextStyle(color: onSurface.withValues(alpha: 0.7)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: onSurface.withValues(alpha: 0.2)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: context.brandPurple),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      ),
+      hintText:
+          'Other amount (min '
+          '${formatCurrencyAmount(minimum, widget.config.currencyCode)})',
+      errorText: _customAmountError,
+      helperText: showPreview
+          ? '= ${formatCurrencyAmount(_selectedAmount, widget.config.currencyCode)}'
+          : null,
       onChanged: _onCustomAmountChanged,
     );
   }
 
   Widget _buildEmailField(BuildContext context, Color onSurface) {
     final l10n = AppLocalizations.of(context)!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          key: donationEmailFieldKey,
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.done,
-          autocorrect: false,
-          enabled: !_isProcessingPayment,
-          style: TextStyle(color: onSurface, fontSize: 16),
-          decoration: InputDecoration(
-            labelText: l10n.donationEmailLabel,
-            helperText: l10n.donationEmailHelper,
-            helperMaxLines: 2,
-            errorText: _emailError,
-            labelStyle: TextStyle(color: onSurface.withValues(alpha: 0.7)),
-            helperStyle: TextStyle(
-              color: onSurface.withValues(alpha: 0.6),
-              fontSize: 12,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: onSurface.withValues(alpha: 0.4)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.brandPurple),
-            ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          onChanged: (_) {
-            if (_emailError != null) setState(() => _emailError = null);
-          },
-        ),
-      ],
+    return MeditoTextField(
+      fieldKey: donationEmailFieldKey,
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.done,
+      autocorrect: false,
+      enabled: !_isProcessingPayment,
+      labelText: l10n.donationEmailLabel,
+      helperText: l10n.donationEmailHelper,
+      helperMaxLines: 2,
+      errorText: _emailError,
+      onChanged: (_) {
+        if (_emailError != null) setState(() => _emailError = null);
+      },
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
 import 'package:medito/utils/currency.dart';
@@ -312,45 +313,16 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
     Color fg,
     AppLocalizations l10n,
   ) {
-    return TextField(
-      key: inlineDonationEmailFieldKey,
+    return MeditoTextField(
+      fieldKey: inlineDonationEmailFieldKey,
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.done,
       autocorrect: false,
       enabled: !widget.isProcessing,
-      style: TextStyle(color: fg, fontSize: 14),
-      cursorColor: fg,
-      decoration: InputDecoration(
-        isDense: true,
-        // The app's InputDecorationTheme fills fields with a surface colour
-        // that fights the purple card; keep the field see-through.
-        filled: true,
-        fillColor: Colors.transparent,
-        hintText: l10n.donationEmailLabel,
-        hintStyle: TextStyle(color: fg.withValues(alpha: 0.6), fontSize: 14),
-        helperText: _emailError == null ? l10n.donationEmailHelper : null,
-        helperStyle: TextStyle(color: fg.withValues(alpha: 0.6), fontSize: 12),
-        errorText: _emailError,
-        errorStyle: TextStyle(color: fg, fontSize: 12),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fg.withValues(alpha: 0.5)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fg),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fg),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fg),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      ),
+      hintText: l10n.donationEmailLabel,
+      helperText: _emailError == null ? l10n.donationEmailHelper : null,
+      errorText: _emailError,
       onChanged: (_) {
         if (_emailError != null) setState(() => _emailError = null);
       },
