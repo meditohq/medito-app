@@ -132,7 +132,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             Text(
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
+                fontFamily: googleSans,
                 color: isSelected ? selectedColor : unselectedColor,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
@@ -261,7 +261,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        fontFamily: dmSans,
+        fontFamily: googleSans,
       ),
     );
   }
@@ -458,7 +458,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                               context,
                             )!.alwaysShowStreakOnHomepage,
                             style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(fontSize: 14, fontFamily: dmSans),
+                                ?.copyWith(fontSize: 14, fontFamily: googleSans),
                           ),
                         ),
                       ],

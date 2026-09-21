@@ -286,7 +286,6 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
                 child: Text(
                   l10n.upNextTitle.toUpperCase(),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    fontFamily: teachers,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.2,
@@ -300,9 +299,8 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
           Text(
             title,
             style: theme.textTheme.headlineSmall?.copyWith(
-              fontFamily: sourceSerif,
               fontSize: isHero ? 28 : 22,
-              fontWeight: isHero ? FontWeight.w700 : FontWeight.w500,
+              fontWeight: FontWeight.w700,
               height: 1.2,
               color: onSurface,
             ),
@@ -481,7 +479,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                         l10n.upNextTitle.toUpperCase(),
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
-                                              fontFamily: teachers,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
                                               letterSpacing: 1.2,
@@ -493,7 +490,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                         '·',
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
-                                              fontFamily: teachers,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
                                               color: palette.muted,
@@ -505,7 +501,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                           widget.data.pack.title,
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
-                                                fontFamily: teachers,
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                                 letterSpacing: 1.2,
@@ -521,11 +516,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                     nextSession.title,
                                     style: theme.textTheme.headlineSmall
                                         ?.copyWith(
-                                          fontFamily: sourceSerif,
                                           fontSize: isHero ? 28 : 22,
-                                          fontWeight: isHero
-                                              ? FontWeight.w700
-                                              : FontWeight.w500,
+                                          fontWeight: FontWeight.w700,
                                           height: 1.2,
                                           color: palette.foreground,
                                         ),
@@ -825,7 +817,6 @@ class _ProgressRow extends StatelessWidget {
         Text(
           AppLocalizations.of(context)!.upNextProgress(completed, total),
           style: theme.textTheme.bodySmall?.copyWith(
-            fontFamily: teachers,
             fontSize: 12,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.6,

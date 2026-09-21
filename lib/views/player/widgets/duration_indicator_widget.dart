@@ -140,7 +140,7 @@ class _DurationIndicatorWidgetState
       label,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
         color: ColorConstants.white,
-        fontFamily: dmMono,
+        fontFamily: googleSans,
         fontSize: 12,
       ),
     );

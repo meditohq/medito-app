@@ -7,16 +7,16 @@ InputDecorationTheme inputDecorationTheme() {
 
   return InputDecorationTheme(
     labelStyle: const TextStyle(
-      fontSize: 14.0,
+      fontSize: 14,
       fontStyle: FontStyle.normal,
       color: ColorConstants.white,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     floatingLabelStyle: const TextStyle(
-      fontSize: 15.0,
+      fontSize: 16,
       fontStyle: FontStyle.normal,
       color: ColorConstants.white,
-      fontFamily: dmSans,
+      fontFamily: googleSans,
     ),
     enabledBorder: outlineInputBorder,
     focusedBorder: outlineInputBorder,

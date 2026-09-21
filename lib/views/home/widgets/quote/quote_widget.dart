@@ -76,7 +76,6 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
             widget.data!.quote,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontFamily: sourceSerif,
               fontWeight: FontWeight.w300,
               fontSize: 18,
               height: 1.4,
@@ -98,7 +97,6 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                   '— ${widget.data!.author}',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: dmSans,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: Theme.of(context).colorScheme.onSurface,

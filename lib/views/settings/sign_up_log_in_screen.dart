@@ -557,7 +557,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           AppLocalizations.of(context)!.emailVerificationText,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontSize: 13,
+            fontSize: 14,
             height: 1.5,
             fontWeight: FontWeight.normal,
           ),

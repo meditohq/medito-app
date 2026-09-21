@@ -5,8 +5,8 @@ import 'package:medito/utils/utils.dart';
 const double _buttonHeight = 48;
 const double _buttonRadius = 12;
 const TextStyle _buttonTextStyle = TextStyle(
-  fontFamily: dmSans,
-  fontSize: 15,
+  fontFamily: googleSans,
+  fontSize: 16,
   fontWeight: FontWeight.w600,
 );
 

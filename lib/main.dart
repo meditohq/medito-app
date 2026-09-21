@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
@@ -83,6 +84,14 @@ void main() async {
   DevicePreview.enable(enabled: DebugOptions.enableDevicePreview);
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Google Sans ships under the SIL Open Font License 1.1, which requires the
+  // license notice to travel with the app. Register it so it's included in the
+  // in-app licenses page (Advanced > Licenses / showLicensePage).
+  LicenseRegistry.addLicense(() async* {
+    final ofl = await rootBundle.loadString('assets/fonts/google-sans/OFL.txt');
+    yield LicenseEntryWithLineBreaks(const ['Google Sans'], ofl);
+  });
 
   if (isMockMode) {
     AppLogger.d('MAIN', 'Mock mode: skipping Firebase, Stripe, Meta SDK');

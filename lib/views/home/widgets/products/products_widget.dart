@@ -120,7 +120,6 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                             maxLines: 1,
                             style: Theme.of(context).textTheme.labelLarge
                                 ?.copyWith(
-                                  fontFamily: 'teachers',
                                   fontSize: 20,
                                   fontWeight: FontWeight.w400,
                                   height: 28 / 24,
@@ -173,7 +172,7 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
               child: Text(
                 AppLocalizations.of(context)!.blackFridaySubtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontSize: 13,
+                  fontSize: 14,
                   color: Theme.of(
                     context,
                   ).colorScheme.onSurface.withValues(alpha: 0.7),
@@ -435,8 +434,8 @@ class ProductGroupCard extends ConsumerWidget {
                                 AppLocalizations.of(context)!.newProductLabel,
                                 style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
                                       color: Theme.of(
                                         context,
                                       ).colorScheme.onSurface,
@@ -458,7 +457,6 @@ class ProductGroupCard extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontFamily: teachers,
               fontSize: 12,
               color: textColor,
             ),

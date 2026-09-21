@@ -98,7 +98,7 @@ class PackPathButton extends ConsumerWidget {
                           Text(
                             title,
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              fontFamily: dmSans,
+                              fontFamily: googleSans,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -108,7 +108,7 @@ class PackPathButton extends ConsumerWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              fontFamily: dmSans,
+                              fontFamily: googleSans,
                               fontSize: 12,
                               color: onSurface.withValues(alpha: 0.65),
                             ),

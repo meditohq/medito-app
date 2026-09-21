@@ -354,11 +354,10 @@ class _TrackViewState extends ConsumerState<TrackView>
     return Text(
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        fontFamily: sourceSerif,
         letterSpacing: 0.2,
-        fontSize: 24,
+        fontSize: 22,
         color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.normal,
+        fontWeight: FontWeight.w700,
       ),
     );
   }
@@ -370,13 +369,11 @@ class _TrackViewState extends ConsumerState<TrackView>
         selectable: true,
         textAlign: WrapAlignment.start,
         p: Theme.of(context).textTheme.headlineMedium?.copyWith(
-          fontFamily: dmSans,
           fontSize: 16,
           fontWeight: FontWeight.normal,
           color: Theme.of(context).colorScheme.onSurface,
         ),
         a: Theme.of(context).textTheme.headlineMedium?.copyWith(
-          fontFamily: dmSans,
           decoration: TextDecoration.underline,
           fontSize: 16,
           fontWeight: FontWeight.normal,

@@ -49,7 +49,7 @@ class _AudioSpeedComponentState extends ConsumerState<AudioSpeedWidget> {
                 '${_currentSpeed.toStringAsFixed(1)}×',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: ColorConstants.white,
-                  fontFamily: dmMono,
+                  fontFamily: googleSans,
                   fontSize: 18,
                 ),
                 textAlign: TextAlign.center,

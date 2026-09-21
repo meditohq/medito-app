@@ -93,13 +93,19 @@ class AdvancedSettingsScreen extends ConsumerWidget {
       RowItemWidget(
         icon: MeditoIcon(assetName: MeditoIcons.privacy, color: onSurface),
         title: l10n.privacyPolicy,
-        hasUnderline: false,
         onTap: () => handleNavigation(
           TypeConstants.route,
           [RouteConstants.analytics],
           context,
           ref: ref,
         ),
+      ),
+      RowItemWidget(
+        icon: Icon(Icons.description_outlined, color: onSurface),
+        title: 'Licenses',
+        hasUnderline: false,
+        onTap: () =>
+            showLicensePage(context: context, applicationName: 'Medito'),
       ),
     ];
 

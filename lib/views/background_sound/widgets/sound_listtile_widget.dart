@@ -47,7 +47,7 @@ class SoundListTileWidget extends ConsumerWidget {
                         ? AppLocalizations.of(context)!.none
                         : sound.title,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontFamily: dmSans,
+                      fontFamily: googleSans,
                       fontSize: 16,
                     ),
                   ),
@@ -74,7 +74,7 @@ class SoundListTileWidget extends ConsumerWidget {
       child: Text(
         AppLocalizations.of(context)!.backgroundSoundDownloadFailed,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          fontFamily: dmSans,
+          fontFamily: googleSans,
           color: Theme.of(context).colorScheme.error,
         ),
       ),

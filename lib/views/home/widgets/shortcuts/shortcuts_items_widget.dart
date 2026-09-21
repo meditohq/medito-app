@@ -95,7 +95,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
     final iconColor = Theme.of(context).colorScheme.onSurface;
     final textColor = Theme.of(context).colorScheme.onSurface;
 
-    final iconSize = (width * 0.5).clamp(24.0, 32.0);
+    final iconSize = (width * 0.5).clamp(26.0, 36.0);
 
     final squareButton = HomeGradientBorder(
       backgroundColor: backgroundColor,
@@ -134,15 +134,14 @@ class ShortcutsItemsWidget extends ConsumerWidget {
             GestureDetector(
               onTap: () => _handleChipPress(context, ref, e),
               child: Padding(
-                padding: const EdgeInsets.only(top: 6),
+                padding: const EdgeInsets.only(top: 8),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
                     e.title ?? '',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontFamily: teachers,
-                      fontSize: 12,
-                      color: textColor.withOpacityValue(0.7),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: textColor.withOpacityValue(0.9),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
