@@ -938,10 +938,6 @@
   "@turnOnReminders": {
     "description": "Button text to enable daily reminders"
   },
-  "remindersOn": "Reminders on",
-  "@remindersOn": {
-    "description": "Status text when daily reminders are enabled"
-  },
   "reminderPromptDismissedMessage": "You can turn reminders on or off in Settings",
   "@reminderPromptDismissedMessage": {
     "description": "Message shown when user dismisses the reminder prompt on the end screen"

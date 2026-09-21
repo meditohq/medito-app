@@ -24,6 +24,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:medito/views/settings/widgets/reminder_tile.dart'
+    show
+        ReminderChoice,
+        ReminderChoiceCustom,
+        ReminderChoiceOff,
+        ReminderChoiceSlot,
+        ReminderOptionsSheet;
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/medito_icon.dart';
@@ -563,8 +570,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   }
 
   Widget _buildReminderPrompt() {
+    // shouldShowReminderPromptProvider is false whenever reminders are on, so
+    // this card only ever renders in the "off" state and vanishes on success.
     final shouldShow = ref.watch(shouldShowReminderPromptProvider);
-    final isReminderEnabled = ref.watch(reminderEnabledProvider);
 
     if (!shouldShow) {
       return const SizedBox.shrink();
@@ -637,31 +645,25 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   ),
                 ],
               ),
-              if (!isReminderEnabled) ...[
-                const SizedBox(height: 8),
-                Text(
-                  AppLocalizations.of(context)!.enableNotificationsBody,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
+              const SizedBox(height: 8),
+              Text(
+                AppLocalizations.of(context)!.enableNotificationsBody,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
                 ),
-              ],
+              ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: isReminderEnabled
-                      ? null
-                      : () => _enableReminders(),
+                  onPressed: _enableReminders,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
                   child: Text(
-                    isReminderEnabled
-                        ? AppLocalizations.of(context)!.remindersOn
-                        : _notificationsBlocked
+                    _notificationsBlocked
                         ? AppLocalizations.of(context)!.turnOnInSettings
                         : AppLocalizations.of(context)!.turnOnReminders,
                     textAlign: TextAlign.center,
@@ -673,20 +675,19 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   ),
                 ),
               ),
-              if (!isReminderEnabled)
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: _snoozeReminderPrompt,
-                    child: Text(
-                      AppLocalizations.of(context)!.notNow,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: _snoozeReminderPrompt,
+                  child: Text(
+                    AppLocalizations.of(context)!.notNow,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         ),
@@ -856,14 +857,72 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     return true;
   }
 
+  /// The same Morning / Evening / Night / Custom sheet as the Settings tile.
+  /// Returns the chosen time and the slot id for analytics, or null if the
+  /// user closed the sheet (or the custom picker) without choosing.
+  Future<(TimeOfDay, String)?> _pickReminderTime() async {
+    final analytics = ref.read(analyticsServiceProvider);
+    unawaited(
+      analytics.logEvent(
+        name: AnalyticsEventConstants.endScreenReminderSheetShown,
+      ),
+    );
+
+    final choice = await showModalBottomSheet<ReminderChoice>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
+      // Reminders are off whenever this card offers to turn them on, so the
+      // sheet never shows its "Turn off" row here.
+      builder: (_) => const ReminderOptionsSheet(current: null, enabled: false),
+    );
+    if (!mounted) return null;
+
+    (TimeOfDay, String)? result;
+    switch (choice) {
+      case ReminderChoiceSlot(:final slot):
+        result = (slot.time, slot.analyticsId);
+      case ReminderChoiceCustom():
+        final picked = await showTimePicker(
+          context: context,
+          initialTime: const TimeOfDay(hour: 7, minute: 0),
+          initialEntryMode: TimePickerEntryMode.input,
+        );
+        if (picked != null) result = (picked, 'custom');
+      case ReminderChoiceOff():
+      case null:
+        result = null;
+    }
+
+    if (result == null) {
+      unawaited(
+        analytics.logEvent(
+          name: AnalyticsEventConstants.endScreenReminderSheetDismissed,
+        ),
+      );
+    }
+    return result;
+  }
+
   Future<void> _enableReminders() async {
     try {
       // No system prompt is coming for these users — route them to settings
-      // instead of raising a dialog that cannot appear.
+      // instead of raising a dialog that cannot appear. Done before the time
+      // sheet so someone who won't grant permission never picks a time for
+      // nothing; if they come back with it granted, the sheet follows.
       if (_notificationsBlocked) {
         final recovered = await _recoverBlockedPermission();
         if (!recovered || !mounted) return;
-      } else if (!_notificationsGranted) {
+      }
+
+      // Time first, permission second — same order as onboarding's chips and
+      // the Settings tile. Replaces the old silent "same time tomorrow"
+      // default that the other two surfaces had already dropped.
+      final pick = await _pickReminderTime();
+      if (pick == null || !mounted) return;
+      final (time, slotId) = pick;
+
+      if (!_notificationsGranted) {
         // Only worth asking when a system dialog is actually coming; if
         // permission is already granted this just adds a tap.
         final proceed = await _confirmPermissionPrompt();
@@ -891,7 +950,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         reminders: ref.read(reminderProvider),
       );
 
-      final time = await service.enable(l10n: AppLocalizations.of(context));
+      final anchor = await service.enableAt(
+        time,
+        l10n: AppLocalizations.of(context),
+      );
       await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
       await ref.read(reminderTimeProvider.notifier).setTime(time);
 
@@ -903,19 +965,16 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               parameters: {
                 AnalyticsEventConstants.paramSource:
                     AnalyticsEventConstants.sourceEndScreen,
-                // This path never asks for a time — enable() keeps the hour
-                // chosen in onboarding/Settings, or falls back to the moment
-                // the session ended. Logged with the same params as the
-                // onboarding set-tap so both surfaces are comparable.
-                AnalyticsEventConstants.paramReminderHour: time.hour,
-                AnalyticsEventConstants.paramReminderMinute: time.minute,
+                // Same params as the onboarding set-tap and the Settings tile
+                // so all three surfaces are comparable.
+                AnalyticsEventConstants.paramReminderSlot: slotId,
+                AnalyticsEventConstants.paramReminderHour: anchor.hour,
+                AnalyticsEventConstants.paramReminderMinute: anchor.minute,
               },
             ),
       );
 
-      if (mounted) {
-        setState(() {});
-      }
+      // No setState: reminderEnabledProvider flipping to true hides the card.
     } catch (e, s) {
       // Previously swallowed: the user tapped the button, granted permission,
       // and got no reminder, no feedback and no event — invisible in both the

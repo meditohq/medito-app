@@ -1798,9 +1798,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get turnOnReminders => 'Turn on reminders';
 
   @override
-  String get remindersOn => 'Reminders on';
-
-  @override
   String get reminderPromptDismissedMessage =>
       'You can turn reminders on or off in Settings';
 
