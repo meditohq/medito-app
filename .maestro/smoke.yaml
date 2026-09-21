@@ -52,97 +52,14 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 60000
 - tapOn: "Never tried it"
 
-# Experience is now the ONLY onboarding question (the intent + attribution
-# questions were removed). Selecting an option auto-advances straight to the
-# donation primer — no second question to answer.
-
-# ── Onboarding: Donation ──
-# Two variants can render here:
-#   - NATIVE donation page — forced on internal builds via
-#     _forceNativeForInternalTesting (TODO(temp)), otherwise server-flagged.
-#     Its donate CTA renders immediately; the close X (labelled "Skip for
-#     Now") fades in top-right ~5s after load, mirroring the webview arm.
-#   - WEBVIEW intro — the previous default ("See how to help" CTA); returns
-#     when the temp force-native flag is reverted.
-# Wait for whichever appears, then branch on the webview CTA.
+# The timing test shows either the early ask (A) or reminders (B).
 - extendedWaitUntil:
-    visible: "See how to help|.*Donate.*"
+    visible: "See how to help|.*Donate.*|Stay on Track with Meditation Reminders"
     timeout: 30000
-
-# Native page path: nothing to drive without charging a card — screenshot,
-# wait out the close-X delay, dismiss.
 - runFlow:
     when:
-      notVisible: "See how to help"
-    commands:
-      - takeScreenshot: paywall-native
-      - extendedWaitUntil:
-          visible: "Skip for Now"
-          timeout: 15000
-      - tapOn: "Skip for Now"
-
-# Webview intro path, iOS: smoke builds enable SMOKE_TEST_MODE, which adds a
-# deterministic close control to the webview route and reveals the skip button
-# after returning. That still verifies the webview opens, without waiting on a
-# remote page close affordance that is slow and flaky on iOS CI.
-- runFlow:
-    when:
-      visible: "See how to help"
-      platform: iOS
-    commands:
-      - tapOn: "See how to help"
-
-      - extendedWaitUntil:
-          visible: "Donation webview opened"
-          timeout: 10000
-      - takeScreenshot: paywall-webview
-      - tapOn: "Donation webview opened"
-
-      - extendedWaitUntil:
-          visible: "Skip for Now"
-          timeout: 20000
-      - tapOn: "Skip for Now"
-
-# Webview intro path, Android: release smoke uses the deployable APK, so it
-# keeps the real production build settings and drives the donation webview
-# before skipping.
-- runFlow:
-    when:
-      visible: "See how to help"
-      platform: Android
-    commands:
-      - tapOn: "See how to help"
-
-      # Dismiss the webview. The webpage shows an x close glyph (aria-label
-      # "Close") in the top-right that fades in 5s after the page loads.
-      # Do NOT use waitForAnimationToEnd here -- the webview can keep loading
-      # indefinitely on CI and block the step. Wait directly for Close instead,
-      # with a generous timeout to cover slow CI network.
-      - extendedWaitUntil:
-          visible: "Close"
-          timeout: 90000
-      - takeScreenshot: paywall-webview
-
-      # One tap is not enough: "Close is visible" is an accessibility-tree
-      # check, and the glyph sits in the tree from page load while it is still
-      # opacity:0 / pointer-events:none for its first 5s, so the wait above can
-      # clear while the tap is still a no-op. That cost two release runs
-      # (32850168903, 33071182758) on the same silent miss -- the webview was
-      # still open afterwards with the X exactly where the tree said it was.
-      # Retry until the app-side screen behind it comes back, which is the only
-      # thing that actually proves the dismiss landed.
-      - retry:
-          maxRetries: 2
-          commands:
-            - runFlow:
-                when:
-                  visible: "Close"
-                commands:
-                  - tapOn: "Close"
-            - extendedWaitUntil:
-                visible: "Skip for Now"
-                timeout: 15000
-      - tapOn: "Skip for Now"
+      notVisible: "Stay on Track with Meditation Reminders"
+    file: dismiss_onboarding_donation.yaml
 
 # ── Onboarding: Notifications / daily reminders (re-added 26.6, sits
 # between the donation primer and battery/tracking). Skip it for the
@@ -204,6 +121,16 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 30000
 - tapOn:
     text: "Get started|Maybe later"
+
+# B ends with the donation ask; A proceeds directly to Home.
+- extendedWaitUntil:
+    visible: "See how to help|.*Donate.*|(?si).*your path.*|Dismiss"
+    timeout: 60000
+- runFlow:
+    when:
+      visible: "See how to help|.*Donate.*"
+      notVisible: "(?si).*your path.*"
+    file: dismiss_onboarding_donation.yaml
 
 # A donation prompt dialog ("Medito is a registered nonprofit") sometimes
 # appears on Home post-onboarding — dismiss if present.
