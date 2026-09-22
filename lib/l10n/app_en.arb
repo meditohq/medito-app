@@ -1720,5 +1720,173 @@
   "donateMostPopular": "Most popular",
   "@donateMostPopular": {"description": "Badge on the suggested amount chip"},
   "donateMonthlyDisclosure": "Monthly, cancel any time. Secure payment via Stripe.",
-  "@donateMonthlyDisclosure": {"description": "Small print under the inline pay button"}
+  "@donateMonthlyDisclosure": {"description": "Small print under the inline pay button"},
+  "tagSleep": "Sleep",
+  "@tagSleep": {
+    "description": "Content tag chip label (server tag id: sleep)"
+  },
+  "tagStress": "Stress",
+  "@tagStress": {
+    "description": "Content tag chip label (server tag id: stress)"
+  },
+  "tagAnxiety": "Anxiety",
+  "@tagAnxiety": {
+    "description": "Content tag chip label (server tag id: anxiety)"
+  },
+  "tagLowMood": "Low mood",
+  "@tagLowMood": {
+    "description": "Content tag chip label (server tag id: low_mood)"
+  },
+  "tagFocus": "Focus",
+  "@tagFocus": {
+    "description": "Content tag chip label (server tag id: focus)"
+  },
+  "tagCalm": "Calm",
+  "@tagCalm": {
+    "description": "Content tag chip label (server tag id: calm)"
+  },
+  "tagSelfCompassion": "Self-compassion",
+  "@tagSelfCompassion": {
+    "description": "Content tag chip label (server tag id: self_compassion)"
+  },
+  "tagGratitude": "Gratitude",
+  "@tagGratitude": {
+    "description": "Content tag chip label (server tag id: gratitude)"
+  },
+  "tagEmotions": "Difficult emotions",
+  "@tagEmotions": {
+    "description": "Content tag chip label (server tag id: emotions)"
+  },
+  "tagPain": "Pain",
+  "@tagPain": {
+    "description": "Content tag chip label (server tag id: pain)"
+  },
+  "tagConfidence": "Confidence",
+  "@tagConfidence": {
+    "description": "Content tag chip label (server tag id: confidence)"
+  },
+  "tagRelationships": "Relationships",
+  "@tagRelationships": {
+    "description": "Content tag chip label (server tag id: relationships)"
+  },
+  "tagGrief": "Grief",
+  "@tagGrief": {
+    "description": "Content tag chip label (server tag id: grief)"
+  },
+  "tagHabitBuilding": "Habit building",
+  "@tagHabitBuilding": {
+    "description": "Content tag chip label (server tag id: habit_building)"
+  },
+  "tagBreathing": "Breathing",
+  "@tagBreathing": {
+    "description": "Content tag chip label (server tag id: breathing)"
+  },
+  "tagBodyScan": "Body scan",
+  "@tagBodyScan": {
+    "description": "Content tag chip label (server tag id: body_scan)"
+  },
+  "tagLovingKindness": "Loving-kindness",
+  "@tagLovingKindness": {
+    "description": "Content tag chip label (server tag id: loving_kindness)"
+  },
+  "tagOpenAwareness": "Open awareness",
+  "@tagOpenAwareness": {
+    "description": "Content tag chip label (server tag id: open_awareness)"
+  },
+  "tagVisualization": "Visualisation",
+  "@tagVisualization": {
+    "description": "Content tag chip label (server tag id: visualization)"
+  },
+  "tagMantra": "Mantra",
+  "@tagMantra": {
+    "description": "Content tag chip label (server tag id: mantra)"
+  },
+  "tagWalking": "Walking",
+  "@tagWalking": {
+    "description": "Content tag chip label (server tag id: walking)"
+  },
+  "tagReflection": "Reflection",
+  "@tagReflection": {
+    "description": "Content tag chip label (server tag id: reflection)"
+  },
+  "tagSound": "Sound",
+  "@tagSound": {
+    "description": "Content tag chip label (server tag id: sound)"
+  },
+  "tagGuidedMeditation": "Guided meditation",
+  "@tagGuidedMeditation": {
+    "description": "Content tag chip label (server tag id: guided_meditation)"
+  },
+  "tagTalk": "Talks",
+  "@tagTalk": {
+    "description": "Content tag chip label (server tag id: talk)"
+  },
+  "tagSleepStory": "Sleep stories",
+  "@tagSleepStory": {
+    "description": "Content tag chip label (server tag id: sleep_story)"
+  },
+  "tagMusic": "Music",
+  "@tagMusic": {
+    "description": "Content tag chip label (server tag id: music)"
+  },
+  "tagNatureSounds": "Nature sounds",
+  "@tagNatureSounds": {
+    "description": "Content tag chip label (server tag id: nature_sounds)"
+  },
+  "tagCourseLesson": "Course lessons",
+  "@tagCourseLesson": {
+    "description": "Content tag chip label (server tag id: course_lesson)"
+  },
+  "tagBeginners": "For beginners",
+  "@tagBeginners": {
+    "description": "Content tag chip label (server tag id: beginners)"
+  },
+  "tagExperienced": "Experienced",
+  "@tagExperienced": {
+    "description": "Content tag chip label (server tag id: experienced)"
+  },
+  "tagTeensStudents": "Teens & students",
+  "@tagTeensStudents": {
+    "description": "Content tag chip label (server tag id: teens_students)"
+  },
+  "tagTeachers": "Teachers",
+  "@tagTeachers": {
+    "description": "Content tag chip label (server tag id: teachers)"
+  },
+  "tagWorkplace": "Work",
+  "@tagWorkplace": {
+    "description": "Content tag chip label (server tag id: workplace)"
+  },
+  "tagKids": "Kids",
+  "@tagKids": {
+    "description": "Content tag chip label (server tag id: kids)"
+  },
+  "tagMorning": "Morning",
+  "@tagMorning": {
+    "description": "Content tag chip label (server tag id: morning)"
+  },
+  "tagEvening": "Evening",
+  "@tagEvening": {
+    "description": "Content tag chip label (server tag id: evening)"
+  },
+  "tagSos": "SOS",
+  "@tagSos": {
+    "description": "Content tag chip label (server tag id: sos)"
+  },
+  "tagOnTheGo": "On the go",
+  "@tagOnTheGo": {
+    "description": "Content tag chip label (server tag id: on_the_go)"
+  },
+  "tagCrisis": "Times of crisis",
+  "@tagCrisis": {
+    "description": "Content tag chip label (server tag id: crisis)"
+  },
+  "tagSpanish": "Español",
+  "@tagSpanish": {
+    "description": "Content tag chip label (server tag id: spanish)"
+  },
+  "tagNoTracks": "No sessions with this tag yet",
+  "@tagNoTracks": {
+    "description": "Empty state on a tag page"
+  }
 }

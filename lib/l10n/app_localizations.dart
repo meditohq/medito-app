@@ -4429,6 +4429,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Monthly, cancel any time. Secure payment via Stripe.'**
   String get donateMonthlyDisclosure;
+
+  /// Content tag chip label (server tag id: sleep)
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep'**
+  String get tagSleep;
+
+  /// Content tag chip label (server tag id: stress)
+  ///
+  /// In en, this message translates to:
+  /// **'Stress'**
+  String get tagStress;
+
+  /// Content tag chip label (server tag id: anxiety)
+  ///
+  /// In en, this message translates to:
+  /// **'Anxiety'**
+  String get tagAnxiety;
+
+  /// Content tag chip label (server tag id: low_mood)
+  ///
+  /// In en, this message translates to:
+  /// **'Low mood'**
+  String get tagLowMood;
+
+  /// Content tag chip label (server tag id: focus)
+  ///
+  /// In en, this message translates to:
+  /// **'Focus'**
+  String get tagFocus;
+
+  /// Content tag chip label (server tag id: calm)
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get tagCalm;
+
+  /// Content tag chip label (server tag id: self_compassion)
+  ///
+  /// In en, this message translates to:
+  /// **'Self-compassion'**
+  String get tagSelfCompassion;
+
+  /// Content tag chip label (server tag id: gratitude)
+  ///
+  /// In en, this message translates to:
+  /// **'Gratitude'**
+  String get tagGratitude;
+
+  /// Content tag chip label (server tag id: emotions)
+  ///
+  /// In en, this message translates to:
+  /// **'Difficult emotions'**
+  String get tagEmotions;
+
+  /// Content tag chip label (server tag id: pain)
+  ///
+  /// In en, this message translates to:
+  /// **'Pain'**
+  String get tagPain;
+
+  /// Content tag chip label (server tag id: confidence)
+  ///
+  /// In en, this message translates to:
+  /// **'Confidence'**
+  String get tagConfidence;
+
+  /// Content tag chip label (server tag id: relationships)
+  ///
+  /// In en, this message translates to:
+  /// **'Relationships'**
+  String get tagRelationships;
+
+  /// Content tag chip label (server tag id: grief)
+  ///
+  /// In en, this message translates to:
+  /// **'Grief'**
+  String get tagGrief;
+
+  /// Content tag chip label (server tag id: habit_building)
+  ///
+  /// In en, this message translates to:
+  /// **'Habit building'**
+  String get tagHabitBuilding;
+
+  /// Content tag chip label (server tag id: breathing)
+  ///
+  /// In en, this message translates to:
+  /// **'Breathing'**
+  String get tagBreathing;
+
+  /// Content tag chip label (server tag id: body_scan)
+  ///
+  /// In en, this message translates to:
+  /// **'Body scan'**
+  String get tagBodyScan;
+
+  /// Content tag chip label (server tag id: loving_kindness)
+  ///
+  /// In en, this message translates to:
+  /// **'Loving-kindness'**
+  String get tagLovingKindness;
+
+  /// Content tag chip label (server tag id: open_awareness)
+  ///
+  /// In en, this message translates to:
+  /// **'Open awareness'**
+  String get tagOpenAwareness;
+
+  /// Content tag chip label (server tag id: visualization)
+  ///
+  /// In en, this message translates to:
+  /// **'Visualisation'**
+  String get tagVisualization;
+
+  /// Content tag chip label (server tag id: mantra)
+  ///
+  /// In en, this message translates to:
+  /// **'Mantra'**
+  String get tagMantra;
+
+  /// Content tag chip label (server tag id: walking)
+  ///
+  /// In en, this message translates to:
+  /// **'Walking'**
+  String get tagWalking;
+
+  /// Content tag chip label (server tag id: reflection)
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection'**
+  String get tagReflection;
+
+  /// Content tag chip label (server tag id: sound)
+  ///
+  /// In en, this message translates to:
+  /// **'Sound'**
+  String get tagSound;
+
+  /// Content tag chip label (server tag id: guided_meditation)
+  ///
+  /// In en, this message translates to:
+  /// **'Guided meditation'**
+  String get tagGuidedMeditation;
+
+  /// Content tag chip label (server tag id: talk)
+  ///
+  /// In en, this message translates to:
+  /// **'Talks'**
+  String get tagTalk;
+
+  /// Content tag chip label (server tag id: sleep_story)
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep stories'**
+  String get tagSleepStory;
+
+  /// Content tag chip label (server tag id: music)
+  ///
+  /// In en, this message translates to:
+  /// **'Music'**
+  String get tagMusic;
+
+  /// Content tag chip label (server tag id: nature_sounds)
+  ///
+  /// In en, this message translates to:
+  /// **'Nature sounds'**
+  String get tagNatureSounds;
+
+  /// Content tag chip label (server tag id: course_lesson)
+  ///
+  /// In en, this message translates to:
+  /// **'Course lessons'**
+  String get tagCourseLesson;
+
+  /// Content tag chip label (server tag id: beginners)
+  ///
+  /// In en, this message translates to:
+  /// **'For beginners'**
+  String get tagBeginners;
+
+  /// Content tag chip label (server tag id: experienced)
+  ///
+  /// In en, this message translates to:
+  /// **'Experienced'**
+  String get tagExperienced;
+
+  /// Content tag chip label (server tag id: teens_students)
+  ///
+  /// In en, this message translates to:
+  /// **'Teens & students'**
+  String get tagTeensStudents;
+
+  /// Content tag chip label (server tag id: teachers)
+  ///
+  /// In en, this message translates to:
+  /// **'Teachers'**
+  String get tagTeachers;
+
+  /// Content tag chip label (server tag id: workplace)
+  ///
+  /// In en, this message translates to:
+  /// **'Work'**
+  String get tagWorkplace;
+
+  /// Content tag chip label (server tag id: kids)
+  ///
+  /// In en, this message translates to:
+  /// **'Kids'**
+  String get tagKids;
+
+  /// Content tag chip label (server tag id: morning)
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get tagMorning;
+
+  /// Content tag chip label (server tag id: evening)
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get tagEvening;
+
+  /// Content tag chip label (server tag id: sos)
+  ///
+  /// In en, this message translates to:
+  /// **'SOS'**
+  String get tagSos;
+
+  /// Content tag chip label (server tag id: on_the_go)
+  ///
+  /// In en, this message translates to:
+  /// **'On the go'**
+  String get tagOnTheGo;
+
+  /// Content tag chip label (server tag id: crisis)
+  ///
+  /// In en, this message translates to:
+  /// **'Times of crisis'**
+  String get tagCrisis;
+
+  /// Content tag chip label (server tag id: spanish)
+  ///
+  /// In en, this message translates to:
+  /// **'Español'**
+  String get tagSpanish;
+
+  /// Empty state on a tag page
+  ///
+  /// In en, this message translates to:
+  /// **'No sessions with this tag yet'**
+  String get tagNoTracks;
 }
 
 class _AppLocalizationsDelegate

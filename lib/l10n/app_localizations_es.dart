@@ -2445,4 +2445,130 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get donateMonthlyDisclosure =>
       'Mensual, cancela cuando quieras. Pago seguro con Stripe.';
+
+  @override
+  String get tagSleep => 'Sueño';
+
+  @override
+  String get tagStress => 'Estrés';
+
+  @override
+  String get tagAnxiety => 'Ansiedad';
+
+  @override
+  String get tagLowMood => 'Ánimo bajo';
+
+  @override
+  String get tagFocus => 'Concentración';
+
+  @override
+  String get tagCalm => 'Calma';
+
+  @override
+  String get tagSelfCompassion => 'Autocompasión';
+
+  @override
+  String get tagGratitude => 'Gratitud';
+
+  @override
+  String get tagEmotions => 'Emociones difíciles';
+
+  @override
+  String get tagPain => 'Dolor';
+
+  @override
+  String get tagConfidence => 'Confianza';
+
+  @override
+  String get tagRelationships => 'Relaciones';
+
+  @override
+  String get tagGrief => 'Duelo';
+
+  @override
+  String get tagHabitBuilding => 'Crear el hábito';
+
+  @override
+  String get tagBreathing => 'Respiración';
+
+  @override
+  String get tagBodyScan => 'Escaneo corporal';
+
+  @override
+  String get tagLovingKindness => 'Bondad amorosa';
+
+  @override
+  String get tagOpenAwareness => 'Conciencia abierta';
+
+  @override
+  String get tagVisualization => 'Visualización';
+
+  @override
+  String get tagMantra => 'Mantra';
+
+  @override
+  String get tagWalking => 'Caminar';
+
+  @override
+  String get tagReflection => 'Reflexión';
+
+  @override
+  String get tagSound => 'Sonido';
+
+  @override
+  String get tagGuidedMeditation => 'Meditación guiada';
+
+  @override
+  String get tagTalk => 'Charlas';
+
+  @override
+  String get tagSleepStory => 'Cuentos para dormir';
+
+  @override
+  String get tagMusic => 'Música';
+
+  @override
+  String get tagNatureSounds => 'Sonidos de la naturaleza';
+
+  @override
+  String get tagCourseLesson => 'Lecciones del curso';
+
+  @override
+  String get tagBeginners => 'Para principiantes';
+
+  @override
+  String get tagExperienced => 'Con experiencia';
+
+  @override
+  String get tagTeensStudents => 'Adolescentes y estudiantes';
+
+  @override
+  String get tagTeachers => 'Docentes';
+
+  @override
+  String get tagWorkplace => 'Trabajo';
+
+  @override
+  String get tagKids => 'Niños';
+
+  @override
+  String get tagMorning => 'Mañana';
+
+  @override
+  String get tagEvening => 'Noche';
+
+  @override
+  String get tagSos => 'SOS';
+
+  @override
+  String get tagOnTheGo => 'En movimiento';
+
+  @override
+  String get tagCrisis => 'Tiempos de crisis';
+
+  @override
+  String get tagSpanish => 'Español';
+
+  @override
+  String get tagNoTracks => 'Aún no hay sesiones con esta etiqueta';
 }
