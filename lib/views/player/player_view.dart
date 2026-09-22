@@ -98,7 +98,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startPlayback();
-      _initializePlayer();
     });
   }
 
@@ -112,6 +111,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     if (request == null) return;
     try {
       await ref.read(playerProvider.notifier).play(request);
+      // The native service must be ready before restoring background audio.
+      if (mounted && !_isClosing) unawaited(_initializePlayer());
     } catch (e, st) {
       AppLogger.e('PLAYER', 'Failed to start playback', e, st);
       if (mounted) setState(() => _startFailed = true);

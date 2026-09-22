@@ -101,6 +101,7 @@ dev_dependencies:
 flutter:
   generate: true
   assets:
+    - assets/audio/
     - assets/
     - assets/images/
     - assets/images/app_icons/ios/

@@ -107,7 +107,7 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
     BackgroundSoundsModel sound,
   ) async {
     try {
-      if (sound.id == kNoneBackgroundSoundId) {
+      if (sound.id == kNoneBackgroundSoundId || sound.id == kSessionBellsId) {
         return;
       } else {
         var pref = ref.read(sharedPreferencesProvider);

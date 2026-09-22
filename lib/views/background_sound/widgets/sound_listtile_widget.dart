@@ -47,12 +47,19 @@ class SoundListTileWidget extends ConsumerWidget {
                     // English title, to be localised here.
                     sound.id == kNoneBackgroundSoundId
                         ? AppLocalizations.of(context)!.none
+                        : sound.id == kSessionBellsId
+                        ? AppLocalizations.of(context)!.sessionBells
                         : sound.title,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontFamily: googleSans,
                       fontSize: 16,
                     ),
                   ),
+                  if (sound.id == kSessionBellsId)
+                    Text(
+                      AppLocalizations.of(context)!.sessionBellsDescription,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   if (hasFailed) _failureMessage(context),
                 ],
               ),

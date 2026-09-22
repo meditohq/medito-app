@@ -2549,4 +2549,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tagNoTracks => 'No sessions with this tag yet';
+
+  @override
+  String get sessionBells => 'Session bells';
+
+  @override
+  String get sessionBellsDescription =>
+      'A bell at the beginning, middle and end';
 }

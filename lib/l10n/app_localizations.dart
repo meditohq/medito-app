@@ -4699,6 +4699,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No sessions with this tag yet'**
   String get tagNoTracks;
+
+  /// No description provided for @sessionBells.
+  ///
+  /// In en, this message translates to:
+  /// **'Session bells'**
+  String get sessionBells;
+
+  /// No description provided for @sessionBellsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A bell at the beginning, middle and end'**
+  String get sessionBellsDescription;
 }
 
 class _AppLocalizationsDelegate

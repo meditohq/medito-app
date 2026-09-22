@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
+import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/widgets/network_image_widget.dart';
 
 import '../stats/streak_circle.dart';
@@ -16,9 +17,13 @@ const double _kOverscrollBleed = 260.0;
 /// [HomeHero] and the home list, which hands its first section to the hero
 /// whenever there is an image to lay it over.
 final homeHeroCoverProvider = Provider.autoDispose<String?>((ref) {
-  final cover = ref
-      .watch(upNextProvider)
-      .whenOrNull(data: (data) => data.pack.coverUrl);
+  final upNext = ref.watch(upNextProvider);
+  // Resolving the next unfinished pack can temporarily be loading. The
+  // pinned pack is already known: keep its hero instead of collapsing it.
+  final pack =
+      upNext.value?.pack ??
+      ref.watch(packProvider(packId: ref.watch(upNextPackIdProvider))).value;
+  final cover = pack?.coverUrl;
   return (cover == null || cover.isEmpty) ? null : cover;
 });
 

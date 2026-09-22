@@ -1,3 +1,5 @@
+import 'package:medito/providers/home/up_next_provider.dart';
+import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/home/widgets/quote/quote_share_sheet.dart';
 import 'package:medito/models/home/home_model.dart';
 import 'package:medito/models/me/me_model.dart';
@@ -178,6 +180,66 @@ void main() {
       await (FontLoader(
         entry.key,
       )..addFont(rootBundle.load(entry.value))).load();
+    }
+  });
+
+  testWidgets('Your Path replaces session text without an outgoing overlap', (
+    tester,
+  ) async {
+    var data = previewUpNext;
+    await tester.pumpWidget(
+      wrapHomeDark(
+        ProviderScope(
+          overrides: [upNextProvider.overrideWith((ref) => AsyncData(data))],
+          child: const Scaffold(body: UpNextWidget(style: UpNextStyle.hero)),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(seconds: 1));
+    final oldTitle = data.nextSession!.title;
+    expect(find.text(oldTitle), findsOneWidget);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(UpNextWidget)),
+    );
+    data = UpNextData(
+      pack: previewPack,
+      nextSession: previewPack.items[4],
+      completedCount: 4,
+      totalCount: previewPack.items.length,
+    );
+    container.invalidate(upNextProvider);
+    await tester.pump();
+    for (final elapsed in [0, 50, 100, 200]) {
+      await tester.pump(Duration(milliseconds: elapsed));
+      expect(find.text(oldTitle), findsNothing);
+      expect(find.text(data.nextSession!.title), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('Your Path loading does not flash a card surface', (
+    tester,
+  ) async {
+    for (final style in UpNextStyle.values) {
+      await tester.pumpWidget(
+        wrapHomeDark(
+          ProviderScope(
+            overrides: [
+              upNextProvider.overrideWith((ref) => const AsyncLoading()),
+            ],
+            child: Scaffold(body: UpNextWidget(style: style)),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 1));
+      expect(
+        find.descendant(
+          of: find.byType(UpNextWidget),
+          matching: find.byType(HomeGradientBorder),
+        ),
+        findsNothing,
+      );
+      expect(tester.takeException(), isNull);
     }
   });
 

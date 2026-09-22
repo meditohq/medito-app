@@ -2584,4 +2584,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tagNoTracks => 'Aún no hay sesiones con esta etiqueta';
+
+  @override
+  String get sessionBells => 'Campanas de sesión';
+
+  @override
+  String get sessionBellsDescription =>
+      'Una campana al principio, a la mitad y al final';
 }

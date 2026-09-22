@@ -115,7 +115,7 @@ class UpNextWidget extends ConsumerWidget {
 
     final child = upNextAsync.when(
       loading: () =>
-          _UpNextShimmer(key: const ValueKey('shimmer'), style: style),
+          _UpNextLoadingSpace(key: const ValueKey('loading'), style: style),
       error: (_, _) => const SizedBox.shrink(key: ValueKey('error')),
       data: (upNextData) {
         if (upNextData.isCompleted) {
@@ -138,20 +138,23 @@ class UpNextWidget extends ConsumerWidget {
       },
     );
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 350),
-      transitionBuilder: (child, animation) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-        );
-        final scale = Tween<double>(begin: 0.94, end: 1.0).animate(curved);
-        return FadeTransition(
-          opacity: curved,
-          child: ScaleTransition(scale: scale, child: child),
-        );
-      },
-      child: child,
+    final alignment = style == UpNextStyle.hero
+        ? Alignment.bottomCenter
+        : Alignment.topCenter;
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOutCubic,
+      alignment: alignment,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeInOut,
+        switchOutCurve: Curves.easeInOut,
+        // Never paint outgoing session text while the next session enters.
+        // A skipped Dismissible can otherwise slide back beneath the new text.
+        layoutBuilder: (currentChild, _) =>
+            Align(alignment: alignment, heightFactor: 1, child: currentChild),
+        child: child,
+      ),
     );
   }
 }
@@ -433,9 +436,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
 
     final borderRadius = BorderRadius.circular(_kCardBorderRadius);
 
-    return AnimatedOpacity(
+    return Opacity(
       opacity: _skipping ? 0.0 : 1.0,
-      duration: const Duration(milliseconds: 150),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: isHero ? 0 : padding16),
         child: ClipRRect(
@@ -608,7 +610,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
 
   Future<void> _onSkip(BuildContext context) async {
     final nextSession = widget.data.nextSession;
-    if (nextSession == null) return;
+    if (nextSession == null || _skipping) return;
 
     setState(() => _skipping = true);
 
@@ -844,30 +846,18 @@ class _ProgressRow extends StatelessWidget {
   }
 }
 
-class _UpNextShimmer extends StatelessWidget {
-  const _UpNextShimmer({super.key, this.style = UpNextStyle.card});
+class _UpNextLoadingSpace extends StatelessWidget {
+  const _UpNextLoadingSpace({super.key, this.style = UpNextStyle.card});
 
   final UpNextStyle style;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cardColor = theme.cardColor;
-    // Over the hero the image is the loading state.
-    if (style == UpNextStyle.hero) return const SizedBox(height: 96);
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: padding16,
-        right: padding16,
-        bottom: padding16,
-      ),
-      child: HomeGradientBorder(
-        backgroundColor: cardColor,
-        borderRadius: _kCardBorderRadius,
-        borderWidth: 0.5,
-        child: const SizedBox(height: 128, width: double.infinity),
-      ),
+    // The pack cover may not be available yet after changing Your Path.
+    // Reserve space without flashing a card before the hero appears.
+    return SizedBox(
+      height: style == UpNextStyle.hero ? 96 : 144,
+      width: double.infinity,
     );
   }
 }

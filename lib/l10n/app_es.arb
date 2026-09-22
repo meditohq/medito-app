@@ -1195,5 +1195,7 @@
   "tagOnTheGo": "En movimiento",
   "tagCrisis": "Tiempos de crisis",
   "tagSpanish": "Español",
-  "tagNoTracks": "Aún no hay sesiones con esta etiqueta"
+  "tagNoTracks": "Aún no hay sesiones con esta etiqueta",
+  "sessionBells": "Campanas de sesión",
+  "sessionBellsDescription": "Una campana al principio, a la mitad y al final"
 }

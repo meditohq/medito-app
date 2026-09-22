@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../services/audio/ios_session_bells.dart';
 import 'package:medito/models/models.dart' show PlaybackRequest;
 import 'package:medito/providers/background_sounds/background_sounds_notifier.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
@@ -18,6 +19,7 @@ import '../../utils/logger.dart';
 
 class IosAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
+  late final sessionBells = IosSessionBells(_player);
   final _httpApiService = HttpApiService();
   bool _isInitialized = false;
   RepeatMode _currentRepeatMode = RepeatMode.none;
@@ -159,6 +161,7 @@ class IosAudioHandler extends BaseAudioHandler {
         // the narration ends; pause it first so the shared session is idle and
         // iOS will actually let us deactivate it (a busy session is rejected).
         await iosBackgroundPlayer.pause();
+        await sessionBells.disable();
         await _deactivateSession();
 
         await _storeTrackCompletion();
@@ -354,7 +357,7 @@ class IosAudioHandler extends BaseAudioHandler {
     await session.setActive(true);
 
     unawaited(_player.play());
-    unawaited(iosBackgroundPlayer.play());
+    if (!sessionBells.enabled) unawaited(iosBackgroundPlayer.play());
   }
 
   @override
@@ -370,6 +373,7 @@ class IosAudioHandler extends BaseAudioHandler {
   @override
   Future<void> stop() async {
     _cancelPauseDeactivationTimer();
+    await sessionBells.disable();
     // Await the players so their audio I/O has actually stopped before we
     // deactivate; iOS rejects deactivation while the shared session is busy.
     await _player.stop();
@@ -422,6 +426,7 @@ class IosAudioHandler extends BaseAudioHandler {
     await ensureInitialized();
 
     _hasReplayedOnce = false;
+    sessionBells.reset();
 
     if (downloadPath == null) {
       await _player.setAudioSource(

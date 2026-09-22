@@ -59,19 +59,26 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
           error: (err, stack) {
             final error = err is AppError ? err : const UnknownError();
 
-            return MeditoErrorWidget(
-              error: error,
-              onTap: () => ref.refresh(backgroundSoundsProvider),
-              isScaffold: false,
+            return _mainContent(
+              [],
+              footer: MeditoErrorWidget(
+                error: error,
+                onTap: () => ref.refresh(backgroundSoundsProvider),
+                isScaffold: false,
+              ),
             );
           },
-          loading: () => const BackgroundSoundsShimmerWidget(),
+          loading: () =>
+              _mainContent([], footer: const BackgroundSoundsShimmerWidget()),
         ),
       ),
     );
   }
 
-  RefreshIndicator _mainContent(List<BackgroundSoundsModel> data) {
+  RefreshIndicator _mainContent(
+    List<BackgroundSoundsModel> data, {
+    Widget? footer,
+  }) {
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(backgroundSoundsProvider);
@@ -84,8 +91,26 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
         children: [
           const VolumeSliderWidget(),
           Column(
-            children: data.map((e) => SoundListTileWidget(sound: e)).toList(),
+            children: [
+              const SoundListTileWidget(
+                sound: BackgroundSoundsModel(
+                  id: kNoneBackgroundSoundId,
+                  title: 'None',
+                  path: '',
+                  duration: 0,
+                ),
+              ),
+              const SoundListTileWidget(sound: kSessionBellsSound),
+              ...data
+                  .where(
+                    (sound) =>
+                        sound.id != kNoneBackgroundSoundId &&
+                        sound.id != kSessionBellsId,
+                  )
+                  .map((e) => SoundListTileWidget(sound: e)),
+            ],
           ),
+          ?footer,
           height32,
         ],
       ),

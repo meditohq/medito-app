@@ -63,6 +63,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private var backgroundSoundUri: String? = null
     private lateinit var primaryPlayer: ExoPlayer
     private lateinit var backgroundMusicPlayer: ExoPlayer
+    private lateinit var sessionBells: SessionBellPlayer
     private var primaryMediaSession: MediaSession? = null
     private var meditoAudioApi: MeditoAudioServiceCallbackApi? = null
     private var isCompletionHandled = false
@@ -121,7 +122,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                     isBuffering = primaryPlayer.playbackState == Player.STATE_BUFFERING,
                     duration = primaryPlayer.duration,
                     isSeeking = primaryPlayer.playbackState == Player.STATE_BUFFERING,
-                    isCompleted = primaryPlayer.playbackState == Player.STATE_ENDED,
+                    isCompleted = false, // Completion is emitted by the native listener.
                     track = trackFromCurrentMediaItem()
                 )
             } ?: return
@@ -396,6 +397,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 .build()
             Log.d(TAG, "🔊 Background music player initialized successfully")
 
+            sessionBells = SessionBellPlayer(this, primaryPlayer)
             primaryPlayer.addListener(this)
 
             primaryMediaSession = createMediaSession()
@@ -447,6 +449,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             try {
                 Log.d(TAG, "🔊 Removing callbacks and stopping players")
                 
+                if (::sessionBells.isInitialized) sessionBells.release()
                 if (::primaryPlayer.isInitialized) {
                     primaryPlayer.stop()
                     primaryPlayer.removeListener(this@AudioPlayerService)
@@ -514,12 +517,17 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                 // Push a final isCompleted=true state to Dart before teardown:
                 // finishPlayback() cancels the position poll before it can observe
                 // STATE_ENDED, and PlayerView opens the end screen off that flag.
+                sessionBells.disable()
                 pushCompletedStateToDart()
                 handleTrackCompletionFromPlayer()
             }
             return
         }
 
+        if (playbackState == Player.STATE_READY) {
+            isCompletionHandled = false
+            startPositionUpdates()
+        }
         if (playbackState == Player.STATE_READY || playbackState == Player.STATE_IDLE) {
             syncBackgroundWithPrimaryState()
         }
@@ -744,6 +752,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         }
 
         isCompletionHandled = false
+        sessionBells.reset()
 
         try {
             // Remember if background was playing
@@ -959,6 +968,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun playBackgroundSound() {
+        if (backgroundSoundUri == SessionBellPlayer.URI) return
         if (backgroundSoundUri == null) {
             Log.d(TAG, "🔊 No background sound URI set - skipping playback")
             return
@@ -1014,6 +1024,8 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
         // Now set the new URI
         this.backgroundSoundUri = uri
+        if (uri == SessionBellPlayer.URI) sessionBells.enable(backgroundMusicVolume)
+        else sessionBells.disable()
 
         if (uri == null) {
             Log.d(TAG, "🔊 Background sound cleared")
@@ -1023,6 +1035,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun stopBackgroundSound() {
+        sessionBells.disable()
         try {
             Log.d(TAG, "🔊 Stopping background sound")
             if (::backgroundMusicPlayer.isInitialized) {
@@ -1042,6 +1055,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             throw IllegalStateException("Service not fully initialized")
         }
         this.backgroundMusicVolume = volume.toFloat()
+        sessionBells.setVolume(this.backgroundMusicVolume)
         if (::backgroundMusicPlayer.isInitialized) {
             backgroundMusicPlayer.volume = this.backgroundMusicVolume
         }
@@ -1110,6 +1124,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun stopAudio() {
+        sessionBells.disable()
         isCompletionHandled = false
         primaryPlayer.stop()
         backgroundMusicPlayer.stop()

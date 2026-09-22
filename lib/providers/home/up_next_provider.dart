@@ -28,7 +28,7 @@ class UpNextData {
   final int completedCount;
   final int totalCount;
 
-  /// Pack to pin from the completed-state CTA; null at the end of the path.
+  /// First remaining pack with unfinished sessions; null at the end of the path.
   final String? nextPackId;
 
   final bool isEndOfPath;
@@ -61,57 +61,91 @@ AsyncValue<UpNextData> upNext(Ref ref) {
   final packId = ref.watch(upNextPackIdProvider);
   final packAsync = ref.watch(packProvider(packId: packId));
 
-  return packAsync.whenData((pack) {
-    final completedCount = pack.items
-        .where((item) => item.isCompleted == true)
-        .length;
-    final isCompleted =
-        pack.items.isNotEmpty && completedCount >= pack.items.length;
+  return packAsync.when(
+    loading: () => const AsyncLoading(),
+    error: (error, stack) => AsyncError(error, stack),
+    data: (pack) {
+      final completedCount = pack.items
+          .where((item) => item.isCompleted == true)
+          .length;
+      final isCompleted =
+          pack.items.isNotEmpty && completedCount >= pack.items.length;
 
-    // isEmpty must short-circuit: the orElse reads `first` and would throw.
-    final nextSession = (isCompleted || pack.items.isEmpty)
-        ? null
-        : pack.items.firstWhere(
-            (item) => item.isCompleted != true,
-            orElse: () => pack.items.first,
-          );
+      // isEmpty must short-circuit: the orElse reads `first` and would throw.
+      final nextSession = (isCompleted || pack.items.isEmpty)
+          ? null
+          : pack.items.firstWhere(
+              (item) => item.isCompleted != true,
+              orElse: () => pack.items.first,
+            );
 
-    final signature = nextSession != null
-        ? '${nextSession.id}|${pack.title}|$completedCount/${pack.items.length}'
-        : '|${pack.title}|$completedCount/${pack.items.length}';
+      final signature = nextSession != null
+          ? '${nextSession.id}|${pack.title}|$completedCount/${pack.items.length}'
+          : '|${pack.title}|$completedCount/${pack.items.length}';
 
-    if (signature != _lastPushedWidgetSignature) {
-      _lastPushedWidgetSignature = signature;
-      if (nextSession != null) {
-        HomeWidgetService.updateUpNextWidget(
-          title: nextSession.title,
-          packTitle: pack.title,
-          trackId: nextSession.id,
-          subtitle: nextSession.subtitle,
-          completed: completedCount,
-          total: pack.items.length,
-        ).ignore();
-      } else {
-        // Pack finished — clear the widget so it stops showing a stale track.
-        // Tapping the empty-state widget just opens the app.
-        HomeWidgetService.updateUpNextWidget(
-          title: '',
-          packTitle: '',
-          trackId: '',
-          subtitle: '',
-          completed: completedCount,
-          total: pack.items.length,
-        ).ignore();
+      if (signature != _lastPushedWidgetSignature) {
+        _lastPushedWidgetSignature = signature;
+        if (nextSession != null) {
+          HomeWidgetService.updateUpNextWidget(
+            title: nextSession.title,
+            packTitle: pack.title,
+            trackId: nextSession.id,
+            subtitle: nextSession.subtitle,
+            completed: completedCount,
+            total: pack.items.length,
+          ).ignore();
+        } else {
+          // Pack finished — clear the widget so it stops showing a stale track.
+          // Tapping the empty-state widget just opens the app.
+          HomeWidgetService.updateUpNextWidget(
+            title: '',
+            packTitle: '',
+            trackId: '',
+            subtitle: '',
+            completed: completedCount,
+            total: pack.items.length,
+          ).ignore();
+        }
       }
-    }
 
-    return UpNextData(
-      pack: pack,
-      nextSession: nextSession,
-      completedCount: completedCount,
-      totalCount: pack.items.length,
-      nextPackId: isCompleted ? PackSequence.nextPackAfter(packId) : null,
-      isEndOfPath: isCompleted && PackSequence.isPathTerminal(packId),
-    );
-  });
+      // Resolve the CTA before offering it: users may already have completed
+      // several later packs (including via the legacy megapack).
+      final nextPack = isCompleted
+          ? _nextUnfinishedPack(ref, PackSequence.nextPackAfter(packId))
+          : const AsyncData<String?>(null);
+      return nextPack.whenData(
+        (nextPackId) => UpNextData(
+          pack: pack,
+          nextSession: nextSession,
+          completedCount: completedCount,
+          totalCount: pack.items.length,
+          nextPackId: nextPackId,
+          isEndOfPath:
+              isCompleted &&
+              nextPackId == null &&
+              (PackSequence.contains(packId) ||
+                  PackSequence.isPathTerminal(packId)),
+        ),
+      );
+    },
+  );
+}
+
+/// Watch each candidate so completion changes also update the offered pack.
+/// Loading/errors must propagate: an unknown pack is not a completed pack.
+AsyncValue<String?> _nextUnfinishedPack(Ref ref, String? packId) {
+  if (packId == null) return const AsyncData(null);
+
+  return ref
+      .watch(packProvider(packId: packId))
+      .when(
+        loading: () => const AsyncLoading(),
+        error: (error, stack) => AsyncError(error, stack),
+        data: (pack) {
+          if (pack.items.any((item) => item.isCompleted != true)) {
+            return AsyncData(packId);
+          }
+          return _nextUnfinishedPack(ref, PackSequence.nextPackAfter(packId));
+        },
+      );
 }

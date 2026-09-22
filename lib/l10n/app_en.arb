@@ -1904,5 +1904,7 @@
   "tagNoTracks": "No sessions with this tag yet",
   "@tagNoTracks": {
     "description": "Empty state on a tag page"
-  }
+  },
+  "sessionBells": "Session bells",
+  "sessionBellsDescription": "A bell at the beginning, middle and end"
 }

@@ -1,3 +1,4 @@
+import '../../services/audio/session_bell_preview.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -101,6 +102,7 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
     ref.read(backgroundSoundsRepositoryProvider).handleOnChangeVolume(vol);
 
     var scaledVol = scaledVolume(vol);
+    if (!Platform.isAndroid) iosAudioHandler.sessionBells.setVolume(scaledVol);
     AppLogger.d('BG_SOUND', 'Scaled volume: $scaledVol');
 
     if (Platform.isAndroid) {
@@ -114,7 +116,11 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
     state = state.copyWith(volume: vol);
   }
 
-  void handleOnChangeSound(BackgroundSoundsModel? sound) {
+  void handleOnChangeSound(
+    BackgroundSoundsModel? sound, {
+    bool preview = true,
+  }) {
+    unawaited(ref.read(sessionBellPreviewProvider).stop());
     AppLogger.d('BG_SOUND', 'Changing sound to: ${sound?.title}');
     // Any new selection clears a previous failure: the retry affordance belongs
     // to the row the user is actually on.
@@ -138,6 +144,11 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
       return;
     }
 
+    if (sound.id == kSessionBellsId) {
+      unawaited(_playSessionBells(sound, preview: preview));
+      return;
+    }
+    stopBackgroundSound();
     unawaited(_downloadAndPlay(sound));
   }
 
@@ -146,7 +157,39 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   void retryDownload(BackgroundSoundsModel sound) {
     AppLogger.d('BG_SOUND', 'Retrying download for: ${sound.title}');
     state = state.copyWith(selectedBgSound: sound, failedBgSound: null);
+    if (sound.id == kSessionBellsId) {
+      unawaited(_playSessionBells(sound, preview: true));
+      return;
+    }
     unawaited(_downloadAndPlay(sound, forceRedownload: true));
+  }
+
+  Future<void> _playSessionBells(
+    BackgroundSoundsModel sound, {
+    bool preview = false,
+  }) async {
+    _fadeSubscription?.cancel();
+    _fadeSubscription = null;
+    try {
+      getVolumeFromPref();
+      if (Platform.isAndroid) {
+        await _api.setBackgroundSound(kSessionBellsUri);
+      } else {
+        await iosBackgroundPlayer.stop();
+        if (state.selectedBgSound?.id != sound.id) return;
+        await iosAudioHandler.sessionBells.enable(scaledVolume(state.volume));
+      }
+      if (preview && state.selectedBgSound?.id == sound.id) {
+        await ref
+            .read(sessionBellPreviewProvider)
+            .play(scaledVolume(state.volume));
+      }
+    } catch (error, stack) {
+      AppLogger.e('BELLS', 'Failed to prepare session bells', error, stack);
+      if (state.selectedBgSound?.id == sound.id) {
+        state = state.copyWith(failedBgSound: sound);
+      }
+    }
   }
 
   /// Resolves [sound] to a local file — downloading it first if needed — and
@@ -307,6 +350,8 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   }
 
   void togglePlayPause(bool isPlaying) {
+    // One-shot bells follow the primary player in their own controller.
+    if (state.selectedBgSound?.id == kSessionBellsId) return;
     AppLogger.d(
       'BG_SOUND',
       'Toggling background sound play/pause, current isPlaying: $isPlaying',
@@ -332,7 +377,9 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   }
 
   void stopBackgroundSound() {
+    unawaited(ref.read(sessionBellPreviewProvider).stop());
     AppLogger.d('BG_SOUND', 'Stopping background sound');
+    if (!Platform.isAndroid) unawaited(iosAudioHandler.sessionBells.disable());
     _fadeSubscription?.cancel();
     _fadeSubscription = null;
     if (Platform.isAndroid) {
@@ -352,7 +399,7 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
     var selectedBgSound = ref
         .read(backgroundSoundsRepositoryProvider)
         .getSelectedBgSoundFromSharedPreferences();
-    handleOnChangeSound(selectedBgSound);
+    handleOnChangeSound(selectedBgSound, preview: false);
   }
 
   void getVolumeFromPref() {

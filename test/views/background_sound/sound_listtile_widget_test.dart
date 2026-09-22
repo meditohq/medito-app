@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/views/background_sound/background_sound_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -36,8 +38,10 @@ class _FakeNotifier extends BackgroundSoundsNotifier {
   void retryDownload(BackgroundSoundsModel sound) => retried.add(sound.id);
 
   @override
-  void handleOnChangeSound(BackgroundSoundsModel? sound) =>
-      changed.add(sound?.id);
+  void handleOnChangeSound(
+    BackgroundSoundsModel? sound, {
+    bool preview = true,
+  }) => changed.add(sound?.id);
 }
 
 void main() {
@@ -133,5 +137,58 @@ void main() {
 
     expect(find.text('Ninguno'), findsOneWidget);
     expect(find.text('None'), findsNothing);
+  });
+
+  testWidgets('session bells explain the three cues and select normally', (
+    tester,
+  ) async {
+    final notifier = await pump(
+      tester,
+      const BackgroundSoundsState(),
+      sound: kSessionBellsSound,
+    );
+    expect(find.text('Session bells'), findsOneWidget);
+    expect(
+      find.text('A bell at the beginning, middle and end'),
+      findsOneWidget,
+    );
+    await tester.tap(find.byType(InkWell));
+    expect(notifier.changed, [kSessionBellsId]);
+  });
+
+  testWidgets('session bells are localised in Spanish', (tester) async {
+    await pump(
+      tester,
+      const BackgroundSoundsState(),
+      sound: kSessionBellsSound,
+      locale: const Locale('es'),
+    );
+    expect(find.text('Campanas de sesión'), findsOneWidget);
+  });
+
+  testWidgets('bundled bells remain available when remote sounds fail', (
+    tester,
+  ) async {
+    final notifier = _FakeNotifier(const BackgroundSoundsState());
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          backgroundSoundsNotifierProvider.overrideWith(() => notifier),
+          backgroundSoundsProvider.overrideWith(
+            (ref) async => throw const ServerError(),
+          ),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: BackgroundSoundView(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Session bells'), findsOneWidget);
+    await tester.tap(find.text('Session bells'));
+    expect(notifier.changed, [kSessionBellsId]);
+    expect(tester.takeException(), isNull);
   });
 }
