@@ -20,6 +20,8 @@ import '../../utils/logger.dart';
 class IosAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
   late final sessionBells = IosSessionBells(_player);
+  // Distinguish a repeat boundary from terminal completion; never wait for bells.
+  final _sessionCompleted = BehaviorSubject<bool>.seeded(false);
   final _httpApiService = HttpApiService();
   bool _isInitialized = false;
   RepeatMode _currentRepeatMode = RepeatMode.none;
@@ -141,6 +143,7 @@ class IosAudioHandler extends BaseAudioHandler {
     });
 
     _player.processingStateStream.listen((state) async {
+      if (state != ProcessingState.completed) _sessionCompleted.add(false);
       if (state == ProcessingState.completed) {
         // Handle repeat once mode
         if (_currentRepeatMode == RepeatMode.once && !_hasReplayedOnce) {
@@ -149,6 +152,8 @@ class IosAudioHandler extends BaseAudioHandler {
           await _player.play();
           return;
         }
+
+        _sessionCompleted.add(true);
 
         // Playback has finished and is not repeating. Release the audio
         // session first so iOS does not keep the app alive in the background,
@@ -220,13 +225,14 @@ class IosAudioHandler extends BaseAudioHandler {
   Duration? get duration => _player.duration;
 
   Stream<IosStateData> get iosStateStream =>
-      Rx.combineLatest6<
+      Rx.combineLatest7<
         double,
         PlayerState,
         Track,
         Duration,
         Duration,
         Duration?,
+        bool,
         IosStateData
       >(
         _player.speedStream,
@@ -235,10 +241,13 @@ class IosAudioHandler extends BaseAudioHandler {
         _player.positionStream,
         _player.bufferedPositionStream,
         _player.durationStream,
-        (speed, state, track, position, bufferedPosition, duration) {
+        _sessionCompleted.stream,
+        (speed, state, track, position, bufferedPosition, duration, completed) {
           return IosStateData(
             speed,
-            state,
+            state.processingState == ProcessingState.completed && !completed
+                ? PlayerState(false, ProcessingState.ready)
+                : state,
             track,
             position,
             bufferedPosition,
@@ -426,6 +435,7 @@ class IosAudioHandler extends BaseAudioHandler {
     await ensureInitialized();
 
     _hasReplayedOnce = false;
+    _sessionCompleted.add(false);
     sessionBells.reset();
 
     if (downloadPath == null) {
