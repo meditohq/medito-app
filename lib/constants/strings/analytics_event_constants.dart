@@ -805,4 +805,33 @@ class AnalyticsEventConstants {
   /// screen (e.g. 'Midnight', 'Cream'). Lets us see which backgrounds people
   /// actually pick.
   static const String paramQuoteSharePalette = 'palette';
+
+  // Player and background sound options.
+  /// User chooses a playback speed. Parameter: speed (multiplier).
+  static const String playerSpeedChanged = 'player_speed_changed';
+
+  /// User changes repeat mode. Parameter: repeat_mode (none, once, infinite).
+  static const String playerRepeatChanged = 'player_repeat_changed';
+
+  /// User requests a download from the player; does not imply success. Parameters: track_id, file_id.
+  static const String playerDownloadTapped = 'player_download_tapped';
+
+  /// User confirms deleting a player download. Parameters: track_id, file_id.
+  static const String playerDownloadDeleteConfirmed = 'player_download_delete_confirmed';
+
+  /// User opens the background sound screen from the player.
+  static const String playerBackgroundSoundsOpened = 'player_background_sounds_opened';
+
+  /// User taps background sounds on a track that disables them. Parameter: track_id.
+  static const String playerBackgroundSoundsUnavailable = 'player_background_sounds_unavailable';
+
+  /// User taps a background sound, including None; does not imply playback success. Parameters: sound_id, sound_title.
+  static const String backgroundSoundSelected = 'background_sound_selected';
+
+  /// User retries a failed background sound. Parameters: sound_id, sound_title.
+  static const String backgroundSoundRetryTapped = 'background_sound_retry_tapped';
+
+  /// User finishes a background volume slider gesture. Parameter: volume (0–100).
+  static const String backgroundSoundVolumeChanged = 'background_sound_volume_changed';
+
 }

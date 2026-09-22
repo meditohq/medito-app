@@ -1,3 +1,5 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -46,7 +48,15 @@ class PlayerActionBar extends StatelessWidget {
         semanticLabel: l10n.backgroundSounds,
       ),
       rightItem: BottomActionBarItem(
-        child: AudioSpeedWidget(onSpeedChanged: onSpeedChanged),
+        child: AudioSpeedWidget(
+          onSpeedChanged: (speed) {
+            FirebaseAnalyticsService().logEvent(
+              name: AnalyticsEventConstants.playerSpeedChanged,
+              parameters: {'speed': speed, 'track_id': request.trackId},
+            );
+            onSpeedChanged(speed);
+          },
+        ),
         onTap: () {}, // The AudioSpeedWidget handles its own tap
         semanticLabel: l10n.playbackSpeed,
       ),
@@ -60,6 +70,10 @@ class PlayerActionBar extends StatelessWidget {
   }
 
   void _showBackgroundSoundDisabledMessage(BuildContext context) {
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.playerBackgroundSoundsUnavailable,
+      parameters: {'track_id': request.trackId},
+    );
     scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context)!.backgroundSoundsDisabled),

@@ -1,3 +1,5 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -61,6 +63,9 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
           : null,
       child: IconButton(
         onPressed: () {
+          FirebaseAnalyticsService().logEvent(
+            name: AnalyticsEventConstants.playerBackgroundSoundsOpened,
+          );
           Navigator.push(
             context,
             MaterialPageRoute(

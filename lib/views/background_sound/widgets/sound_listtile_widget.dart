@@ -1,3 +1,5 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -132,6 +134,12 @@ class SoundListTileWidget extends ConsumerWidget {
     BuildContext context, {
     required bool hasFailed,
   }) {
+    FirebaseAnalyticsService().logEvent(
+      name: hasFailed
+          ? AnalyticsEventConstants.backgroundSoundRetryTapped
+          : AnalyticsEventConstants.backgroundSoundSelected,
+      parameters: {'sound_id': sound.id, 'sound_title': sound.title},
+    );
     final notifier = ref.read(backgroundSoundsNotifierProvider.notifier);
 
     // Retrying discards whatever is cached for the sound; a plain re-select

@@ -1,3 +1,5 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -168,6 +170,10 @@ class _RepeatButtonWithLabelState
         break;
     }
 
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.playerRepeatChanged,
+      parameters: {'repeat_mode': nextMode.name},
+    );
     widget.onRepeat();
 
     _timer?.cancel();
