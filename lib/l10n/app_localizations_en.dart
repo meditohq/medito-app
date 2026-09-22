@@ -1090,6 +1090,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setReminderB => 'Remind Me Daily';
 
   @override
+  String get donationContinueToPayment => 'Continue to payment';
+
+  @override
   String get donationEmailLabel => 'Email address';
 
   @override

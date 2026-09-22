@@ -1110,6 +1110,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get setReminderB => 'Recuérdamelo Cada Día';
 
   @override
+  String get donationContinueToPayment => 'Continuar al pago';
+
+  @override
   String get donationEmailLabel => 'Correo electrónico';
 
   @override

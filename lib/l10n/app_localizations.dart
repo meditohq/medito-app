@@ -2054,6 +2054,12 @@ abstract class AppLocalizations {
   /// **'Remind Me Daily'**
   String get setReminderB;
 
+  /// No description provided for @donationContinueToPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to payment'**
+  String get donationContinueToPayment;
+
   /// No description provided for @donationEmailLabel.
   ///
   /// In en, this message translates to:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
 import 'package:medito/utils/currency.dart';
@@ -13,18 +14,18 @@ const inlineDonationPayButtonKey = Key('inline_donation_pay_button');
 @visibleForTesting
 const inlineDonationOtherAmountKey = Key('inline_donation_other_amount');
 
-typedef InlinePayCallback =
-    Future<void> Function({
-      required int amount,
-      required String email,
-      required payment_models.PaymentMethodType method,
-    });
+typedef InlinePayCallback = Future<void> Function({
+  required int amount,
+  required String email,
+  required payment_models.PaymentMethodType method,
+});
 
 /// Variant B body of the end-screen donation card (`end_screen_inline_pay`):
-/// the localized monthly ladder as chips, a one-tap pay button, and an
+/// the localized monthly ladder as chips, a donate button, and an
 /// "Other amount" escape to the full paywall. Pure presentation — the parent
 /// owns config loading, payment, analytics and the experiment gate — so it
-/// is testable without Stripe or Riverpod.
+/// is testable without Stripe or Riverpod. Anonymous donors reveal an
+/// autofill-enabled email field on the first tap, then continue to payment.
 ///
 /// Drawn on the brand-purple card, so every foreground uses
 /// `context.onBrandPurple` like the control CTA does.
@@ -72,6 +73,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
   late int _selectedAmount;
   final _emailController = TextEditingController();
   String? _emailError;
+  bool _emailRevealed = false;
 
   // Intentionally permissive: a false reject costs more than a typo.
   static final _emailPattern = RegExp(r'^[^@\s]+@[^@\s.]+\.[^@\s]+$');
@@ -126,6 +128,11 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
   Future<void> _submit() async {
     if (widget.isProcessing || _selectedAmount <= 0) return;
 
+    if (_asksForEmail && !_emailRevealed) {
+      setState(() => _emailRevealed = true);
+      return;
+    }
+
     var email = widget.knownEmail?.trim() ?? '';
     if (_asksForEmail) {
       email = _emailController.text.trim();
@@ -141,6 +148,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
     }
     if (_emailError != null) setState(() => _emailError = null);
 
+    FocusScope.of(context).unfocus();
     await widget.onPay(
       amount: _selectedAmount,
       email: email,
@@ -159,12 +167,12 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildChips(context, fg),
-        if (_asksForEmail) ...[
+        if (_asksForEmail && _emailRevealed) ...[
           const SizedBox(height: 14),
           _buildEmailField(context, fg, l10n),
         ],
         const SizedBox(height: 14),
-        widget.applePayAvailable
+        widget.applePayAvailable && !_asksForEmail
             ? _buildApplePayButton(context, l10n)
             : _buildCardButton(context, l10n),
         const SizedBox(height: 10),
@@ -312,48 +320,25 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
     Color fg,
     AppLocalizations l10n,
   ) {
-    return TextField(
-      key: inlineDonationEmailFieldKey,
-      controller: _emailController,
-      keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.done,
-      autocorrect: false,
-      enabled: !widget.isProcessing,
-      style: TextStyle(color: fg, fontSize: 14),
-      cursorColor: fg,
-      decoration: InputDecoration(
-        isDense: true,
-        // The app's InputDecorationTheme fills fields with a surface colour
-        // that fights the purple card; keep the field see-through.
-        filled: true,
-        fillColor: Colors.transparent,
+    return AutofillGroup(
+      child: MeditoTextField(
+        fieldKey: inlineDonationEmailFieldKey,
+        controller: _emailController,
+        keyboardType: TextInputType.emailAddress,
+        autofillHints: const [AutofillHints.email],
+        autofocus: true,
+        onSubmitted: (_) => _submit(),
+        textInputAction: TextInputAction.done,
+        autocorrect: false,
+        enabled: !widget.isProcessing,
         hintText: l10n.donationEmailLabel,
-        hintStyle: TextStyle(color: fg.withValues(alpha: 0.6), fontSize: 14),
         helperText: _emailError == null ? l10n.donationEmailHelper : null,
-        helperStyle: TextStyle(color: fg.withValues(alpha: 0.6), fontSize: 12),
+        supportingTextColor: fg,
         errorText: _emailError,
-        errorStyle: TextStyle(color: fg, fontSize: 12),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fg.withValues(alpha: 0.5)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fg),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fg),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: fg),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        onChanged: (_) {
+          if (_emailError != null) setState(() => _emailError = null);
+        },
       ),
-      onChanged: (_) {
-        if (_emailError != null) setState(() => _emailError = null);
-      },
     );
   }
 
@@ -442,7 +427,9 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                 ),
               )
             : Text(
-                l10n.donateAmountPerMonth(_amountLabel),
+                _asksForEmail && _emailRevealed
+                    ? l10n.donationContinueToPayment
+                    : l10n.donateAmountPerMonth(_amountLabel),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

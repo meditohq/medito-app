@@ -450,6 +450,7 @@
   "@setReminderB": {
     "description": "CTA on the onboarding notifications screen"
   },
+  "donationContinueToPayment": "Continue to payment",
   "donationEmailLabel": "Email address",
   "donationEmailHelper": "For your receipt and to manage your donation.",
   "donationEmailRequired": "Enter your email so we can send a receipt.",
