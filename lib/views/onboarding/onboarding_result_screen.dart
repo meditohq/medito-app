@@ -109,6 +109,12 @@ class _OnboardingResultScreenState
   bool _completionHandled = false;
   int _priorStreak = 0;
 
+  // Keep the regular-practice experience fixed while its offered/control
+  // experiment is running. Beginner presentation changes must stay behind this
+  // gate, even though both audiences share this screen and audio.
+  bool get _useBeginnerPresentation =>
+      widget.showMeditation && widget.state != OnboardingResultState.stateC;
+
   /// Experiment tag for the first-meditation events; empty when not enrolled.
   /// Reads the variant without assigning — assigning here would over-enrol.
   Map<String, Object> get _meditationEventParams {
@@ -340,6 +346,16 @@ class _OnboardingResultScreenState
 
     return Column(
       children: [
+        if (_useBeginnerPresentation) ...[
+          Text(
+            l10n.onboardingFirstMeditationTitle,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+        ],
         // Duration cue only matters before they commit; once playing it's
         // noise, so hide it (and the time readout below).
         if (!_started) ...[
@@ -383,31 +399,64 @@ class _OnboardingResultScreenState
           ),
         ],
         const SizedBox(height: 16),
-        SizedBox(
-          width: 64,
-          height: 64,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              shape: const CircleBorder(),
-              padding: EdgeInsets.zero,
+        if (_useBeginnerPresentation)
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(0, 56),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
+              icon: busy
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+              label: Text(
+                !_started
+                    ? l10n.onboardingFirstMeditationBegin
+                    : isPlaying
+                    ? l10n.pause
+                    : l10n.play,
+                textAlign: TextAlign.center,
+              ),
             ),
-            onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
-            child: busy
-                ? SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
+          )
+        else
+          SizedBox(
+            width: 64,
+            height: 64,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+                padding: EdgeInsets.zero,
+              ),
+              onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
+              child: busy
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: context.onBrandPurple,
+                      ),
+                    )
+                  : Icon(
+                      isPlaying ? Icons.pause : Icons.play_arrow,
                       color: context.onBrandPurple,
+                      size: 32,
                     ),
-                  )
-                : Icon(
-                    isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: context.onBrandPurple,
-                    size: 32,
-                  ),
+            ),
           ),
-        ),
       ],
     );
   }
