@@ -269,7 +269,14 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
     }
 
     final body = Padding(
-      padding: EdgeInsets.all(isHero ? padding16 : padding20),
+      padding: isHero
+          ? EdgeInsets.fromLTRB(
+              padding16,
+              padding16,
+              MediaQuery.sizeOf(context).width >= 600 ? 32 : padding16,
+              padding16,
+            )
+          : const EdgeInsets.all(padding20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,7 +472,16 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(isHero ? padding16 : padding20),
+                        padding: isHero
+                            ? EdgeInsets.fromLTRB(
+                                padding16,
+                                padding16,
+                                MediaQuery.sizeOf(context).width >= 600
+                                    ? 32
+                                    : padding16,
+                                padding16,
+                              )
+                            : const EdgeInsets.all(padding20),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [

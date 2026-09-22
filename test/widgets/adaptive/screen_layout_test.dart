@@ -236,6 +236,12 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
       expect(find.byType(ShortcutsItemsWidget), findsOneWidget);
       expect(find.byType(UpNextWidget), findsOneWidget);
+      final play = find.descendant(
+        of: find.byType(UpNextWidget),
+        matching: find.byIcon(Icons.play_arrow_rounded),
+      );
+      expect(size.width - tester.getCenter(play).dx, closeTo(32 + 52 / 2, 0.1));
+
       expect(tester.takeException(), isNull);
     }
     await tester.pumpWidget(const SizedBox());

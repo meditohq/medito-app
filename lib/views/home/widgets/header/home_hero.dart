@@ -65,8 +65,8 @@ class HomeHero extends ConsumerWidget {
     final header = Padding(
       padding: EdgeInsets.fromLTRB(
         padding16,
-        topInset + padding12,
-        padding16,
+        topInset + (size.width >= 600 ? 24 : padding12),
+        size.width >= 600 ? 32 : padding16,
         0,
       ),
       // Just the streak pill, top right; the section title carries the hero.
