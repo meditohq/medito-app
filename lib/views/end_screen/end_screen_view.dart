@@ -37,6 +37,7 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
 import 'widgets/account_prompt_card.dart';
+import 'widgets/animated_end_screen_section.dart';
 import 'widgets/donation_widget.dart';
 import 'widgets/zen_mode_animation.dart';
 
@@ -263,7 +264,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   // animation slot; only one ever renders.
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [_buildReminderPrompt(), _buildAccountPrompt()],
+                    children: [
+                      AnimatedEndScreenSection(child: _buildReminderPrompt()),
+                      AnimatedEndScreenSection(child: _buildAccountPrompt()),
+                    ],
                   ),
                 ),
               ),

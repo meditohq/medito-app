@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'animated_end_screen_section.dart';
 import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
@@ -326,23 +328,24 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
           // Someone who tapped "Hide for now" asked for silence: no card at
           // all for the snooze window (the suppressed impression above still
           // keeps the denominator honest). Donors get a thank-you instead.
-          if (snoozeState.isSnoozed && !snoozeState.isDonor) {
-            return const FeedbackWidget();
-          }
           return Column(
             children: [
-              AnimatedOpacity(
-                opacity: 1.0,
-                duration: const Duration(milliseconds: 500),
-                child: snoozeState.isSnoozed
-                    ? const DonationThankYouCard()
-                    : _buildDonationWidget(
-                        context,
-                        donationPageModel,
-                        isSnoozed: false,
+              AnimatedEndScreenSection(
+                child: snoozeState.isSnoozed && !snoozeState.isDonor
+                    ? const SizedBox.shrink()
+                    : Column(
+                        children: [
+                          snoozeState.isSnoozed
+                              ? const DonationThankYouCard()
+                              : _buildDonationWidget(
+                                  context,
+                                  donationPageModel,
+                                  isSnoozed: false,
+                                ),
+                          height20,
+                        ],
                       ),
               ),
-              height20,
               const FeedbackWidget(),
             ],
           );
