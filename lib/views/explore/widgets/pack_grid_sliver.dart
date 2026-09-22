@@ -18,7 +18,9 @@ class PackGridSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final crossAxisCount = MediaQuery.sizeOf(context).width > 600 ? 3 : 2;
+    final crossAxisCount = (MediaQuery.sizeOf(context).width / 240)
+        .floor()
+        .clamp(2, 5);
 
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(padding16, padding16, padding16, 0),

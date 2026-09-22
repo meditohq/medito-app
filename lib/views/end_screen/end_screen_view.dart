@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -242,44 +243,47 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         ),
         layout: BottomActionBarLayout.edgeAligned,
       ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            children: [
-              SlideTransition(
-                position: _statsSlideAnimation,
-                child: FadeTransition(
-                  opacity: _statsFadeAnimation,
-                  child: ref.watch(zenModeProvider)
-                      ? const ZenModeAnimation()
-                      : _buildStatsArea(),
-                ),
-              ),
-              SlideTransition(
-                position: _reminderSlideAnimation,
-                child: FadeTransition(
-                  opacity: _reminderFadeAnimation,
-                  // The reminder and account soft-asks are mutually exclusive
-                  // (see shouldShowAccountPromptProvider), so they share this
-                  // animation slot; only one ever renders.
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedEndScreenSection(child: _buildReminderPrompt()),
-                      AnimatedEndScreenSection(child: _buildAccountPrompt()),
-                    ],
+      body: AdaptivePageBody(
+        maxWidth: 640,
+        child: SingleChildScrollView(
+          child: SafeArea(
+            child: Column(
+              children: [
+                SlideTransition(
+                  position: _statsSlideAnimation,
+                  child: FadeTransition(
+                    opacity: _statsFadeAnimation,
+                    child: ref.watch(zenModeProvider)
+                        ? const ZenModeAnimation()
+                        : _buildStatsArea(),
                   ),
                 ),
-              ),
-              SlideTransition(
-                position: _cardSlideAnimation,
-                child: FadeTransition(
-                  opacity: _cardFadeAnimation,
-                  child: _buildCard(),
+                SlideTransition(
+                  position: _reminderSlideAnimation,
+                  child: FadeTransition(
+                    opacity: _reminderFadeAnimation,
+                    // The reminder and account soft-asks are mutually exclusive
+                    // (see shouldShowAccountPromptProvider), so they share this
+                    // animation slot; only one ever renders.
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedEndScreenSection(child: _buildReminderPrompt()),
+                        AnimatedEndScreenSection(child: _buildAccountPrompt()),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
-            ],
+                SlideTransition(
+                  position: _cardSlideAnimation,
+                  child: FadeTransition(
+                    opacity: _cardFadeAnimation,
+                    child: _buildCard(),
+                  ),
+                ),
+                // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
+              ],
+            ),
           ),
         ),
       ),

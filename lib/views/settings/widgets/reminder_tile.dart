@@ -312,53 +312,55 @@ class ReminderOptionsSheet extends StatelessWidget {
     }
 
     return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Text(
-              l10n.reminderChipsQuestion,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w600,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                l10n.reminderChipsQuestion,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-          for (final slot in ReminderSlot.values)
-            row(
-              icon: MeditoIcon(
-                assetName: switch (slot) {
-                  ReminderSlot.morning => MeditoIcons.sun,
-                  ReminderSlot.evening => MeditoIcons.bell,
-                  ReminderSlot.night => MeditoIcons.moon,
-                },
-                color: onSurface,
+            for (final slot in ReminderSlot.values)
+              row(
+                icon: MeditoIcon(
+                  assetName: switch (slot) {
+                    ReminderSlot.morning => MeditoIcons.sun,
+                    ReminderSlot.evening => MeditoIcons.bell,
+                    ReminderSlot.night => MeditoIcons.moon,
+                  },
+                  color: onSurface,
+                ),
+                title: slot.label(l10n),
+                subTitle: slot.time.format(context),
+                selected: slot == currentSlot,
+                choice: ReminderChoiceSlot(slot),
               ),
-              title: slot.label(l10n),
-              subTitle: slot.time.format(context),
-              selected: slot == currentSlot,
-              choice: ReminderChoiceSlot(slot),
-            ),
-          row(
-            icon: Icon(Icons.schedule_rounded, color: onSurface),
-            title: l10n.reminderSlotCustom,
-            subTitle: isCustom ? current!.format(context) : null,
-            selected: isCustom,
-            choice: const ReminderChoiceCustom(),
-            hasUnderline: enabled,
-          ),
-          if (enabled)
             row(
-              icon: Icon(Icons.notifications_off_outlined, color: onSurface),
-              title: l10n.reminderTurnOff,
-              selected: false,
-              choice: const ReminderChoiceOff(),
-              hasUnderline: false,
+              icon: Icon(Icons.schedule_rounded, color: onSurface),
+              title: l10n.reminderSlotCustom,
+              subTitle: isCustom ? current!.format(context) : null,
+              selected: isCustom,
+              choice: const ReminderChoiceCustom(),
+              hasUnderline: enabled,
             ),
-          const SizedBox(height: 8),
-        ],
+            if (enabled)
+              row(
+                icon: Icon(Icons.notifications_off_outlined, color: onSurface),
+                title: l10n.reminderTurnOff,
+                selected: false,
+                choice: const ReminderChoiceOff(),
+                hasUnderline: false,
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }

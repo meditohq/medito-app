@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -50,19 +51,22 @@ class _BackgroundSoundViewState extends ConsumerState<BackgroundSoundView> {
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: backgroundSounds.when(
-        skipLoadingOnRefresh: false,
-        data: (data) => _mainContent(data),
-        error: (err, stack) {
-          final error = err is AppError ? err : const UnknownError();
+      body: AdaptivePageBody(
+        maxWidth: 600,
+        child: backgroundSounds.when(
+          skipLoadingOnRefresh: false,
+          data: (data) => _mainContent(data),
+          error: (err, stack) {
+            final error = err is AppError ? err : const UnknownError();
 
-          return MeditoErrorWidget(
-            error: error,
-            onTap: () => ref.refresh(backgroundSoundsProvider),
-            isScaffold: false,
-          );
-        },
-        loading: () => const BackgroundSoundsShimmerWidget(),
+            return MeditoErrorWidget(
+              error: error,
+              onTap: () => ref.refresh(backgroundSoundsProvider),
+              isScaffold: false,
+            );
+          },
+          loading: () => const BackgroundSoundsShimmerWidget(),
+        ),
       ),
     );
   }

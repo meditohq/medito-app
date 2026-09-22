@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -79,47 +80,40 @@ class _TrackViewState extends ConsumerState<TrackView>
         loading: () => backButton,
         error: (_, _) => backButton,
       ),
-      body: SafeArea(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: trackAsyncValue.when(
-                  data: (track) {
-                    final selection = TrackVariantSelector.resolve(
-                      track,
-                      guideName: guideName,
-                      durationMs: lastSelectedDuration,
-                    );
+      body: AdaptivePageBody(
+        maxWidth: 600,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: trackAsyncValue.when(
+                data: (track) {
+                  final selection = TrackVariantSelector.resolve(
+                    track,
+                    guideName: guideName,
+                    durationMs: lastSelectedDuration,
+                  );
 
-                    return orientation == Orientation.portrait
-                        ? _buildPortraitLayout(
-                            track,
-                            selection.voice,
-                            selection.file,
-                            useCompactLayout,
-                          )
-                        : _buildLandscapeLayout(
-                            track,
-                            selection.voice,
-                            selection.file,
-                          );
-                  },
-                  loading: () => const TrackShimmerWidget(),
-                  error: (err, stack) {
-                    final error = err is AppError ? err : const UnknownError();
-                    return MeditoErrorWidget(
-                      error: error,
-                      onTap: () =>
-                          ref.refresh(tracksProvider(trackId: widget.trackId)),
-                      isScaffold: false,
-                    );
-                  },
-                ),
+                  return _buildPortraitLayout(
+                    track,
+                    selection.voice,
+                    selection.file,
+                    useCompactLayout,
+                  );
+                },
+                loading: () => const TrackShimmerWidget(),
+                error: (err, stack) {
+                  final error = err is AppError ? err : const UnknownError();
+                  return MeditoErrorWidget(
+                    error: error,
+                    onTap: () =>
+                        ref.refresh(tracksProvider(trackId: widget.trackId)),
+                    isScaffold: false,
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
@@ -140,64 +134,7 @@ class _TrackViewState extends ConsumerState<TrackView>
           track,
           activeVoice,
           activeFile,
-          isLandscape: false,
           useCompactLayout: useCompactLayout,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLandscapeLayout(
-    Track track,
-    TrackVoice activeVoice,
-    TrackAudioFile activeFile,
-  ) {
-    var size = MediaQuery.of(context).size;
-    var maxWidth = size.width * 0.25;
-    var maxHeight = size.height * 0.45;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: maxWidth,
-                maxHeight: maxHeight,
-              ),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: _buildCoverImage(track),
-              ),
-            ),
-            const SizedBox(width: 24),
-            Expanded(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: maxHeight),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _title(context, track.title),
-                      const SizedBox(height: 8),
-                      _getSubTitle(context, track.description),
-                      _tags(track),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        _buildTrackContent(
-          track,
-          activeVoice,
-          activeFile,
-          isLandscape: true,
-          useCompactLayout: false,
         ),
       ],
     );
@@ -220,46 +157,11 @@ class _TrackViewState extends ConsumerState<TrackView>
     Track track,
     TrackVoice activeVoice,
     TrackAudioFile activeFile, {
-    required bool isLandscape,
     required bool useCompactLayout,
   }) {
     final showGuideNameDropdown = track.voices.first.guideName
         .isNotNullAndNotEmpty();
     final guideName = ref.watch(guideNamePreferenceProvider);
-
-    if (isLandscape) {
-      return Row(
-        children: [
-          if (showGuideNameDropdown)
-            Expanded(
-              child: _guideNameDropdown(
-                track,
-                activeVoice,
-                isLandscape: true,
-                guideNameState: guideName,
-              ),
-            ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _durationDropdown(
-              activeVoice,
-              activeFile,
-              isLandscape: true,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _playBtn(
-              ref,
-              track,
-              activeVoice,
-              activeFile,
-              isFullWidth: false,
-            ),
-          ),
-        ],
-      );
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medito/widgets/adaptive/adaptive_home_sections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
@@ -151,14 +152,19 @@ class _HomeViewState extends ConsumerState<HomeView>
                         child: HomeAnnouncementSection(),
                       ),
                     ),
-                  SliverList.builder(
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: kHomeSectionGap),
-                        child: _buildSection(widgetOrder[index], homeData),
-                      );
-                    },
-                    itemCount: widgetOrder.length,
+                  SliverToBoxAdapter(
+                    child: AdaptiveHomeSections(
+                      children: [
+                        for (final type in widgetOrder)
+                          Padding(
+                            key: ValueKey(type),
+                            padding: const EdgeInsets.only(
+                              bottom: kHomeSectionGap,
+                            ),
+                            child: _buildSection(type, homeData),
+                          ),
+                      ],
+                    ),
                   ),
                   SliverPadding(
                     padding: EdgeInsets.only(

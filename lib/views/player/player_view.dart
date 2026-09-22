@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'package:medito/widgets/adaptive/adaptive_player_layout.dart';
+import 'package:medito/models/player/playback_request.dart';
 import 'dart:ui';
 import 'dart:io';
 
@@ -262,15 +264,6 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
     final isPlaying = ref.watch(audioStateProvider.select((s) => s.isPlaying));
 
-    // Static metadata comes from the prepared request, which is populated the
-    // instant the screen opens. Sourcing it from audioState instead would show
-    // an empty title/cover for the ~1s until native reports back, then pop the
-    // real content in — the "jumping" we're avoiding.
-    final title = currentlyPlayingTrack.title;
-    final artistName = currentlyPlayingTrack.guideName;
-    final artistUrl = currentlyPlayingTrack.artist?.path;
-    final imageUrl = currentlyPlayingTrack.coverUrl;
-
     // The transport (play/pause + progress) is genuinely loading until the
     // native player reports it's playing or knows the duration. Everything
     // else on screen is already final, so only the play button shows a spinner.
@@ -292,92 +285,15 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
           _stopAudio();
         }
       },
-      child: Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        body: OrientationBuilder(
-          builder: (context, orientation) {
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                RepaintBoundary(
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      if (imageUrl.isNotEmpty &&
-                          !HTTPConstants.isDeadDomain(imageUrl))
-                        // ImageFiltered (not BackdropFilter) — blurs only the
-                        // cover image itself, never the screen behind. Using
-                        // BackdropFilter here leaks the underlying route
-                        // during pop animations, blurring the previous screen
-                        // for a frame.
-                        ImageFiltered(
-                          imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: _FadingNetworkImage(imageUrl: imageUrl),
-                        ),
-                      Container(
-                        color: ColorConstants.black.withOpacityValue(0.3),
-                      ),
-                    ],
-                  ),
-                ),
-                RepaintBoundary(
-                  child: SafeArea(
-                    child: Stack(
-                      children: [
-                        Center(
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 32.0,
-                              ),
-                              child: orientation == Orientation.portrait
-                                  ? _PortraitPlayerLayout(
-                                      title: title,
-                                      artistName: artistName,
-                                      artistUrl: artistUrl,
-                                      totalDurationMs:
-                                          currentlyPlayingTrack.duration,
-                                      isPlaying: isPlaying,
-                                      isLoading: isAudioLoading,
-                                      onPlayPause: onPlayPausePressed,
-                                    )
-                                  : _LandscapePlayerLayout(
-                                      title: title,
-                                      artistName: artistName,
-                                      artistUrl: artistUrl,
-                                      totalDurationMs:
-                                          currentlyPlayingTrack.duration,
-                                      isPlaying: isPlaying,
-                                      isLoading: isAudioLoading,
-                                      onPlayPause: onPlayPausePressed,
-                                    ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 16,
-                          right: 16,
-                          child: ReportButtonWidget(
-                            request: currentlyPlayingTrack,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        bottomNavigationBar: PlayerActionBar(
-          request: currentlyPlayingTrack,
-          isBackgroundSoundSelected: _isBackgroundSoundSelected(),
-          onSpeedChanged: (speed) =>
-              ref.read(playerProvider.notifier).setSpeed(speed),
-          onClosePressed: () => _handleClose(),
-        ),
+      child: PlayerScreenLayout(
+        currentlyPlayingTrack: currentlyPlayingTrack,
+        isPlaying: isPlaying,
+        isAudioLoading: isAudioLoading,
+        isBackgroundSoundSelected: _isBackgroundSoundSelected(),
+        onPlayPausePressed: onPlayPausePressed,
+        onSpeedChanged: (speed) =>
+            ref.read(playerProvider.notifier).setSpeed(speed),
+        onClosePressed: () => _handleClose(),
       ),
     );
   }
@@ -469,8 +385,134 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 }
 
+/// The production player surface, separated from playback lifecycle for previews.
+/// Existing controls and their callbacks are shared at every window size.
+class PlayerScreenLayout extends StatelessWidget {
+  const PlayerScreenLayout({
+    super.key,
+    required this.currentlyPlayingTrack,
+    required this.isPlaying,
+    required this.isAudioLoading,
+    required this.isBackgroundSoundSelected,
+    required this.onPlayPausePressed,
+    required this.onSpeedChanged,
+    required this.onClosePressed,
+  });
+
+  final PlaybackRequest currentlyPlayingTrack;
+  final bool isPlaying;
+  final bool isAudioLoading;
+  final bool isBackgroundSoundSelected;
+  final VoidCallback onPlayPausePressed;
+  final ValueChanged<double> onSpeedChanged;
+  final VoidCallback onClosePressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = currentlyPlayingTrack.title;
+    final artistName = currentlyPlayingTrack.guideName;
+    final artistUrl = currentlyPlayingTrack.artist?.path;
+    final imageUrl = currentlyPlayingTrack.coverUrl;
+    return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final expanded =
+              constraints.maxWidth >= 700 && constraints.maxHeight >= 440;
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              RepaintBoundary(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (imageUrl.isNotEmpty &&
+                        !HTTPConstants.isDeadDomain(imageUrl))
+                      // ImageFiltered (not BackdropFilter) — blurs only the
+                      // cover image itself, never the screen behind. Using
+                      // BackdropFilter here leaks the underlying route
+                      // during pop animations, blurring the previous screen
+                      // for a frame.
+                      ImageFiltered(
+                        imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: _FadingNetworkImage(imageUrl: imageUrl),
+                      ),
+                    Container(
+                      color: ColorConstants.black.withOpacityValue(0.3),
+                    ),
+                  ],
+                ),
+              ),
+              RepaintBoundary(
+                child: SafeArea(
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32.0,
+                            ),
+                            child: constraints.maxHeight >= 440
+                                ? _PortraitPlayerLayout(
+                                    expanded: expanded,
+                                    title: title,
+                                    artistName: artistName,
+                                    artistUrl: artistUrl,
+                                    totalDurationMs:
+                                        currentlyPlayingTrack.duration,
+                                    isPlaying: isPlaying,
+                                    isLoading: isAudioLoading,
+                                    onPlayPause: onPlayPausePressed,
+                                  )
+                                : ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 1040,
+                                    ),
+                                    child: _LandscapePlayerLayout(
+                                      title: title,
+                                      artistName: artistName,
+                                      artistUrl: artistUrl,
+                                      totalDurationMs:
+                                          currentlyPlayingTrack.duration,
+                                      isPlaying: isPlaying,
+                                      isLoading: isAudioLoading,
+                                      onPlayPause: onPlayPausePressed,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: ReportButtonWidget(
+                          request: currentlyPlayingTrack,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      bottomNavigationBar: PlayerActionBar(
+        request: currentlyPlayingTrack,
+        isBackgroundSoundSelected: isBackgroundSoundSelected,
+        onSpeedChanged: onSpeedChanged,
+        onClosePressed: onClosePressed,
+      ),
+    );
+  }
+}
+
 class _PortraitPlayerLayout extends ConsumerWidget {
   const _PortraitPlayerLayout({
+    this.expanded = false,
     required this.title,
     required this.artistName,
     required this.artistUrl,
@@ -480,6 +522,7 @@ class _PortraitPlayerLayout extends ConsumerWidget {
     required this.onPlayPause,
   });
 
+  final bool expanded;
   final String title;
   final String? artistName;
   final String? artistUrl;
@@ -490,41 +533,42 @@ class _PortraitPlayerLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ArtistTitleWidget(
-          trackTitle: title,
-          artistName: artistName ?? '',
-          artistUrlPath: artistUrl,
-          isPlayerScreen: true,
-        ),
-        const SizedBox(height: 32),
-        DurationIndicatorWidget(
-          fallbackDurationMs: totalDurationMs,
-          onSeekEnd: (value) {
-            ref.read(playerProvider.notifier).seekToPosition(value);
-          },
-        ),
-        const SizedBox(height: 24),
-        PlayerButtonsWidget(
-          isPlaying: isPlaying,
-          isLoading: isLoading,
-          onPlayPause: onPlayPause,
-          onSkip10SecondsBackward: () =>
-              ref.read(playerProvider.notifier).skip10SecondsBackward(),
-          onSkip10SecondsForward: () =>
-              ref.read(playerProvider.notifier).skip10SecondsForward(),
-          onRepeat: () {
-            final newMode = ref
-                .read(repeatStateProvider.notifier)
-                .toggleRepeat();
-            ref.read(playerProvider.notifier).setRepeatMode(newMode);
-          },
-          isPortrait: true,
-        ),
-      ],
+    return AdaptivePlayerLayout(
+      expanded: expanded,
+      heading: ArtistTitleWidget(
+        trackTitle: title,
+        artistName: artistName ?? '',
+        artistUrlPath: artistUrl,
+        isPlayerScreen: true,
+      ),
+      controls: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DurationIndicatorWidget(
+            fallbackDurationMs: totalDurationMs,
+            onSeekEnd: (value) {
+              ref.read(playerProvider.notifier).seekToPosition(value);
+            },
+          ),
+          const SizedBox(height: 24),
+          PlayerButtonsWidget(
+            isPlaying: isPlaying,
+            isLoading: isLoading,
+            onPlayPause: onPlayPause,
+            onSkip10SecondsBackward: () =>
+                ref.read(playerProvider.notifier).skip10SecondsBackward(),
+            onSkip10SecondsForward: () =>
+                ref.read(playerProvider.notifier).skip10SecondsForward(),
+            onRepeat: () {
+              final newMode = ref
+                  .read(repeatStateProvider.notifier)
+                  .toggleRepeat();
+              ref.read(playerProvider.notifier).setRepeatMode(newMode);
+            },
+            isPortrait: true,
+          ),
+        ],
+      ),
     );
   }
 }

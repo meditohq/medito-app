@@ -228,7 +228,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       // card clear of the pill.
       body: SafeArea(
         bottom: false,
-        child: _buildMain(context, ref, settingsItems),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: _buildMain(context, ref, settingsItems),
+          ),
+        ),
       ),
     );
   }

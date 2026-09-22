@@ -7,7 +7,7 @@ class AssetConstants {
   static const String onboardingImage2 = 'assets/images/relationships.png';
   static const String onboardingImage3 =
       'assets/images/palouse_mindfulness_small.png';
-  static const String splashBackground = 'assets/images/splashbg.png';
+  static const String splashBackground = 'assets/images/splashbg.svg';
 
   static const String iconAlert = 'assets/images/warning-triangle.svg';
   static const String iconArrowLeft = 'assets/images/arrow-left.svg';

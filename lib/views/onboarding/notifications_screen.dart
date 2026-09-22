@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:medito/widgets/onboarding/onboarding_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -398,80 +399,87 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                       imagePath: widget.headerImage!,
                       heightFraction: headerFraction,
                     ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(32, 24, 32, 32),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: (constraints.maxHeight - 72 - headerHeight)
-                            .clamp(0.0, double.infinity),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Top group: title, notification preview and the time
-                          // chips stack together near the top so the choice sits
-                          // right under the preview rather than being pushed to
-                          // the bottom of the screen.
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _notificationsTitle(
-                                  AppLocalizations.of(context)!,
-                                ),
-                                style: Theme.of(context).textTheme.displayLarge
-                                    ?.copyWith(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                              // When a reminder already exists (e.g. re-entering
-                              // onboarding) surface the time it's set for; the
-                              // chips below let the user change it.
-                              if (reminderTime != null) ...[
-                                const SizedBox(height: 16),
+                  OnboardingContent(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(32, 24, 32, 32),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: (constraints.maxHeight - 72 - headerHeight)
+                              .clamp(0.0, double.infinity),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Top group: title, notification preview and the time
+                            // chips stack together near the top so the choice sits
+                            // right under the preview rather than being pushed to
+                            // the bottom of the screen.
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                                 Text(
-                                  AppLocalizations.of(context)!
-                                      .onboardingReminderCurrentlySet(
-                                        reminderTime.format(context),
+                                  _notificationsTitle(
+                                    AppLocalizations.of(context)!,
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayLarge
+                                      ?.copyWith(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(fontSize: 16, height: 1.5),
                                   textAlign: TextAlign.center,
                                 ),
+                                // When a reminder already exists (e.g. re-entering
+                                // onboarding) surface the time it's set for; the
+                                // chips below let the user change it.
+                                if (reminderTime != null) ...[
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.onboardingReminderCurrentlySet(
+                                      reminderTime.format(context),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(fontSize: 16, height: 1.5),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                                const SizedBox(height: 24),
+                                _buildNotificationPreview(context),
+                                const SizedBox(height: 24),
+                                // Always the chips: first-timers pick a time
+                                // (which sets it and auto-advances), and returning
+                                // users change the already-set time with the same
+                                // control.
+                                _buildTimeChips(AppLocalizations.of(context)!),
                               ],
-                              const SizedBox(height: 24),
-                              _buildNotificationPreview(context),
-                              const SizedBox(height: 24),
-                              // Always the chips: first-timers pick a time
-                              // (which sets it and auto-advances), and returning
-                              // users change the already-set time with the same
-                              // control.
-                              _buildTimeChips(AppLocalizations.of(context)!),
-                            ],
-                          ),
-                          // Skip stays pinned toward the bottom.
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: TextButton(
-                                onPressed: () async {
-                                  await FirebaseAnalyticsService().logEvent(
-                                    name: FirebaseAnalyticsService
-                                        .eventOnboardingReminderSkipTap,
-                                    parameters: _eventParams,
-                                  );
-                                  _navigateNext();
-                                },
-                                child: Text(
-                                  AppLocalizations.of(context)!.skipForNow,
+                            ),
+                            // Skip stays pinned toward the bottom.
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: TextButton(
+                                  onPressed: () async {
+                                    await FirebaseAnalyticsService().logEvent(
+                                      name: FirebaseAnalyticsService
+                                          .eventOnboardingReminderSkipTap,
+                                      parameters: _eventParams,
+                                    );
+                                    _navigateNext();
+                                  },
+                                  child: Text(
+                                    AppLocalizations.of(context)!.skipForNow,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -690,6 +698,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+              side: BorderSide(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.24),
+              ),
+            ),
             onPressed: _isProcessing ? null : _onCustomTimeTap,
             icon: const Icon(Icons.schedule_rounded, size: 20),
             label: Text(
@@ -758,7 +774,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       ),
     );
   }
-
 }
 
 /// Clips only the bottom of a widget, leaving horizontal overflow intact so

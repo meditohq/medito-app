@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
@@ -70,24 +71,27 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
         hasCloseButton: !widget.isRoot,
       ),
       key: scaffoldKey,
-      body: downloadedTracks.when(
-        skipLoadingOnRefresh: false,
-        data: (data) {
-          if (data.isEmpty) {
-            return _getEmptyWidget();
-          }
+      body: AdaptivePageBody(
+        maxWidth: 760,
+        child: downloadedTracks.when(
+          skipLoadingOnRefresh: false,
+          data: (data) {
+            if (data.isEmpty) {
+              return _getEmptyWidget();
+            }
 
-          return _getDownloadList(data);
-        },
-        error: (err, stack) {
-          final error = err is AppError ? err : const UnknownError();
+            return _getDownloadList(data);
+          },
+          error: (err, stack) {
+            final error = err is AppError ? err : const UnknownError();
 
-          return MeditoErrorWidget(
-            error: error,
-            onTap: () => ref.refresh(downloadedTracksProvider),
-          );
-        },
-        loading: () => const TrackShimmerWidget(),
+            return MeditoErrorWidget(
+              error: error,
+              onTap: () => ref.refresh(downloadedTracksProvider),
+            );
+          },
+          loading: () => const TrackShimmerWidget(),
+        ),
       ),
     );
   }

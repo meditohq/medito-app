@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -44,68 +45,71 @@ class _RestoreStatsScreenState extends ConsumerState<RestoreStatsScreen> {
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: SafeArea(
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              centerTitle: false,
-              automaticallyImplyLeading: false,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              toolbarHeight: 56.0,
-              pinned: true,
-              floating: true,
-              elevation: 0.0,
-              title: HomeHeaderWidget(greeting: l10n.restorePreviousStats),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                child: Text(
-                  l10n.restorePreviousStatsExplainer,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+      body: AdaptivePageBody(
+        maxWidth: 760,
+        child: SafeArea(
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                centerTitle: false,
+                automaticallyImplyLeading: false,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                toolbarHeight: 56.0,
+                pinned: true,
+                floating: true,
+                elevation: 0.0,
+                title: HomeHeaderWidget(greeting: l10n.restorePreviousStats),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  child: Text(
+                    l10n.restorePreviousStatsExplainer,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),
-            ),
-            FutureBuilder<List<StatsBackup>>(
-              future: _backupsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) {
-                  return const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                final backups = snapshot.data ?? const <StatsBackup>[];
-                if (backups.isEmpty) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Text(
-                          l10n.noBackupsAvailable,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium,
+              FutureBuilder<List<StatsBackup>>(
+                future: _backupsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  final backups = snapshot.data ?? const <StatsBackup>[];
+                  if (backups.isEmpty) {
+                    return SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Text(
+                            l10n.noBackupsAvailable,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
                         ),
                       ),
+                    );
+                  }
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => _BackupRow(
+                        backup: backups[index],
+                        onRestored: _refresh,
+                      ),
+                      childCount: backups.length,
                     ),
                   );
-                }
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _BackupRow(
-                      backup: backups[index],
-                      onRestored: _refresh,
-                    ),
-                    childCount: backups.length,
-                  ),
-                );
-              },
-            ),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

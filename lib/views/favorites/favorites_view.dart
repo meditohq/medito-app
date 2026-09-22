@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -65,12 +66,15 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: favoritesState.when(
-          data: (favorites) => _buildFavoritesContent(favorites, statsState),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => _buildErrorState(),
+      body: AdaptivePageBody(
+        maxWidth: 760,
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: favoritesState.when(
+            data: (favorites) => _buildFavoritesContent(favorites, statsState),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => _buildErrorState(),
+          ),
         ),
       ),
     );

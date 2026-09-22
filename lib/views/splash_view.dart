@@ -25,6 +25,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/app_globals.dart' show appReadyCompleter;
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
+import 'package:medito/views/splash_welcome_layout.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
@@ -569,224 +570,34 @@ class SplashViewState extends ConsumerState<SplashView>
                   width: 168,
                 ),
               )
-            : LayoutBuilder(
-                builder: (context, constraints) {
-                  return Stack(
-                    children: [
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: SizedBox(
-                          height: 500,
-                          child: Image.asset(
-                            AssetConstants.splashBackground,
-                            fit: BoxFit.fitWidth,
-                            alignment: Alignment.bottomCenter,
-                          ),
-                        ),
-                      ),
-                      SafeArea(
-                        bottom: false,
-                        child: SingleChildScrollView(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight:
-                                  constraints.maxHeight -
-                                  MediaQuery.of(context).padding.top,
-                            ),
-                            child: IntrinsicHeight(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 16,
-                                      top: 16,
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withAlpha(
-                                              ((0.1).clamp(0.0, 1.0) * 255)
-                                                  .round(),
-                                            ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: SvgPicture.asset(
-                                            AssetConstants.icLogo,
-                                            width: 40,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Text(
-                                          AppLocalizations.of(context)!.appName,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .displayLarge
-                                              ?.copyWith(
-                                                fontSize: 24,
-                                                color: Colors.white,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      32,
-                                      24,
-                                      32,
-                                      0,
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(
-                                            context,
-                                          )!.splashHeadline,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .displayLarge
-                                              ?.copyWith(
-                                                fontSize: 40,
-                                                fontWeight: FontWeight.bold,
-                                                height: 1.2,
-                                                color: Colors.white,
-                                              ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            AppLocalizations.of(
-                                              context,
-                                            )!.splashSubtitle,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium
-                                                ?.copyWith(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500,
-                                                  height: 1.35,
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.85),
-                                                ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  if (_showAccountButtons) ...[
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                        32,
-                                        0,
-                                        32,
-                                        250,
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          // Primary: start straight away as a
-                                          // guest; the account choice can wait.
-                                          SizedBox(
-                                            width: double.infinity,
-                                            height: 52,
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.white,
-                                                foregroundColor: Colors.black,
-                                                textStyle: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              onPressed: _isSigningIn
-                                                  ? null
-                                                  : () async {
-                                                      await FirebaseAnalyticsService()
-                                                          .logEvent(
-                                                            name: FirebaseAnalyticsService
-                                                                .eventOnboardingSplashscreenContinueTap,
-                                                          );
-                                                      await _handleAnonymousSignIn();
-                                                    },
-                                              child: _isSigningIn
-                                                  ? const SizedBox(
-                                                      width: 20,
-                                                      height: 20,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                            strokeWidth: 2,
-                                                          ),
-                                                    )
-                                                  : Text(
-                                                      AppLocalizations.of(
-                                                        context,
-                                                      )!.getStarted,
-                                                    ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          // Secondary: quiet link for returning
-                                          // users to sign in.
-                                          TextButton(
-                                            onPressed: _isSigningIn
-                                                ? null
-                                                : () async {
-                                                    await FirebaseAnalyticsService()
-                                                        .logEvent(
-                                                          name: FirebaseAnalyticsService
-                                                              .eventOnboardingSplashscreenSignupTap,
-                                                        );
-                                                    await Navigator.of(context)
-                                                        .push(
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                const SignUpLogInPage(
-                                                                  source: AnalyticsEventConstants
-                                                                      .sourceSplash,
-                                                                ),
-                                                          ),
-                                                        )
-                                                        .then((value) {
-                                                          if (value == true) {
-                                                            _checkAuthAndInitialize();
-                                                          }
-                                                        });
-                                                  },
-                                            child: Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.splashSignInOrSignUp,
-                                              style: TextStyle(
-                                                color: Colors.white.withValues(
-                                                  alpha: 0.8,
-                                                ),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ), // IntrinsicHeight
-                          ),
-                        ),
-                      ),
-                    ],
+            : SplashWelcomeLayout(
+                showAccountButtons: _showAccountButtons,
+                isSigningIn: _isSigningIn,
+                onGetStarted: () async {
+                  await FirebaseAnalyticsService().logEvent(
+                    name: FirebaseAnalyticsService
+                        .eventOnboardingSplashscreenContinueTap,
                   );
+                  await _handleAnonymousSignIn();
+                },
+                onSignIn: () async {
+                  await FirebaseAnalyticsService().logEvent(
+                    name: FirebaseAnalyticsService
+                        .eventOnboardingSplashscreenSignupTap,
+                  );
+                  await Navigator.of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpLogInPage(
+                            source: AnalyticsEventConstants.sourceSplash,
+                          ),
+                        ),
+                      )
+                      .then((value) {
+                        if (value == true) {
+                          _checkAuthAndInitialize();
+                        }
+                      });
                 },
               ),
       ),

@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -71,19 +72,22 @@ class _PackViewState extends ConsumerState<PackView>
         loading: () => backButton,
         error: (_, _) => backButton,
       ),
-      body: packAsyncValue.when(
-        skipLoadingOnRefresh: false,
-        skipLoadingOnReload: false,
-        data: (data) => _buildScaffoldWithData(data, ref),
-        error: (err, stack) {
-          final error = err is AppError ? err : const UnknownError();
-          return MeditoErrorWidget(
-            error: error,
-            onTap: () => ref.refresh(packDataProvider(packId: widget.id)),
-            isLoading: packAsyncValue.isLoading,
-          );
-        },
-        loading: () => const FolderShimmerWidget(),
+      body: AdaptivePageBody(
+        maxWidth: 960,
+        child: packAsyncValue.when(
+          skipLoadingOnRefresh: false,
+          skipLoadingOnReload: false,
+          data: (data) => _buildScaffoldWithData(data, ref),
+          error: (err, stack) {
+            final error = err is AppError ? err : const UnknownError();
+            return MeditoErrorWidget(
+              error: error,
+              onTap: () => ref.refresh(packDataProvider(packId: widget.id)),
+              isLoading: packAsyncValue.isLoading,
+            );
+          },
+          loading: () => const FolderShimmerWidget(),
+        ),
       ),
     );
   }

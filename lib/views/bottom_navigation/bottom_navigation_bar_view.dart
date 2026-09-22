@@ -1,3 +1,5 @@
+import 'package:medito/widgets/adaptive/adaptive_content.dart';
+import 'package:medito/views/bottom_navigation/widgets/medito_sidebar.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -66,6 +68,14 @@ class _BottomNavigationBarViewState
     final isDark = theme.brightness == Brightness.dark;
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     final keyboardOpen = keyboardInset > 0;
+    final width = MediaQuery.sizeOf(context).width;
+    final wide = width >= 700;
+    final items = [
+      MeditoNavItem(icon: MeditoIcons.home, label: l10n.home),
+      MeditoNavItem(icon: MeditoIcons.book, label: l10n.explore),
+      MeditoNavItem(icon: MeditoIcons.search, label: l10n.search),
+      MeditoNavItem(icon: MeditoIcons.settings, label: l10n.settings),
+    ];
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -91,30 +101,46 @@ class _BottomNavigationBarViewState
           // doesn't also inset the body — padding the bar already reserves the
           // keyboard's height, shrinking the body to sit above it.
           resizeToAvoidBottomInset: false,
-          bottomNavigationBar: Padding(
-            padding: EdgeInsets.only(bottom: keyboardInset),
-            // While the keyboard is open the bar sits directly on top of it, so
-            // drop the bar's bottom safe-area (home-indicator) inset — otherwise
-            // it leaves a gap between the tabs and the keyboard.
-            child: MediaQuery.removePadding(
-              context: context,
-              removeBottom: keyboardOpen,
-              child: MeditoNavBar(
-                selectedIndex: _currentPageIndex,
-                onSelected: _onDestinationSelected,
-                items: [
-                  MeditoNavItem(icon: MeditoIcons.home, label: l10n.home),
-                  MeditoNavItem(icon: MeditoIcons.book, label: l10n.explore),
-                  MeditoNavItem(icon: MeditoIcons.search, label: l10n.search),
-                  MeditoNavItem(
-                    icon: MeditoIcons.settings,
-                    label: l10n.settings,
+          bottomNavigationBar: wide
+              ? null
+              : Padding(
+                  padding: EdgeInsets.only(bottom: keyboardInset),
+                  // While the keyboard is open the bar sits directly on top of it, so
+                  // drop the bar's bottom safe-area (home-indicator) inset — otherwise
+                  // it leaves a gap between the tabs and the keyboard.
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeBottom: keyboardOpen,
+                    child: MeditoNavBar(
+                      selectedIndex: _currentPageIndex,
+                      onSelected: _onDestinationSelected,
+                      items: items,
+                    ),
                   ),
-                ],
-              ),
+                ),
+          body: Padding(
+            padding: EdgeInsets.only(bottom: wide ? keyboardInset : 0),
+            child: Row(
+              children: [
+                if (wide)
+                  MeditoSidebar(
+                    extended: width >= 1100,
+                    items: items,
+                    selectedIndex: _currentPageIndex,
+                    onSelected: _onDestinationSelected,
+                  ),
+                Expanded(
+                  key: const ValueKey('main-content'),
+                  child: AdaptiveContent(
+                    child: IndexedStack(
+                      index: _currentPageIndex,
+                      children: _pages,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          body: IndexedStack(index: _currentPageIndex, children: _pages),
         ),
       ),
     );

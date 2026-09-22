@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:medito/widgets/onboarding/onboarding_content.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
@@ -123,58 +124,60 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
         children: [
           if (widget.headerImage != null)
             OnboardingHeaderImage(imagePath: widget.headerImage!),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              padding24,
-              padding16,
-              padding24,
-              padding24,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.stepLabel != null &&
-                    widget.stepLabel!.isNotEmpty) ...[
+          OnboardingContent(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                padding24,
+                padding16,
+                padding24,
+                padding24,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.stepLabel != null &&
+                      widget.stepLabel!.isNotEmpty) ...[
+                    Text(
+                      widget.stepLabel!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withAlpha(120),
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    const SizedBox(height: padding16),
+                  ],
                   Text(
-                    widget.stepLabel!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withAlpha(120),
-                      letterSpacing: 0.8,
+                    widget.question,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
                     ),
                   ),
-                  const SizedBox(height: padding16),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.subtext,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(160),
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  ...List.generate(_displayOrder.length, (i) {
+                    final originalIndex = _displayOrder[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: OnboardingOptionButton(
+                        label: widget.options[originalIndex],
+                        selected: _selectedIndex == originalIndex,
+                        onTap: () => _onTap(originalIndex),
+                      ),
+                    );
+                  }),
+                  if (widget.freeTextHint != null &&
+                      widget.onFreeTextSubmitted != null)
+                    _buildFreeTextField(theme),
                 ],
-                Text(
-                  widget.question,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    height: 1.25,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  widget.subtext,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withAlpha(160),
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                ...List.generate(_displayOrder.length, (i) {
-                  final originalIndex = _displayOrder[i];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: OnboardingOptionButton(
-                      label: widget.options[originalIndex],
-                      selected: _selectedIndex == originalIndex,
-                      onTap: () => _onTap(originalIndex),
-                    ),
-                  );
-                }),
-                if (widget.freeTextHint != null &&
-                    widget.onFreeTextSubmitted != null)
-                  _buildFreeTextField(theme),
-              ],
+              ),
             ),
           ),
         ],

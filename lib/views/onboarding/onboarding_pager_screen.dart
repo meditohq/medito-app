@@ -20,6 +20,9 @@ import 'package:medito/views/onboarding/battery_optimization_screen.dart';
 import 'package:medito/views/onboarding/tracking_permission_screen.dart';
 import 'package:medito/widgets/onboarding/progress_indicator_widget.dart';
 
+// Keep the device decision injectable so previews exercise the real pager.
+final onboardingTrackingStepProvider = Provider<bool>((ref) => Platform.isIOS);
+
 class OnboardingPagerScreen extends ConsumerStatefulWidget {
   const OnboardingPagerScreen({super.key});
 
@@ -172,7 +175,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     final steps = OnboardingDonationTimingExperiment.steps(
       variant: _donationTimingVariant,
       showBattery: _showBatteryScreen,
-      showTracking: Platform.isIOS,
+      showTracking: ref.watch(onboardingTrackingStepProvider),
     );
     return [
       for (final step in steps)
@@ -311,7 +314,7 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     final steps = OnboardingDonationTimingExperiment.steps(
       variant: _donationTimingVariant,
       showBattery: _showBatteryScreen,
-      showTracking: Platform.isIOS,
+      showTracking: ref.watch(onboardingTrackingStepProvider),
     );
     final totalSteps = steps
         .where((step) => step != OnboardingStep.result)

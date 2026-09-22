@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -89,56 +90,59 @@ class SearchViewState extends ConsumerState<SearchView> {
     final l10n = AppLocalizations.of(context)!;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
-    return SafeArea(
-      bottom: false,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              padding16,
-              padding12,
-              padding16,
-              padding8,
-            ),
-            child: ValueListenableBuilder<TextEditingValue>(
-              valueListenable: _controller,
-              builder: (context, value, _) {
-                return MeditoTextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  hintText: l10n.searchMeditations,
-                  textInputAction: TextInputAction.search,
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.only(left: 14, right: 10),
-                    child: MeditoIcon(
-                      assetName: MeditoIcons.search,
-                      color: onSurface.withOpacityValue(0.6),
-                      size: 18,
+    return AdaptivePageBody(
+      maxWidth: 960,
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                padding16,
+                32,
+                padding16,
+                padding8,
+              ),
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _controller,
+                builder: (context, value, _) {
+                  return MeditoTextField(
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    hintText: l10n.searchMeditations,
+                    textInputAction: TextInputAction.search,
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(left: 14, right: 10),
+                      child: MeditoIcon(
+                        assetName: MeditoIcons.search,
+                        color: onSurface.withOpacityValue(0.6),
+                        size: 18,
+                      ),
                     ),
-                  ),
-                  suffixIcon: value.text.isEmpty
-                      ? null
-                      : IconButton(
-                          tooltip: l10n.clearSearch,
-                          iconSize: 20,
-                          onPressed: _clear,
-                          icon: Icon(
-                            Icons.cancel,
-                            color: onSurface.withOpacityValue(0.6),
+                    suffixIcon: value.text.isEmpty
+                        ? null
+                        : IconButton(
+                            tooltip: l10n.clearSearch,
+                            iconSize: 20,
+                            onPressed: _clear,
+                            icon: Icon(
+                              Icons.cancel,
+                              color: onSurface.withOpacityValue(0.6),
+                            ),
                           ),
-                        ),
-                  onChanged: _onChanged,
-                );
-              },
+                    onChanged: _onChanged,
+                  );
+                },
+              ),
             ),
-          ),
-          Expanded(
-            child: SearchResults(
-              query: _query,
-              onBeforeNavigate: _focusNode.unfocus,
+            Expanded(
+              child: SearchResults(
+                query: _query,
+                onBeforeNavigate: _focusNode.unfocus,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

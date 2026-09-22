@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -46,32 +47,35 @@ class _TagViewState extends ConsumerState<TagView> {
           ),
         ],
       ),
-      body: tracksAsync.when(
-        data: (tracks) {
-          if (tracks.isEmpty) {
-            return Center(
-              child: Text(
-                AppLocalizations.of(context)!.tagNoTracks,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            );
-          }
-          return CustomScrollView(
-            slivers: [
-              TrackListSliver(tracks: tracks),
-              SliverPadding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.paddingOf(context).bottom + padding16,
+      body: AdaptivePageBody(
+        maxWidth: 760,
+        child: tracksAsync.when(
+          data: (tracks) {
+            if (tracks.isEmpty) {
+              return Center(
+                child: Text(
+                  AppLocalizations.of(context)!.tagNoTracks,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
-              ),
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => MeditoErrorWidget(
-          error: err is AppError ? err : const UnknownError(),
-          isScaffold: false,
-          onTap: () => ref.invalidate(tagTracksProvider(widget.tag.id)),
+              );
+            }
+            return CustomScrollView(
+              slivers: [
+                TrackListSliver(tracks: tracks),
+                SliverPadding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.paddingOf(context).bottom + padding16,
+                  ),
+                ),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => MeditoErrorWidget(
+            error: err is AppError ? err : const UnknownError(),
+            isScaffold: false,
+            onTap: () => ref.invalidate(tagTracksProvider(widget.tag.id)),
+          ),
         ),
       ),
     );

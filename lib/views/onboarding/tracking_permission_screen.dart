@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:medito/widgets/onboarding/onboarding_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
@@ -78,56 +79,60 @@ class TrackingPermissionScreen extends ConsumerWidget {
                 children: [
                   if (headerImage != null)
                     OnboardingHeaderImage(imagePath: headerImage!),
-                  Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: (constraints.maxHeight - 64 - headerHeight)
-                            .clamp(0.0, double.infinity),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              MeditoIcon(
-                                assetName: MeditoIcons.shield,
-                                size: 48,
-                                color: onSurface,
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                l10n.trackingPermissionTitle,
-                                style: Theme.of(context).textTheme.displayLarge
-                                    ?.copyWith(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                      color: onSurface,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                l10n.trackingPermissionBody,
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(
-                                      fontSize: 16,
-                                      height: 1.5,
-                                      color: onSurface.withOpacityValue(0.9),
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 12),
-                              _buildPrivacyNote(context, l10n),
-                            ],
-                          ),
-                          const SizedBox(height: 32),
-                          _buildActionButton(
-                            text: l10n.trackingPermissionAllow,
-                            onPressed: () async =>
-                                await _handleContinue(context, ref),
-                          ),
-                        ],
+                  OnboardingContent(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: (constraints.maxHeight - 64 - headerHeight)
+                              .clamp(0.0, double.infinity),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              children: [
+                                MeditoIcon(
+                                  assetName: MeditoIcons.shield,
+                                  size: 48,
+                                  color: onSurface,
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  l10n.trackingPermissionTitle,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayLarge
+                                      ?.copyWith(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600,
+                                        color: onSurface,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  l10n.trackingPermissionBody,
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(
+                                        fontSize: 16,
+                                        height: 1.5,
+                                        color: onSurface.withOpacityValue(0.9),
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 12),
+                                _buildPrivacyNote(context, l10n),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                            _buildActionButton(
+                              text: l10n.trackingPermissionAllow,
+                              onPressed: () async =>
+                                  await _handleContinue(context, ref),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

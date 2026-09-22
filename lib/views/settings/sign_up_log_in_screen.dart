@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
@@ -517,29 +518,28 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               )
             : null,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            32.0,
-            0,
-            32.0,
-            MediaQuery.of(context).viewInsets.bottom + 32.0,
-          ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight:
-                  MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top -
-                  kToolbarHeight -
-                  MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _hasRequestedOtp
-                    ? _buildOtpVerificationView(inputTextStyle)
-                    : _buildInitialView(inputTextStyle),
-              ],
+      body: AdaptivePageBody(
+        maxWidth: 600,
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: (constraints.maxHeight - 32).clamp(
+                    0,
+                    double.infinity,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _hasRequestedOtp
+                        ? _buildOtpVerificationView(inputTextStyle)
+                        : _buildInitialView(inputTextStyle),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

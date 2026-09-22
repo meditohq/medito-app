@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// Full-bleed hero image at the top of an onboarding page.
 ///
 /// Lives inside each page's own scroll view (rather than pinned above the
-/// PageView) so it scrolls away with the content. Hidden in landscape and on
+/// PageView) so it scrolls away with the content. Hidden in compact landscape and on
 /// very short screens; shrinks on small screens so the content keeps room.
 class OnboardingHeaderImage extends StatelessWidget {
   const OnboardingHeaderImage({
@@ -19,17 +19,18 @@ class OnboardingHeaderImage extends StatelessWidget {
   /// smaller value. Null uses the defaults.
   final double? heightFraction;
 
-  /// 0 when the image is hidden (landscape / very short screens).
+  /// 0 when the image is hidden (compact landscape / very short screens).
   static double heightFor(BuildContext context, {double? fractionOverride}) {
     final mediaQuery = MediaQuery.of(context);
     final size = mediaQuery.size;
-    if (size.height <= 500 || mediaQuery.orientation == Orientation.landscape) {
+    if (size.height <= 500 ||
+        (size.width < 600 && mediaQuery.orientation == Orientation.landscape)) {
       return 0;
     }
     // Small screens give up less of the viewport to the hero image.
-    final fraction =
-        fractionOverride ?? (size.height < 700 ? 0.2 : 0.3);
-    return size.height * fraction;
+    final fraction = fractionOverride ?? (size.height < 700 ? 0.2 : 0.3);
+    final height = size.height * fraction;
+    return size.width >= 600 ? height.clamp(0.0, 280.0) : height;
   }
 
   @override

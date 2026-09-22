@@ -22,7 +22,7 @@ class BackgroundSoundVolumeTrackShapeWidget
     final trackHeight = sliderTheme.trackHeight ?? 0;
     final trackLeft = offset.dx;
     double trackTop;
-    trackTop = parentBox.size.height - trackHeight;
+    trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2;
     final trackWidth = parentBox.size.width;
 
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
@@ -52,28 +52,64 @@ class BackgroundSoundVolumeTrackShapeWidget
       thumbCenter: thumbCenter,
     );
     final canvas = context.canvas;
-    const textStyle = TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.w500,
-      color: ColorConstants.white,
-      fontFamily: googleSans,
+    final rect = getPreferredRect(
+      parentBox: parentBox,
+      offset: offset,
+      sliderTheme: sliderTheme,
+      isEnabled: isEnabled,
+      isDiscrete: isDiscrete,
     );
-    TextPainter textPainter(span) => TextPainter(
-      text: span,
-      textAlign: TextAlign.left,
-      textDirection: TextDirection.ltr,
+    Color foreground(Color? background) =>
+        ThemeData.estimateBrightnessForColor(background ?? Colors.black) ==
+            Brightness.light
+        ? Colors.black
+        : Colors.white;
+
+    void paintLabels(Color color) {
+      TextPainter label(String text) => TextPainter(
+        text: TextSpan(
+          text: text,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: color,
+            fontFamily: googleSans,
+          ),
+        ),
+        textDirection: textDirection,
+        maxLines: 1,
+        ellipsis: '…',
+      )..layout(maxWidth: (rect.width / 2 - 32).clamp(0, double.infinity));
+      final title = label(leadingTitle);
+      final value = label(tralingText);
+      final rtl = textDirection == TextDirection.rtl;
+      title.paint(
+        canvas,
+        Offset(
+          rtl ? rect.right - 16 - title.width : rect.left + 16,
+          rect.center.dy - title.height / 2,
+        ),
+      );
+      value.paint(
+        canvas,
+        Offset(
+          rtl ? rect.left + 16 : rect.right - 16 - value.width,
+          rect.center.dy - value.height / 2,
+        ),
+      );
+    }
+
+    paintLabels(foreground(sliderTheme.inactiveTrackColor));
+    canvas.save();
+    canvas.clipRect(
+      Rect.fromLTRB(
+        textDirection == TextDirection.ltr ? rect.left : thumbCenter.dx,
+        rect.top,
+        textDirection == TextDirection.ltr ? thumbCenter.dx : rect.right,
+        rect.bottom,
+      ),
     );
-    var span = TextSpan(style: textStyle, text: leadingTitle);
-    var span1 = TextSpan(style: textStyle, text: tralingText);
-    var tp = textPainter(span);
-    var tp1 = textPainter(span1);
-    tp.layout();
-    tp1.layout();
-    final xCenter = tp.width - 50;
-    final yCenter = tp.height + 2;
-    final offset1 = Offset(xCenter, yCenter);
-    final offset2 = Offset(parentBox.size.width * 0.85, yCenter);
-    tp.paint(canvas, offset1);
-    tp1.paint(canvas, offset2);
+    paintLabels(foreground(sliderTheme.activeTrackColor));
+    canvas.restore();
   }
 }

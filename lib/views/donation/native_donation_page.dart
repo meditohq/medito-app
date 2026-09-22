@@ -915,9 +915,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             // unpatchable asset diff (see Apple Pay button above).
             MeditoIcon(assetName: MeditoIcons.shield, color: faint, size: 13),
             const SizedBox(width: 4),
-            Text(
-              _stripeTrustCopy,
-              style: TextStyle(color: faint, fontSize: 12),
+            Flexible(
+              child: Text(
+                _stripeTrustCopy,
+                style: TextStyle(color: faint, fontSize: 12),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
