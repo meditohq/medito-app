@@ -145,3 +145,6 @@ superwall-paywall.png
 docs/experiments/*
 # Widget Preview related
 .widget_preview/
+
+# Local release adoption snapshot
+/docs/RELEASE_ADOPTION.md
