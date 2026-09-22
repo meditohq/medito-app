@@ -1,6 +1,13 @@
 Unreleased
 -
 
+2609.22.0
+- Browse meditation topics from Explore, tracks and packs.
+- Clearer controls for your first meditation during onboarding.
+- Smoother transitions on the end-of-session screen.
+- Donation email entry now appears when you tap Donate.
+- Clearer onboarding progress.
+
 2609.20.0
 - Pack screens: the pin icon is now a clear "Set as Your Path" row, showing your progress once set
 - Tapping the star now confirms "Added to Favorites" / "Removed from Favorites"
