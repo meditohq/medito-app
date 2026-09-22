@@ -1,3 +1,5 @@
+import 'package:medito/views/home/widgets/quote/quote_share_sheet.dart';
+import 'package:medito/models/home/home_model.dart';
 import 'package:medito/models/me/me_model.dart';
 
 import 'package:medito/views/explore/widgets/explore_view.dart';
@@ -983,4 +985,41 @@ void main() {
       }
     },
   );
+
+  testWidgets('quote card stays square and share control scrolls into view', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    for (final size in [const Size(820, 900), const Size(1024, 500)]) {
+      tester.view.physicalSize = size;
+      await tester.pumpWidget(
+        const PreviewShell(
+          prefs: prefsDark,
+          child: QuoteShareScreen(
+            data: HomeQuoteModel(
+              id: 'layout-test',
+              quote:
+                  'The present moment is filled with joy and happiness. If you are attentive, you will see it.',
+              author: 'Thich Nhat Hanh',
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final card = find.descendant(
+        of: find.byType(QuoteShareScreen),
+        matching: find.byType(AspectRatio),
+      );
+      expect(tester.getSize(card).width, tester.getSize(card).height);
+      expect(tester.getSize(card).width, lessThanOrEqualTo(440));
+      final share = find.widgetWithText(FilledButton, 'Share');
+      await tester.ensureVisible(share);
+      await tester.pumpAndSettle();
+      expect(share.hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }
+  });
 }

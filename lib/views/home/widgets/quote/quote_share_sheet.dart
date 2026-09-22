@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
@@ -188,13 +189,14 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.of(context).pop(),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-          child: Column(
-            children: [
-              Expanded(
-                child: Center(
+      body: AdaptivePageBody(
+        maxWidth: 488,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+            child: Column(
+              children: [
+                Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 440),
                     child: RepaintBoundary(
@@ -203,46 +205,46 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              _PalettePicker(
-                palettes: _palettes,
-                selectedIndex: _paletteIndex,
-                onSelected: (i) => setState(() => _paletteIndex = i),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  key: _shareButtonKey,
-                  onPressed: _sharing ? null : _share,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: context.brandPurple,
-                    foregroundColor: context.onBrandPurple,
-                    padding: const EdgeInsets.symmetric(vertical: padding16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: _sharing
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: context.onBrandPurple,
-                          ),
-                        )
-                      : const Text(
-                          'Share',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                const SizedBox(height: 20),
+                _PalettePicker(
+                  palettes: _palettes,
+                  selectedIndex: _paletteIndex,
+                  onSelected: (i) => setState(() => _paletteIndex = i),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    key: _shareButtonKey,
+                    onPressed: _sharing ? null : _share,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: context.brandPurple,
+                      foregroundColor: context.onBrandPurple,
+                      padding: const EdgeInsets.symmetric(vertical: padding16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: _sharing
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: context.onBrandPurple,
+                            ),
+                          )
+                        : const Text(
+                            'Share',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
