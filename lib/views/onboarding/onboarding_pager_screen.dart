@@ -239,6 +239,8 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final pages = _buildPages(l10n);
+    // The final "Get started" screen is the payoff, not a counted setup step.
+    final totalSteps = pages.length - 1;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -257,10 +259,11 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
                 itemBuilder: (context, index) => pages[index],
               ),
             ),
-            OnboardingProgressIndicator(
-              currentIndex: _currentPage,
-              totalSteps: pages.length,
-            ),
+            if (_currentPage < totalSteps)
+              OnboardingProgressIndicator(
+                currentIndex: _currentPage,
+                totalSteps: totalSteps,
+              ),
           ],
         ),
       ),
