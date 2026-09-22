@@ -8,6 +8,7 @@ import 'package:medito/constants/pack_sequence.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/onboarding/onboarding_experienced_meditation_experiment.dart';
+import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/onboarding/notifications_screen.dart';
@@ -30,6 +31,15 @@ class OnboardingPagerScreen extends ConsumerStatefulWidget {
 class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
+  late final String _donationTimingVariant;
+  bool _advancing = false;
+  bool _completed = false;
+
+  Map<String, Object> get _timingParams => {
+    AnalyticsEventConstants.paramExperimentName:
+        OnboardingDonationTimingExperiment.experimentName,
+    AnalyticsEventConstants.paramVariantId: _donationTimingVariant,
+  };
 
   // Answer from the question screen (set before advancing to result).
   int? _experienceIndex;
@@ -59,11 +69,17 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
     AssetConstants.onboardingImage3,
   ];
 
-  void _nextPage() {
-    _controller.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeIn,
-    );
+  Future<void> _nextPage() async {
+    if (_advancing || _completed || !_controller.hasClients) return;
+    _advancing = true;
+    try {
+      await _controller.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    } finally {
+      _advancing = false;
+    }
   }
 
   void _onExperienceSelected(int index) {
@@ -153,38 +169,67 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
       experienceIndex: _experienceIndex ?? 0,
     );
 
+    final steps = OnboardingDonationTimingExperiment.steps(
+      variant: _donationTimingVariant,
+      showBattery: _showBatteryScreen,
+      showTracking: Platform.isIOS,
+    );
     return [
-      OnboardingQuestionScreen(
-        headerImage: _images[0],
-        question: l10n.onboardingExperienceQuestion,
-        subtext: l10n.onboardingExperienceSubtext,
-        options: [
-          l10n.onboardingExperienceNever,
-          l10n.onboardingExperienceALittle,
-          l10n.onboardingExperienceRegular,
-        ],
-        onOptionSelected: _onExperienceSelected,
-      ),
-      OnboardingDonationScreen(headerImage: _images[1], onNext: _nextPage),
-      NotificationsScreen(headerImage: _images[2], onNext: _nextPage),
-      if (_showBatteryScreen)
-        BatteryOptimizationScreen(headerImage: _images[2], onNext: _nextPage),
-      if (Platform.isIOS)
-        TrackingPermissionScreen(headerImage: _images[2], onNext: _nextPage),
-      OnboardingResultScreen(
-        headerImage: _images[2],
-        state: resultState,
-        onGetStarted: _onGetStarted,
-        showMeditation: _showMeditationStep,
-      ),
+      for (final step in steps)
+        switch (step) {
+          OnboardingStep.question => OnboardingQuestionScreen(
+            key: ValueKey(step),
+            headerImage: _images[0],
+            question: l10n.onboardingExperienceQuestion,
+            subtext: l10n.onboardingExperienceSubtext,
+            options: [
+              l10n.onboardingExperienceNever,
+              l10n.onboardingExperienceALittle,
+              l10n.onboardingExperienceRegular,
+            ],
+            onOptionSelected: _onExperienceSelected,
+          ),
+          OnboardingStep.donation => OnboardingDonationScreen(
+            key: ValueKey(step),
+            headerImage: _images[1],
+            onNext: steps.last == step ? _onGetStarted : _nextPage,
+          ),
+          OnboardingStep.notifications => NotificationsScreen(
+            key: ValueKey(step),
+            headerImage: _images[2],
+            onNext: _nextPage,
+          ),
+          OnboardingStep.battery => BatteryOptimizationScreen(
+            key: ValueKey(step),
+            headerImage: _images[2],
+            onNext: _nextPage,
+          ),
+          OnboardingStep.tracking => TrackingPermissionScreen(
+            key: ValueKey(step),
+            headerImage: _images[2],
+            onNext: _nextPage,
+          ),
+          OnboardingStep.result => OnboardingResultScreen(
+            key: ValueKey(step),
+            headerImage: _images[2],
+            state: resultState,
+            onGetStarted: steps.last == step ? _onGetStarted : _nextPage,
+            showMeditation: _showMeditationStep,
+          ),
+        },
     ];
   }
 
   Future<void> _onGetStarted() async {
+    if (_completed) return;
+    _completed = true;
     unawaited(
       ref
           .read(analyticsServiceProvider)
-          .logEvent(name: AnalyticsEventConstants.onboardingCompleted),
+          .logEvent(
+            name: AnalyticsEventConstants.onboardingCompleted,
+            parameters: _timingParams,
+          ),
     );
     unawaited(
       ref
@@ -223,11 +268,33 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   @override
   void initState() {
     super.initState();
+    _donationTimingVariant = isSmokeTestMode
+        ? OnboardingDonationTimingExperiment.variantControl
+        : OnboardingDonationTimingExperiment.resolveVariant(
+            ref.read(sharedPreferencesProvider),
+          );
+    // Enrol before any flow divergence; do not restrict analysis to ask viewers.
+    if (!isSmokeTestMode) {
+      final analytics = ref.read(analyticsServiceProvider);
+      unawaited(
+        analytics.setUserProperty(
+          name: OnboardingDonationTimingExperiment.userProperty,
+          value: _donationTimingVariant,
+        ),
+      );
+      unawaited(
+        analytics.logEvent(
+          name: AnalyticsEventConstants.onboardingExperimentExposure,
+          parameters: _timingParams,
+        ),
+      );
+    }
     unawaited(
       ref
           .read(analyticsServiceProvider)
           .logEvent(
             name: AnalyticsEventConstants.onboardingQuestionFlowStarted,
+            parameters: _timingParams,
           ),
     );
     shouldShowBatteryOptimizationScreen().then((show) {
@@ -239,8 +306,22 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final pages = _buildPages(l10n);
-    // The final "Get started" screen is the payoff, not a counted setup step.
-    final totalSteps = pages.length - 1;
+    // The result is not a setup step, including when the experiment places
+    // the donation step after it.
+    final steps = OnboardingDonationTimingExperiment.steps(
+      variant: _donationTimingVariant,
+      showBattery: _showBatteryScreen,
+      showTracking: Platform.isIOS,
+    );
+    final totalSteps = steps
+        .where((step) => step != OnboardingStep.result)
+        .length;
+    final progressIndex =
+        steps
+            .take(_currentPage + 1)
+            .where((step) => step != OnboardingStep.result)
+            .length -
+        1;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -259,9 +340,9 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
                 itemBuilder: (context, index) => pages[index],
               ),
             ),
-            if (_currentPage < totalSteps)
+            if (steps[_currentPage] != OnboardingStep.result)
               OnboardingProgressIndicator(
-                currentIndex: _currentPage,
+                currentIndex: progressIndex,
                 totalSteps: totalSteps,
               ),
           ],

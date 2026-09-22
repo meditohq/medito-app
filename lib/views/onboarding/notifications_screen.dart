@@ -368,19 +368,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     }
   }
 
-  String _notificationsBody(AppLocalizations l10n) {
-    switch (widget.intentIndex) {
-      case 0:
-        return l10n.enableNotificationsBodyLearn;
-      case 1:
-        return l10n.enableNotificationsBodyHabit;
-      case 2:
-        return l10n.enableNotificationsBodyStress;
-      default:
-        return l10n.enableNotificationsBody;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final reminderTime = ref.watch(reminderTimeProvider);
@@ -391,8 +378,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
+            // Smaller hero than the default onboarding pages so the preview +
+            // time chips have room to sit higher on the screen.
+            const headerFraction = 0.2;
             final headerHeight = widget.headerImage != null
-                ? OnboardingHeaderImage.heightFor(context)
+                ? OnboardingHeaderImage.heightFor(
+                    context,
+                    fractionOverride: headerFraction,
+                  )
                 : 0.0;
 
             return SingleChildScrollView(
@@ -401,7 +394,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (widget.headerImage != null)
-                    OnboardingHeaderImage(imagePath: widget.headerImage!),
+                    OnboardingHeaderImage(
+                      imagePath: widget.headerImage!,
+                      heightFraction: headerFraction,
+                    ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(32, 24, 32, 32),
                     child: ConstrainedBox(
@@ -412,7 +408,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          // Top group: title, notification preview and the time
+                          // chips stack together near the top so the choice sits
+                          // right under the preview rather than being pushed to
+                          // the bottom of the screen.
                           Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 _notificationsTitle(
@@ -425,51 +426,50 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                                     ),
                                 textAlign: TextAlign.center,
                               ),
-                              // Before a reminder is set the body line is
-                              // dropped — the title plus the "When will you
-                              // meditate?" question above the chips carry the
-                              // message, one message per block instead of two.
+                              // When a reminder already exists (e.g. re-entering
+                              // onboarding) surface the time it's set for; the
+                              // chips below let the user change it.
                               if (reminderTime != null) ...[
                                 const SizedBox(height: 16),
                                 Text(
-                                  _notificationsBody(
-                                    AppLocalizations.of(context)!,
-                                  ),
+                                  AppLocalizations.of(context)!
+                                      .onboardingReminderCurrentlySet(
+                                        reminderTime.format(context),
+                                      ),
                                   style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(fontSize: 16, height: 1.5),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
+                              const SizedBox(height: 24),
+                              _buildNotificationPreview(context),
+                              const SizedBox(height: 24),
+                              // Always the chips: first-timers pick a time
+                              // (which sets it and auto-advances), and returning
+                              // users change the already-set time with the same
+                              // control.
+                              _buildTimeChips(AppLocalizations.of(context)!),
                             ],
                           ),
-                          const SizedBox(height: 24),
-                          _buildNotificationPreview(context),
-                          const SizedBox(height: 32),
-                          Column(
-                            children: [
-                              if (reminderTime != null)
-                                _buildConfirmReminderButton()
-                              else
-                                _buildTimeChips(AppLocalizations.of(context)!),
-                              const SizedBox(height: 12),
-                              SizedBox(
-                                width: double.infinity,
-                                child: TextButton(
-                                  onPressed: () async {
-                                    // Log analytics event for skip tap
-                                    await FirebaseAnalyticsService().logEvent(
-                                      name: FirebaseAnalyticsService
-                                          .eventOnboardingReminderSkipTap,
-                                      parameters: _eventParams,
-                                    );
-                                    _navigateNext();
-                                  },
-                                  child: Text(
-                                    AppLocalizations.of(context)!.skipForNow,
-                                  ),
+                          // Skip stays pinned toward the bottom.
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: TextButton(
+                                onPressed: () async {
+                                  await FirebaseAnalyticsService().logEvent(
+                                    name: FirebaseAnalyticsService
+                                        .eventOnboardingReminderSkipTap,
+                                    parameters: _eventParams,
+                                  );
+                                  _navigateNext();
+                                },
+                                child: Text(
+                                  AppLocalizations.of(context)!.skipForNow,
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
@@ -759,21 +759,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     );
   }
 
-  Widget _buildConfirmReminderButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () async {
-          await FirebaseAnalyticsService().logEvent(
-            name: FirebaseAnalyticsService.eventOnboardingReminderConfirmTap,
-            parameters: _eventParams,
-          );
-          _navigateNext();
-        },
-        child: Text(AppLocalizations.of(context)!.setReminderB),
-      ),
-    );
-  }
 }
 
 /// Clips only the bottom of a widget, leaving horizontal overflow intact so

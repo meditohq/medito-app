@@ -29,6 +29,15 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
   static const _paywallConfigTimeout = Duration(seconds: 3);
 
   bool _hasAttemptedDonation = isSmokeTestMode;
+  bool _openingDonation = false;
+  bool _advanced = false;
+
+  void _advance() {
+    if (!mounted || _advanced) return;
+    _advanced = true;
+    widget.onNext?.call();
+  }
+
   // Decided once: true = native inline paywall, false = existing intro +
   // webview flow, null = still waiting on paywall config.
   bool? _useNativePaywall;
@@ -65,31 +74,32 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     super.dispose();
   }
 
-  void _handleDonationAction(BuildContext context) async {
-    if (!_hasAttemptedDonation) {
-      await FirebaseAnalyticsService().logEvent(
-        name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+  Future<void> _handleDonationAction(BuildContext context) async {
+    if (_openingDonation || _advanced) return;
+    setState(() => _openingDonation = true);
+    try {
+      if (!_hasAttemptedDonation) {
+        unawaited(
+          FirebaseAnalyticsService().logEvent(
+            name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+          ),
+        );
+      }
+      if (!context.mounted) return;
+      await handleDonationNavigation(
+        context,
+        ref,
+        FirebaseAnalyticsService.paywallSourceOnboarding,
+        navigator: Navigator.of(context),
       );
+      // A completed gift AND a dismissed ask both continue the onboarding flow.
+      _advance();
+    } catch (_) {
+      // If navigation fails, leave an explicit way to continue.
+      if (mounted) setState(() => _hasAttemptedDonation = true);
+    } finally {
+      if (mounted) setState(() => _openingDonation = false);
     }
-
-    if (!context.mounted) return;
-
-    final didSucceed = await handleDonationNavigation(
-      context,
-      ref,
-      FirebaseAnalyticsService.paywallSourceOnboarding,
-      navigator: Navigator.of(context),
-    );
-
-    if (!mounted) return;
-
-    if (didSucceed == true) {
-      widget.onNext?.call();
-
-      return;
-    }
-
-    setState(() => _hasAttemptedDonation = true);
   }
 
   /// The wait elapsed with no config, so this user gets the webview arm no
@@ -157,7 +167,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
       name: FirebaseAnalyticsService.eventOnboardingDonationSkipTap,
     );
 
-    widget.onNext?.call();
+    _advance();
   }
 
   @override
@@ -183,7 +193,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
           child: NativeDonationPage(
             config: config,
             source: FirebaseAnalyticsService.paywallSourceOnboarding,
-            onNext: () => widget.onNext?.call(),
+            onNext: _advance,
           ),
         ),
       );
@@ -290,7 +300,9 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                                 text: AppLocalizations.of(
                                   context,
                                 )!.donationPrimerCta,
-                                onPressed: () => _handleDonationAction(context),
+                                onPressed: _openingDonation
+                                    ? null
+                                    : () => _handleDonationAction(context),
                               ),
                               if (_hasAttemptedDonation) ...[
                                 const SizedBox(height: 12),
@@ -321,7 +333,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
 
   Widget _buildActionButton({
     required String text,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
   }) {
     return SizedBox(
       width: double.infinity,

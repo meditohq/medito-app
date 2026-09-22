@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/widgets/onboarding/onboarding_option_button.dart';
+import 'package:medito/widgets/widgets.dart';
 
 /// A single question screen in the onboarding question flow.
 ///
@@ -199,23 +200,21 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
             ),
             const SizedBox(height: 8),
           ],
-          TextField(
+          MeditoTextField(
             controller: _freeTextController,
             focusNode: _freeTextFocusNode,
             enabled: !disabled,
             textInputAction: TextInputAction.done,
             onSubmitted: (_) => _onFreeTextSubmit(),
             maxLength: 80,
-            decoration: InputDecoration(
-              hintText: widget.freeTextHint,
-              counterText: '',
-              suffixIcon: hasText && !disabled
-                  ? IconButton(
-                      icon: const Icon(Icons.arrow_forward_rounded),
-                      onPressed: _onFreeTextSubmit,
-                    )
-                  : null,
-            ),
+            counterText: '',
+            hintText: widget.freeTextHint,
+            suffixIcon: hasText && !disabled
+                ? IconButton(
+                    icon: const Icon(Icons.arrow_forward_rounded),
+                    onPressed: _onFreeTextSubmit,
+                  )
+                : null,
           ),
         ],
       ),

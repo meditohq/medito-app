@@ -12,12 +12,6 @@ InputDecorationTheme inputDecorationTheme() {
       color: ColorConstants.white,
       fontFamily: googleSans,
     ),
-    floatingLabelStyle: const TextStyle(
-      fontSize: 16,
-      fontStyle: FontStyle.normal,
-      color: ColorConstants.white,
-      fontFamily: googleSans,
-    ),
     enabledBorder: outlineInputBorder,
     focusedBorder: outlineInputBorder,
     border: outlineInputBorder,

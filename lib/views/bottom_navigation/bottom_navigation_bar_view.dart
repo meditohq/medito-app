@@ -10,11 +10,9 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/bottom_navigation/widgets/medito_nav_bar.dart';
-import 'package:medito/views/bottom_navigation/widgets/floating_search_bar.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
-import 'package:medito/views/path/path_view.dart';
-import 'package:medito/views/search/search_results.dart';
+import 'package:medito/views/search/search_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 
 class BottomNavigationBarView extends ConsumerStatefulWidget {
@@ -27,32 +25,30 @@ class BottomNavigationBarView extends ConsumerStatefulWidget {
 
 class _BottomNavigationBarViewState
     extends ConsumerState<BottomNavigationBarView> {
-  // Maps nav destination index -> page index in _pages.
-  static const _pageIndexForDestination = [0, 1, 3];
-  static const _searchDebounce = Duration(milliseconds: 500);
+  // Nav destination index == page index in _pages: Home, Explore, Search,
+  // Settings. Search is a full tab (not an overlay), so it behaves like any
+  // other tab: you leave it by switching tabs, and Android back returns Home.
+  static const _homeIndex = 0;
+  static const _exploreIndex = 1;
+  static const _searchIndex = 2;
 
   late int _currentPageIndex;
   final _exploreViewKey = GlobalKey<ExploreViewState>();
+  final _searchViewKey = GlobalKey<SearchViewState>();
   late final List<Widget> _pages;
-
-  // Search expands in place: the nav capsule holds the field and results
-  // overlay the current tab.
-  bool _searchOpen = false;
-  String _searchQuery = '';
-  final _searchController = TextEditingController();
-  final _searchFocusNode = FocusNode();
-  Timer? _searchDebounceTimer;
 
   @override
   void initState() {
     super.initState();
     final prefs = ref.read(sharedPreferencesProvider);
     final saved = prefs.getInt(SharedPreferenceConstants.lastMainTabIndex) ?? 0;
-    _currentPageIndex = saved <= 1 ? saved : 0;
+    // Only Home/Explore are restored on launch; never open straight into
+    // Search or Settings.
+    _currentPageIndex = saved <= _exploreIndex ? saved : _homeIndex;
     _pages = [
       const HomeView(),
       ExploreView(key: _exploreViewKey),
-      const JourneyView(),
+      SearchView(key: _searchViewKey),
       const SettingsScreen(),
     ];
 
@@ -64,21 +60,12 @@ class _BottomNavigationBarViewState
   }
 
   @override
-  void dispose() {
-    _searchDebounceTimer?.cancel();
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final selectedDestination = _pageIndexForDestination.indexOf(
-      _currentPageIndex,
-    );
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final keyboardOpen = keyboardInset > 0;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -91,142 +78,64 @@ class _BottomNavigationBarViewState
             : Brightness.dark,
       ),
       child: PopScope(
-        canPop: !_searchOpen && _currentPageIndex == 0,
+        canPop: _currentPageIndex == _homeIndex,
         onPopInvokedWithResult: (didPop, _) {
           if (didPop) return;
-          if (_searchOpen) {
-            _closeSearch();
-          } else {
-            _onDestinationSelected(0);
-          }
+          _onDestinationSelected(_homeIndex);
         },
         child: Scaffold(
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
-          // Solid docked bar: content stops above it, and the bar reserves
-          // room for the keyboard itself, so the Scaffold must not resize.
+          // The nav bar is lifted to sit just above the keyboard (via the
+          // bottom-inset padding below) rather than hiding behind it, so a tap
+          // aimed at the Search tab hits the icon instead of the keyboard's
+          // spacebar. resizeToAvoidBottomInset stays false so the Scaffold
+          // doesn't also inset the body — padding the bar already reserves the
+          // keyboard's height, shrinking the body to sit above it.
           resizeToAvoidBottomInset: false,
-          // Hidden while searching: the floating search field replaces it,
-          // sitting just above the keyboard.
-          bottomNavigationBar: _searchOpen
-              ? null
-              : MeditoNavBar(
-                  selectedIndex: selectedDestination >= 0
-                      ? selectedDestination
-                      : 0,
-                  onSelected: (index) =>
-                      _onDestinationSelected(_pageIndexForDestination[index]),
-                  items: [
-                    MeditoNavItem(icon: MeditoIcons.home, label: l10n.home),
-                    MeditoNavItem(icon: MeditoIcons.book, label: l10n.explore),
-                    MeditoNavItem(
-                      icon: MeditoIcons.settings,
-                      label: l10n.settings,
-                    ),
-                  ],
-                  action: MeditoNavAction(
-                    icon: MeditoIcons.search,
-                    label: l10n.search,
-                    onTap: _openSearch,
+          bottomNavigationBar: Padding(
+            padding: EdgeInsets.only(bottom: keyboardInset),
+            // While the keyboard is open the bar sits directly on top of it, so
+            // drop the bar's bottom safe-area (home-indicator) inset — otherwise
+            // it leaves a gap between the tabs and the keyboard.
+            child: MediaQuery.removePadding(
+              context: context,
+              removeBottom: keyboardOpen,
+              child: MeditoNavBar(
+                selectedIndex: _currentPageIndex,
+                onSelected: _onDestinationSelected,
+                items: [
+                  MeditoNavItem(icon: MeditoIcons.home, label: l10n.home),
+                  MeditoNavItem(icon: MeditoIcons.book, label: l10n.explore),
+                  MeditoNavItem(icon: MeditoIcons.search, label: l10n.search),
+                  MeditoNavItem(
+                    icon: MeditoIcons.settings,
+                    label: l10n.settings,
                   ),
-                  // Search sits between Explore and Settings.
-                  actionIndex: 2,
-                ),
-          body: Stack(
-            children: [
-              IndexedStack(index: _currentPageIndex, children: _pages),
-              // Fades in over the tab; the tab underneath keeps its state.
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
-                child: _searchOpen
-                    ? Material(
-                        key: const ValueKey('search'),
-                        color: theme.scaffoldBackgroundColor,
-                        child: SafeArea(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              bottom: MediaQuery.viewInsetsOf(context).bottom,
-                            ),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: SearchResults(
-                                    query: _searchQuery,
-                                    onBeforeNavigate: _searchFocusNode.unfocus,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    padding16,
-                                    padding8,
-                                    padding8,
-                                    padding8,
-                                  ),
-                                  child: FloatingSearchBar(
-                                    controller: _searchController,
-                                    focusNode: _searchFocusNode,
-                                    onChanged: _onSearchChanged,
-                                    onClear: _clearSearch,
-                                    onCancel: _closeSearch,
-                                    cancelLabel: l10n.cancel,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(key: ValueKey('tabs')),
+                ],
               ),
-            ],
+            ),
           ),
+          body: IndexedStack(index: _currentPageIndex, children: _pages),
         ),
       ),
     );
   }
 
-  void _openSearch() {
-    if (_searchOpen) return;
-    unawaited(
-      ref
-          .read(analyticsServiceProvider)
-          .logFirstActionAfterOnboardingIfNeeded('search'),
-    );
-    unawaited(FirebaseAnalyticsService().logScreenView(screenName: 'Search'));
-    setState(() => _searchOpen = true);
-  }
-
-  /// Empties the field but stays in search.
-  void _clearSearch() {
-    _searchDebounceTimer?.cancel();
-    _searchController.clear();
-    setState(() => _searchQuery = '');
-    _searchFocusNode.requestFocus();
-  }
-
-  void _closeSearch() {
-    _searchDebounceTimer?.cancel();
-    _searchFocusNode.unfocus();
-    _searchController.clear();
-    setState(() {
-      _searchOpen = false;
-      _searchQuery = '';
-    });
-  }
-
-  void _onSearchChanged(String value) {
-    _searchDebounceTimer?.cancel();
-    _searchDebounceTimer = Timer(_searchDebounce, () {
-      if (!mounted) return;
-      // The search backend is ASCII-only.
-      final asciiQuery = value.replaceAll(RegExp(r'[^\x00-\x7F]'), '');
-      setState(() => _searchQuery = asciiQuery);
-    });
-  }
-
   void _onDestinationSelected(int index) {
-    if (index != _currentPageIndex) {
-      const tabTargets = {0: 'tab_home', 1: 'tab_explore', 3: 'tab_settings'};
+    final entering = index != _currentPageIndex;
+
+    // Leaving Search dismisses the keyboard so it doesn't linger over another
+    // tab. (Entering Search focuses the field below.)
+    if (index != _searchIndex) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+
+    if (entering) {
+      const tabTargets = {
+        _homeIndex: 'tab_home',
+        _exploreIndex: 'tab_explore',
+        _searchIndex: 'search',
+        3: 'tab_settings',
+      };
       final target = tabTargets[index];
       if (target != null) {
         unawaited(
@@ -241,15 +150,29 @@ class _BottomNavigationBarViewState
       _currentPageIndex = index;
     });
 
-    if (index <= 1) {
+    if (index <= _exploreIndex) {
       ref
           .read(sharedPreferencesProvider)
           .setInt(SharedPreferenceConstants.lastMainTabIndex, index);
     }
 
-    // Load explore data only on the first visit to the explore tab
-    if (index == 1) {
+    // Load explore data only on the first visit to the explore tab.
+    if (index == _exploreIndex) {
       _exploreViewKey.currentState?.loadData();
+    }
+
+    // Selecting Search focuses the field so the user can type immediately;
+    // re-tapping the active tab re-opens the keyboard too. The screen view is
+    // logged only on actual entry, not on every re-tap.
+    if (index == _searchIndex) {
+      if (entering) {
+        unawaited(
+          FirebaseAnalyticsService().logScreenView(screenName: 'Search'),
+        );
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _searchViewKey.currentState?.focusInput();
+      });
     }
   }
 }

@@ -290,6 +290,8 @@
   "notificationPreviewTimestamp": "ahora",
   "notificationPreviewTitleB": "Una mente más tranquila empieza aquí",
   "notificationPreviewBodyB": "Tu respiración diaria te espera. Solo toca para empezar.",
+  "onboardingStepIndicator": "Paso {current} de {total}",
+  "onboardingReminderCurrentlySet": "Recordatorio diario configurado para las {time}",
   "reminderChipsQuestion": "¿Cuándo vas a meditar?",
   "reminderSlotMorning": "Mañana",
   "reminderSlotAfternoon": "Tarde",

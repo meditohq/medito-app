@@ -22,6 +22,7 @@ import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
+import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/routes/routes.dart' as routes;
@@ -673,35 +674,19 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   }
 
   Widget _buildEmailField(TextStyle inputTextStyle) {
-    return TextField(
+    final l10n = AppLocalizations.of(context)!;
+    final showError = !_isEmailValid && _emailController.text.isNotEmpty;
+    // In onboarding (opened from the splash) drop the keyboard straight in so
+    // the user can start typing; the Settings entry stays tap-to-focus.
+    final autofocus = widget.source == AnalyticsEventConstants.sourceSplash;
+    return MeditoTextField(
       controller: _emailController,
       enabled: !_hasRequestedOtp,
-      decoration:
-          getInputDecoration(
-            AppLocalizations.of(context)!.emailLabel,
-            _isEmailValid || _emailController.text.isEmpty,
-            AppLocalizations.of(context)!.invalidEmailError,
-          ).copyWith(
-            fillColor: Theme.of(context).colorScheme.surface,
-            filled: true,
-            suffixIcon: _emailController.text.isNotEmpty && !_hasRequestedOtp
-                ? IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacityValue(0.6),
-                    ),
-                    onPressed: () {
-                      _emailController.clear();
-                      _validateEmail();
-                    },
-                  )
-                : null,
-          ),
-      onChanged: (_) => setState(() {}),
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      autofocus: autofocus,
+      hintText: l10n.emailLabel,
+      errorText: showError ? l10n.invalidEmailError : null,
       keyboardType: TextInputType.emailAddress,
+      onChanged: (_) => setState(() {}),
       inputFormatters: [
         TextInputFormatter.withFunction(
           (oldValue, newValue) => TextEditingValue(
@@ -710,22 +695,31 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           ),
         ),
       ],
+      suffixIcon: _emailController.text.isNotEmpty && !_hasRequestedOtp
+          ? IconButton(
+              icon: Icon(
+                Icons.clear,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacityValue(0.6),
+              ),
+              onPressed: () {
+                _emailController.clear();
+                _validateEmail();
+              },
+            )
+          : null,
     );
   }
 
   Widget _buildOtpField(TextStyle inputTextStyle) {
-    return TextField(
+    final l10n = AppLocalizations.of(context)!;
+    final showError = !_isOtpValid && _otpController.text.isNotEmpty;
+    return MeditoTextField(
       controller: _otpController,
-      decoration:
-          getInputDecoration(
-            AppLocalizations.of(context)!.otpLabel,
-            _isOtpValid || _otpController.text.isEmpty,
-            AppLocalizations.of(context)!.invalidOtpError,
-          ).copyWith(
-            fillColor: Theme.of(context).colorScheme.surface,
-            filled: true,
-          ),
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      autofocus: widget.source == AnalyticsEventConstants.sourceSplash,
+      hintText: l10n.otpLabel,
+      errorText: showError ? l10n.invalidOtpError : null,
       keyboardType: TextInputType.number,
       maxLength: 6,
     );
@@ -789,45 +783,6 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       disabledForegroundColor: context.onBrandPurple.withValues(alpha: 0.6),
       disabledBackgroundColor: context.brandPurple.withOpacityValue(0.5),
       minimumSize: const Size(double.infinity, 48),
-    );
-  }
-
-  InputDecoration getInputDecoration(
-    String hint,
-    bool isValid,
-    String? errorText,
-  ) {
-    const borderRadius = BorderRadius.all(Radius.circular(4));
-
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(
-        color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
-      ),
-      filled: true,
-      fillColor: Theme.of(context).colorScheme.surface,
-      enabledBorder: const OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: ColorConstants.softGrey),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: context.brandPurple),
-      ),
-      disabledBorder: const OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: ColorConstants.softGrey),
-      ),
-      errorBorder: const OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: Colors.red),
-      ),
-      focusedErrorBorder: const OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: Colors.red),
-      ),
-      errorText: !isValid && errorText != null ? errorText : null,
-      errorStyle: const TextStyle(color: Colors.red),
     );
   }
 

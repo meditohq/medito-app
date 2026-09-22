@@ -5,6 +5,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
+import 'package:medito/widgets/inputs/medito_text_field.dart';
 
 /// Streak/session preview for a chosen date range, computed by the caller so
 /// the dialog stays free of stats wiring.
@@ -247,7 +248,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
         const SizedBox(height: 20),
         _buildTimePickerTile(context, l10n),
         const SizedBox(height: 12),
-        MeditoDialogTextField(
+        MeditoTextField(
           controller: _durationController,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -378,7 +379,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           ),
         ],
         const SizedBox(height: 16),
-        MeditoDialogTextField(
+        MeditoTextField(
           controller: _bulkDurationController,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],

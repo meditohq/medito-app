@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/explore/explore_list_item.dart';
-import 'package:medito/providers/explore/track_search_provider.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/explore/widgets/pack_grid_sliver.dart';
 import 'package:medito/views/explore/widgets/track_list_sliver.dart';
@@ -61,6 +64,10 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
   int? _previousPacksCount;
   int? _previousTracksCount;
   bool _filterSwitchScheduled = false;
+
+  /// The last query we logged a "no results" event for, so a settled
+  /// zero-result query is only reported once (not on every rebuild).
+  String? _loggedNoResultsQuery;
 
   @override
   void didUpdateWidget(covariant SearchResults oldWidget) {
@@ -170,6 +177,25 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
 
     return tracksAsync.when(
       data: (tracks) {
+        // A settled, non-empty query with nothing in either bucket is a
+        // content/discovery gap — report it once per query.
+        if (query.isNotEmpty &&
+            packs.isEmpty &&
+            tracks.isEmpty &&
+            _loggedNoResultsQuery != query) {
+          _loggedNoResultsQuery = query;
+          final analytics = ref.read(analyticsServiceProvider);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            unawaited(
+              analytics.logEvent(
+                name: AnalyticsEventConstants.searchNoResults,
+                parameters: {AnalyticsEventConstants.paramSearchTerm: query},
+              ),
+            );
+          });
+        }
+
         final shownPacks = _filter == SearchFilter.tracks
             ? <PackItem>[]
             : packs;
