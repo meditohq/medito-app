@@ -1035,6 +1035,41 @@ jobs:
             fi
           fi
 
+      # Keep this build's dSYMs. They are the only copy: Apple stopped retaining
+      # dSYMs for uploads when bitcode went away, the runner is thrown away
+      # with the .xcarchive, and 2609.18.0 showed the in-lane Crashlytics upload
+      # can be cut short when the job ends. With the artifact, symbols can be
+      # re-uploaded later with
+      #   upload-symbols -gsp ios/Runner/GoogleService-Info.plist -p ios <dir>
+      # Runs even when a later step failed, as long as gym produced an archive.
+      - name: Collect iOS dSYMs
+        id: dsyms
+        if: ${{ !cancelled() }}
+        run: |
+          archive=$(ls -dt ~/Library/Developer/Xcode/Archives/*/*.xcarchive 2>/dev/null | head -1)
+          if [ -z "$archive" ] || [ ! -d "$archive/dSYMs" ]; then
+            echo "No .xcarchive with a dSYMs folder found; nothing to keep."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          version=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+/-/')
+          mkdir -p /tmp/ios-dsyms
+          cp -R "$archive/dSYMs/." /tmp/ios-dsyms/
+          echo "Kept dSYMs from: $archive"
+          ls /tmp/ios-dsyms
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "name=ios-dsyms-$version" >> "$GITHUB_OUTPUT"
+
+      - name: Upload iOS dSYM artifact
+        if: ${{ !cancelled() && steps.dsyms.outputs.found == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.dsyms.outputs.name }}
+          path: /tmp/ios-dsyms
+          # Same window as the APK artifact; long enough to symbolicate a
+          # release for its whole time on the store.
+          retention-days: 90
+
   # After a successful deploy, tag the built commit with the pubspec version
   # (bare semver, no v prefix — matches existing tags). Runs only when at
   # least one deploy job actually deployed, and is a no-op if the tag already
