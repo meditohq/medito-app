@@ -23,6 +23,9 @@ Unreleased
 - Pack screens: the pin icon is now a clear "Set as Your Path" row, showing your progress once set
 - Tapping the star now confirms "Added to Favorites" / "Removed from Favorites"
 
+2609.18.1
+- Fixes a crash when opening the app on some iPhones running iOS 17 or 18
+
 2609.18.0
 - After a session you can now save your progress by creating a free account, so your streak and stats are kept safe
 - A simpler welcome screen with one clear button to get started
