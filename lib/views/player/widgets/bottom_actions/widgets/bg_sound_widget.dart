@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +23,8 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(seconds: 2),
+      // 33⅓ rpm — one revolution every 1.8s, like a real turntable.
+      duration: const Duration(milliseconds: 1800),
       vsync: this,
     );
     if (widget.isBackgroundSoundSelected) {
@@ -70,17 +73,59 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
   }
 
   Widget _spinningIcon() {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return Transform.rotate(
-          angle: _animationController.value * 2 * 3.1415926535897932,
-          child: MeditoIcon(
-            assetName: MeditoIcons.compactDiscSolid,
-            color: ColorConstants.white,
-          ),
-        );
-      },
+    return RotationTransition(
+      turns: _animationController,
+      child: const CustomPaint(
+        size: Size.square(24),
+        painter: _VinylPainter(color: ColorConstants.white),
+      ),
     );
   }
+}
+
+/// A single-colour vinyl record in the style of the other action-bar icons:
+/// a solid disc with short groove arcs, the label edge and the spindle hole
+/// cut out. The arcs are off-centre, so the spin is visible.
+class _VinylPainter extends CustomPainter {
+  const _VinylPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final r = size.shortestSide / 2;
+    final cut = Paint()
+      ..blendMode = BlendMode.clear
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = r * 0.08
+      ..strokeCap = StrokeCap.round;
+
+    void groove(double radius, double startDeg, double sweepDeg) =>
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: r * radius),
+          startDeg * math.pi / 180,
+          sweepDeg * math.pi / 180,
+          false,
+          cut,
+        );
+
+    canvas.saveLayer(Offset.zero & size, Paint());
+    canvas.drawCircle(center, r, Paint()..color = color);
+
+    groove(0.74, 195, 60);
+    groove(0.58, 205, 40);
+    groove(0.74, 20, 45);
+
+    canvas.drawCircle(center, r * 0.34, cut);
+    canvas.drawCircle(
+      center,
+      r * 0.1,
+      Paint()..blendMode = BlendMode.clear,
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_VinylPainter oldDelegate) => oldDelegate.color != color;
 }
