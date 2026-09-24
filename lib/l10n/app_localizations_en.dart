@@ -2256,7 +2256,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Learn meditation one minute at a time. Sessions get longer as you learn.';
 
   @override
-  String get yourPathExplainerSwipeHint => 'Swipe left to skip.';
+  String get yourPathExplainerSwipeHint =>
+      'Swipe left to skip or open the pack.';
 
   @override
   String get onboardingStep1of2 => '1 of 2';
@@ -2370,6 +2371,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get removeFromFavorites => 'Remove from favorites';
 
   @override
+  String get openPack => 'Open pack';
+
+  @override
+  String showOnHomeReplaced(String pack, String previous) {
+    return '$pack is now on Home, replacing $previous.';
+  }
+
+  @override
+  String showOnHomeDone(String pack) {
+    return '$pack is now on Home.';
+  }
+
+  @override
+  String get showOnHome => 'Show on Home';
+
+  @override
+  String yourPathStatusTitle(int completed, int total) {
+    return 'Your Path · $completed of $total';
+  }
+
+  @override
+  String yourPathNextSession(String title) {
+    return 'Next: $title';
+  }
+
+  @override
+  String get yourPathAllDone => 'All sessions done';
+
+  @override
+  String get yourPathOptions => 'Your Path options';
+
+  @override
   String get setAsYourPath => 'Set as Your Path';
 
   @override
@@ -2386,14 +2419,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourPathSheetBody =>
-      'Your next session from this pack shows on the home screen and in the home widget.';
+      'Home picks up this pack where you left off, with your next session ready to play. The Medito widget shows it too, if you\'ve added one to your phone.';
 
   @override
   String get yourPathDefaultNote =>
-      'This is your starting path. To change it, open another pack and set it as Your Path.';
+      'This is where everyone starts. To follow a different pack, open it and tap Show on Home.';
 
   @override
-  String get removeFromYourPath => 'Remove from Your Path';
+  String get removeFromYourPath => 'Stop showing on Home';
 
   @override
   String get connectionErrorTitle => 'Couldn\'t load paywall';

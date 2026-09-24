@@ -3,23 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/pack_sequence.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
-import 'package:medito/routes/routes.dart';
-import 'package:medito/utils/logger.dart';
-import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/providers/duration_preference_provider.dart';
-import 'package:medito/providers/guide_name_preference_provider.dart';
-import 'package:medito/providers/meditation/track_provider.dart';
-import 'package:medito/models/models.dart';
-import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:medito/views/player/player_view.dart';
+import 'package:medito/views/player/start_session.dart';
+import 'package:medito/routes/routes.dart';
+import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'dart:async';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -419,7 +414,18 @@ class _UpNextContent extends ConsumerStatefulWidget {
   ConsumerState<_UpNextContent> createState() => _UpNextContentState();
 }
 
-class _UpNextContentState extends ConsumerState<_UpNextContent> {
+class _UpNextContentState extends ConsumerState<_UpNextContent>
+    with SingleTickerProviderStateMixin {
+  // Swiping reveals Open pack / Skip; a tap while open should close the menu
+  // rather than start a session.
+  late final SlidableController _slidable = SlidableController(this);
+
+  @override
+  void dispose() {
+    _slidable.dispose();
+    super.dispose();
+  }
+
   bool _skipping = false;
   // True while the track is being fetched and the player is opening. Shows a
   // spinner in the play button and blocks a duplicate tap.
@@ -442,21 +448,38 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
         padding: EdgeInsets.symmetric(horizontal: isHero ? 0 : padding16),
         child: ClipRRect(
           borderRadius: borderRadius,
-          child: Dismissible(
+          child: Slidable(
             key: Key('up_next_${nextSession.id}'),
-            direction: DismissDirection.endToStart,
-            background: _getSkipBackground(context, l10n, palette),
-            movementDuration: const Duration(milliseconds: 1),
-            confirmDismiss: (_) async {
-              await _onSkip(context);
-              return false;
-            },
+            controller: _slidable,
+            endActionPane: ActionPane(
+              motion: const BehindMotion(),
+              extentRatio: 0.5,
+              // No full-swipe action: both Open pack and Skip are buttons
+              // behind the menu, so a swipe only ever reveals them.
+              children: [
+                _swipeAction(
+                  palette: palette,
+                  icon: Icons.menu_book_rounded,
+                  label: l10n.openPack,
+                  onPressed: () => _onOpenPack(context),
+                ),
+                _swipeAction(
+                  palette: palette,
+                  showDivider: true,
+                  icon: Icons.skip_next_rounded,
+                  label: l10n.skip,
+                  onPressed: () => _onSkip(context),
+                ),
+              ],
+            ),
             child: Semantics(
               label:
                   '${l10n.upNext}: ${widget.data.pack.title} — ${nextSession.title}',
               button: true,
               customSemanticsActions: {
                 CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
+                CustomSemanticsAction(label: l10n.openPack): () =>
+                    _onOpenPack(context),
               },
               child: GestureDetector(
                 // The hero style has no card surface behind the content, so
@@ -571,40 +594,70 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     );
   }
 
-  Widget _getSkipBackground(
-    BuildContext context,
-    AppLocalizations l10n,
-    _UpNextPalette palette,
-  ) {
+  Widget _swipeAction({
+    required _UpNextPalette palette,
+    bool showDivider = false,
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
     final theme = Theme.of(context);
-    final iconColor = palette.foreground;
-
-    return Container(
-      color: palette.skipBackground,
-      child: Padding(
-        padding: const EdgeInsets.all(padding16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.skip_next_rounded, color: iconColor, size: 28),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.skip,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: iconColor,
-                    fontWeight: FontWeight.w600,
+    // Custom rather than SlidableAction: its default label style is too large
+    // for half-width tiles and wrapped "Open pack" out of view.
+    return CustomSlidableAction(
+      onPressed: (_) => onPressed(),
+      // One surface for both actions (two tones looked patchy over the
+      // artwork); a hairline separates them instead.
+      backgroundColor: palette.skipBackground,
+      foregroundColor: palette.foreground,
+      padding: EdgeInsets.zero,
+      child: Container(
+        decoration: showDivider
+            ? BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: palette.foreground.withValues(alpha: 0.2),
+                    width: 0.5,
                   ),
                 ),
-              ],
+              )
+            : null,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: palette.foreground, size: 28),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: palette.foreground,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _onOpenPack(BuildContext context) {
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.upNextPackOpened,
+            parameters: _upNextEventParams(widget.data),
+          ),
+    );
+    handleNavigation(
+      TypeConstants.pack,
+      [widget.data.pack.id],
+      context,
+      ref: ref,
     );
   }
 
@@ -647,6 +700,10 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     final nextSession = widget.data.nextSession;
     if (nextSession == null) return;
     if (_isStarting) return;
+    if (_slidable.ratio != 0) {
+      unawaited(_slidable.close());
+      return;
+    }
 
     unawaited(
       ref
@@ -665,60 +722,17 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
           .logFirstActionAfterOnboardingIfNeeded('up_next'),
     );
 
-    final guideName = ref.read(guideNamePreferenceProvider);
-    final preferredDuration = ref.read(durationPreferenceProvider);
-
-    if (guideName != null && preferredDuration != null) {
-      setState(() => _isStarting = true);
-      try {
-        final track = await ref.read(
-          tracksProvider(trackId: nextSession.id).future,
-        );
-        final selection = TrackVariantSelector.resolve(
-          track,
-          guideName: guideName,
-          durationMs: preferredDuration,
-        );
-
-        final request = PlaybackRequest.fromTrack(
-          track,
-          selection.voice,
-          selection.file,
-        );
-        if (!context.mounted) return;
-        // Prepare + open the player immediately; PlayerView starts playback
-        // and shows its own loading state. The button spinner covers only the
-        // track fetch above.
-        ref.read(playerProvider.notifier).prepare(request);
-        _navigateToPlayer(context);
-      } catch (e, st) {
-        // The track fetch failed (offline / bad response) so we never reached
-        // the player — surface it here rather than leaving a dead tap.
-        AppLogger.e('UP_NEXT', 'Failed to start playback from Up Next', e, st);
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.unableToLoadAudio),
-          ),
-        );
-      } finally {
-        if (mounted) setState(() => _isStarting = false);
-      }
-    } else {
-      handleNavigation(
-        TypeConstants.track,
-        [nextSession.id, nextSession.path],
+    setState(() => _isStarting = true);
+    try {
+      await startSession(
         context,
-        ref: ref,
+        ref,
+        trackId: nextSession.id,
+        path: nextSession.path,
       );
+    } finally {
+      if (mounted) setState(() => _isStarting = false);
     }
-  }
-
-  void _navigateToPlayer(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PlayerView()),
-    );
   }
 }
 

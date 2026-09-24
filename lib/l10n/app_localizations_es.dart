@@ -2292,7 +2292,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'Learn meditation one minute at a time. Sessions get longer as you learn.';
 
   @override
-  String get yourPathExplainerSwipeHint => 'Swipe left to skip.';
+  String get yourPathExplainerSwipeHint =>
+      'Swipe left to skip or open the pack.';
 
   @override
   String get onboardingStep1of2 => '1 de 2';
@@ -2406,6 +2407,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get removeFromFavorites => 'Quitar de favoritos';
 
   @override
+  String get openPack => 'Abrir paquete';
+
+  @override
+  String showOnHomeReplaced(String pack, String previous) {
+    return '$pack está ahora en Inicio, en lugar de $previous.';
+  }
+
+  @override
+  String showOnHomeDone(String pack) {
+    return '$pack está ahora en Inicio.';
+  }
+
+  @override
+  String get showOnHome => 'Mostrar en Inicio';
+
+  @override
+  String yourPathStatusTitle(int completed, int total) {
+    return 'Tu Camino · $completed de $total';
+  }
+
+  @override
+  String yourPathNextSession(String title) {
+    return 'Siguiente: $title';
+  }
+
+  @override
+  String get yourPathAllDone => 'Todas las sesiones completadas';
+
+  @override
+  String get yourPathOptions => 'Opciones de Tu Camino';
+
+  @override
   String get setAsYourPath => 'Elegir como Tu Camino';
 
   @override
@@ -2422,14 +2455,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get yourPathSheetBody =>
-      'Tu próxima sesión de este paquete se muestra en la pantalla de inicio y en el widget.';
+      'Inicio retoma este paquete donde lo dejaste, con tu próxima sesión lista para reproducir. El widget de Medito también la muestra, si lo has añadido a tu teléfono.';
 
   @override
   String get yourPathDefaultNote =>
-      'Este es tu camino inicial. Para cambiarlo, abre otro paquete y elígelo como Tu Camino.';
+      'Aquí empieza todo el mundo. Para seguir otro paquete, ábrelo y toca Mostrar en Inicio.';
 
   @override
-  String get removeFromYourPath => 'Quitar de Tu Camino';
+  String get removeFromYourPath => 'Dejar de mostrar en Inicio';
 
   @override
   String get connectionErrorTitle => 'No se pudo cargar el paywall';

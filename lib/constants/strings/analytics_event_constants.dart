@@ -418,6 +418,9 @@ class AnalyticsEventConstants {
   /// Event logged when user swipes to skip the Up Next session
   static const String upNextSkipped = 'up_next_skipped';
 
+  /// User opened the Up Next pack from the card's swipe menu.
+  static const String upNextPackOpened = 'up_next_pack_opened';
+
   /// The pinned pack is finished and the completed state was shown.
   static const String upNextPackCompleted = 'up_next_pack_completed';
 

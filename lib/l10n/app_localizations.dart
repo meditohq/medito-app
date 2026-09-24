@@ -4151,7 +4151,7 @@ abstract class AppLocalizations {
   /// Stage 2 text in the Your Path explainer strip, shown after the user taps Got it
   ///
   /// In en, this message translates to:
-  /// **'Swipe left to skip.'**
+  /// **'Swipe left to skip or open the pack.'**
   String get yourPathExplainerSwipeHint;
 
   /// Step indicator label on onboarding question screen 1 (of 2)
@@ -4358,6 +4358,54 @@ abstract class AppLocalizations {
   /// **'Remove from favorites'**
   String get removeFromFavorites;
 
+  /// Swipe action on the home Your Path card that opens the pack
+  ///
+  /// In en, this message translates to:
+  /// **'Open pack'**
+  String get openPack;
+
+  /// Snackbar after Show on Home when it replaced the pack Home was showing
+  ///
+  /// In en, this message translates to:
+  /// **'{pack} is now on Home, replacing {previous}.'**
+  String showOnHomeReplaced(String pack, String previous);
+
+  /// Snackbar after Show on Home when the previous pack's name isn't known
+  ///
+  /// In en, this message translates to:
+  /// **'{pack} is now on Home.'**
+  String showOnHomeDone(String pack);
+
+  /// Pack screen button: makes this pack Your Path, the pack the home screen continues
+  ///
+  /// In en, this message translates to:
+  /// **'Show on Home'**
+  String get showOnHome;
+
+  /// Pack screen status row title when this pack is Your Path
+  ///
+  /// In en, this message translates to:
+  /// **'Your Path · {completed} of {total}'**
+  String yourPathStatusTitle(int completed, int total);
+
+  /// Pack screen status row subtitle naming the session that plays on tap
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {title}'**
+  String yourPathNextSession(String title);
+
+  /// Pack screen status row subtitle when every session in Your Path is complete
+  ///
+  /// In en, this message translates to:
+  /// **'All sessions done'**
+  String get yourPathAllDone;
+
+  /// Accessibility label for the menu button on the Your Path status row
+  ///
+  /// In en, this message translates to:
+  /// **'Your Path options'**
+  String get yourPathOptions;
+
   /// Button on the pack screen that makes this pack the one shown in the Your Path section on the home screen
   ///
   /// In en, this message translates to:
@@ -4385,19 +4433,19 @@ abstract class AppLocalizations {
   /// Body of the sheet opened from the Your Path button, explaining what Your Path does
   ///
   /// In en, this message translates to:
-  /// **'Your next session from this pack shows on the home screen and in the home widget.'**
+  /// **'Home picks up this pack where you left off, with your next session ready to play. The Medito widget shows it too, if you\'ve added one to your phone.'**
   String get yourPathSheetBody;
 
   /// Shown in the Your Path sheet for the default pack, which cannot be removed
   ///
   /// In en, this message translates to:
-  /// **'This is your starting path. To change it, open another pack and set it as Your Path.'**
+  /// **'This is where everyone starts. To follow a different pack, open it and tap Show on Home.'**
   String get yourPathDefaultNote;
 
   /// Action in the Your Path sheet that stops showing this pack on the home screen
   ///
   /// In en, this message translates to:
-  /// **'Remove from Your Path'**
+  /// **'Stop showing on Home'**
   String get removeFromYourPath;
 
   /// Title shown when the donation paywall webview fails to load

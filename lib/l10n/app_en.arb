@@ -1538,7 +1538,7 @@
   "@yourPathExplainerText": {
     "description": "Stage 1 text in the Your Path explainer strip shown below the card on the home screen"
   },
-  "yourPathExplainerSwipeHint": "Swipe left to skip.",
+  "yourPathExplainerSwipeHint": "Swipe left to skip or open the pack.",
   "@yourPathExplainerSwipeHint": {
     "description": "Stage 2 text in the Your Path explainer strip, shown after the user taps Got it"
   },
@@ -1686,6 +1686,58 @@
   "@removeFromFavorites": {
     "description": "Accessibility label for the favorite button when the item is already favorited"
   },
+  "openPack": "Open pack",
+  "@openPack": {
+    "description": "Swipe action on the home Your Path card that opens the pack"
+  },
+  "showOnHomeReplaced": "{pack} is now on Home, replacing {previous}.",
+  "@showOnHomeReplaced": {
+    "description": "Snackbar after Show on Home when it replaced the pack Home was showing",
+    "placeholders": {
+      "pack": {"type": "String"},
+      "previous": {"type": "String"}
+    }
+  },
+  "showOnHomeDone": "{pack} is now on Home.",
+  "@showOnHomeDone": {
+    "description": "Snackbar after Show on Home when the previous pack's name isn't known",
+    "placeholders": {
+      "pack": {"type": "String"}
+    }
+  },
+  "showOnHome": "Show on Home",
+  "@showOnHome": {
+    "description": "Pack screen button: makes this pack Your Path, the pack the home screen continues"
+  },
+  "yourPathStatusTitle": "Your Path · {completed} of {total}",
+  "@yourPathStatusTitle": {
+    "description": "Pack screen status row title when this pack is Your Path",
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "yourPathNextSession": "Next: {title}",
+  "@yourPathNextSession": {
+    "description": "Pack screen status row subtitle naming the session that plays on tap",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "yourPathAllDone": "All sessions done",
+  "@yourPathAllDone": {
+    "description": "Pack screen status row subtitle when every session in Your Path is complete"
+  },
+  "yourPathOptions": "Your Path options",
+  "@yourPathOptions": {
+    "description": "Accessibility label for the menu button on the Your Path status row"
+  },
   "setAsYourPath": "Set as Your Path",
   "@setAsYourPath": {
     "description": "Button on the pack screen that makes this pack the one shown in the Your Path section on the home screen"
@@ -1703,15 +1755,15 @@
   "@yourPathSheetTitle": {
     "description": "Title of the sheet opened from the Your Path button on the pack screen"
   },
-  "yourPathSheetBody": "Your next session from this pack shows on the home screen and in the home widget.",
+  "yourPathSheetBody": "Home picks up this pack where you left off, with your next session ready to play. The Medito widget shows it too, if you've added one to your phone.",
   "@yourPathSheetBody": {
     "description": "Body of the sheet opened from the Your Path button, explaining what Your Path does"
   },
-  "yourPathDefaultNote": "This is your starting path. To change it, open another pack and set it as Your Path.",
+  "yourPathDefaultNote": "This is where everyone starts. To follow a different pack, open it and tap Show on Home.",
   "@yourPathDefaultNote": {
     "description": "Shown in the Your Path sheet for the default pack, which cannot be removed"
   },
-  "removeFromYourPath": "Remove from Your Path",
+  "removeFromYourPath": "Stop showing on Home",
   "@removeFromYourPath": {
     "description": "Action in the Your Path sheet that stops showing this pack on the home screen"
   },

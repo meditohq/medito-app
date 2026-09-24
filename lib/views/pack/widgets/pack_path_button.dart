@@ -12,16 +12,22 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/scaffold_messenger_key.dart';
+import 'package:medito/views/player/start_session.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 
-/// Full-width "Set as Your Path" button on the pack screen.
+/// Your Path control on the pack screen, built to get people into their next
+/// session in one tap.
 ///
-/// Replaces the old pin icon in the bottom action bar, which read as a second
-/// favourite. Only one pack can be Your Path at a time; setting a new one
-/// replaces the previous, and the snackbar says so.
+/// - Not Your Path: a "Show on Home" button that makes this pack Your Path.
+///   It does only that — playing is the status row's job, one tap later.
+/// - Your Path: a status row ("Your Path · 1 of 23", "Next: …") whose tap
+///   plays that next session; the ⋯ button holds the explainer and Remove.
 ///
-/// Hidden for packs that contain sub-packs and for the favourites pseudo-pack:
-/// Up Next walks a flat list of tracks.
-class PackPathButton extends ConsumerWidget {
+/// Only one pack can be Your Path at a time; setting a new one replaces the
+/// previous. Hidden for packs that contain sub-packs and for the favourites
+/// pseudo-pack: Up Next walks a flat list of tracks.
+class PackPathButton extends ConsumerStatefulWidget {
   const PackPathButton({super.key, required this.pack});
 
   final PackModel pack;
@@ -29,107 +35,192 @@ class PackPathButton extends ConsumerWidget {
   static const _favoritesPackId = 'favorites';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PackPathButton> createState() => _PackPathButtonState();
+}
+
+class _PackPathButtonState extends ConsumerState<PackPathButton> {
+  bool _starting = false;
+
+  PackModel get pack => widget.pack;
+
+  @override
+  Widget build(BuildContext context) {
     final trackItems = pack.items
         .where((item) => item.type == TypeConstants.track)
         .toList();
     final onlyTracks = trackItems.length == pack.items.length;
-    if (trackItems.isEmpty || !onlyTracks || pack.id == _favoritesPackId) {
+    if (trackItems.isEmpty ||
+        !onlyTracks ||
+        pack.id == PackPathButton._favoritesPackId) {
       return const SizedBox.shrink();
     }
 
-    final l10n = AppLocalizations.of(context)!;
     final isCurrent = ref.watch(upNextPackIdProvider) == pack.id;
-
-    final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface;
     final completed = trackItems
         .where((item) => item.isCompleted == true)
         .length;
-
-    final title = isCurrent ? l10n.upNextTitle : l10n.setAsYourPath;
-    final subtitle = isCurrent
-        ? l10n.yourPathRowSubtitle(completed, trackItems.length)
-        : l10n.setAsYourPathSubtitle;
+    // Same rule as upNextProvider, so this plays what Home would.
+    final next = trackItems
+        .where((item) => item.isCompleted != true)
+        .firstOrNull;
 
     // Lives inside the description block (cardColor), separated from the
     // text by a hairline: part of the pack's header, not a row in the list.
+    return Column(
+      children: [
+        Divider(
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withValues(alpha: 0.08),
+          thickness: 0.5,
+          height: 0.5,
+        ),
+        isCurrent
+            ? _statusRow(context, next, completed, trackItems.length)
+            : _showOnHomeButton(context),
+      ],
+    );
+  }
+
+  Widget _showOnHomeButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    // Tonal, not filled: this is a shortcut, so it sits inside the header
+    // rather than out-shouting the track list. Same 64px as the status row
+    // so the header doesn't jump when it flips.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: FilledButton.icon(
+        onPressed: () => _setAsPath(context, ref),
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(48),
+          backgroundColor: onSurface.withValues(alpha: 0.08),
+          disabledBackgroundColor: onSurface.withValues(alpha: 0.08),
+          foregroundColor: onSurface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: theme.textTheme.bodyLarge?.copyWith(
+            fontFamily: googleSans,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        icon: const Icon(Icons.home_outlined, size: 22),
+        label: Text(l10n.showOnHome),
+      ),
+    );
+  }
+
+  Widget _statusRow(
+    BuildContext context,
+    PackItemsModel? next,
+    int completed,
+    int total,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final title = l10n.yourPathStatusTitle(completed, total);
+    final subtitle = next != null
+        ? l10n.yourPathNextSession(next.title)
+        : l10n.yourPathAllDone;
+
     return Semantics(
       button: true,
       label: '$title. $subtitle',
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(
-          onTap: () => isCurrent
-              ? _showCurrentSheet(context, ref)
-              : _setAsPath(context, ref),
-          child: Column(
-            children: [
-              Divider(
-                color: onSurface.withValues(alpha: 0.08),
-                thickness: 0.5,
-                height: 0.5,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 16, 12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isCurrent
-                            ? context.brandPurple
-                            : onSurface.withValues(alpha: 0.08),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        isCurrent ? Icons.check_rounded : Icons.route_outlined,
-                        size: 17,
-                        color: isCurrent ? context.onBrandPurple : onSurface,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              fontFamily: googleSans,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
+          onTap: next != null
+              ? () => _play(context, next)
+              : () => _showCurrentSheet(context),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 4, 8),
+            child: Row(
+              children: [
+                // Play, not a tick: a check here read as "pack completed"
+                // right above the track completion ticks.
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: next != null
+                        ? context.brandPurple
+                        : onSurface.withValues(alpha: 0.08),
+                  ),
+                  alignment: Alignment.center,
+                  child: _starting
+                      ? SizedBox.square(
+                          dimension: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: context.onBrandPurple,
                           ),
-                          Text(
-                            subtitle,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontFamily: googleSans,
-                              fontSize: 12,
-                              color: onSurface.withValues(alpha: 0.65),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20,
-                      color: onSurface.withValues(alpha: 0.45),
-                    ),
-                  ],
+                        )
+                      : Icon(
+                          next != null
+                              ? Icons.play_arrow_rounded
+                              : Icons.route_outlined,
+                          size: 20,
+                          color: next != null
+                              ? context.onBrandPurple
+                              : onSurface,
+                        ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontFamily: googleSans,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontFamily: googleSans,
+                          fontSize: 12,
+                          color: onSurface.withValues(alpha: 0.65),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _showCurrentSheet(context),
+                  tooltip: l10n.yourPathOptions,
+                  icon: Icon(
+                    Icons.more_horiz_rounded,
+                    color: onSurface.withValues(alpha: 0.65),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _play(BuildContext context, PackItemsModel next) async {
+    if (_starting) return;
+    setState(() => _starting = true);
+    try {
+      await startSession(context, ref, trackId: next.id, path: next.path);
+    } finally {
+      if (mounted) setState(() => _starting = false);
+    }
   }
 
   Future<void> _setAsPath(BuildContext context, WidgetRef ref) async {
@@ -147,13 +238,44 @@ class PackPathButton extends ConsumerWidget {
           ),
     );
 
-    // The row flipping to its "Your Path" state is the confirmation; no
-    // snackbar. Only one pack can be Your Path, so this replaces the previous
-    // one — progress lives in stats, so nothing is lost.
-    await ref
-        .read(sharedPreferencesProvider)
-        .setString(SharedPreferenceConstants.upNextPackId, pack.id);
+    // Only one pack can be Your Path, so this replaces the previous one —
+    // progress lives in stats, so nothing is lost. Replacing is the surprising
+    // part (Home stops showing what you were doing), so the snackbar names the
+    // old pack and offers Undo.
+    final prefs = ref.read(sharedPreferencesProvider);
+    // Null when Home was on the default pack without an explicit choice; Undo
+    // restores exactly that.
+    final previousRaw = prefs.getString(SharedPreferenceConstants.upNextPackId);
+    final previousTitle = previousId == pack.id
+        ? null
+        : ref.read(packProvider(packId: previousId)).value?.title;
+    // Container, not ref: Undo can be tapped after leaving this screen.
+    final container = ProviderScope.containerOf(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+
+    await prefs.setString(SharedPreferenceConstants.upNextPackId, pack.id);
     ref.invalidate(upNextPackIdProvider);
+
+    if (previousId == pack.id) return;
+    scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+    showSnackBar(
+      context.mounted ? context : null,
+      previousTitle != null
+          ? l10n.showOnHomeReplaced(pack.title, previousTitle)
+          : l10n.showOnHomeDone(pack.title),
+      actionLabel: l10n.undo,
+      onActionPressed: () async {
+        if (previousRaw == null) {
+          await prefs.remove(SharedPreferenceConstants.upNextPackId);
+        } else {
+          await prefs.setString(
+            SharedPreferenceConstants.upNextPackId,
+            previousRaw,
+          );
+        }
+        container.invalidate(upNextPackIdProvider);
+      },
+    );
   }
 
   Future<void> _removeFromPath(WidgetRef ref) async {
@@ -173,7 +295,7 @@ class PackPathButton extends ConsumerWidget {
     ref.invalidate(upNextPackIdProvider);
   }
 
-  void _showCurrentSheet(BuildContext context, WidgetRef ref) {
+  void _showCurrentSheet(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDefaultPack = pack.id == ConfigConstants.basicsPackId;
