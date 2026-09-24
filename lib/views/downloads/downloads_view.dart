@@ -90,7 +90,10 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
               onTap: () => ref.refresh(downloadedTracksProvider),
             );
           },
-          loading: () => const TrackShimmerWidget(),
+          loading: () => const SingleChildScrollView(
+            padding: EdgeInsets.all(20),
+            child: TrackShimmerWidget(),
+          ),
         ),
       ),
     );
