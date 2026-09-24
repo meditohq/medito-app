@@ -1,4 +1,5 @@
 import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -72,12 +73,17 @@ class BackgroundSoundView extends ConsumerWidget {
     List<BackgroundSoundsModel> data, {
     Widget? footer,
   }) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
     // Volume stays pinned above the scrolling list. No pull-to-refresh: in a
     // sheet, pulling down at the top should collapse the sheet, and the error
     // footer already offers a retry.
     return Column(
       children: [
         const VolumeSliderWidget(),
+        // Breathing room between the pinned volume bar and the list.
+        const SizedBox(height: 12),
         Expanded(
           child: ListView(
             controller: scrollController,
@@ -85,6 +91,8 @@ class BackgroundSoundView extends ConsumerWidget {
               bottom: MediaQuery.paddingOf(context).bottom + 16,
             ),
             children: [
+              // "Off" and bells come first, split from the sound list by the
+              // section label, so None reads as turning sound off, not a track.
               const SoundListTileWidget(
                 sound: BackgroundSoundsModel(
                   id: kNoneBackgroundSoundId,
@@ -94,6 +102,20 @@ class BackgroundSoundView extends ConsumerWidget {
                 ),
               ),
               const SoundListTileWidget(sound: kSessionBellsSound),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
+                child: Text(
+                  AppLocalizations.of(
+                    context,
+                  )!.backgroundSoundsSection.toUpperCase(),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.8,
+                    color: onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
               ...data
                   .where(
                     (sound) =>

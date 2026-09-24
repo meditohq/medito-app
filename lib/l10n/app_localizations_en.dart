@@ -2216,6 +2216,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get speedReset => 'Reset';
 
   @override
+  String get backgroundSoundsSection => 'Sounds';
+
+  @override
   String get reportIssue => 'Report issue';
 
   @override

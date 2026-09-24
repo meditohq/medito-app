@@ -4070,6 +4070,12 @@ abstract class AppLocalizations {
   /// **'Reset'**
   String get speedReset;
 
+  /// Background sound sheet: label above the list of ambient sounds
+  ///
+  /// In en, this message translates to:
+  /// **'Sounds'**
+  String get backgroundSoundsSection;
+
   /// Accessibility label for the report button in the player
   ///
   /// In en, this message translates to:

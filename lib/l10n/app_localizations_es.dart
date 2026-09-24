@@ -2252,6 +2252,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get speedReset => 'Restablecer';
 
   @override
+  String get backgroundSoundsSection => 'Sonidos';
+
+  @override
   String get reportIssue => 'Reportar problema';
 
   @override

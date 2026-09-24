@@ -1482,6 +1482,10 @@
   "@speedReset": {
     "description": "Speed sheet: button that sets playback speed back to 1.0x"
   },
+  "backgroundSoundsSection": "Sounds",
+  "@backgroundSoundsSection": {
+    "description": "Background sound sheet: label above the list of ambient sounds"
+  },
   "reportIssue": "Report issue",
   "@reportIssue": {
     "description": "Accessibility label for the report button in the player"

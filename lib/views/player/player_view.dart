@@ -369,8 +369,18 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         // animate from the old streak to the current one.
         unawaited(ref.read(dndProvider.notifier).setDndMode(false));
 
-        Navigator.pushReplacement(
-          context,
+        // pushReplacement swaps whatever route is on top. If a sheet (repeat,
+        // speed, background sound) is open when the session ends, that would
+        // replace the sheet and leave the player underneath, so back from the
+        // end screen returned to the player. Close anything above the player
+        // first so the end screen always replaces the player itself.
+        final navigator = Navigator.of(context);
+        final playerRoute = ModalRoute.of(context);
+        if (playerRoute != null && playerRoute.isActive) {
+          navigator.popUntil((route) => route == playerRoute);
+        }
+
+        navigator.pushReplacement(
           MaterialPageRoute(
             builder: (context) => EndScreenView(
               request: currentlyPlayingTrack,
