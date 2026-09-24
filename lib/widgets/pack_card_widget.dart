@@ -2,6 +2,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/widgets/network_image_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/views/pack/widgets/pack_complete_badge.dart';
 
 class PackCardWidget extends StatefulWidget {
   const PackCardWidget({
@@ -10,12 +11,16 @@ class PackCardWidget extends StatefulWidget {
     this.subTitle,
     this.coverUrlPath,
     this.onTap,
+    this.isCompleted = false,
   });
 
   final String title;
   final String? subTitle;
   final String? coverUrlPath;
   final void Function()? onTap;
+
+  /// Shows a tick when every session in the pack is complete.
+  final bool isCompleted;
 
   @override
   State<PackCardWidget> createState() => _PackCardWidgetState();
@@ -31,7 +36,7 @@ class _PackCardWidgetState extends State<PackCardWidget> {
     final titleColor = theme.colorScheme.onSurface;
     final subtitleColor = theme.colorScheme.onSurface;
 
-    return HomeGradientBorder(
+    final card = HomeGradientBorder(
       backgroundColor: backgroundColor,
       borderRadius: 14,
       borderWidth: 0.5,
@@ -62,6 +67,14 @@ class _PackCardWidgetState extends State<PackCardWidget> {
           ],
         ),
       ),
+    );
+
+    if (!widget.isCompleted) return card;
+    return Stack(
+      children: [
+        card,
+        const Positioned(top: 10, right: 10, child: PackCompleteBadge()),
+      ],
     );
   }
 

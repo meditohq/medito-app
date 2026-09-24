@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/mock/mock_data.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/utils/logger.dart';
@@ -59,6 +60,19 @@ class MockHttpApiService extends HttpApiService {
     // Announcement
     if (cleanPath.startsWith('announcements')) {
       return mockAnnouncement.toJson();
+    }
+
+    // Pack -> track ids (must precede pack detail, which matches packs/*)
+    if (cleanPath == HTTPConstants.packTracks) {
+      return {
+        'packTracks': {
+          for (final pack in mockPacks)
+            pack.id: [
+              for (final item in pack.items)
+                if (item.type == TypeConstants.track) item.id,
+            ],
+        },
+      };
     }
 
     // Pack detail: packs/{id}

@@ -9,6 +9,9 @@ abstract class PacksRepository {
   Future<List<PackModel>> fetchAllPacks();
 
   Future<PackModel> fetchPacks(String packId);
+
+  /// Every pack's track ids, including tracks in its sub-packs.
+  Future<Map<String, List<String>>> fetchPackTrackIds();
 }
 
 class PackRepositoryImpl extends PacksRepository {
@@ -44,6 +47,23 @@ class PackRepositoryImpl extends PacksRepository {
     var response = await client.getRequest('${HTTPConstants.packs}/$packId');
 
     return PackModel.fromJson(response);
+  }
+
+  @override
+  Future<Map<String, List<String>>> fetchPackTrackIds() async {
+    final response = await client.getRequest(HTTPConstants.packTracks);
+    final packTracks = response['packTracks'];
+    if (packTracks is! Map) {
+      throw FormatException('Expected packTracks map, got $response');
+    }
+    return {
+      for (final entry in packTracks.entries)
+        if (entry.value is List)
+          entry.key as String: [
+            for (final id in entry.value as List)
+              if (id is String) id,
+          ],
+    };
   }
 }
 
