@@ -9,7 +9,7 @@ import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/settings/widgets/app_icon_option.dart';
-import 'package:medito/widgets/radio_option_card.dart';
+import 'package:medito/constants/constants.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
 /// Settings row for the home-screen icon: shows the current icon as a preview
@@ -115,10 +115,12 @@ class _AppIconTileState extends State<AppIconTile> {
   }
 }
 
-const _kPreviewSize = 36.0;
+const _kPreviewSize = 60.0;
 
-/// Bottom sheet listing the available icons as radio option cards with a
-/// preview of each. Pops with the chosen [AppIconOption].
+/// Bottom sheet showing the available icons as a grid of large previews with
+/// their names; the current one gets a ring. The icon is what's being chosen,
+/// so it leads rather than sitting small beside a text label. Pops with the
+/// chosen [AppIconOption].
 class AppIconSheet extends StatelessWidget {
   const AppIconSheet({super.key, required this.current});
 
@@ -130,60 +132,124 @@ class AppIconSheet extends StatelessWidget {
     final options = AppIconOption.availableOptions;
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    final maxHeight = MediaQuery.sizeOf(context).height * 0.8;
 
     return SafeArea(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: maxHeight),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Text(
-                l10n.appIconTitle,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+            Text(
+              l10n.appIconTitle,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: onSurface,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            Flexible(
-              child: ListView.separated(
-                shrinkWrap: true,
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                itemCount: options.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (context, i) {
-                  final option = options[i];
-                  return RadioOptionCard(
-                    title: option.displayName(context),
-                    selected: option == current,
-                    // Hairline so the white Classic icon still reads as a
-                    // tile on the light card surface.
-                    trailing: Container(
-                      // Foreground, or the icon paints over the edge.
-                      foregroundDecoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          _kPreviewSize * 0.22,
-                        ),
-                        border: Border.all(
-                          color: onSurface.withValues(alpha: 0.18),
-                          width: 1,
+            const SizedBox(height: 16),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const columns = 4;
+                final tileWidth = constraints.maxWidth / columns;
+                return Wrap(
+                  runSpacing: 16,
+                  children: [
+                    for (final option in options)
+                      SizedBox(
+                        width: tileWidth,
+                        child: _AppIconChoice(
+                          option: option,
+                          selected: option == current,
+                          onTap: () => Navigator.of(context).pop(option),
                         ),
                       ),
-                      child: AppIconPreview(
-                        option: option,
-                        size: _kPreviewSize,
-                      ),
-                    ),
-                    onTap: () => Navigator.of(context).pop(option),
-                  );
-                },
-              ),
+                  ],
+                );
+              },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppIconChoice extends StatelessWidget {
+  const _AppIconChoice({
+    required this.option,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final AppIconOption option;
+  final bool selected;
+  final VoidCallback onTap;
+
+  static const _ringGap = 3.0;
+  static const _ringWidth = 2.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final accent = context.brandPurple;
+    const radius = _kPreviewSize * 0.22;
+    const ringInset = _ringGap + _ringWidth;
+
+    return Semantics(
+      inMutuallyExclusiveGroup: true,
+      checked: selected,
+      button: true,
+      label: option.displayName(context),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: ExcludeSemantics(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOut,
+                  padding: const EdgeInsets.all(_ringGap),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(radius + ringInset),
+                    border: Border.all(
+                      color: selected ? accent : Colors.transparent,
+                      width: _ringWidth,
+                    ),
+                  ),
+                  // Hairline so the white Classic icon still reads as a tile
+                  // on a light surface. Foreground, or the icon paints over it.
+                  child: Container(
+                    foregroundDecoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(radius),
+                      border: Border.all(
+                        color: onSurface.withValues(alpha: 0.18),
+                        width: 1,
+                      ),
+                    ),
+                    child: AppIconPreview(option: option, size: _kPreviewSize),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  option.displayName(context),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 12,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                    color: onSurface.withValues(alpha: selected ? 1 : 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
