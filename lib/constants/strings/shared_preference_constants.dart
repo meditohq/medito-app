@@ -11,6 +11,7 @@ class SharedPreferenceConstants {
   static const String lastSelectedGuideName = 'lastSelectedGuideName';
   static const String favoritePacks = 'favorite_packs';
   static const String favorites = 'favorites';
+  static const String removedFavorites = 'removed_favorites';
 
   static const String userId = 'userId';
   static const String userEmail = 'userEmail';

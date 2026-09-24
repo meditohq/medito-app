@@ -15,6 +15,11 @@ abstract class FavoritesRepository {
   Future<void> saveFavorites(List<FavoriteItem> favorites);
   Future<void> syncWithServer(List<FavoriteItem> favorites);
   Future<List<FavoriteItem>> loadFavoritesFromServer();
+
+  /// Ids removed on this device that the server may not know about yet,
+  /// mapped to when they were removed (ms since epoch).
+  Future<Map<String, int>> loadRemovedFavorites();
+  Future<void> saveRemovedFavorites(Map<String, int> removed);
 }
 
 class FavoritesRepositoryImpl implements FavoritesRepository {
@@ -46,6 +51,29 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   }
 
   @override
+  Future<Map<String, int>> loadRemovedFavorites() async {
+    final removedJson = _prefs.getString(
+      SharedPreferenceConstants.removedFavorites,
+    );
+    if (removedJson == null) return {};
+
+    final Map<String, dynamic> decoded = json.decode(removedJson);
+    return decoded.map((id, removedAt) => MapEntry(id, removedAt as int));
+  }
+
+  @override
+  Future<void> saveRemovedFavorites(Map<String, int> removed) async {
+    if (removed.isEmpty) {
+      await _prefs.remove(SharedPreferenceConstants.removedFavorites);
+      return;
+    }
+    await _prefs.setString(
+      SharedPreferenceConstants.removedFavorites,
+      json.encode(removed),
+    );
+  }
+
+  @override
   Future<List<FavoriteItem>> loadFavoritesFromServer() async {
     try {
       final response = await _httpApiService.getRequest(
@@ -64,25 +92,20 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
 
   @override
   Future<void> syncWithServer(List<FavoriteItem> favorites) async {
-    if (favorites.isEmpty) return;
-
     try {
-      final dtos = favorites
-          .map(
-            (item) => FavoriteItemDto(
-              id: item.id,
-              title: item.title,
-              subtitle: item.subtitle,
-              path: item.path,
-              type: item.type.toString().split('.').last,
-              timestamp: item.timestamp,
-            ),
-          )
-          .toList();
-
+      // The server stores only id/type/timestamp and looks titles up from
+      // content itself, so display text is never sent.
       await _httpApiService.postRequest(
         HTTPConstants.favorites,
-        body: dtos.map((dto) => dto.toJson()).toList(),
+        body: favorites
+            .map(
+              (item) => {
+                'id': item.id,
+                'type': item.type.name,
+                'timestamp': item.timestamp,
+              },
+            )
+            .toList(),
       );
     } catch (e) {
       AppLogger.e('FAVORITES', 'Error syncing favorites with server: $e');

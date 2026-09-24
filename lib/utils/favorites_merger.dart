@@ -5,12 +5,15 @@ import 'package:medito/models/favorites/favorite_item.dart';
 /// Takes a list of local favorites and a list of server favorites.
 /// Returns a single list containing the merged items.
 /// If an item exists in both lists, the one with the later timestamp is kept.
-/// Items unique to either list are included.
+/// Items unique to either list are included, except server items whose id is
+/// in [removedIds] — those were removed on this device and the server just
+/// hasn't caught up yet (failed sync, or a fetch that raced the removal).
 /// The final list is sorted by timestamp descending (newest first).
 List<FavoriteItem> mergeFavoriteLists(
   List<FavoriteItem> localFavorites,
-  List<FavoriteItem> serverFavorites,
-) {
+  List<FavoriteItem> serverFavorites, {
+  Map<String, int> removedIds = const {},
+}) {
   final merged = <String, FavoriteItem>{};
 
   // Add all local items first
@@ -21,7 +24,10 @@ List<FavoriteItem> mergeFavoriteLists(
   // Merge server items, potentially overwriting local if server is newer
   for (final serverItem in serverFavorites) {
     final localItem = merged[serverItem.id];
-    if (localItem == null || serverItem.timestamp > localItem.timestamp) {
+    if (localItem == null) {
+      if (removedIds.containsKey(serverItem.id)) continue;
+      merged[serverItem.id] = serverItem;
+    } else if (serverItem.timestamp > localItem.timestamp) {
       merged[serverItem.id] = serverItem;
     }
     // If local item exists and has a later or equal timestamp, keep the local version
