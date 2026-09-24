@@ -23,7 +23,6 @@ import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
-import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/views/settings/widgets/reminder_tile.dart'
     show
@@ -40,6 +39,7 @@ import 'package:medito/widgets/snackbar_widget.dart';
 import 'widgets/account_prompt_card.dart';
 import 'widgets/animated_end_screen_section.dart';
 import 'widgets/donation_widget.dart';
+import 'widgets/soft_ask_card.dart';
 import 'widgets/zen_mode_animation.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
@@ -601,105 +601,16 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       });
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: padding16,
-        right: padding16,
-        bottom: 16,
-      ),
-      child: HomeGradientBorder(
-        backgroundColor: Theme.of(context).cardColor,
-        borderRadius: 14,
-        borderWidth: 0.5,
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 16,
-            left: 16,
-            right: 16,
-            bottom: 4,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  MeditoIcon(
-                    assetName: MeditoIcons.bell,
-                    size: 24,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context)!.dailyReminders,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: AppLocalizations.of(context)!.dismiss,
-                    icon: MeditoIcon(
-                      assetName: MeditoIcons.xmark,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    onPressed: _dismissReminderPromptForever,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppLocalizations.of(context)!.enableNotificationsBody,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _enableReminders,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                  ),
-                  child: Text(
-                    _notificationsBlocked
-                        ? AppLocalizations.of(context)!.turnOnInSettings
-                        : AppLocalizations.of(context)!.turnOnReminders,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: context.onBrandPurple,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: _snoozeReminderPrompt,
-                  child: Text(
-                    AppLocalizations.of(context)!.notNow,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    final l10n = AppLocalizations.of(context)!;
+    return SoftAskCard(
+      title: l10n.dailyReminders,
+      body: l10n.enableNotificationsBody,
+      ctaLabel: _notificationsBlocked
+          ? l10n.turnOnInSettings
+          : l10n.turnOnReminders,
+      onCta: _enableReminders,
+      onSnooze: _snoozeReminderPrompt,
+      onDismiss: _dismissReminderPromptForever,
     );
   }
 
