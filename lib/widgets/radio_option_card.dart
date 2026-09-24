@@ -61,7 +61,7 @@ class RadioOptionCard extends StatelessWidget {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(top: description == null ? 0 : 1),
-                    child: _RadioDot(selected: selected, accent: accent),
+                    child: RadioDot(selected: selected, accent: accent),
                   ),
                   const SizedBox(width: padding12),
                   Expanded(
@@ -103,8 +103,10 @@ class RadioOptionCard extends StatelessWidget {
   }
 }
 
-class _RadioDot extends StatelessWidget {
-  const _RadioDot({required this.selected, required this.accent});
+/// The radio indicator used by [RadioOptionCard], exposed so plain list rows
+/// in sheets (e.g. background sounds) share the same control.
+class RadioDot extends StatelessWidget {
+  const RadioDot({super.key, required this.selected, required this.accent});
 
   final bool selected;
   final Color accent;

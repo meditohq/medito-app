@@ -7,6 +7,7 @@ import 'package:medito/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/widgets/radio_option_card.dart';
 
 import '../../../providers/background_sounds/background_sounds_notifier.dart';
 
@@ -23,52 +24,66 @@ class SoundListTileWidget extends ConsumerWidget {
     var isSelected = selectedSoundId == sound.id;
     var hasFailed = bgSoundState.failedBgSound?.id == sound.id;
 
-    return InkWell(
-      onTap: () => _handleItemTap(ref, context, hasFailed: hasFailed),
-      child: Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(width: 0.9, color: ColorConstants.softGrey),
-          ),
-        ),
-        constraints: const BoxConstraints(minHeight: 88),
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
-        child: Row(
-          children: [
-            _radioButton(isSelected, context),
-            width16,
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    // The repository builds the "None" row with a hardcoded
-                    // English title, to be localised here.
-                    sound.id == kNoneBackgroundSoundId
-                        ? AppLocalizations.of(context)!.none
-                        : sound.id == kSessionBellsId
-                        ? AppLocalizations.of(context)!.sessionBells
-                        : sound.title,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontFamily: googleSans,
-                      fontSize: 16,
-                    ),
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    // Styled like the settings sheets (same radio dot, type and 16pt margins)
+    // but as plain rows rather than bordered cards: the list is long and
+    // cards would push most of it below the fold.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: InkWell(
+        onTap: () => _handleItemTap(ref, context, hasFailed: hasFailed),
+        borderRadius: BorderRadius.circular(12),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            child: Row(
+              children: [
+                RadioDot(selected: isSelected, accent: context.brandPurple),
+                const SizedBox(width: padding12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        // The repository builds the "None" row with a
+                        // hardcoded English title, to be localised here.
+                        sound.id == kNoneBackgroundSoundId
+                            ? AppLocalizations.of(context)!.none
+                            : sound.id == kSessionBellsId
+                            ? AppLocalizations.of(context)!.sessionBells
+                            : sound.title,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: onSurface,
+                        ),
+                      ),
+                      if (sound.id == kSessionBellsId) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          AppLocalizations.of(context)!.sessionBellsDescription,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            color: onSurface.withValues(alpha: 0.7),
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                      if (hasFailed) _failureMessage(context),
+                    ],
                   ),
-                  if (sound.id == kSessionBellsId)
-                    Text(
-                      AppLocalizations.of(context)!.sessionBellsDescription,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  if (hasFailed) _failureMessage(context),
-                ],
-              ),
+                ),
+                if (isDownloading)
+                  _loadingSpinner(context)
+                else if (hasFailed)
+                  _retryIcon(context),
+              ],
             ),
-            if (isDownloading)
-              _loadingSpinner(context)
-            else if (hasFailed)
-              _retryIcon(context),
-          ],
+          ),
         ),
       ),
     );
@@ -111,27 +126,8 @@ class SoundListTileWidget extends ConsumerWidget {
         width: 16,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          color: Theme.of(context).colorScheme.onInverseSurface,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
-      ),
-    );
-  }
-
-  Container _radioButton(bool isSelected, BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          width: 2,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
-      padding: const EdgeInsets.all(4),
-      child: CircleAvatar(
-        radius: 6,
-        backgroundColor: isSelected
-            ? Theme.of(context).colorScheme.onSurface
-            : ColorConstants.transparent,
       ),
     );
   }

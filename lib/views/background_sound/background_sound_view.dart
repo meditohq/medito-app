@@ -103,7 +103,7 @@ class BackgroundSoundView extends ConsumerWidget {
               ),
               const SoundListTileWidget(sound: kSessionBellsSound),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
                 child: Text(
                   AppLocalizations.of(
                     context,
