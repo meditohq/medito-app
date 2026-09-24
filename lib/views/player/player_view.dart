@@ -48,6 +48,14 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   // caller no longer awaits play() before navigating — we own starting
   // playback here — so this is how a start failure surfaces to the user.
   bool _startFailed = false;
+
+  /// Whether playback has actually started on this screen. Until it has, the
+  /// play button shows a spinner regardless of the shared audio state, which
+  /// can still hold the previous session's values or briefly read "loaded but
+  /// not playing" between load and play — both made the button flicker
+  /// play → spinner → pause on open.
+  bool _playbackStarted = false;
+  Timer? _playbackStartFallback;
   final _analytics = FirebaseAnalyticsService();
   // Snapshot of stats taken when the player opens, before the session can
   // affect them. EndScreenView uses this as the "before" value so its
@@ -110,6 +118,14 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     if (request == null) return;
     try {
       await ref.read(playerProvider.notifier).play(request);
+      // If audio never reports playing (e.g. an interruption right at start),
+      // stop waiting and show the play button so the user can start it.
+      _playbackStartFallback?.cancel();
+      _playbackStartFallback = Timer(const Duration(seconds: 3), () {
+        if (mounted && !_playbackStarted) {
+          setState(() => _playbackStarted = true);
+        }
+      });
       // The native service must be ready before restoring background audio.
       if (mounted && !_isClosing) unawaited(_initializePlayer());
     } catch (e, st) {
@@ -119,7 +135,10 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   }
 
   void _retryPlayback() {
-    setState(() => _startFailed = false);
+    setState(() {
+      _startFailed = false;
+      _playbackStarted = false;
+    });
     _startPlayback();
   }
 
@@ -135,6 +154,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     // paused session. No-op if it's still playing (continues in background) or
     // already completed/stopped.
     unawaited(AudioSessionTracker.instance.onPlayerClosed());
+    _playbackStartFallback?.cancel();
     _donationAskWarmup?.close();
     _endScreenConfigWarmup?.close();
     super.dispose();
@@ -263,6 +283,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     }
 
     final isPlaying = ref.watch(audioStateProvider.select((s) => s.isPlaying));
+    ref.listen(audioStateProvider.select((s) => s.isPlaying), (_, playing) {
+      if (playing && !_playbackStarted) {
+        _playbackStartFallback?.cancel();
+        setState(() => _playbackStarted = true);
+      }
+    });
 
     // The transport (play/pause + progress) is genuinely loading until the
     // native player reports it's playing or knows the duration. Everything
@@ -273,10 +299,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final audioState = ref.watch(audioStateProvider);
     final isAudioLoading =
         !audioState.isCompleted &&
-        (audioState.isBuffering ||
-            (!audioState.isPlaying &&
-                audioState.duration == 0 &&
-                audioState.position == 0));
+        (!_playbackStarted || audioState.isBuffering);
 
     return PopScope<void>(
       onPopInvokedWithResult: (didPop, result) {
