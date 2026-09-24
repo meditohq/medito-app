@@ -40,6 +40,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get removed => 'Removed';
 
   @override
+  String get undo => 'Undo';
+
+  @override
+  String get reorder => 'Reorder';
+
+  @override
   String get meditationProducts => 'Shop to Support';
 
   @override

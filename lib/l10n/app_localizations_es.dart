@@ -41,6 +41,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get removed => 'Eliminado';
 
   @override
+  String get undo => 'Deshacer';
+
+  @override
+  String get reorder => 'Reordenar';
+
+  @override
   String get meditationProducts => 'Tienda para Apoyar';
 
   @override

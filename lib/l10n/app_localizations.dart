@@ -158,6 +158,18 @@ abstract class AppLocalizations {
   /// **'Removed'**
   String get removed;
 
+  /// Snackbar action that reverses the removal just made
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// Accessibility label for a drag handle that reorders a list item
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder'**
+  String get reorder;
+
   /// No description provided for @meditationProducts.
   ///
   /// In en, this message translates to:

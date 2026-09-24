@@ -10,6 +10,14 @@
   "backgroundSoundDownloadFailed": "Couldn't download. Tap to try again.",
   "none": "None",
   "removed": "Removed",
+  "undo": "Undo",
+  "@undo": {
+    "description": "Snackbar action that reverses the removal just made"
+  },
+  "reorder": "Reorder",
+  "@reorder": {
+    "description": "Accessibility label for a drag handle that reorders a list item"
+  },
   "meditationProducts": "Shop to Support",
   "blackFridayTitle": "Support Free Meditation",
   "blackFridaySubtitle": "This Black Friday, support free meditation for everyone. Your purchase helps keep Medito free and accessible to millions worldwide",
