@@ -1,5 +1,15 @@
 Unreleased
--
+- New "Session bells" background option: a bell at the beginning, middle and end of your session.
+- Repeat, playback speed and background sounds now open simple pickers in the player.
+- Background sounds open over the player, with the volume always in view.
+- Repeat and playback speed now start fresh for each new session.
+- Fixed sessions sometimes repeating forever instead of finishing.
+- Sessions on repeat now count the minutes of every repetition in your stats.
+- Fixed going back from the end-of-session screen sometimes returning to the player.
+- Fixed the play button flickering when a session starts.
+- Tidier reminder and account cards on the end-of-session screen.
+- Better layouts on tablets and foldable phones.
+- Fixed quote sharing on wide and short screens.
 
 2609.22.0
 - Browse meditation topics from Explore, tracks and packs.
