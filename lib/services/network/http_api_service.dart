@@ -123,7 +123,7 @@ class HttpApiService {
 
   void _initializeHeaders() {
     AppLogger.d('HTTP', 'Initializing headers for instance #$_instanceId');
-    _headers[kContentTypeHeader] = ContentType.json.value;
+    _headers[kContentTypeHeader] = ContentType.json.toString();
   }
 
   void setAuthHeader(String accessToken) {
@@ -239,7 +239,9 @@ class HttpApiService {
 
       if (body != null) {
         final encodedBody = jsonEncode(body);
-        request.write(encodedBody);
+        // add() with explicit UTF-8: write() encodes as Latin-1 unless the
+        // content-type carries a charset, and throws on any char > U+00FF.
+        request.add(utf8.encode(encodedBody));
       }
 
       final response = await request.close().timeout(kTimeoutDuration);
@@ -382,7 +384,9 @@ class HttpApiService {
 
       if (body != null) {
         final encodedBody = jsonEncode(body);
-        request.write(encodedBody);
+        // add() with explicit UTF-8: write() encodes as Latin-1 unless the
+        // content-type carries a charset, and throws on any char > U+00FF.
+        request.add(utf8.encode(encodedBody));
       }
 
       final response = await request.close().timeout(kTimeoutDuration);

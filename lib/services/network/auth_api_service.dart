@@ -45,7 +45,7 @@ class AuthApiService {
   }
 
   void _initializeHeaders() {
-    _headers[kContentTypeHeader] = ContentType.json.value;
+    _headers[kContentTypeHeader] = ContentType.json.toString();
     _headers[kAuthorizationHeader] = 'Bearer $_apiKey';
   }
 
@@ -279,7 +279,9 @@ class AuthApiService {
 
       if (body != null) {
         final encodedBody = jsonEncode(body);
-        request.write(encodedBody);
+        // add() with explicit UTF-8: write() encodes as Latin-1 unless the
+        // content-type carries a charset, and throws on any char > U+00FF.
+        request.add(utf8.encode(encodedBody));
         AppLogger.d('AUTH', 'Request Body: $encodedBody');
       }
 

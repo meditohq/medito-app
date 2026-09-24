@@ -80,7 +80,9 @@ class DonationApiService implements IDonationApiService {
       if (body != null) {
         final encodedBody = jsonEncode(body);
         AppLogger.d('DONATION_API', 'REQUEST: $encodedBody');
-        request.write(encodedBody);
+        // add() with explicit UTF-8: write() encodes as Latin-1 unless the
+        // content-type carries a charset, and throws on any char > U+00FF.
+        request.add(utf8.encode(encodedBody));
       }
 
       final response = await request.close().timeout(
