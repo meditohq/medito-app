@@ -1,4 +1,7 @@
 Unreleased
+-
+
+2609.24.0
 - New "Session bells" background option: a bell at the beginning, middle and end of your session.
 - Repeat, playback speed and background sounds now open simple pickers in the player.
 - Background sounds open over the player, with the volume always in view.
@@ -10,6 +13,13 @@ Unreleased
 - Tidier reminder and account cards on the end-of-session screen.
 - Better layouts on tablets and foldable phones.
 - Fixed quote sharing on wide and short screens.
+- Removed favorites no longer come back, and favorites now sync reliably.
+- Your Path: swipe the Home card to open the pack or skip, and use "Show on Home" on any pack (with Undo).
+- Refreshed downloads screen: drag to reorder, and swipe to remove with Undo.
+- App icon choices now show as large previews.
+- Flat, cleaner app icons on iOS.
+- The background sound button now spins like a vinyl record.
+- Reminder permission dialogs now match the rest of the app.
 
 2609.22.0
 - Browse meditation topics from Explore, tracks and packs.
