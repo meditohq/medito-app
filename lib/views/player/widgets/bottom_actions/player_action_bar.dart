@@ -8,6 +8,9 @@ import 'package:medito/models/models.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/bg_sound_widget.dart';
+import 'package:medito/views/player/widgets/bottom_actions/widgets/speed_sheet.dart';
+
+import 'package:medito/views/background_sound/background_sound_view.dart';
 
 import 'bottom_action_bar.dart';
 
@@ -43,12 +46,19 @@ class PlayerActionBar extends StatelessWidget {
       rightCenterItem: BottomActionBarItem(
         child: _buildBackgroundSoundWidget(),
         onTap: request.hasBackgroundSound
-            ? () {}
+            ? () {
+                FirebaseAnalyticsService().logEvent(
+                  name: AnalyticsEventConstants.playerBackgroundSoundsOpened,
+                );
+                showBackgroundSoundSheet(context);
+              }
             : () => _showBackgroundSoundDisabledMessage(context),
         semanticLabel: l10n.backgroundSounds,
       ),
       rightItem: BottomActionBarItem(
-        child: AudioSpeedWidget(
+        child: const AudioSpeedWidget(),
+        onTap: () => showSpeedSheet(
+          context,
           onSpeedChanged: (speed) {
             FirebaseAnalyticsService().logEvent(
               name: AnalyticsEventConstants.playerSpeedChanged,
@@ -57,7 +67,6 @@ class PlayerActionBar extends StatelessWidget {
             onSpeedChanged(speed);
           },
         ),
-        onTap: () {}, // The AudioSpeedWidget handles its own tap
         semanticLabel: l10n.playbackSpeed,
       ),
     );

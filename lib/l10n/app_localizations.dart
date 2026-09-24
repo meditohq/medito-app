@@ -3710,6 +3710,30 @@ abstract class AppLocalizations {
   /// **'Repeat Forever'**
   String get repeatModeForever;
 
+  /// Repeat sheet option: no repeat
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get repeatModeOff;
+
+  /// Repeat sheet: description of no repeat
+  ///
+  /// In en, this message translates to:
+  /// **'Play once, then finish.'**
+  String get repeatModeOffDescription;
+
+  /// Repeat sheet: description of repeat once
+  ///
+  /// In en, this message translates to:
+  /// **'Play it twice, then finish.'**
+  String get repeatModeOnceDescription;
+
+  /// Repeat sheet: description of repeat forever
+  ///
+  /// In en, this message translates to:
+  /// **'Keep playing until you stop it.'**
+  String get repeatModeForeverDescription;
+
   /// Title for adding a manual meditation session
   ///
   /// In en, this message translates to:
@@ -4039,6 +4063,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Playback speed'**
   String get playbackSpeed;
+
+  /// Speed sheet: button that sets playback speed back to 1.0x
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get speedReset;
 
   /// Accessibility label for the report button in the player
   ///

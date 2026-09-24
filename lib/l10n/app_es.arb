@@ -966,6 +966,22 @@
   "@repeatModeForever": {
     "description": "Tooltip text for repeat mode when set to repeat forever"
   },
+  "repeatModeOff": "Desactivado",
+  "@repeatModeOff": {
+    "description": "Repeat sheet option: no repeat"
+  },
+  "repeatModeOffDescription": "Se reproduce una vez y termina.",
+  "@repeatModeOffDescription": {
+    "description": "Repeat sheet: description of no repeat"
+  },
+  "repeatModeOnceDescription": "Se reproduce dos veces y termina.",
+  "@repeatModeOnceDescription": {
+    "description": "Repeat sheet: description of repeat once"
+  },
+  "repeatModeForeverDescription": "Sigue sonando hasta que lo detengas.",
+  "@repeatModeForeverDescription": {
+    "description": "Repeat sheet: description of repeat forever"
+  },
   "addSession": "Agregar sesión",
   "@addSession": {
     "description": "Title for adding a manual meditation session"
@@ -1090,6 +1106,7 @@
   "downloadAudio": "Descargar audio",
   "deleteDownload": "Eliminar descarga",
   "playbackSpeed": "Velocidad de reproducción",
+  "speedReset": "Restablecer",
   "reportIssue": "Reportar problema",
   "viewStreak": "Ver racha",
   "refresh": "Actualizar",

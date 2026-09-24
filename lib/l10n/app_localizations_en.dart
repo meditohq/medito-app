@@ -2014,6 +2014,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get repeatModeForever => 'Repeat Forever';
 
   @override
+  String get repeatModeOff => 'Off';
+
+  @override
+  String get repeatModeOffDescription => 'Play once, then finish.';
+
+  @override
+  String get repeatModeOnceDescription => 'Play it twice, then finish.';
+
+  @override
+  String get repeatModeForeverDescription => 'Keep playing until you stop it.';
+
+  @override
   String get addSession => 'Add Session';
 
   @override
@@ -2199,6 +2211,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playbackSpeed => 'Playback speed';
+
+  @override
+  String get speedReset => 'Reset';
 
   @override
   String get reportIssue => 'Report issue';

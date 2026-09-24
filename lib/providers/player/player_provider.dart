@@ -82,10 +82,10 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     final url = downloadPath ?? request.remoteUrl;
     AppLogger.d('PLAYER', 'Will use path: $url');
 
-    // Both engines outlive the player screen and re-apply their last repeat
-    // mode to every new track, while repeatStateProvider auto-disposes back to
-    // none. Sync them so a leftover "repeat forever" can't loop a session
-    // (and block the end screen) while the button shows repeat off.
+    // Both engines outlive the player screen and keep their last repeat mode
+    // and speed across tracks, while each player screen starts at repeat off /
+    // 1.0x. Reset them so a leftover "repeat forever" can't loop a session
+    // (and block the end screen) and a slowed-down speed doesn't carry over.
     final repeatMode = ref.read(repeatStateProvider);
 
     final trackData = pigeon.Track(
@@ -126,6 +126,7 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
         await Future.delayed(const Duration(seconds: 1));
       }
       setRepeatMode(repeatMode);
+      setSpeed(1.0);
       await _playAudioWithRetry(url, trackData);
     } else {
       AppLogger.d('PLAYER', 'On iOS - setting up audio');
@@ -134,6 +135,7 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
       // its retry budget — iOS has no such retry layer, so a single failure
       // here propagates immediately. That's intentional: callers need to know.
       setRepeatMode(repeatMode);
+      setSpeed(1.0);
       await iosAudioHandler.setUrl(downloadPath, request, trackData);
       AppLogger.d('PLAYER', 'iOS setUrl succeeded');
       await iosAudioHandler.play();

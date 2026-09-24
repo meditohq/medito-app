@@ -1206,6 +1206,22 @@
   "@repeatModeForever": {
     "description": "Tooltip text for repeat mode when set to repeat forever"
   },
+  "repeatModeOff": "Off",
+  "@repeatModeOff": {
+    "description": "Repeat sheet option: no repeat"
+  },
+  "repeatModeOffDescription": "Play once, then finish.",
+  "@repeatModeOffDescription": {
+    "description": "Repeat sheet: description of no repeat"
+  },
+  "repeatModeOnceDescription": "Play it twice, then finish.",
+  "@repeatModeOnceDescription": {
+    "description": "Repeat sheet: description of repeat once"
+  },
+  "repeatModeForeverDescription": "Keep playing until you stop it.",
+  "@repeatModeForeverDescription": {
+    "description": "Repeat sheet: description of repeat forever"
+  },
   "addSession": "Add Session",
   "@addSession": {
     "description": "Title for adding a manual meditation session"
@@ -1461,6 +1477,10 @@
   "playbackSpeed": "Playback speed",
   "@playbackSpeed": {
     "description": "Accessibility label for the playback speed control in the player"
+  },
+  "speedReset": "Reset",
+  "@speedReset": {
+    "description": "Speed sheet: button that sets playback speed back to 1.0x"
   },
   "reportIssue": "Report issue",
   "@reportIssue": {

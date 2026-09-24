@@ -1,18 +1,15 @@
-import 'package:medito/constants/strings/analytics_event_constants.dart';
-import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 import '../../../../models/player/repeat_mode.dart' as medito_repeat;
 import '../../../../providers/player/repeat_state_provider.dart';
 import 'play_pause_button_widget.dart';
+import 'repeat_mode_sheet.dart';
 
 class PlayerButtonsWidget extends ConsumerWidget {
   const PlayerButtonsWidget({
@@ -21,7 +18,6 @@ class PlayerButtonsWidget extends ConsumerWidget {
     required this.isPlaying,
     super.key,
     required this.onPlayPause,
-    required this.onRepeat,
     this.isPortrait = true,
     this.isLoading = false,
   });
@@ -30,7 +26,6 @@ class PlayerButtonsWidget extends ConsumerWidget {
   final Function() onSkip10SecondsForward;
   final bool isPlaying;
   final Function() onPlayPause;
-  final Function() onRepeat;
   final bool isPortrait;
   final bool isLoading;
 
@@ -112,144 +107,43 @@ class PlayerButtonsWidget extends ConsumerWidget {
     medito_repeat.RepeatMode repeatMode,
     AppLocalizations l10n,
   ) {
-    return _RepeatButtonWithLabel(
-      repeatMode: repeatMode,
-      onRepeat: onRepeat,
-      l10n: l10n,
-    );
+    return _RepeatButton(l10n: l10n);
   }
 }
 
-class _RepeatButtonWithLabel extends ConsumerStatefulWidget {
-  const _RepeatButtonWithLabel({
-    required this.repeatMode,
-    required this.onRepeat,
-    required this.l10n,
-  });
+class _RepeatButton extends ConsumerWidget {
+  const _RepeatButton({required this.l10n});
 
-  final medito_repeat.RepeatMode repeatMode;
-  final VoidCallback onRepeat;
   final AppLocalizations l10n;
 
   @override
-  ConsumerState<_RepeatButtonWithLabel> createState() =>
-      _RepeatButtonWithLabelState();
-}
-
-class _RepeatButtonWithLabelState
-    extends ConsumerState<_RepeatButtonWithLabel> {
-  Timer? _timer;
-  bool _showLabel = false;
-  String _currentLabel = '';
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _handleTap() {
-    final l10n = widget.l10n;
-
-    final nextMode = switch (widget.repeatMode) {
-      medito_repeat.RepeatMode.none => medito_repeat.RepeatMode.once,
-      medito_repeat.RepeatMode.once => medito_repeat.RepeatMode.infinite,
-      medito_repeat.RepeatMode.infinite => medito_repeat.RepeatMode.none,
-    };
-
-    String labelText;
-    switch (nextMode) {
-      case medito_repeat.RepeatMode.none:
-        labelText = l10n.repeatModeNormal;
-        break;
-      case medito_repeat.RepeatMode.once:
-        labelText = l10n.repeatModeOnce;
-        break;
-      case medito_repeat.RepeatMode.infinite:
-        labelText = l10n.repeatModeForever;
-        break;
-    }
-
-    FirebaseAnalyticsService().logEvent(
-      name: AnalyticsEventConstants.playerRepeatChanged,
-      parameters: {'repeat_mode': nextMode.name},
-    );
-    widget.onRepeat();
-
-    _timer?.cancel();
-    setState(() {
-      _currentLabel = labelText;
-      _showLabel = true;
-    });
-
-    _timer = Timer(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          _showLabel = false;
-        });
-      }
-    });
-  }
-
-  String _tooltipForMode(medito_repeat.RepeatMode mode) {
-    return switch (mode) {
-      medito_repeat.RepeatMode.none => widget.l10n.repeat,
-      medito_repeat.RepeatMode.once => widget.l10n.repeatModeOnce,
-      medito_repeat.RepeatMode.infinite => widget.l10n.repeatModeForever,
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final repeatMode = ref.watch(repeatStateProvider);
-    var iconAsset = MeditoIcons.repeat;
-    Color? iconColor;
+    final (iconAsset, tooltip) = switch (repeatMode) {
+      medito_repeat.RepeatMode.none => (MeditoIcons.repeat, l10n.repeat),
+      medito_repeat.RepeatMode.once => (
+        MeditoIcons.repeatOnce,
+        l10n.repeatModeOnce,
+      ),
+      medito_repeat.RepeatMode.infinite => (
+        MeditoIcons.repeat,
+        l10n.repeatModeForever,
+      ),
+    };
 
-    switch (repeatMode) {
-      case medito_repeat.RepeatMode.none:
-        iconColor = Colors.white.withValues(alpha: 0.5);
-        break;
-      case medito_repeat.RepeatMode.once:
-        iconAsset = MeditoIcons.repeatOnce;
-        iconColor = Colors.white;
-        break;
-      case medito_repeat.RepeatMode.infinite:
-        iconColor = Colors.white;
-        break;
-    }
-
-    return Stack(
-      alignment: Alignment.center,
-      clipBehavior: Clip.none,
-      children: [
-        IconButton(
-          onPressed: _handleTap,
-          tooltip: _tooltipForMode(repeatMode),
-          icon: MeditoIcon(assetName: iconAsset, size: 32, color: iconColor),
-        ),
-        if (_showLabel)
-          Positioned(
-            bottom: -40,
-            child: AnimatedOpacity(
-              opacity: _showLabel ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacityValue(0.7),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  _currentLabel,
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ),
-          ),
-      ],
+    // Always full white: the icon opens a sheet, so dimming it for "off"
+    // read as disabled. An active mode gets the same rounded highlight as the
+    // speed and download buttons in the action bar.
+    return IconButton(
+      onPressed: () => showRepeatModeSheet(context),
+      tooltip: tooltip,
+      style: IconButton.styleFrom(
+        backgroundColor: repeatMode == medito_repeat.RepeatMode.none
+            ? Colors.transparent
+            : ColorConstants.graphite.withAlpha(200),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      ),
+      icon: MeditoIcon(assetName: iconAsset, size: 32, color: Colors.white),
     );
   }
 }

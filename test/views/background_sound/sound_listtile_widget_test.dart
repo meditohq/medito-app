@@ -181,7 +181,7 @@ void main() {
         child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: BackgroundSoundView(),
+          home: Scaffold(body: BackgroundSoundView()),
         ),
       ),
     );

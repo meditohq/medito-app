@@ -31,7 +31,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/background_sounds/background_sounds_notifier.dart';
-import '../../providers/player/repeat_state_provider.dart';
 import '../../widgets/errors/medito_error_widget.dart';
 import '../../utils/health_kit_manager.dart';
 
@@ -560,12 +559,6 @@ class _PortraitPlayerLayout extends ConsumerWidget {
                 ref.read(playerProvider.notifier).skip10SecondsBackward(),
             onSkip10SecondsForward: () =>
                 ref.read(playerProvider.notifier).skip10SecondsForward(),
-            onRepeat: () {
-              final newMode = ref
-                  .read(repeatStateProvider.notifier)
-                  .toggleRepeat();
-              ref.read(playerProvider.notifier).setRepeatMode(newMode);
-            },
             isPortrait: true,
           ),
         ],
@@ -619,12 +612,6 @@ class _LandscapePlayerLayout extends ConsumerWidget {
               ref.read(playerProvider.notifier).skip10SecondsBackward(),
           onSkip10SecondsForward: () =>
               ref.read(playerProvider.notifier).skip10SecondsForward(),
-          onRepeat: () {
-            final newMode = ref
-                .read(repeatStateProvider.notifier)
-                .toggleRepeat();
-            ref.read(playerProvider.notifier).setRepeatMode(newMode);
-          },
           isPortrait: false,
         ),
       ],

@@ -1,13 +1,8 @@
-import 'package:medito/constants/strings/analytics_event_constants.dart';
-import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/widgets/medito_icon.dart';
-
-import '../../../../background_sound/background_sound_view.dart';
 
 class BgSoundWidget extends ConsumerStatefulWidget {
   const BgSoundWidget({super.key, required this.isBackgroundSoundSelected});
@@ -52,36 +47,25 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
     super.dispose();
   }
 
+  // Display only: the action-bar slot owns the tap (opening the sheet) so the
+  // whole button area responds, not just a nested inner button.
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.all(8),
       decoration: widget.isBackgroundSoundSelected
           ? BoxDecoration(
               color: ColorConstants.graphite.withAlpha(200),
               borderRadius: BorderRadius.circular(6),
             )
           : null,
-      child: IconButton(
-        onPressed: () {
-          FirebaseAnalyticsService().logEvent(
-            name: AnalyticsEventConstants.playerBackgroundSoundsOpened,
-          );
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const BackgroundSoundView(),
+      child: widget.isBackgroundSoundSelected
+          ? _spinningIcon()
+          : MeditoIcon(
+              assetName: MeditoIcons.musicNote,
+              color: Colors.white,
+              size: 23,
             ),
-          );
-        },
-        tooltip: AppLocalizations.of(context)!.backgroundSounds,
-        icon: widget.isBackgroundSoundSelected
-            ? _spinningIcon()
-            : MeditoIcon(
-                assetName: MeditoIcons.musicNote,
-                color: Colors.white,
-                size: 23,
-              ),
-      ),
     );
   }
 

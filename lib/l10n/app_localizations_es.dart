@@ -2048,6 +2048,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get repeatModeForever => 'Repetir siempre';
 
   @override
+  String get repeatModeOff => 'Desactivado';
+
+  @override
+  String get repeatModeOffDescription => 'Se reproduce una vez y termina.';
+
+  @override
+  String get repeatModeOnceDescription => 'Se reproduce dos veces y termina.';
+
+  @override
+  String get repeatModeForeverDescription =>
+      'Sigue sonando hasta que lo detengas.';
+
+  @override
   String get addSession => 'Agregar sesión';
 
   @override
@@ -2234,6 +2247,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get playbackSpeed => 'Velocidad de reproducción';
+
+  @override
+  String get speedReset => 'Restablecer';
 
   @override
   String get reportIssue => 'Reportar problema';
