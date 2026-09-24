@@ -27,6 +27,10 @@ class IosAudioHandler extends BaseAudioHandler {
   RepeatMode _currentRepeatMode = RepeatMode.none;
   bool _hasReplayedOnce = false;
 
+  /// Full play-throughs of the current track, counting repeats. The first is
+  /// recorded as the session; each later one only adds its listening time.
+  int _completedPlaythroughs = 0;
+
   /// While the player is paused the audio session is kept active so a quick
   /// resume stays seamless and the lock-screen controls remain. If the pause
   /// lasts longer than this the user has likely walked away, so the session is
@@ -148,6 +152,7 @@ class IosAudioHandler extends BaseAudioHandler {
         // Handle repeat once mode
         if (_currentRepeatMode == RepeatMode.once && !_hasReplayedOnce) {
           _hasReplayedOnce = true;
+          unawaited(_recordPlaythrough());
           await _player.seek(Duration.zero);
           await _player.play();
           return;
@@ -169,8 +174,26 @@ class IosAudioHandler extends BaseAudioHandler {
         await sessionBells.disable();
         await _deactivateSession();
 
-        await _storeTrackCompletion();
+        await _recordPlaythrough();
       }
+    });
+
+    // Repeat forever (LoopMode.one) never reaches `completed`; each loop back
+    // to the start surfaces as an auto-advance discontinuity instead.
+    // just_audio also reports autoAdvance when a new source is loaded, so only
+    // count it when the same, already-playing item wrapped around.
+    _player.positionDiscontinuityStream.listen((discontinuity) {
+      final prev = discontinuity.previousEvent;
+      final curr = discontinuity.event;
+      const active = {ProcessingState.ready, ProcessingState.buffering};
+      final isLoop =
+          discontinuity.reason == PositionDiscontinuityReason.autoAdvance &&
+          _currentRepeatMode == RepeatMode.infinite &&
+          active.contains(prev.processingState) &&
+          active.contains(curr.processingState) &&
+          prev.duration != null &&
+          prev.duration == curr.duration;
+      if (isLoop) unawaited(_recordPlaythrough());
     });
 
     _player.playbackEventStream.listen((event) {
@@ -255,6 +278,27 @@ class IosAudioHandler extends BaseAudioHandler {
           );
         },
       );
+
+  Future<void> _recordPlaythrough() {
+    _completedPlaythroughs++;
+    if (_completedPlaythroughs == 1) return _storeTrackCompletion();
+    return _storeRepeatPlaythrough();
+  }
+
+  Future<void> _storeRepeatPlaythrough() async {
+    try {
+      if (duration == null) return;
+      await handleRepeatPlaythrough({
+        TypeConstants.trackIdKey: trackState.id,
+        TypeConstants.durationIdKey: duration!.inMilliseconds,
+        TypeConstants.fileIdKey: trackState.fileId,
+        TypeConstants.guideIdKey: trackState.artist ?? '',
+        TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
+      });
+    } catch (e) {
+      AppLogger.e('IOS', 'Error recording repeat play-through: $e');
+    }
+  }
 
   Future<void> _storeTrackCompletion() async {
     try {
@@ -435,6 +479,7 @@ class IosAudioHandler extends BaseAudioHandler {
     await ensureInitialized();
 
     _hasReplayedOnce = false;
+    _completedPlaythroughs = 0;
     _sessionCompleted.add(false);
     sessionBells.reset();
 

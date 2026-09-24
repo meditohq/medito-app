@@ -9,6 +9,7 @@ import '../../services/analytics/crashlytics_service.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/audio_session_tracker.dart';
 import '../../utils/stats_updater.dart';
+import '../../utils/stats_updater.dart' as stats_updater;
 
 class AudioStateProvider implements MeditoAudioServiceCallbackApi {
   final AudioStateNotifier notifier;
@@ -63,6 +64,18 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
     } on Exception catch (_) {
       return false;
     }
+  }
+
+  // only used on Android
+  @override
+  Future<bool> handleRepeatPlaythrough(CompletionData completionData) {
+    return stats_updater.handleRepeatPlaythrough({
+      TypeConstants.trackIdKey: completionData.trackId,
+      TypeConstants.durationIdKey: completionData.duration,
+      TypeConstants.fileIdKey: completionData.fileId,
+      TypeConstants.guideIdKey: completionData.guideId,
+      TypeConstants.timestampIdKey: completionData.timestamp,
+    });
   }
 }
 

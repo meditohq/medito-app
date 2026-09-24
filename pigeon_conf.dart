@@ -180,6 +180,9 @@ abstract class MeditoAudioServiceCallbackApi {
   void updatePlaybackState(PlaybackState state);
   @async
   bool handleCompletedTrack(CompletionData completionData);
+  // A repeated play-through (repeat once / forever): adds listening time only.
+  @async
+  bool handleRepeatPlaythrough(CompletionData completionData);
   void reportPlayerError(
     String errorCode,
     String message,

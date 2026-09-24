@@ -210,6 +210,44 @@ Future<bool> handleStats(
   }
 }
 
+// Timestamps of repeat play-throughs already recorded by this engine. Android
+// persists each repeat and replays it on resume, so a replay can race the live
+// callback for the same play-through.
+final Set<int> _recordedRepeatTimestamps = {};
+
+/// Records a repeated play-through (repeat once / forever) of a track whose
+/// first play-through was already recorded by [handleStats]. Adds its minutes
+/// to total time listened and writes it to Health, but does not count as a new
+/// session. Takes the same payload shape as [handleStats].
+Future<bool> handleRepeatPlaythrough(
+  Map<String, dynamic> payload, {
+  StatsManager? statsManager, // For testing
+}) async {
+  final timestamp = payload[TypeConstants.timestampIdKey] as int;
+  if (!_recordedRepeatTimestamps.add(timestamp)) return true;
+  try {
+    await _syncHealthKit(payload).catchError((e) {
+      AppLogger.e('STATS', 'HealthKit sync error', e);
+    });
+
+    statsManager ??= StatsManager()..initialize();
+    await statsManager.addRepeatListeningTime(
+      payload[TypeConstants.durationIdKey] as int,
+    );
+    AppLogger.d(
+      'STATS',
+      'Repeat play-through recorded for track ${payload[TypeConstants.trackIdKey]}',
+    );
+
+    await _refreshStatsAndUpNext();
+    return true;
+  } catch (e) {
+    _recordedRepeatTimestamps.remove(timestamp);
+    AppLogger.e('STATS', 'Failed to record repeat play-through', e);
+    return false;
+  }
+}
+
 /// Process any pending track completions that were stored while the app was in the background.
 /// This is typically called when the app starts or returns to the foreground.
 ///

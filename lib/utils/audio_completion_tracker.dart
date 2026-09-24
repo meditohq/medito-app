@@ -56,4 +56,18 @@ class AudioCompletionTracker {
       totalTimeListened: newDuration,
     );
   }
+
+  /// Adds the minutes of a repeated play-through (repeat once / forever).
+  /// The first play-through is already recorded as the session via
+  /// [updateStatsWithCompletedAudio]; repetitions only add listening time so
+  /// looping one track does not inflate the session count.
+  static LocalAllStats addRepeatListeningTime({
+    required LocalAllStats? stats,
+    required int duration,
+  }) {
+    return (stats ?? LocalAllStats.empty()).copyWith(
+      totalTimeListened: (stats?.totalTimeListened ?? 0) + duration,
+      updated: DateTime.now().toUtc().millisecondsSinceEpoch,
+    );
+  }
 }

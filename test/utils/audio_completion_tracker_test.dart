@@ -329,4 +329,33 @@ void main() {
       );
     });
   });
+
+  group('AudioCompletionTracker.addRepeatListeningTime', () {
+    test('adds time without adding a session', () {
+      final stats = LocalAllStats.empty().copyWith(
+        totalTimeListened: 600000,
+        totalTracksCompleted: 1,
+        audioCompleted: [LocalAudioCompleted(id: 't1', timestamp: 1)],
+      );
+
+      final result = AudioCompletionTracker.addRepeatListeningTime(
+        stats: stats,
+        duration: 600000,
+      );
+
+      expect(result.totalTimeListened, 1200000);
+      expect(result.totalTracksCompleted, 1);
+      expect(result.audioCompleted?.length, 1);
+    });
+
+    test('handles null stats', () {
+      final result = AudioCompletionTracker.addRepeatListeningTime(
+        stats: null,
+        duration: 1000,
+      );
+
+      expect(result.totalTimeListened, 1000);
+      expect(result.totalTracksCompleted, 0);
+    });
+  });
 }

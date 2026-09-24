@@ -342,6 +342,21 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
                     println("Error parsing completion data: ${e.message}")
                 }
             }
+
+            val pendingRepeats = SharedPreferencesManager.getPendingRepeats(this@MainActivity)
+            if (pendingRepeats.isNotEmpty()) {
+                withContext(Dispatchers.Main) {
+                    pendingRepeats.forEach { repeat ->
+                        meditoAudioApi?.handleRepeatPlaythrough(repeat) {
+                            if (it.getOrNull() == true) {
+                                activityScope.launch(Dispatchers.IO) {
+                                    SharedPreferencesManager.removePendingRepeat(this@MainActivity, repeat)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

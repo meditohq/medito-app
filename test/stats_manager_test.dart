@@ -676,6 +676,43 @@ void main() {
       expect(result?.audioCompleted?.length, 1);
       expect(result?.tracksChecked?.contains('1'), true);
     });
+
+    test(
+      'addRepeatListeningTime - adds minutes of every repetition, one session',
+      () async {
+        statsManager.setStatsForTesting(LocalAllStats.empty());
+        when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+        final audio = LocalAudioCompleted(
+          id: '1',
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+        );
+
+        // Track played three times on repeat.
+        await statsManager.addAudioCompleted(audio, 300);
+        await statsManager.addRepeatListeningTime(300);
+        await statsManager.addRepeatListeningTime(300);
+
+        final result = statsManager.currentStats;
+        expect(result?.totalTimeListened, 900);
+        expect(result?.totalTracksCompleted, 1);
+        expect(result?.audioCompleted?.length, 1);
+      },
+    );
+
+    test(
+      'addRepeatListeningTime - keeps the local write when the post fails',
+      () async {
+        statsManager.setStatsForTesting(
+          LocalAllStats.empty().copyWith(totalTimeListened: 300),
+        );
+        when(mockStatsService.postStats(any)).thenThrow(Exception('offline'));
+
+        await statsManager.addRepeatListeningTime(300);
+
+        expect(statsManager.currentStats?.totalTimeListened, 600);
+      },
+    );
   });
 
   group('StatsManager Audio Completion Edge Cases', () {

@@ -585,6 +585,41 @@ class StatsManager {
     }
   }
 
+  /// Adds the listening time of a repeated play-through without recording a
+  /// new session. See [AudioCompletionTracker.addRepeatListeningTime].
+  Future<void> addRepeatListeningTime(int duration) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+    await _ensureStatsLoaded();
+
+    _dirty = true;
+    _allStats = AudioCompletionTracker.addRepeatListeningTime(
+      stats: _allStats,
+      duration: duration,
+    );
+    await _saveLocalAllStatsToSharedPrefs();
+
+    // The local write is the record; don't surface a post failure (the caller
+    // would retry and double-count). _dirty stays true so the next sync pushes.
+    try {
+      await _statsService.postStats(_allStats!);
+      _lastSyncedAt = _getCurrentDate();
+      await _saveLastSyncedAt();
+      _dirty = false;
+    } catch (e) {
+      AppLogger.e(
+        'STATS_MANAGER',
+        'addRepeatListeningTime: post failed, will retry on next sync',
+        e,
+      );
+    }
+
+    HomeWidgetService.updateWidgetFromStats(_allStats!).catchError((e) {
+      // Silently fail - widget updates are not critical
+    });
+  }
+
   /// Posts the current stats once, after a batch of [addAudioCompleted] calls
   /// made with `skipPost: true`. No-op if there's nothing to flush.
   Future<void> flushPendingPost() async {
