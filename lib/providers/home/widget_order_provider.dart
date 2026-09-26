@@ -12,31 +12,40 @@ final homeWidgetOrderProvider =
 class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
   @override
   List<HomeWidgetType> build() {
+    return _applyBlackFridayOrdering(_loadBaseOrder());
+  }
+
+  static const _defaultOrder = [
+    HomeWidgetType.upNext,
+    HomeWidgetType.shortcuts,
+    HomeWidgetType.carousel,
+    HomeWidgetType.quote,
+    HomeWidgetType.products,
+  ];
+
+  List<HomeWidgetType> _loadBaseOrder() {
     final prefs = ref.read(sharedPreferencesProvider);
     final savedOrder = prefs.getStringList(
       SharedPreferenceConstants.homeWidgetOrder,
     );
+    if (savedOrder == null) return List.of(_defaultOrder);
 
-    List<HomeWidgetType> baseOrder;
-    if (savedOrder != null) {
-      baseOrder = savedOrder
-          .map((type) => HomeWidgetType.fromString(type))
-          .toList();
-      // Ensure upNext is always included if not already present
-      if (!baseOrder.contains(HomeWidgetType.upNext)) {
-        baseOrder.insert(0, HomeWidgetType.upNext);
+    // A saved order only lists the sections that existed when it was saved
+    // (products and upNext are both missing from older saves), so add any
+    // added since instead of hiding them for good: upNext at the top,
+    // anything else at the bottom. The set also drops duplicates, which
+    // fromString's fallback can produce and ReorderableListView's keys
+    // can't take.
+    final order = {...savedOrder.map(HomeWidgetType.fromString)}.toList();
+    for (final type in _defaultOrder) {
+      if (order.contains(type)) continue;
+      if (type == HomeWidgetType.upNext) {
+        order.insert(0, type);
+      } else {
+        order.add(type);
       }
-    } else {
-      baseOrder = [
-        HomeWidgetType.upNext,
-        HomeWidgetType.shortcuts,
-        HomeWidgetType.carousel,
-        HomeWidgetType.quote,
-        HomeWidgetType.products,
-      ];
     }
-
-    return _applyBlackFridayOrdering(baseOrder);
+    return order;
   }
 
   List<HomeWidgetType> _applyBlackFridayOrdering(
@@ -150,30 +159,6 @@ class HomeWidgetOrderNotifier extends Notifier<List<HomeWidgetType>> {
   }
 
   void refreshOrder() {
-    final prefs = ref.read(sharedPreferencesProvider);
-    final savedOrder = prefs.getStringList(
-      SharedPreferenceConstants.homeWidgetOrder,
-    );
-
-    List<HomeWidgetType> baseOrder;
-    if (savedOrder != null) {
-      baseOrder = savedOrder
-          .map((type) => HomeWidgetType.fromString(type))
-          .toList();
-      // Ensure upNext is always included if not already present
-      if (!baseOrder.contains(HomeWidgetType.upNext)) {
-        baseOrder.insert(0, HomeWidgetType.upNext);
-      }
-    } else {
-      baseOrder = [
-        HomeWidgetType.upNext,
-        HomeWidgetType.shortcuts,
-        HomeWidgetType.carousel,
-        HomeWidgetType.quote,
-        HomeWidgetType.products,
-      ];
-    }
-
-    state = _applyBlackFridayOrdering(baseOrder);
+    state = _applyBlackFridayOrdering(_loadBaseOrder());
   }
 }
