@@ -89,6 +89,12 @@ class MeditoTextField extends StatefulWidget {
 class _MeditoTextFieldState extends State<MeditoTextField> {
   FocusNode? _internalNode;
   late FocusNode _node;
+  TextEditingController? _internalController;
+
+  /// The counter is drawn outside the ringed box, so it needs a controller to
+  /// listen to even when the caller didn't pass one.
+  TextEditingController get _controller =>
+      widget.controller ?? (_internalController ??= TextEditingController());
 
   @override
   void initState() {
@@ -117,6 +123,7 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
   void dispose() {
     _node.removeListener(_handleFocusChange);
     _internalNode?.dispose();
+    _internalController?.dispose();
     super.dispose();
   }
 
@@ -131,6 +138,8 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
     final muted = onSurface.withOpacityValue(0.6);
     final focused = _node.hasFocus;
     final hasError = widget.errorText != null;
+    final maxLength = widget.maxLength;
+    final showCounter = maxLength != null && widget.counterText == null;
 
     OutlineInputBorder borderWith(Color color, double width) =>
         OutlineInputBorder(
@@ -146,11 +155,12 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
     final errorBorder = borderWith(theme.colorScheme.error, 1);
     final hintLabelStyle = TextStyle(fontFamily: googleSans, color: muted);
 
-    // Helper / error live below the ringed box (see class doc), so keep them
-    // out of the InputDecoration and drive the border colour ourselves.
+    // Helper / error / counter live below the ringed box (see class doc), so
+    // keep them out of the InputDecoration and drive the border colour
+    // ourselves. Otherwise the ring would wrap the built-in counter too.
     final field = TextField(
       key: widget.fieldKey,
-      controller: widget.controller,
+      controller: _controller,
       focusNode: _node,
       autofocus: widget.autofocus,
       enabled: widget.enabled,
@@ -171,7 +181,7 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
         // No floating label — the label is rendered statically above the box
         // (see below). Only the hint lives in the decoration.
         hintText: widget.hintText,
-        counterText: widget.counterText,
+        counterText: maxLength != null ? '' : widget.counterText,
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.suffixIcon,
         filled: true,
@@ -221,7 +231,16 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
 
     final label = widget.labelText;
     final subText = widget.errorText ?? widget.helperText;
-    if (label == null && subText == null) return ringedBox;
+    if (label == null && subText == null && !showCounter) return ringedBox;
+
+    final supportingColor =
+        widget.supportingTextColor ??
+        (hasError ? theme.colorScheme.error : muted);
+    final supportingStyle = TextStyle(
+      fontFamily: googleSans,
+      fontSize: 12,
+      color: supportingColor,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -241,20 +260,38 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
             ),
           ),
         ringedBox,
-        if (subText != null)
+        if (subText != null || showCounter)
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
-            child: Text(
-              subText,
-              maxLines: widget.helperMaxLines,
-              overflow:
-                  widget.helperMaxLines != null ? TextOverflow.ellipsis : null,
-              style: TextStyle(
-                fontFamily: googleSans,
-                fontSize: 12,
-                color: widget.supportingTextColor ??
-                    (hasError ? theme.colorScheme.error : muted),
-              ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: subText == null
+                      ? const SizedBox.shrink()
+                      : Text(
+                          subText,
+                          maxLines: widget.helperMaxLines,
+                          overflow: widget.helperMaxLines != null
+                              ? TextOverflow.ellipsis
+                              : null,
+                          style: supportingStyle,
+                        ),
+                ),
+                if (showCounter)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12),
+                    child: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _controller,
+                      builder: (context, value, _) => Text(
+                        '${value.text.characters.length}/$maxLength',
+                        style: supportingStyle.copyWith(
+                          color: widget.supportingTextColor ?? muted,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
       ],
