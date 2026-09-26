@@ -95,40 +95,37 @@ class AuthApiService {
     AppLogger.i('AUTH', 'OTP request successful for email: $email');
   }
 
-  // The most recent refresh, keyed by the refresh token it spent. Static
-  // because the auth repository and HttpApiService each own an instance, and
-  // both refresh on a cold start. Refresh tokens rotate, so a second call with
-  // the same (now spent) token must share this result rather than hit the
-  // server again. Only the latest entry is kept; failures are dropped.
-  static String? _lastRefreshKey;
-  static Future<AuthTokens>? _lastRefresh;
+  // The refresh currently in flight, keyed by the refresh token it uses.
+  // Static because the auth repository and HttpApiService each own an
+  // instance, and both refresh on a cold start. Only an IN-FLIGHT refresh is
+  // shared: the server hands back the same refresh token every time (it does
+  // not rotate), so a finished result must never be reused — its access token
+  // expires after 2h and would be replayed forever.
+  static String? _inFlightRefreshKey;
+  static Future<AuthTokens>? _inFlightRefresh;
 
   Future<AuthTokens> refreshToken(String refreshToken) {
-    if (refreshToken == _lastRefreshKey && _lastRefresh != null) {
-      AppLogger.i('AUTH_API', 'Sharing refresh already made with this token');
-      return _lastRefresh!;
+    final inFlight = _inFlightRefresh;
+    if (inFlight != null && refreshToken == _inFlightRefreshKey) {
+      AppLogger.i('AUTH_API', 'Joining refresh already in flight');
+      return inFlight;
     }
     final refresh = _refreshToken(refreshToken);
-    _lastRefreshKey = refreshToken;
-    _lastRefresh = refresh;
+    _inFlightRefreshKey = refreshToken;
+    _inFlightRefresh = refresh;
     unawaited(
-      refresh.then<void>(
-        (_) {},
-        onError: (Object _) {
-          if (identical(_lastRefresh, refresh)) {
-            _lastRefreshKey = null;
-            _lastRefresh = null;
-          }
-        },
-      ),
+      refresh.then<void>((_) {}, onError: (Object _) {}).whenComplete(() {
+        if (identical(_inFlightRefresh, refresh)) clearRefreshCache();
+      }),
     );
     return refresh;
   }
 
-  @visibleForTesting
-  static void resetRefreshCacheForTesting() {
-    _lastRefreshKey = null;
-    _lastRefresh = null;
+  /// Forgets any in-flight refresh so callers after a sign-out can't join a
+  /// refresh that belongs to the previous session.
+  static void clearRefreshCache() {
+    _inFlightRefreshKey = null;
+    _inFlightRefresh = null;
   }
 
   Future<AuthTokens> _refreshToken(String refreshToken) async {
@@ -160,6 +157,9 @@ class AuthApiService {
         'Email in token refresh response: $emailInResponse',
       );
 
+      final clientId =
+          response['client_id'] as String? ?? oldTokens?.clientId ?? '';
+
       // Create new tokens object with the refreshed access token
       final tokens = AuthTokens(
         accessToken: response['access_token'] as String,
@@ -167,14 +167,13 @@ class AuthApiService {
             response['refresh_token']
                 as String, // Use refresh token from response
         expiresIn: response['expires_in'] as int,
-        clientId:
-            response['client_id'] as String? ??
-            _tokens?.clientId ??
-            '', // Get from response or preserve existing
+        clientId: clientId,
+        // Only fall back to the previous email for the same client, so an
+        // email can never carry over to a different (e.g. new anonymous)
+        // account.
         email:
             emailInResponse ??
-            _tokens
-                ?.email, // Try to get email from response or preserve existing
+            (clientId == oldTokens?.clientId ? oldTokens?.email : null),
       );
 
       // Log differences between old and new tokens
@@ -273,6 +272,7 @@ class AuthApiService {
 
   Future<void> clearAuthTokens() async {
     _tokens = null;
+    clearRefreshCache();
     await _secureStorage.clearRefreshToken();
   }
 

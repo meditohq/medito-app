@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
@@ -65,6 +67,7 @@ void main() {
     registerFallbackValue(<String, String>{});
 
     when(() => mockUuid.v4()).thenReturn('test-uuid-value-1234');
+    when(() => mockHttpApiService.clearLocalAuth()).thenAnswer((_) async {});
   });
 
   group('AuthRepositoryImpl', () {
@@ -334,7 +337,7 @@ void main() {
       verify(() => mockHttpApiService.signOut()).called(1);
       verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
       verify(() => mockSecureStorageService.clearUserEmail()).called(1);
-      verify(() => mockHttpApiService.clearAuthHeader()).called(1);
+      verify(() => mockHttpApiService.clearLocalAuth()).called(1);
       verify(
         () => mockPreferences.setBool(
           SharedPreferenceConstants.isLoggedIn,
@@ -679,7 +682,7 @@ void main() {
         verify(() => mockAuthApiService.refreshToken(refreshToken)).called(1);
         verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
         verify(() => mockSecureStorageService.clearUserEmail()).called(1);
-        verify(() => mockHttpApiService.clearAuthHeader()).called(1);
+        verify(() => mockHttpApiService.clearLocalAuth()).called(1);
         verify(
           () => mockPreferences.setBool(
             SharedPreferenceConstants.isLoggedIn,
@@ -711,6 +714,96 @@ void main() {
         // Verify called 3 times (max retries)
         verify(() => mockAuthApiService.refreshToken(refreshToken)).called(3);
       });
+    });
+  });
+
+  group('sign-out guards', () {
+    const refreshToken = 'test-refresh-token';
+
+    Future<void> Function() capturedSupplier() =>
+        verify(
+              () => mockHttpApiService.setTokenSupplier(captureAny()),
+            ).captured.single
+            as Future<void> Function();
+
+    void stubSignOutStorage() {
+      when(
+        () => mockPreferences.setBool(any(), any()),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockSecureStorageService.clearRefreshToken(),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockSecureStorageService.clearUserEmail(),
+      ).thenAnswer((_) async {});
+      when(() => mockAuthApiService.clearAuthTokens()).thenAnswer((_) async {});
+    }
+
+    test('the token supplier never refreshes for a signed-out user', () async {
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(false);
+      when(
+        () => mockSecureStorageService.getRefreshToken(),
+      ).thenAnswer((_) async => 'leftover-keychain-token');
+
+      await capturedSupplier()();
+
+      verifyNever(() => mockSecureStorageService.getRefreshToken());
+      verifyNever(() => mockAuthApiService.refreshToken(any()));
+      verifyNever(() => mockHttpApiService.setAuthHeader(any()));
+    });
+
+    test('the token supplier sets the header for a signed-in user', () async {
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(true);
+      when(
+        () => mockSecureStorageService.getRefreshToken(),
+      ).thenAnswer((_) async => refreshToken);
+      when(() => mockAuthApiService.refreshToken(refreshToken)).thenAnswer(
+        (_) async => AuthTokens(
+          accessToken: 'fresh',
+          refreshToken: refreshToken,
+          expiresIn: 7200,
+          clientId: 'client',
+        ),
+      );
+
+      await capturedSupplier()();
+
+      verify(
+        () => mockHttpApiService.setAuthHeader('fresh'),
+      ).called(greaterThan(0));
+    });
+
+    test('a refresh that finishes after signOutLocally is dropped', () async {
+      stubSignOutStorage();
+      when(
+        () => mockSecureStorageService.getRefreshToken(),
+      ).thenAnswer((_) async => refreshToken);
+      final pending = Completer<AuthTokens>();
+      when(
+        () => mockAuthApiService.refreshToken(refreshToken),
+      ).thenAnswer((_) => pending.future);
+
+      final token = authRepository.getToken();
+      await pumpEventQueue();
+      await authRepository.signOutLocally();
+      pending.complete(
+        AuthTokens(
+          accessToken: 'deleted-account-access',
+          refreshToken: refreshToken,
+          expiresIn: 7200,
+          clientId: 'deleted-client',
+          email: 'gone@example.com',
+        ),
+      );
+
+      await expectLater(token, throwsA(isA<UnauthorizedError>()));
+      verifyNever(() => mockHttpApiService.setAuthHeader(any()));
+      verifyNever(() => mockSecureStorageService.storeUserEmail(any()));
+      verify(() => mockHttpApiService.clearLocalAuth()).called(1);
     });
   });
 
