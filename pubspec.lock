@@ -1841,14 +1841,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.6.1"
-  xml2json:
-    dependency: "direct main"
-    description:
-      name: xml2json
-      sha256: "8a7ae63b76676f083d81287b61f03222952609c0507893bc62e60a4a588a9702"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.2.7"
   yaml:
     dependency: transitive
     description:

@@ -10,7 +10,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/home/products_provider.dart';
+import 'package:medito/providers/shop/shop_providers.dart';
+import 'package:medito/services/shop/fourthwall_service.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:medito/routes/routes.dart';
@@ -209,14 +210,20 @@ class _HomeViewState extends ConsumerState<HomeView>
   Future<void> _onRefresh() async {
     ref.invalidate(fetchLatestAnnouncementProvider);
     ref.invalidate(refreshHomeAPIsProvider);
-    ref.invalidate(refreshProductsProvider);
+    // The shop row fetches lazily; only refresh it if it already has.
+    for (final collection in [
+      FourthwallService.homeCollection,
+      FourthwallService.allCollection,
+    ]) {
+      final shop = shopListingProvider(collection);
+      if (ref.exists(shop)) ref.invalidate(shop);
+    }
     // Refetch all pack data; upNext is derived and will re-derive automatically.
     ref.invalidate(packDataProvider);
     await Future.wait([
       ref.read(statsProvider.notifier).refresh(),
       ref.read(fetchLatestAnnouncementProvider.future),
       ref.read(refreshHomeAPIsProvider.future),
-      ref.read(refreshProductsProvider.future),
     ]);
   }
 

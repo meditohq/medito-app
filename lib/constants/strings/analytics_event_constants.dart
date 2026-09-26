@@ -820,21 +820,48 @@ class AnalyticsEventConstants {
   static const String playerDownloadTapped = 'player_download_tapped';
 
   /// User confirms deleting a player download. Parameters: track_id, file_id.
-  static const String playerDownloadDeleteConfirmed = 'player_download_delete_confirmed';
+  static const String playerDownloadDeleteConfirmed =
+      'player_download_delete_confirmed';
 
   /// User opens the background sound screen from the player.
-  static const String playerBackgroundSoundsOpened = 'player_background_sounds_opened';
+  static const String playerBackgroundSoundsOpened =
+      'player_background_sounds_opened';
 
   /// User taps background sounds on a track that disables them. Parameter: track_id.
-  static const String playerBackgroundSoundsUnavailable = 'player_background_sounds_unavailable';
+  static const String playerBackgroundSoundsUnavailable =
+      'player_background_sounds_unavailable';
 
   /// User taps a background sound, including None; does not imply playback success. Parameters: sound_id, sound_title.
   static const String backgroundSoundSelected = 'background_sound_selected';
 
   /// User retries a failed background sound. Parameters: sound_id, sound_title.
-  static const String backgroundSoundRetryTapped = 'background_sound_retry_tapped';
+  static const String backgroundSoundRetryTapped =
+      'background_sound_retry_tapped';
 
   /// User finishes a background volume slider gesture. Parameter: volume (0–100).
-  static const String backgroundSoundVolumeChanged = 'background_sound_volume_changed';
+  static const String backgroundSoundVolumeChanged =
+      'background_sound_volume_changed';
 
+  // Native shop (Fourthwall Storefront API). `source` says where the user
+  // came from: home_header, home_card, settings, deeplink, shop_grid,
+  // bag_add_on.
+
+  /// Shop grid opened. Params: source.
+  static const String shopViewed = 'shop_viewed';
+
+  /// Native product page opened. Params: product_slug, source.
+  static const String shopProductViewed = 'shop_product_viewed';
+
+  /// "Add to bag" tapped on a product page. Params: product_slug,
+  /// variant_id, quantity, value, currency.
+  static const String shopAddToBag = 'shop_add_to_bag';
+
+  /// "Checkout" tapped in the bag; opens Fourthwall's hosted checkout.
+  /// Params: items (lines), quantity (units), value, currency.
+  static const String shopCheckoutStarted = 'shop_checkout_started';
+
+  static const String sourceHomeHeader = 'home_header';
+  static const String sourceHomeCard = 'home_card';
+  static const String sourceShopGrid = 'shop_grid';
+  static const String sourceBagAddOn = 'bag_add_on';
 }

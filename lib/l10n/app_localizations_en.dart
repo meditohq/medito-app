@@ -2656,4 +2656,130 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get packAddedToHome =>
       'Added to Home so you can pick up where you left off.';
+
+  @override
+  String get shopSubtitle =>
+      'Every purchase helps keep Medito free for everyone.';
+
+  @override
+  String get shopAllCollection => 'All';
+
+  @override
+  String shopFromPrice(String price) {
+    return 'From $price';
+  }
+
+  @override
+  String get shopSoldOut => 'Sold out';
+
+  @override
+  String get shopAddToBag => 'Add to bag';
+
+  @override
+  String get shopAddedToBag => 'Added to bag';
+
+  @override
+  String get shopSelectSize => 'Select a size';
+
+  @override
+  String get shopColour => 'Colour';
+
+  @override
+  String get shopSize => 'Size';
+
+  @override
+  String get shopOption => 'Option';
+
+  @override
+  String get shopBagTitle => 'Your bag';
+
+  @override
+  String get shopBagEmpty => 'Your bag is empty';
+
+  @override
+  String get shopBagEmptyBody =>
+      'Anything you add will wait here until you\'re ready.';
+
+  @override
+  String get shopBrowse => 'Browse the shop';
+
+  @override
+  String get shopSubtotal => 'Subtotal';
+
+  @override
+  String get shopShippingNote =>
+      'Shipping and taxes are calculated at checkout.';
+
+  @override
+  String get shopCheckout => 'Checkout';
+
+  @override
+  String get shopCheckoutPrompt => 'Already placed your order?';
+
+  @override
+  String get shopClearBag => 'Clear bag';
+
+  @override
+  String get shopSupportNote =>
+      'Medito is a nonprofit. Every purchase supports free meditation for everyone.';
+
+  @override
+  String get shopLoadError => 'We couldn\'t load the shop right now.';
+
+  @override
+  String get shopOpenInBrowser => 'Open in browser';
+
+  @override
+  String get shopRemoveItem => 'Remove';
+
+  @override
+  String get shopIncreaseQuantity => 'Increase quantity';
+
+  @override
+  String get shopDecreaseQuantity => 'Decrease quantity';
+
+  @override
+  String get shopViewBag => 'View bag';
+
+  @override
+  String get shopMoreDetails => 'Details';
+
+  @override
+  String shopBagItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shopSeeAll => 'See all';
+
+  @override
+  String get shopAddOnsTitle => 'Add a little something';
+
+  @override
+  String get shopSizeGuide => 'Size guide';
+
+  @override
+  String get shopSizeChartNote =>
+      'Garment measurements laid flat, from the supplier. They can vary by up to 2 in (5 cm), so compare with a tee you own.';
+
+  @override
+  String get shopMeasureLength => 'Length';
+
+  @override
+  String get shopMeasureWidth => 'Width';
+
+  @override
+  String get shopMeasureSleeve => 'Sleeve';
+
+  @override
+  String get shopInches => 'in';
+
+  @override
+  String get shopCentimetres => 'cm';
 }

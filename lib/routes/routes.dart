@@ -23,6 +23,9 @@ import 'package:medito/views/donation/webview_donation_screen.dart';
 import 'package:medito/views/favorites/favorites_view.dart';
 import 'package:medito/views/stats/stats_screen.dart';
 import 'package:medito/views/settings/analytics_settings_screen.dart';
+import 'package:medito/views/shop/product_screen.dart';
+import 'package:medito/views/shop/shop_screen.dart';
+import 'package:medito/services/shop/fourthwall_service.dart';
 
 extension SanitisePath on String {
   String sanitisePath() => replaceFirst('/', '');
@@ -59,7 +62,10 @@ Future<void> handleNavigation(
   } else if (type == TypeConstants.url || type == TypeConstants.link) {
     final url = ids.last ?? 'https://meditofoundation.org/';
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
+    final shopRoute = _nativeShopRoute(uri);
+    if (shopRoute != null) {
+      await _pushRoute(shopRoute, ref);
+    } else if (await canLaunchUrl(uri)) {
       final isEditStatsUrl = url.startsWith(editStatsUrl);
       await Navigator.push<bool>(
         context,
@@ -98,12 +104,44 @@ Future<void> handleNavigation(
     );
     final initialTabIndex = statsPath?.contains(':history') == true ? 1 : 0;
     await _pushRoute(StatsScreen(initialTabIndex: initialTabIndex), ref);
+  } else if (type == TypeConstants.route && ids.any(_isShopRoute)) {
+    final id = ids.firstWhere(_isShopRoute)!;
+    final slug = id.contains(':') ? id.substring(id.indexOf(':') + 1) : '';
+    final source = sourceRouteName ?? AnalyticsEventConstants.sourceDeeplink;
+    await _pushRoute(
+      slug.isEmpty
+          ? ShopScreen(source: source)
+          : ProductScreen(slug: slug, source: source),
+      ref,
+    );
   } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.analytics)) {
     await _pushRoute(const AnalyticsSettingsScreen(), ref);
   } else if (type == '/debug_info') {
     await _pushRoute(const DebugInfoScreen(), ref);
   }
+}
+
+bool _isShopRoute(String? id) =>
+    id == RouteConstants.shop ||
+    (id?.startsWith('${RouteConstants.shop}:') ?? false);
+
+/// Links to shop.medito.app (announcements, carousel, settings) open the
+/// native shop: the storefront root or a collection opens the grid, a
+/// product link opens that product. Anything else stays on the web.
+Widget? _nativeShopRoute(Uri uri) {
+  if (uri.host != FourthwallService.shopDomain) return null;
+  final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
+  if (segments.isEmpty || segments.first == 'collections') {
+    return const ShopScreen(source: AnalyticsEventConstants.sourceDeeplink);
+  }
+  if (segments.first == 'products' && segments.length > 1) {
+    return ProductScreen(
+      slug: segments[1],
+      source: AnalyticsEventConstants.sourceDeeplink,
+    );
+  }
+  return null;
 }
 
 Future<bool?> _pushRoute(Widget route, WidgetRef? ref) async {

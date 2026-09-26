@@ -106,13 +106,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.supportCommunitySection,
-        type: TypeConstants.url,
+        type: TypeConstants.route,
         title: AppLocalizations.of(context)!.shopTitle,
         icon: MeditoIcon(
           assetName: MeditoIcons.shop,
           color: Theme.of(context).colorScheme.onSurface,
         ),
-        path: 'https://shop.medito.app',
+        path: RouteConstants.shop,
       ),
       SettingsItem(
         section: AppLocalizations.of(context)!.helpLegalSection,
@@ -265,9 +265,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       [item.path.toString().getIdFromPath(), item.path],
       context,
       ref: ref,
-      sourceRouteName: item.path == RouteConstants.donation
-          ? FirebaseAnalyticsService.paywallSourceSettings
-          : null,
+      sourceRouteName: switch (item.path) {
+        RouteConstants.donation =>
+          FirebaseAnalyticsService.paywallSourceSettings,
+        RouteConstants.shop => AnalyticsEventConstants.sourceSettings,
+        _ => null,
+      },
     );
   }
 

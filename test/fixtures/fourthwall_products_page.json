@@ -1,0 +1,696 @@
+{
+ "results": [
+  {
+   "id": "54c8de66-1675-43d1-8646-0da09c7d7193",
+   "name": "Sleepy Cat T-Shirt",
+   "slug": "sleepy-cat-t-shirt",
+   "description": "<p>Made with soft lightweight fabric and a classic fit, this unisex t-shirt is perfect for those seeking comfort and style.</p>",
+   "state": {
+    "type": "AVAILABLE"
+   },
+   "access": {
+    "type": "PUBLIC"
+   },
+   "images": [
+    {
+     "id": "bb6afffc-b62a-4659-a44f-c3384a207721",
+     "url": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp",
+     "width": 675,
+     "height": 900,
+     "transformedUrl": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp"
+    },
+    {
+     "id": "7a35a0be-c2cb-4f2c-b0c7-342386d659d2",
+     "url": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp",
+     "width": 1536,
+     "height": 2048,
+     "transformedUrl": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp"
+    }
+   ],
+   "variants": [
+    {
+     "id": "1609f5d7-1d38-4d1e-829a-97664d3f9c24",
+     "name": "Sleepy Cat T-Shirt - Lilac, S",
+     "unitPrice": {
+      "value": 28.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "Lilac, S",
+      "color": {
+       "name": "Lilac",
+       "swatch": "#eec9e2"
+      },
+      "size": {
+       "name": "S"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "bb6afffc-b62a-4659-a44f-c3384a207721",
+       "url": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp",
+       "width": 675,
+       "height": 900,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp"
+      },
+      {
+       "id": "7a35a0be-c2cb-4f2c-b0c7-342386d659d2",
+       "url": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp"
+      }
+     ]
+    },
+    {
+     "id": "9c89b955-4b47-4cb3-b67e-be87e631732c",
+     "name": "Sleepy Cat T-Shirt - Lilac, M",
+     "unitPrice": {
+      "value": 28.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "Lilac, M",
+      "color": {
+       "name": "Lilac",
+       "swatch": "#eec9e2"
+      },
+      "size": {
+       "name": "M"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "bb6afffc-b62a-4659-a44f-c3384a207721",
+       "url": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp",
+       "width": 675,
+       "height": 900,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp"
+      },
+      {
+       "id": "7a35a0be-c2cb-4f2c-b0c7-342386d659d2",
+       "url": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp"
+      }
+     ]
+    },
+    {
+     "id": "a15b2f53-686c-4072-85db-0b4faae9a581",
+     "name": "Sleepy Cat T-Shirt - Lilac, L",
+     "unitPrice": {
+      "value": 28.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "Lilac, L",
+      "color": {
+       "name": "Lilac",
+       "swatch": "#eec9e2"
+      },
+      "size": {
+       "name": "L"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "bb6afffc-b62a-4659-a44f-c3384a207721",
+       "url": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp",
+       "width": 675,
+       "height": 900,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp"
+      },
+      {
+       "id": "7a35a0be-c2cb-4f2c-b0c7-342386d659d2",
+       "url": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp"
+      }
+     ]
+    },
+    {
+     "id": "4f9070ec-c05e-43f0-bcdc-e43ede3f1a67",
+     "name": "Sleepy Cat T-Shirt - Lilac, XL",
+     "unitPrice": {
+      "value": 28.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "Lilac, XL",
+      "color": {
+       "name": "Lilac",
+       "swatch": "#eec9e2"
+      },
+      "size": {
+       "name": "XL"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "bb6afffc-b62a-4659-a44f-c3384a207721",
+       "url": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp",
+       "width": 675,
+       "height": 900,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp"
+      },
+      {
+       "id": "7a35a0be-c2cb-4f2c-b0c7-342386d659d2",
+       "url": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp"
+      }
+     ]
+    },
+    {
+     "id": "449d9cd3-c893-4bcc-9a54-6fa6ef2cefb0",
+     "name": "Sleepy Cat T-Shirt - Lilac, 2XL",
+     "unitPrice": {
+      "value": 30.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "Lilac, 2XL",
+      "color": {
+       "name": "Lilac",
+       "swatch": "#eec9e2"
+      },
+      "size": {
+       "name": "2XL"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "bb6afffc-b62a-4659-a44f-c3384a207721",
+       "url": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp",
+       "width": 675,
+       "height": 900,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/QMrOfmm8ZsTqCyO6_TEvSBA-6v6naBnc1fdPdEZTxbU/w:1920/sm:1/enc/0uRKcPWG9S-fwY1W/yCdpisLnQA4OLbqF/bRZhGMgQqAYNFSEu/1mqZ57jTCNlOOp1H/UwGhPLk1yBaYBOhk/zj6qt3_kWX9-gBmx/aFzD_K5jG_Rr79Ht/KgJmBPNCQ4CLl2-V/yG-MVvVnHWXlgx7m/XvHJcZqcJK2CSjFS/XDEunzYC4qNszx19/04Dp85nui3SxNna8/wLlo4pbif3DsEyG-/zDhyZw.webp"
+      },
+      {
+       "id": "7a35a0be-c2cb-4f2c-b0c7-342386d659d2",
+       "url": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/V35Q5bo0JXZAFll9Vw064ShuE0jqPm6FfctgHuimW4k/w:1920/sm:1/enc/BN1NLmUytIWo2wDw/_ntGgttxoKPWEE52/ygQ5jAZuY4q_k6-y/W051XQ6ShcNdaSIT/yEhm3fFMbqvo7yzs/g_jb02LH3To6n_Vk/ks75MLnYQXi3-P7h/rIJknLS_EsBQ9uY1/GxHq7iy_7LgpnOaG/CJZbQbe-iWLYwjkV/UKV6_bMExkgmHOo4/p48ICa0d7-wyDJox/Huuwk0FoDKD27Lym/dJslcXV9LiTot4lg/s6NOTmCY8mk.webp"
+      }
+     ]
+    },
+    {
+     "id": "842029ae-b954-4f90-a780-cd0b1de9817d",
+     "name": "Sleepy Cat T-Shirt - Gold, S",
+     "unitPrice": {
+      "value": 28.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "Gold, S",
+      "color": {
+       "name": "Gold",
+       "swatch": "#fea729"
+      },
+      "size": {
+       "name": "S"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "6dda3f71-8f4d-4a7e-b32f-5dc9b6e84f3a",
+       "url": "https://imgproxy.fourthwall.dev/dRCLZe7Z_8lTTUwZqDpP3HFptPZIW2SoG1PQ-UvK-R8/w:1920/sm:1/enc/9Mm5D5yf_L8zRsrU/vv41OEmRza4xVn3D/vVbvXQ9jbf7Xj4mw/l-jHLO61rDZ4bqhD/7CX9sSMPVVu1aQs3/gzFwseqS4iIU5mAP/M5oMgyaBhg_LdNRR/R-09cItzZJRaj13J/qhaPDdtIJ3mU2c1i/b62Hb-DSUcEj7SrA/U3ltMrXAduxk_ARK/SOj3EncTb4FOYt6G/6sDk5c9Efmewqryu/R4gW3YgDFEHP2TRB/gh4tIa8ajLk.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/dRCLZe7Z_8lTTUwZqDpP3HFptPZIW2SoG1PQ-UvK-R8/w:1920/sm:1/enc/9Mm5D5yf_L8zRsrU/vv41OEmRza4xVn3D/vVbvXQ9jbf7Xj4mw/l-jHLO61rDZ4bqhD/7CX9sSMPVVu1aQs3/gzFwseqS4iIU5mAP/M5oMgyaBhg_LdNRR/R-09cItzZJRaj13J/qhaPDdtIJ3mU2c1i/b62Hb-DSUcEj7SrA/U3ltMrXAduxk_ARK/SOj3EncTb4FOYt6G/6sDk5c9Efmewqryu/R4gW3YgDFEHP2TRB/gh4tIa8ajLk.webp"
+      },
+      {
+       "id": "b1d7e490-0ad2-45e3-9867-bbcd0e83a5bf",
+       "url": "https://imgproxy.fourthwall.dev/quw4BfUTTqwyawsMFcJPbnYD-J4BkhYQj3CfTZM0szY/w:1920/sm:1/enc/oz70sqFIeoL3oANG/mYmwXzLQ_KJekYyy/-19dm56asrZQERtQ/a93ZhCnuO3K1Uo0b/8VPxDTnwen5odgnK/cX_QnYcnsMe0UTEx/bDTPsWBCjRuBsw6e/x3hv7JBJTC8tw9H7/Fww5oWmgmRUbPymE/o0Y11thZT6zRs3AP/S5dSoT1bFk_ZnabY/Hbh0XZMtF1ikmiOC/Qy8rSWbeC4VnPdaD/G5e5un98UztjrGt7/ztJhpf-cQeM.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/quw4BfUTTqwyawsMFcJPbnYD-J4BkhYQj3CfTZM0szY/w:1920/sm:1/enc/oz70sqFIeoL3oANG/mYmwXzLQ_KJekYyy/-19dm56asrZQERtQ/a93ZhCnuO3K1Uo0b/8VPxDTnwen5odgnK/cX_QnYcnsMe0UTEx/bDTPsWBCjRuBsw6e/x3hv7JBJTC8tw9H7/Fww5oWmgmRUbPymE/o0Y11thZT6zRs3AP/S5dSoT1bFk_ZnabY/Hbh0XZMtF1ikmiOC/Qy8rSWbeC4VnPdaD/G5e5un98UztjrGt7/ztJhpf-cQeM.webp"
+      }
+     ]
+    },
+    {
+     "id": "212738a8-c0fb-4d44-a54b-50fa0460da43",
+     "name": "Sleepy Cat T-Shirt - Gold, M",
+     "unitPrice": {
+      "value": 28.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "Gold, M",
+      "color": {
+       "name": "Gold",
+       "swatch": "#fea729"
+      },
+      "size": {
+       "name": "M"
+      }
+     },
+     "stock": {
+      "type": "LIMITED",
+      "inStock": 0
+     },
+     "images": [
+      {
+       "id": "6dda3f71-8f4d-4a7e-b32f-5dc9b6e84f3a",
+       "url": "https://imgproxy.fourthwall.dev/dRCLZe7Z_8lTTUwZqDpP3HFptPZIW2SoG1PQ-UvK-R8/w:1920/sm:1/enc/9Mm5D5yf_L8zRsrU/vv41OEmRza4xVn3D/vVbvXQ9jbf7Xj4mw/l-jHLO61rDZ4bqhD/7CX9sSMPVVu1aQs3/gzFwseqS4iIU5mAP/M5oMgyaBhg_LdNRR/R-09cItzZJRaj13J/qhaPDdtIJ3mU2c1i/b62Hb-DSUcEj7SrA/U3ltMrXAduxk_ARK/SOj3EncTb4FOYt6G/6sDk5c9Efmewqryu/R4gW3YgDFEHP2TRB/gh4tIa8ajLk.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/dRCLZe7Z_8lTTUwZqDpP3HFptPZIW2SoG1PQ-UvK-R8/w:1920/sm:1/enc/9Mm5D5yf_L8zRsrU/vv41OEmRza4xVn3D/vVbvXQ9jbf7Xj4mw/l-jHLO61rDZ4bqhD/7CX9sSMPVVu1aQs3/gzFwseqS4iIU5mAP/M5oMgyaBhg_LdNRR/R-09cItzZJRaj13J/qhaPDdtIJ3mU2c1i/b62Hb-DSUcEj7SrA/U3ltMrXAduxk_ARK/SOj3EncTb4FOYt6G/6sDk5c9Efmewqryu/R4gW3YgDFEHP2TRB/gh4tIa8ajLk.webp"
+      },
+      {
+       "id": "b1d7e490-0ad2-45e3-9867-bbcd0e83a5bf",
+       "url": "https://imgproxy.fourthwall.dev/quw4BfUTTqwyawsMFcJPbnYD-J4BkhYQj3CfTZM0szY/w:1920/sm:1/enc/oz70sqFIeoL3oANG/mYmwXzLQ_KJekYyy/-19dm56asrZQERtQ/a93ZhCnuO3K1Uo0b/8VPxDTnwen5odgnK/cX_QnYcnsMe0UTEx/bDTPsWBCjRuBsw6e/x3hv7JBJTC8tw9H7/Fww5oWmgmRUbPymE/o0Y11thZT6zRs3AP/S5dSoT1bFk_ZnabY/Hbh0XZMtF1ikmiOC/Qy8rSWbeC4VnPdaD/G5e5un98UztjrGt7/ztJhpf-cQeM.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/quw4BfUTTqwyawsMFcJPbnYD-J4BkhYQj3CfTZM0szY/w:1920/sm:1/enc/oz70sqFIeoL3oANG/mYmwXzLQ_KJekYyy/-19dm56asrZQERtQ/a93ZhCnuO3K1Uo0b/8VPxDTnwen5odgnK/cX_QnYcnsMe0UTEx/bDTPsWBCjRuBsw6e/x3hv7JBJTC8tw9H7/Fww5oWmgmRUbPymE/o0Y11thZT6zRs3AP/S5dSoT1bFk_ZnabY/Hbh0XZMtF1ikmiOC/Qy8rSWbeC4VnPdaD/G5e5un98UztjrGt7/ztJhpf-cQeM.webp"
+      }
+     ]
+    }
+   ],
+   "additionalInformation": [
+    {
+     "type": "MORE_DETAILS",
+     "title": "More details",
+     "bodyHtml": "<ul><li>Solid colors are 100% Airlume combed and ring-spun cotton</li><li>Ash color is 99% combed and ring-spun cotton, 1% polyester</li><li>Heather colors are 52% combed and ring-spun cotton, 48% polyester</li><li>Athletic and Black Heather are 90% combed and ring-spun cotton, 10% polyester</li><li>Heather Prism colors are 99% combed and ring-spun cotton, 1% polyester</li><li>Lightweight fabric (4.2 oz)&nbsp;</li><li>Regular fit</li><li>Unisex sizing</li></ul>"
+    },
+    {
+     "type": "GUARANTEE_AND_RETURNS",
+     "title": "Quality Guarantee & Returns",
+     "bodyHtml": "<ul><li>Quality is guaranteed. If there is a print error or visible quality issue, we'll replace or refund it.</li><li>Because the products are made to order, we do not accept general returns or sizing-related returns.</li></ul>"
+    }
+   ],
+   "sizeGuide": null,
+   "createdAt": "2025-03-23T13:12:59.016467Z",
+   "updatedAt": "2026-02-18T23:54:34.482235Z",
+   "type": "PRODUCT"
+  },
+  {
+   "id": "71a1578b-c36f-4852-997c-48adc3952af9",
+   "name": "Sleepy Cat Mug",
+   "slug": "sleepy-cat-mug",
+   "description": "",
+   "state": {
+    "type": "AVAILABLE"
+   },
+   "access": {
+    "type": "PUBLIC"
+   },
+   "images": [
+    {
+     "id": "2c6929f8-8916-485f-83ae-0fba10550f15",
+     "url": "https://imgproxy.fourthwall.dev/X_PfUp3hCXDTRZAc42YAz0mPcOUGH9D3KJ525J6lx1U/w:1920/sm:1/enc/Fw8buECxyy_1MdLJ/kx6h90ilC3iYeR3u/Ow4bK-PPasO8hsw9/XYl81RIH10yteWlN/tg2XsKs1fYO5vpFw/oDfCxWI-MSDBKhtk/Q2q9PCb_DYtGiCL-/1tYDdF-3p7_7_kHh/eChiwL2REvqbEtwM/sheu52AFHiXsretp/ddywNlMPFeWmlGhb/cynGiihQp52RDQX8/0kV7awcIG6TwadiK/QeIjPA.webp",
+     "width": 280,
+     "height": 373,
+     "transformedUrl": "https://imgproxy.fourthwall.dev/X_PfUp3hCXDTRZAc42YAz0mPcOUGH9D3KJ525J6lx1U/w:1920/sm:1/enc/Fw8buECxyy_1MdLJ/kx6h90ilC3iYeR3u/Ow4bK-PPasO8hsw9/XYl81RIH10yteWlN/tg2XsKs1fYO5vpFw/oDfCxWI-MSDBKhtk/Q2q9PCb_DYtGiCL-/1tYDdF-3p7_7_kHh/eChiwL2REvqbEtwM/sheu52AFHiXsretp/ddywNlMPFeWmlGhb/cynGiihQp52RDQX8/0kV7awcIG6TwadiK/QeIjPA.webp"
+    },
+    {
+     "id": "dafd8dc6-1dbe-46e9-9601-31912c06df3c",
+     "url": "https://imgproxy.fourthwall.dev/u-f9s5AjhHdCsd6yUxiglQQBuFRF8sn49FyMWKdN9X8/w:1920/sm:1/enc/1QtacHlfEt-JK3HL/cJPBFOXbYBQHj2Te/O8yCuoJTJewy4yhA/-iNiElJZZOi9wNtT/AyWgAHIkOT3-lpeM/pp3rGXFiwEwHKlYh/AzNyAU1XaWcefzx0/lhA7ZCUXkVhRtm6m/-wEWZqY2emdNRiC8/Rf4CklA3E69S0WsH/LhXzVbm4514roWBN/9Zd8c6Ph5Jj21_hn/oaEDyXCrXqDWUiA4/rUgKSi1AJpqzj6nq/6L7QUb-CQCc.webp",
+     "width": 1536,
+     "height": 2048,
+     "transformedUrl": "https://imgproxy.fourthwall.dev/u-f9s5AjhHdCsd6yUxiglQQBuFRF8sn49FyMWKdN9X8/w:1920/sm:1/enc/1QtacHlfEt-JK3HL/cJPBFOXbYBQHj2Te/O8yCuoJTJewy4yhA/-iNiElJZZOi9wNtT/AyWgAHIkOT3-lpeM/pp3rGXFiwEwHKlYh/AzNyAU1XaWcefzx0/lhA7ZCUXkVhRtm6m/-wEWZqY2emdNRiC8/Rf4CklA3E69S0WsH/LhXzVbm4514roWBN/9Zd8c6Ph5Jj21_hn/oaEDyXCrXqDWUiA4/rUgKSi1AJpqzj6nq/6L7QUb-CQCc.webp"
+    }
+   ],
+   "variants": [
+    {
+     "id": "7f2cfbf9-6bb1-4eb3-a387-5a3510eefda6",
+     "name": "Sleepy Cat Mug - White, 11oz",
+     "unitPrice": {
+      "value": 12.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "White, 11oz",
+      "color": {
+       "name": "White",
+       "swatch": "#ffffff"
+      },
+      "size": {
+       "name": "11oz"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "2c6929f8-8916-485f-83ae-0fba10550f15",
+       "url": "https://imgproxy.fourthwall.dev/X_PfUp3hCXDTRZAc42YAz0mPcOUGH9D3KJ525J6lx1U/w:1920/sm:1/enc/Fw8buECxyy_1MdLJ/kx6h90ilC3iYeR3u/Ow4bK-PPasO8hsw9/XYl81RIH10yteWlN/tg2XsKs1fYO5vpFw/oDfCxWI-MSDBKhtk/Q2q9PCb_DYtGiCL-/1tYDdF-3p7_7_kHh/eChiwL2REvqbEtwM/sheu52AFHiXsretp/ddywNlMPFeWmlGhb/cynGiihQp52RDQX8/0kV7awcIG6TwadiK/QeIjPA.webp",
+       "width": 280,
+       "height": 373,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/X_PfUp3hCXDTRZAc42YAz0mPcOUGH9D3KJ525J6lx1U/w:1920/sm:1/enc/Fw8buECxyy_1MdLJ/kx6h90ilC3iYeR3u/Ow4bK-PPasO8hsw9/XYl81RIH10yteWlN/tg2XsKs1fYO5vpFw/oDfCxWI-MSDBKhtk/Q2q9PCb_DYtGiCL-/1tYDdF-3p7_7_kHh/eChiwL2REvqbEtwM/sheu52AFHiXsretp/ddywNlMPFeWmlGhb/cynGiihQp52RDQX8/0kV7awcIG6TwadiK/QeIjPA.webp"
+      },
+      {
+       "id": "dafd8dc6-1dbe-46e9-9601-31912c06df3c",
+       "url": "https://imgproxy.fourthwall.dev/u-f9s5AjhHdCsd6yUxiglQQBuFRF8sn49FyMWKdN9X8/w:1920/sm:1/enc/1QtacHlfEt-JK3HL/cJPBFOXbYBQHj2Te/O8yCuoJTJewy4yhA/-iNiElJZZOi9wNtT/AyWgAHIkOT3-lpeM/pp3rGXFiwEwHKlYh/AzNyAU1XaWcefzx0/lhA7ZCUXkVhRtm6m/-wEWZqY2emdNRiC8/Rf4CklA3E69S0WsH/LhXzVbm4514roWBN/9Zd8c6Ph5Jj21_hn/oaEDyXCrXqDWUiA4/rUgKSi1AJpqzj6nq/6L7QUb-CQCc.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/u-f9s5AjhHdCsd6yUxiglQQBuFRF8sn49FyMWKdN9X8/w:1920/sm:1/enc/1QtacHlfEt-JK3HL/cJPBFOXbYBQHj2Te/O8yCuoJTJewy4yhA/-iNiElJZZOi9wNtT/AyWgAHIkOT3-lpeM/pp3rGXFiwEwHKlYh/AzNyAU1XaWcefzx0/lhA7ZCUXkVhRtm6m/-wEWZqY2emdNRiC8/Rf4CklA3E69S0WsH/LhXzVbm4514roWBN/9Zd8c6Ph5Jj21_hn/oaEDyXCrXqDWUiA4/rUgKSi1AJpqzj6nq/6L7QUb-CQCc.webp"
+      }
+     ]
+    },
+    {
+     "id": "911a59a1-b97f-497c-8541-e2eb04b42ea4",
+     "name": "Sleepy Cat Mug - White, 15oz",
+     "unitPrice": {
+      "value": 14.55,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "White, 15oz",
+      "color": {
+       "name": "White",
+       "swatch": "#ffffff"
+      },
+      "size": {
+       "name": "15oz"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "8c3882a7-bcaf-46e0-b1c8-9fbffb7d574b",
+       "url": "https://imgproxy.fourthwall.dev/KR4rdnr-X1BXPMkjpeQPLq-0UzihqGh1FO7y4MTLNao/w:1920/sm:1/enc/v713UYyrfWgCfe2n/WRQzOj6g7Qhc0v6G/C3t156x5U07cs14X/kGKuHXvNXVUEUdID/103-C_LHlkYSuy6c/brydD1unl7sCK_Zs/TOS5lVUFmELcWJi_/C5HbMbeiQQk71uyW/0jFINH2wqt2FasLK/6RNnWQTKrmoR-0zy/zkrTnaPwzFw_x-5f/Dy9_3Qcsst8K5N7T/0eVYkKgL0_IJX_8x/V4O4tiuIV_2h0FGt/t0Ue1KCPaKc.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/KR4rdnr-X1BXPMkjpeQPLq-0UzihqGh1FO7y4MTLNao/w:1920/sm:1/enc/v713UYyrfWgCfe2n/WRQzOj6g7Qhc0v6G/C3t156x5U07cs14X/kGKuHXvNXVUEUdID/103-C_LHlkYSuy6c/brydD1unl7sCK_Zs/TOS5lVUFmELcWJi_/C5HbMbeiQQk71uyW/0jFINH2wqt2FasLK/6RNnWQTKrmoR-0zy/zkrTnaPwzFw_x-5f/Dy9_3Qcsst8K5N7T/0eVYkKgL0_IJX_8x/V4O4tiuIV_2h0FGt/t0Ue1KCPaKc.webp"
+      },
+      {
+       "id": "893173e6-2300-4fed-8a70-5519e60bb66b",
+       "url": "https://imgproxy.fourthwall.dev/FPs96XVAL9Vcj5LcdJO6S-OlCd0bNxGea97hhuijo7Q/w:1920/sm:1/enc/9qzEIoc6iI3IRNKf/069o18pL_BRt9q0O/6fZDsXs87RhfDCE-/A9xcGEw_QtZCiWhW/4QoJKY-I9IGK8Gdr/MOm8Vxg8EQpq3exD/-vawgLuB7Ttj08kN/K9JT_n3noH_Sq09H/HYm6ph_l6OaizJLw/wF2nrYkxSzcY1wq7/d98NKpbhHReM8Pb8/Cq0bYWMx28cAxSRm/sbUxjuWKPfm45fPn/l_jhWOKdIAYeFSM_/XTwiJClrK0k.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/FPs96XVAL9Vcj5LcdJO6S-OlCd0bNxGea97hhuijo7Q/w:1920/sm:1/enc/9qzEIoc6iI3IRNKf/069o18pL_BRt9q0O/6fZDsXs87RhfDCE-/A9xcGEw_QtZCiWhW/4QoJKY-I9IGK8Gdr/MOm8Vxg8EQpq3exD/-vawgLuB7Ttj08kN/K9JT_n3noH_Sq09H/HYm6ph_l6OaizJLw/wF2nrYkxSzcY1wq7/d98NKpbhHReM8Pb8/Cq0bYWMx28cAxSRm/sbUxjuWKPfm45fPn/l_jhWOKdIAYeFSM_/XTwiJClrK0k.webp"
+      }
+     ]
+    },
+    {
+     "id": "d78f7538-025c-4c4b-b749-d42744672198",
+     "name": "Sleepy Cat Mug - White, 20 oz",
+     "unitPrice": {
+      "value": 16.55,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "White, 20 oz",
+      "color": {
+       "name": "White",
+       "swatch": "#ffffff"
+      },
+      "size": {
+       "name": "20 oz"
+      }
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "2c6232e0-ed55-4483-b817-ce3b41d27a0a",
+       "url": "https://imgproxy.fourthwall.dev/IV1vvAtwDGSTtmEL1p2p1jdB8v7iziW_k6j5JA3kYnQ/w:1920/sm:1/enc/5d7N9Uf3_g2YetM6/7-6pizEKYAqF0Wlp/7-lFbGrsOIGRM040/-VqUF_702W3jOMo0/8GEjZOrMr8XYPYfZ/Zl_WP-65fd1eB6nT/PJIElc1v4bvmllSp/uLHc-qPQyZztsOAN/9We5Pgq0irakS0Rz/xGky6w8E-TSAWc5h/ggLdDv-ZV8eEhAaI/ENwS-Lwd8PCgezfe/xggM_MfEMqPJ4beN/Ll0w3nu3OGQueO6i/HjqPxYL_wP0.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/IV1vvAtwDGSTtmEL1p2p1jdB8v7iziW_k6j5JA3kYnQ/w:1920/sm:1/enc/5d7N9Uf3_g2YetM6/7-6pizEKYAqF0Wlp/7-lFbGrsOIGRM040/-VqUF_702W3jOMo0/8GEjZOrMr8XYPYfZ/Zl_WP-65fd1eB6nT/PJIElc1v4bvmllSp/uLHc-qPQyZztsOAN/9We5Pgq0irakS0Rz/xGky6w8E-TSAWc5h/ggLdDv-ZV8eEhAaI/ENwS-Lwd8PCgezfe/xggM_MfEMqPJ4beN/Ll0w3nu3OGQueO6i/HjqPxYL_wP0.webp"
+      },
+      {
+       "id": "126ead5a-0ff7-46ca-8079-873718e43e38",
+       "url": "https://imgproxy.fourthwall.dev/yI1raQYwYk0s7ZUBpmGXJHallCPfUmGWRQF_-osJRtI/w:1920/sm:1/enc/vMvLvQ6q-r8S1ZDX/LoiGJG4cx22t9YlO/eRHK6O7ViJgZ2t8s/heudbJz0JuKnErX7/zgVFR1fxZjTnjMHO/NeLhucP8SlPBtmJn/_Hb19F-KH6Q92Cl7/rCYMPOVJpwIY4Zol/_PGmOavH0rY1Dww5/-ns9y4xDF2monLvf/gs0VKifvD0Wg7c__/-di_U0OO0iQ4vVn1/oQV6pXiIFu6J_ySg/5yj35DsAfQLbIyss/SdBOqEPXGFs.webp",
+       "width": 1536,
+       "height": 2048,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/yI1raQYwYk0s7ZUBpmGXJHallCPfUmGWRQF_-osJRtI/w:1920/sm:1/enc/vMvLvQ6q-r8S1ZDX/LoiGJG4cx22t9YlO/eRHK6O7ViJgZ2t8s/heudbJz0JuKnErX7/zgVFR1fxZjTnjMHO/NeLhucP8SlPBtmJn/_Hb19F-KH6Q92Cl7/rCYMPOVJpwIY4Zol/_PGmOavH0rY1Dww5/-ns9y4xDF2monLvf/gs0VKifvD0Wg7c__/-di_U0OO0iQ4vVn1/oQV6pXiIFu6J_ySg/5yj35DsAfQLbIyss/SdBOqEPXGFs.webp"
+      }
+     ]
+    }
+   ],
+   "additionalInformation": [
+    {
+     "type": "MORE_DETAILS",
+     "title": "More details",
+     "bodyHtml": "<ul><li>Ceramic mug</li><li>Dishwasher and microwave safe</li><li>11 oz mug dimensions: 3.8\u2033 (9.6 cm) in height, 3.2\u2033 (8.2 cm) in diameter</li><li>15 oz mug dimensions: 4.7\u2033 (11.9 cm) in height, 3.3\u2033 (8.5 cm) in diameter</li><li>20 oz mug dimensions: 4.3\u2033 (10.9 cm) in height, 3.7\u2033 (9.3 cm) in diameter</li></ul>"
+    },
+    {
+     "type": "SIZE_AND_FIT",
+     "title": "Size & Fit",
+     "bodyHtml": "<ul><li>11 oz mug dimensions: 3.79\u2033 (9.6 cm) in height, 3.25\u2033 (8.3 cm) in diameter</li><li>15 oz mug dimensions: 4.69\u2033 (11.9 cm) in height, 3.35\u2033 (8.5 cm) in diameter</li><li>20 oz mug dimensions: 4.3\u2033 (10.9 cm) in height, 3.7\u2033 (9.3 cm) in diameter</li></ul>"
+    },
+    {
+     "type": "GUARANTEE_AND_RETURNS",
+     "title": "Quality Guarantee & Returns",
+     "bodyHtml": "<ul><li>Quality is guaranteed. If there is a print error or visible quality issue, we'll replace or refund it.</li><li>Because the products are made to order, we do not accept general returns or sizing-related returns.</li></ul>"
+    }
+   ],
+   "sizeGuide": null,
+   "createdAt": "2025-05-21T13:08:30.770894Z",
+   "updatedAt": "2026-02-18T16:38:37.754715Z",
+   "type": "PRODUCT"
+  },
+  {
+   "id": "f39ac6cc-57f3-47ed-91fa-e9d583a1cb97",
+   "name": "Medito Gift Card",
+   "slug": "medito-gift-card",
+   "description": "",
+   "state": {
+    "type": "AVAILABLE"
+   },
+   "access": {
+    "type": "PUBLIC"
+   },
+   "images": [
+    {
+     "id": "f9114421-3544-423d-b93d-a65cc259284f",
+     "url": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp",
+     "width": 810,
+     "height": 1080,
+     "transformedUrl": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp"
+    },
+    {
+     "id": "b641f325-91c6-440e-89a5-07e9f034b716",
+     "url": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp",
+     "width": 810,
+     "height": 1080,
+     "transformedUrl": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp"
+    }
+   ],
+   "variants": [
+    {
+     "id": "db3667c3-9127-45d2-a67b-0442b967e649",
+     "name": "Medito Gift Card - $10.00",
+     "unitPrice": {
+      "value": 10.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "$10.00",
+      "color": null,
+      "size": null
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "f9114421-3544-423d-b93d-a65cc259284f",
+       "url": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp"
+      },
+      {
+       "id": "b641f325-91c6-440e-89a5-07e9f034b716",
+       "url": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp"
+      }
+     ]
+    },
+    {
+     "id": "f32c2a33-c8ef-4fea-823a-cce96c2d8f9f",
+     "name": "Medito Gift Card - $25.00",
+     "unitPrice": {
+      "value": 25.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "$25.00",
+      "color": null,
+      "size": null
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "f9114421-3544-423d-b93d-a65cc259284f",
+       "url": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp"
+      },
+      {
+       "id": "b641f325-91c6-440e-89a5-07e9f034b716",
+       "url": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp"
+      }
+     ]
+    },
+    {
+     "id": "42f6de3c-a6bd-4950-80c7-1cc18dc554b1",
+     "name": "Medito Gift Card - $50.00",
+     "unitPrice": {
+      "value": 50.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "$50.00",
+      "color": null,
+      "size": null
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "f9114421-3544-423d-b93d-a65cc259284f",
+       "url": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp"
+      },
+      {
+       "id": "b641f325-91c6-440e-89a5-07e9f034b716",
+       "url": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp"
+      }
+     ]
+    },
+    {
+     "id": "09be0a06-aee9-43e4-9c34-0570dffcb306",
+     "name": "Medito Gift Card - $100.00",
+     "unitPrice": {
+      "value": 100.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "$100.00",
+      "color": null,
+      "size": null
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "f9114421-3544-423d-b93d-a65cc259284f",
+       "url": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp"
+      },
+      {
+       "id": "b641f325-91c6-440e-89a5-07e9f034b716",
+       "url": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp"
+      }
+     ]
+    },
+    {
+     "id": "d828a174-d3e1-4798-8413-58cd1273abd7",
+     "name": "Medito Gift Card - $250.00",
+     "unitPrice": {
+      "value": 250.0,
+      "currency": "USD"
+     },
+     "compareAtPrice": null,
+     "attributes": {
+      "description": "$250.00",
+      "color": null,
+      "size": null
+     },
+     "stock": {
+      "type": "UNLIMITED"
+     },
+     "images": [
+      {
+       "id": "f9114421-3544-423d-b93d-a65cc259284f",
+       "url": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/JTHL6I5EknbvQn7Bf2LMvgCha5S48nuxTdZNvTffm2c/w:1920/sm:1/enc/WdSeSMBBTzqZnHy4/J6WiZFqxmvqM6g2H/eFKoDLE5PTWNFljo/4CeuB2C_7F6vpU_m/rfTk4DPAhLgLN__9/nHILXWtk6QgHgYH-/Gf-FwK1gSv5a_AoN/N4d9Wn6i9SMZ08wg/d1ltWIkqROuQI-8b/cb0lHb1zdRAZExOb/Ixyo-kgGx8lvAzAn/LF1r2_kLS2-0Thws/IjW4q5ikij2J83gq/2nK4ng.webp"
+      },
+      {
+       "id": "b641f325-91c6-440e-89a5-07e9f034b716",
+       "url": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp",
+       "width": 810,
+       "height": 1080,
+       "transformedUrl": "https://imgproxy.fourthwall.dev/v9MoXoXpxMk0frkj2GuLgmCGUJISOg7Z1LRovtcrlP0/w:1920/sm:1/enc/7iowPKdwMWnI98Qb/7zoklz8ktzGaTWmW/oLYr3qw-pa5SOKxK/2gC1QIKZh6ULGtWD/4K-gwMlC8tDttd8g/UyqE1-bfabRTSX7Q/G9OerSEboWvWC2uT/SbH58Lkokp2J9z5I/qUPakDgFH2ptdmFJ/du-8wSylrtpCrhRx/sUmPflx2kyc7EOev/mzR-8lYQ1ZUH1_fR/LxdKkXNl2k7BBh2H/IGHyoQ.webp"
+      }
+     ]
+    }
+   ],
+   "additionalInformation": [
+    {
+     "type": "MORE_DETAILS",
+     "title": "More Details",
+     "bodyHtml": "<p data-renderer-start-pos=\"305\"><strong data-renderer-mark=\"true\">Gift card never expires.</strong><br>Your gift card balance does not expire. Use it anytime.</p>\n<p data-renderer-start-pos=\"397\"><strong data-renderer-mark=\"true\">Reusable across orders.</strong><br>Use this gift card on multiple orders until the balance is fully spent.</p>\n<p data-renderer-start-pos=\"495\"><strong data-renderer-mark=\"true\">Balance stored and redeemed in USD.</strong><br>The card balance is stored and redeemed in US dollars (USD). Purchases made in other currencies are converted to US dollars and deducted from your gift card balance in USD.</p>"
+    }
+   ],
+   "sizeGuide": null,
+   "createdAt": "2025-12-23T21:06:17.720154Z",
+   "updatedAt": "2025-12-24T07:41:35.060068Z",
+   "type": "PRODUCT"
+  }
+ ],
+ "paging": {
+  "pageNumber": 0,
+  "pageSize": 12,
+  "elementsSize": 3,
+  "elementsTotal": 30,
+  "totalPages": 3,
+  "hasNextPage": true
+ }
+}

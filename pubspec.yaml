@@ -77,7 +77,6 @@ dependencies:
   uuid: ^4.5.3
   webview_flutter: ^4.10.0
   xml: ^6.6.1
-  xml2json: ^6.2.7
   home_widget: ^0.9.1
   dynamic_app_icon_flutter_plus: ^0.0.8
   flutter_slidable: ^4.0.3

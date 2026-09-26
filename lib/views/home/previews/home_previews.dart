@@ -18,12 +18,12 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/mock/mock_data.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
-import 'package:medito/models/home/product/product_model.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/home/announcement_provider.dart';
 import 'package:medito/providers/home/home_provider.dart';
-import 'package:medito/providers/home/products_provider.dart';
+import 'package:medito/providers/shop/shop_providers.dart';
+import 'package:medito/views/shop/previews/shop_previews.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/home/home_view.dart';
@@ -294,33 +294,8 @@ LocalAllStats _stats({required bool doneToday}) {
 final previewStats = _stats(doneToday: false);
 final previewStatsDoneToday = _stats(doneToday: true);
 
-ProductGroupModel _product(String name, String seed, {bool isNew = false}) {
-  final image = 'https://picsum.photos/seed/$seed/400/400';
-  return ProductGroupModel(
-    groupId: name,
-    name: name,
-    url: 'https://shop.meditofoundation.org',
-    imageUrl: image,
-    variants: [
-      ProductModel(
-        id: '$seed-1',
-        name: name,
-        price: 25,
-        currency: 'EUR',
-        imageUrl: image,
-        firstSeenDate: isNew ? DateTime.now() : null,
-      ),
-    ],
-    allImageUrls: [image],
-    displayImageUrl: image,
-  );
-}
-
-final previewProducts = [
-  _product('Medito Tee', 'tee', isNew: true),
-  _product('Meditation Cushion', 'cushion'),
-  _product('Enamel Mug', 'mug'),
-];
+/// Shop row fixtures: the first few real products from the shop previews.
+final previewProducts = previewShopProducts.take(4).toList();
 
 /// [StatsNotifier] that serves a fixture instead of syncing.
 class _PreviewStatsNotifier extends StatsNotifier {
@@ -341,7 +316,9 @@ List<Override> _homeOverrides({
   upNextProvider.overrideWith((ref) => upNext ?? AsyncData(previewUpNext)),
   statsProvider.overrideWith(() => _PreviewStatsNotifier(stats)),
   fetchLatestAnnouncementProvider.overrideWith((ref) async => announcement),
-  productsProvider.overrideWith((ref) async => previewProducts),
+  homeShopProductsProvider.overrideWith(
+    (ref) async => HomeShopProducts(products: previewProducts, curated: true),
+  ),
 ];
 
 // Wrappers must be top-level functions so they can be referenced from a

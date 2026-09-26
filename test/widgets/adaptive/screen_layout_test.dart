@@ -1,3 +1,4 @@
+import 'package:medito/providers/shop/shop_providers.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
 import 'package:medito/views/home/widgets/quote/quote_share_sheet.dart';
@@ -30,7 +31,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/providers/home/products_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/models/player/playback_request.dart';
@@ -257,7 +257,7 @@ void main() {
     for (final url in {
       previewPack.coverUrl,
       ...previewHome.carousel.map((item) => item.coverUrl),
-      ...previewProducts.map((item) => item.displayImageUrl),
+      ...previewProducts.expand((p) => p.showcaseImages.map((i) => i.url)),
     }) {
       PaintingBinding.instance.imageCache.putIfAbsent(
         CachedNetworkImageProvider(url!),
@@ -274,8 +274,11 @@ void main() {
             // One sample product keeps the real shop's random ordering from
             // making visual snapshots nondeterministic.
             overrides: [
-              productsProvider.overrideWith(
-                (ref) async => [previewProducts.first],
+              homeShopProductsProvider.overrideWith(
+                (ref) async => HomeShopProducts(
+                  products: [previewProducts.first],
+                  curated: true,
+                ),
               ),
             ],
             child: Scaffold(

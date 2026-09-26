@@ -41,6 +41,9 @@ class RouteConstants {
   static const String donation = 'donation';
   static const String stats = 'stats';
   static const String analytics = 'analytics';
+
+  /// Native shop. `shop` opens the grid, `shop:<product-slug>` a product.
+  static const String shop = 'shop';
 }
 
 class LocaleConstants {

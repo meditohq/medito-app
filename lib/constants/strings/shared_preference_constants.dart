@@ -32,7 +32,6 @@ class SharedPreferenceConstants {
   static const String dndEnabled = 'dnd_enabled';
   static const String isLoggedIn = 'is_logged_in';
 
-
   // Locale preference - stores the user's preferred language setting
   static const String localePreference = 'locale_preference';
 
@@ -139,4 +138,13 @@ class SharedPreferenceConstants {
   // onboarded before this was captured or skipped the question. Used to
   // segment the first-session experience and downstream personalisation.
   static const String onboardingExperienceLevel = 'onboarding_experience_level';
+
+  // Native shop bag: JSON list of BagItem (variant id, quantity, and enough
+  // product detail to render offline). Cleared by the user after checkout.
+  static const String shopBag = 'shop_bag';
+
+  // Set when the user leaves for Fourthwall checkout with a non-empty bag, so
+  // the bag can offer to clear itself on return. We can't observe the order
+  // completing (checkout runs in the system browser sheet).
+  static const String shopBagCheckoutStarted = 'shop_bag_checkout_started';
 }

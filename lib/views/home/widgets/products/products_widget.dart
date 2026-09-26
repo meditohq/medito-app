@@ -1,139 +1,92 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/models/home/product/product_model.dart';
-import 'package:medito/utils/logger.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:medito/services/products_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/providers/providers.dart';
-import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/widgets/medito_icon.dart';
-import 'package:medito/utils/black_friday_utils.dart';
+import 'package:medito/models/shop/shop_models.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
-import 'package:medito/constants/constants.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/services/shop/fourthwall_service.dart';
+import 'package:medito/utils/black_friday_utils.dart';
+import 'package:medito/views/shop/shop_navigation.dart';
+import 'package:medito/views/shop/widgets/shop_photo.dart';
+import 'package:medito/views/shop/widgets/shop_product_card.dart';
+import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
+
 import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 
-class ProductsWidget extends ConsumerStatefulWidget {
-  final List<ProductGroupModel>? productGroups;
+const _tileWidth = 148.0;
+const _tileGap = 12.0;
+const _photoHeight = _tileWidth / kShopPhotoAspect;
+const _captionHeight = 52.0;
 
-  const ProductsWidget({super.key, this.productGroups});
+/// Height of the tile strip, shared with the loading placeholder so the
+/// section doesn't jump when products arrive.
+const kHomeShopStripHeight = _photoHeight + _captionHeight;
 
-  @override
-  ConsumerState<ProductsWidget> createState() => _ProductsWidgetState();
-}
+/// "Shop to Support" row on Home: a horizontal strip of shop products with
+/// local prices, ending in a "See all" tile. Tapping opens the native shop.
+class ProductsWidget extends ConsumerWidget {
+  const ProductsWidget({super.key, required this.products});
 
-class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
-  final ScrollController _scrollController = ScrollController();
-  bool _showLeftGradient = false;
-  bool _showRightGradient = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_updateScrollGradients);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _updateScrollGradients();
-    });
-  }
-
-  void _updateScrollGradients() {
-    if (!_scrollController.hasClients) return;
-    final position = _scrollController.position;
-    final maxScroll = position.maxScrollExtent;
-    final currentScroll = position.pixels;
-    final showLeft = currentScroll > 10;
-    final showRight = maxScroll > 0 && currentScroll < maxScroll - 10;
-
-    if (showLeft != _showLeftGradient || showRight != _showRightGradient) {
-      setState(() {
-        _showLeftGradient = showLeft;
-        _showRightGradient = showRight;
-      });
-    }
-  }
+  /// Null while loading: renders the header over skeleton tiles.
+  final List<ShopProduct>? products;
 
   @override
-  void didUpdateWidget(ProductsWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.productGroups != widget.productGroups) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _updateScrollGradients();
-      });
-    }
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
 
-  @override
-  void dispose() {
-    _scrollController.removeListener(_updateScrollGradients);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.productGroups == null || widget.productGroups!.isEmpty) {
-      AppLogger.d('ProductsWidget', 'No product groups to display');
-      return const SizedBox.shrink();
-    }
-
-    final isBlackFriday = BlackFridayUtils.isBlackFridayWeek(DateTime.now());
     final prefs = ref.read(sharedPreferencesProvider);
-    final isDismissed = BlackFridayUtils.isBlackFridayDismissedSync(prefs);
-    final showBlackFridayStyle = isBlackFriday && !isDismissed;
+    final showBlackFridayStyle =
+        BlackFridayUtils.isBlackFridayWeek(DateTime.now()) &&
+        !BlackFridayUtils.isBlackFridayDismissedSync(prefs);
 
-    // Sort product groups - new products first
-    final sortedGroups = List<ProductGroupModel>.from(widget.productGroups!)
-      ..sort((a, b) {
-        // Check if any variant in the group is new
-        final aHasNew = a.variants.any((v) => v.isNew);
-        final bHasNew = b.variants.any((v) => v.isNew);
-        if (aHasNew != bHasNew) return aHasNew ? -1 : 1;
-        return 0;
-      });
+    void openAll() =>
+        openShop(context, source: AnalyticsEventConstants.sourceHomeHeader);
 
-    return Padding(
-      padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
+    final products = this.products;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Semantics(
+                  button: true,
                   child: GestureDetector(
-                    onTap: () => _openShopUrl(),
+                    onTap: openAll,
+                    behavior: HitTestBehavior.opaque,
                     child: Row(
                       children: [
                         Flexible(
                           child: Text(
                             showBlackFridayStyle
-                                ? AppLocalizations.of(context)!.blackFridayTitle
-                                : AppLocalizations.of(
-                                    context,
-                                  )!.meditationProducts,
+                                ? l10n.blackFridayTitle
+                                : l10n.meditationProducts,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            style: Theme.of(context).textTheme.labelLarge
-                                ?.copyWith(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400,
-                                  height: 28 / 24,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w400,
+                              height: 28 / 24,
+                              color: onSurface,
+                            ),
                           ),
                         ),
                         if (!showBlackFridayStyle) ...[
                           const SizedBox(width: 8),
                           MeditoIcon(
                             assetName: MeditoIcons.arrowRight,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: onSurface,
                             size: 16,
                           ),
                         ],
@@ -141,525 +94,298 @@ class _ProductsWidgetState extends ConsumerState<ProductsWidget> {
                     ),
                   ),
                 ),
-                if (showBlackFridayStyle) ...[
-                  const SizedBox(width: 8),
-                  Semantics(
-                    label: AppLocalizations.of(context)!.dismiss,
-                    button: true,
-                    child: GestureDetector(
-                      onTap: () => _dismissBlackFriday(context, ref),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        child: ExcludeSemantics(
-                          child: Icon(
-                            Icons.close,
-                            size: 20,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          if (showBlackFridayStyle)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-              child: Text(
-                AppLocalizations.of(context)!.blackFridaySubtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontSize: 14,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
               ),
-            ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
-            child: Stack(
-              children: [
-                ListView.builder(
-                  controller: _scrollController,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.only(left: 16, right: 4),
-                  itemCount: sortedGroups.length,
-                  itemBuilder: (context, index) {
-                    final productGroup = sortedGroups[index];
-                    return ProductGroupCard(productGroup: productGroup);
+              if (showBlackFridayStyle)
+                IconButton(
+                  tooltip: l10n.dismiss,
+                  onPressed: () async {
+                    await BlackFridayUtils.dismissBlackFriday();
+                    ref.read(homeWidgetOrderProvider.notifier).refreshOrder();
                   },
+                  icon: Icon(
+                    Icons.close,
+                    size: 20,
+                    color: onSurface.withValues(alpha: 0.6),
+                  ),
                 ),
-                if (_showLeftGradient)
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 32,
-                    child: IgnorePointer(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Theme.of(context).scaffoldBackgroundColor,
-                              Theme.of(
-                                context,
-                              ).scaffoldBackgroundColor.withValues(alpha: 0),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                if (_showRightGradient)
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 32,
-                    child: IgnorePointer(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerRight,
-                            end: Alignment.centerLeft,
-                            colors: [
-                              Theme.of(context).scaffoldBackgroundColor,
-                              Theme.of(
-                                context,
-                              ).scaffoldBackgroundColor.withValues(alpha: 0),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
-          if (showBlackFridayStyle)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _openShopUrl(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    AppLocalizations.of(context)!.blackFridaySeeAllButton,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
+        ),
+        if (showBlackFridayStyle)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Text(
+              l10n.blackFridaySubtitle,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontSize: 14,
+                color: onSurface.withValues(alpha: 0.7),
               ),
             ),
-        ],
-      ),
+          ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: kHomeShopStripHeight,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: products == null ? 4 : products.length + 1,
+            separatorBuilder: (_, _) => const SizedBox(width: _tileGap),
+            itemBuilder: (context, index) {
+              if (products == null) return const _SkeletonTile();
+              if (index == products.length) {
+                return _SeeAllTile(onTap: openAll);
+              }
+              return _ProductTile(
+                product: products[index],
+                // Stagger the colour cycling so tiles don't all flip at once.
+                cycleOffset: Duration(milliseconds: 1300 * index),
+              );
+            },
+          ),
+        ),
+        if (showBlackFridayStyle)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: openAll,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: Text(l10n.blackFridaySeeAllButton),
+              ),
+            ),
+          ),
+      ],
     );
-  }
-
-  Future<void> _dismissBlackFriday(BuildContext context, WidgetRef ref) async {
-    await BlackFridayUtils.dismissBlackFriday();
-    ref.read(homeWidgetOrderProvider.notifier).refreshOrder();
-  }
-
-  Future<void> _openShopUrl() async {
-    final uri = Uri.parse(ConfigConstants.shopUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
   }
 }
 
-class ProductGroupCard extends ConsumerWidget {
-  final ProductGroupModel productGroup;
-  final double cardWidth = 150.0;
-  static const _kCardBorderWidth = 0.5;
-  static const _kCardBorderRadius = kHomeTileRadius;
+class _ProductTile extends ConsumerWidget {
+  const _ProductTile({required this.product, required this.cycleOffset});
 
-  const ProductGroupCard({super.key, required this.productGroup});
+  final ShopProduct product;
+  final Duration cycleOffset;
+
+  void _open(BuildContext context, WidgetRef ref) {
+    final analytics = ref.read(analyticsServiceProvider);
+    analytics.logEvent(
+      name: AnalyticsEventConstants.productClicked,
+      parameters: {
+        'group_id': product.id,
+        'name': product.name,
+        'url': FourthwallService.productWebUri(product.slug).toString(),
+      },
+    );
+    analytics.logFirstActionAfterOnboardingIfNeeded('product');
+    openShopProduct(
+      context,
+      slug: product.slug,
+      product: product,
+      source: AnalyticsEventConstants.sourceHomeCard,
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final hasNewVariant = productGroup.variants.any((v) => v.isNew);
-    final backgroundColor = Theme.of(context).cardColor;
-    final textColor = Theme.of(context).colorScheme.onSurface;
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final price = product.fromPrice;
+    final priceLabel = price == null
+        ? ''
+        : product.hasVariedPrices
+        ? l10n.shopFromPrice(price.format())
+        : price.format();
 
-    return Container(
-      width: cardWidth,
-      margin: const EdgeInsets.only(right: 12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: cardWidth,
-            height: cardWidth,
-            child: HomeGradientBorder(
-              backgroundColor: backgroundColor,
-              borderRadius: _kCardBorderRadius,
-              borderWidth: _kCardBorderWidth,
-              child: Material(
-                color: Colors.transparent,
-                child: Semantics(
-                  label: productGroup.name,
-                  button: true,
-                  child: InkWell(
-                    onTap: () async {
-                      // Log analytics event
-                      var analytics = ref.read(analyticsServiceProvider);
-
-                      analytics.logEvent(
-                        name: AnalyticsEventConstants.productClicked,
-                        parameters: {
-                          'group_id': productGroup.groupId,
-                          'name': productGroup.name,
-                          'url': productGroup.url ?? '',
-                        },
-                      );
-                      analytics.logFirstActionAfterOnboardingIfNeeded(
-                        'product',
-                      );
-
-                      _openProductUrl(productGroup.url);
-                      for (final variant in productGroup.variants) {
-                        ProductsService().markProductAsSeen(variant.id);
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(
-                      _kCardBorderRadius - _kCardBorderWidth,
-                    ),
-                    child: Stack(
-                      children: [
-                        if (productGroup.allImageUrls.isNotEmpty)
-                          AspectRatio(
-                            aspectRatio: 1,
-                            child: ProductImageCarousel(
-                              productGroup: productGroup,
-                              cardWidth: cardWidth,
-                            ),
-                          )
-                        else if (productGroup.imageUrl != null)
-                          AspectRatio(
-                            aspectRatio: 1,
-                            child: CachedNetworkImage(
-                              imageUrl: productGroup.imageUrl!,
-                              fit: BoxFit.cover,
-                              width: cardWidth,
-                              key: ValueKey(
-                                'product_image_${productGroup.groupId}',
-                              ),
-                              placeholder: (context, url) => Container(
-                                color: Theme.of(context).colorScheme.surface,
-                                child: Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: Theme.of(context).colorScheme.surface,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.image_not_supported_outlined,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        else
-                          AspectRatio(
-                            aspectRatio: 1,
-                            child: Container(
-                              color: Theme.of(context).colorScheme.surface,
-                              child: Center(
-                                child: Icon(
-                                  Icons.image_not_supported_outlined,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
-                              ),
-                            ),
-                          ),
-                        if (hasNewVariant)
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
-                                borderRadius: BorderRadius.circular(100),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Text(
-                                AppLocalizations.of(context)!.newProductLabel,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+    return Semantics(
+      button: true,
+      label: '${product.name}, $priceLabel',
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () => _open(context, ref),
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          width: _tileWidth,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: _photoHeight,
+                child: HomeGradientBorder(
+                  backgroundColor: theme.cardColor,
+                  borderRadius: kHomeTileRadius,
+                  borderWidth: 0.5,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      _CyclingPhoto(
+                        urls: product.showcaseImages.map((i) => i.url).toList(),
+                        offset: cycleOffset,
+                      ),
+                      if (product.isNewAt(DateTime.now()))
+                        Positioned(
+                          left: 8,
+                          top: 8,
+                          child: ShopPill(label: l10n.newProductLabel),
+                        ),
+                      Positioned.fill(
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: InkWell(onTap: () => _open(context, ref)),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
+                child: Text(
+                  product.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: onSurface,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Text(
+                  priceLabel,
+                  maxLines: 1,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: onSurface.withValues(alpha: 0.6),
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            productGroup.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontSize: 12,
-              color: textColor,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
-
-  Future<void> _openProductUrl(String? url) async {
-    if (url == null) return;
-
-    var uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
 }
 
-class ProductImageCarousel extends StatefulWidget {
-  final ProductGroupModel productGroup;
-  final double cardWidth;
+/// Crossfades through one photo per colour, so a shirt that comes in six
+/// colours shows them off without a tap.
+class _CyclingPhoto extends StatefulWidget {
+  const _CyclingPhoto({required this.urls, required this.offset});
 
-  const ProductImageCarousel({
-    super.key,
-    required this.productGroup,
-    required this.cardWidth,
-  });
+  final List<String> urls;
+  final Duration offset;
 
   @override
-  State<ProductImageCarousel> createState() => _ProductImageCarouselState();
+  State<_CyclingPhoto> createState() => _CyclingPhotoState();
 }
 
-class _ProductImageCarouselState extends State<ProductImageCarousel> {
-  int _currentImageIndex = 0;
-  Timer? _imageTimer;
-  final _imageDuration = const Duration(seconds: 10);
-  List<String> _tshirtImageUrls = [];
-  List<String> _imageUrls = [];
+class _CyclingPhotoState extends State<_CyclingPhoto> {
+  static const _interval = Duration(seconds: 8);
+
+  int _index = 0;
+  Timer? _start;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _organizeImages();
-    _updateImageUrls();
-    _startImageTimer();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _precacheAllImages();
-  }
-
-  void _updateImageUrls() {
-    _imageUrls = _isTshirt
-        ? List<String>.from(_tshirtImageUrls)
-        : List<String>.from(widget.productGroup.allImageUrls);
-  }
-
-  @override
-  void didUpdateWidget(ProductImageCarousel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.productGroup != widget.productGroup) {
-      _organizeImages();
-      setState(() {
-        _updateImageUrls();
+    if (widget.urls.length > 1) {
+      _start = Timer(_interval + widget.offset, () {
+        _advance();
+        _timer = Timer.periodic(_interval, (_) => _advance());
       });
-      _precacheAllImages();
-      _startImageTimer();
     }
+  }
+
+  void _advance() {
+    if (!mounted) return;
+    setState(() => _index = (_index + 1) % widget.urls.length);
   }
 
   @override
   void dispose() {
-    _imageTimer?.cancel();
+    _start?.cancel();
+    _timer?.cancel();
     super.dispose();
-  }
-
-  void _organizeImages() {
-    _currentImageIndex = 0; // Reset index when organizing images
-
-    _tshirtImageUrls = [];
-    if (!_isTshirt) return;
-
-    final imageByColor = <String, String>{};
-    for (final variant in widget.productGroup.variants) {
-      final color = variant.color;
-      final imageUrl = variant.imageUrl;
-      if (color == null || color.isEmpty || imageUrl == null) continue;
-
-      imageByColor.putIfAbsent(color.toLowerCase(), () => imageUrl);
-    }
-
-    _tshirtImageUrls = imageByColor.values.toList();
-    if (_tshirtImageUrls.isEmpty) {
-      _tshirtImageUrls = List<String>.from(widget.productGroup.allImageUrls);
-    }
-
-    _tshirtImageUrls.shuffle();
-  }
-
-  void _precacheAllImages() {
-    for (final url in _imageUrls) {
-      // Skip precaching images from dead domains
-      if (HTTPConstants.isDeadDomain(url)) {
-        continue;
-      }
-
-      try {
-        precacheImage(CachedNetworkImageProvider(url), context).catchError((
-          error,
-        ) {
-          // Silently handle precaching errors - they're not critical
-          AppLogger.d(
-            'ProductImageCarousel',
-            'Failed to precache image: $url, error: $error',
-          );
-        });
-      } catch (e) {
-        // Silently handle any synchronous errors from precaching
-        AppLogger.d(
-          'ProductImageCarousel',
-          'Failed to precache image: $url, error: $e',
-        );
-      }
-    }
-  }
-
-  void _startImageTimer() {
-    _imageTimer?.cancel();
-
-    if (_imageUrls.length <= 1) return;
-
-    _imageTimer = Timer.periodic(_imageDuration, (timer) {
-      if (!mounted) return;
-
-      setState(() {
-        _currentImageIndex = (_currentImageIndex + 1) % _imageUrls.length;
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_imageUrls.isEmpty) {
-      // If no images available, show placeholder
-      return Container(
-        color: Theme.of(context).colorScheme.surface,
-        child: Center(
-          child: Icon(
-            Icons.image_not_supported_outlined,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-      );
-    }
-
-    // Make sure current index is within bounds for the active list
-    if (_currentImageIndex >= _imageUrls.length) {
-      _currentImageIndex = 0; // Reset to first image if out of bounds
-    }
-
-    // Get current image URL (with bounds checking)
-    final String currentImageUrl = _imageUrls[_currentImageIndex];
-
+    final urls = widget.urls;
+    if (urls.isEmpty) return const ShopPhoto(url: null);
+    final url = urls[_index % urls.length];
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 500),
-      transitionBuilder: (child, animation) {
-        return FadeTransition(opacity: animation, child: child);
-      },
-      child: Container(
-        key: ValueKey(
-          'product_image_${widget.productGroup.groupId}_$_currentImageIndex',
-        ),
-        color: Theme.of(context).colorScheme.surface,
-        child: CachedNetworkImage(
-          imageUrl: currentImageUrl,
-          fit: BoxFit.cover,
-          imageBuilder: (context, imageProvider) => Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-            ),
-          ),
-          placeholder: (context, url) => Container(
-            color: Theme.of(context).colorScheme.surface,
-            child: Center(
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Theme.of(context).colorScheme.onSurface,
+      duration: const Duration(milliseconds: 600),
+      child: ShopPhoto(key: ValueKey(url), url: url),
+    );
+  }
+}
+
+class _SeeAllTile extends StatelessWidget {
+  const _SeeAllTile({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    return SizedBox(
+      width: _tileWidth,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: SizedBox(
+          height: _photoHeight,
+          child: HomeGradientBorder(
+            backgroundColor: theme.cardColor,
+            borderRadius: kHomeTileRadius,
+            borderWidth: 0.5,
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                onTap: onTap,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: onSurface.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Center(
+                          child: MeditoIcon(
+                            assetName: MeditoIcons.arrowRight,
+                            color: onSurface,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        l10n.shopSeeAll,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-          errorWidget: (context, url, error) => Container(
-            color: Theme.of(context).colorScheme.surface,
-            child: Center(
-              child: Icon(
-                Icons.image_not_supported_outlined,
-                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -667,7 +393,29 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
       ),
     );
   }
+}
 
-  bool get _isTshirt =>
-      widget.productGroup.description?.toLowerCase().contains('shirt') ?? false;
+class _SkeletonTile extends StatelessWidget {
+  const _SkeletonTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      width: _tileWidth,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          BoxShimmerWidget(
+            width: _tileWidth,
+            height: _photoHeight,
+            borderRadius: kHomeTileRadius,
+          ),
+          SizedBox(height: 12),
+          BoxShimmerWidget(width: 110, height: 12, borderRadius: 6),
+          SizedBox(height: 8),
+          BoxShimmerWidget(width: 60, height: 12, borderRadius: 6),
+        ],
+      ),
+    );
+  }
 }

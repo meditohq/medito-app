@@ -4891,6 +4891,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Added to Home so you can pick up where you left off.'**
   String get packAddedToHome;
+
+  /// Line under the Shop title on the native shop screen
+  ///
+  /// In en, this message translates to:
+  /// **'Every purchase helps keep Medito free for everyone.'**
+  String get shopSubtitle;
+
+  /// First filter chip on the shop screen: every product, no collection filter
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get shopAllCollection;
+
+  /// Product card price when sizes cost different amounts; price is already formatted with currency, e.g. 'From $28'
+  ///
+  /// In en, this message translates to:
+  /// **'From {price}'**
+  String shopFromPrice(String price);
+
+  /// Badge/label on a product or size that can't be bought right now
+  ///
+  /// In en, this message translates to:
+  /// **'Sold out'**
+  String get shopSoldOut;
+
+  /// Primary button on the product page
+  ///
+  /// In en, this message translates to:
+  /// **'Add to bag'**
+  String get shopAddToBag;
+
+  /// Product page button label for a moment after adding
+  ///
+  /// In en, this message translates to:
+  /// **'Added to bag'**
+  String get shopAddedToBag;
+
+  /// Product page primary button while no size is chosen
+  ///
+  /// In en, this message translates to:
+  /// **'Select a size'**
+  String get shopSelectSize;
+
+  /// Label above the colour swatches on the product page
+  ///
+  /// In en, this message translates to:
+  /// **'Colour'**
+  String get shopColour;
+
+  /// Label above the size pills on the product page
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get shopSize;
+
+  /// Label above option pills for products without colour or size, e.g. gift card amounts
+  ///
+  /// In en, this message translates to:
+  /// **'Option'**
+  String get shopOption;
+
+  /// Title of the shopping bag sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Your bag'**
+  String get shopBagTitle;
+
+  /// Empty state title in the shopping bag sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Your bag is empty'**
+  String get shopBagEmpty;
+
+  /// Empty state body in the shopping bag sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Anything you add will wait here until you\'re ready.'**
+  String get shopBagEmptyBody;
+
+  /// Button in the empty bag that opens the shop
+  ///
+  /// In en, this message translates to:
+  /// **'Browse the shop'**
+  String get shopBrowse;
+
+  /// Bag sheet: sum of item prices before shipping and tax
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal'**
+  String get shopSubtotal;
+
+  /// Bag sheet note under the subtotal
+  ///
+  /// In en, this message translates to:
+  /// **'Shipping and taxes are calculated at checkout.'**
+  String get shopShippingNote;
+
+  /// Bag sheet button that opens the secure checkout page
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout'**
+  String get shopCheckout;
+
+  /// Bag sheet card shown after the user returned from checkout; offers to clear the bag
+  ///
+  /// In en, this message translates to:
+  /// **'Already placed your order?'**
+  String get shopCheckoutPrompt;
+
+  /// Button that removes everything from the shopping bag
+  ///
+  /// In en, this message translates to:
+  /// **'Clear bag'**
+  String get shopClearBag;
+
+  /// Note near the bottom of a product page
+  ///
+  /// In en, this message translates to:
+  /// **'Medito is a nonprofit. Every purchase supports free meditation for everyone.'**
+  String get shopSupportNote;
+
+  /// Error state on the shop and product pages
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load the shop right now.'**
+  String get shopLoadError;
+
+  /// Fallback button on shop error states; opens shop.medito.app
+  ///
+  /// In en, this message translates to:
+  /// **'Open in browser'**
+  String get shopOpenInBrowser;
+
+  /// Bag sheet: remove a line from the bag
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get shopRemoveItem;
+
+  /// Accessibility label for the + button in the bag
+  ///
+  /// In en, this message translates to:
+  /// **'Increase quantity'**
+  String get shopIncreaseQuantity;
+
+  /// Accessibility label for the − button in the bag
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease quantity'**
+  String get shopDecreaseQuantity;
+
+  /// Accessibility label for the bag icon; also snackbar action after adding an item
+  ///
+  /// In en, this message translates to:
+  /// **'View bag'**
+  String get shopViewBag;
+
+  /// Fallback title for a product info section with no title
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get shopMoreDetails;
+
+  /// Count of units in the shopping bag, under the bag title
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item} other{{count} items}}'**
+  String shopBagItemCount(int count);
+
+  /// Last tile of the home shop carousel; opens the full shop
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get shopSeeAll;
+
+  /// Bag sheet: heading over a row of cheap add-on products (stickers)
+  ///
+  /// In en, this message translates to:
+  /// **'Add a little something'**
+  String get shopAddOnsTitle;
+
+  /// Product page: link next to the size picker that opens the size chart
+  ///
+  /// In en, this message translates to:
+  /// **'Size guide'**
+  String get shopSizeGuide;
+
+  /// Under the size chart on the product page
+  ///
+  /// In en, this message translates to:
+  /// **'Garment measurements laid flat, from the supplier. They can vary by up to 2 in (5 cm), so compare with a tee you own.'**
+  String get shopSizeChartNote;
+
+  /// Size chart column: garment length
+  ///
+  /// In en, this message translates to:
+  /// **'Length'**
+  String get shopMeasureLength;
+
+  /// Size chart column: garment chest width, laid flat
+  ///
+  /// In en, this message translates to:
+  /// **'Width'**
+  String get shopMeasureWidth;
+
+  /// Size chart column: sleeve length
+  ///
+  /// In en, this message translates to:
+  /// **'Sleeve'**
+  String get shopMeasureSleeve;
+
+  /// Size chart unit toggle: inches (abbreviation)
+  ///
+  /// In en, this message translates to:
+  /// **'in'**
+  String get shopInches;
+
+  /// Size chart unit toggle: centimetres (abbreviation)
+  ///
+  /// In en, this message translates to:
+  /// **'cm'**
+  String get shopCentimetres;
 }
 
 class _AppLocalizationsDelegate
