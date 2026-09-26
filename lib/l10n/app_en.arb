@@ -478,6 +478,19 @@
   "donationEmailHelper": "For your receipt and to manage your donation.",
   "donationEmailRequired": "Enter your email so we can send a receipt.",
   "donationEmailInvalid": "That email address does not look right.",
+  "emailTypoSuggestion": "Did you mean {email}?",
+  "@emailTypoSuggestion": {
+    "description": "Tappable hint under an email field when the domain looks mistyped, e.g. gmil.com.",
+    "placeholders": {"email": {"type": "String"}}
+  },
+  "emailTypoDialogTitle": "Check your email",
+  "emailTypoDialogTyped": "You typed {email}.",
+  "@emailTypoDialogTyped": {
+    "description": "First line of the email typo confirm dialog.",
+    "placeholders": {"email": {"type": "String"}}
+  },
+  "emailTypoUseSuggestion": "Use this",
+  "emailTypoKeepTyped": "Keep mine",
   "donationThankYouTitle": "Thank You for Your Support!",
   "donationThankYouBody": "Your generosity helps keep Medito free and accessible to everyone. We're deeply grateful for your contribution to spreading mindfulness worldwide.",
   "donationVisitFoundation": "Visit Medito Foundation",
