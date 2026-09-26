@@ -5,6 +5,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/config_constants.dart';
 import 'package:medito/constants/pack_sequence.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
@@ -232,9 +233,12 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
 
     if (!mounted) return;
     setState(() => _pinning = false);
+    // The hero swaps to the new pack anyway; the snackbar only names it.
+    final nextTitle = ref.read(packProvider(packId: nextPackId)).value?.title;
+    if (nextTitle == null || nextTitle.isEmpty) return;
     showSnackBar(
       context,
-      AppLocalizations.of(context)!.upNextNextPackPinnedSnack,
+      AppLocalizations.of(context)!.upNextNextPackPinnedSnack(nextTitle),
     );
   }
 
@@ -247,9 +251,9 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
     final l10n = AppLocalizations.of(context)!;
     final hasNext = widget.data.nextPackId != null;
 
-    final title = hasNext
-        ? l10n.upNextPackCompletedTitle(widget.data.pack.title)
-        : l10n.upNextPathCompletedTitle;
+    final title = widget.data.isEndOfPath
+        ? l10n.upNextPathCompletedTitle
+        : l10n.upNextPackCompletedTitle(widget.data.pack.title);
     final subtitle = hasNext
         ? l10n.upNextPackCompletedSubtitle(widget.data.completedCount)
         : l10n.upNextPathCompletedSubtitle;
@@ -289,7 +293,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  l10n.upNextTitle.toUpperCase(),
+                  l10n.completed.toUpperCase(),
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -441,6 +445,15 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
     final l10n = AppLocalizations.of(context)!;
 
     final borderRadius = BorderRadius.circular(_kCardBorderRadius);
+    // Nothing played yet reads as a first step, not a resume.
+    final eyebrow = widget.data.completedCount == 0
+        ? l10n.upNextStartHere
+        : l10n.upNextTitle;
+    // Only hand-picked packs: series packs are where Home returns to, and
+    // are replaced by starting another pack rather than removed.
+    final canRemove =
+        widget.data.pack.id != ConfigConstants.basicsPackId &&
+        !PackSequence.contains(widget.data.pack.id);
 
     return Opacity(
       opacity: _skipping ? 0.0 : 1.0,
@@ -453,9 +466,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
             controller: _slidable,
             endActionPane: ActionPane(
               motion: const BehindMotion(),
-              extentRatio: 0.5,
-              // No full-swipe action: both Open pack and Skip are buttons
-              // behind the menu, so a swipe only ever reveals them.
+              extentRatio: canRemove ? 0.75 : 0.5,
+              // No full-swipe action: every action is a button behind the
+              // menu, so a swipe only ever reveals them.
               children: [
                 _swipeAction(
                   palette: palette,
@@ -470,16 +483,27 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                   label: l10n.skip,
                   onPressed: () => _onSkip(context),
                 ),
+                if (canRemove)
+                  _swipeAction(
+                    palette: palette,
+                    showDivider: true,
+                    icon: Icons.close_rounded,
+                    label: l10n.removeFromHomeShort,
+                    onPressed: () => _onRemove(context),
+                  ),
               ],
             ),
             child: Semantics(
               label:
-                  '${l10n.upNext}: ${widget.data.pack.title} — ${nextSession.title}',
+                  '$eyebrow: ${widget.data.pack.title} — ${nextSession.title}',
               button: true,
               customSemanticsActions: {
                 CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
                 CustomSemanticsAction(label: l10n.openPack): () =>
                     _onOpenPack(context),
+                if (canRemove)
+                  CustomSemanticsAction(label: l10n.removeFromHome): () =>
+                      _onRemove(context),
               },
               child: GestureDetector(
                 // The hero style has no card surface behind the content, so
@@ -517,7 +541,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                                   Row(
                                     children: [
                                       Text(
-                                        l10n.upNextTitle.toUpperCase(),
+                                        eyebrow.toUpperCase(),
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                               fontSize: 14,
@@ -658,6 +682,44 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
       [widget.data.pack.id],
       context,
       ref: ref,
+    );
+  }
+
+  /// Home goes back to the series pack the user was on before picking this
+  /// one, or the no-pin default.
+  Future<void> _onRemove(BuildContext context) async {
+    final packId = widget.data.pack.id;
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.packUnpinned,
+            parameters: {AnalyticsEventConstants.paramPackId: packId},
+          ),
+    );
+
+    final prefs = ref.read(sharedPreferencesProvider);
+    // This widget is replaced once the pin changes, so Undo can't use ref.
+    final container = ProviderScope.containerOf(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+    final returnTo = prefs.getString(
+      SharedPreferenceConstants.upNextReturnPackId,
+    );
+    if (returnTo == null) {
+      await prefs.remove(SharedPreferenceConstants.upNextPackId);
+    } else {
+      await prefs.setString(SharedPreferenceConstants.upNextPackId, returnTo);
+    }
+    ref.invalidate(upNextPackIdProvider);
+
+    showSnackBar(
+      context.mounted ? context : null,
+      l10n.removedFromHome,
+      actionLabel: l10n.undo,
+      onActionPressed: () async {
+        await prefs.setString(SharedPreferenceConstants.upNextPackId, packId);
+        container.invalidate(upNextPackIdProvider);
+      },
     );
   }
 

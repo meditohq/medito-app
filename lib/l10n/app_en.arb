@@ -198,7 +198,6 @@
   "stepTitle": "Step",
   "completed": "Completed",
   "locked": "Locked",
-  "loadingPath": "Loading your path...",
   "pathLoadError": "Failed to load path. Please try again.",
   "stepCompleted": "Step completed!",
   "stepCompletionError": "Failed to complete step. Please try again.",
@@ -1347,9 +1346,9 @@
   "@completedAt": {
     "description": "Label prefix for meditation completion time"
   },
-  "upNextTitle": "Your Path",
+  "upNextTitle": "Continue",
   "@upNextTitle": {
-    "description": "Title for the Your Path section on the home screen"
+    "description": "Eyebrow on the home hero once the pack is under way (CONTINUE \u00b7 pack), and the section name in Customise Home"
   },
   "upNextProgress": "{completed} of {total}",
   "@upNextProgress": {
@@ -1393,17 +1392,18 @@
       }
     }
   },
-  "upNextPathCompletedTitle": "You've completed your path",
+  "upNextPathCompletedTitle": "You've finished every pack in the series",
   "@upNextPathCompletedTitle": {
     "description": "Headline shown when the user finishes the final pack in the curated sequence"
   },
-  "upNextPathCompletedSubtitle": "Every pack in your path is done. Explore the library to choose what's next.",
+  "upNextPathCompletedSubtitle": "Explore the library to find what's next.",
   "@upNextPathCompletedSubtitle": {
     "description": "Supporting line shown when there is no next pack to offer"
   },
-  "upNextNextPackPinnedSnack": "Your next pack is ready in Your Path",
+  "upNextNextPackPinnedSnack": "{packTitle} is ready on Home",
   "@upNextNextPackPinnedSnack": {
-    "description": "Snackbar confirming the next pack was pinned as Up Next"
+    "description": "Snackbar after the completed hero's button puts the next pack in the series on Home",
+    "placeholders": {"packTitle": {"type": "String"}}
   },
   "upNextSessionCount": "Session {current} of {total}",
   "@upNextSessionCount": {
@@ -1447,7 +1447,7 @@
   "@notSet": {
     "description": "Text shown when a default value is not set"
   },
-  "defaultsNote": "These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.",
+  "defaultsNote": "These defaults are set from your last selection on any track. Home uses them to skip the selection screen when you continue a pack.",
   "@defaultsNote": {
     "description": "Note explaining how defaults work in Up Next"
   },
@@ -1519,9 +1519,9 @@
   "@refresh": {
     "description": "Accessibility label for the retry/refresh button"
   },
-  "upNext": "Your Path",
+  "upNext": "Continue",
   "@upNext": {
-    "description": "Accessibility label prefix for the Your Path card on the home screen"
+    "description": "Accessibility label prefix for the home hero card"
   },
   "dismiss": "Dismiss",
   "@dismiss": {
@@ -1703,82 +1703,9 @@
   "@openPack": {
     "description": "Swipe action on the home Your Path card that opens the pack"
   },
-  "showOnHomeReplaced": "{pack} is now on Home, replacing {previous}.",
-  "@showOnHomeReplaced": {
-    "description": "Snackbar after Show on Home when it replaced the pack Home was showing",
-    "placeholders": {
-      "pack": {"type": "String"},
-      "previous": {"type": "String"}
-    }
-  },
-  "showOnHomeDone": "{pack} is now on Home.",
-  "@showOnHomeDone": {
-    "description": "Snackbar after Show on Home when the previous pack's name isn't known",
-    "placeholders": {
-      "pack": {"type": "String"}
-    }
-  },
-  "showOnHome": "Show on Home",
-  "@showOnHome": {
-    "description": "Pack screen button: makes this pack Your Path, the pack the home screen continues"
-  },
-  "yourPathStatusTitle": "Your Path · {completed} of {total}",
-  "@yourPathStatusTitle": {
-    "description": "Pack screen status row title when this pack is Your Path",
-    "placeholders": {
-      "completed": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "yourPathNextSession": "Next: {title}",
-  "@yourPathNextSession": {
-    "description": "Pack screen status row subtitle naming the session that plays on tap",
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
   "yourPathAllDone": "All sessions done",
   "@yourPathAllDone": {
     "description": "Pack screen status row subtitle when every session in Your Path is complete"
-  },
-  "yourPathOptions": "Your Path options",
-  "@yourPathOptions": {
-    "description": "Accessibility label for the menu button on the Your Path status row"
-  },
-  "setAsYourPath": "Set as Your Path",
-  "@setAsYourPath": {
-    "description": "Button on the pack screen that makes this pack the one shown in the Your Path section on the home screen"
-  },
-  "setAsYourPathSubtitle": "Continue this pack from your home screen",
-  "@setAsYourPathSubtitle": {
-    "description": "Subtitle under the Set as Your Path row on the pack screen"
-  },
-  "yourPathRowSubtitle": "{completed} of {total} complete · shown on your home screen",
-  "@yourPathRowSubtitle": {
-    "description": "Subtitle under the Your Path row on the pack screen when this pack is the current Your Path",
-    "placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}
-  },
-  "yourPathSheetTitle": "This pack is Your Path",
-  "@yourPathSheetTitle": {
-    "description": "Title of the sheet opened from the Your Path button on the pack screen"
-  },
-  "yourPathSheetBody": "Home picks up this pack where you left off, with your next session ready to play. The Medito widget shows it too, if you've added one to your phone.",
-  "@yourPathSheetBody": {
-    "description": "Body of the sheet opened from the Your Path button, explaining what Your Path does"
-  },
-  "yourPathDefaultNote": "This is where everyone starts. To follow a different pack, open it and tap Show on Home.",
-  "@yourPathDefaultNote": {
-    "description": "Shown in the Your Path sheet for the default pack, which cannot be removed"
-  },
-  "removeFromYourPath": "Stop showing on Home",
-  "@removeFromYourPath": {
-    "description": "Action in the Your Path sheet that stops showing this pack on the home screen"
   },
   "connectionErrorTitle": "Couldn't load paywall",
   "@connectionErrorTitle": {
@@ -2003,5 +1930,33 @@
     "description": "Empty state on a tag page"
   },
   "sessionBells": "Session bells",
-  "sessionBellsDescription": "A bell at the beginning, middle and end"
+  "sessionBellsDescription": "A bell at the beginning, middle and end",
+  "upNextStartHere": "Start here",
+  "@upNextStartHere": {
+    "description": "Eyebrow on the home hero when nothing in the pack has been played yet, e.g. START HERE · Getting started"
+  },
+  "removeFromHomeShort": "Remove",
+  "@removeFromHomeShort": {
+    "description": "Short label on the home hero swipe tile for Remove from Home (tiles are narrow)"
+  },
+  "removeFromHome": "Remove from Home",
+  "@removeFromHome": {
+    "description": "Swipe action on the home hero that stops showing this pack there (Home falls back to Getting started)"
+  },
+  "removedFromHome": "Removed from Home.",
+  "@removedFromHome": {
+    "description": "Snackbar after removing a pack from the home hero; offers Undo"
+  },
+  "packStart": "Start",
+  "@packStart": {
+    "description": "Pack screen play button when nothing in the pack has been played; also puts the pack on Home"
+  },
+  "packContinue": "Continue",
+  "@packContinue": {
+    "description": "Pack screen play button once some sessions are done; also puts the pack on Home"
+  },
+  "packAddedToHome": "Added to Home so you can pick up where you left off.",
+  "@packAddedToHome": {
+    "description": "Snackbar after the pack screen Start/Continue button puts a new pack on Home; offers Undo"
+  }
 }

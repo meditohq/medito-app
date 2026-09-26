@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -30,6 +32,18 @@ class PackView extends ConsumerStatefulWidget {
 class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
   final ScrollController _scrollController = ScrollController();
+  // The inline play button and the Stack it docks into, measured on scroll.
+  final _playButtonKey = GlobalKey();
+  final _bodyKey = GlobalKey();
+
+  /// Where the inline play button's slot sits at scroll offset 0. The slot's
+  /// on-screen top is always this minus the offset (content below the app bar
+  /// moves 1:1 with scrolling), so the floating button can be placed from the
+  /// current offset without waiting a frame for a measurement.
+  double? _playSlotTopAtZero;
+
+  /// SliverAppBar.large's collapsed toolbar height (Material 3).
+  static const _collapsedAppBarHeight = 64.0;
   final _analytics = FirebaseAnalyticsService();
   bool _markingAll = false;
 
@@ -77,7 +91,37 @@ class _PackViewState extends ConsumerState<PackView>
         child: packAsyncValue.when(
           skipLoadingOnRefresh: false,
           skipLoadingOnReload: false,
-          data: (data) => _buildScaffoldWithData(data, ref),
+          data: (data) {
+            final playable = PackPathButton.isPlayable(data);
+            if (playable) {
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => mounted ? _measurePlaySlot() : null,
+              );
+            }
+            final slotTop = _playSlotTopAtZero;
+            final offset = _scrollController.hasClients
+                ? _scrollController.offset
+                : 0.0;
+            return Stack(
+              key: _bodyKey,
+              children: [
+                _buildScaffoldWithData(
+                  data,
+                  ref,
+                  floatingPlay: playable && slotTop != null,
+                ),
+                // One button, drawn above the app bar: it rides with the
+                // content, then sticks straddling the collapsed bar's edge
+                // (Spotify-style). No swap between copies, so no jump.
+                if (playable && slotTop != null)
+                  Positioned(
+                    top: math.max(slotTop - offset, _dockedPlayTop),
+                    right: PackPathButton.rightInset,
+                    child: PackPlayButton(pack: data),
+                  ),
+              ],
+            );
+          },
           error: (err, stack) {
             final error = err is AppError ? err : const UnknownError();
             return MeditoErrorWidget(
@@ -96,7 +140,32 @@ class _PackViewState extends ConsumerState<PackView>
     setState(() => {});
   }
 
-  RefreshIndicator _buildScaffoldWithData(PackModel pack, WidgetRef ref) {
+  /// Re-measures the play slot after layout (description, tags or text scale
+  /// can move it); only rebuilds when it actually moved.
+  void _measurePlaySlot() {
+    final slot = _playButtonKey.currentContext?.findRenderObject();
+    final body = _bodyKey.currentContext?.findRenderObject();
+    if (slot is! RenderBox || body is! RenderBox || !slot.attached) return;
+    final offset = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
+    final atZero = slot.localToGlobal(Offset.zero, ancestor: body).dy + offset;
+    final previous = _playSlotTopAtZero;
+    if (previous == null || (previous - atZero).abs() > 0.5) {
+      setState(() => _playSlotTopAtZero = atZero);
+    }
+  }
+
+  double get _dockedPlayTop =>
+      MediaQuery.paddingOf(context).top +
+      _collapsedAppBarHeight -
+      PackPathButton.buttonSize / 2;
+
+  RefreshIndicator _buildScaffoldWithData(
+    PackModel pack,
+    WidgetRef ref, {
+    bool floatingPlay = false,
+  }) {
     return RefreshIndicator(
       onRefresh: () async {
         if (widget.id == 'favorites') {
@@ -117,14 +186,19 @@ class _PackViewState extends ConsumerState<PackView>
           ),
           SliverList(
             delegate: SliverChildListDelegate([
-              // One surface: description text plus the Your Path row.
-              Container(
-                color: Theme.of(context).cardColor,
+              // Description surface with the play button on its lower edge.
+              PackPathButton(
+                pack: pack,
+                buttonKey: _playButtonKey,
+                // The floating copy takes over once the slot is measured.
+                hideButton: floatingPlay,
                 child: Column(
                   children: [
-                    DescriptionWidget(description: pack.description ?? ''),
+                    DescriptionWidget(
+                      description: pack.description ?? '',
+                      endReserve: PackPathButton.endReserve,
+                    ),
                     _packTags(pack),
-                    PackPathButton(pack: pack),
                   ],
                 ),
               ),
@@ -149,7 +223,13 @@ class _PackViewState extends ConsumerState<PackView>
       alignment: Alignment.centerLeft,
       child: PackTagChips(
         trackIds: trackIds,
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        // Right inset clears the play button on the header's lower edge.
+        padding: const EdgeInsets.fromLTRB(
+          20,
+          0,
+          20 + PackPathButton.endReserve,
+          16,
+        ),
       ),
     );
   }

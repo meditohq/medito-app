@@ -591,9 +591,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get locked => 'Bloqueado';
 
   @override
-  String get loadingPath => 'Cargando tu ruta...';
-
-  @override
   String get pathLoadError =>
       'Error al cargar la ruta. Por favor inténtalo de nuevo.';
 
@@ -2165,7 +2162,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get completedAt => 'Completado a las';
 
   @override
-  String get upNextTitle => 'Your Path';
+  String get upNextTitle => 'Continuar';
 
   @override
   String upNextProgress(int completed, int total) {
@@ -2197,15 +2194,17 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get upNextPathCompletedTitle => 'You\'ve completed your path';
+  String get upNextPathCompletedTitle =>
+      'Has terminado todos los paquetes de la serie';
 
   @override
   String get upNextPathCompletedSubtitle =>
-      'Every pack in your path is done. Explore the library to choose what\'s next.';
+      'Explora la biblioteca para encontrar lo siguiente.';
 
   @override
-  String get upNextNextPackPinnedSnack =>
-      'Your next pack is ready in Your Path';
+  String upNextNextPackPinnedSnack(String packTitle) {
+    return '$packTitle está listo en Inicio';
+  }
 
   @override
   String upNextSessionCount(int current, int total) {
@@ -2235,7 +2234,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get defaultsNote =>
-      'These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.';
+      'These defaults are set from your last selection on any track. Home uses them to skip the selection screen when you continue a pack.';
 
   @override
   String get streakFreezeUsed => 'Streak freeze used';
@@ -2289,7 +2288,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get refresh => 'Actualizar';
 
   @override
-  String get upNext => 'Tu Camino';
+  String get upNext => 'Continuar';
 
   @override
   String get donationInfo => 'Información sobre donaciones';
@@ -2429,59 +2428,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get openPack => 'Abrir paquete';
 
   @override
-  String showOnHomeReplaced(String pack, String previous) {
-    return '$pack está ahora en Inicio, en lugar de $previous.';
-  }
-
-  @override
-  String showOnHomeDone(String pack) {
-    return '$pack está ahora en Inicio.';
-  }
-
-  @override
-  String get showOnHome => 'Mostrar en Inicio';
-
-  @override
-  String yourPathStatusTitle(int completed, int total) {
-    return 'Tu Camino · $completed de $total';
-  }
-
-  @override
-  String yourPathNextSession(String title) {
-    return 'Siguiente: $title';
-  }
-
-  @override
   String get yourPathAllDone => 'Todas las sesiones completadas';
-
-  @override
-  String get yourPathOptions => 'Opciones de Tu Camino';
-
-  @override
-  String get setAsYourPath => 'Elegir como Tu Camino';
-
-  @override
-  String get setAsYourPathSubtitle =>
-      'Continúa este paquete desde tu pantalla de inicio';
-
-  @override
-  String yourPathRowSubtitle(int completed, int total) {
-    return '$completed de $total completadas · en tu inicio';
-  }
-
-  @override
-  String get yourPathSheetTitle => 'Este paquete es Tu Camino';
-
-  @override
-  String get yourPathSheetBody =>
-      'Inicio retoma este paquete donde lo dejaste, con tu próxima sesión lista para reproducir. El widget de Medito también la muestra, si lo has añadido a tu teléfono.';
-
-  @override
-  String get yourPathDefaultNote =>
-      'Aquí empieza todo el mundo. Para seguir otro paquete, ábrelo y toca Mostrar en Inicio.';
-
-  @override
-  String get removeFromYourPath => 'Dejar de mostrar en Inicio';
 
   @override
   String get connectionErrorTitle => 'No se pudo cargar el paywall';
@@ -2668,4 +2615,26 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get sessionBellsDescription =>
       'Una campana al principio, a la mitad y al final';
+
+  @override
+  String get upNextStartHere => 'Empieza aquí';
+
+  @override
+  String get removeFromHomeShort => 'Quitar';
+
+  @override
+  String get removeFromHome => 'Quitar de Inicio';
+
+  @override
+  String get removedFromHome => 'Quitado de Inicio.';
+
+  @override
+  String get packStart => 'Empezar';
+
+  @override
+  String get packContinue => 'Continuar';
+
+  @override
+  String get packAddedToHome =>
+      'Añadido a Inicio para que retomes donde lo dejaste.';
 }

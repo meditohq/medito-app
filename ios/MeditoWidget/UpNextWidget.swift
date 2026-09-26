@@ -73,13 +73,22 @@ private struct PlayCircleView: View {
     }
 }
 
+/// Matches the app's Home hero: "Start here" before anything in the pack is
+/// played, "Continue" after.
+private func upNextLabel(_ entry: UpNextEntry) -> String {
+    entry.completed == 0 ? "START HERE" : "CONTINUE"
+}
+
+private let emptyTitle = "Choose what's next"
+
 private struct UpNextLabel: View {
+    let label: String
     let packTitle: String
     let labelColor: Color
 
     var body: some View {
         HStack(spacing: 3) {
-            Text("UP NEXT")
+            Text(label)
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(labelColor)
             if !packTitle.isEmpty {
@@ -115,9 +124,9 @@ private struct UpNextSmallView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // "UP NEXT" label pinned to top-left
+            // Start here / Continue label pinned to top-left
             HStack {
-                Text("UP NEXT")
+                Text(upNextLabel(entry))
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(labelColor)
                 Spacer()
@@ -161,12 +170,16 @@ private struct UpNextMediumView: View {
 
     private var colors: WidgetColors { isDark ? .dark : .light }
     private var labelColor: Color { colors.textColor.opacity(0.4) }
-    private var displayTitle: String { entry.title.isEmpty ? "No session up next" : entry.title }
+    private var displayTitle: String { entry.title.isEmpty ? emptyTitle : entry.title }
 
     var body: some View {
         HStack(spacing: 14) {
             VStack(alignment: .leading, spacing: 5) {
-                UpNextLabel(packTitle: entry.packTitle, labelColor: labelColor)
+                UpNextLabel(
+                    label: upNextLabel(entry),
+                    packTitle: entry.packTitle,
+                    labelColor: labelColor
+                )
 
                 Text(displayTitle)
                     .font(.system(size: 17, weight: .bold))
@@ -228,8 +241,8 @@ struct UpNextWidget: Widget {
         StaticConfiguration(kind: kind, provider: UpNextProvider()) { entry in
             UpNextWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Up Next")
-        .description("See your next meditation session.")
+        .configurationDisplayName("Continue")
+        .description("Pick up your pack where you left off.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

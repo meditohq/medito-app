@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/config_constants.dart';
+import 'package:medito/constants/pack_sequence.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -41,6 +42,7 @@ PackModel _pack(String id, String title, {int tracks = 3, int done = 1}) {
 void main() {
   late SharedPreferences prefs;
   late AppLocalizations l10n;
+  late List<String> started;
 
   final basics = _pack(ConfigConstants.basicsPackId, 'Basics');
   final sleep = _pack('sleep', 'Sleep', tracks: 7, done: 3);
@@ -49,62 +51,90 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    started = [];
   });
 
-  Future<void> pump(WidgetTester tester, PackModel pack) async {
+  Future<void> fakeStart(
+    BuildContext context,
+    WidgetRef ref, {
+    required String trackId,
+    required String path,
+  }) async => started.add(trackId);
+
+  Future<void> pump(
+    WidgetTester tester,
+    PackModel pack, {
+    List<PackModel> others = const [],
+  }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
-          packProvider(packId: basics.id).overrideWith(() => _FakePack(basics)),
-          packProvider(packId: sleep.id).overrideWith(() => _FakePack(sleep)),
+          for (final p in [basics, sleep, ...others])
+            packProvider(packId: p.id).overrideWith(() => _FakePack(p)),
         ],
         child: MaterialApp(
           scaffoldMessengerKey: scaffoldMessengerKey,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(body: PackPathButton(pack: pack)),
+          home: Scaffold(
+            body: PackPathButton(
+              pack: pack,
+              onStartSession: fakeStart,
+              child: const SizedBox(height: 40),
+            ),
+          ),
         ),
       ),
     );
     await tester.pumpAndSettle();
   }
 
-  testWidgets('another pack offers "Show on Home"; tapping makes it the path', (
-    tester,
-  ) async {
-    await pump(tester, sleep);
+  testWidgets('an untouched pack says Start', (tester) async {
+    await pump(tester, _pack('fresh', 'Fresh', done: 0));
 
-    expect(find.text(l10n.showOnHome), findsOneWidget);
-
-    await tester.tap(find.text(l10n.showOnHome));
-    await tester.pumpAndSettle();
-
-    expect(prefs.getString(SharedPreferenceConstants.upNextPackId), 'sleep');
-    // Flips to the status row naming the session that plays next.
-    expect(find.text(l10n.yourPathStatusTitle(3, 7)), findsOneWidget);
-    expect(find.text(l10n.yourPathNextSession('Session 3')), findsOneWidget);
-  });
-
-  testWidgets('replacing the default pack names it; Undo restores it', (
-    tester,
-  ) async {
-    await pump(tester, sleep);
-
-    await tester.tap(find.text(l10n.showOnHome));
-    await tester.pumpAndSettle();
-
+    final handle = tester.ensureSemantics();
     expect(
-      find.text(l10n.showOnHomeReplaced('Sleep', 'Basics')),
+      find.bySemanticsLabel(RegExp('^${l10n.packStart}: Session 0')),
       findsOneWidget,
     );
+    handle.dispose();
+  });
 
+  testWidgets('Continue plays the next session and puts the pack on Home', (
+    tester,
+  ) async {
+    await pump(tester, sleep);
+
+    final handle = tester.ensureSemantics();
+    expect(
+      find.bySemanticsLabel(
+        '${l10n.packContinue}: Session 3. ${l10n.upNextProgress(3, 7)}',
+      ),
+      findsOneWidget,
+    );
+    handle.dispose();
+
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.pumpAndSettle();
+
+    expect(started, ['sleep-3']);
+    expect(prefs.getString(SharedPreferenceConstants.upNextPackId), 'sleep');
+    expect(find.text(l10n.packAddedToHome), findsOneWidget);
+  });
+
+  testWidgets('Undo after replacing the default restores the default', (
+    tester,
+  ) async {
+    await pump(tester, sleep);
+
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(l10n.undo));
     await tester.pumpAndSettle();
 
     // Home was on the default without an explicit choice; Undo restores that.
     expect(prefs.getString(SharedPreferenceConstants.upNextPackId), isNull);
-    expect(find.text(l10n.showOnHome), findsOneWidget);
   });
 
   testWidgets('Undo restores an explicitly chosen previous pack', (
@@ -112,73 +142,67 @@ void main() {
   ) async {
     final work = _pack('work', 'Work life');
     await prefs.setString(SharedPreferenceConstants.upNextPackId, 'work');
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-          packProvider(packId: work.id).overrideWith(() => _FakePack(work)),
-          packProvider(packId: sleep.id).overrideWith(() => _FakePack(sleep)),
-        ],
-        child: MaterialApp(
-          scaffoldMessengerKey: scaffoldMessengerKey,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(body: PackPathButton(pack: sleep)),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+    await pump(tester, sleep, others: [work]);
 
-    await tester.tap(find.text(l10n.showOnHome));
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
     await tester.pumpAndSettle();
-    expect(
-      find.text(l10n.showOnHomeReplaced('Sleep', 'Work life')),
-      findsOneWidget,
-    );
-
     await tester.tap(find.text(l10n.undo));
     await tester.pumpAndSettle();
+
     expect(prefs.getString(SharedPreferenceConstants.upNextPackId), 'work');
   });
 
-  testWidgets('a finished pack shows "All sessions done" once set', (
+  testWidgets('remembers the series pack it replaced, for Remove on Home', (
     tester,
   ) async {
-    final done = _pack('done', 'Done', tracks: 2, done: 2);
-    await pump(tester, done);
-
-    await tester.tap(find.text(l10n.showOnHome));
+    final gettingStarted = _pack(PackSequence.beginnerEntryPackId, 'Start');
+    final work = _pack('work', 'Work life');
+    await prefs.setString(
+      SharedPreferenceConstants.upNextPackId,
+      gettingStarted.id,
+    );
+    await pump(tester, work, others: [gettingStarted, work]);
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
     await tester.pumpAndSettle();
+    expect(
+      prefs.getString(SharedPreferenceConstants.upNextReturnPackId),
+      gettingStarted.id,
+    );
 
-    expect(prefs.getString(SharedPreferenceConstants.upNextPackId), 'done');
-    expect(find.text(l10n.yourPathAllDone), findsOneWidget);
+    // Hopping to another hand-picked pack keeps the series position.
+    await pump(tester, sleep, others: [gettingStarted, work]);
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    await tester.pumpAndSettle();
+    expect(prefs.getString(SharedPreferenceConstants.upNextPackId), 'sleep');
+    expect(
+      prefs.getString(SharedPreferenceConstants.upNextReturnPackId),
+      gettingStarted.id,
+    );
   });
 
-  testWidgets('current pack: the menu opens a sheet whose remove action falls '
-      'back to the default pack', (tester) async {
+  testWidgets('the pack already on Home just plays, with no snackbar', (
+    tester,
+  ) async {
     await prefs.setString(SharedPreferenceConstants.upNextPackId, 'sleep');
     await pump(tester, sleep);
 
-    expect(find.byIcon(Icons.check_rounded), findsNothing);
-    await tester.tap(find.byTooltip(l10n.yourPathOptions));
-    await tester.pumpAndSettle();
-    expect(find.text(l10n.yourPathSheetTitle), findsOneWidget);
-
-    await tester.tap(find.text(l10n.removeFromYourPath));
+    await tester.tap(find.byIcon(Icons.play_arrow_rounded));
     await tester.pumpAndSettle();
 
-    expect(prefs.getString(SharedPreferenceConstants.upNextPackId), isNull);
-    expect(find.text(l10n.showOnHome), findsOneWidget);
+    expect(started, ['sleep-3']);
+    expect(find.text(l10n.packAddedToHome), findsNothing);
   });
 
-  testWidgets('default pack as current path cannot be removed', (tester) async {
-    await pump(tester, basics);
+  testWidgets('a finished pack shows "All sessions done" and does nothing', (
+    tester,
+  ) async {
+    await pump(tester, _pack('done', 'Done', tracks: 2, done: 2));
 
-    await tester.tap(find.byTooltip(l10n.yourPathOptions));
+    await tester.tap(find.byIcon(Icons.check_rounded));
     await tester.pumpAndSettle();
 
-    expect(find.text(l10n.yourPathDefaultNote), findsOneWidget);
-    expect(find.text(l10n.removeFromYourPath), findsNothing);
+    expect(started, isEmpty);
+    expect(prefs.getString(SharedPreferenceConstants.upNextPackId), isNull);
   });
 
   testWidgets('hidden for packs that contain sub-packs', (tester) async {
@@ -196,8 +220,7 @@ void main() {
     );
     await pump(tester, nested);
 
-    expect(find.text(l10n.showOnHome), findsNothing);
-    expect(find.text(l10n.upNextTitle), findsNothing);
+    expect(find.byIcon(Icons.play_arrow_rounded), findsNothing);
   });
 
   test('upNextPackIdProvider falls back to the basics pack', () {

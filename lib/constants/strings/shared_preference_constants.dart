@@ -96,6 +96,10 @@ class SharedPreferenceConstants {
   // Up Next pack preference
   static const String upNextPackId = 'up_next_pack_id';
 
+  /// The series pack Home returns to when a hand-picked pack is removed from
+  /// it. Absent means the no-pin default.
+  static const String upNextReturnPackId = 'up_next_return_pack_id';
+
   // Onboarding custom-time-picker entry-mode A/B test (dial vs keyboard) —
   // sticky per-install variant.
   static const String onboardingReminderPickerModeVariant =

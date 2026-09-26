@@ -583,9 +583,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locked => 'Locked';
 
   @override
-  String get loadingPath => 'Loading your path...';
-
-  @override
   String get pathLoadError => 'Failed to load path. Please try again.';
 
   @override
@@ -2129,7 +2126,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get completedAt => 'Completed at';
 
   @override
-  String get upNextTitle => 'Your Path';
+  String get upNextTitle => 'Continue';
 
   @override
   String upNextProgress(int completed, int total) {
@@ -2161,15 +2158,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get upNextPathCompletedTitle => 'You\'ve completed your path';
+  String get upNextPathCompletedTitle =>
+      'You\'ve finished every pack in the series';
 
   @override
   String get upNextPathCompletedSubtitle =>
-      'Every pack in your path is done. Explore the library to choose what\'s next.';
+      'Explore the library to find what\'s next.';
 
   @override
-  String get upNextNextPackPinnedSnack =>
-      'Your next pack is ready in Your Path';
+  String upNextNextPackPinnedSnack(String packTitle) {
+    return '$packTitle is ready on Home';
+  }
 
   @override
   String upNextSessionCount(int current, int total) {
@@ -2199,7 +2198,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get defaultsNote =>
-      'These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.';
+      'These defaults are set from your last selection on any track. Home uses them to skip the selection screen when you continue a pack.';
 
   @override
   String get streakFreezeUsed => 'Streak freeze used';
@@ -2253,7 +2252,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refresh => 'Refresh';
 
   @override
-  String get upNext => 'Your Path';
+  String get upNext => 'Continue';
 
   @override
   String get donationInfo => 'Donation info';
@@ -2393,59 +2392,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openPack => 'Open pack';
 
   @override
-  String showOnHomeReplaced(String pack, String previous) {
-    return '$pack is now on Home, replacing $previous.';
-  }
-
-  @override
-  String showOnHomeDone(String pack) {
-    return '$pack is now on Home.';
-  }
-
-  @override
-  String get showOnHome => 'Show on Home';
-
-  @override
-  String yourPathStatusTitle(int completed, int total) {
-    return 'Your Path · $completed of $total';
-  }
-
-  @override
-  String yourPathNextSession(String title) {
-    return 'Next: $title';
-  }
-
-  @override
   String get yourPathAllDone => 'All sessions done';
-
-  @override
-  String get yourPathOptions => 'Your Path options';
-
-  @override
-  String get setAsYourPath => 'Set as Your Path';
-
-  @override
-  String get setAsYourPathSubtitle =>
-      'Continue this pack from your home screen';
-
-  @override
-  String yourPathRowSubtitle(int completed, int total) {
-    return '$completed of $total complete · shown on your home screen';
-  }
-
-  @override
-  String get yourPathSheetTitle => 'This pack is Your Path';
-
-  @override
-  String get yourPathSheetBody =>
-      'Home picks up this pack where you left off, with your next session ready to play. The Medito widget shows it too, if you\'ve added one to your phone.';
-
-  @override
-  String get yourPathDefaultNote =>
-      'This is where everyone starts. To follow a different pack, open it and tap Show on Home.';
-
-  @override
-  String get removeFromYourPath => 'Stop showing on Home';
 
   @override
   String get connectionErrorTitle => 'Couldn\'t load paywall';
@@ -2632,4 +2579,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sessionBellsDescription =>
       'A bell at the beginning, middle and end';
+
+  @override
+  String get upNextStartHere => 'Start here';
+
+  @override
+  String get removeFromHomeShort => 'Remove';
+
+  @override
+  String get removeFromHome => 'Remove from Home';
+
+  @override
+  String get removedFromHome => 'Removed from Home.';
+
+  @override
+  String get packStart => 'Start';
+
+  @override
+  String get packContinue => 'Continue';
+
+  @override
+  String get packAddedToHome =>
+      'Added to Home so you can pick up where you left off.';
 }

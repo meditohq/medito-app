@@ -1178,12 +1178,6 @@ abstract class AppLocalizations {
   /// **'Locked'**
   String get locked;
 
-  /// No description provided for @loadingPath.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading your path...'**
-  String get loadingPath;
-
   /// No description provided for @pathLoadError.
   ///
   /// In en, this message translates to:
@@ -3926,10 +3920,10 @@ abstract class AppLocalizations {
   /// **'Completed at'**
   String get completedAt;
 
-  /// Title for the Your Path section on the home screen
+  /// Eyebrow on the home hero once the pack is under way (CONTINUE · pack), and the section name in Customise Home
   ///
   /// In en, this message translates to:
-  /// **'Your Path'**
+  /// **'Continue'**
   String get upNextTitle;
 
   /// Caption next to the pack progress bar on the Your Path card, e.g. 3 of 7
@@ -3965,20 +3959,20 @@ abstract class AppLocalizations {
   /// Headline shown when the user finishes the final pack in the curated sequence
   ///
   /// In en, this message translates to:
-  /// **'You\'ve completed your path'**
+  /// **'You\'ve finished every pack in the series'**
   String get upNextPathCompletedTitle;
 
   /// Supporting line shown when there is no next pack to offer
   ///
   /// In en, this message translates to:
-  /// **'Every pack in your path is done. Explore the library to choose what\'s next.'**
+  /// **'Explore the library to find what\'s next.'**
   String get upNextPathCompletedSubtitle;
 
-  /// Snackbar confirming the next pack was pinned as Up Next
+  /// Snackbar after the completed hero's button puts the next pack in the series on Home
   ///
   /// In en, this message translates to:
-  /// **'Your next pack is ready in Your Path'**
-  String get upNextNextPackPinnedSnack;
+  /// **'{packTitle} is ready on Home'**
+  String upNextNextPackPinnedSnack(String packTitle);
 
   /// Shows the current session number out of total sessions
   ///
@@ -4031,7 +4025,7 @@ abstract class AppLocalizations {
   /// Note explaining how defaults work in Up Next
   ///
   /// In en, this message translates to:
-  /// **'These defaults are set from your last selection on any track. Your Path uses them to skip the selection screen.'**
+  /// **'These defaults are set from your last selection on any track. Home uses them to skip the selection screen when you continue a pack.'**
   String get defaultsNote;
 
   /// Text shown when a streak freeze was used on a particular day
@@ -4136,10 +4130,10 @@ abstract class AppLocalizations {
   /// **'Refresh'**
   String get refresh;
 
-  /// Accessibility label prefix for the Your Path card on the home screen
+  /// Accessibility label prefix for the home hero card
   ///
   /// In en, this message translates to:
-  /// **'Your Path'**
+  /// **'Continue'**
   String get upNext;
 
   /// Accessibility label for the donation information button
@@ -4394,89 +4388,11 @@ abstract class AppLocalizations {
   /// **'Open pack'**
   String get openPack;
 
-  /// Snackbar after Show on Home when it replaced the pack Home was showing
-  ///
-  /// In en, this message translates to:
-  /// **'{pack} is now on Home, replacing {previous}.'**
-  String showOnHomeReplaced(String pack, String previous);
-
-  /// Snackbar after Show on Home when the previous pack's name isn't known
-  ///
-  /// In en, this message translates to:
-  /// **'{pack} is now on Home.'**
-  String showOnHomeDone(String pack);
-
-  /// Pack screen button: makes this pack Your Path, the pack the home screen continues
-  ///
-  /// In en, this message translates to:
-  /// **'Show on Home'**
-  String get showOnHome;
-
-  /// Pack screen status row title when this pack is Your Path
-  ///
-  /// In en, this message translates to:
-  /// **'Your Path · {completed} of {total}'**
-  String yourPathStatusTitle(int completed, int total);
-
-  /// Pack screen status row subtitle naming the session that plays on tap
-  ///
-  /// In en, this message translates to:
-  /// **'Next: {title}'**
-  String yourPathNextSession(String title);
-
   /// Pack screen status row subtitle when every session in Your Path is complete
   ///
   /// In en, this message translates to:
   /// **'All sessions done'**
   String get yourPathAllDone;
-
-  /// Accessibility label for the menu button on the Your Path status row
-  ///
-  /// In en, this message translates to:
-  /// **'Your Path options'**
-  String get yourPathOptions;
-
-  /// Button on the pack screen that makes this pack the one shown in the Your Path section on the home screen
-  ///
-  /// In en, this message translates to:
-  /// **'Set as Your Path'**
-  String get setAsYourPath;
-
-  /// Subtitle under the Set as Your Path row on the pack screen
-  ///
-  /// In en, this message translates to:
-  /// **'Continue this pack from your home screen'**
-  String get setAsYourPathSubtitle;
-
-  /// Subtitle under the Your Path row on the pack screen when this pack is the current Your Path
-  ///
-  /// In en, this message translates to:
-  /// **'{completed} of {total} complete · shown on your home screen'**
-  String yourPathRowSubtitle(int completed, int total);
-
-  /// Title of the sheet opened from the Your Path button on the pack screen
-  ///
-  /// In en, this message translates to:
-  /// **'This pack is Your Path'**
-  String get yourPathSheetTitle;
-
-  /// Body of the sheet opened from the Your Path button, explaining what Your Path does
-  ///
-  /// In en, this message translates to:
-  /// **'Home picks up this pack where you left off, with your next session ready to play. The Medito widget shows it too, if you\'ve added one to your phone.'**
-  String get yourPathSheetBody;
-
-  /// Shown in the Your Path sheet for the default pack, which cannot be removed
-  ///
-  /// In en, this message translates to:
-  /// **'This is where everyone starts. To follow a different pack, open it and tap Show on Home.'**
-  String get yourPathDefaultNote;
-
-  /// Action in the Your Path sheet that stops showing this pack on the home screen
-  ///
-  /// In en, this message translates to:
-  /// **'Stop showing on Home'**
-  String get removeFromYourPath;
 
   /// Title shown when the donation paywall webview fails to load
   ///
@@ -4837,6 +4753,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A bell at the beginning, middle and end'**
   String get sessionBellsDescription;
+
+  /// Eyebrow on the home hero when nothing in the pack has been played yet, e.g. START HERE · Getting started
+  ///
+  /// In en, this message translates to:
+  /// **'Start here'**
+  String get upNextStartHere;
+
+  /// Short label on the home hero swipe tile for Remove from Home (tiles are narrow)
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeFromHomeShort;
+
+  /// Swipe action on the home hero that stops showing this pack there (Home falls back to Getting started)
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from Home'**
+  String get removeFromHome;
+
+  /// Snackbar after removing a pack from the home hero; offers Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from Home.'**
+  String get removedFromHome;
+
+  /// Pack screen play button when nothing in the pack has been played; also puts the pack on Home
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get packStart;
+
+  /// Pack screen play button once some sessions are done; also puts the pack on Home
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get packContinue;
+
+  /// Snackbar after the pack screen Start/Continue button puts a new pack on Home; offers Undo
+  ///
+  /// In en, this message translates to:
+  /// **'Added to Home so you can pick up where you left off.'**
+  String get packAddedToHome;
 }
 
 class _AppLocalizationsDelegate

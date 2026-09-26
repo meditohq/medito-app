@@ -21,7 +21,6 @@
     "onboardingFirstMeditationDone",
     "onboardingFirstMeditationContinue",
     "addHomeScreenWidget",
-    "upNextTitle",
     "upNextSessionCount",
     "manageDefaults",
     "defaults",

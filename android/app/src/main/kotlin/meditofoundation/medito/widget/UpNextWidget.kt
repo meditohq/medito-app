@@ -63,6 +63,9 @@ class UpNextWidget : GlanceAppWidget() {
         val subtitle = prefs.getString("up_next_subtitle",   "") ?: ""
         val packTitle = prefs.getString("up_next_pack_title", "") ?: ""
         val trackId  = prefs.getString("up_next_track_id",   "") ?: ""
+        // Matches the app's Home hero: "Start here" before anything in the
+        // pack is played, "Continue" after.
+        val label = if (prefs.getInt("up_next_completed", 0) == 0) "START HERE" else "CONTINUE"
         val themePreference = prefs.getString("theme_preference", "system") ?: "system"
 
         val isDark = when (themePreference) {
@@ -120,8 +123,8 @@ class UpNextWidget : GlanceAppWidget() {
         ) {
             when (layout) {
                 Layout.TINY   -> TinyLayout(title, colors)
-                Layout.MEDIUM -> MediumLayout(title, packTitle, colors)
-                Layout.WIDE   -> WideLayout(title, subtitle, packTitle, colors)
+                Layout.MEDIUM -> MediumLayout(title, label, packTitle, colors)
+                Layout.WIDE   -> WideLayout(title, subtitle, label, packTitle, colors)
             }
         }
     }
@@ -140,7 +143,7 @@ class UpNextWidget : GlanceAppWidget() {
             )
             Spacer(modifier = GlanceModifier.height(6.dp))
             Text(
-                text = if (title.isEmpty()) "Up next" else title,
+                text = if (title.isEmpty()) "Medito" else title,
                 style = TextStyle(
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Medium,
@@ -153,20 +156,20 @@ class UpNextWidget : GlanceAppWidget() {
 
     // Comfortable 3×1 — label row + title + play button side-by-side
     @Composable
-    private fun MediumLayout(title: String, packTitle: String, colors: ThemeColors) {
+    private fun MediumLayout(title: String, label: String, packTitle: String, colors: ThemeColors) {
         Column(
             modifier = GlanceModifier
                 .fillMaxWidth()
                 .padding(12.dp),
         ) {
-            LabelRow(packTitle, 9.sp.value, colors)
+            LabelRow(label, packTitle, 9.sp.value, colors)
             Spacer(modifier = GlanceModifier.height(4.dp))
             Row(
                 modifier = GlanceModifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
                 Text(
-                    text = if (title.isEmpty()) "No session up next" else title,
+                    text = if (title.isEmpty()) EMPTY_TITLE else title,
                     style = TextStyle(
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
@@ -190,6 +193,7 @@ class UpNextWidget : GlanceAppWidget() {
     private fun WideLayout(
         title: String,
         subtitle: String,
+        label: String,
         packTitle: String,
         colors: ThemeColors,
     ) {
@@ -200,10 +204,10 @@ class UpNextWidget : GlanceAppWidget() {
             verticalAlignment = Alignment.Vertical.CenterVertically,
         ) {
             Column(modifier = GlanceModifier.defaultWeight()) {
-                LabelRow(packTitle, 10.sp.value, colors)
+                LabelRow(label, packTitle, 10.sp.value, colors)
                 Spacer(modifier = GlanceModifier.height(5.dp))
                 Text(
-                    text = if (title.isEmpty()) "No session up next" else title,
+                    text = if (title.isEmpty()) EMPTY_TITLE else title,
                     style = TextStyle(
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
@@ -233,10 +237,10 @@ class UpNextWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun LabelRow(packTitle: String, fontSize: Float, colors: ThemeColors) {
+    private fun LabelRow(label: String, packTitle: String, fontSize: Float, colors: ThemeColors) {
         Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
             Text(
-                text = "UP NEXT",
+                text = label,
                 style = TextStyle(
                     fontSize = fontSize.sp,
                     fontWeight = FontWeight.Medium,
@@ -272,6 +276,9 @@ class UpNextWidget : GlanceAppWidget() {
 
     private enum class Layout { TINY, MEDIUM, WIDE }
 }
+
+/** Shown when the pinned pack is finished (the app clears the session). */
+private const val EMPTY_TITLE = "Choose what's next"
 
 private object LocalSizeCompat {
     val current: DpSize
