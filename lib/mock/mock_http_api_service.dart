@@ -66,11 +66,7 @@ class MockHttpApiService extends HttpApiService {
     if (cleanPath == HTTPConstants.packTracks) {
       return {
         'packTracks': {
-          for (final pack in mockPacks)
-            pack.id: [
-              for (final item in pack.items)
-                if (item.type == TypeConstants.track) item.id,
-            ],
+          for (final pack in mockPacks) pack.id: _mockPackTrackIds(pack.id),
         },
       };
     }
@@ -167,4 +163,19 @@ class MockHttpApiService extends HttpApiService {
     AppLogger.w('MOCK_HTTP', 'No mock data for path: $cleanPath');
     return {};
   }
+}
+
+/// Track ids in a mock pack, sub-packs included, like `GET /packs/tracks`.
+List<String> _mockPackTrackIds(String packId, [Set<String>? seen]) {
+  seen ??= {};
+  if (!seen.add(packId)) return const [];
+  final pack = mockPacks.where((p) => p.id == packId).firstOrNull;
+  if (pack == null) return const [];
+  return {
+    for (final item in pack.items)
+      if (item.type == TypeConstants.track)
+        item.id
+      else if (item.type == TypeConstants.pack)
+        ..._mockPackTrackIds(item.id, seen),
+  }.toList();
 }

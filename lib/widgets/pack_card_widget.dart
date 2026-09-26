@@ -73,7 +73,12 @@ class _PackCardWidgetState extends State<PackCardWidget> {
     return Stack(
       children: [
         card,
-        const Positioned(top: 10, right: 10, child: PackCompleteBadge()),
+        // Decorative: let taps on the badge reach the card's InkWell.
+        const Positioned(
+          top: 10,
+          right: 10,
+          child: IgnorePointer(child: PackCompleteBadge()),
+        ),
       ],
     );
   }
