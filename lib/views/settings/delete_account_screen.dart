@@ -133,6 +133,11 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
   }
 
   Future<void> _delete() async {
+    if (_isDeleting) return;
+    // Captured up front: once the account is gone the confirmation screen
+    // must be shown even if this screen was somehow popped meanwhile.
+    final navigator = Navigator.of(context);
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isDeleting = true);
     try {
       await ref
@@ -144,14 +149,15 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
       setState(() => _isDeleting = false);
       showSnackBar(
         context,
-        AppLocalizations.of(context)!.deleteAccountFailed,
+        e is AccountDeletionUnconfirmed
+            ? l10n.deleteAccountUnconfirmed
+            : l10n.deleteAccountFailed,
         backgroundColor: Colors.red,
       );
       return;
     }
 
-    if (!mounted) return;
-    await Navigator.of(context).pushAndRemoveUntil(
+    await navigator.pushAndRemoveUntil(
       MaterialPageRoute<void>(builder: (_) => const AccountDeletedScreen()),
       (route) => false,
     );
@@ -163,110 +169,115 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
 
-    return Scaffold(
-      bottomNavigationBar: SingleBackButtonActionBar(
-        onBackPressed: () {
-          if (!_isDeleting) Navigator.pop(context);
-        },
-      ),
-      body: AdaptivePageBody(
-        maxWidth: 760,
-        child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                centerTitle: false,
-                automaticallyImplyLeading: false,
-                backgroundColor: theme.scaffoldBackgroundColor,
-                toolbarHeight: 56.0,
-                pinned: true,
-                elevation: 0.0,
-                title: HomeHeaderWidget(greeting: l10n.deleteAccountTitle),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.all(padding16),
-                sliver: SliverList.list(
-                  children: [
-                    Text(
-                      l10n.deleteAccountReasonTitle,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: onSurface,
-                        fontWeight: FontWeight.w600,
+    // System back (Android back, iOS edge swipe) is blocked while the
+    // request is in flight, like the bottom-bar back button.
+    return PopScope(
+      canPop: !_isDeleting,
+      child: Scaffold(
+        bottomNavigationBar: SingleBackButtonActionBar(
+          onBackPressed: () {
+            if (!_isDeleting) Navigator.pop(context);
+          },
+        ),
+        body: AdaptivePageBody(
+          maxWidth: 760,
+          child: SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  centerTitle: false,
+                  automaticallyImplyLeading: false,
+                  backgroundColor: theme.scaffoldBackgroundColor,
+                  toolbarHeight: 56.0,
+                  pinned: true,
+                  elevation: 0.0,
+                  title: HomeHeaderWidget(greeting: l10n.deleteAccountTitle),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.all(padding16),
+                  sliver: SliverList.list(
+                    children: [
+                      Text(
+                        l10n.deleteAccountReasonTitle,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.deleteAccountReasonSubtitle,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: onSurface.withOpacityValue(0.7),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.deleteAccountReasonSubtitle,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: onSurface.withOpacityValue(0.7),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    RadioGroup<DeleteAccountReason>(
-                      groupValue: _reason,
-                      onChanged: _selectReason,
-                      child: HomeGradientBorder(
-                        backgroundColor: theme.cardColor,
-                        borderRadius: 14,
-                        borderWidth: 0.5,
-                        child: Material(
-                          type: MaterialType.transparency,
-                          child: Column(
-                            children: [
-                              for (final reason in DeleteAccountReason.values)
-                                InkWell(
-                                  onTap: () => _selectReason(reason),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                      vertical: 2,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Radio<DeleteAccountReason>(
-                                          value: reason,
-                                          activeColor: onSurface,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            _reasonLabel(l10n, reason),
-                                            style: theme.textTheme.bodyLarge
-                                                ?.copyWith(color: onSurface),
+                      const SizedBox(height: 8),
+                      RadioGroup<DeleteAccountReason>(
+                        groupValue: _reason,
+                        onChanged: _selectReason,
+                        child: HomeGradientBorder(
+                          backgroundColor: theme.cardColor,
+                          borderRadius: 14,
+                          borderWidth: 0.5,
+                          child: Material(
+                            type: MaterialType.transparency,
+                            child: Column(
+                              children: [
+                                for (final reason in DeleteAccountReason.values)
+                                  InkWell(
+                                    onTap: () => _selectReason(reason),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                        vertical: 2,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Radio<DeleteAccountReason>(
+                                            value: reason,
+                                            activeColor: onSurface,
                                           ),
-                                        ),
-                                      ],
+                                          Expanded(
+                                            child: Text(
+                                              _reasonLabel(l10n, reason),
+                                              style: theme.textTheme.bodyLarge
+                                                  ?.copyWith(color: onSurface),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    MeditoTextField(
-                      controller: _detailsController,
-                      enabled: !_isDeleting,
-                      hintText: l10n.deleteAccountDetailsHint,
-                      maxLength: 1000,
-                      maxLines: 5,
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 48,
-                      child: LoadingButtonWidget(
-                        btnText: l10n.deleteAccountFinalButton,
-                        bgColor: theme.colorScheme.error,
-                        textColor: theme.colorScheme.onError,
-                        borderRadius: 12,
-                        isLoading: _isDeleting,
-                        onPressed: _delete,
+                      const SizedBox(height: 16),
+                      MeditoTextField(
+                        controller: _detailsController,
+                        enabled: !_isDeleting,
+                        hintText: l10n.deleteAccountDetailsHint,
+                        maxLength: 1000,
+                        maxLines: 5,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 48,
+                        child: LoadingButtonWidget(
+                          btnText: l10n.deleteAccountFinalButton,
+                          bgColor: theme.colorScheme.error,
+                          textColor: theme.colorScheme.onError,
+                          borderRadius: 12,
+                          isLoading: _isDeleting,
+                          onPressed: _delete,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

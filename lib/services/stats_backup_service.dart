@@ -230,6 +230,18 @@ class StatsBackupService {
     }
   }
 
+  /// Removes every backup on the device, whichever client id it belongs to.
+  /// Used after account deletion: the server also deletes other accounts
+  /// sharing the email (earlier forked client ids), so their snapshots go too.
+  Future<void> clearAll() async {
+    for (var i = 0; i < _maxBackups; i++) {
+      await _prefs.remove(_getBackupKey(i));
+    }
+    await _prefs.remove(_backupIndexKey);
+    await _prefs.remove(_richestSlotKey);
+    await _prefs.remove(_richestTotalKey);
+  }
+
   bool _sameContent(LocalAllStats a, LocalAllStats b) =>
       a.totalTracksCompleted == b.totalTracksCompleted &&
       a.totalTimeListened == b.totalTimeListened &&

@@ -44,7 +44,10 @@ class SecureStorage {
 
 class SecureStorageService {
   static const _refreshTokenKey = 'medito_refresh_token';
-  static const _userEmailKey = 'medito_user_email';
+  static const _userEmailKey = userEmailPrefsKey;
+
+  /// SharedPreferences key holding the signed-in user's email.
+  static const userEmailPrefsKey = 'medito_user_email';
   static const _backupRefreshTokenKey = 'medito_backup_refresh_token';
   final SecureStorage _storage;
   var _isSecureStorageBrokenForSession = false;
@@ -384,14 +387,20 @@ class SecureStorageService {
   }
 
   Future<void> clearUserEmail() async {
+    // The prefs copy is the one getUserEmail reads first, so remove it on its
+    // own: a failing keystore must not leave the email behind.
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_userEmailKey);
+    } catch (e) {
+      dev.log('[SECURE_STORAGE] Error clearing user email (prefs)', error: e);
+    }
+
     try {
       await _retrySecureOperation(() async {
         await _storage.delete(key: _userEmailKey);
         dev.log('[SECURE_STORAGE] User email cleared', level: 1000);
       });
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_userEmailKey);
     } catch (e) {
       dev.log('[SECURE_STORAGE] Error clearing user email', error: e);
     }

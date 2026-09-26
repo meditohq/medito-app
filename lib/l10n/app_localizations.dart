@@ -1109,7 +1109,7 @@ abstract class AppLocalizations {
   /// Shown in the delete-account confirmation dialog; account deletion does not cancel Stripe subscriptions
   ///
   /// In en, this message translates to:
-  /// **'Deleting your account does not cancel a monthly donation. You can cancel it in the donation portal with the email you donated with.'**
+  /// **'Deleting your account does not cancel a recurring (monthly or yearly) donation. You can cancel it in the donation portal with the email you donated with.'**
   String get deleteAccountDonationNotice;
 
   /// No description provided for @deleteAccountManageDonations.
@@ -1183,6 +1183,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to delete account, please try again.'**
   String get deleteAccountFailed;
+
+  /// Delete-account error when the request never got a definite answer (network dropped or timed out after retries)
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t confirm your account was deleted. Check your connection and try again.'**
+  String get deleteAccountUnconfirmed;
 
   /// Confirmation screen shown after the account was deleted (required by Apple)
   ///

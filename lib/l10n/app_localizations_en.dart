@@ -547,7 +547,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountDonationNotice =>
-      'Deleting your account does not cancel a monthly donation. You can cancel it in the donation portal with the email you donated with.';
+      'Deleting your account does not cancel a recurring (monthly or yearly) donation. You can cancel it in the donation portal with the email you donated with.';
 
   @override
   String get deleteAccountManageDonations => 'Manage donations';
@@ -588,6 +588,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteAccountFailed =>
       'Failed to delete account, please try again.';
+
+  @override
+  String get deleteAccountUnconfirmed =>
+      'We couldn\'t confirm your account was deleted. Check your connection and try again.';
 
   @override
   String get accountDeletedTitle => 'Your account has been deleted';

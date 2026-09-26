@@ -49,6 +49,11 @@ class StatsManager {
   bool _dirty = false;
   Duration _dayBoundaryOffset = Duration.zero;
 
+  // Bumped by clearAllStats. A sync that was already fetching when the stats
+  // were cleared (sign-out, account deletion) drops its result instead of
+  // writing the old account's history back.
+  int _clearGeneration = 0;
+
   StatsManager._internal();
 
   Future<bool> _acquireLock() async {
@@ -169,8 +174,10 @@ class StatsManager {
   }
 
   Future<void> _doSync() async {
+    final generation = _clearGeneration;
     //dev.log'StatsManager: Fetching remote stats');
     var remoteStats = await _statsService.fetchAllStats();
+    if (generation != _clearGeneration) return;
 
     // If we got empty stats but have valid local stats, keep the local stats
     // but still recalculate streak against current date
@@ -192,6 +199,10 @@ class StatsManager {
 
     // Pass the remote stats to merge instead of overwriting first
     await _merge(tempRemoteStats);
+    if (generation != _clearGeneration) {
+      _allStats = LocalAllStats.empty();
+      return;
+    }
 
     if (_allStats != null) {
       // Store the current streak values before recalculating
@@ -824,6 +835,8 @@ class StatsManager {
     if (!_isInitialized) {
       await initialize();
     }
+    _clearGeneration++;
+    _dirty = false;
     var prefs = _prefs;
     await prefs.remove(SharedPreferenceConstants.localAllStatsKey);
     _allStats = LocalAllStats.empty();

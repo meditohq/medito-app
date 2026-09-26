@@ -94,6 +94,24 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
   );
 
   @override
+  _i3.Future<void> clearLocalAuth() =>
+      (super.noSuchMethod(
+            Invocation.method(#clearLocalAuth, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> awaitAuthHeaderForTesting() =>
+      (super.noSuchMethod(
+            Invocation.method(#awaitAuthHeaderForTesting, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
   _i3.Future<void> refreshTokenForTesting() =>
       (super.noSuchMethod(
             Invocation.method(#refreshTokenForTesting, []),
@@ -213,6 +231,15 @@ class MockStatsBackupService extends _i1.Mock
   _i3.Future<void> clearBackups(String? userId) =>
       (super.noSuchMethod(
             Invocation.method(#clearBackups, [userId]),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> clearAll() =>
+      (super.noSuchMethod(
+            Invocation.method(#clearAll, []),
             returnValue: _i3.Future<void>.value(),
             returnValueForMissingStub: _i3.Future<void>.value(),
           )

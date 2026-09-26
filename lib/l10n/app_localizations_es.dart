@@ -555,7 +555,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deleteAccountDonationNotice =>
-      'Eliminar tu cuenta no cancela una donación mensual. Puedes cancelarla en el portal de donaciones con el correo con el que donaste.';
+      'Eliminar tu cuenta no cancela una donación recurrente (mensual o anual). Puedes cancelarla en el portal de donaciones con el correo con el que donaste.';
 
   @override
   String get deleteAccountManageDonations => 'Gestionar donaciones';
@@ -596,6 +596,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get deleteAccountFailed =>
       'No se pudo eliminar la cuenta, inténtalo de nuevo.';
+
+  @override
+  String get deleteAccountUnconfirmed =>
+      'No pudimos confirmar que tu cuenta se eliminó. Revisa tu conexión e inténtalo de nuevo.';
 
   @override
   String get accountDeletedTitle => 'Tu cuenta ha sido eliminada';

@@ -1,8 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/account/account_service.dart';
+import 'package:medito/services/secure_storage_service.dart';
+import 'package:medito/services/stats_backup_service.dart';
+import 'package:medito/utils/completed_tracks_storage.dart';
 import 'package:medito/utils/stats_manager.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,6 +52,15 @@ void main() {
       SharedPreferenceConstants.userId: 'old-client-id',
       SharedPreferenceConstants.favorites: '[]',
       SharedPreferenceConstants.themePreference: 'dark',
+      SecureStorageService.userEmailPrefsKey: 'gone@example.com',
+      CompletedTracksStorage.completedTracksKey: ['{"trackId":"t1"}'],
+      'userToken': 'legacy-v3-token',
+      'has_active_subscription': true,
+      'stats_backup_0': '{"userId":"old-client-id"}',
+      'stats_backup_7': '{"userId":"earlier-fork-id"}',
+      'stats_backup_index': 8,
+      'stats_backup_richest_slot': 0,
+      'stats_backup_richest_total': 42,
     });
     prefs = await SharedPreferences.getInstance();
     http = MockHttpApiService();
@@ -58,6 +71,7 @@ void main() {
       authRepository: auth,
       preferences: prefs,
       statsManager: stats,
+      retryDelay: Duration.zero,
     );
   });
 
@@ -90,6 +104,69 @@ void main() {
     expect(prefs.getString(SharedPreferenceConstants.userId), isNull);
     expect(prefs.getString(SharedPreferenceConstants.favorites), isNull);
     expect(prefs.getString(SharedPreferenceConstants.themePreference), 'dark');
+    expect(prefs.getString(SecureStorageService.userEmailPrefsKey), isNull);
+    expect(prefs.get(CompletedTracksStorage.completedTracksKey), isNull);
+    expect(prefs.get('userToken'), isNull);
+    expect(prefs.get('has_active_subscription'), isNull);
+    expect(
+      prefs.getKeys().where((k) => k.startsWith('stats_backup_')),
+      isEmpty,
+    );
+    expect(
+      await StatsBackupService(prefs: prefs).getAllBackupsAcrossUsers(),
+      isEmpty,
+    );
+  });
+
+  test('retries a lost response and then wipes', () async {
+    var calls = 0;
+    when(
+      http.deleteRequest(HTTPConstants.me, body: anyNamed('body')),
+    ).thenAnswer((_) async {
+      if (++calls == 1) throw const TimeoutError();
+      return {'deleted': true};
+    });
+
+    await service.deleteAccount(reason: DeleteAccountReason.other);
+
+    expect(calls, 2);
+    expect(auth.signOutLocallyCalls, 1);
+  });
+
+  test(
+    'reports an unconfirmed outcome after repeated network failures',
+    () async {
+      when(
+        http.deleteRequest(HTTPConstants.me, body: anyNamed('body')),
+      ).thenThrow(const NetworkConnectionError());
+
+      await expectLater(
+        service.deleteAccount(),
+        throwsA(isA<AccountDeletionUnconfirmed>()),
+      );
+
+      verify(
+        http.deleteRequest(HTTPConstants.me, body: anyNamed('body')),
+      ).called(3);
+      expect(auth.signOutLocallyCalls, 0);
+      expect(
+        prefs.getString(SharedPreferenceConstants.userId),
+        'old-client-id',
+      );
+    },
+  );
+
+  test('does not retry a server error', () async {
+    when(
+      http.deleteRequest(HTTPConstants.me, body: anyNamed('body')),
+    ).thenThrow(const ServerError());
+
+    await expectLater(service.deleteAccount(), throwsA(isA<ServerError>()));
+
+    verify(
+      http.deleteRequest(HTTPConstants.me, body: anyNamed('body')),
+    ).called(1);
+    expect(auth.signOutLocallyCalls, 0);
   });
 
   test('sends no body when nothing was picked', () async {
