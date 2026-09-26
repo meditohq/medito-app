@@ -541,7 +541,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deleteAccountConfirmation =>
-      '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y debes seguir las instrucciones en la siguiente página.';
+      'Esto elimina tu cuenta de forma permanente, incluidas tus estadísticas y favoritos. No se puede deshacer.';
 
   @override
   String get deleteAccountButtonText => 'Eliminar Cuenta';
@@ -552,6 +552,57 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deleteAccountError => 'Error al eliminar la cuenta.';
+
+  @override
+  String get deleteAccountDonationNotice =>
+      'Eliminar tu cuenta no cancela una donación mensual. Puedes cancelarla en el portal de donaciones con el correo con el que donaste.';
+
+  @override
+  String get deleteAccountManageDonations => 'Gestionar donaciones';
+
+  @override
+  String get deleteAccountReasonTitle => '¿Por qué te vas?';
+
+  @override
+  String get deleteAccountReasonSubtitle =>
+      'Es opcional, pero nos ayuda a mejorar Medito.';
+
+  @override
+  String get deleteAccountReasonNotUsing => 'Ya no la uso';
+
+  @override
+  String get deleteAccountReasonPrivacy => 'Preocupaciones de privacidad';
+
+  @override
+  String get deleteAccountReasonSwitchingApp => 'Me cambio a otra app';
+
+  @override
+  String get deleteAccountReasonTechnicalIssues => 'Problemas técnicos';
+
+  @override
+  String get deleteAccountReasonTooManyNotifications =>
+      'Demasiadas notificaciones';
+
+  @override
+  String get deleteAccountReasonOther => 'Otra cosa';
+
+  @override
+  String get deleteAccountDetailsHint =>
+      '¿Algo más que quieras contarnos? (opcional)';
+
+  @override
+  String get deleteAccountFinalButton => 'Eliminar mi cuenta';
+
+  @override
+  String get deleteAccountFailed =>
+      'No se pudo eliminar la cuenta, inténtalo de nuevo.';
+
+  @override
+  String get accountDeletedTitle => 'Tu cuenta ha sido eliminada';
+
+  @override
+  String get accountDeletedBody =>
+      'Tu perfil, estadísticas y favoritos se han eliminado. Puedes seguir usando Medito sin una cuenta.';
 
   @override
   String get accountMarkedForDeletionError =>

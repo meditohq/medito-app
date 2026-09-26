@@ -1085,7 +1085,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteAccountConfirmation.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete your account? This action cannot be undone and you must follow the instructions on the next page.'**
+  /// **'This permanently deletes your account, including your stats and favorites. It can\'t be undone.'**
   String get deleteAccountConfirmation;
 
   /// No description provided for @deleteAccountButtonText.
@@ -1105,6 +1105,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to delete account.'**
   String get deleteAccountError;
+
+  /// Shown in the delete-account confirmation dialog; account deletion does not cancel Stripe subscriptions
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your account does not cancel a monthly donation. You can cancel it in the donation portal with the email you donated with.'**
+  String get deleteAccountDonationNotice;
+
+  /// No description provided for @deleteAccountManageDonations.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage donations'**
+  String get deleteAccountManageDonations;
+
+  /// Heading of the delete-account reason picker screen
+  ///
+  /// In en, this message translates to:
+  /// **'Why are you leaving?'**
+  String get deleteAccountReasonTitle;
+
+  /// No description provided for @deleteAccountReasonSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional, but it helps us improve Medito.'**
+  String get deleteAccountReasonSubtitle;
+
+  /// No description provided for @deleteAccountReasonNotUsing.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m not using it anymore'**
+  String get deleteAccountReasonNotUsing;
+
+  /// No description provided for @deleteAccountReasonPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy concerns'**
+  String get deleteAccountReasonPrivacy;
+
+  /// No description provided for @deleteAccountReasonSwitchingApp.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m switching to another app'**
+  String get deleteAccountReasonSwitchingApp;
+
+  /// No description provided for @deleteAccountReasonTechnicalIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical problems'**
+  String get deleteAccountReasonTechnicalIssues;
+
+  /// No description provided for @deleteAccountReasonTooManyNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many notifications'**
+  String get deleteAccountReasonTooManyNotifications;
+
+  /// No description provided for @deleteAccountReasonOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else'**
+  String get deleteAccountReasonOther;
+
+  /// No description provided for @deleteAccountDetailsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything else you\'d like to tell us? (optional)'**
+  String get deleteAccountDetailsHint;
+
+  /// No description provided for @deleteAccountFinalButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get deleteAccountFinalButton;
+
+  /// No description provided for @deleteAccountFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete account, please try again.'**
+  String get deleteAccountFailed;
+
+  /// Confirmation screen shown after the account was deleted (required by Apple)
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been deleted'**
+  String get accountDeletedTitle;
+
+  /// No description provided for @accountDeletedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile, stats and favorites have been removed. You can keep using Medito without an account.'**
+  String get accountDeletedBody;
 
   /// No description provided for @accountMarkedForDeletionError.
   ///

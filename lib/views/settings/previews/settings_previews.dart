@@ -18,6 +18,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/advanced_settings_screen.dart';
+import 'package:medito/views/settings/delete_account_screen.dart';
 import 'package:medito/views/settings/widgets/app_icon_tile.dart';
 import 'package:medito/views/settings/widgets/app_icon_option.dart';
 import 'package:medito/views/settings/widgets/day_boundary_offset_dialog.dart';
@@ -328,3 +329,39 @@ Widget dayBoundaryDialog() =>
 )
 Widget dayBoundaryDialogLight() =>
     const Center(child: DayBoundaryOffsetDialog(currentHours: 0));
+
+// ---------------------------------------------------------------------------
+// Delete account
+// ---------------------------------------------------------------------------
+
+@Preview(
+  group: 'Delete account',
+  name: 'Confirmation dialog',
+  size: Size(390, 520),
+  wrapper: wrapSignedIn,
+)
+Widget deleteAccountDialog() => const DeleteAccountConfirmationDialog();
+
+@Preview(
+  group: 'Delete account',
+  name: 'Reason picker · dark',
+  size: Size(390, 844),
+  wrapper: wrapSignedIn,
+)
+Widget deleteAccountReasons() => const DeleteAccountScreen();
+
+@Preview(
+  group: 'Delete account',
+  name: 'Reason picker · light',
+  size: Size(390, 844),
+  wrapper: wrapLight,
+)
+Widget deleteAccountReasonsLight() => const DeleteAccountScreen();
+
+@Preview(
+  group: 'Delete account',
+  name: 'Account deleted',
+  size: Size(390, 844),
+  wrapper: wrapDark,
+)
+Widget accountDeleted() => const AccountDeletedScreen();

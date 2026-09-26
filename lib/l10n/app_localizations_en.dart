@@ -533,7 +533,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountConfirmation =>
-      'Are you sure you want to delete your account? This action cannot be undone and you must follow the instructions on the next page.';
+      'This permanently deletes your account, including your stats and favorites. It can\'t be undone.';
 
   @override
   String get deleteAccountButtonText => 'Delete Account';
@@ -544,6 +544,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountError => 'Failed to delete account.';
+
+  @override
+  String get deleteAccountDonationNotice =>
+      'Deleting your account does not cancel a monthly donation. You can cancel it in the donation portal with the email you donated with.';
+
+  @override
+  String get deleteAccountManageDonations => 'Manage donations';
+
+  @override
+  String get deleteAccountReasonTitle => 'Why are you leaving?';
+
+  @override
+  String get deleteAccountReasonSubtitle =>
+      'Optional, but it helps us improve Medito.';
+
+  @override
+  String get deleteAccountReasonNotUsing => 'I\'m not using it anymore';
+
+  @override
+  String get deleteAccountReasonPrivacy => 'Privacy concerns';
+
+  @override
+  String get deleteAccountReasonSwitchingApp => 'I\'m switching to another app';
+
+  @override
+  String get deleteAccountReasonTechnicalIssues => 'Technical problems';
+
+  @override
+  String get deleteAccountReasonTooManyNotifications =>
+      'Too many notifications';
+
+  @override
+  String get deleteAccountReasonOther => 'Something else';
+
+  @override
+  String get deleteAccountDetailsHint =>
+      'Anything else you\'d like to tell us? (optional)';
+
+  @override
+  String get deleteAccountFinalButton => 'Delete my account';
+
+  @override
+  String get deleteAccountFailed =>
+      'Failed to delete account, please try again.';
+
+  @override
+  String get accountDeletedTitle => 'Your account has been deleted';
+
+  @override
+  String get accountDeletedBody =>
+      'Your profile, stats and favorites have been removed. You can keep using Medito without an account.';
 
   @override
   String get accountMarkedForDeletionError =>
