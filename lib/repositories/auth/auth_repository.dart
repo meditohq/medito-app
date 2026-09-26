@@ -72,7 +72,9 @@ class AuthRepositoryImpl extends AuthRepository {
        _httpApiService = httpApiService ?? HttpApiService(),
        _secureStorage = secureStorage ?? SecureStorageService(),
        _uuid = uuid ?? const Uuid(),
-       _crashlyticsService = crashlyticsService ?? CrashlyticsService();
+       _crashlyticsService = crashlyticsService ?? CrashlyticsService() {
+    _httpApiService.setTokenSupplier(getToken);
+  }
 
   @override
   User? get currentUser {

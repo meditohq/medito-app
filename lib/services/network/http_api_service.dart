@@ -59,6 +59,13 @@ class HttpApiService {
   // List of callbacks to notify on auth events
   final List<AuthStateCallback> _authCallbacks = [];
 
+  // Supplies an access token (setting the auth header as a side effect) when
+  // a request is about to go out without one. Registered by the auth
+  // repository. On a cold start the header stays empty until the first
+  // getToken(), so without this, early requests (stats, packs, home) went out
+  // with no token, got a 401, and triggered a second, parallel refresh.
+  Future<void> Function()? _tokenSupplier;
+
   // NOTE: The dependency on `package:medito/mock/...` above is INTENTIONAL.
   // `lib/mock/` is not test code — it's a shipped demo environment that lets
   // contributors run the app without real API keys (see lib/mock/README.md
@@ -134,6 +141,23 @@ class HttpApiService {
     _headers[kAuthorizationHeader] = 'Bearer $accessToken';
   }
 
+  void setTokenSupplier(Future<void> Function() supplier) {
+    _tokenSupplier = supplier;
+  }
+
+  /// Waits for an access token if the request would otherwise be sent
+  /// without one. Failures are swallowed: the request then goes out as
+  /// before and the 401 handling takes over.
+  Future<void> _awaitAuthHeader() async {
+    final supplier = _tokenSupplier;
+    if (supplier == null || _headers.containsKey(kAuthorizationHeader)) return;
+    try {
+      await supplier().timeout(kTimeoutDuration);
+    } catch (e) {
+      AppLogger.w('HTTP', 'No access token before request: $e');
+    }
+  }
+
   void clearAuthHeader() {
     AppLogger.d('HTTP', 'Clearing auth header on instance #$_instanceId');
     _headers.remove(kAuthorizationHeader);
@@ -149,6 +173,9 @@ class HttpApiService {
   /// refresh + retry flow.
   @visibleForTesting
   set retryCountForTesting(int value) => _retryCount = value;
+
+  @visibleForTesting
+  Future<void> awaitAuthHeaderForTesting() => _awaitAuthHeader();
 
   /// Test-only accessor for the in-progress refresh flag.
   @visibleForTesting
@@ -229,6 +256,7 @@ class HttpApiService {
     dynamic body,
   }) async {
     try {
+      await _awaitAuthHeader();
       final request = await requestBuilder();
       _headers.forEach(request.headers.set);
 

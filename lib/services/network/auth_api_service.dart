@@ -95,7 +95,43 @@ class AuthApiService {
     AppLogger.i('AUTH', 'OTP request successful for email: $email');
   }
 
-  Future<AuthTokens> refreshToken(String refreshToken) async {
+  // The most recent refresh, keyed by the refresh token it spent. Static
+  // because the auth repository and HttpApiService each own an instance, and
+  // both refresh on a cold start. Refresh tokens rotate, so a second call with
+  // the same (now spent) token must share this result rather than hit the
+  // server again. Only the latest entry is kept; failures are dropped.
+  static String? _lastRefreshKey;
+  static Future<AuthTokens>? _lastRefresh;
+
+  Future<AuthTokens> refreshToken(String refreshToken) {
+    if (refreshToken == _lastRefreshKey && _lastRefresh != null) {
+      AppLogger.i('AUTH_API', 'Sharing refresh already made with this token');
+      return _lastRefresh!;
+    }
+    final refresh = _refreshToken(refreshToken);
+    _lastRefreshKey = refreshToken;
+    _lastRefresh = refresh;
+    unawaited(
+      refresh.then<void>(
+        (_) {},
+        onError: (Object _) {
+          if (identical(_lastRefresh, refresh)) {
+            _lastRefreshKey = null;
+            _lastRefresh = null;
+          }
+        },
+      ),
+    );
+    return refresh;
+  }
+
+  @visibleForTesting
+  static void resetRefreshCacheForTesting() {
+    _lastRefreshKey = null;
+    _lastRefresh = null;
+  }
+
+  Future<AuthTokens> _refreshToken(String refreshToken) async {
     AppLogger.i('AUTH_API', 'Starting token refresh');
     AppLogger.d(
       'AUTH_API',
