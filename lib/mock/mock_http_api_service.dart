@@ -36,9 +36,13 @@ class MockHttpApiService extends HttpApiService {
   }
 
   @override
-  Future<Map<String, dynamic>> deleteRequest(String path) async {
+  Future<Map<String, dynamic>> deleteRequest(
+    String path, {
+    dynamic body,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 100));
     AppLogger.d('MOCK_HTTP', 'DELETE $path');
+    if (path == HTTPConstants.me) return {'deleted': true};
     return {};
   }
 

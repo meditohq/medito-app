@@ -41,6 +41,10 @@ abstract class AuthRepository {
   Future<bool> verifyOtp(String email, String otp);
   User? get currentUser;
   Future<bool> signOut();
+
+  /// Clears local auth state without calling the server's signout endpoint.
+  /// Used after account deletion, when the server session is already gone.
+  Future<void> signOutLocally();
   Future<void> signInAnonymously();
   void resetAuthState();
   Future<void> migrateEmailToStorage();
@@ -709,6 +713,18 @@ class AuthRepositoryImpl extends AuthRepository {
 
     dev.log('[AUTH_REPO] Sign out complete', level: 500);
     return true;
+  }
+
+  @override
+  Future<void> signOutLocally() async {
+    // Drop the in-memory token before any await: the HTTP token supplier
+    // (getToken) would otherwise hand a deleted account's still-valid access
+    // token to the next request and recreate its profile.
+    _tokens = null;
+    _httpApiService.clearAuthHeader();
+    await _resetAuth();
+    await _authService.clearAuthTokens();
+    dev.log('[AUTH_REPO] Local sign out complete', level: 500);
   }
 
   @override

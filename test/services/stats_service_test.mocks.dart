@@ -81,6 +81,13 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
   );
 
   @override
+  void setTokenSupplier(_i3.Future<void> Function()? supplier) =>
+      super.noSuchMethod(
+        Invocation.method(#setTokenSupplier, [supplier]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   void clearAuthHeader() => super.noSuchMethod(
     Invocation.method(#clearAuthHeader, []),
     returnValueForMissingStub: null,
@@ -119,9 +126,12 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
           as _i3.Future<Map<String, dynamic>>);
 
   @override
-  _i3.Future<Map<String, dynamic>> deleteRequest(String? path) =>
+  _i3.Future<Map<String, dynamic>> deleteRequest(
+    String? path, {
+    dynamic body,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#deleteRequest, [path]),
+            Invocation.method(#deleteRequest, [path], {#body: body}),
             returnValue: _i3.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),

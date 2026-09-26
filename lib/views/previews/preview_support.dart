@@ -63,6 +63,11 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<bool> signOut() async => true;
 
+
+  @override
+
+  Future<void> signOutLocally() async {}
+
   @override
   Future<bool> verifyOtp(String email, String otp) async => true;
 }

@@ -198,8 +198,13 @@ class HttpApiService {
   Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async =>
       _handleRequest(() async => _client.postUrl(_buildUri(path)), body: body);
 
-  Future<Map<String, dynamic>> deleteRequest(String path) async =>
-      _handleRequest(() async => _client.deleteUrl(_buildUri(path)));
+  Future<Map<String, dynamic>> deleteRequest(
+    String path, {
+    dynamic body,
+  }) async => _handleRequest(
+    () async => _client.deleteUrl(_buildUri(path)),
+    body: body,
+  );
 
   Uri _buildUri(String path, [Map<String, dynamic>? queryParams]) {
     return Uri.parse(
