@@ -15,7 +15,6 @@ class SharedPreferenceConstants {
 
   static const String userId = 'userId';
   static const String userEmail = 'userEmail';
-  static const String userToken = 'userToken';
 
   // New constants for stats
   static const String localAllStatsKey = 'local_all_stats';
@@ -33,7 +32,6 @@ class SharedPreferenceConstants {
   static const String dndEnabled = 'dnd_enabled';
   static const String isLoggedIn = 'is_logged_in';
 
-  static const String hasActiveSubscription = 'has_active_subscription';
 
   // Locale preference - stores the user's preferred language setting
   static const String localePreference = 'locale_preference';

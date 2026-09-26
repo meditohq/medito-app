@@ -2,16 +2,12 @@ import 'dart:async';
 import '../../services/audio/ios_session_bells.dart';
 import 'package:medito/models/models.dart' show PlaybackRequest;
 import 'package:medito/providers/background_sounds/background_sounds_notifier.dart';
-import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:medito/services/network/http_api_service.dart';
-import 'package:medito/constants/http/http_constants.dart';
 
-import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/stats_updater.dart';
@@ -22,7 +18,6 @@ class IosAudioHandler extends BaseAudioHandler {
   late final sessionBells = IosSessionBells(_player);
   // Distinguish a repeat boundary from terminal completion; never wait for bells.
   final _sessionCompleted = BehaviorSubject<bool>.seeded(false);
-  final _httpApiService = HttpApiService();
   bool _isInitialized = false;
   RepeatMode _currentRepeatMode = RepeatMode.none;
   bool _hasReplayedOnce = false;
@@ -323,15 +318,12 @@ class IosAudioHandler extends BaseAudioHandler {
 
   /// Creates a payload map with all track completion data
   Future<Map<String, dynamic>> _createTrackCompletionPayload() async {
-    String? userToken = await _getUserToken();
-
     return {
       TypeConstants.trackIdKey: trackState.id,
       TypeConstants.durationIdKey: duration?.inMilliseconds ?? 0,
       TypeConstants.fileIdKey: trackState.fileId,
       TypeConstants.guideIdKey: trackState.artist ?? '',
       TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
-      UpdateStatsConstants.userTokenKey: userToken,
     };
   }
 
@@ -362,17 +354,6 @@ class IosAudioHandler extends BaseAudioHandler {
     );
     final prefs = await SharedPreferences.getInstance();
     await storeTrackCompletion(prefs, payload);
-  }
-
-  Future<String?> _getUserToken() async {
-    try {
-      final response = await _httpApiService.getRequest(HTTPConstants.me);
-      return response['userToken'] as String?;
-    } catch (e) {
-      AppLogger.e('IOS', 'Error getting user token: $e');
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(SharedPreferenceConstants.userToken);
-    }
   }
 
   @override

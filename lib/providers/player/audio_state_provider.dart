@@ -188,7 +188,3 @@ extension PlaybackStateExt on PlaybackState {
     );
   }
 }
-
-class UpdateStatsConstants {
-  static const userTokenKey = 'userToken';
-}

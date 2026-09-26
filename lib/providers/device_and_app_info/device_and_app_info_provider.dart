@@ -213,7 +213,6 @@ String _formatBasicInfo(
   var deviceModel = 'deviceModel: ${deviceInfo?.model ?? ''}';
   var devicePlatform = 'devicePlatform: ${deviceInfo?.platform ?? ''}';
   var email = 'email: ${emailAddress ?? ''}';
-  var isMonthlyDonorString = 'd: ${me?.hasActiveSubscription ?? false}';
 
-  return '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs\n$isMonthlyDonorString';
+  return '$env\n$id\n$email\n$appVersion\n$buildNumber\n$deviceModel\n$devicePlatform\n$deviceOs';
 }

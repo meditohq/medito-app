@@ -32,7 +32,6 @@ class MeRepositoryImpl extends MeRepository {
       AppLogger.d('ME_REPO', 'Got response from /me endpoint: $response');
 
       return MeModel.fromJson(response);
-      // return MeModel.fromJson(response).copyWith(hasActiveSubscription: true);
     } catch (error) {
       AppLogger.e('ME_REPO', 'Error in fetchMe', error);
       if (error is AppError) {

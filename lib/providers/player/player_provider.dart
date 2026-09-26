@@ -4,11 +4,9 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/models.dart';
 
-import '../../constants/strings/shared_preference_constants.dart';
 import '../../models/player/repeat_mode.dart' as app_repeat;
 import '../../src/audio_pigeon.g.dart' as pigeon;
 import '../../utils/utils.dart';
-import '../shared_preference/shared_preference_provider.dart';
 import 'download/audio_downloader_provider.dart';
 import 'ios_audio_handler.dart';
 import 'repeat_state_provider.dart';
@@ -212,12 +210,6 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
         }
       }
     }
-  }
-
-  String? getUserToken() {
-    return ref
-        .read(sharedPreferencesProvider)
-        .getString(SharedPreferenceConstants.userToken);
   }
 
   String _constructFileName(PlaybackRequest request) =>

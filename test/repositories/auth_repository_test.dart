@@ -762,11 +762,7 @@ void main() {
           () => mockSecureStorageService.storeUserEmail(any()),
         ).thenAnswer((_) async {});
         when(() => mockHttpApiService.getRequest(any())).thenAnswer(
-          (_) async => MeModel(
-            id: 'test-id',
-            email: email,
-            hasActiveSubscription: false,
-          ).toJson(),
+          (_) async => MeModel(id: 'test-id', email: email).toJson(),
         );
 
         authRepository.setCurrentUserForTesting(mockUser);
@@ -785,13 +781,9 @@ void main() {
       when(
         () => mockSecureStorageService.getUserEmail(),
       ).thenAnswer((_) async => null);
-      when(() => mockHttpApiService.getRequest(any())).thenAnswer(
-        (_) async => MeModel(
-          id: 'test-id',
-          email: null,
-          hasActiveSubscription: false,
-        ).toJson(),
-      );
+      when(
+        () => mockHttpApiService.getRequest(any()),
+      ).thenAnswer((_) async => MeModel(id: 'test-id', email: null).toJson());
 
       authRepository.setCurrentUserForTesting(mockUser);
       await authRepository.migrateEmailToStorage();
