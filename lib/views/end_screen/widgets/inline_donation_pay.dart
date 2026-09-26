@@ -5,6 +5,7 @@ import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
 import 'package:medito/utils/currency.dart';
+import 'package:medito/widgets/inputs/email_typo_hint.dart';
 
 /// Stable handles for tests.
 @visibleForTesting
@@ -72,6 +73,7 @@ class InlineDonationPay extends StatefulWidget {
 class _InlineDonationPayState extends State<InlineDonationPay> {
   late int _selectedAmount;
   final _emailController = TextEditingController();
+  final _emailTypoConfirmation = EmailTypoConfirmation();
   String? _emailError;
   bool _emailRevealed = false;
 
@@ -135,6 +137,10 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
 
     var email = widget.knownEmail?.trim() ?? '';
     if (_asksForEmail) {
+      if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
+        return;
+      }
+      if (!mounted) return;
       email = _emailController.text.trim();
       if (!_emailPattern.hasMatch(email)) {
         final l10n = AppLocalizations.of(context)!;
@@ -321,23 +327,36 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
     AppLocalizations l10n,
   ) {
     return AutofillGroup(
-      child: MeditoTextField(
-        fieldKey: inlineDonationEmailFieldKey,
-        controller: _emailController,
-        keyboardType: TextInputType.emailAddress,
-        autofillHints: const [AutofillHints.email],
-        autofocus: true,
-        onSubmitted: (_) => _submit(),
-        textInputAction: TextInputAction.done,
-        autocorrect: false,
-        enabled: !widget.isProcessing,
-        hintText: l10n.donationEmailLabel,
-        helperText: _emailError == null ? l10n.donationEmailHelper : null,
-        supportingTextColor: fg,
-        errorText: _emailError,
-        onChanged: (_) {
-          if (_emailError != null) setState(() => _emailError = null);
-        },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MeditoTextField(
+            fieldKey: inlineDonationEmailFieldKey,
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+            autofocus: true,
+            onSubmitted: (_) => _submit(),
+            textInputAction: TextInputAction.done,
+            autocorrect: false,
+            enabled: !widget.isProcessing,
+            hintText: l10n.donationEmailLabel,
+            helperText: _emailError == null ? l10n.donationEmailHelper : null,
+            supportingTextColor: fg,
+            errorText: _emailError,
+            onChanged: (_) {
+              if (_emailError != null) setState(() => _emailError = null);
+            },
+          ),
+          EmailTypoHint(
+            controller: _emailController,
+            color: fg,
+            onAccepted: () {
+              if (_emailError != null) setState(() => _emailError = null);
+            },
+          ),
+        ],
       ),
     );
   }

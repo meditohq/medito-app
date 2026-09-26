@@ -22,6 +22,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/widgets/inputs/email_typo_hint.dart';
 
 enum _Frequency {
   oneTime('oneTime', 'one_time', 'One-time'),
@@ -104,6 +105,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   // recurring charge the donor cannot cancel themselves. Always shown (even
   // when known) to match the webview arm, which always collects one.
   final _emailController = TextEditingController();
+  final _emailTypoConfirmation = EmailTypoConfirmation();
   String? _emailError;
 
   // Custom "other amount" field — mirrors the webview arm's input, which the
@@ -336,6 +338,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
     // Block before the sheet opens: the Customer is created upstream of it, so
     // an email captured later would never reach the Customer record.
+    if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
+      return;
+    }
+    if (!mounted) return;
     final typedEmail = _emailController.text.trim();
     if (!_emailPattern.hasMatch(typedEmail)) {
       final l10n = AppLocalizations.of(context)!;
@@ -772,7 +778,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
   Widget _buildEmailField(BuildContext context, Color onSurface) {
     final l10n = AppLocalizations.of(context)!;
-    return MeditoTextField(
+    final field = MeditoTextField(
       fieldKey: donationEmailFieldKey,
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
@@ -786,6 +792,19 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       onChanged: (_) {
         if (_emailError != null) setState(() => _emailError = null);
       },
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        field,
+        EmailTypoHint(
+          controller: _emailController,
+          onAccepted: () {
+            if (_emailError != null) setState(() => _emailError = null);
+          },
+        ),
+      ],
     );
   }
 

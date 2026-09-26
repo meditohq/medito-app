@@ -202,6 +202,27 @@ void main() {
     expect(calls.single.email, 'new@example.com');
   });
 
+  testWidgets('domain typo: confirms before paying, "Use this" fixes it', (
+    tester,
+  ) async {
+    final calls = await pump(tester);
+    await tester.tap(find.byKey(inlineDonationPayButtonKey));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(inlineDonationEmailFieldKey),
+      'donor@gmial.con',
+    );
+    await tester.tap(find.byKey(inlineDonationPayButtonKey));
+    await tester.pumpAndSettle();
+    expect(calls, isEmpty);
+    expect(find.text('Check your email'), findsOneWidget);
+
+    await tester.tap(find.text('Use this'));
+    await tester.pumpAndSettle();
+    expect(calls, hasLength(1));
+    expect(calls.single.email, 'donor@gmail.com');
+  });
+
   testWidgets('Apple Pay available: wallet button, applePay method', (
     tester,
   ) async {

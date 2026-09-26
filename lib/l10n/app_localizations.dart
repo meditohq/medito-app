@@ -2108,6 +2108,36 @@ abstract class AppLocalizations {
   /// **'That email address does not look right.'**
   String get donationEmailInvalid;
 
+  /// Tappable hint under an email field when the domain looks mistyped, e.g. gmil.com.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you mean {email}?'**
+  String emailTypoSuggestion(String email);
+
+  /// No description provided for @emailTypoDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get emailTypoDialogTitle;
+
+  /// First line of the email typo confirm dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'You typed {email}.'**
+  String emailTypoDialogTyped(String email);
+
+  /// No description provided for @emailTypoUseSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this'**
+  String get emailTypoUseSuggestion;
+
+  /// No description provided for @emailTypoKeepTyped.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep mine'**
+  String get emailTypoKeepTyped;
+
   /// No description provided for @donationThankYouTitle.
   ///
   /// In en, this message translates to:

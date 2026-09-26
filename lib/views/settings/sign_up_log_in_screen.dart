@@ -29,6 +29,7 @@ import 'package:medito/utils/utils.dart';
 import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
+import 'package:medito/widgets/inputs/email_typo_hint.dart';
 import 'package:app_links/app_links.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
@@ -102,6 +103,7 @@ class SignUpLogInForm extends ConsumerStatefulWidget {
 
 class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   final _emailController = TextEditingController();
+  final _emailTypoConfirmation = EmailTypoConfirmation();
   final _otpController = TextEditingController();
   var _isLoading = false;
   var _isEmailValid = false;
@@ -189,6 +191,12 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
   Future<void> _requestOtp() async {
     if (_isLoading || _isRateLimited) return;
+
+    // A mistyped domain sends the code nowhere and strands the user.
+    if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
+      return;
+    }
+    if (!mounted) return;
 
     final hasLocalStats = await ref.read(statsManagerProvider).hasLocalStats();
 
@@ -679,7 +687,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     // In onboarding (opened from the splash) drop the keyboard straight in so
     // the user can start typing; the Settings entry stays tap-to-focus.
     final autofocus = widget.source == AnalyticsEventConstants.sourceSplash;
-    return MeditoTextField(
+    final field = MeditoTextField(
       controller: _emailController,
       enabled: !_hasRequestedOtp,
       autofocus: autofocus,
@@ -709,6 +717,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               },
             )
           : null,
+    );
+    if (_hasRequestedOtp) return field;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        field,
+        EmailTypoHint(controller: _emailController),
+      ],
     );
   }
 

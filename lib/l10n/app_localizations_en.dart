@@ -1123,6 +1123,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get donationEmailInvalid => 'That email address does not look right.';
 
   @override
+  String emailTypoSuggestion(String email) {
+    return 'Did you mean $email?';
+  }
+
+  @override
+  String get emailTypoDialogTitle => 'Check your email';
+
+  @override
+  String emailTypoDialogTyped(String email) {
+    return 'You typed $email.';
+  }
+
+  @override
+  String get emailTypoUseSuggestion => 'Use this';
+
+  @override
+  String get emailTypoKeepTyped => 'Keep mine';
+
+  @override
   String get donationThankYouTitle => 'Thank You for Your Support!';
 
   @override

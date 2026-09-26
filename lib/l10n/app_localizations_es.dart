@@ -1144,6 +1144,25 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ese correo electrónico no parece correcto.';
 
   @override
+  String emailTypoSuggestion(String email) {
+    return '¿Quisiste decir $email?';
+  }
+
+  @override
+  String get emailTypoDialogTitle => 'Revisa tu correo';
+
+  @override
+  String emailTypoDialogTyped(String email) {
+    return 'Escribiste $email.';
+  }
+
+  @override
+  String get emailTypoUseSuggestion => 'Usar este';
+
+  @override
+  String get emailTypoKeepTyped => 'Dejar el mío';
+
+  @override
   String get donationThankYouTitle => '¡Gracias por Tu Apoyo!';
 
   @override
