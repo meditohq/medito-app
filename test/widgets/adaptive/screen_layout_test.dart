@@ -371,9 +371,14 @@ void main() {
         }
         expect(tester.takeException(), isNull);
       }
+      // The speed chip opens a sheet; tapping a step label applies it.
       await tester.tap(find.text('1.0×'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('0.6×'));
       await tester.pump();
       expect(speed, 0.6);
+      Navigator.of(tester.element(find.text('0.6×').first)).pop();
+      await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.close));
       expect(closed, isTrue);
     },

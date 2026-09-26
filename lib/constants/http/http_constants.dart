@@ -147,6 +147,7 @@ class HTTPConstants {
   //END POINTS
   static const String tokens = 'tokens';
   static const String packs = 'packs';
+  static const String packTracks = 'packs/tracks';
   static const String tracks = 'tracks';
   static const String favorites = 'favorites';
   static const String backgroundSounds = 'backgroundsounds';

@@ -4,6 +4,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:medito/views/pack/widgets/pack_complete_badge.dart';
 
 class PackItemWidget extends StatelessWidget {
   const PackItemWidget({super.key, required this.item, this.onSetComplete});
@@ -71,6 +72,21 @@ class PackItemWidget extends StatelessWidget {
       return _CompletionToggle(
         isCompleted: item.isCompleted ?? false,
         onSetComplete: onSetComplete!,
+      );
+    }
+
+    if (item.type == TypeConstants.pack && item.isCompleted == true) {
+      // Same 48px slot and left gap as the track toggle, so ticks line up.
+      return const Padding(
+        padding: EdgeInsets.only(left: 8),
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: PackCompleteBadge(),
+          ),
+        ),
       );
     }
 
