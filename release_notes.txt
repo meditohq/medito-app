@@ -1,6 +1,10 @@
 Unreleased
 -
 
+2609.26.0
+- Spot a mistyped email address before you sign up or donate (e.g. "gmial.com").
+- Fixed a crash on some Android phones with Medito home screen widgets.
+
 2609.24.0
 - New "Session bells" background option: a bell at the beginning, middle and end of your session.
 - Repeat, playback speed and background sounds now open simple pickers in the player.
