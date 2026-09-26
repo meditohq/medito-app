@@ -1677,6 +1677,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get german => 'Deutsch';
+
+  @override
   String get spanish => 'Español (beta)';
 
   @override
