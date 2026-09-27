@@ -135,7 +135,9 @@ class AccountSectionWidget extends ConsumerWidget {
           hasUnderline: !inCard,
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SignUpLogInPage()),
+              MaterialPageRoute(
+                builder: (context) => const SignUpLogInPage(fromSettings: true),
+              ),
             );
           },
         ),
