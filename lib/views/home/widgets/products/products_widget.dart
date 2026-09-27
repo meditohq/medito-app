@@ -10,6 +10,8 @@ import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/shop/fourthwall_service.dart';
 import 'package:medito/utils/black_friday_utils.dart';
+import 'package:medito/providers/shop/shop_providers.dart';
+import 'package:medito/views/shop/bag_sheet.dart';
 import 'package:medito/views/shop/shop_navigation.dart';
 import 'package:medito/views/shop/widgets/shop_photo.dart';
 import 'package:medito/views/shop/widgets/shop_product_card.dart';
@@ -56,45 +58,30 @@ class ProductsWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          // The See all button brings its own padding on the right.
+          padding: const EdgeInsets.only(left: 16, right: 4),
           child: Row(
             children: [
               Expanded(
-                child: Semantics(
-                  button: true,
-                  child: GestureDetector(
-                    onTap: openAll,
-                    behavior: HitTestBehavior.opaque,
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            showBlackFridayStyle
-                                ? l10n.blackFridayTitle
-                                : l10n.meditationProducts,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                              height: 28 / 24,
-                              color: onSurface,
-                            ),
-                          ),
-                        ),
-                        if (!showBlackFridayStyle) ...[
-                          const SizedBox(width: 8),
-                          MeditoIcon(
-                            assetName: MeditoIcons.arrowRight,
-                            color: onSurface,
-                            size: 16,
-                          ),
-                        ],
-                      ],
+                child: GestureDetector(
+                  onTap: openAll,
+                  behavior: HitTestBehavior.opaque,
+                  child: Text(
+                    showBlackFridayStyle
+                        ? l10n.blackFridayTitle
+                        : l10n.meditationProducts,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                      height: 28 / 24,
+                      color: onSurface,
                     ),
                   ),
                 ),
               ),
+              _BagPill(onBrowse: openAll),
               if (showBlackFridayStyle)
                 IconButton(
                   tooltip: l10n.dismiss,
@@ -106,6 +93,25 @@ class ProductsWidget extends ConsumerWidget {
                     Icons.close,
                     size: 20,
                     color: onSurface.withValues(alpha: 0.6),
+                  ),
+                )
+              else
+                TextButton(
+                  onPressed: openAll,
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.only(left: 12, right: 8),
+                    textStyle: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(l10n.shopSeeAll),
+                      const SizedBox(width: 2),
+                      const Icon(Icons.chevron_right_rounded, size: 20),
+                    ],
                   ),
                 ),
             ],
@@ -415,6 +421,63 @@ class _SkeletonTile extends StatelessWidget {
           SizedBox(height: 8),
           BoxShimmerWidget(width: 60, height: 12, borderRadius: 6),
         ],
+      ),
+    );
+  }
+}
+
+/// Bag count, shown on Home only while something is in the bag: the way back
+/// to an unfinished order, without turning Home into a storefront.
+class _BagPill extends ConsumerWidget {
+  const _BagPill({required this.onBrowse});
+
+  final VoidCallback onBrowse;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(shopBagProvider.select((b) => b.quantity));
+    if (count == 0) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: Semantics(
+        button: true,
+        label: '${l10n.shopViewBag}, ${l10n.shopBagItemCount(count)}',
+        excludeSemantics: true,
+        child: Material(
+          color: theme.cardColor,
+          shape: StadiumBorder(
+            side: BorderSide(color: onSurface.withValues(alpha: 0.15)),
+          ),
+          child: InkWell(
+            customBorder: const StadiumBorder(),
+            onTap: () => showShopBag(context, onBrowse: onBrowse),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  MeditoIcon(
+                    assetName: MeditoIcons.shop,
+                    color: onSurface,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '$count',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
