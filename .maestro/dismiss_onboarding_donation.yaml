@@ -28,7 +28,21 @@ name: Dismiss onboarding donation without payment
           visible: "Donation webview opened"
           timeout: 10000
       - takeScreenshot: paywall-webview
-      - tapOn: "Donation webview opened"
+      # The control is in the hierarchy while the route is still sliding in,
+      # so a single tap can land where it was and do nothing (run
+      # 36312432526: tap "completed", webview still open). Retry until the
+      # control is actually gone, as the Android path below does.
+      - retry:
+          maxRetries: 2
+          commands:
+            - runFlow:
+                when:
+                  visible: "Donation webview opened"
+                commands:
+                  - tapOn: "Donation webview opened"
+            - extendedWaitUntil:
+                notVisible: "Donation webview opened"
+                timeout: 10000
 
 
 # Webview intro path, Android: release smoke uses the deployable APK, so it
