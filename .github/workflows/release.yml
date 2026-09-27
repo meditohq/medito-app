@@ -701,6 +701,13 @@ jobs:
             .maestro/signed_in_stats.yaml \
             --no-ansi --debug-output /tmp/maestro-debug/signed-in
 
+      - name: Save iOS app log
+        if: failure()
+        run: |
+          mkdir -p /tmp/maestro-debug
+          xcrun simctl spawn booted log show --last 30m --style compact \
+            --predicate 'process == "Runner"' > /tmp/maestro-debug/ios-app.log 2>&1 || true
+
       - name: Scrub test account credentials from debug output
         if: failure()
         env:

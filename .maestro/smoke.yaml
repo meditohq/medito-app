@@ -42,14 +42,24 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - extendedWaitUntil:
     visible: "Get started"
     timeout: 180000
-- tapOn: "Get started"
 
 # ── Onboarding: Experience question ──
 # First onboarding screen. Anonymous sign-in can take a while on first
 # launch (clearState wipes the account), so the timeout is generous.
-- extendedWaitUntil:
-    visible: "Never tried it"
-    timeout: 60000
+# If sign-in fails the splash comes back with "Get started" (the button shows
+# a spinner, not its label, while signing in), so tap it again like a user
+# would (run 36313758914 sat on the splash after one attempt).
+- retry:
+    maxRetries: 2
+    commands:
+      - runFlow:
+          when:
+            visible: "Get started"
+          commands:
+            - tapOn: "Get started"
+      - extendedWaitUntil:
+          visible: "Never tried it"
+          timeout: 45000
 - tapOn: "Never tried it"
 
 # The timing test shows either the early ask (A) or reminders (B).
