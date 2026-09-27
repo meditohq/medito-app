@@ -138,6 +138,14 @@ maestro-debug-ios/
 after-donation-next.png
 player-playing.png
 superwall-paywall.png
+end-screen.png
+paywall-native.png
+paywall-webview.png
+post-upgrade-home.png
+post-upgrade-playing.png
+signed-in-end-screen.png
+stats-before.png
+stats-after.png
 /maestro-debug-ios/.maestro/tests
 /android/build
 /android/build/ios

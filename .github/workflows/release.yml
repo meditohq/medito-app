@@ -705,8 +705,9 @@ jobs:
         if: failure()
         run: |
           mkdir -p /tmp/maestro-debug
-          xcrun simctl spawn booted log show --last 30m --style compact \
-            --predicate 'process == "Runner"' > /tmp/maestro-debug/ios-app.log 2>&1 || true
+          # The smoke build's executable is "Medito Dev" (dev flavor), not Runner.
+          xcrun simctl spawn booted log show --last 30m --style compact --info --debug \
+            --predicate 'process BEGINSWITH "Medito"' > /tmp/maestro-debug/ios-app.log 2>&1 || true
 
       - name: Scrub test account credentials from debug output
         if: failure()

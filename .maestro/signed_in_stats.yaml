@@ -18,23 +18,22 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
       STATS_KEY: before
 
 # ── Complete a session ──
-# Open a fixed track by deep link rather than via Home: what Home offers
-# depends on this account's progress. This is the ~2 min onboarding
+# Find a fixed track through Search rather than Home: what Home offers depends
+# on this account's progress. "What is mindfulness?" is the ~2 min onboarding
 # meditation (onboarding_result_screen.dart _meditationTrackId), so it exists
-# in prod content and keeps the skip-to-end loop short. The "medito" host is
-# required: Android's custom-scheme intent filter only matches that host.
-- openLink: org.meditofoundation://medito/tracks/yz7XKNm0iaM4kkeI
-
-# iOS confirms custom-scheme links with a system "Open in "Medito"?" alert
-# (run 36310479101 stopped on it).
+# in prod content and keeps the skip-to-end loop short.
+#
+# Not a deep link: on iOS, org.meditofoundation:// raises a system "Open in
+# Medito?" alert, and after returning from it the app's accessibility tree
+# stayed on Home while the track view was on screen (run 36315034796), so
+# Maestro could never find the track view's controls.
+- tapOn: "Search"
+- tapOn: "Search meditations"
+- inputText: "What is mindfulness"
 - extendedWaitUntil:
-    visible: "Share Track|Open in .*"
-    timeout: 15000
-- runFlow:
-    when:
-      visible: "Open in .*"
-    commands:
-      - tapOn: "Open"
+    visible: "(?s)What is mindfulness\\?\\s+\\d+ min"
+    timeout: 20000
+- tapOn: "(?s)What is mindfulness\\?\\s+\\d+ min"
 
 - extendedWaitUntil:
     visible: "Share Track"
