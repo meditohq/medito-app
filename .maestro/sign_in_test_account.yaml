@@ -75,11 +75,10 @@ name: Sign in to the prod test account from a fresh install and reach Home
 # case returning accounts ever skip onboarding.
 #
 # Home is recognised by the stats circle ("N day streak" / "Consistency
-# score: N%"), not smoke.yaml's "YOUR PATH" card: this account has history,
-# and once its path pack is finished Home shows a "You finished ..." hero
-# with no Your Path label.
+# Score: N%"), not smoke.yaml's "Start here:" hero: this account has history,
+# and once its pack is finished Home shows a "You finished ..." card instead.
 - extendedWaitUntil:
-    visible: "Never tried it|(?s).*day streak.*|Consistency score: .*"
+    visible: "Never tried it|(?s).*day streak.*|Consistency Score: .*"
     timeout: 60000
 
 - runFlow:
@@ -138,12 +137,12 @@ name: Sign in to the prod test account from a fresh install and reach Home
       # an announcement with a "Donate now" button, so only treat ".*Donate.*"
       # as the onboarding ask while the stats circle is not on screen.
       - extendedWaitUntil:
-          visible: "See how to help|.*Donate.*|(?s).*day streak.*|Consistency score: .*|Dismiss"
+          visible: "See how to help|.*Donate.*|(?s).*day streak.*|Consistency Score: .*|Dismiss"
           timeout: 60000
       - runFlow:
           when:
             visible: "See how to help|.*Donate.*"
-            notVisible: "(?s).*day streak.*|Consistency score: .*"
+            notVisible: "(?s).*day streak.*|Consistency Score: .*"
           file: dismiss_onboarding_donation.yaml
 
 # Home announcement card (e.g. a fundraising note), if one is live.
@@ -156,5 +155,5 @@ name: Sign in to the prod test account from a fresh install and reach Home
           optional: true
 
 - extendedWaitUntil:
-    visible: "(?s).*day streak.*|Consistency score: .*"
+    visible: "(?s).*day streak.*|Consistency Score: .*"
     timeout: 60000

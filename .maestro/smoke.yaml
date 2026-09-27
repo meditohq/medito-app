@@ -124,12 +124,12 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # B ends with the donation ask; A proceeds directly to Home.
 - extendedWaitUntil:
-    visible: "See how to help|.*Donate.*|(?si).*your path.*|Dismiss"
+    visible: "See how to help|.*Donate.*|(?s).*(Start here|Continue): .*|Dismiss"
     timeout: 60000
 - runFlow:
     when:
       visible: "See how to help|.*Donate.*"
-      notVisible: "(?si).*your path.*"
+      notVisible: "(?s).*(Start here|Continue): .*"
     file: dismiss_onboarding_donation.yaml
 
 # A donation prompt dialog ("Medito is a registered nonprofit") sometimes
@@ -142,59 +142,22 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           text: "Dismiss"
           optional: true
 
-# ── Play a session via Your Path ──
-# The Your Path card's accessibility label is a merged multi-line string
-# like "Your Path: Getting started — Welcome\nYOUR PATH\n·\nGetting started\n...",
-# so we use a regex with wildcards + DOTALL ((?s)) so "." matches newlines.
-# Match on "YOUR PATH" rather than a pack title: onboarding now pins new users
-# onto the pack sequence ("Getting started" for beginners, "Deepen your
-# practice" for regulars) instead of the megapack, so the title here depends on
-# who the account is. Pre-sequence installs with no pin still read
-# "Medito's Journey", and this matches those too.
+# ── Play a session from the Home hero ──
+# Onboarding pins new users onto a pack, and Home leads with it as a hero
+# card. Its accessibility label is "<progress>, Start here: <pack> —
+# <session>\n..." (or "Continue: ..." once something in the pack has been
+# played; the leading progress value is merged in), so match the
+# eyebrow rather than a pack title, which depends on who the account is.
+# "Your Path" copy was removed from the app in e246b118.
 # On a fresh install, anonymous auth + home API can take up to 60s.
 - extendedWaitUntil:
-    visible: "(?si).*your path.*"
+    visible: "(?s).*(Start here|Continue): .*"
     timeout: 60000
-# On small screens the shortcut may be below the fold
-- scrollUntilVisible:
-    element: "(?si).*your path.*"
-    direction: DOWN
-    timeout: 15000
-    speed: 20
-    waitToSettleTimeoutMs: 500
-    centerElement: true
 - tapOn:
-    text: "(?si).*your path.*"
+    text: "(?s).*(Start here|Continue): .*"
 
-# Make sure we have actually left Home before looking for Play. The Up Next
-# card on Home carries its own circular "Play" control right next to the Your
-# Path label, so checking for "Play" straight after the tap matched Home while
-# the push transition was still running and the tap landed on the wrong
-# screen (run 34955197941: tapped at (969,1028) on the card's play circle, the
-# track view opened underneath it, playback never started). Wait for something
-# only the track view ("Share Track") or the pack list ("N - M min") shows.
-- extendedWaitUntil:
-    visible: "Share Track|(?i)\\d+ - \\d+ min"
-    timeout: 20000
-
-# Your Path may open a track (Share Track in the bottom bar) or a pack (list of
-# sessions). If it opened a pack, tap the first session to reach a track view.
-- runFlow:
-    when:
-      notVisible: "Share Track"
-    commands:
-      - extendedWaitUntil:
-          visible: "(?i)\\d+ - \\d+ min"
-          timeout: 10000
-      - scrollUntilVisible:
-          element: "(?i)\\d+ - \\d+ min"
-          direction: DOWN
-          timeout: 10000
-          visibilityPercentage: 50
-      - tapOn:
-          text: "(?i)\\d+ - \\d+ min"
-          index: 0
-
+# The hero starts a session via startSession(): a fresh install has no saved
+# guide/duration yet, so it opens the track view to pick them.
 # Track view loads with a play button. Wait for the bottom bar first so the
 # "Play" we tap is the track view's, never a card left behind on Home.
 - extendedWaitUntil:
