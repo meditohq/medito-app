@@ -518,6 +518,12 @@ class FirebaseAnalyticsService {
 
   /// Set a user property for Firebase Analytics
   Future<void> setUserProperty({required String name, String? value}) async {
+    // Firebase rejects longer names at runtime (logged, not thrown), so the
+    // property would silently never be set.
+    assert(
+      name.length <= 24,
+      'Firebase user property names are limited to 24 characters: $name',
+    );
     if (_runningInTest) return;
     if (!_initialized) await initialize();
 

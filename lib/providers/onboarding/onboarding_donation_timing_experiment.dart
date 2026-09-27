@@ -17,7 +17,13 @@ class OnboardingDonationTimingExperiment {
 
   static const experimentName = 'onboarding_donation_timing';
   static const preferenceKey = 'onboarding_donation_timing_variant';
-  static const userProperty = 'onboarding_donation_timing';
+
+  /// Key on Stripe payment metadata (Stripe allows 40 chars).
+  static const paymentMetadataKey = 'onboarding_donation_timing';
+
+  /// GA4 user property. Firebase caps user property names at 24 characters
+  /// and silently drops longer ones, so this can't reuse [experimentName].
+  static const userProperty = 'onb_donation_timing';
   static const variantControl = 'A';
   static const variantLast = 'B';
 
@@ -37,7 +43,7 @@ class OnboardingDonationTimingExperiment {
   /// Separate keys preserve attribution for other experiments and later gifts.
   static Map<String, String> paymentMetadata(SharedPreferences prefs) {
     final variant = assignedVariant(prefs);
-    return variant == null ? const {} : {userProperty: variant};
+    return variant == null ? const {} : {paymentMetadataKey: variant};
   }
 
   static List<OnboardingStep> steps({

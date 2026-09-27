@@ -30,7 +30,7 @@ void main() {
       ...Exp.paymentMetadata(prefs),
     };
     expect(metadata['experiment_variant'], 'A');
-    expect(metadata[Exp.userProperty], 'B');
+    expect(metadata[Exp.paymentMetadataKey], 'B');
     expect(Exp.resolveVariant(prefs), 'B');
   });
 
