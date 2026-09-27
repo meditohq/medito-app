@@ -1,0 +1,73 @@
+appId: ${APP_ID}
+name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
+---
+# Signs in to the prod test account, notes "Total Tracks Completed" as pulled
+# from the server, completes a session, then wipes the app, signs in again and
+# checks the server now returns a higher count. The second read can only come
+# from the server (clearState drops every local copy), so this proves both the
+# pull on sign-in and the push on completion.
+#
+# Needs TEST_ACCOUNT_EMAIL and TEST_ACCOUNT_OTP (see sign_in_test_account.yaml).
+# The check is "went up", not "+1": Android and iOS CI can run this against
+# the same account at the same time.
+
+- runFlow: sign_in_test_account.yaml
+- runFlow:
+    file: read_total_tracks.yaml
+    env:
+      STATS_KEY: before
+
+# ── Complete a session ──
+# Open a fixed track by deep link rather than via Home: what Home offers
+# depends on this account's progress. This is the ~2 min onboarding
+# meditation (onboarding_result_screen.dart _meditationTrackId), so it exists
+# in prod content and keeps the skip-to-end loop short. The "medito" host is
+# required: Android's custom-scheme intent filter only matches that host.
+- openLink: org.meditofoundation://medito/tracks/yz7XKNm0iaM4kkeI
+
+- extendedWaitUntil:
+    visible: "Share Track"
+    timeout: 15000
+- extendedWaitUntil:
+    visible: "Play"
+    timeout: 15000
+- tapOn: "Play"
+
+- extendedWaitUntil:
+    visible: "00:0[5-9]|00:[1-5][0-9]"
+    timeout: 30000
+
+- repeat:
+    times: 60
+    while:
+      notVisible: "(?s).*day streak.*"
+    commands:
+      - tapOn:
+          text: "Skip forward 10 seconds"
+          optional: true
+      - runFlow: dismiss_end_screen_reminder.yaml
+- runFlow: dismiss_end_screen_reminder.yaml
+
+- extendedWaitUntil:
+    visible: "(?s).*day streak.*"
+    timeout: 30000
+- takeScreenshot: signed-in-end-screen
+
+# The completion is POSTed as the session finishes. Give it a few seconds
+# before clearState throws the app away: this wait is expected to time out
+# (the end screen stays up), and optional turns that into a plain pause.
+- extendedWaitUntil:
+    notVisible: "(?s).*day streak.*"
+    timeout: 8000
+    optional: true
+
+# ── Fresh install, sign in again, read the server's count ──
+- runFlow: sign_in_test_account.yaml
+- runFlow:
+    file: read_total_tracks.yaml
+    env:
+      STATS_KEY: after
+
+- assertTrue:
+    condition: ${output.after > output.before}
+    label: "Server Total Tracks Completed went up after a signed-in session"
