@@ -68,6 +68,31 @@ name: Sign in to the prod test account from a fresh install and reach Home
 - inputText: ${TEST_ACCOUNT_OTP}
 - tapOn: "Continue"
 
+# The fixed code is single-use per request: when Android and iOS CI run this
+# account at the same time, one platform's sign-in can consume the code the
+# other just requested, and the second gets INVALID_CODE (release run
+# 36342317998, 19:09:48–19:10:02). Still on this screen after the wait means
+# the code was rejected: resend (a fresh code) and submit again.
+- extendedWaitUntil:
+    visible: "Never tried it|(?s).*day streak.*|Consistency Score: .*"
+    timeout: 20000
+    optional: true
+- runFlow:
+    when:
+      visible: "Didn't get the code\\? Resend it"
+    commands:
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn: "Didn't get the code\\? Resend it"
+            - extendedWaitUntil:
+                visible: "Continue"
+                timeout: 15000
+            - tapOn: "Continue"
+            - extendedWaitUntil:
+                notVisible: "Didn't get the code\\? Resend it"
+                timeout: 20000
+
 # ── Onboarding ──
 # A splash sign-in lands on the onboarding pager, same as a new user. These
 # steps mirror smoke.yaml (which must stay self-contained: the release upgrade
