@@ -689,7 +689,9 @@ jobs:
             --no-ansi --debug-output /tmp/maestro-debug
 
       - name: Signed-in stats test on simulator
-        timeout-minutes: 12
+        # Two sign-ins + two onboarding passes + a session: ~11 min on the
+        # macOS runner, so 12 cut off a run that had passed (36317083446).
+        timeout-minutes: 20
         env:
           TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
           TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
