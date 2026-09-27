@@ -217,8 +217,11 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Smoke test on emulator
-        timeout-minutes: 12
+        timeout-minutes: 20
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
         with:
           api-level: 34
           arch: x86_64
@@ -234,6 +237,19 @@ jobs:
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
             mkdir -p /tmp/maestro-debug
             $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug
+            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml --no-ansi --debug-output /tmp/maestro-debug/signed-in
+
+      - name: Scrub test account credentials from debug output
+        if: failure()
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        run: |
+          [ -d /tmp/maestro-debug ] || exit 0
+          find /tmp/maestro-debug -type f ! -name '*.png' -print0 | while IFS= read -r -d '' f; do
+            TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" \
+              perl -pi -e 's/\Q$ENV{TEST_ACCOUNT_EMAIL}\E/[redacted]/g if length $ENV{TEST_ACCOUNT_EMAIL}; s/\Q$ENV{TEST_ACCOUNT_OTP}\E/[redacted]/g if length $ENV{TEST_ACCOUNT_OTP}' "$f"
+          done
 
       - name: Upload Maestro debug output
         if: failure()
@@ -666,6 +682,31 @@ jobs:
             -e APP_ID=org.meditofoundation \
             .maestro/smoke.yaml \
             --no-ansi --debug-output /tmp/maestro-debug
+
+      - name: Signed-in stats test on simulator
+        timeout-minutes: 12
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        run: |
+          $HOME/.maestro/bin/maestro test \
+            -e APP_ID=org.meditofoundation \
+            -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" \
+            -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" \
+            .maestro/signed_in_stats.yaml \
+            --no-ansi --debug-output /tmp/maestro-debug/signed-in
+
+      - name: Scrub test account credentials from debug output
+        if: failure()
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        run: |
+          [ -d /tmp/maestro-debug ] || exit 0
+          find /tmp/maestro-debug -type f ! -name '*.png' -print0 | while IFS= read -r -d '' f; do
+            TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" \
+              perl -pi -e 's/\Q$ENV{TEST_ACCOUNT_EMAIL}\E/[redacted]/g if length $ENV{TEST_ACCOUNT_EMAIL}; s/\Q$ENV{TEST_ACCOUNT_OTP}\E/[redacted]/g if length $ENV{TEST_ACCOUNT_OTP}' "$f"
+          done
 
       - name: Upload Maestro debug output
         if: failure()
