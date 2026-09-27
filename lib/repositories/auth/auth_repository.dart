@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
@@ -713,43 +714,42 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<bool> signOut() async {
     dev.log('[AUTH_REPO] Starting signOut process', level: 500);
 
-    // First reset local auth state
+    // The server ends the session named by the access token, so take it
+    // before the local reset clears the header. The header is at least as
+    // fresh as _tokens (every refresh path sets it).
+    final accessToken =
+        _httpApiService.accessToken ??
+        (_tokens != null && !_tokens!.isExpired ? _tokens!.accessToken : null);
+
     await _resetAuth();
     dev.log('[AUTH_REPO] Local auth state reset', level: 500);
 
-    // Then try to inform the server, but don't wait for success
+    if (accessToken == null) {
+      // No usable token: the refresh token is already gone locally, and the
+      // server session lapses on its own.
+      dev.log('[AUTH_REPO] No access token, skipping server sign out');
+    } else {
+      // Courtesy call: sign-out is already complete locally, so don't make
+      // the user wait on the network.
+      unawaited(_endServerSession(accessToken));
+    }
+
+    dev.log('[AUTH_REPO] Sign out complete', level: 500);
+    return true;
+  }
+
+  Future<void> _endServerSession(String accessToken) async {
     try {
-      dev.log(
-        '[AUTH_REPO] Attempting server sign out notification',
-        level: 500,
-      );
-      // We don't need to handle the response, this is just a courtesy call to the server
-      await _httpApiService.signOut().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          dev.log(
-            '[AUTH_REPO] Server sign out timed out, continuing',
-            level: 500,
-          );
-          _crashlyticsService.recordError(
-            Exception('Server sign out timed out'),
-            StackTrace.current,
-            reason: 'AuthRepo: Server sign out timed out',
-          );
-          return;
-        },
-      );
+      await _httpApiService
+          .signOut(accessToken)
+          .timeout(const Duration(seconds: 10));
     } catch (e) {
       _crashlyticsService.recordError(
         e,
         StackTrace.current,
         reason: 'AuthRepo: Error during server sign out (ignored)',
       );
-      // Ignore errors since we've already cleared local state
     }
-
-    dev.log('[AUTH_REPO] Sign out complete', level: 500);
-    return true;
   }
 
   @override

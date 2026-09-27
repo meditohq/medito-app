@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
@@ -315,35 +316,62 @@ void main() {
       verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
     });
 
-    test('signOut clears tokens', () async {
-      // Setup
-      when(() => mockHttpApiService.signOut()).thenAnswer((_) async {});
+    void stubSignOutState() {
       when(
         () => mockSecureStorageService.clearRefreshToken(),
       ).thenAnswer((_) async {});
       when(
         () => mockSecureStorageService.clearUserEmail(),
       ).thenAnswer((_) async {});
-      when(() => mockHttpApiService.clearAuthHeader()).thenAnswer((_) async {});
       when(
         () => mockPreferences.setBool(any(), any()),
       ).thenAnswer((_) async => true);
+      when(() => mockHttpApiService.signOut(any())).thenAnswer((_) async {});
+    }
 
-      // Action
+    test('signOut clears local state, then ends the server session', () async {
+      stubSignOutState();
+      when(() => mockHttpApiService.accessToken).thenReturn('access-123');
+
       final result = await authRepository.signOut();
 
-      // Verify
       expect(result, isTrue);
-      verify(() => mockHttpApiService.signOut()).called(1);
       verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
       verify(() => mockSecureStorageService.clearUserEmail()).called(1);
-      verify(() => mockHttpApiService.clearLocalAuth()).called(1);
       verify(
         () => mockPreferences.setBool(
           SharedPreferenceConstants.isLoggedIn,
           false,
         ),
       ).called(1);
+      // The token is read before the reset clears the header, and the server
+      // call carries it explicitly.
+      verifyInOrder([
+        () => mockHttpApiService.accessToken,
+        () => mockHttpApiService.clearLocalAuth(),
+        () => mockHttpApiService.signOut('access-123'),
+      ]);
+    });
+
+    test('signOut skips the server call without an access token', () async {
+      stubSignOutState();
+      when(() => mockHttpApiService.accessToken).thenReturn(null);
+
+      await authRepository.signOut();
+
+      verify(() => mockHttpApiService.clearLocalAuth()).called(1);
+      verifyNever(() => mockHttpApiService.signOut(any()));
+    });
+
+    test('a failing server sign out does not fail sign out', () async {
+      stubSignOutState();
+      when(() => mockHttpApiService.accessToken).thenReturn('access-123');
+      when(
+        () => mockHttpApiService.signOut(any()),
+      ).thenAnswer((_) async => throw const SocketException('offline'));
+
+      expect(await authRepository.signOut(), isTrue);
+      await pumpEventQueue();
     });
 
     test('initiateUser creates client ID with expected format', () async {

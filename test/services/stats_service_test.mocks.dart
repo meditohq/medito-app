@@ -157,9 +157,9 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
           as _i3.Future<Map<String, dynamic>>);
 
   @override
-  _i3.Future<void> signOut() =>
+  _i3.Future<void> signOut(String? accessToken) =>
       (super.noSuchMethod(
-            Invocation.method(#signOut, []),
+            Invocation.method(#signOut, [accessToken]),
             returnValue: _i3.Future<void>.value(),
             returnValueForMissingStub: _i3.Future<void>.value(),
           )

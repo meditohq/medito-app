@@ -250,43 +250,42 @@ class HttpApiService {
     return Uri.parse('$authBaseUrl$path');
   }
 
-  Future<void> signOut() async {
-    AppLogger.i('HTTP', 'Signing out user');
+  /// The access token requests currently go out with, if any.
+  String? get accessToken {
+    final header = _headers[kAuthorizationHeader];
+    const prefix = 'Bearer ';
+    return header != null && header.startsWith(prefix)
+        ? header.substring(prefix.length)
+        : null;
+  }
 
-    if (!_headers.containsKey(kAuthorizationHeader)) {
-      AppLogger.i('HTTP', 'No auth header present, skipping signout request');
-      return;
-    }
+  /// Asks the server to end the session [accessToken] belongs to (the server
+  /// deletes the session named by the token's `jti`). Local auth state is not
+  /// touched: the auth repository clears it first, so sign-out never waits on
+  /// the network — which is why the token has to be passed in.
+  Future<void> signOut(String accessToken) async {
+    AppLogger.i('HTTP', 'Ending server session');
 
     try {
       final request = await _client.postUrl(
         _buildAuthUri(HTTPConstants.authTokensSignout),
       );
-      _headers.forEach(request.headers.set);
-
-      AppLogger.d('HTTP', 'Signout request headers set');
+      request.headers.set(kContentTypeHeader, ContentType.json.toString());
+      request.headers.set(kAuthorizationHeader, 'Bearer $accessToken');
 
       final response = await request.close().timeout(kTimeoutDuration);
       final content = await utf8.decodeStream(response);
-
-      AppLogger.d(
-        'HTTP',
-        'Signout response received. Status: ${response.statusCode}, Content: $content',
-      );
 
       if (response.statusCode >= HttpStatus.badRequest) {
         AppLogger.w(
           'HTTP',
           'Signout request failed. Status: ${response.statusCode}, Content: $content',
         );
+      } else {
+        AppLogger.i('HTTP', 'Server session ended');
       }
     } catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Signout request error', e, stackTrace);
-    } finally {
-      // Always clear local auth state even if the request fails
-      clearAuthHeader();
-      await _authService.clearAuthTokens();
-      AppLogger.i('HTTP', 'Local auth state cleared during signout');
     }
   }
 

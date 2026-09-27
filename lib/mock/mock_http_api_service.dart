@@ -47,9 +47,8 @@ class MockHttpApiService extends HttpApiService {
   }
 
   @override
-  Future<void> signOut() async {
+  Future<void> signOut(String accessToken) async {
     AppLogger.d('MOCK_HTTP', 'Sign out (mock)');
-    clearAuthHeader();
   }
 
   Map<String, dynamic> _matchResponse(String path) {
