@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -70,6 +71,9 @@ class AccountSectionWidget extends ConsumerWidget {
               try {
                 await authRepository.signOut();
                 await ref.read(statsManagerProvider).clearAllStats();
+                // Otherwise the next account to sign in on this device
+                // merges (and uploads) this account's favourites.
+                await ref.read(favoritesNotifierProvider.notifier).clearLocal();
                 ref.read(meRefreshProvider)();
                 ref.read(statsProvider.notifier).refresh();
                 ref.invalidate(packProvider);

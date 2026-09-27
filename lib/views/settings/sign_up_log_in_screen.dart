@@ -428,10 +428,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         ref.read(statsProvider.notifier).refresh();
         ref.invalidate(packProvider);
 
-        // Initialize favorites after successful login
-        unawaited(
-          ref.read(favoritesNotifierProvider.notifier).syncWithServer(),
-        );
+        // Same for favourites: on a different account, drop the local list
+        // rather than pushing the old account's favourites into this one.
+        // Either way, rebuild so this account's server list is merged in
+        // (and anything the server lacks, e.g. favourites made while
+        // anonymous on this same account, is pushed up).
+        if (newUserId != previousUserId) {
+          await ref.read(favoritesNotifierProvider.notifier).clearLocal();
+        }
+        ref.invalidate(favoritesNotifierProvider);
 
         if (!mounted) return;
 

@@ -12,12 +12,20 @@ import '../../utils/logger.dart';
 const _removedFavoriteTtl = Duration(days: 30);
 
 class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
-  late final FavoritesRepository _repository;
+  // Not final: invalidating the provider re-runs build() on this instance.
+  late FavoritesRepository _repository;
+
+  // Bumped by every build and by [clearLocal]. A server fetch that started
+  // before either belongs to a superseded list (e.g. the previous account)
+  // and must not write it back.
+  int _generation = 0;
 
   @override
   Future<List<FavoriteItem>> build() async {
     _repository = ref.read(favoritesRepositoryProvider);
+    final generation = ++_generation;
     final local = await _repository.loadFavorites();
+    if (generation != _generation) return const [];
     // Kick off the server merge in the background — by the time it
     // resolves, build() has already returned, so writing to `state` is
     // a normal post-build update that re-renders watchers if the merged
@@ -26,12 +34,17 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
     return local;
   }
 
+  bool _isStale(int generation) => !ref.mounted || generation != _generation;
+
   Future<void> _fetchAndMergeFromServer() async {
     final fetchStartedAt = DateTime.now().millisecondsSinceEpoch;
+    final generation = _generation;
     try {
       final serverFavorites = await _repository.loadFavoritesFromServer();
+      if (_isStale(generation)) return;
       // Read after the fetch so removals made while it was in flight count.
       final removed = await _repository.loadRemovedFavorites();
+      if (_isStale(generation)) return;
       final currentLocalFavorites = state.value ?? [];
       final mergedFavorites = mergeFavoriteLists(
         currentLocalFavorites,
@@ -95,6 +108,17 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteItem>> {
 
   /// Pull-to-refresh entry point.
   Future<void> refreshFromServer() => _fetchAndMergeFromServer();
+
+  /// Drops the local favourites (sign-out, or signing in as a different
+  /// account) so they can't be merged into, and uploaded to, whichever
+  /// account signs in next. The server copy is left alone: it still belongs
+  /// to the previous account and comes back when that account signs in.
+  Future<void> clearLocal() async {
+    _generation++;
+    state = const AsyncValue.data([]);
+    // Read directly: build() may not have run (or finished) yet.
+    await ref.read(favoritesRepositoryProvider).clearLocal();
+  }
 
   /// Pushes the current local list up to the server. Best-effort; merge logic
   /// on next launch will reconcile if this fails.

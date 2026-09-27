@@ -54,6 +54,12 @@ class _FakeRepository implements FavoritesRepository {
   @override
   Future<void> saveRemovedFavorites(Map<String, int> value) async =>
       removed = {...value};
+
+  @override
+  Future<void> clearLocal() async {
+    local = [];
+    removed = {};
+  }
 }
 
 Future<ProviderContainer> _start(_FakeRepository repo) async {
@@ -169,5 +175,72 @@ void main() {
 
     await container.read(favoritesNotifierProvider.notifier).syncWithServer();
     expect(repo.posts, isEmpty);
+  });
+
+  group('clearLocal (sign-out / account switch)', () {
+    test('drops the local copy without touching the server', () async {
+      final repo = _FakeRepository(
+        local: [_item('a', 1)],
+        server: [_item('a', 1)],
+      );
+      final container = await _start(repo);
+      await _settle();
+      repo.removed = {'x': 5};
+
+      await container.read(favoritesNotifierProvider.notifier).clearLocal();
+
+      expect(_ids(container), isEmpty);
+      expect(repo.local, isEmpty);
+      expect(repo.removed, isEmpty);
+      expect(repo.posts, isEmpty, reason: 'must not wipe the server copy');
+      expect(repo.server.map((f) => f.id), ['a']);
+    });
+
+    test('a fetch still in flight cannot bring the old list back', () async {
+      final repo = _FakeRepository(
+        local: [_item('a', 1)],
+        server: [_item('a', 1), _item('b', 2)],
+      )..holdGet = Completer<void>();
+      final container = await _start(repo);
+
+      await container.read(favoritesNotifierProvider.notifier).clearLocal();
+      repo.holdGet!.complete();
+      await _settle();
+      await _settle();
+
+      expect(_ids(container), isEmpty);
+      expect(repo.local, isEmpty);
+      expect(repo.posts, isEmpty);
+    });
+
+    test(
+      'rebuilding after sign-in loads the new account from the server',
+      () async {
+        // Signed in as the old account: its favourites are local and synced.
+        final repo = _FakeRepository(
+          local: [_item('old-account', 1)],
+          server: [_item('old-account', 1)],
+        );
+        final container = await _start(repo);
+        await _settle();
+
+        // Sign out, then sign in as a different account.
+        await container.read(favoritesNotifierProvider.notifier).clearLocal();
+        repo.server = [_item('new-account', 2)];
+        repo.posts.clear();
+        container.invalidate(favoritesNotifierProvider);
+        await container.read(favoritesNotifierProvider.future);
+        await _settle();
+        await _settle();
+
+        expect(_ids(container), ['new-account']);
+        expect(repo.server.map((f) => f.id), ['new-account']);
+        expect(
+          repo.posts.expand((p) => p),
+          isNot(contains('old-account')),
+          reason: 'the old account must never be uploaded to the new one',
+        );
+      },
+    );
   });
 }

@@ -20,6 +20,10 @@ abstract class FavoritesRepository {
   /// mapped to when they were removed (ms since epoch).
   Future<Map<String, int>> loadRemovedFavorites();
   Future<void> saveRemovedFavorites(Map<String, int> removed);
+
+  /// Forgets this device's copy (favourites and pending removals) without
+  /// touching the server. Used on sign-out and account switches.
+  Future<void> clearLocal();
 }
 
 class FavoritesRepositoryImpl implements FavoritesRepository {
@@ -71,6 +75,12 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
       SharedPreferenceConstants.removedFavorites,
       json.encode(removed),
     );
+  }
+
+  @override
+  Future<void> clearLocal() async {
+    await _prefs.remove(SharedPreferenceConstants.favorites);
+    await _prefs.remove(SharedPreferenceConstants.removedFavorites);
   }
 
   @override
