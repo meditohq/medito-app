@@ -25,6 +25,17 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
 # required: Android's custom-scheme intent filter only matches that host.
 - openLink: org.meditofoundation://medito/tracks/yz7XKNm0iaM4kkeI
 
+# iOS confirms custom-scheme links with a system "Open in "Medito"?" alert
+# (run 36310479101 stopped on it).
+- extendedWaitUntil:
+    visible: "Share Track|Open in .*"
+    timeout: 15000
+- runFlow:
+    when:
+      visible: "Open in .*"
+    commands:
+      - tapOn: "Open"
+
 - extendedWaitUntil:
     visible: "Share Track"
     timeout: 15000
