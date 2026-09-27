@@ -7,6 +7,7 @@ import 'package:medito/models/models.dart';
 import '../../models/player/repeat_mode.dart' as app_repeat;
 import '../../src/audio_pigeon.g.dart' as pigeon;
 import '../../utils/utils.dart';
+import 'audio_state_provider.dart';
 import 'download/audio_downloader_provider.dart';
 import 'ios_audio_handler.dart';
 import 'repeat_state_provider.dart';
@@ -40,6 +41,9 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
       'Loading track: ${request.title}, fileId: ${request.fileId}',
     );
 
+    // The audio state outlives sessions; drop the previous track's (possibly
+    // completed, full-position) values so nothing reads them as this one's.
+    ref.read(audioStateProvider.notifier).resetState();
     await _playTrack(request);
     state = request;
 

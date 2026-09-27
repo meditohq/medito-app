@@ -22,6 +22,7 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/end_screen/end_screen_view.dart';
+import 'package:medito/views/player/session_completion_gate.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/player_action_bar.dart';
 import 'package:medito/views/player/widgets/duration_indicator_widget.dart';
@@ -56,6 +57,9 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   /// play → spinner → pause on open.
   bool _playbackStarted = false;
   Timer? _playbackStartFallback;
+
+  /// Keeps a previous session's completed state from opening the end screen.
+  final _completionGate = SessionCompletionGate();
   final _analytics = FirebaseAnalyticsService();
   // Snapshot of stats taken when the player opens, before the session can
   // affect them. EndScreenView uses this as the "before" value so its
@@ -79,6 +83,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     super.initState();
     _statsAtSessionStart = ref.read(statsProvider).value;
     _logScreenView();
+    // A listener rather than build(): build only sees the latest value, and a
+    // not-completed reading between two completed ones must still arm the gate.
+    ref.listenManual(
+      audioStateProvider.select((s) => s.isCompleted),
+      (_, isCompleted) => _completionGate.completionChanged(isCompleted),
+    );
     _donationAskWarmup = ref.listenManual(fetchDonationPageProvider, (_, _) {});
     try {
       if (EndScreenDonationExperiment.isInlineVariant(
@@ -116,8 +126,13 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   Future<void> _startPlayback() async {
     final request = ref.read(playerProvider);
     if (request == null) return;
+    _completionGate.reset();
     try {
       await ref.read(playerProvider.notifier).play(request);
+      if (!mounted) return;
+      _completionGate.trackLoaded(
+        isCompleted: ref.read(audioStateProvider).isCompleted,
+      );
       // If audio never reports playing (e.g. an interruption right at start),
       // stop waiting and show the play button so the user can start it.
       _playbackStartFallback?.cancel();
@@ -232,14 +247,10 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = ref.watch(
-      audioStateProvider.select((s) => s.isCompleted),
-    );
-    if (isCompleted) {
-      final position = ref.read(audioStateProvider).position;
-      if (position > 5000) {
-        _openEndScreen();
-      }
+    // Rebuild on completion; the gate decides whether it is this session's.
+    ref.watch(audioStateProvider.select((s) => s.isCompleted));
+    if (_completionGate.isSessionComplete(ref.read(audioStateProvider))) {
+      _openEndScreen();
     }
 
     final currentlyPlayingTrack = ref.watch(playerProvider);
