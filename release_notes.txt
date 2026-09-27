@@ -1,6 +1,16 @@
 Unreleased
 -
 
+2609.27.0
+- Start or continue a pack with one tap from its page, which also puts it on Home
+- Fixed the keyboard closing after the first letter when typing your email
+- Fixed a new session sometimes opening the previous session's end screen
+- Delete your account directly from Settings
+- Signing in to a different account no longer brings the previous account's favourites with it
+- Signing in from Settings now takes you back to Settings
+- Finished sessions are saved straight away, even while Apple Health asks for permission
+- More reliable first launch on Android
+
 2609.26.0
 - Spot a mistyped email address before you sign up or donate (e.g. "gmial.com").
 - Fixed a crash on some Android phones with Medito home screen widgets.
