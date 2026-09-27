@@ -231,7 +231,6 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
 
     final label = widget.labelText;
     final subText = widget.errorText ?? widget.helperText;
-    if (label == null && subText == null && !showCounter) return ringedBox;
 
     final supportingColor =
         widget.supportingTextColor ??
@@ -242,6 +241,11 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
       color: supportingColor,
     );
 
+    // Always the same Column, even with nothing to show below the box. An
+    // early `return ringedBox` changed the tree shape whenever errorText
+    // appeared or cleared (first keystroke into an email field, then again
+    // once it validated), which remounted the TextField and closed the
+    // keyboard mid-typing.
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
