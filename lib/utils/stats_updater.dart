@@ -135,13 +135,6 @@ Future<bool> handleStats(
   StatsManager? statsManager, // For testing
 }) async {
   try {
-    // First try to sync with HealthKit
-    await _syncHealthKit(payload).catchError((e) {
-      AppLogger.e('STATS', 'HealthKit sync error', e);
-      // Continue even if HealthKit sync fails
-    });
-
-    // Then update local stats
     statsManager ??= StatsManager()..initialize();
 
     var newAudioCompleted = LocalAudioCompleted(
@@ -202,6 +195,13 @@ Future<bool> handleStats(
       endMs: payload[TypeConstants.timestampIdKey] as int,
       durationMs: payload[TypeConstants.durationIdKey] as int,
     );
+
+    // Last: the first sync can show the Health permission sheet, and nothing
+    // above (recording and posting the session) should wait for the user to
+    // answer it.
+    await _syncHealthKit(payload).catchError((e) {
+      AppLogger.e('STATS', 'HealthKit sync error', e);
+    });
 
     return true;
   } catch (e) {
