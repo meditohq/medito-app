@@ -494,6 +494,11 @@ jobs:
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
     runs-on: macos-latest
     environment: prod
+    # The XCTest driver Maestro installs can take well over its default
+    # startup timeout on a cold CI simulator ("iOS driver not ready in time",
+    # run 36309254158), failing the job before any flow runs.
+    env:
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
 
     steps:
       - uses: actions/checkout@v4
@@ -734,6 +739,11 @@ jobs:
     needs: [ios-smoke-test]
     runs-on: macos-latest
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
+    # The XCTest driver Maestro installs can take well over its default
+    # startup timeout on a cold CI simulator ("iOS driver not ready in time",
+    # run 36309254158), failing the job before any flow runs.
+    env:
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
     # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
     # there's no baseline yet, or to avoid blocking ship on a flaky test.
     continue-on-error: true

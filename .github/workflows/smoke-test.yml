@@ -217,6 +217,11 @@ jobs:
     if: inputs.platforms == 'both' || inputs.platforms == 'ios'
     runs-on: macos-latest
     environment: prod
+    # The XCTest driver Maestro installs can take well over its default
+    # startup timeout on a cold CI simulator ("iOS driver not ready in time",
+    # run 36309254158), failing the job before any flow runs.
+    env:
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
 
     steps:
       - uses: actions/checkout@v4
