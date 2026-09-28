@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Outline sized to overlay widget_dot (marks today); white so widgets can tint it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.25"
+        android:pathData="M12,1.125A10.875,10.875 0,1 1,12 22.875A10.875,10.875 0,1 1,12 1.125Z"/>
+</vector>
