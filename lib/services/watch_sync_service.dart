@@ -163,8 +163,14 @@ class _WatchSync {
       // just cleared.
       if (_disposed || signature == _lastSignature) return;
 
+      // sentAt keeps each push distinct: the system drops a context equal
+      // to the last one sent, which would strand a reinstalled watch app.
       final delivered =
-          await _channel.invokeMethod<bool>('updateContext', context) ?? false;
+          await _channel.invokeMethod<bool>('updateContext', {
+            ...context,
+            'sentAt': DateTime.now().millisecondsSinceEpoch,
+          }) ??
+          false;
       // Only remember what actually reached the watch, so a later push
       // retries once a watch is paired / the app is installed.
       if (delivered) _lastSignature = signature;

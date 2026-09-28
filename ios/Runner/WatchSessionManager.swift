@@ -79,6 +79,13 @@ final class WatchSessionManager: NSObject, WCSessionDelegate {
         didReceiveMessage message: [String: Any],
         replyHandler: @escaping ([String: Any]) -> Void
     ) {
+        if message["type"] as? String == "requestContext" {
+            // A watch with nothing to show (fresh install / reinstall). The
+            // system only delivers a context that differs from the last one
+            // sent, so hand it the persisted one directly.
+            replyHandler(session.applicationContext)
+            return
+        }
         enqueue(message)
         replyHandler(["ok": true])
     }

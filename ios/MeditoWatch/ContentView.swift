@@ -36,11 +36,11 @@ struct ContentView: View {
                             // Icon tiles, like the phone's Home shortcuts.
                             HStack(spacing: 8) {
                                 if let daily = store.daily {
-                                    ShortcutTile(title: "Daily", systemImage: "sun.max") {
+                                    ShortcutTile(title: "Daily", image: "Sun") {
                                         path.append(.player(daily))
                                     }
                                 }
-                                ShortcutTile(title: "Favorites", systemImage: "star") {
+                                ShortcutTile(title: "Favorites", image: "Star") {
                                     path.append(.favorites)
                                 }
                             }
@@ -128,16 +128,20 @@ private struct StatPill: View {
     }
 }
 
+/// A phone Home shortcut: the app's own icon (assets/images, same set as the
+/// phone) on a tile, label below.
 private struct ShortcutTile: View {
     let title: String
-    let systemImage: String
+    let image: String
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 6) {
-                Image(systemName: systemImage)
-                    .font(.title3)
+                Image(image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
                     .frame(maxWidth: .infinity, minHeight: 44)
                     .background(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)

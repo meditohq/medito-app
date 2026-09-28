@@ -142,7 +142,25 @@ final class WatchStore: NSObject, ObservableObject, WCSessionDelegate {
     // MARK: WCSessionDelegate
 
     func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {
-        apply(session.receivedApplicationContext)
+        let received = session.receivedApplicationContext
+        apply(received)
+        if received.isEmpty { requestContext() }
+    }
+
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        if !hasSynced { requestContext() }
+    }
+
+    /// Asks the phone for its current context. Needed after a (re)install:
+    /// updateApplicationContext skips a context identical to the last one
+    /// sent, so the phone wouldn't otherwise resend. Messaging the phone
+    /// wakes the Medito app in the background if it isn't running.
+    private func requestContext() {
+        let session = WCSession.default
+        guard session.activationState == .activated, session.isReachable else { return }
+        session.sendMessage(["type": "requestContext"], replyHandler: { [weak self] context in
+            self?.apply(context)
+        }, errorHandler: nil)
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
