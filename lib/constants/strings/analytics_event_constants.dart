@@ -219,6 +219,11 @@ class AnalyticsEventConstants {
   /// denominator for completion rate. Same params as [audioSessionCompleted].
   static const String audioSessionStarted = 'audio_session_started';
 
+  /// Event logged when a session finished on the Apple Watch is recorded on
+  /// the phone. Kept separate from [audioSessionCompleted] so watch sessions
+  /// (which never log [audioSessionStarted]) don't skew phone completion rate.
+  static const String watchSessionCompleted = 'watch_session_completed';
+
   /// Event logged once when a started session ends WITHOUT completing
   /// (close, switch track, navigate-away-while-paused, background-while-paused,
   /// or replayed on next launch after a force-quit). Carries

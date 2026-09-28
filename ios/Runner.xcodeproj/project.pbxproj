@@ -9,28 +9,28 @@
 /* Begin PBXBuildFile section */
 		0D4562B77FF4244FD7A0BF1F /* blush@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 11B39ECC271C6439638C9ACA /* blush@2x.png */; };
 		0E56EAD091A3D2694CF3FA38 /* blush@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F696C23AC21F365306D45A /* blush@3x.png */; };
-		9956A5D296C34F048C5E16B1 /* classic@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BBFDA482A614471ACEB6AA2 /* classic@2x.png */; };
-		EA038FA9FDD44FFC876BD637 /* classic@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 92533D48FC1445F8A9835B38 /* classic@3x.png */; };
-		B09C70E0D2A642E886AE9FA9 /* classic@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C7AAB90810A445B83AC1E36 /* classic@2x~ipad.png */; };
-		D73C3F41BAB3461BB99C5D25 /* classic-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 58C716697FBE49889455C64E /* classic-83.5@2x~ipad.png */; };
+		13D0C50A6B4CA266FBAB86F7 /* WatchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D576D19966E7AE13ECF32583 /* WatchStore.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
-		A0B1C2D3000000000000000A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3000000000000000F /* SceneDelegate.swift */; };
 		27250C9F2E843752008B6308 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		27250CA32E843752008B6308 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		27250CA42E843752008B6308 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		27250CA52E843752008B6308 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BD257942AC4B7C80012213D /* GoogleService-Info.plist */; };
 		27250CA62E843752008B6308 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
-		E1C0E1C0E1C0E1C0E1C0E1C1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */; };
-		E1C0E1C0E1C0E1C0E1C0E1C2 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */; };
 		27250CA72E843752008B6308 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		286F501132BCE08B5ED702C1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
+		2A466391A785B78F81163E49 /* MeditoWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12EC24E788BFA38D86BD6E25 /* MeditoWatchApp.swift */; };
 		2AB55F368BB0C48A3099C502 /* forest@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 101421EE97843C1D2CD49583 /* forest@3x.png */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		34902A6B292214B6EB757F62 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9020A8043DD32631839BE6F /* Pods_RunnerTests.framework */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		4C8061651FC29BF06FEDB62B /* WatchSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB8288033A82BDD9CAFBB82 /* WatchSessionManager.swift */; };
+		641CD214BD1BD8749E05BEC6 /* WatchPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089536BB3C3956D35AFC876D /* WatchPlayer.swift */; };
+		6451A594DBE4B3CBC8067CE5 /* PlayerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC468F5892C7178348F6B57 /* PlayerScreen.swift */; };
+		6866BE97793F9904A70EE96F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 358B404278B0F6AF03015244 /* ContentView.swift */; };
+		7283398C96503E9F083178E4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67234EBD27FB2A721BF8F00E /* Foundation.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
-		A0B1C2D3000000000000000B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3000000000000000F /* SceneDelegate.swift */; };
+		7597452E75302F483857C4F8 /* FavoritesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC27011A3A9360FF25D2FB9 /* FavoritesScreen.swift */; };
 		75FFF940D93AA63726585B1C /* ocean@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1642F495F0BF67E432218A44 /* ocean@3x.png */; };
 		7F3A591E80D70D658C77967D /* goldenhour@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AC169176E7723242F1D76211 /* goldenhour@2x.png */; };
 		8779BC35DF1AAC24F2EB5EC0 /* forest@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6E4B2292C6E7C1E5F56AFA5 /* forest@2x.png */; };
@@ -39,6 +39,10 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		9956A5D296C34F048C5E16B1 /* classic@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BBFDA482A614471ACEB6AA2 /* classic@2x.png */; };
+		A0B1C2D3000000000000000A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3000000000000000F /* SceneDelegate.swift */; };
+		A0B1C2D3000000000000000B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3000000000000000F /* SceneDelegate.swift */; };
+		B09C70E0D2A642E886AE9FA9 /* classic@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C7AAB90810A445B83AC1E36 /* classic@2x~ipad.png */; };
 		B94EBB14C84430DEFDEAABA1 /* nearblack@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3695491DE3C75B6C6589CADB /* nearblack@3x.png */; };
 		BBBB00001111222233334441 /* nearblack@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334441 /* nearblack@2x~ipad.png */; };
 		BBBB00001111222233334442 /* nearblack-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334442 /* nearblack-83.5@2x~ipad.png */; };
@@ -50,8 +54,14 @@
 		BBBB00001111222233334448 /* forest-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334448 /* forest-83.5@2x~ipad.png */; };
 		BBBB00001111222233334449 /* goldenhour@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00001111222233334449 /* goldenhour@2x~ipad.png */; };
 		BBBB0000111122223333444A /* goldenhour-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = AAAA0000111122223333444A /* goldenhour-83.5@2x~ipad.png */; };
+		C829294F0AD9178D1F4E9D73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04693E3961D4C52B2395E97A /* Assets.xcassets */; };
 		CC934284185658B1ADA4785C /* nearblack@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DD285FFF1378316BD5FCFEC6 /* nearblack@2x.png */; };
 		CC9F9E6509D2EF1445F7D052 /* ocean@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8569F526DAB5AAE67011AF21 /* ocean@2x.png */; };
+		D73C3F41BAB3461BB99C5D25 /* classic-83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 58C716697FBE49889455C64E /* classic-83.5@2x~ipad.png */; };
+		E1C0E1C0E1C0E1C0E1C0E1C1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */; };
+		E1C0E1C0E1C0E1C0E1C0E1C2 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */; };
+		E268E739604287F373D42F57 /* MeditoWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 65D2C154795F354C3113637B /* MeditoWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EA038FA9FDD44FFC876BD637 /* classic@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 92533D48FC1445F8A9835B38 /* classic@3x.png */; };
 		EDFD4D0B2C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0A2C9359BF0066E874 /* MeditoWidgetBundle.swift */; };
 		EDFD4D0D2C9359BF0066E874 /* WidgetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */; };
 		EDFD4D0F2C9359BF0066E874 /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */; };
@@ -59,10 +69,19 @@
 		EDFD4D122C9359BF0066E874 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDFD4D072C9359BF0066E874 /* Assets.xcassets */; };
 		EDFD4D242C9359BF0066E874 /* MeditoWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		EDFD4D2B2C9359BF0066E874 /* UpNextWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */; };
+		EF7A7F348E5E344884DE6920 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */; };
+		F3646B52EE26CE5E27FB9A7C /* CoverImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB7404E0DEB68569A8F5344 /* CoverImage.swift */; };
 		F7C33FCECFCB2BD7A48BA96A /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D823902C8C535090C29E3B7 /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		2A5FA4073B359A110015FF30 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B3D99FD8D06FC8D44A33DA32;
+			remoteInfo = MeditoWatch;
+		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -80,6 +99,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		0786BB01AC83A751DAD96021 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				E268E739604287F373D42F57 /* MeditoWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EDFD4D232C9359BF0066E874 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -94,41 +124,49 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		04693E3961D4C52B2395E97A /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0486B7CC9C4218C886196CB6 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		089536BB3C3956D35AFC876D /* WatchPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchPlayer.swift; sourceTree = "<group>"; };
+		0BBFDA482A614471ACEB6AA2 /* classic@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@2x.png"; sourceTree = "<group>"; };
 		0FFC4805F01806064CC598A5 /* Pods-RunnerTests.release-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release-prod.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release-prod.xcconfig"; sourceTree = "<group>"; };
 		101421EE97843C1D2CD49583 /* forest@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "forest@3x.png"; sourceTree = "<group>"; };
 		11B39ECC271C6439638C9ACA /* blush@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "blush@2x.png"; sourceTree = "<group>"; };
-		0BBFDA482A614471ACEB6AA2 /* classic@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@2x.png"; sourceTree = "<group>"; };
-		92533D48FC1445F8A9835B38 /* classic@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@3x.png"; sourceTree = "<group>"; };
-		1C7AAB90810A445B83AC1E36 /* classic@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@2x~ipad.png"; sourceTree = "<group>"; };
-		58C716697FBE49889455C64E /* classic-83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic-83.5@2x~ipad.png"; sourceTree = "<group>"; };
+		12EC24E788BFA38D86BD6E25 /* MeditoWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MeditoWatchApp.swift; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		1642F495F0BF67E432218A44 /* ocean@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "ocean@3x.png"; sourceTree = "<group>"; };
+		1C7AAB90810A445B83AC1E36 /* classic@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@2x~ipad.png"; sourceTree = "<group>"; };
+		1FC468F5892C7178348F6B57 /* PlayerScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerScreen.swift; sourceTree = "<group>"; };
 		24D0B291C26CB2CCD78E20CC /* Pods-Runner.profile-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-dev.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-dev.xcconfig"; sourceTree = "<group>"; };
 		270582582DE8CCDB00033AF9 /* MeditoWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtension.entitlements; sourceTree = "<group>"; };
 		270582592DE8CCDB00033AF9 /* MeditoWidgetExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MeditoWidgetExtensionRelease.entitlements; sourceTree = "<group>"; };
 		27250CAF2E843752008B6308 /* Runner copy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Runner copy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27250CB02E843752008B6308 /* Runner copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Runner copy-Info.plist"; path = "/Users/mike/Projects/Medito/medito_new/ios/Runner copy-Info.plist"; sourceTree = "<absolute>"; };
+		2CB7404E0DEB68569A8F5344 /* CoverImage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoverImage.swift; sourceTree = "<group>"; };
 		3003D9AA92FEE696D942646E /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		32E5F811F97EF8E9F497DF92 /* Pods-Runner.debug-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-dev.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-dev.xcconfig"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		358B404278B0F6AF03015244 /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3695491DE3C75B6C6589CADB /* nearblack@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "nearblack@3x.png"; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		4DEB2B518C79BF83188E4EAD /* Pods-RunnerTests.profile-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile-prod.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile-prod.xcconfig"; sourceTree = "<group>"; };
 		562C54457B5AD73CC565B087 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		58C716697FBE49889455C64E /* classic-83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic-83.5@2x~ipad.png"; sourceTree = "<group>"; };
+		65D2C154795F354C3113637B /* MeditoWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MeditoWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		67234EBD27FB2A721BF8F00E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		6B5E8A053C7F26C6BDC2A5C2 /* Pods-Runner.profile-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-prod.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-prod.xcconfig"; sourceTree = "<group>"; };
 		6EC2086D227D5D7852BA3A41 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
+		6FB8288033A82BDD9CAFBB82 /* WatchSessionManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchSessionManager.swift; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A0B1C2D3000000000000000F /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		8569F526DAB5AAE67011AF21 /* ocean@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "ocean@2x.png"; sourceTree = "<group>"; };
 		8B72EB2FA75CFF73922EBDE7 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		8B7AADD52A559F5C004A5611 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		8BD257942AC4B7C80012213D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8EA0F658C4F29C790453417C /* goldenhour@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "goldenhour@3x.png"; sourceTree = "<group>"; };
+		92533D48FC1445F8A9835B38 /* classic@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "classic@3x.png"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Medito Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Medito Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -137,6 +175,7 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D823902C8C535090C29E3B7 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0B1C2D3000000000000000F /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A6E4B2292C6E7C1E5F56AFA5 /* forest@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "forest@2x.png"; sourceTree = "<group>"; };
 		A7146AD3A13BBF4F494FABD8 /* Pods-Runner.release-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-prod.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-prod.xcconfig"; sourceTree = "<group>"; };
 		A9020A8043DD32631839BE6F /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -151,15 +190,18 @@
 		AAAA00001111222233334449 /* goldenhour@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "goldenhour@2x~ipad.png"; sourceTree = "<group>"; };
 		AAAA0000111122223333444A /* goldenhour-83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "goldenhour-83.5@2x~ipad.png"; sourceTree = "<group>"; };
 		AC169176E7723242F1D76211 /* goldenhour@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "goldenhour@2x.png"; sourceTree = "<group>"; };
+		AE5A5E827021C45EEAA5AA0A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B0005ABE56C0BD68C1811D4A /* Pods-RunnerTests.profile-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile-dev.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile-dev.xcconfig"; sourceTree = "<group>"; };
 		BB0B0E732488A1D670FFA76D /* Pods-Runner.debug-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug-prod.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug-prod.xcconfig"; sourceTree = "<group>"; };
 		BC957D59D1CBF4ED522FE216 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		C3B8A64AB2A0C4A0A9884353 /* Pods-Runner.release-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release-dev.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release-dev.xcconfig"; sourceTree = "<group>"; };
 		D254B14FB671A44EA78C4DCE /* Pods_MeditoWidgetExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MeditoWidgetExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2B0B14E44D70527A0679E0E /* Pods-RunnerTests.debug-prod.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug-prod.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug-prod.xcconfig"; sourceTree = "<group>"; };
+		D576D19966E7AE13ECF32583 /* WatchStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchStore.swift; sourceTree = "<group>"; };
 		D824AF5E86BAF1075761917E /* Pods-RunnerTests.release-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release-dev.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release-dev.xcconfig"; sourceTree = "<group>"; };
 		DD285FFF1378316BD5FCFEC6 /* nearblack@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "nearblack@2x.png"; sourceTree = "<group>"; };
 		DF7C673A0BFFFE28F1BB7522 /* Pods-RunnerTests.debug-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug-dev.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug-dev.xcconfig"; sourceTree = "<group>"; };
+		E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposericon; path = AppIcon.icon; sourceTree = "<group>"; };
 		EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MeditoWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDFD4CFE2C9359BF0066E874 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		EDFD4D002C9359BF0066E874 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -170,8 +212,8 @@
 		EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidget.swift; sourceTree = "<group>"; };
 		EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsistencyWidget.swift; sourceTree = "<group>"; };
 		EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpNextWidget.swift; sourceTree = "<group>"; };
+		EEC27011A3A9360FF25D2FB9 /* FavoritesScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FavoritesScreen.swift; sourceTree = "<group>"; };
 		F5F696C23AC21F365306D45A /* blush@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "blush@3x.png"; sourceTree = "<group>"; };
-		E1C0E1C0E1C0E1C0E1C0E1C0 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposericon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -209,6 +251,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DD997BF5811EE4A1750A0B3E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7283398C96503E9F083178E4 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EDFD4D142C9359BF0066E874 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -233,6 +283,7 @@
 				9D823902C8C535090C29E3B7 /* Pods_Runner.framework */,
 				A9020A8043DD32631839BE6F /* Pods_RunnerTests.framework */,
 				D254B14FB671A44EA78C4DCE /* Pods_MeditoWidgetExtension.framework */,
+				B6F495152A8DD5CEE92846C8 /* watchOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -285,6 +336,7 @@
 				ED43ED8D2CCBDB0D00648C2A /* Recovered References */,
 				571AF27B71021884340919D6 /* Frameworks */,
 				27250CB02E843752008B6308 /* Runner copy-Info.plist */,
+				A022FA1DDB904EE3671A9C4E /* MeditoWatch */,
 			);
 			sourceTree = "<group>";
 		};
@@ -295,6 +347,7 @@
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 				EDFD4CFD2C9359BE0066E874 /* MeditoWidgetExtension.appex */,
 				27250CAF2E843752008B6308 /* Runner copy.app */,
+				65D2C154795F354C3113637B /* MeditoWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -338,8 +391,34 @@
 				AAAA00001111222233334448 /* forest-83.5@2x~ipad.png */,
 				AAAA00001111222233334449 /* goldenhour@2x~ipad.png */,
 				AAAA0000111122223333444A /* goldenhour-83.5@2x~ipad.png */,
+				6FB8288033A82BDD9CAFBB82 /* WatchSessionManager.swift */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		A022FA1DDB904EE3671A9C4E /* MeditoWatch */ = {
+			isa = PBXGroup;
+			children = (
+				12EC24E788BFA38D86BD6E25 /* MeditoWatchApp.swift */,
+				D576D19966E7AE13ECF32583 /* WatchStore.swift */,
+				089536BB3C3956D35AFC876D /* WatchPlayer.swift */,
+				1FC468F5892C7178348F6B57 /* PlayerScreen.swift */,
+				358B404278B0F6AF03015244 /* ContentView.swift */,
+				AE5A5E827021C45EEAA5AA0A /* Info.plist */,
+				04693E3961D4C52B2395E97A /* Assets.xcassets */,
+				EEC27011A3A9360FF25D2FB9 /* FavoritesScreen.swift */,
+				2CB7404E0DEB68569A8F5344 /* CoverImage.swift */,
+			);
+			name = MeditoWatch;
+			path = MeditoWatch;
+			sourceTree = "<group>";
+		};
+		B6F495152A8DD5CEE92846C8 /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				67234EBD27FB2A721BF8F00E /* Foundation.framework */,
+			);
+			name = watchOS;
 			sourceTree = "<group>";
 		};
 		ED43ED8D2CCBDB0D00648C2A /* Recovered References */ = {
@@ -518,6 +597,7 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				EDFD4D232C9359BF0066E874 /* Embed App Extensions */,
+				0786BB01AC83A751DAD96021 /* Embed Watch Content */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				DA924EFF1FA9E02F0BAC8C9E /* [CP] Embed Pods Frameworks */,
 				1F09CDF1A6D489A27D3AF8EB /* [CP] Copy Pods Resources */,
@@ -527,6 +607,7 @@
 			);
 			dependencies = (
 				EDFD4D262C9359BF0066E874 /* PBXTargetDependency */,
+				5E319F3FFA7104EBF43EA87A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				ED8A5BC82CCCE1060043D20A /* Fonts */,
@@ -534,6 +615,23 @@
 			name = Runner;
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Medito Dev.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B3D99FD8D06FC8D44A33DA32 /* MeditoWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D9E01F25A72ABD8403E2BC74 /* Build configuration list for PBXNativeTarget "MeditoWatch" */;
+			buildPhases = (
+				9ADC56CDA86B4935A034BE12 /* Sources */,
+				DD997BF5811EE4A1750A0B3E /* Frameworks */,
+				FC39F60149F8EB0E1413C753 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MeditoWatch;
+			productName = MeditoWatch;
+			productReference = 65D2C154795F354C3113637B /* MeditoWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
 		EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */ = {
@@ -595,6 +693,7 @@
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				27250C942E843752008B6308 /* Runner copy */,
 				EDFD4CFC2C9359BE0066E874 /* MeditoWidgetExtension */,
+				B3D99FD8D06FC8D44A33DA32 /* MeditoWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -662,6 +761,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDFD4D122C9359BF0066E874 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC39F60149F8EB0E1413C753 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C829294F0AD9178D1F4E9D73 /* Assets.xcassets in Resources */,
+				EF7A7F348E5E344884DE6920 /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -854,6 +962,21 @@
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				A0B1C2D3000000000000000B /* SceneDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				4C8061651FC29BF06FEDB62B /* WatchSessionManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9ADC56CDA86B4935A034BE12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A466391A785B78F81163E49 /* MeditoWatchApp.swift in Sources */,
+				13D0C50A6B4CA266FBAB86F7 /* WatchStore.swift in Sources */,
+				641CD214BD1BD8749E05BEC6 /* WatchPlayer.swift in Sources */,
+				6451A594DBE4B3CBC8067CE5 /* PlayerScreen.swift in Sources */,
+				6866BE97793F9904A70EE96F /* ContentView.swift in Sources */,
+				7597452E75302F483857C4F8 /* FavoritesScreen.swift in Sources */,
+				F3646B52EE26CE5E27FB9A7C /* CoverImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -876,6 +999,12 @@
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
+		};
+		5E319F3FFA7104EBF43EA87A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MeditoWatch;
+			target = B3D99FD8D06FC8D44A33DA32 /* MeditoWatch */;
+			targetProxy = 2A5FA4073B359A110015FF30 /* PBXContainerItemProxy */;
 		};
 		EDFD4D262C9359BF0066E874 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1004,6 +1133,41 @@
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = "Debug-dev";
+		};
+		1C756804487C86DF123D44BC /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Profile;
 		};
 		1E9E45D0280AEAE67A472786 /* Release-dev */ = {
 			isa = XCBuildConfiguration;
@@ -1466,6 +1630,40 @@
 			};
 			name = "Profile-dev";
 		};
+		7D1A19AA108DBB37DFEA7006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
 		800EBD995491F18498EE4925 /* Profile-dev */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1574,6 +1772,41 @@
 			};
 			name = "Release-dev";
 		};
+		8AD781E363EE9F273EC39D30 /* Release-dev */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = "Release-dev";
+		};
 		8B8F0C9FEECB6C470A8E47A6 /* Release-dev */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
@@ -1606,6 +1839,41 @@
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = "Release-dev";
+		};
+		8E1ABFF3EF879EB57220C20E /* Profile-prod */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = "Profile-prod";
 		};
 		97C147031CF9000F007C117D /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1948,6 +2216,76 @@
 			};
 			name = "Profile-prod";
 		};
+		BDB314092916B5D38D692C83 /* Release-prod */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = "Release-prod";
+		};
+		BF936A82F4A9C28F73F1DB2C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 		C02ABB482525D84242567EF7 /* Profile-prod */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
@@ -1996,6 +2334,41 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
 			};
 			name = "Profile-prod";
+		};
+		CB97EC0D4346A169D01D13BD /* Profile-dev */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = "Profile-dev";
 		};
 		CDF4E0AFD9E2C65A9667348B /* Release-prod */ = {
 			isa = XCBuildConfiguration;
@@ -2329,6 +2702,40 @@
 			};
 			name = "Profile-prod";
 		};
+		F2A72C29BDAB6E8D656B9E15 /* Debug-prod */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = "Debug-prod";
+		};
 		F80BE9C6D58F773EBE92FCCA /* Profile-prod */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2360,6 +2767,40 @@
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = "Profile-prod";
+		};
+		FB82DBEB82AEE03C90219DA5 /* Debug-dev */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = JLKV36C38P;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeditoWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Medito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.meditofoundation;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.meditofoundation.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = "Debug-dev";
 		};
 /* End XCBuildConfiguration section */
 
@@ -2424,6 +2865,22 @@
 				1290A87B3BC21BD6A6836E9C /* Release-prod */,
 				51FBE001B63186BCCCE163C2 /* Profile-dev */,
 				C02ABB482525D84242567EF7 /* Profile-prod */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D9E01F25A72ABD8403E2BC74 /* Build configuration list for PBXNativeTarget "MeditoWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF936A82F4A9C28F73F1DB2C /* Release */,
+				7D1A19AA108DBB37DFEA7006 /* Debug */,
+				1C756804487C86DF123D44BC /* Profile */,
+				FB82DBEB82AEE03C90219DA5 /* Debug-dev */,
+				F2A72C29BDAB6E8D656B9E15 /* Debug-prod */,
+				8AD781E363EE9F273EC39D30 /* Release-dev */,
+				BDB314092916B5D38D692C83 /* Release-prod */,
+				CB97EC0D4346A169D01D13BD /* Profile-dev */,
+				8E1ABFF3EF879EB57220C20E /* Profile-prod */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

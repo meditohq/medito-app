@@ -32,6 +32,12 @@ class StreakCircleController extends ChangeNotifier {
   bool shouldShowConsistencyScore(
     LocalAllStats stats, [
     StreakCircleDisplayType? displayType,
+  ]) => showsConsistencyScore(stats, displayType);
+
+  /// The Home stat circle's rule, shared with the Apple Watch app.
+  static bool showsConsistencyScore(
+    LocalAllStats stats, [
+    StreakCircleDisplayType? displayType,
   ]) {
     // If display preference is explicitly set to currentStreak, always show streak
     if (displayType == StreakCircleDisplayType.currentStreak) {

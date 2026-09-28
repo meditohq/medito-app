@@ -28,6 +28,7 @@ import 'widgets/up_next/up_next_widget.dart';
 import '../../providers/home/announcement_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/watch_sync_service.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -97,6 +98,9 @@ class _HomeViewState extends ConsumerState<HomeView>
     super.build(context);
 
     final home = ref.watch(fetchHomeProvider);
+    // Keep the Apple Watch app's Continue / Daily / favourites current. Started here,
+    // not at the app root, so it never fetches before sign-in/onboarding.
+    ref.watch(watchSyncProvider);
 
     return home.when(
       loading: () => const _HomeLoadingView(),

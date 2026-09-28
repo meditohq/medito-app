@@ -25,6 +25,10 @@ class AppDelegate: FlutterAppDelegate {
 
         // Register Flutter plugins
         GeneratedPluginRegistrant.register(with: self)
+
+        // Activate early so sessions finished on the watch are received even
+        // when the app is launched in the background to deliver them.
+        WatchSessionManager.shared.activate()
         
         // Set background fetch interval
         UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60 * 15)) // 15 minutes
@@ -71,6 +75,8 @@ class AppDelegate: FlutterAppDelegate {
     /// Called from SceneDelegate once the scene (and its FlutterViewController) is attached,
     /// because `self.window` is nil on the AppDelegate when using a UIScene lifecycle.
     func registerMethodChannels(with controller: FlutterViewController) {
+        WatchSessionManager.shared.register(with: controller.binaryMessenger)
+
         // Siri channel
         let siriChannel = FlutterMethodChannel(
             name: "com.medito.app/siri",

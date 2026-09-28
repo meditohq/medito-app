@@ -1,4 +1,5 @@
 import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/config_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io' show Platform;
@@ -152,8 +153,7 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
     final trackState = ref.watch(tracksProvider(trackId: widget.trackId));
     final favoritesState = ref.watch(favoritesNotifierProvider);
 
-    const dailyMeditationId = 'BmTFAyYt8jVMievZ'; // from back end :(
-    final isDailyMeditation = widget.trackId == dailyMeditationId;
+    final isDailyMeditation = widget.trackId == ConfigConstants.dailyTrackId;
 
     return trackState.when(
       data: (track) {

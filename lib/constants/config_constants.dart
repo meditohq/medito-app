@@ -2,6 +2,10 @@ class ConfigConstants {
   // Pack IDs
   static const String basicsPackId = 'j4SVy5TrKAT7ywxp';
 
+  /// "Your Daily": a fixed track id the API resolves to a different track
+  /// each day (medito-api src/routes/tracks.ts).
+  static const String dailyTrackId = 'BmTFAyYt8jVMievZ';
+
   // URL constants
   static const String meditoUrl = 'https://meditofoundation.org/';
   static const String donationFormUrl = 'https://donate.meditofoundation.org';

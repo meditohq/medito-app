@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_constants.dart';
+import 'package:medito/providers/streak_circle_display_provider.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 
 void main() {
@@ -121,6 +122,24 @@ void main() {
         );
         expect(controller.shouldShowConsistencyScore(stats), false);
       });
+
+      test(
+        'showsConsistencyScore (shared with the watch) matches the instance rule',
+        () {
+          final short = LocalAllStats.empty().copyWith(streakCurrent: 5);
+          final long = LocalAllStats.empty().copyWith(streakCurrent: 120);
+
+          expect(StreakCircleController.showsConsistencyScore(short), true);
+          expect(StreakCircleController.showsConsistencyScore(long), false);
+          expect(
+            StreakCircleController.showsConsistencyScore(
+              short,
+              StreakCircleDisplayType.currentStreak,
+            ),
+            false,
+          );
+        },
+      );
 
       test('getDisplayValue returns percentage for consistency score', () {
         final stats = LocalAllStats.empty().copyWith(
