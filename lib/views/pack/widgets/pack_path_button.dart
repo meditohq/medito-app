@@ -110,7 +110,7 @@ class PackPathButton extends StatelessWidget {
       child: LinearProgressIndicator(
         value: total == 0 ? 0 : completed / total,
         backgroundColor: onSurface.withValues(alpha: 0.08),
-        color: context.brandPurple,
+        color: context.brandAccent,
       ),
     );
   }
@@ -196,7 +196,7 @@ class _PackPlayButtonState extends ConsumerState<PackPlayButton> {
                   onSurface.withValues(alpha: 0.08),
                   Theme.of(context).cardColor,
                 )
-              : context.brandPurple,
+              : context.brandAccent,
           child: InkWell(
             onTap: done ? null : () => _start(context, next),
             child: SizedBox.square(
@@ -207,13 +207,13 @@ class _PackPlayButtonState extends ConsumerState<PackPlayButton> {
                         dimension: 22,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
-                          color: context.onBrandPurple,
+                          color: context.onBrandAccent,
                         ),
                       )
                     : Icon(
                         done ? Icons.check_rounded : Icons.play_arrow_rounded,
                         size: done ? 26 : 32,
-                        color: done ? onSurface : context.onBrandPurple,
+                        color: done ? onSurface : context.onBrandAccent,
                       ),
               ),
             ),

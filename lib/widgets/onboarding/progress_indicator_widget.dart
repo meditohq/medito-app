@@ -47,7 +47,7 @@ class OnboardingProgressIndicator extends StatelessWidget {
                     minHeight: 4,
                     backgroundColor: trackColor,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      context.brandPurple,
+                      context.brandAccent,
                     ),
                   );
                 },

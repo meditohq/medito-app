@@ -86,8 +86,8 @@ class _UpNextPalette {
       foreground: onSurface,
       muted: onSurface.withOpacityValue(0.7),
       track: onSurface.withOpacityValue(0.1),
-      buttonBackground: context.brandPurple,
-      buttonForeground: context.onBrandPurple,
+      buttonBackground: context.brandAccent,
+      buttonForeground: context.onBrandAccent,
       skipBackground: theme.scaffoldBackgroundColor,
     );
   }
@@ -288,7 +288,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
               Icon(
                 Icons.check_circle_rounded,
                 size: 18,
-                color: isHero ? palette.foreground : context.brandPurple,
+                color: isHero ? palette.foreground : context.brandAccent,
               ),
               const SizedBox(width: 6),
               Expanded(

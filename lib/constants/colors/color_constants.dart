@@ -15,7 +15,8 @@ class ColorConstants {
 
   // Accent. Monochrome after tickets.knit.amsterdam: the page's "primary" is a
   // light button with dark text in dark mode, and vice versa; see onAccent*.
-  static const lightPurple = Color(0xFFE5E5E5);
+  // accentDark is the dark-mode accent; light mode uses [lightPrimary].
+  static const accentDark = Color(0xFFE5E5E5);
   static const onAccentDark = Color(0xFF171717);
   static const onAccentLight = Color(0xFFFAFAFA);
   static const lightBlue = Color(0xFF5DADE2);
@@ -41,9 +42,8 @@ class ColorConstants {
   static const lightGrey = Color(0xFFE5E5E5);
   static const lightSoftGrey = Color(0xFFD4D4D4);
   static const lightGraphite = Color(0xFF737373);
-  // Darker variant of the brand purple for light-mode primary / text / buttons.
-  // lightPurple (#917DF0) is only 3.05:1 on white — fails AA for text and for
-  // white-on-purple button fills. lightPrimary is 6.35:1 with white → AA.
+  // Light-mode accent: primary / text / buttons. Near-black: ~17.9:1 on
+  // white, ~17.2:1 under onAccentLight text → AAA.
   static const lightPrimary = Color(0xFF171717);
   // Darker error for light surfaces (amber #EF5E55 is 3.49:1 on white — sub-AA).
   // 5.35:1 on white → AA.
@@ -58,24 +58,20 @@ class ColorConstants {
   }
 }
 
-/// The brand purple, resolved per theme so the whole app shows a single purple
-/// at a time:
-///   * Dark mode → [ColorConstants.lightPurple] (bright #917DF0) — reads fine
-///     on dark surfaces and preserves the brand accent.
-///   * Light mode → [ColorConstants.lightPrimary] (darker #5D4EC0) — meets
-///     WCAG AA contrast (6.35:1 with white) for text and button fills on the
-///     light scaffold, and avoids the visible mismatch between themed widgets
-///     (which already routed through [ColorConstants.lightPrimary]) and
-///     widgets that hardcoded [ColorConstants.lightPurple].
-extension BrandPurple on BuildContext {
-  Color get brandPurple {
+/// The brand accent, resolved per theme. Monochrome: the accent is the
+/// inverse of the surface, so it always contrasts strongly with it.
+///   * Dark mode → [ColorConstants.accentDark] (light grey #E5E5E5).
+///   * Light mode → [ColorConstants.lightPrimary] (near-black #171717), which
+///     themed widgets also route through, so the two never mismatch.
+extension BrandAccent on BuildContext {
+  Color get brandAccent {
     return Theme.of(this).brightness == Brightness.dark
-        ? ColorConstants.lightPurple
+        ? ColorConstants.accentDark
         : ColorConstants.lightPrimary;
   }
 
-  /// Foreground for glyphs and text drawn on [brandPurple].
-  Color get onBrandPurple {
+  /// Foreground for glyphs and text drawn on [brandAccent].
+  Color get onBrandAccent {
     return Theme.of(this).brightness == Brightness.dark
         ? ColorConstants.onAccentDark
         : ColorConstants.onAccentLight;

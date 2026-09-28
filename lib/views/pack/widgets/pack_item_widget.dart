@@ -191,10 +191,10 @@ class _CompletionToggleState extends State<_CompletionToggle> {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _shown ? context.brandPurple : Colors.transparent,
+                    color: _shown ? context.brandAccent : Colors.transparent,
                     border: Border.all(
                       color: _shown
-                          ? context.brandPurple
+                          ? context.brandAccent
                           : Theme.of(
                               context,
                             ).colorScheme.onSurface.withValues(alpha: 0.4),
@@ -207,7 +207,7 @@ class _CompletionToggleState extends State<_CompletionToggle> {
                       ? Icon(
                           Icons.check,
                           size: 16,
-                          color: context.onBrandPurple,
+                          color: context.onBrandAccent,
                         )
                       : null,
                 ),

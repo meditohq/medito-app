@@ -193,7 +193,7 @@ class _AppIconChoice extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    final accent = context.brandPurple;
+    final accent = context.brandAccent;
     const radius = _kPreviewSize * 0.22;
     const ringInset = _ringGap + _ringWidth;
 

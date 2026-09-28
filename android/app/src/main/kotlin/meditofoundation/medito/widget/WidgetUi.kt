@@ -51,7 +51,7 @@ internal data class WidgetPalette(
             foreground = Color(0xFFFFFFFF),
             muted = Color(0xFFA1A1A1), // graphite
             inactive = Color(0xFF333333), // charcoal
-            accent = Color(0xFFE5E5E5), // brandPurple (dark)
+            accent = Color(0xFFE5E5E5), // brandAccent (dark)
             onAccent = Color(0xFF171717), // onAccentDark
         )
 
@@ -60,7 +60,7 @@ internal data class WidgetPalette(
             foreground = Color(0xFF0A0A0A), // lightOnSurface
             muted = Color(0xFF737373), // lightSecondary
             inactive = Color(0xFFE5E5E5), // lightGrey
-            accent = Color(0xFF171717), // brandPurple (light)
+            accent = Color(0xFF171717), // brandAccent (light)
             onAccent = Color(0xFFFAFAFA), // onAccentLight
         )
 

@@ -88,7 +88,7 @@ struct WidgetColors {
         textColor: Color(hex: "FFFFFF"),
         secondaryTextColor: Color(hex: "A1A1A1"), // graphite
         inactiveColor: Color(hex: "333333"), // charcoal
-        accent: Color(hex: "E5E5E5"), // brandPurple (dark)
+        accent: Color(hex: "E5E5E5"), // brandAccent (dark)
         onAccent: Color(hex: "171717") // onAccentDark
     )
 
@@ -97,7 +97,7 @@ struct WidgetColors {
         textColor: Color(hex: "0A0A0A"), // lightOnSurface
         secondaryTextColor: Color(hex: "737373"), // lightSecondary
         inactiveColor: Color(hex: "E5E5E5"), // lightGrey
-        accent: Color(hex: "171717"), // brandPurple (light)
+        accent: Color(hex: "171717"), // brandAccent (light)
         onAccent: Color(hex: "FAFAFA") // onAccentLight
     )
 }

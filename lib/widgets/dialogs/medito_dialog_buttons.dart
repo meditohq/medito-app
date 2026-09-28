@@ -10,7 +10,7 @@ const TextStyle _buttonTextStyle = TextStyle(
   fontWeight: FontWeight.w600,
 );
 
-/// Filled primary action used in a Medito dialog. Defaults to the brand purple
+/// Filled primary action used in a Medito dialog. Defaults to the brand accent
 /// but can be overridden (e.g. for destructive flows). Use
 /// [MeditoDialogDestructiveButton] for the standard destructive styling.
 class MeditoDialogPrimaryButton extends StatelessWidget {
@@ -31,8 +31,8 @@ class MeditoDialogPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = backgroundColor ?? context.brandPurple;
-    final fg = foregroundColor ?? context.onBrandPurple;
+    final bg = backgroundColor ?? context.brandAccent;
+    final fg = foregroundColor ?? context.onBrandAccent;
 
     return SizedBox(
       height: _buttonHeight,

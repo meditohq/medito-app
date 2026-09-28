@@ -171,7 +171,7 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
     bool isFavorite,
   ) {
     final favouriteColour = isFavorite
-        ? context.brandPurple
+        ? context.brandAccent
         : Theme.of(context).colorScheme.onSurface;
 
     final l10n = AppLocalizations.of(context)!;

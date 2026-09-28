@@ -187,7 +187,7 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
     bool isDailyMeditation,
   ) {
     final colour = isFavorite
-        ? context.brandPurple
+        ? context.brandAccent
         : Theme.of(context).colorScheme.onSurface;
 
     final l10n = AppLocalizations.of(context)!;

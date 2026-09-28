@@ -271,7 +271,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
 
     final bannerColor = item.bannerColor != null
         ? parseColor(item.bannerColor!)
-        : context.brandPurple;
+        : context.brandAccent;
 
     return Stack(
       fit: StackFit.expand,

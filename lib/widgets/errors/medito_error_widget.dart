@@ -122,7 +122,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                       )!.downloads.toLowerCase(),
                       style: textStyle?.copyWith(
                         decoration: TextDecoration.underline,
-                        color: ColorConstants.lightPurple,
+                        color: ColorConstants.accentDark,
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () => Navigator.of(context).push(
@@ -183,7 +183,7 @@ class MeditoErrorWidget extends ConsumerWidget {
                         }
                       },
                       isLoading: isLoading,
-                      bgColor: ColorConstants.lightPurple,
+                      bgColor: ColorConstants.accentDark,
                       textColor: ColorConstants.onyx,
                     ),
                   ),
@@ -216,8 +216,8 @@ class MeditoErrorWidget extends ConsumerWidget {
                         ], context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: context.brandPurple,
-                        foregroundColor: context.onBrandPurple,
+                        backgroundColor: context.brandAccent,
+                        foregroundColor: context.onBrandAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -249,8 +249,8 @@ class MeditoErrorWidget extends ConsumerWidget {
                   AppLocalizations.of(context)!.reportError,
                   style: TextStyle(
                     color: isCoolingDown
-                        ? ColorConstants.lightPurple.withOpacityValue(0.5)
-                        : ColorConstants.lightPurple,
+                        ? ColorConstants.accentDark.withOpacityValue(0.5)
+                        : ColorConstants.accentDark,
                   ),
                 ),
               ),

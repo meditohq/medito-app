@@ -27,7 +27,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     ),
     colorScheme: isDark
         ? const ColorScheme.dark(
-            primary: ColorConstants.lightPurple,
+            primary: ColorConstants.accentDark,
             onPrimary: ColorConstants.onAccentDark,
             secondary: ColorConstants.white,
             onSecondary: ColorConstants.black,
@@ -104,12 +104,12 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
       ),
     ),
     // Enhanced button themes.
-    // Light mode uses lightPrimary (#5D4EC0, 6.35:1 on white — AA) for both
-    // fills and text; dark mode keeps the brand lightPurple on dark surfaces.
+    // Light mode uses lightPrimary (#171717) for both fills and text; dark mode
+    // uses accentDark (#E5E5E5) on dark surfaces.
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: isDark
-            ? ColorConstants.lightPurple
+            ? ColorConstants.accentDark
             : ColorConstants.lightPrimary,
         foregroundColor: isDark
             ? ColorConstants.onAccentDark
@@ -127,11 +127,11 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
       style: OutlinedButton.styleFrom(
         backgroundColor: Colors.transparent,
         foregroundColor: isDark
-            ? ColorConstants.lightPurple
+            ? ColorConstants.accentDark
             : ColorConstants.lightPrimary,
         side: BorderSide(
           color: isDark
-              ? ColorConstants.lightPurple
+              ? ColorConstants.accentDark
               : ColorConstants.lightPrimary,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -145,7 +145,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: isDark
-            ? ColorConstants.lightPurple
+            ? ColorConstants.accentDark
             : ColorConstants.lightPrimary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(
@@ -204,9 +204,9 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           // Light mode: use solid lightPrimary for a 3:1+ track against the
-          // white thumb. Dark mode keeps the semi-transparent brand purple.
+          // white thumb. Dark mode keeps the semi-transparent brand accent.
           return isDark
-              ? ColorConstants.lightPurple.withValues(alpha: 0.3)
+              ? ColorConstants.accentDark.withValues(alpha: 0.3)
               : ColorConstants.lightPrimary;
         }
         return isDark
@@ -216,7 +216,7 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
     ),
     // Progress indicator theme
     progressIndicatorTheme: ProgressIndicatorThemeData(
-      color: isDark ? ColorConstants.lightPurple : ColorConstants.lightPrimary,
+      color: isDark ? ColorConstants.accentDark : ColorConstants.lightPrimary,
       linearTrackColor: isDark
           ? ColorConstants.greyIsTheNewGrey
           : ColorConstants.lightGrey,

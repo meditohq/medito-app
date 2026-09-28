@@ -368,10 +368,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   }) {
     // The backend's cardTextColor was tuned for the old purple card; the card
     // colour is theme-driven now, so the foreground must follow the theme too.
-    final footerColor = context.onBrandPurple.withValues(alpha: 0.85);
+    final footerColor = context.onBrandAccent.withValues(alpha: 0.85);
 
     return HomeGradientBorder(
-      backgroundColor: context.brandPurple,
+      backgroundColor: context.brandAccent,
       borderRadius: 14,
       borderWidth: 0.5,
       child: Padding(
@@ -395,7 +395,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                             fontSize: 22,
                             fontWeight: FontWeight.w400,
                             height: 1.2,
-                            color: context.onBrandPurple,
+                            color: context.onBrandAccent,
                           ),
                     ),
                   ),
@@ -405,7 +405,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                   icon: MeditoIcon(
                     assetName: MeditoIcons.help,
                     size: 20,
-                    color: context.onBrandPurple,
+                    color: context.onBrandAccent,
                   ),
                   onPressed: () => _showDonationInfoDialog(context),
                   padding: EdgeInsets.zero,
@@ -425,7 +425,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 height: 1.4,
-                color: context.onBrandPurple.withValues(alpha: 0.9),
+                color: context.onBrandAccent.withValues(alpha: 0.9),
               ),
             ),
             const SizedBox(height: 20),
@@ -616,8 +616,8 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: context.onBrandPurple,
-                foregroundColor: context.brandPurple,
+                backgroundColor: context.onBrandAccent,
+                foregroundColor: context.brandAccent,
                 padding: const EdgeInsets.symmetric(vertical: 8),
               ),
               child: Text(
@@ -625,7 +625,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: context.brandPurple,
+                  color: context.brandAccent,
                 ),
               ),
             ),
@@ -654,8 +654,8 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: context.onBrandPurple,
-                foregroundColor: context.brandPurple,
+                backgroundColor: context.onBrandAccent,
+                foregroundColor: context.brandAccent,
                 padding: const EdgeInsets.symmetric(vertical: 8),
               ),
               child: Text(

@@ -361,7 +361,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 fontSize: 40,
                 fontWeight: FontWeight.w400,
                 height: 1,
-                color: context.brandPurple,
+                color: context.brandAccent,
               ),
               textAlign: TextAlign.left,
             ),
@@ -502,7 +502,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   color: isFreeze
                       ? ColorConstants.graphite
                       : isMeditated
-                      ? context.brandPurple
+                      ? context.brandAccent
                       : ColorConstants.moon,
                 ),
               ),
@@ -538,7 +538,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                       MeditoIcon(
                         assetName: MeditoIcons.checkCircleSolid,
                         size: 32,
-                        color: context.brandPurple,
+                        color: context.brandAccent,
                       )
                     else
                       _buildCircle(32, ColorConstants.moon),

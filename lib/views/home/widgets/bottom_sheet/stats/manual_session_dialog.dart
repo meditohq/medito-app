@@ -351,7 +351,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: context.brandPurple.withOpacityValue(0.1),
+              color: context.brandAccent.withOpacityValue(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -579,7 +579,7 @@ class _PreviewRow extends StatelessWidget {
             fontFamily: googleSans,
             fontWeight: FontWeight.w700,
             color: emphasize
-                ? context.brandPurple
+                ? context.brandAccent
                 : theme.colorScheme.onSurface,
           ),
         ),
