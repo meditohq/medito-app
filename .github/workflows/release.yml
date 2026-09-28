@@ -335,13 +335,16 @@ jobs:
       - name: Extract OLD seed flow from previous tag
         if: steps.prev.outputs.sha != ''
         run: |
-          git show "${{ steps.prev.outputs.sha }}:.maestro/smoke.yaml" \
-            > /tmp/old-seed.yaml || echo "Previous tag had no smoke.yaml"
+          # Extract the whole .maestro/ dir, not just smoke.yaml: the seed
+          # flow calls subflows (runFlow file:) resolved relative to itself.
+          mkdir -p /tmp/old-maestro
+          git archive "${{ steps.prev.outputs.sha }}" .maestro \
+            | tar -x -C /tmp/old-maestro || echo "Previous tag had no .maestro/"
 
       - name: Skip if no baseline available
         id: gate
         run: |
-          if [ ! -f /tmp/old/app-prod-release.apk ] || [ ! -s /tmp/old-seed.yaml ]; then
+          if [ ! -f /tmp/old/app-prod-release.apk ] || [ ! -s /tmp/old-maestro/.maestro/smoke.yaml ]; then
             echo "No usable baseline (APK or seed flow missing) — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
@@ -385,7 +388,7 @@ jobs:
             adb install /tmp/old/app-prod-release.apk
             adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
-            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-seed.yaml --no-ansi --debug-output /tmp/maestro-debug/seed || (echo "Seed failed once (usually the donation webview not loading in time); clearing app data and retrying" && adb shell pm clear meditofoundation.medito && adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS && $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-seed.yaml --no-ansi --debug-output /tmp/maestro-debug/seed-retry)
+            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-maestro/.maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug/seed || (echo "Seed failed once (usually the donation webview not loading in time); clearing app data and retrying" && adb shell pm clear meditofoundation.medito && adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS && $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-maestro/.maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug/seed-retry)
 
       - name: Install new version and verify on a fresh boot
         if: steps.gate.outputs.run == 'true'
@@ -809,13 +812,16 @@ jobs:
       - name: Extract OLD seed flow from previous tag
         if: steps.prev.outputs.sha != ''
         run: |
-          git show "${{ steps.prev.outputs.sha }}:.maestro/smoke.yaml" \
-            > /tmp/old-seed.yaml || echo "Previous tag had no smoke.yaml"
+          # Extract the whole .maestro/ dir, not just smoke.yaml: the seed
+          # flow calls subflows (runFlow file:) resolved relative to itself.
+          mkdir -p /tmp/old-maestro
+          git archive "${{ steps.prev.outputs.sha }}" .maestro \
+            | tar -x -C /tmp/old-maestro || echo "Previous tag had no .maestro/"
 
       - name: Skip if no baseline available
         id: gate
         run: |
-          if [ ! -f /tmp/old/medito-sim.tar ] || [ ! -s /tmp/old-seed.yaml ]; then
+          if [ ! -f /tmp/old/medito-sim.tar ] || [ ! -s /tmp/old-maestro/.maestro/smoke.yaml ]; then
             echo "No usable baseline (.app or seed flow missing) — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
@@ -858,7 +864,7 @@ jobs:
           # 2. Seed state using the OLD tag's smoke.yaml — matches that
           #    binary's onboarding UI even if HEAD has renamed strings.
           $HOME/.maestro/bin/maestro test \
-            -e APP_ID=org.meditofoundation /tmp/old-seed.yaml \
+            -e APP_ID=org.meditofoundation /tmp/old-maestro/.maestro/smoke.yaml \
             --no-ansi --debug-output /tmp/maestro-debug/seed
 
           # 3. In-place upgrade. simctl install over an existing bundle ID
