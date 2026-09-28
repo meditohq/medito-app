@@ -1,0 +1,104 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
+}
+
+// Same keystore.properties as :app — the watch APK must share the phone's
+// applicationId and signing key or the Wearable Data Layer won't connect them.
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} else {
+    throw new FileNotFoundException("keystore.properties file not found. Please create it from keystore.properties.example")
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader -> localProperties.load(reader) }
+}
+def flutterVersionCode = (localProperties.getProperty('flutter.versionCode') ?: '1').toInteger()
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
+
+android {
+    namespace "meditofoundation.medito.wear"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId keystoreProperties['appId']
+        minSdk 30 // Wear OS 3+
+        targetSdk 36
+        // Play needs a versionCode unique across the phone and watch APKs.
+        versionCode 1_000_000_000 + flutterVersionCode
+        versionName flutterVersionName
+    }
+
+    signingConfigs {
+        release {
+            storeFile rootProject.file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // Mirrors :app so each flavor pairs with the matching phone app.
+    flavorDimensions "default"
+    productFlavors {
+        dev {
+            dimension "default"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+        }
+        prod {
+            dimension "default"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        compose true
+        buildConfig true
+    }
+}
+
+// Pinned to releases that build with compileSdk 36 / AGP 8.11 (the rest of
+// the project); newer AndroidX needs compileSdk 37 + AGP 9.1.
+dependencies {
+    def wearCompose = '1.5.6'
+    implementation "androidx.wear.compose:compose-material3:$wearCompose"
+    implementation "androidx.wear.compose:compose-foundation:$wearCompose"
+    implementation "androidx.wear.compose:compose-navigation:$wearCompose"
+
+    implementation 'androidx.activity:activity-compose:1.11.0'
+    implementation 'androidx.core:core-ktx:1.15.0'
+
+    implementation 'com.google.android.gms:play-services-wearable:19.0.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2'
+
+    def media3 = '1.8.0'
+    implementation "androidx.media3:media3-exoplayer:$media3"
+    implementation "androidx.media3:media3-session:$media3"
+
+    implementation 'io.coil-kt.coil3:coil-compose:3.3.0'
+    implementation 'io.coil-kt.coil3:coil-network-okhttp:3.3.0'
+}

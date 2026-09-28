@@ -29,15 +29,16 @@ import 'package:medito/utils/track_variant_selector.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 
-/// Keeps the Apple Watch app in sync: pushes Up Next, Your Daily, favourites
-/// and the consistency score / streak (each track pre-resolved to the user's
-/// guide + duration so the watch can stream it directly) and records sessions
-/// finished on the watch.
+/// Keeps the Apple Watch / Wear OS app in sync: pushes Continue, Your Daily,
+/// favourites and the consistency score / streak (each track pre-resolved to
+/// the user's guide + duration so the watch can stream it directly) and
+/// records sessions finished on the watch.
 ///
-/// Watched from HomeView, so it only runs while signed in; a no-op off iOS or
-/// with no paired watch (the native side drops the push).
+/// Watched from HomeView, so it only runs while signed in; with no watch the
+/// native side drops the push (iOS) or just stores it (Android Data Layer).
 final watchSyncProvider = Provider.autoDispose<void>((ref) {
-  if (!Platform.isIOS) return;
+  // iOS: WatchSessionManager.swift; Android (Wear OS): WatchSyncBridge.kt.
+  if (!Platform.isIOS && !Platform.isAndroid) return;
   final prefs = ref.read(sharedPreferencesProvider);
   final sync = _WatchSync(ref, prefs);
   // Home is rebuilt after every session (end screen) but only torn down for

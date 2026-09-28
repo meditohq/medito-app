@@ -81,6 +81,9 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         healthConnectBridge.attachLauncher(healthConnectPermissionLauncher)
         MeditoHealthConnectManager.setUp(flutterEngine.dartExecutor.binaryMessenger, healthConnectBridge)
 
+        // Wear OS companion: same `medito.app/watch` channel as the iPhone.
+        WatchSyncBridge.register(flutterEngine.dartExecutor.binaryMessenger, this)
+
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
         checkAndSendCompletionData()
         
