@@ -11,6 +11,10 @@ on:
         description: 'Android – Production track'
         type: boolean
         default: true
+      wear_os:
+        description: 'Also ship the Wear OS app to the matching Wear track(s) (wear:internal / wear:production). Needs the Wear OS form factor enabled in Play Console.'
+        type: boolean
+        default: false
       ios_testflight:
         description: 'iOS – TestFlight'
         type: boolean
@@ -195,6 +199,25 @@ jobs:
           # 90 days so the next release's upgrade test can pull the
           # previously-shipped APK as its "old version" baseline.
           retention-days: 90
+
+      # The Wear OS companion (android/wear) is its own APK: same package and
+      # signing key as the phone app, versionCode 1_000_000_000 + the phone's.
+      # Runs after `flutter build apk`, which writes the flutter.versionCode it
+      # reads from android/local.properties.
+      - name: Build Wear OS APK
+        if: inputs.wear_os
+        working-directory: android
+        run: |
+          ./gradlew :wear:assembleProdRelease --no-daemon
+          ls -lh ../build/wear/outputs/apk/prod/release/wear-prod-release.apk
+
+      - name: Upload Wear OS APK artifact
+        if: inputs.wear_os
+        uses: actions/upload-artifact@v4
+        with:
+          name: wear-prod-release
+          path: build/wear/outputs/apk/prod/release/wear-prod-release.apk
+          retention-days: 30
 
   android-smoke-test:
     name: Android – Smoke Test
@@ -443,6 +466,13 @@ jobs:
           name: app-prod-release
           path: build/app/outputs/apk/prod/release/
 
+      - name: Download Wear OS APK
+        if: inputs.wear_os
+        uses: actions/download-artifact@v4
+        with:
+          name: wear-prod-release
+          path: build/wear/outputs/apk/prod/release/
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
@@ -490,6 +520,28 @@ jobs:
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
                 track:"internal"
             fi
+          fi
+
+      # Same track choice as the phone app, on the Wear OS form-factor tracks.
+      - name: Upload Wear OS app to Play Store
+        if: inputs.wear_os
+        working-directory: android
+        env:
+          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
+        run: |
+          APK="../build/wear/outputs/apk/prod/release/wear-prod-release.apk"
+          BUILD=$(grep '^version:' ../pubspec.yaml | sed 's/.*+//')
+          CODE=$((1000000000 + BUILD))
+          if [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_production }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:internal" promote_to:"wear:production" \
+              submit_review:"${{ inputs.submit_for_review }}"
+          elif [ "${{ inputs.android_production }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:production" submit_review:"${{ inputs.submit_for_review }}"
+          elif [ "${{ inputs.android_internal }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:internal"
           fi
 
   ios-smoke-test:

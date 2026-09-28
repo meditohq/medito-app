@@ -124,6 +124,7 @@ git push origin <new-version>
 The `Build & Deploy` workflow (`.github/workflows/release.yml`) is **`workflow_dispatch`-only** — pushing the tag does not auto-deploy. After the tag is pushed, ask the user which tracks to ship to using `AskUserQuestion`:
 
 - **Android**: `internal`, `production`, `both`, or `none`
+- **Wear OS**: whether to also ship the Wear OS app (only when Android isn't `none`). It goes to the Wear track matching the Android choice (`wear:internal` / `wear:production`), and needs the Wear OS form factor enabled in Play Console.
 - **iOS**: `testflight`, `appstore`, `both`, or `none`
 
 Then trigger the workflow against the new tag with the chosen inputs:
@@ -133,6 +134,7 @@ gh workflow run release.yml \
   --ref <new-version> \
   -f android_internal=<true|false> \
   -f android_production=<true|false> \
+  -f wear_os=<true|false> \
   -f ios_testflight=<true|false> \
   -f ios_appstore=<true|false> \
   -f match_readonly=true

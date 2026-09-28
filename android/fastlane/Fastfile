@@ -126,7 +126,10 @@ platform :android do
       # invoked. Guard the read so a missing pubspec degrades to default.txt
       # rather than crashing the whole deploy.
       pubspec = File.expand_path('../../pubspec.yaml', __dir__)
-      version_code = File.exist?(pubspec) ? File.read(pubspec)[/^version:\s*\S+\+(\d+)/, 1] : nil
+      # The Wear OS APK has its own code (1_000_000_000 + the phone's, see
+      # android/wear/build.gradle), passed in as version_code.
+      version_code = options[:version_code]&.to_s ||
+                     (File.exist?(pubspec) ? File.read(pubspec)[/^version:\s*\S+\+(\d+)/, 1] : nil)
       ['en-US', 'en-GB', 'es-ES'].each do |locale|
         dir = File.expand_path("metadata/android/#{locale}/changelogs", __dir__)
         FileUtils.mkdir_p(dir)
@@ -139,6 +142,8 @@ platform :android do
     json_key_path = options[:json_key]
 
     final_track = promote_to || track
+    # Form-factor tracks are "<form factor>:<track>", e.g. "wear:production".
+    production = final_track == 'production' || final_track.end_with?(':production')
     # Production uploads default to a DRAFT release (someone rolls it out by
     # hand, which is what sends it to Play review). With submit_review:true the
     # release is 'completed' instead: it enters Play review immediately and
@@ -152,7 +157,7 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
       skip_upload_changelogs: notes.empty?,
-      release_status: final_track == 'production' ? production_status : 'completed',
+      release_status: production ? production_status : 'completed',
     }
     upload_params[:track_promote_to] = promote_to if promote_to
 
