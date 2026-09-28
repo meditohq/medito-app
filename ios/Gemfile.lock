@@ -131,7 +131,7 @@ GEM
     faraday_middleware (1.2.1)
       faraday (~> 1.0)
     fastimage (2.4.1)
-    fastlane (2.226.0)
+    fastlane (2.228.0)
       CFPropertyList (>= 2.3, < 4.0.0)
       addressable (>= 2.8, < 3.0.0)
       artifactory (~> 3.0)
@@ -171,7 +171,7 @@ GEM
       tty-spinner (>= 0.8.0, < 1.0.0)
       word_wrap (~> 1.0.0)
       xcodeproj (>= 1.13.0, < 2.0.0)
-      xcpretty (~> 0.4.0)
+      xcpretty (~> 0.4.1)
       xcpretty-travis-formatter (>= 0.0.3, < 2.0.0)
     fastlane-sirp (1.1.0)
     ffi (1.17.2)
@@ -314,7 +314,7 @@ PLATFORMS
 
 DEPENDENCIES
   cocoapods (~> 1.16.2)
-  fastlane (= 2.226.0)
+  fastlane (= 2.228.0)
   xcodeproj (= 1.27.0)
 
 BUNDLED WITH
