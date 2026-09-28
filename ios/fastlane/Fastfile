@@ -201,7 +201,8 @@ end
 #
 # How signing works:
 #   1. fetch_profiles() runs `match`, which downloads the appstore profiles for
-#      BOTH bundle IDs (the app and the widget extension — see fetch_profiles)
+#      every bundle ID (the app, the widget extension and the Apple Watch app —
+#      see fetch_profiles)
 #      and exports each profile name as sigh_<bundle_id>_appstore_profile-name.
 #   2. `flutter build ios --no-codesign` compiles the Dart/plugin side without
 #      touching signing.
@@ -213,13 +214,13 @@ end
 #      upload_to_testflight/upload_to_app_store finds the ipa with no `ipa:`
 #      param, and the dSYM upload below finds the archive.
 def build_release
-  widget_bundle_id = fetch_profiles()
+  widget_bundle_id, watch_bundle_id = fetch_profiles()
 
   Dir.chdir("..") do
     sh("flutter build ios --release #{DART_DEFINES} --no-codesign")
   end
 
-  apply_code_signing(widget_bundle_id)
+  apply_code_signing(widget_bundle_id, watch_bundle_id)
 
   build_app(
     workspace: "Runner.xcworkspace",
@@ -229,7 +230,8 @@ def build_release
     export_options: {
       provisioningProfiles: {
         ENV["DEVELOPER_APP_IDENTIFIER"] => ENV["PROVISIONING_PROFILE_SPECIFIER"],
-        widget_bundle_id => ENV["sigh_#{widget_bundle_id}_appstore_profile-name"]
+        widget_bundle_id => ENV["sigh_#{widget_bundle_id}_appstore_profile-name"],
+        watch_bundle_id => ENV["sigh_#{watch_bundle_id}_appstore_profile-name"]
       }
     }
   )
@@ -331,15 +333,17 @@ def upload_dsyms_to_crashlytics
   )
 end
 
-# Downloads provisioning profiles for the main app and widget extension.
-# Returns the widget bundle ID so callers can reference the widget profile.
+# Downloads provisioning profiles for the main app, the widget extension and
+# the Apple Watch app (embedded in Runner as Watch/MeditoWatch.app). Returns the
+# widget and watch bundle IDs so callers can reference their profiles.
 def fetch_profiles
   widget_bundle_id = "#{ENV["DEVELOPER_APP_IDENTIFIER"]}.widget"
+  watch_bundle_id = "#{ENV["DEVELOPER_APP_IDENTIFIER"]}.watchkitapp"
 
   match(
     type: 'appstore',
     readonly: match_readonly?,
-    app_identifier: [ENV["DEVELOPER_APP_IDENTIFIER"], widget_bundle_id],
+    app_identifier: [ENV["DEVELOPER_APP_IDENTIFIER"], widget_bundle_id, watch_bundle_id],
     # SSH with a write-enabled deploy key on the certs repo. The previous
     # HTTPS + MATCH_GIT_TOKEN auth could read but not write, so every run
     # re-fetched the widget profile from the portal and then failed to store
@@ -351,12 +355,13 @@ def fetch_profiles
     keychain_password: ENV["TEMP_KEYCHAIN_PASSWORD"]
   )
 
-  widget_bundle_id
+  [widget_bundle_id, watch_bundle_id]
 end
 
 # Applies manual code signing settings to each target separately so that
-# the MeditoWidgetExtension gets its own profile rather than the main app's.
-def apply_code_signing(widget_bundle_id)
+# the MeditoWidgetExtension and MeditoWatch get their own profiles rather than
+# the main app's (MeditoWatch is on automatic signing for local development).
+def apply_code_signing(widget_bundle_id, watch_bundle_id)
   shared = {
     use_automatic_signing: false,
     path: "Runner.xcodeproj",
@@ -374,6 +379,12 @@ def apply_code_signing(widget_bundle_id)
     **shared,
     targets: ["MeditoWidgetExtension"],
     profile_name: ENV["sigh_#{widget_bundle_id}_appstore_profile-name"]
+  )
+
+  update_code_signing_settings(
+    **shared,
+    targets: ["MeditoWatch"],
+    profile_name: ENV["sigh_#{watch_bundle_id}_appstore_profile-name"]
   )
 end
 
