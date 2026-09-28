@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2609.28.0
+- New Apple Watch app: continue your pack, or play your Daily or a favourite, right from your wrist (with headphones). Sessions count towards your stats and streak.
+- Refreshed look for the home screen widgets
+- Fixed the app sometimes freezing on Android when home screen widgets update
+- Smoother animation when dismissing an announcement on Home
+
 2609.27.0
 - Start or continue a pack with one tap from its page, which also puts it on Home
 - Fixed the keyboard closing after the first letter when typing your email
