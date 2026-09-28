@@ -111,7 +111,7 @@ class SoftAskCard extends StatelessWidget {
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: context.onBrandPurple,
+                            color: context.onBrandAccent,
                           ),
                         ),
                       ),

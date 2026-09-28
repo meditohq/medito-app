@@ -542,7 +542,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         Text(
           eyebrow.toUpperCase(),
           style: TextStyle(
-            color: context.brandPurple,
+            color: context.brandAccent,
             fontSize: 14,
             fontWeight: FontWeight.w500,
             letterSpacing: 1.3,
@@ -678,7 +678,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }) {
     final isSelected =
         amount == _selectedAmount && _customAmountController.text.isEmpty;
-    final accent = context.brandPurple;
+    final accent = context.brandAccent;
     final label = formatCurrencyAmount(amount, widget.config.currencyCode);
 
     return Semantics(
@@ -877,18 +877,18 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             style: hasApplePay
                 ? ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
-                    foregroundColor: context.brandPurple,
+                    foregroundColor: context.brandAccent,
                     elevation: 0,
                     side: BorderSide(
-                      color: context.brandPurple.withValues(alpha: 0.6),
+                      color: context.brandAccent.withValues(alpha: 0.6),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   )
                 : ElevatedButton.styleFrom(
-                    backgroundColor: context.brandPurple,
-                    foregroundColor: context.onBrandPurple,
+                    backgroundColor: context.brandAccent,
+                    foregroundColor: context.onBrandAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -900,8 +900,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
                       color: hasApplePay
-                          ? context.brandPurple
-                          : context.onBrandPurple,
+                          ? context.brandAccent
+                          : context.onBrandAccent,
                     ),
                   )
                 : Text(

@@ -345,8 +345,8 @@ class AccountDeletedScreen extends ConsumerWidget {
                     height: 48,
                     child: LoadingButtonWidget(
                       btnText: l10n.continueText,
-                      bgColor: context.brandPurple,
-                      textColor: context.onBrandPurple,
+                      bgColor: context.brandAccent,
+                      textColor: context.onBrandAccent,
                       borderRadius: 12,
                       onPressed: () => _done(context, ref),
                     ),

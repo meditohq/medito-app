@@ -306,7 +306,7 @@ class _PackViewState extends ConsumerState<PackView>
           onPressed: _markingAll ? null : () => _markAll(!allComplete),
           style: TextButton.styleFrom(
             minimumSize: const Size.fromHeight(48),
-            foregroundColor: context.brandPurple,
+            foregroundColor: context.brandAccent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: const BorderSide(color: ColorConstants.charcoal),
@@ -318,7 +318,7 @@ class _PackViewState extends ConsumerState<PackView>
                   height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: context.brandPurple,
+                    color: context.brandAccent,
                   ),
                 )
               : Icon(allComplete ? Icons.remove_done : Icons.done_all),

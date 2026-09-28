@@ -37,7 +37,7 @@ class VolumeSliderWidget extends ConsumerWidget {
         min: 0,
         max: 100,
         divisions: 100,
-        activeColor: context.brandPurple,
+        activeColor: context.brandAccent,
         inactiveColor: ColorConstants.greyIsTheNewGrey,
         onChanged: (double newValue) {
           ref

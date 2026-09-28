@@ -77,7 +77,7 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                             child: ElevatedButton(
                               onPressed: onPressed,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorConstants.lightPurple,
+                                backgroundColor: ColorConstants.accentDark,
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 8,

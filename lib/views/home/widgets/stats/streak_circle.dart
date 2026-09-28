@@ -211,7 +211,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                             ).colorScheme.onSurface.withOpacityValue(0.2),
                             valueColor: AlwaysStoppedAnimation<Color>(
                               isStreakDoneToday
-                                  ? context.brandPurple
+                                  ? context.brandAccent
                                   : Theme.of(context).colorScheme.onSurface,
                             ),
                             strokeWidth: 2,
@@ -231,7 +231,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                             MeditoIcon(
                               assetName: MeditoIcons.fire,
                               color: isStreakDoneToday
-                                  ? context.brandPurple
+                                  ? context.brandAccent
                                   : Theme.of(context).colorScheme.onSurface,
                               size: StreakCircleConstants.innerIconSize,
                             ),
@@ -268,7 +268,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
     if (!active) return child;
     return StreakRing(
       animation: _controller.animationController,
-      color: context.brandPurple,
+      color: context.brandAccent,
       strokeWidth: StreakCircleConstants.ringWidth,
       child: child,
     );
@@ -329,7 +329,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                         : MeditoIcons.sun,
                     size: StreakCircleConstants.iconSize,
                     color: isStreakDoneToday
-                        ? context.brandPurple
+                        ? context.brandAccent
                         : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),

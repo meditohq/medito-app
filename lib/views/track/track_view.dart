@@ -225,7 +225,7 @@ class _TrackViewState extends ConsumerState<TrackView>
     // In dark mode a white fill pops against the ebony scaffold (~18:1).
     // In light mode the same white fill sits on #F8F9FA at ~1.07:1 and the
     // button disappears into the page — so switch to the themed primary
-    // (WCAG-AA dark purple) with a white icon for light mode.
+    // (near-black accent) with a white icon for light mode.
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 56,

@@ -19,13 +19,13 @@ class PackCompleteBadge extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: context.brandPurple,
+            color: context.brandAccent,
           ),
           // Accent's own foreground: the accent is near-white in dark mode.
           child: Icon(
             Icons.check,
             size: size * 2 / 3,
-            color: context.onBrandPurple,
+            color: context.onBrandAccent,
           ),
         ),
       ),

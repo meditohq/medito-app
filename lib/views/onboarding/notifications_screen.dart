@@ -583,7 +583,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: ColorConstants.lightPurple,
+              color: ColorConstants.accentDark,
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// The app's flat card surface: a solid fill with a 0.5px hairline tinted
-/// from the fill itself, so it works on the card colour, on brand purple
+/// from the fill itself, so it works on the card colour, on the brand accent
 /// (donation card) and on images alike.
 ///
 /// The name predates the flat look — this used to paint a vertical
