@@ -17,6 +17,7 @@ import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
+import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/streak_circle_display_provider.dart';
@@ -56,6 +57,7 @@ final watchSyncProvider = Provider.autoDispose<void>((ref) {
   ref.listen(guideNamePreferenceProvider, (_, _) => sync.schedule());
   ref.listen(durationPreferenceProvider, (_, _) => sync.schedule());
   ref.listen(streakCircleDisplayProvider, (_, _) => sync.schedule());
+  ref.listen(zenModeProvider, (_, _) => sync.schedule());
 
   sync.drainPendingSessions();
 });
@@ -143,7 +145,9 @@ class _WatchSync {
       }
       context['favorites'] = favoriteTracks;
 
-      if (stats != null) {
+      // Zen mode hides streak, stats and consistency "everywhere in the app";
+      // the watch included. Progress is still recorded either way.
+      if (stats != null && !_ref.read(zenModeProvider)) {
         context['streak'] = stats.streakCurrent;
         context['consistency'] = (stats.consistencyScore * 100).round();
         // Same rule as the Home stat circle: consistency score unless the

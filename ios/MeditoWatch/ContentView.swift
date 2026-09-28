@@ -11,42 +11,49 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            List {
-                if let upNext = store.upNext {
-                    NavigationLink(value: Route.player(upNext.track)) {
-                        // Stat pill top right over the cover, like the phone hero.
-                        UpNextCard(upNext: upNext, stat: stat?.onImage())
-                    }
-                    .buttonStyle(.plain)
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(rowInsets)
-                } else if let stat {
-                    stat
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(rowInsets)
-                }
-
-                if store.hasSynced {
-                    // Icon tiles, like the phone's Home shortcuts.
-                    HStack(spacing: 8) {
-                        if let daily = store.daily {
-                            ShortcutTile(title: "Daily", systemImage: "sun.max") {
-                                path.append(.player(daily))
+            // A ScrollView rather than a List so the cover can run up under
+            // the clock, full-bleed like the phone's Home hero.
+            GeometryReader { geo in
+                let topInset = geo.safeAreaInsets.top
+                ScrollView {
+                    VStack(spacing: 8) {
+                        if let upNext = store.upNext {
+                            NavigationLink(value: Route.player(upNext.track)) {
+                                // Stat pill top right over the cover, like the phone hero.
+                                UpNextCard(upNext: upNext, stat: stat?.onImage(), topInset: topInset)
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            Color.clear.frame(height: topInset)
+                            if let stat {
+                                stat
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 4)
                             }
                         }
-                        ShortcutTile(title: "Favorites", systemImage: "star") {
-                            path.append(.favorites)
+
+                        if store.hasSynced {
+                            // Icon tiles, like the phone's Home shortcuts.
+                            HStack(spacing: 8) {
+                                if let daily = store.daily {
+                                    ShortcutTile(title: "Daily", systemImage: "sun.max") {
+                                        path.append(.player(daily))
+                                    }
+                                }
+                                ShortcutTile(title: "Favorites", systemImage: "star") {
+                                    path.append(.favorites)
+                                }
+                            }
+                            .padding(.horizontal, 4)
+                        } else {
+                            EmptyStateRow()
                         }
                     }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(rowInsets)
-                } else {
-                    EmptyStateRow()
-                        .listRowBackground(Color.clear)
+                    .padding(.bottom, 8)
                 }
+                .ignoresSafeArea(edges: .top)
             }
-            .navigationTitle("Medito")
+            .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .player(let track): PlayerScreen(track: track)
@@ -60,9 +67,6 @@ struct ContentView: View {
             if !synced { path.removeAll() }
         }
     }
-
-    /// Full-width custom rows, spaced evenly apart.
-    private let rowInsets = EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0)
 
     /// Consistency score, unless the phone's Home would show the streak.
     private var stat: StatPill? {
@@ -99,8 +103,11 @@ private struct StatPill: View {
                 .frame(width: isOnImage ? 12 : 14, height: isOnImage ? 12 : 14)
                 Text("\(percent)%")
             case .streak(let days):
-                Image(systemName: "flame")
-                    .font(.system(size: isOnImage ? 11 : 13, weight: .semibold))
+                // The phone's own flame (assets/images/fire-flame.svg).
+                Image("Flame")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: isOnImage ? 14 : 16, height: isOnImage ? 14 : 16)
                 Text("\(days)")
             }
         }
@@ -152,12 +159,14 @@ private struct ShortcutTile: View {
 private struct UpNextCard: View {
     let upNext: UpNext
     var stat: StatPill?
+    /// Height of the clock area the cover runs up under.
+    var topInset: CGFloat = 0
 
     var body: some View {
         // The cover is layered on a fixed-size base (not a ZStack child), so
         // its fill-scaling can't grow the card and push the text off it.
         Color.clear
-            .frame(height: 124)
+            .frame(height: 124 + topInset)
             .overlay { CoverImage(url: upNext.coverUrl) }
             .overlay {
                 // Dark enough under the eyebrow to read on busy cover art.
@@ -171,9 +180,24 @@ private struct UpNextCard: View {
                     endPoint: .bottom
                 )
             }
+            .overlay {
+                // A light shade at the top so the clock reads over bright art.
+                LinearGradient(
+                    stops: [
+                        .init(color: .black.opacity(0.45), location: 0),
+                        .init(color: .black.opacity(0), location: 0.3),
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
             .overlay(alignment: .bottomLeading) { content }
-            .overlay(alignment: .topTrailing) { stat?.padding(8) }
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            // Just below the clock, which sits top right.
+            .overlay(alignment: .topTrailing) {
+                stat?.padding(.top, topInset + 2).padding(.trailing, 8)
+            }
+            // Square edges, like the phone's full-bleed hero.
+            .clipped()
             .accessibilityElement(children: .combine)
     }
 
