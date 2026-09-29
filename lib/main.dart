@@ -26,6 +26,7 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
@@ -145,6 +146,13 @@ void main() async {
     }
   }
 
+  // Users who declined the reminder permission before the fix still read as
+  // "reminders on"; see repairReminderFlagOnce.
+  await repairReminderFlagOnce(
+    prefs,
+    isGranted: () async => (await Permission.notification.status).isGranted,
+  );
+
   if (!isMockMode) {
     // Initialize Firebase (non-blocking when offline).
     // On iOS, FirebaseApp.configure() may have already been called natively
@@ -254,13 +262,19 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
   /// If a previous run was force-quit mid-session and sent no event, recover
   /// it as an audio_session_abandoned now (before any new session starts).
-  /// On iOS, completions that finished while the app was dead are processed
-  /// first so the session's record is cleared and not also reported abandoned.
+  /// Completions that finished while the app was dead must win over the
+  /// replay, or one session is reported both completed and abandoned. iOS
+  /// holds them in a queue Dart can drain first; Android pushes them from
+  /// MainActivity.onResume at its own pace, so the replay waits for them.
   Future<void> _recoverPreviousSession() async {
     if (Platform.isIOS) {
       await processPendingCompletedTracks();
+      await AudioSessionTracker.instance.replayIfAbandoned();
+    } else {
+      await AudioSessionTracker.instance.replayIfAbandoned(
+        completionGrace: const Duration(seconds: 10),
+      );
     }
-    await AudioSessionTracker.instance.replayIfAbandoned();
   }
 
   void _setUpSystemUi() {

@@ -23,6 +23,29 @@ import 'package:medito/widgets/dialogs/medito_dialog_buttons.dart';
 Future<void> recordReminderNotEnabled(SharedPreferences prefs) =>
     prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, false);
 
+/// One-time repair for installs that declined before [recordReminderNotEnabled]
+/// existed: a saved time, no flag, and no permission. Writes the explicit false
+/// so the end-screen card can ask again. Never touches a flag that is already
+/// set, or an install whose reminders can actually fire.
+Future<void> repairReminderFlagOnce(
+  SharedPreferences prefs, {
+  required Future<bool> Function() isGranted,
+}) async {
+  if (prefs.getBool(SharedPreferenceConstants.reminderFlagRepaired) ?? false) {
+    return;
+  }
+  await prefs.setBool(SharedPreferenceConstants.reminderFlagRepaired, true);
+
+  final flagUnset =
+      prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) == null;
+  final hasSavedTime =
+      prefs.getInt(SharedPreferenceConstants.savedHours) != null;
+  if (!flagUnset || !hasSavedTime) return;
+  if (await isGranted()) return;
+
+  await recordReminderNotEnabled(prefs);
+}
+
 /// Soft-ask shown immediately before the OS notification permission dialog.
 ///
 /// The system dialog is effectively one-shot: on iOS every denial we record is

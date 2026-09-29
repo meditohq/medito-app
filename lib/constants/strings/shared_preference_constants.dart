@@ -44,6 +44,9 @@ class SharedPreferenceConstants {
       'reminder_prompt_dismissed_forever';
   static const String notifPermissionFixNeeded = 'notif_permission_fix_needed';
 
+  /// Set once repairReminderFlagOnce has run on this install.
+  static const String reminderFlagRepaired = 'reminder_flag_repair_v1';
+
   /// Epoch millis until which the post-session reminder prompt is suppressed.
   /// Set by a soft dismiss ("Not now") instead of the permanent dismiss.
   static const String reminderPromptSnoozeUntil =
@@ -132,6 +135,11 @@ class SharedPreferenceConstants {
   // as an audio_session_abandoned event on next launch if a force-quit left it
   // behind. See docs/ANALYTICS_SESSION_EVENTS.md.
   static const String incompleteAudioSession = 'incompleteAudioSession';
+
+  /// Pack ids whose Up Next completed state has been logged, so
+  /// up_next_pack_completed / up_next_path_completed fire once per pack.
+  static const String upNextCompletedLoggedPacks =
+      'up_next_completed_logged_packs';
 
   // The onboarding "experience" answer, persisted as an int index:
   // 0 = never tried, 1 = a little, 2 = regular practice. Absent if the user

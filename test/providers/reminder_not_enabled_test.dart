@@ -2,9 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/providers/settings/reminder_prompt_provider.dart';
-import 'package:medito/providers/settings/settings_providers.dart';
-import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,6 +50,68 @@ void main() {
 
       expect(prefs.getInt(SharedPreferenceConstants.savedHours), 21);
       expect(prefs.getInt(SharedPreferenceConstants.savedMinutes), 0);
+    });
+  });
+
+  group('repairReminderFlagOnce', () {
+    Future<SharedPreferences> prefsWith(Map<String, Object> values) async {
+      SharedPreferences.setMockInitialValues(values);
+      return SharedPreferences.getInstance();
+    }
+
+    final declined = <String, Object>{
+      SharedPreferenceConstants.savedHours: 8,
+      SharedPreferenceConstants.savedMinutes: 0,
+    };
+
+    test('saved time + no flag + no permission -> writes false', () async {
+      final prefs = await prefsWith(declined);
+      await repairReminderFlagOnce(prefs, isGranted: () async => false);
+      expect(
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled),
+        isFalse,
+      );
+      expect(prefs.getInt(SharedPreferenceConstants.savedHours), 8);
+    });
+
+    test('permission granted -> left alone', () async {
+      final prefs = await prefsWith(declined);
+      await repairReminderFlagOnce(prefs, isGranted: () async => true);
+      expect(
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled),
+        isNull,
+      );
+    });
+
+    test('explicit flag is never overwritten', () async {
+      final prefs = await prefsWith({
+        ...declined,
+        SharedPreferenceConstants.dailyReminderEnabled: true,
+      });
+      await repairReminderFlagOnce(prefs, isGranted: () async => false);
+      expect(
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled),
+        isTrue,
+      );
+    });
+
+    test('runs only once', () async {
+      final prefs = await prefsWith(declined);
+      await repairReminderFlagOnce(prefs, isGranted: () async => true);
+      await prefs.remove(SharedPreferenceConstants.dailyReminderEnabled);
+      var asked = false;
+      await repairReminderFlagOnce(
+        prefs,
+        isGranted: () async {
+          asked = true;
+          return false;
+        },
+      );
+      expect(asked, isFalse);
+      expect(
+        prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled),
+        isNull,
+      );
     });
   });
 }
