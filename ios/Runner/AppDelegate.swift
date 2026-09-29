@@ -199,11 +199,17 @@ final class WatchPresence: NSObject, WCSessionDelegate {
 
     private func flush() {
         let session = WCSession.default
-        let status: [String: Bool] = session.activationState == .activated
-            ? snapshot(session)
-            : ["paired": false, "appInstalled": false]
-        waiting.forEach { $0(status) }
+        // If activation didn't succeed, report an error (Dart skips the update)
+        // rather than a false "no watch" that would skew the audience count.
+        let pending = waiting
         waiting.removeAll()
+        if session.activationState == .activated {
+            let status = snapshot(session)
+            pending.forEach { $0(status) }
+        } else {
+            let err = FlutterError(code: "activation_failed", message: "WCSession not activated", details: nil)
+            pending.forEach { $0(err) }
+        }
     }
 
     func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {
