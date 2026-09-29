@@ -40,6 +40,10 @@ class AudioSessionTracker {
   /// How often, at most, the persisted record's position is rewritten. We do
   /// NOT persist on every position tick — that would be needless disk churn.
   static const _persistThrottle = Duration(seconds: 3);
+
+  /// A persisted position this close to the end counts as finished. Slightly
+  /// wider than [_persistThrottle] because the record can be up to that stale.
+  static const _nearEndWindowMs = 5000;
   DateTime? _lastPersistAt;
 
   /// Called from `PlayerProvider.play()` when a track starts. If a prior session
@@ -152,6 +156,18 @@ class AudioSessionTracker {
       final session = _Session.fromJson(
         Map<String, dynamic>.from(jsonDecode(raw) as Map),
       );
+
+      // The app died at the very end of the track: the completion is (or is
+      // about to be) delivered separately, so this is not an abandon.
+      if (session.durationMs > 0 &&
+          session.durationMs - session.lastPositionMs <= _nearEndWindowMs) {
+        AppLogger.d(
+          'SESSION',
+          'launch replay skipped, session reached the end: ${session.fileId}',
+        );
+        return;
+      }
+
       await _fireAbandoned(session, reason: 'launch_replay');
       AppLogger.d(
         'SESSION',

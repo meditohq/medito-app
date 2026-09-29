@@ -222,8 +222,8 @@ void main() {
       // fresh process (only the persisted record survives).
       SharedPreferences.setMockInitialValues({
         SharedPreferenceConstants.incompleteAudioSession:
-            '{"fileId":"f9","guide":"Sky","durationMs":1000,'
-            '"startMs":111,"lastPositionMs":300}',
+            '{"fileId":"f9","guide":"Sky","durationMs":60000,'
+            '"startMs":111,"lastPositionMs":18000}',
       });
       tracker.resetForTesting();
       events.clear();
@@ -241,6 +241,21 @@ void main() {
         ab.first.params[AnalyticsEventConstants.paramPercentCompleted],
         30,
       );
+      expect(await persisted(), isNull);
+    });
+
+    test('record that reached the end is not an abandon', () async {
+      SharedPreferences.setMockInitialValues({
+        SharedPreferenceConstants.incompleteAudioSession:
+            '{"fileId":"f9","guide":"Sky","durationMs":60000,'
+            '"startMs":111,"lastPositionMs":57000}',
+      });
+      tracker.resetForTesting();
+      events.clear();
+
+      await tracker.replayIfAbandoned();
+
+      expect(of(AnalyticsEventConstants.audioSessionAbandoned), isEmpty);
       expect(await persisted(), isNull);
     });
 

@@ -249,9 +249,18 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     super.initState();
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
-    // If a previous run was force-quit mid-session and sent no event, recover
-    // it as an audio_session_abandoned now (before any new session starts).
-    unawaited(AudioSessionTracker.instance.replayIfAbandoned());
+    unawaited(_recoverPreviousSession());
+  }
+
+  /// If a previous run was force-quit mid-session and sent no event, recover
+  /// it as an audio_session_abandoned now (before any new session starts).
+  /// On iOS, completions that finished while the app was dead are processed
+  /// first so the session's record is cleared and not also reported abandoned.
+  Future<void> _recoverPreviousSession() async {
+    if (Platform.isIOS) {
+      await processPendingCompletedTracks();
+    }
+    await AudioSessionTracker.instance.replayIfAbandoned();
   }
 
   void _setUpSystemUi() {
