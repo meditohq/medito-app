@@ -140,6 +140,12 @@ class FirebaseAnalyticsService {
       // Initialize the analytics instance now that Firebase should be ready
       if (_runningInTest || isMockMode) {
         _analytics = _NoopAnalytics() as dynamic; // cast to satisfy type
+      } else if (isDevFlavor) {
+        // Dev builds must never post to prod analytics. Disabling collection
+        // persists natively, so automatic events (first_open, session_start)
+        // stop on later launches too.
+        await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
+        _analytics = _NoopAnalytics() as dynamic;
       } else {
         _analytics = FirebaseAnalytics.instance;
       }
