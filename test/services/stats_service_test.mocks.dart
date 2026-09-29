@@ -81,10 +81,35 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
   );
 
   @override
+  void setTokenSupplier(_i3.Future<void> Function()? supplier) =>
+      super.noSuchMethod(
+        Invocation.method(#setTokenSupplier, [supplier]),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   void clearAuthHeader() => super.noSuchMethod(
     Invocation.method(#clearAuthHeader, []),
     returnValueForMissingStub: null,
   );
+
+  @override
+  _i3.Future<void> clearLocalAuth() =>
+      (super.noSuchMethod(
+            Invocation.method(#clearLocalAuth, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> awaitAuthHeaderForTesting() =>
+      (super.noSuchMethod(
+            Invocation.method(#awaitAuthHeaderForTesting, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
 
   @override
   _i3.Future<void> refreshTokenForTesting() =>
@@ -119,9 +144,12 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
           as _i3.Future<Map<String, dynamic>>);
 
   @override
-  _i3.Future<Map<String, dynamic>> deleteRequest(String? path) =>
+  _i3.Future<Map<String, dynamic>> deleteRequest(
+    String? path, {
+    dynamic body,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#deleteRequest, [path]),
+            Invocation.method(#deleteRequest, [path], {#body: body}),
             returnValue: _i3.Future<Map<String, dynamic>>.value(
               <String, dynamic>{},
             ),
@@ -129,9 +157,9 @@ class MockHttpApiService extends _i1.Mock implements _i2.HttpApiService {
           as _i3.Future<Map<String, dynamic>>);
 
   @override
-  _i3.Future<void> signOut() =>
+  _i3.Future<void> signOut(String? accessToken) =>
       (super.noSuchMethod(
-            Invocation.method(#signOut, []),
+            Invocation.method(#signOut, [accessToken]),
             returnValue: _i3.Future<void>.value(),
             returnValueForMissingStub: _i3.Future<void>.value(),
           )
@@ -203,6 +231,15 @@ class MockStatsBackupService extends _i1.Mock
   _i3.Future<void> clearBackups(String? userId) =>
       (super.noSuchMethod(
             Invocation.method(#clearBackups, [userId]),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> clearAll() =>
+      (super.noSuchMethod(
+            Invocation.method(#clearAll, []),
             returnValue: _i3.Future<void>.value(),
             returnValueForMissingStub: _i3.Future<void>.value(),
           )

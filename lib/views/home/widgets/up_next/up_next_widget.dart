@@ -3,23 +3,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/config_constants.dart';
 import 'package:medito/constants/pack_sequence.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
-import 'package:medito/routes/routes.dart';
-import 'package:medito/utils/logger.dart';
-import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
-import 'package:medito/providers/duration_preference_provider.dart';
-import 'package:medito/providers/guide_name_preference_provider.dart';
-import 'package:medito/providers/meditation/track_provider.dart';
-import 'package:medito/models/models.dart';
-import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
-import 'package:medito/views/player/player_view.dart';
+import 'package:medito/views/player/start_session.dart';
+import 'package:medito/routes/routes.dart';
+import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'dart:async';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -105,18 +101,9 @@ class _UpNextPalette {
 }
 
 class UpNextWidget extends ConsumerWidget {
-  /// Optional widget rendered inside the card below the main content (e.g. the
-  /// explainer strip). When provided it collapses inside the card so the
-  /// rounded corners are always intact. Ignored in [UpNextStyle.hero].
-  final Widget? inlineStrip;
-
   final UpNextStyle style;
 
-  const UpNextWidget({
-    super.key,
-    this.inlineStrip,
-    this.style = UpNextStyle.card,
-  });
+  const UpNextWidget({super.key, this.style = UpNextStyle.card});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -124,7 +111,7 @@ class UpNextWidget extends ConsumerWidget {
 
     final child = upNextAsync.when(
       loading: () =>
-          _UpNextShimmer(key: const ValueKey('shimmer'), style: style),
+          _UpNextLoadingSpace(key: const ValueKey('loading'), style: style),
       error: (_, _) => const SizedBox.shrink(key: ValueKey('error')),
       data: (upNextData) {
         if (upNextData.isCompleted) {
@@ -142,26 +129,28 @@ class UpNextWidget extends ConsumerWidget {
         return _UpNextContent(
           key: ValueKey(upNextData.nextSession!.id),
           data: upNextData,
-          inlineStrip: style == UpNextStyle.hero ? null : inlineStrip,
           style: style,
         );
       },
     );
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 350),
-      transitionBuilder: (child, animation) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-        );
-        final scale = Tween<double>(begin: 0.94, end: 1.0).animate(curved);
-        return FadeTransition(
-          opacity: curved,
-          child: ScaleTransition(scale: scale, child: child),
-        );
-      },
-      child: child,
+    final alignment = style == UpNextStyle.hero
+        ? Alignment.bottomCenter
+        : Alignment.topCenter;
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOutCubic,
+      alignment: alignment,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeInOut,
+        switchOutCurve: Curves.easeInOut,
+        // Never paint outgoing session text while the next session enters.
+        // A skipped Dismissible can otherwise slide back beneath the new text.
+        layoutBuilder: (currentChild, _) =>
+            Align(alignment: alignment, heightFactor: 1, child: currentChild),
+        child: child,
+      ),
     );
   }
 }
@@ -244,9 +233,12 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
 
     if (!mounted) return;
     setState(() => _pinning = false);
+    // The hero swaps to the new pack anyway; the snackbar only names it.
+    final nextTitle = ref.read(packProvider(packId: nextPackId)).value?.title;
+    if (nextTitle == null || nextTitle.isEmpty) return;
     showSnackBar(
       context,
-      AppLocalizations.of(context)!.upNextNextPackPinnedSnack,
+      AppLocalizations.of(context)!.upNextNextPackPinnedSnack(nextTitle),
     );
   }
 
@@ -259,9 +251,9 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
     final l10n = AppLocalizations.of(context)!;
     final hasNext = widget.data.nextPackId != null;
 
-    final title = hasNext
-        ? l10n.upNextPackCompletedTitle(widget.data.pack.title)
-        : l10n.upNextPathCompletedTitle;
+    final title = widget.data.isEndOfPath
+        ? l10n.upNextPathCompletedTitle
+        : l10n.upNextPackCompletedTitle(widget.data.pack.title);
     final subtitle = hasNext
         ? l10n.upNextPackCompletedSubtitle(widget.data.completedCount)
         : l10n.upNextPathCompletedSubtitle;
@@ -279,7 +271,14 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
     }
 
     final body = Padding(
-      padding: EdgeInsets.all(isHero ? padding16 : padding20),
+      padding: isHero
+          ? EdgeInsets.fromLTRB(
+              padding16,
+              padding16,
+              MediaQuery.sizeOf(context).width >= 600 ? 32 : padding16,
+              padding16,
+            )
+          : const EdgeInsets.all(padding20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,9 +293,8 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  l10n.upNextTitle.toUpperCase(),
+                  l10n.completed.toUpperCase(),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    fontFamily: teachers,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.2,
@@ -310,9 +308,8 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
           Text(
             title,
             style: theme.textTheme.headlineSmall?.copyWith(
-              fontFamily: sourceSerif,
               fontSize: isHero ? 28 : 22,
-              fontWeight: isHero ? FontWeight.w700 : FontWeight.w500,
+              fontWeight: FontWeight.w700,
               height: 1.2,
               color: onSurface,
             ),
@@ -409,13 +406,11 @@ class _CompletedCta extends StatelessWidget {
 
 class _UpNextContent extends ConsumerStatefulWidget {
   final UpNextData data;
-  final Widget? inlineStrip;
   final UpNextStyle style;
 
   const _UpNextContent({
     super.key,
     required this.data,
-    this.inlineStrip,
     this.style = UpNextStyle.card,
   });
 
@@ -423,8 +418,22 @@ class _UpNextContent extends ConsumerStatefulWidget {
   ConsumerState<_UpNextContent> createState() => _UpNextContentState();
 }
 
-class _UpNextContentState extends ConsumerState<_UpNextContent> {
+class _UpNextContentState extends ConsumerState<_UpNextContent>
+    with SingleTickerProviderStateMixin {
+  // Swiping reveals Open pack / Skip; a tap while open should close the menu
+  // rather than start a session.
+  late final SlidableController _slidable = SlidableController(this);
+
+  @override
+  void dispose() {
+    _slidable.dispose();
+    super.dispose();
+  }
+
   bool _skipping = false;
+  // True while the track is being fetched and the player is opening. Shows a
+  // spinner in the play button and blocks a duplicate tap.
+  bool _isStarting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -436,29 +445,65 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     final l10n = AppLocalizations.of(context)!;
 
     final borderRadius = BorderRadius.circular(_kCardBorderRadius);
+    // Nothing played yet reads as a first step, not a resume.
+    final eyebrow = widget.data.completedCount == 0
+        ? l10n.upNextStartHere
+        : l10n.upNextTitle;
+    // Only hand-picked packs: series packs are where Home returns to, and
+    // are replaced by starting another pack rather than removed.
+    final canRemove =
+        widget.data.pack.id != ConfigConstants.basicsPackId &&
+        !PackSequence.contains(widget.data.pack.id);
 
-    return AnimatedOpacity(
+    return Opacity(
       opacity: _skipping ? 0.0 : 1.0,
-      duration: const Duration(milliseconds: 150),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: isHero ? 0 : padding16),
         child: ClipRRect(
           borderRadius: borderRadius,
-          child: Dismissible(
+          child: Slidable(
             key: Key('up_next_${nextSession.id}'),
-            direction: DismissDirection.endToStart,
-            background: _getSkipBackground(context, l10n, palette),
-            movementDuration: const Duration(milliseconds: 1),
-            confirmDismiss: (_) async {
-              await _onSkip(context);
-              return false;
-            },
+            controller: _slidable,
+            endActionPane: ActionPane(
+              motion: const BehindMotion(),
+              extentRatio: canRemove ? 0.75 : 0.5,
+              // No full-swipe action: every action is a button behind the
+              // menu, so a swipe only ever reveals them.
+              children: [
+                _swipeAction(
+                  palette: palette,
+                  icon: Icons.menu_book_rounded,
+                  label: l10n.openPack,
+                  onPressed: () => _onOpenPack(context),
+                ),
+                _swipeAction(
+                  palette: palette,
+                  showDivider: true,
+                  icon: Icons.skip_next_rounded,
+                  label: l10n.skip,
+                  onPressed: () => _onSkip(context),
+                ),
+                if (canRemove)
+                  _swipeAction(
+                    palette: palette,
+                    showDivider: true,
+                    icon: Icons.close_rounded,
+                    label: l10n.removeFromHomeShort,
+                    onPressed: () => _onRemove(context),
+                  ),
+              ],
+            ),
             child: Semantics(
               label:
-                  '${l10n.upNext}: ${widget.data.pack.title} — ${nextSession.title}',
+                  '$eyebrow: ${widget.data.pack.title} — ${nextSession.title}',
               button: true,
               customSemanticsActions: {
                 CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
+                CustomSemanticsAction(label: l10n.openPack): () =>
+                    _onOpenPack(context),
+                if (canRemove)
+                  CustomSemanticsAction(label: l10n.removeFromHome): () =>
+                      _onRemove(context),
               },
               child: GestureDetector(
                 // The hero style has no card surface behind the content, so
@@ -476,7 +521,16 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(isHero ? padding16 : padding20),
+                        padding: isHero
+                            ? EdgeInsets.fromLTRB(
+                                padding16,
+                                padding16,
+                                MediaQuery.sizeOf(context).width >= 600
+                                    ? 32
+                                    : padding16,
+                                padding16,
+                              )
+                            : const EdgeInsets.all(padding20),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -487,10 +541,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                   Row(
                                     children: [
                                       Text(
-                                        l10n.upNextTitle.toUpperCase(),
+                                        eyebrow.toUpperCase(),
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
-                                              fontFamily: teachers,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
                                               letterSpacing: 1.2,
@@ -502,7 +555,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                         '·',
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
-                                              fontFamily: teachers,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
                                               color: palette.muted,
@@ -514,7 +566,6 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                           widget.data.pack.title,
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
-                                                fontFamily: teachers,
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                                 letterSpacing: 1.2,
@@ -530,11 +581,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                                     nextSession.title,
                                     style: theme.textTheme.headlineSmall
                                         ?.copyWith(
-                                          fontFamily: sourceSerif,
                                           fontSize: isHero ? 28 : 22,
-                                          fontWeight: isHero
-                                              ? FontWeight.w700
-                                              : FontWeight.w500,
+                                          fontWeight: FontWeight.w700,
                                           height: 1.2,
                                           color: palette.foreground,
                                         ),
@@ -554,11 +602,11 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
                             _PlayButton(
                               onTap: () => _onTap(context),
                               palette: palette,
+                              isLoading: _isStarting,
                             ),
                           ],
                         ),
                       ),
-                      if (widget.inlineStrip != null) widget.inlineStrip!,
                     ],
                   ),
                 ),
@@ -570,36 +618,49 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     );
   }
 
-  Widget _getSkipBackground(
-    BuildContext context,
-    AppLocalizations l10n,
-    _UpNextPalette palette,
-  ) {
+  Widget _swipeAction({
+    required _UpNextPalette palette,
+    bool showDivider = false,
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
     final theme = Theme.of(context);
-    final iconColor = palette.foreground;
-
-    return Container(
-      color: palette.skipBackground,
-      child: Padding(
-        padding: const EdgeInsets.all(padding16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.skip_next_rounded, color: iconColor, size: 28),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.skip,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: iconColor,
-                    fontWeight: FontWeight.w600,
+    // Custom rather than SlidableAction: its default label style is too large
+    // for half-width tiles and wrapped "Open pack" out of view.
+    return CustomSlidableAction(
+      onPressed: (_) => onPressed(),
+      // One surface for both actions (two tones looked patchy over the
+      // artwork); a hairline separates them instead.
+      backgroundColor: palette.skipBackground,
+      foregroundColor: palette.foreground,
+      padding: EdgeInsets.zero,
+      child: Container(
+        decoration: showDivider
+            ? BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: palette.foreground.withValues(alpha: 0.2),
+                    width: 0.5,
                   ),
                 ),
-              ],
+              )
+            : null,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: palette.foreground, size: 28),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: palette.foreground,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -607,9 +668,64 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
     );
   }
 
+  void _onOpenPack(BuildContext context) {
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.upNextPackOpened,
+            parameters: _upNextEventParams(widget.data),
+          ),
+    );
+    handleNavigation(
+      TypeConstants.pack,
+      [widget.data.pack.id],
+      context,
+      ref: ref,
+    );
+  }
+
+  /// Home goes back to the series pack the user was on before picking this
+  /// one, or the no-pin default.
+  Future<void> _onRemove(BuildContext context) async {
+    final packId = widget.data.pack.id;
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.packUnpinned,
+            parameters: {AnalyticsEventConstants.paramPackId: packId},
+          ),
+    );
+
+    final prefs = ref.read(sharedPreferencesProvider);
+    // This widget is replaced once the pin changes, so Undo can't use ref.
+    final container = ProviderScope.containerOf(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+    final returnTo = prefs.getString(
+      SharedPreferenceConstants.upNextReturnPackId,
+    );
+    if (returnTo == null) {
+      await prefs.remove(SharedPreferenceConstants.upNextPackId);
+    } else {
+      await prefs.setString(SharedPreferenceConstants.upNextPackId, returnTo);
+    }
+    ref.invalidate(upNextPackIdProvider);
+
+    showSnackBar(
+      context.mounted ? context : null,
+      l10n.removedFromHome,
+      actionLabel: l10n.undo,
+      onActionPressed: () async {
+        await prefs.setString(SharedPreferenceConstants.upNextPackId, packId);
+        container.invalidate(upNextPackIdProvider);
+      },
+    );
+  }
+
   Future<void> _onSkip(BuildContext context) async {
     final nextSession = widget.data.nextSession;
-    if (nextSession == null) return;
+    if (nextSession == null || _skipping) return;
 
     setState(() => _skipping = true);
 
@@ -645,6 +761,11 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
   Future<void> _onTap(BuildContext context) async {
     final nextSession = widget.data.nextSession;
     if (nextSession == null) return;
+    if (_isStarting) return;
+    if (_slidable.ratio != 0) {
+      unawaited(_slidable.close());
+      return;
+    }
 
     unawaited(
       ref
@@ -663,69 +784,37 @@ class _UpNextContentState extends ConsumerState<_UpNextContent> {
           .logFirstActionAfterOnboardingIfNeeded('up_next'),
     );
 
-    final guideName = ref.read(guideNamePreferenceProvider);
-    final preferredDuration = ref.read(durationPreferenceProvider);
-
-    if (guideName != null && preferredDuration != null) {
-      final track = await ref.read(
-        tracksProvider(trackId: nextSession.id).future,
-      );
-      final selection = TrackVariantSelector.resolve(
-        track,
-        guideName: guideName,
-        durationMs: preferredDuration,
-      );
-
-      final request = PlaybackRequest.fromTrack(
-        track,
-        selection.voice,
-        selection.file,
-      );
-      try {
-        await ref.read(playerProvider.notifier).play(request);
-      } catch (e, st) {
-        // play() now propagates native playback failures (see P0-4 in the
-        // audit). Before this change, errors were swallowed and we'd
-        // navigate to a silent player. Show a snackbar instead.
-        AppLogger.e('UP_NEXT', 'Failed to start playback from Up Next', e, st);
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.unableToLoadAudio),
-          ),
-        );
-        return;
-      }
-      _navigateToPlayer(context);
-    } else {
-      handleNavigation(
-        TypeConstants.track,
-        [nextSession.id, nextSession.path],
+    setState(() => _isStarting = true);
+    try {
+      await startSession(
         context,
-        ref: ref,
+        ref,
+        trackId: nextSession.id,
+        path: nextSession.path,
       );
+    } finally {
+      if (mounted) setState(() => _isStarting = false);
     }
-  }
-
-  void _navigateToPlayer(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PlayerView()),
-    );
   }
 }
 
 class _PlayButton extends StatelessWidget {
   final VoidCallback onTap;
   final _UpNextPalette palette;
+  final bool isLoading;
 
-  const _PlayButton({required this.onTap, required this.palette});
+  const _PlayButton({
+    required this.onTap,
+    required this.palette,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Semantics(
-      label: AppLocalizations.of(context)!.play,
-      button: true,
+      label: isLoading ? l10n.loading : l10n.play,
+      button: !isLoading,
       child: GestureDetector(
         onTap: onTap,
         child: DecoratedBox(
@@ -737,11 +826,25 @@ class _PlayButton extends StatelessWidget {
             width: _kPlayButtonSize,
             height: _kPlayButtonSize,
             child: ExcludeSemantics(
-              child: Icon(
-                Icons.play_arrow_rounded,
-                color: palette.buttonForeground,
-                size: 28,
-              ),
+              // Same box size whether icon or spinner, so nothing shifts.
+              child: isLoading
+                  ? Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            palette.buttonForeground,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Icon(
+                      Icons.play_arrow_rounded,
+                      color: palette.buttonForeground,
+                      size: 28,
+                    ),
             ),
           ),
         ),
@@ -808,7 +911,6 @@ class _ProgressRow extends StatelessWidget {
         Text(
           AppLocalizations.of(context)!.upNextProgress(completed, total),
           style: theme.textTheme.bodySmall?.copyWith(
-            fontFamily: teachers,
             fontSize: 12,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.6,
@@ -820,30 +922,18 @@ class _ProgressRow extends StatelessWidget {
   }
 }
 
-class _UpNextShimmer extends StatelessWidget {
-  const _UpNextShimmer({super.key, this.style = UpNextStyle.card});
+class _UpNextLoadingSpace extends StatelessWidget {
+  const _UpNextLoadingSpace({super.key, this.style = UpNextStyle.card});
 
   final UpNextStyle style;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cardColor = theme.cardColor;
-    // Over the hero the image is the loading state.
-    if (style == UpNextStyle.hero) return const SizedBox(height: 96);
-
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: padding16,
-        right: padding16,
-        bottom: padding16,
-      ),
-      child: HomeGradientBorder(
-        backgroundColor: cardColor,
-        borderRadius: _kCardBorderRadius,
-        borderWidth: 0.5,
-        child: const SizedBox(height: 128, width: double.infinity),
-      ),
+    // The pack cover may not be available yet after changing Your Path.
+    // Reserve space without flashing a card before the hero appears.
+    return SizedBox(
+      height: style == UpNextStyle.hero ? 96 : 144,
+      width: double.infinity,
     );
   }
 }

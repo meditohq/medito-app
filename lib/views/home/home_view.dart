@@ -1,15 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:medito/widgets/adaptive/adaptive_home_sections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
-import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:medito/constants/enums/home_widget_type.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
-import 'package:medito/providers/home/products_provider.dart';
+import 'package:medito/providers/shop/shop_providers.dart';
+import 'package:medito/services/shop/fourthwall_service.dart';
 import 'package:medito/providers/home/widget_order_provider.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:medito/routes/routes.dart';
@@ -22,7 +26,6 @@ import 'widgets/products/home_products_section.dart';
 import 'widgets/quote/quote_widget.dart';
 import 'widgets/shortcuts/shortcuts_items_widget.dart';
 import 'widgets/up_next/up_next_widget.dart';
-import 'widgets/up_next/your_path_explainer_strip.dart';
 
 import '../../providers/home/announcement_provider.dart';
 import 'package:medito/providers/providers.dart';
@@ -62,7 +65,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     if (!mounted) return;
 
     if (status.isGranted) {
-      final service = SmartRemindersService(
+      final service = DailyRemindersService(
         prefs: prefs,
         reminders: ref.read(reminderProvider),
       );
@@ -138,44 +141,33 @@ class _HomeViewState extends ConsumerState<HomeView>
                 slivers: [
                   HomeHero(
                     onStatsButtonTap: () => _onStatsButtonTapped(context),
+                    announcement: const HomeAnnouncementSection(),
                     child: heroType == null
                         ? null
                         : _buildSection(heroType, homeData, inHero: true),
                   ),
-                  // First-run explainer; lives inside the Up Next card when
-                  // that card is in the list, stands alone under the hero
-                  // otherwise. Collapses itself once dismissed.
-                  if (heroType == HomeWidgetType.upNext)
+                  // Banner / no-hero mode only: with an overlaid section the
+                  // hero shows the announcement above it instead.
+                  if (heroType == null)
                     const SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          padding16,
-                          padding8,
-                          padding16,
-                          0,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(kHomeTileRadius),
-                          ),
-                          child: YourPathExplainerStrip(),
-                        ),
+                        padding: EdgeInsets.only(top: 12),
+                        child: HomeAnnouncementSection(),
                       ),
                     ),
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 12),
-                      child: HomeAnnouncementSection(),
+                  SliverToBoxAdapter(
+                    child: AdaptiveHomeSections(
+                      children: [
+                        for (final type in widgetOrder)
+                          Padding(
+                            key: ValueKey(type),
+                            padding: const EdgeInsets.only(
+                              bottom: kHomeSectionGap,
+                            ),
+                            child: _buildSection(type, homeData),
+                          ),
+                      ],
                     ),
-                  ),
-                  SliverList.builder(
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: kHomeSectionGap),
-                        child: _buildSection(widgetOrder[index], homeData),
-                      );
-                    },
-                    itemCount: widgetOrder.length,
                   ),
                   SliverPadding(
                     padding: EdgeInsets.only(
@@ -213,7 +205,6 @@ class _HomeViewState extends ConsumerState<HomeView>
       HomeWidgetType.upNext => UpNextWidget(
         key: key,
         style: inHero ? UpNextStyle.hero : UpNextStyle.card,
-        inlineStrip: inHero ? null : const YourPathExplainerStrip(),
       ),
     };
   }
@@ -221,14 +212,20 @@ class _HomeViewState extends ConsumerState<HomeView>
   Future<void> _onRefresh() async {
     ref.invalidate(fetchLatestAnnouncementProvider);
     ref.invalidate(refreshHomeAPIsProvider);
-    ref.invalidate(refreshProductsProvider);
+    // The shop row fetches lazily; only refresh it if it already has.
+    for (final collection in [
+      FourthwallService.homeCollection,
+      FourthwallService.allCollection,
+    ]) {
+      final shop = shopListingProvider(collection);
+      if (ref.exists(shop)) ref.invalidate(shop);
+    }
     // Refetch all pack data; upNext is derived and will re-derive automatically.
     ref.invalidate(packDataProvider);
     await Future.wait([
       ref.read(statsProvider.notifier).refresh(),
       ref.read(fetchLatestAnnouncementProvider.future),
       ref.read(refreshHomeAPIsProvider.future),
-      ref.read(refreshProductsProvider.future),
     ]);
   }
 

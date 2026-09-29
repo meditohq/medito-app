@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -13,21 +14,32 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/review_service_provider.dart';
+import 'package:medito/providers/settings/account_prompt_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
-import 'package:medito/views/home/widgets/home_gradient_border.dart';
+import 'package:medito/views/settings/sign_up_log_in_screen.dart';
+import 'package:medito/views/settings/widgets/reminder_tile.dart'
+    show
+        ReminderChoice,
+        ReminderChoiceCustom,
+        ReminderChoiceOff,
+        ReminderChoiceSlot,
+        ReminderOptionsSheet;
 import 'package:medito/views/player/widgets/bottom_actions/bottom_action_bar.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
+import 'widgets/account_prompt_card.dart';
+import 'widgets/animated_end_screen_section.dart';
 import 'widgets/donation_widget.dart';
+import 'widgets/soft_ask_card.dart';
 import 'widgets/zen_mode_animation.dart';
 
 class EndScreenView extends ConsumerStatefulWidget {
@@ -54,6 +66,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   // AnimatedSwitcher transition from old streak -> new streak.
   bool _showPriorStats = true;
   bool _reminderPromptImpressionLogged = false;
+  bool _accountPromptImpressionLogged = false;
 
   /// Whether the OS notification permission is already granted. When it is,
   /// tapping the CTA raises no system dialog, so the soft-ask is skipped.
@@ -230,35 +243,47 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         ),
         layout: BottomActionBarLayout.edgeAligned,
       ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Column(
-            children: [
-              SlideTransition(
-                position: _statsSlideAnimation,
-                child: FadeTransition(
-                  opacity: _statsFadeAnimation,
-                  child: ref.watch(zenModeProvider)
-                      ? const ZenModeAnimation()
-                      : _buildStatsArea(),
+      body: AdaptivePageBody(
+        maxWidth: 640,
+        child: SingleChildScrollView(
+          child: SafeArea(
+            child: Column(
+              children: [
+                SlideTransition(
+                  position: _statsSlideAnimation,
+                  child: FadeTransition(
+                    opacity: _statsFadeAnimation,
+                    child: ref.watch(zenModeProvider)
+                        ? const ZenModeAnimation()
+                        : _buildStatsArea(),
+                  ),
                 ),
-              ),
-              SlideTransition(
-                position: _reminderSlideAnimation,
-                child: FadeTransition(
-                  opacity: _reminderFadeAnimation,
-                  child: _buildReminderPrompt(),
+                SlideTransition(
+                  position: _reminderSlideAnimation,
+                  child: FadeTransition(
+                    opacity: _reminderFadeAnimation,
+                    // The reminder and account soft-asks are mutually exclusive
+                    // (see shouldShowAccountPromptProvider), so they share this
+                    // animation slot; only one ever renders.
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedEndScreenSection(child: _buildReminderPrompt()),
+                        AnimatedEndScreenSection(child: _buildAccountPrompt()),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              SlideTransition(
-                position: _cardSlideAnimation,
-                child: FadeTransition(
-                  opacity: _cardFadeAnimation,
-                  child: _buildCard(),
+                SlideTransition(
+                  position: _cardSlideAnimation,
+                  child: FadeTransition(
+                    opacity: _cardFadeAnimation,
+                    child: _buildCard(),
+                  ),
                 ),
-              ),
-              // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
-            ],
+                // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
+              ],
+            ),
           ),
         ),
       ),
@@ -321,7 +346,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 child: Text(
                   streak.toString(),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontFamily: dmSerif,
+                    fontFamily: googleSans,
                     fontSize: 100,
                     fontWeight: FontWeight.w400,
                   ),
@@ -332,7 +357,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             Text(
               AppLocalizations.of(context)!.dayStreak,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontFamily: teachers,
+                fontFamily: googleSans,
                 fontSize: 40,
                 fontWeight: FontWeight.w400,
                 height: 1,
@@ -356,7 +381,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 AppLocalizations.of(context)!.dailyPracticeMessage,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontFamily: teachers,
+                  fontFamily: googleSans,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   height: 1.3,
@@ -468,7 +493,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               Text(
                 dayLetters[index],
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontFamily: teachers,
+                  fontFamily: googleSans,
                   fontSize: 14,
                   fontWeight: (isMeditated || isFreeze)
                       ? FontWeight.w600
@@ -553,8 +578,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   }
 
   Widget _buildReminderPrompt() {
+    // shouldShowReminderPromptProvider is false whenever reminders are on, so
+    // this card only ever renders in the "off" state and vanishes on success.
     final shouldShow = ref.watch(shouldShowReminderPromptProvider);
-    final isReminderEnabled = ref.watch(reminderEnabledProvider);
 
     if (!shouldShow) {
       return const SizedBox.shrink();
@@ -575,107 +601,87 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       });
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: padding16,
-        right: padding16,
-        bottom: 16,
-      ),
-      child: HomeGradientBorder(
-        backgroundColor: Theme.of(context).cardColor,
-        borderRadius: 14,
-        borderWidth: 0.5,
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 16,
-            left: 16,
-            right: 16,
-            bottom: 4,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  MeditoIcon(
-                    assetName: MeditoIcons.bell,
-                    size: 24,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context)!.smartReminders,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: AppLocalizations.of(context)!.dismiss,
-                    icon: MeditoIcon(
-                      assetName: MeditoIcons.xmark,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    onPressed: _dismissReminderPromptForever,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ],
-              ),
-              if (!isReminderEnabled) ...[
-                const SizedBox(height: 8),
-                Text(
-                  AppLocalizations.of(context)!.enableNotificationsBody,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
+    final l10n = AppLocalizations.of(context)!;
+    return SoftAskCard(
+      title: l10n.dailyReminders,
+      body: l10n.enableNotificationsBody,
+      ctaLabel: _notificationsBlocked
+          ? l10n.turnOnInSettings
+          : l10n.turnOnReminders,
+      onCta: _enableReminders,
+      onSnooze: _snoozeReminderPrompt,
+      onDismiss: _dismissReminderPromptForever,
+    );
+  }
+
+  /// End-screen soft-ask inviting an anonymous user to attach an email so their
+  /// streak and history survive a reinstall or a new phone. Gated by
+  /// [shouldShowAccountPromptProvider]; shares the reminder animation slot.
+  Widget _buildAccountPrompt() {
+    final shouldShow = ref.watch(shouldShowAccountPromptProvider);
+    if (!shouldShow) {
+      return const SizedBox.shrink();
+    }
+
+    if (!_accountPromptImpressionLogged) {
+      _accountPromptImpressionLogged = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          unawaited(
+            ref
+                .read(analyticsServiceProvider)
+                .logEvent(
+                  name: AnalyticsEventConstants.endScreenAccountPromptShown,
                 ),
-              ],
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isReminderEnabled
-                      ? null
-                      : () => _enableReminders(),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                  ),
-                  child: Text(
-                    isReminderEnabled
-                        ? AppLocalizations.of(context)!.smartRemindersOn
-                        : _notificationsBlocked
-                        ? AppLocalizations.of(context)!.turnOnInSettings
-                        : AppLocalizations.of(context)!.turnOnSmartReminders,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: context.onBrandPurple,
-                    ),
-                  ),
-                ),
-              ),
-              if (!isReminderEnabled)
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: _snoozeReminderPrompt,
-                    child: Text(AppLocalizations.of(context)!.notNow),
-                  ),
-                ),
-            ],
-          ),
+          );
+        }
+      });
+    }
+
+    return AccountPromptCard(
+      onSave: _openAccountConversion,
+      onSnooze: _snoozeAccountPrompt,
+      onDismiss: _dismissAccountPromptForever,
+    );
+  }
+
+  /// Opens the existing sign-in sheet to link an email to the current
+  /// (anonymous) account. Uses `fromSettings: true` so a successful link pops
+  /// back to this end screen instead of restarting onboarding. The account-
+  /// forking fix (deployed 2026-09-02) means the server reuses this client_id,
+  /// so local stats are preserved rather than wiped.
+  Future<void> _openAccountConversion() async {
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(name: AnalyticsEventConstants.endScreenAccountPromptTapped),
+    );
+
+    // Make sure the session that just finished is on the server before we link
+    // the email, so nothing done pre-conversion is left behind.
+    unawaited(ref.read(statsManagerProvider).sync(force: true));
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SignUpLogInPage(
+          fromSettings: true,
+          source: AnalyticsEventConstants.sourceEndScreen,
         ),
       ),
     );
+
+    if (!mounted) return;
+    // Refresh identity + stats so the card disappears once an email is attached.
+    ref.invalidate(meProvider);
+    ref.read(statsProvider.notifier).refresh();
+  }
+
+  Future<void> _snoozeAccountPrompt() async {
+    await ref.read(accountPromptDismissedProvider.notifier).snooze();
+  }
+
+  Future<void> _dismissAccountPromptForever() async {
+    await ref.read(accountPromptDismissedProvider.notifier).dismissForever();
   }
 
   Future<void> _checkNotificationPermission() async {
@@ -770,14 +776,72 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     return true;
   }
 
+  /// The same Morning / Evening / Night / Custom sheet as the Settings tile.
+  /// Returns the chosen time and the slot id for analytics, or null if the
+  /// user closed the sheet (or the custom picker) without choosing.
+  Future<(TimeOfDay, String)?> _pickReminderTime() async {
+    final analytics = ref.read(analyticsServiceProvider);
+    unawaited(
+      analytics.logEvent(
+        name: AnalyticsEventConstants.endScreenReminderSheetShown,
+      ),
+    );
+
+    final choice = await showModalBottomSheet<ReminderChoice>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
+      // Reminders are off whenever this card offers to turn them on, so the
+      // sheet never shows its "Turn off" row here.
+      builder: (_) => const ReminderOptionsSheet(current: null, enabled: false),
+    );
+    if (!mounted) return null;
+
+    (TimeOfDay, String)? result;
+    switch (choice) {
+      case ReminderChoiceSlot(:final slot):
+        result = (slot.time, slot.analyticsId);
+      case ReminderChoiceCustom():
+        final picked = await showTimePicker(
+          context: context,
+          initialTime: const TimeOfDay(hour: 7, minute: 0),
+          initialEntryMode: TimePickerEntryMode.input,
+        );
+        if (picked != null) result = (picked, 'custom');
+      case ReminderChoiceOff():
+      case null:
+        result = null;
+    }
+
+    if (result == null) {
+      unawaited(
+        analytics.logEvent(
+          name: AnalyticsEventConstants.endScreenReminderSheetDismissed,
+        ),
+      );
+    }
+    return result;
+  }
+
   Future<void> _enableReminders() async {
     try {
       // No system prompt is coming for these users — route them to settings
-      // instead of raising a dialog that cannot appear.
+      // instead of raising a dialog that cannot appear. Done before the time
+      // sheet so someone who won't grant permission never picks a time for
+      // nothing; if they come back with it granted, the sheet follows.
       if (_notificationsBlocked) {
         final recovered = await _recoverBlockedPermission();
         if (!recovered || !mounted) return;
-      } else if (!_notificationsGranted) {
+      }
+
+      // Time first, permission second — same order as onboarding's chips and
+      // the Settings tile. Replaces the old silent "same time tomorrow"
+      // default that the other two surfaces had already dropped.
+      final pick = await _pickReminderTime();
+      if (pick == null || !mounted) return;
+      final (time, slotId) = pick;
+
+      if (!_notificationsGranted) {
         // Only worth asking when a system dialog is actually coming; if
         // permission is already granted this just adds a tap.
         final proceed = await _confirmPermissionPrompt();
@@ -800,12 +864,15 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       if (!mounted) return;
 
       final prefs = ref.read(sharedPreferencesProvider);
-      final service = SmartRemindersService(
+      final service = DailyRemindersService(
         prefs: prefs,
         reminders: ref.read(reminderProvider),
       );
 
-      final time = await service.enable(l10n: AppLocalizations.of(context));
+      final anchor = await service.enableAt(
+        time,
+        l10n: AppLocalizations.of(context),
+      );
       await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
       await ref.read(reminderTimeProvider.notifier).setTime(time);
 
@@ -817,24 +884,21 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               parameters: {
                 AnalyticsEventConstants.paramSource:
                     AnalyticsEventConstants.sourceEndScreen,
-                // This path never asks for a time — enable() keeps the hour
-                // chosen in onboarding/Settings, or falls back to the moment
-                // the session ended. Logged with the same params as the
-                // onboarding set-tap so both surfaces are comparable.
-                AnalyticsEventConstants.paramReminderHour: time.hour,
-                AnalyticsEventConstants.paramReminderMinute: time.minute,
+                // Same params as the onboarding set-tap and the Settings tile
+                // so all three surfaces are comparable.
+                AnalyticsEventConstants.paramReminderSlot: slotId,
+                AnalyticsEventConstants.paramReminderHour: anchor.hour,
+                AnalyticsEventConstants.paramReminderMinute: anchor.minute,
               },
             ),
       );
 
-      if (mounted) {
-        setState(() {});
-      }
+      // No setState: reminderEnabledProvider flipping to true hides the card.
     } catch (e, s) {
       // Previously swallowed: the user tapped the button, granted permission,
       // and got no reminder, no feedback and no event — invisible in both the
       // UI and analytics.
-      AppLogger.e('END_SCREEN', 'Failed to enable smart reminders: $e', s);
+      AppLogger.e('END_SCREEN', 'Failed to enable daily reminders: $e', s);
       unawaited(
         ref
             .read(analyticsServiceProvider)

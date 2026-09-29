@@ -1,0 +1,184 @@
+appId: ${APP_ID}
+name: Sign in to the prod test account from a fresh install and reach Home
+---
+# The account email and fixed OTP are NEVER written in this repo (it is
+# public). They come in as Maestro env vars from the TEST_ACCOUNT_EMAIL /
+# TEST_ACCOUNT_OTP GitHub secrets:
+#   maestro test -e TEST_ACCOUNT_EMAIL=... -e TEST_ACCOUNT_OTP=... <flow>
+# The API gives this one account a fixed code and no resend rate limit, so
+# parallel Android + iOS runs do not lock each other out.
+
+- launchApp:
+    clearState: true
+
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - runFlow:
+          when:
+            visible: "(?i).*isn't responding.*"
+          commands:
+            - tapOn:
+                text: "Wait"
+                optional: true
+
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - runFlow:
+          when:
+            visible: "Cancel"
+          commands:
+            - tapOn: "Cancel"
+
+# ── Splash: the quiet returning-user link, not "Get started" ──
+# Signing in from here skips the anonymous sign-in, so no throwaway account is
+# created on the way to the real one.
+- extendedWaitUntil:
+    visible: "Sign in or sign up"
+    timeout: 180000
+- tapOn: "Sign in or sign up"
+
+# ── Email step ──
+- extendedWaitUntil:
+    visible: "Email"
+    timeout: 20000
+- tapOn: "Email"
+- inputText: ${TEST_ACCOUNT_EMAIL}
+# No hideKeyboard: on Android it falls back to a Back press, which pops this
+# screen (and then the app). Continue sits just under the field, above the
+# keyboard.
+- tapOn: "Continue"
+
+# The typo check should stay quiet for a real domain; keep what we typed if a
+# future domain list ever flags it.
+- runFlow:
+    when:
+      visible: "Check your email"
+    commands:
+      - tapOn: "Keep mine"
+
+# ── OTP step ──
+- extendedWaitUntil:
+    visible: "Enter verification code"
+    timeout: 30000
+- tapOn: "Enter verification code"
+- inputText: ${TEST_ACCOUNT_OTP}
+- tapOn: "Continue"
+
+# The fixed code is single-use per request: when Android and iOS CI run this
+# account at the same time, one platform's sign-in can consume the code the
+# other just requested, and the second gets INVALID_CODE (release run
+# 36342317998, 19:09:48–19:10:02). Still on this screen after the wait means
+# the code was rejected: resend (a fresh code) and submit again.
+- extendedWaitUntil:
+    visible: "Never tried it|(?s).*day streak.*|Consistency Score: .*"
+    timeout: 20000
+    optional: true
+- runFlow:
+    when:
+      visible: "Didn't get the code\\? Resend it"
+    commands:
+      - retry:
+          maxRetries: 2
+          commands:
+            - tapOn: "Didn't get the code\\? Resend it"
+            - extendedWaitUntil:
+                visible: "Continue"
+                timeout: 15000
+            - tapOn: "Continue"
+            - extendedWaitUntil:
+                notVisible: "Didn't get the code\\? Resend it"
+                timeout: 20000
+
+# ── Onboarding ──
+# A splash sign-in lands on the onboarding pager, same as a new user. These
+# steps mirror smoke.yaml (which must stay self-contained: the release upgrade
+# test replays the previous tag's smoke.yaml on its own). Allow Home too, in
+# case returning accounts ever skip onboarding.
+#
+# Home is recognised by the stats circle ("N day streak" / "Consistency
+# Score: N%"), not smoke.yaml's "Start here:" hero: this account has history,
+# and once its pack is finished Home shows a "You finished ..." card instead.
+- extendedWaitUntil:
+    visible: "Never tried it|(?s).*day streak.*|Consistency Score: .*"
+    timeout: 60000
+
+- runFlow:
+    when:
+      visible: "Never tried it"
+    commands:
+      - tapOn: "Never tried it"
+
+      - extendedWaitUntil:
+          visible: "See how to help|.*Donate.*|Stay on Track with Meditation Reminders"
+          timeout: 30000
+      - runFlow:
+          when:
+            notVisible: "Stay on Track with Meditation Reminders"
+          file: dismiss_onboarding_donation.yaml
+
+      - extendedWaitUntil:
+          visible: "Stay on Track with Meditation Reminders"
+          timeout: 20000
+      - scrollUntilVisible:
+          element:
+            text: "Skip for Now"
+          direction: DOWN
+      - tapOn: "Skip for Now"
+
+      - extendedWaitUntil:
+          visible: "Update Setting|Help Us Improve Medito|Get started|Maybe later"
+          timeout: 30000
+      - runFlow:
+          when:
+            visible: "Update Setting"
+          commands:
+            - tapOn:
+                text: "Skip for Now"
+                optional: true
+      - runFlow:
+          when:
+            visible: "Help Us Improve Medito"
+          commands:
+            - tapOn: "Continue"
+            - runFlow:
+                when:
+                  visible: "Allow"
+                commands:
+                  - tapOn: "Allow"
+
+      - scrollUntilVisible:
+          element:
+            text: "Get started|Maybe later"
+          direction: DOWN
+          timeout: 30000
+      - tapOn:
+          text: "Get started|Maybe later"
+
+      # B ends with the donation ask; A goes straight to Home. Home can carry
+      # an announcement with a "Donate now" button, so only treat ".*Donate.*"
+      # as the onboarding ask while the stats circle is not on screen.
+      - extendedWaitUntil:
+          visible: "See how to help|.*Donate.*|(?s).*day streak.*|Consistency Score: .*|Dismiss"
+          timeout: 60000
+      - runFlow:
+          when:
+            visible: "See how to help|.*Donate.*"
+            notVisible: "(?s).*day streak.*|Consistency Score: .*"
+          file: dismiss_onboarding_donation.yaml
+
+# Home announcement card (e.g. a fundraising note), if one is live.
+- runFlow:
+    when:
+      visible: "Dismiss"
+    commands:
+      - tapOn:
+          text: "Dismiss"
+          optional: true
+
+- extendedWaitUntil:
+    visible: "(?s).*day streak.*|Consistency Score: .*"
+    timeout: 60000

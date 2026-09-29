@@ -36,3 +36,20 @@ Widget packCardNoImage(BuildContext context) {
     ),
   );
 }
+
+@UseCase(name: 'Completed', type: PackCardWidget)
+Widget packCardCompleted(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: PackCardWidget(
+      title: 'Mindfulness Basics',
+      subTitle: '8 sessions · Beginner',
+      coverUrlPath: 'https://picsum.photos/seed/pack/800/450',
+      isCompleted: context.knobs.boolean(
+        label: 'Completed',
+        initialValue: true,
+      ),
+      onTap: () {},
+    ),
+  );
+}

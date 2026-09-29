@@ -243,33 +243,37 @@ void main() {
       LocalAudioCompleted(id: 'd', timestamp: ms(DateTime(2026, 4, 28, 0, 30))),
     ];
 
-    test('changing the offset recomputes the stored streak straight away',
-        () async {
-      await statsManager.initializeForTesting();
-      statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
-      statsManager.setStatsForTesting(
-        statsManager.calculateStreak(statsFrom(audio: nightOwl())),
-      );
-      expect((await statsManager.localAllStats).streakCurrent, 1);
+    test(
+      'changing the offset recomputes the stored streak straight away',
+      () async {
+        await statsManager.initializeForTesting();
+        statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
+        statsManager.setStatsForTesting(
+          statsManager.calculateStreak(statsFrom(audio: nightOwl())),
+        );
+        expect((await statsManager.localAllStats).streakCurrent, 1);
 
-      await statsManager.setDayBoundaryOffset(const Duration(hours: 3));
+        await statsManager.setDayBoundaryOffset(const Duration(hours: 3));
 
-      final stats = await statsManager.localAllStats;
-      expect(stats.streakCurrent, 4);
-      expect(stats.streakLongest, 4);
-    });
+        final stats = await statsManager.localAllStats;
+        expect(stats.streakCurrent, 4);
+        expect(stats.streakLongest, 4);
+      },
+    );
 
-    test('setting the same offset again leaves the stored stats untouched',
-        () async {
-      await statsManager.initializeForTesting();
-      statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
-      final seeded = statsFrom(audio: nightOwl()).copyWith(streakCurrent: 99);
-      statsManager.setStatsForTesting(seeded);
+    test(
+      'setting the same offset again leaves the stored stats untouched',
+      () async {
+        await statsManager.initializeForTesting();
+        statsManager.setCurrentDateForTesting(DateTime(2026, 4, 28, 14, 0));
+        final seeded = statsFrom(audio: nightOwl()).copyWith(streakCurrent: 99);
+        statsManager.setStatsForTesting(seeded);
 
-      await statsManager.setDayBoundaryOffset(Duration.zero);
+        await statsManager.setDayBoundaryOffset(Duration.zero);
 
-      expect((await statsManager.localAllStats).streakCurrent, 99);
-    });
+        expect((await statsManager.localAllStats).streakCurrent, 99);
+      },
+    );
 
     test('does nothing when no stats are loaded yet', () async {
       await statsManager.initializeForTesting();

@@ -68,39 +68,36 @@ void main() {
   group('streak / calendar / consistency parity under a nonzero offset', () {
     const offset = Duration(hours: 4); // user-day starts at 04:00 local
 
-    test(
-      'a just-after-midnight session is bucketed identically by the streak '
-      'and the calendar (no "filled day the streak ignores")',
-      () {
-        final now = DateTime(2026, 8, 20, 12, 0);
-        statsManager.setCurrentDateForTesting(now);
-        statsManager.setDayBoundaryOffsetForTesting(offset);
+    test('a just-after-midnight session is bucketed identically by the streak '
+        'and the calendar (no "filled day the streak ignores")', () {
+      final now = DateTime(2026, 8, 20, 12, 0);
+      statsManager.setCurrentDateForTesting(now);
+      statsManager.setDayBoundaryOffsetForTesting(offset);
 
-        // Andrey-shaped: a real session at 01:00 on the 17th. Under a +4h
-        // day-boundary it belongs to the 16th, so the 17th is genuinely empty.
-        final stats = statsFrom([
-          LocalAudioCompleted(id: 'a', timestamp: ms(DateTime(2026, 8, 16, 20))),
-          LocalAudioCompleted(id: 'b', timestamp: ms(DateTime(2026, 8, 17, 1))),
-          LocalAudioCompleted(id: 'c', timestamp: ms(DateTime(2026, 8, 18, 12))),
-          LocalAudioCompleted(id: 'd', timestamp: ms(DateTime(2026, 8, 19, 12))),
-          LocalAudioCompleted(id: 'e', timestamp: ms(DateTime(2026, 8, 20, 12))),
-        ]);
+      // Andrey-shaped: a real session at 01:00 on the 17th. Under a +4h
+      // day-boundary it belongs to the 16th, so the 17th is genuinely empty.
+      final stats = statsFrom([
+        LocalAudioCompleted(id: 'a', timestamp: ms(DateTime(2026, 8, 16, 20))),
+        LocalAudioCompleted(id: 'b', timestamp: ms(DateTime(2026, 8, 17, 1))),
+        LocalAudioCompleted(id: 'c', timestamp: ms(DateTime(2026, 8, 18, 12))),
+        LocalAudioCompleted(id: 'd', timestamp: ms(DateTime(2026, 8, 19, 12))),
+        LocalAudioCompleted(id: 'e', timestamp: ms(DateTime(2026, 8, 20, 12))),
+      ]);
 
-        final streak = statsManager.calculateStreak(stats).streakCurrent;
-        final calendar = calendarActiveDays(stats, offset, now);
+      final streak = statsManager.calculateStreak(stats).streakCurrent;
+      final calendar = calendarActiveDays(stats, offset, now);
 
-        // The calendar must NOT circle the 17th (the streak doesn't count it).
-        expect(
-          calendar.contains(DateTime(2026, 8, 17)),
-          isFalse,
-          reason: 'calendar circled a day the streak treats as a gap',
-        );
+      // The calendar must NOT circle the 17th (the streak doesn't count it).
+      expect(
+        calendar.contains(DateTime(2026, 8, 17)),
+        isFalse,
+        reason: 'calendar circled a day the streak treats as a gap',
+      );
 
-        // Calendar's current run and the streak must be the same number.
-        expect(runFromToday(calendar, dayOf(now, offset)), streak);
-        expect(streak, 3);
-      },
-    );
+      // Calendar's current run and the streak must be the same number.
+      expect(runFromToday(calendar, dayOf(now, offset)), streak);
+      expect(streak, 3);
+    });
 
     test('consistency score honours the offset (sees the real gap)', () {
       final now = DateTime(2026, 8, 20, 12, 0);
@@ -132,7 +129,10 @@ void main() {
       // user-day; the chain is unbroken under the offset.
       final stats = statsFrom([
         for (var d = 16; d <= 20; d++)
-          LocalAudioCompleted(id: 'n$d', timestamp: ms(DateTime(2026, 8, d, 1))),
+          LocalAudioCompleted(
+            id: 'n$d',
+            timestamp: ms(DateTime(2026, 8, d, 1)),
+          ),
       ]);
 
       final streak = statsManager.calculateStreak(stats).streakCurrent;

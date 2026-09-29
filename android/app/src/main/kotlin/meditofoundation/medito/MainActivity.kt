@@ -7,7 +7,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.media3.common.util.UnstableApi
+import com.ryanheise.audioservice.AudioServicePlugin
 import io.flutter.embedding.android.FlutterFragmentActivity
+import io.flutter.embedding.engine.FlutterShellArgs
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugins.GeneratedPluginRegistrant
@@ -50,6 +52,22 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         healthConnectBridge.onPermissionResult(granted)
     }
 
+    // audio_service drives iOS only; Android plays through AudioPlayerService. If
+    // the plugin attaches to this activity it starts a second FlutterEngine that
+    // runs main() again (duplicate auth/clientId, analytics init) and binds to a
+    // service we never declare, whose failure NPEs if it lands after a detach.
+    // It must be gone before the activity attaches, which happens before
+    // configureFlutterEngine, so build the engine here without it. The fragment
+    // still destroys it with the activity, and super.configureFlutterEngine
+    // skips plugin registration for an injected engine.
+    override fun provideFlutterEngine(context: Context): FlutterEngine =
+        FlutterEngine(
+            context,
+            FlutterShellArgs.fromIntent(intent).toArray(),
+            true,
+            true,
+        ).also { it.plugins.remove(AudioServicePlugin::class.java) }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         FlutterEngineCache
             .getInstance()
@@ -64,6 +82,7 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         MeditoHealthConnectManager.setUp(flutterEngine.dartExecutor.binaryMessenger, healthConnectBridge)
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
+        WatchPresence.register(flutterEngine.dartExecutor.binaryMessenger, this)
         checkAndSendCompletionData()
         
         // Set up platform channel for widget updates
@@ -340,6 +359,21 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
                     }
                 } catch (e: Exception) {
                     println("Error parsing completion data: ${e.message}")
+                }
+            }
+
+            val pendingRepeats = SharedPreferencesManager.getPendingRepeats(this@MainActivity)
+            if (pendingRepeats.isNotEmpty()) {
+                withContext(Dispatchers.Main) {
+                    pendingRepeats.forEach { repeat ->
+                        meditoAudioApi?.handleRepeatPlaythrough(repeat) {
+                            if (it.getOrNull() == true) {
+                                activityScope.launch(Dispatchers.IO) {
+                                    SharedPreferencesManager.removePendingRepeat(this@MainActivity, repeat)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

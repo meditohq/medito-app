@@ -1,16 +1,13 @@
 import 'dart:async';
+import '../../services/audio/ios_session_bells.dart';
 import 'package:medito/models/models.dart' show PlaybackRequest;
 import 'package:medito/providers/background_sounds/background_sounds_notifier.dart';
-import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:medito/services/network/http_api_service.dart';
-import 'package:medito/constants/http/http_constants.dart';
 
-import '../../constants/strings/shared_preference_constants.dart';
 import '../../constants/types/type_constants.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/stats_updater.dart';
@@ -18,10 +15,16 @@ import '../../utils/logger.dart';
 
 class IosAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
-  final _httpApiService = HttpApiService();
+  late final sessionBells = IosSessionBells(_player);
+  // Distinguish a repeat boundary from terminal completion; never wait for bells.
+  final _sessionCompleted = BehaviorSubject<bool>.seeded(false);
   bool _isInitialized = false;
   RepeatMode _currentRepeatMode = RepeatMode.none;
   bool _hasReplayedOnce = false;
+
+  /// Full play-throughs of the current track, counting repeats. The first is
+  /// recorded as the session; each later one only adds its listening time.
+  int _completedPlaythroughs = 0;
 
   /// While the player is paused the audio session is kept active so a quick
   /// resume stays seamless and the lock-screen controls remain. If the pause
@@ -139,14 +142,18 @@ class IosAudioHandler extends BaseAudioHandler {
     });
 
     _player.processingStateStream.listen((state) async {
+      if (state != ProcessingState.completed) _sessionCompleted.add(false);
       if (state == ProcessingState.completed) {
         // Handle repeat once mode
         if (_currentRepeatMode == RepeatMode.once && !_hasReplayedOnce) {
           _hasReplayedOnce = true;
+          unawaited(_recordPlaythrough());
           await _player.seek(Duration.zero);
           await _player.play();
           return;
         }
+
+        _sessionCompleted.add(true);
 
         // Playback has finished and is not repeating. Release the audio
         // session first so iOS does not keep the app alive in the background,
@@ -159,10 +166,29 @@ class IosAudioHandler extends BaseAudioHandler {
         // the narration ends; pause it first so the shared session is idle and
         // iOS will actually let us deactivate it (a busy session is rejected).
         await iosBackgroundPlayer.pause();
+        await sessionBells.disable();
         await _deactivateSession();
 
-        await _storeTrackCompletion();
+        await _recordPlaythrough();
       }
+    });
+
+    // Repeat forever (LoopMode.one) never reaches `completed`; each loop back
+    // to the start surfaces as an auto-advance discontinuity instead.
+    // just_audio also reports autoAdvance when a new source is loaded, so only
+    // count it when the same, already-playing item wrapped around.
+    _player.positionDiscontinuityStream.listen((discontinuity) {
+      final prev = discontinuity.previousEvent;
+      final curr = discontinuity.event;
+      const active = {ProcessingState.ready, ProcessingState.buffering};
+      final isLoop =
+          discontinuity.reason == PositionDiscontinuityReason.autoAdvance &&
+          _currentRepeatMode == RepeatMode.infinite &&
+          active.contains(prev.processingState) &&
+          active.contains(curr.processingState) &&
+          prev.duration != null &&
+          prev.duration == curr.duration;
+      if (isLoop) unawaited(_recordPlaythrough());
     });
 
     _player.playbackEventStream.listen((event) {
@@ -217,13 +243,14 @@ class IosAudioHandler extends BaseAudioHandler {
   Duration? get duration => _player.duration;
 
   Stream<IosStateData> get iosStateStream =>
-      Rx.combineLatest6<
+      Rx.combineLatest7<
         double,
         PlayerState,
         Track,
         Duration,
         Duration,
         Duration?,
+        bool,
         IosStateData
       >(
         _player.speedStream,
@@ -232,10 +259,13 @@ class IosAudioHandler extends BaseAudioHandler {
         _player.positionStream,
         _player.bufferedPositionStream,
         _player.durationStream,
-        (speed, state, track, position, bufferedPosition, duration) {
+        _sessionCompleted.stream,
+        (speed, state, track, position, bufferedPosition, duration, completed) {
           return IosStateData(
             speed,
-            state,
+            state.processingState == ProcessingState.completed && !completed
+                ? PlayerState(false, ProcessingState.ready)
+                : state,
             track,
             position,
             bufferedPosition,
@@ -243,6 +273,27 @@ class IosAudioHandler extends BaseAudioHandler {
           );
         },
       );
+
+  Future<void> _recordPlaythrough() {
+    _completedPlaythroughs++;
+    if (_completedPlaythroughs == 1) return _storeTrackCompletion();
+    return _storeRepeatPlaythrough();
+  }
+
+  Future<void> _storeRepeatPlaythrough() async {
+    try {
+      if (duration == null) return;
+      await handleRepeatPlaythrough({
+        TypeConstants.trackIdKey: trackState.id,
+        TypeConstants.durationIdKey: duration!.inMilliseconds,
+        TypeConstants.fileIdKey: trackState.fileId,
+        TypeConstants.guideIdKey: trackState.artist ?? '',
+        TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
+      });
+    } catch (e) {
+      AppLogger.e('IOS', 'Error recording repeat play-through: $e');
+    }
+  }
 
   Future<void> _storeTrackCompletion() async {
     try {
@@ -267,15 +318,12 @@ class IosAudioHandler extends BaseAudioHandler {
 
   /// Creates a payload map with all track completion data
   Future<Map<String, dynamic>> _createTrackCompletionPayload() async {
-    String? userToken = await _getUserToken();
-
     return {
       TypeConstants.trackIdKey: trackState.id,
       TypeConstants.durationIdKey: duration?.inMilliseconds ?? 0,
       TypeConstants.fileIdKey: trackState.fileId,
       TypeConstants.guideIdKey: trackState.artist ?? '',
       TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
-      UpdateStatsConstants.userTokenKey: userToken,
     };
   }
 
@@ -306,17 +354,6 @@ class IosAudioHandler extends BaseAudioHandler {
     );
     final prefs = await SharedPreferences.getInstance();
     await storeTrackCompletion(prefs, payload);
-  }
-
-  Future<String?> _getUserToken() async {
-    try {
-      final response = await _httpApiService.getRequest(HTTPConstants.me);
-      return response['userToken'] as String?;
-    } catch (e) {
-      AppLogger.e('IOS', 'Error getting user token: $e');
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(SharedPreferenceConstants.userToken);
-    }
   }
 
   @override
@@ -354,7 +391,7 @@ class IosAudioHandler extends BaseAudioHandler {
     await session.setActive(true);
 
     unawaited(_player.play());
-    unawaited(iosBackgroundPlayer.play());
+    if (!sessionBells.enabled) unawaited(iosBackgroundPlayer.play());
   }
 
   @override
@@ -370,6 +407,7 @@ class IosAudioHandler extends BaseAudioHandler {
   @override
   Future<void> stop() async {
     _cancelPauseDeactivationTimer();
+    await sessionBells.disable();
     // Await the players so their audio I/O has actually stopped before we
     // deactivate; iOS rejects deactivation while the shared session is busy.
     await _player.stop();
@@ -422,6 +460,9 @@ class IosAudioHandler extends BaseAudioHandler {
     await ensureInitialized();
 
     _hasReplayedOnce = false;
+    _completedPlaythroughs = 0;
+    _sessionCompleted.add(false);
+    sessionBells.reset();
 
     if (downloadPath == null) {
       await _player.setAudioSource(

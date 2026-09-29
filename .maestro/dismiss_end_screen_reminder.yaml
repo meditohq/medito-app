@@ -1,0 +1,19 @@
+appId: ${APP_ID}
+name: Dismiss reminder UI opened by the final playback skip
+---
+- runFlow:
+    when:
+      visible: "One quick thing"
+    commands:
+      - tapOn: "Not Now"
+- runFlow:
+    when:
+      visible: "When will you meditate?"
+    commands:
+      # This modal bottom sheet has no close button. Its dismissible scrim
+      # covers the top of the screen; tapping it leaves reminders unset.
+      - tapOn:
+          point: "50%,15%"
+      - extendedWaitUntil:
+          notVisible: "When will you meditate?"
+          timeout: 5000

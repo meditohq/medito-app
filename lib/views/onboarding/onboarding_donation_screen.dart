@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:medito/widgets/onboarding/onboarding_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -29,6 +30,15 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
   static const _paywallConfigTimeout = Duration(seconds: 3);
 
   bool _hasAttemptedDonation = isSmokeTestMode;
+  bool _openingDonation = false;
+  bool _advanced = false;
+
+  void _advance() {
+    if (!mounted || _advanced) return;
+    _advanced = true;
+    widget.onNext?.call();
+  }
+
   // Decided once: true = native inline paywall, false = existing intro +
   // webview flow, null = still waiting on paywall config.
   bool? _useNativePaywall;
@@ -65,31 +75,32 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
     super.dispose();
   }
 
-  void _handleDonationAction(BuildContext context) async {
-    if (!_hasAttemptedDonation) {
-      await FirebaseAnalyticsService().logEvent(
-        name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+  Future<void> _handleDonationAction(BuildContext context) async {
+    if (_openingDonation || _advanced) return;
+    setState(() => _openingDonation = true);
+    try {
+      if (!_hasAttemptedDonation) {
+        unawaited(
+          FirebaseAnalyticsService().logEvent(
+            name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+          ),
+        );
+      }
+      if (!context.mounted) return;
+      await handleDonationNavigation(
+        context,
+        ref,
+        FirebaseAnalyticsService.paywallSourceOnboarding,
+        navigator: Navigator.of(context),
       );
+      // A completed gift AND a dismissed ask both continue the onboarding flow.
+      _advance();
+    } catch (_) {
+      // If navigation fails, leave an explicit way to continue.
+      if (mounted) setState(() => _hasAttemptedDonation = true);
+    } finally {
+      if (mounted) setState(() => _openingDonation = false);
     }
-
-    if (!context.mounted) return;
-
-    final didSucceed = await handleDonationNavigation(
-      context,
-      ref,
-      FirebaseAnalyticsService.paywallSourceOnboarding,
-      navigator: Navigator.of(context),
-    );
-
-    if (!mounted) return;
-
-    if (didSucceed == true) {
-      widget.onNext?.call();
-
-      return;
-    }
-
-    setState(() => _hasAttemptedDonation = true);
   }
 
   /// The wait elapsed with no config, so this user gets the webview arm no
@@ -157,7 +168,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
       name: FirebaseAnalyticsService.eventOnboardingDonationSkipTap,
     );
 
-    widget.onNext?.call();
+    _advance();
   }
 
   @override
@@ -183,7 +194,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
           child: NativeDonationPage(
             config: config,
             source: FirebaseAnalyticsService.paywallSourceOnboarding,
-            onNext: () => widget.onNext?.call(),
+            onNext: _advance,
           ),
         ),
       );
@@ -247,66 +258,74 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                 children: [
                   if (widget.headerImage != null)
                     OnboardingHeaderImage(imagePath: widget.headerImage!),
-                  Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: (constraints.maxHeight - 64 - headerHeight)
-                            .clamp(0.0, double.infinity),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)!.donationTitle,
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 24),
-                              Text(
-                                AppLocalizations.of(context)!.donationBody,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.7),
-                                  fontSize: 16,
-                                  height: 1.5,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 32),
-                          Column(
-                            children: [
-                              _buildActionButton(
-                                text: AppLocalizations.of(
-                                  context,
-                                )!.donationPrimerCta,
-                                onPressed: () => _handleDonationAction(context),
-                              ),
-                              if (_hasAttemptedDonation) ...[
-                                const SizedBox(height: 12),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: TextButton(
-                                    onPressed: _handleSkip,
-                                    child: Text(
-                                      AppLocalizations.of(context)!.skipForNow,
-                                    ),
+                  OnboardingContent(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: (constraints.maxHeight - 64 - headerHeight)
+                              .clamp(0.0, double.infinity),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)!.donationTitle,
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
                                   ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  AppLocalizations.of(context)!.donationBody,
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                    fontSize: 16,
+                                    height: 1.5,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ],
-                            ],
-                          ),
-                        ],
+                            ),
+                            const SizedBox(height: 32),
+                            Column(
+                              children: [
+                                _buildActionButton(
+                                  text: AppLocalizations.of(
+                                    context,
+                                  )!.donationPrimerCta,
+                                  onPressed: _openingDonation
+                                      ? null
+                                      : () => _handleDonationAction(context),
+                                ),
+                                if (_hasAttemptedDonation) ...[
+                                  const SizedBox(height: 12),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: TextButton(
+                                      onPressed: _handleSkip,
+                                      child: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.skipForNow,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -321,7 +340,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
 
   Widget _buildActionButton({
     required String text,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
   }) {
     return SizedBox(
       width: double.infinity,

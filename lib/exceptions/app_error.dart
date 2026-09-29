@@ -96,7 +96,7 @@ final class NetworkConnectionError extends AppError {
         text.contains('broken pipe') ||
         errno == 111 /* ECONNREFUSED linux */ ||
         errno == 61 /* ECONNREFUSED darwin */ ||
-        errno == 104 /* ECONNRESET */) {
+        errno == 104 /* ECONNRESET */ ) {
       return NetworkFailureKind.connectionRefused;
     }
     return NetworkFailureKind.offline;

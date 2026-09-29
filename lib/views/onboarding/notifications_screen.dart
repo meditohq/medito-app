@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:medito/widgets/onboarding/onboarding_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,7 +21,7 @@ import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/services/reminders/reminder_slots.dart';
-import 'package:medito/services/reminders/smart_reminders_service.dart';
+import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:medito/widgets/medito_icon.dart';
 
 class NotificationsScreen extends ConsumerStatefulWidget {
@@ -276,7 +277,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       },
     );
 
-    final scheduler = SmartRemindersScheduler(
+    final scheduler = DailyRemindersScheduler(
       prefs: prefs,
       reminders: ref.read(reminderProvider),
     );
@@ -368,19 +369,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     }
   }
 
-  String _notificationsBody(AppLocalizations l10n) {
-    switch (widget.intentIndex) {
-      case 0:
-        return l10n.enableNotificationsBodyLearn;
-      case 1:
-        return l10n.enableNotificationsBodyHabit;
-      case 2:
-        return l10n.enableNotificationsBodyStress;
-      default:
-        return l10n.enableNotificationsBody;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final reminderTime = ref.watch(reminderTimeProvider);
@@ -391,8 +379,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
+            // Smaller hero than the default onboarding pages so the preview +
+            // time chips have room to sit higher on the screen.
+            const headerFraction = 0.2;
             final headerHeight = widget.headerImage != null
-                ? OnboardingHeaderImage.heightFor(context)
+                ? OnboardingHeaderImage.heightFor(
+                    context,
+                    fractionOverride: headerFraction,
+                  )
                 : 0.0;
 
             return SingleChildScrollView(
@@ -401,62 +395,76 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (widget.headerImage != null)
-                    OnboardingHeaderImage(imagePath: widget.headerImage!),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(32, 24, 32, 32),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: (constraints.maxHeight - 72 - headerHeight)
-                            .clamp(0.0, double.infinity),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                _notificationsTitle(
-                                  AppLocalizations.of(context)!,
-                                ),
-                                style: Theme.of(context).textTheme.displayLarge
-                                    ?.copyWith(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                              // Before a reminder is set the body line is
-                              // dropped — the title plus the "When will you
-                              // meditate?" question above the chips carry the
-                              // message, one message per block instead of two.
-                              if (reminderTime != null) ...[
-                                const SizedBox(height: 16),
+                    OnboardingHeaderImage(
+                      imagePath: widget.headerImage!,
+                      heightFraction: headerFraction,
+                    ),
+                  OnboardingContent(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(32, 24, 32, 32),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: (constraints.maxHeight - 72 - headerHeight)
+                              .clamp(0.0, double.infinity),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Top group: title, notification preview and the time
+                            // chips stack together near the top so the choice sits
+                            // right under the preview rather than being pushed to
+                            // the bottom of the screen.
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                                 Text(
-                                  _notificationsBody(
+                                  _notificationsTitle(
                                     AppLocalizations.of(context)!,
                                   ),
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(fontSize: 16, height: 1.5),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayLarge
+                                      ?.copyWith(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                   textAlign: TextAlign.center,
                                 ),
-                              ],
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          _buildNotificationPreview(context),
-                          const SizedBox(height: 32),
-                          Column(
-                            children: [
-                              if (reminderTime != null)
-                                _buildSmartRemindersOnButton()
-                              else
+                                // When a reminder already exists (e.g. re-entering
+                                // onboarding) surface the time it's set for; the
+                                // chips below let the user change it.
+                                if (reminderTime != null) ...[
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.onboardingReminderCurrentlySet(
+                                      reminderTime.format(context),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(fontSize: 16, height: 1.5),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                                const SizedBox(height: 24),
+                                _buildNotificationPreview(context),
+                                const SizedBox(height: 24),
+                                // Always the chips: first-timers pick a time
+                                // (which sets it and auto-advances), and returning
+                                // users change the already-set time with the same
+                                // control.
                                 _buildTimeChips(AppLocalizations.of(context)!),
-                              const SizedBox(height: 12),
-                              SizedBox(
+                              ],
+                            ),
+                            // Skip stays pinned toward the bottom.
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: SizedBox(
                                 width: double.infinity,
                                 child: TextButton(
                                   onPressed: () async {
-                                    // Log analytics event for skip tap
                                     await FirebaseAnalyticsService().logEvent(
                                       name: FirebaseAnalyticsService
                                           .eventOnboardingReminderSkipTap,
@@ -469,9 +477,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -597,7 +605,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                         'MEDITO',
                         style: TextStyle(
                           color: Colors.black54,
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.4,
                         ),
@@ -607,7 +615,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                       l10n.notificationPreviewTimestamp,
                       style: const TextStyle(
                         color: Colors.black45,
-                        fontSize: 11,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -617,7 +625,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                   title,
                   style: const TextStyle(
                     color: Colors.black,
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
@@ -690,12 +698,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+              side: BorderSide(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.24),
+              ),
+            ),
             onPressed: _isProcessing ? null : _onCustomTimeTap,
             icon: const Icon(Icons.schedule_rounded, size: 20),
             label: Text(
               l10n.reminderSlotCustom,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -748,31 +764,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
               slot.time.format(context),
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 13,
+                fontSize: 14,
                 height: 1.2,
                 color: onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSmartRemindersOnButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () async {
-          await FirebaseAnalyticsService().logEvent(
-            name: FirebaseAnalyticsService.eventOnboardingReminderConfirmTap,
-            parameters: _eventParams,
-          );
-          _navigateNext();
-        },
-        child: Text(
-          AppLocalizations.of(context)!.smartRemindersOn,
-          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

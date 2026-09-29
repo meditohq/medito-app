@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/explore/explore_list_item.dart';
+import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/widgets/widgets.dart';
 
@@ -18,7 +19,10 @@ class PackGridSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final crossAxisCount = MediaQuery.sizeOf(context).width > 600 ? 3 : 2;
+    final completedPacks = ref.watch(completedPackIdsProvider);
+    final crossAxisCount = (MediaQuery.sizeOf(context).width / 240)
+        .floor()
+        .clamp(2, 5);
 
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(padding16, padding16, padding16, 0),
@@ -35,6 +39,7 @@ class PackGridSliver extends ConsumerWidget {
               title: item.title,
               subTitle: item.subtitle,
               coverUrlPath: item.coverUrl,
+              isCompleted: completedPacks.contains(item.id),
               onTap: () {
                 onBeforeNavigate?.call();
                 handleNavigation(

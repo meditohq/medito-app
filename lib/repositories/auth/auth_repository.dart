@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
@@ -41,6 +42,10 @@ abstract class AuthRepository {
   Future<bool> verifyOtp(String email, String otp);
   User? get currentUser;
   Future<bool> signOut();
+
+  /// Clears local auth state without calling the server's signout endpoint.
+  /// Used after account deletion, when the server session is already gone.
+  Future<void> signOutLocally();
   Future<void> signInAnonymously();
   void resetAuthState();
   Future<void> migrateEmailToStorage();
@@ -60,6 +65,11 @@ class AuthRepositoryImpl extends AuthRepository {
   User? _currentUser;
   AuthTokens? _tokens;
 
+  // Bumped by _resetAuth before its first await. getToken compares it after
+  // each await so a refresh that finishes after a sign-out (or account
+  // deletion) is dropped instead of restoring the old session.
+  int _authGeneration = 0;
+
   AuthRepositoryImpl({
     required SharedPreferences preferences,
     AuthApiService? authService,
@@ -72,7 +82,23 @@ class AuthRepositoryImpl extends AuthRepository {
        _httpApiService = httpApiService ?? HttpApiService(),
        _secureStorage = secureStorage ?? SecureStorageService(),
        _uuid = uuid ?? const Uuid(),
-       _crashlyticsService = crashlyticsService ?? CrashlyticsService();
+       _crashlyticsService = crashlyticsService ?? CrashlyticsService() {
+    _httpApiService.setTokenSupplier(_supplyTokenIfSignedIn);
+  }
+
+  /// Token supplier for requests that are about to go out without a header.
+  /// Signed-out users (fresh install, after sign-out or deletion) must never
+  /// trigger a refresh: a leftover refresh token (e.g. in the iOS keychain
+  /// after a reinstall) would otherwise sign the request in as that account.
+  Future<void> _supplyTokenIfSignedIn() async {
+    if (!(_preferences.getBool(SharedPreferenceConstants.isLoggedIn) ??
+        false)) {
+      return;
+    }
+    final generation = _authGeneration;
+    final token = await getToken();
+    if (generation == _authGeneration) _httpApiService.setAuthHeader(token);
+  }
 
   @override
   User? get currentUser {
@@ -221,6 +247,7 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<String> getToken() async {
     dev.log('[AUTH_REPO] getToken called', level: 800);
+    final generation = _authGeneration;
 
     // If we have a valid token that isn't expired, return it immediately
     if (_tokens != null && !_tokens!.isExpired) {
@@ -259,6 +286,7 @@ class AuthRepositoryImpl extends AuthRepository {
         int retryCount = 0;
         const maxRetries = 3;
         bool refreshSuccess = false;
+        AuthTokens? refreshed;
 
         while (!refreshSuccess && retryCount < maxRetries) {
           try {
@@ -279,7 +307,7 @@ class AuthRepositoryImpl extends AuthRepository {
               await Future.delayed(delay);
             }
 
-            _tokens = await _authService.refreshToken(refreshToken);
+            refreshed = await _authService.refreshToken(refreshToken);
             refreshSuccess = true;
 
             dev.log(
@@ -366,6 +394,9 @@ class AuthRepositoryImpl extends AuthRepository {
           }
         }
 
+        _throwIfSignedOutSince(generation);
+        _tokens = refreshed;
+
         dev.log(
           '[AUTH_REPO] After refresh - Email: ${_tokens?.email}, ClientId: ${_tokens?.clientId}',
           level: 800,
@@ -406,6 +437,11 @@ class AuthRepositoryImpl extends AuthRepository {
         // If we have email in the token now, ensure it's saved to secure storage
         if (_tokens?.email != null && _tokens!.email!.isNotEmpty) {
           await _secureStorage.storeUserEmail(_tokens!.email!);
+          if (generation != _authGeneration) {
+            // Signed out while the email was being written: undo it.
+            await _secureStorage.clearUserEmail();
+          }
+          _throwIfSignedOutSince(generation);
           dev.log(
             '[AUTH_REPO] Updated stored email: ${_tokens!.email}',
             level: 800,
@@ -421,8 +457,12 @@ class AuthRepositoryImpl extends AuthRepository {
           );
         }
 
+        _throwIfSignedOutSince(generation);
         _httpApiService.setAuthHeader(_tokens!.accessToken);
         return _tokens!.accessToken;
+      } on _SignedOutDuringRefresh {
+        dev.log('[AUTH_REPO] Signed out during token refresh', level: 800);
+        throw const UnauthorizedError();
       } on NetworkConnectionError catch (e) {
         dev.log(
           '[AUTH_REPO] Network error refreshing token',
@@ -480,6 +520,10 @@ class AuthRepositoryImpl extends AuthRepository {
     }
 
     throw const UnauthorizedError();
+  }
+
+  void _throwIfSignedOutSince(int generation) {
+    if (generation != _authGeneration) throw const _SignedOutDuringRefresh();
   }
 
   @override
@@ -670,43 +714,52 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<bool> signOut() async {
     dev.log('[AUTH_REPO] Starting signOut process', level: 500);
 
-    // First reset local auth state
+    // The server ends the session named by the access token, so take it
+    // before the local reset clears the header. The header is at least as
+    // fresh as _tokens (every refresh path sets it).
+    final accessToken =
+        _httpApiService.accessToken ??
+        (_tokens != null && !_tokens!.isExpired ? _tokens!.accessToken : null);
+
     await _resetAuth();
     dev.log('[AUTH_REPO] Local auth state reset', level: 500);
 
-    // Then try to inform the server, but don't wait for success
+    if (accessToken == null) {
+      // No usable token: the refresh token is already gone locally, and the
+      // server session lapses on its own.
+      dev.log('[AUTH_REPO] No access token, skipping server sign out');
+    } else {
+      // Courtesy call: sign-out is already complete locally, so don't make
+      // the user wait on the network.
+      unawaited(_endServerSession(accessToken));
+    }
+
+    dev.log('[AUTH_REPO] Sign out complete', level: 500);
+    return true;
+  }
+
+  Future<void> _endServerSession(String accessToken) async {
     try {
-      dev.log(
-        '[AUTH_REPO] Attempting server sign out notification',
-        level: 500,
-      );
-      // We don't need to handle the response, this is just a courtesy call to the server
-      await _httpApiService.signOut().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          dev.log(
-            '[AUTH_REPO] Server sign out timed out, continuing',
-            level: 500,
-          );
-          _crashlyticsService.recordError(
-            Exception('Server sign out timed out'),
-            StackTrace.current,
-            reason: 'AuthRepo: Server sign out timed out',
-          );
-          return;
-        },
-      );
+      await _httpApiService
+          .signOut(accessToken)
+          .timeout(const Duration(seconds: 10));
     } catch (e) {
       _crashlyticsService.recordError(
         e,
         StackTrace.current,
         reason: 'AuthRepo: Error during server sign out (ignored)',
       );
-      // Ignore errors since we've already cleared local state
     }
+  }
 
-    dev.log('[AUTH_REPO] Sign out complete', level: 500);
-    return true;
+  @override
+  Future<void> signOutLocally() async {
+    // _resetAuth drops the in-memory tokens, header and in-flight refresh
+    // before its first await, so nothing can hand a deleted account's
+    // still-valid access token to the next request and recreate its profile.
+    await _resetAuth();
+    await _authService.clearAuthTokens();
+    dev.log('[AUTH_REPO] Local sign out complete', level: 500);
   }
 
   @override
@@ -770,6 +823,16 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<void> _resetAuth() async {
     dev.log('[AUTH_REPO] Resetting auth state', level: 500);
 
+    // Synchronous part first: nothing that starts after this point may see
+    // the old session (tokens, header, in-flight refresh).
+    _authGeneration++;
+    _tokens = null;
+    final httpAuthCleared = _httpApiService.clearLocalAuth().catchError((
+      Object e,
+    ) {
+      dev.log('[AUTH_REPO] Error clearing HTTP auth state: $e', level: 800);
+    });
+
     // Mark user as logged out
     await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, false);
 
@@ -780,8 +843,8 @@ class AuthRepositoryImpl extends AuthRepository {
     await _secureStorage.clearUserEmail();
     _tokens = null;
 
-    // Clear HTTP auth header
-    _httpApiService.clearAuthHeader();
+    // Clear HTTP auth header and HttpApiService's own view of the session
+    await httpAuthCleared;
 
     // Clear Firebase Analytics user ID and reset analytics data
     try {
@@ -935,3 +998,8 @@ final authRepositorySyncProvider = Provider<AuthRepository>((ref) {
   );
   throw Exception('Unexpected state: AuthRepository not initialized');
 });
+
+/// Internal signal that a sign-out happened while getToken was refreshing.
+class _SignedOutDuringRefresh implements Exception {
+  const _SignedOutDuringRefresh();
+}

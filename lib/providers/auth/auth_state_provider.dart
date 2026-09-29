@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/network/http_api_service_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:medito/utils/logger.dart';
 
 // Auth events that can be emitted
 enum AuthStateEvent { forceLogout }
@@ -33,6 +35,9 @@ final authStateListenerProvider = Provider<void>((ref) {
   void onAuthEvent(AuthEvent event) {
     if (event == AuthEvent.forceLogout) {
       authRepository.resetAuthState();
+      // Whoever signs in next (possibly a new anonymous account) must not
+      // inherit and upload this account's favourites.
+      unawaited(_clearLocalFavorites(ref));
       _authStateController.add(AuthStateEvent.forceLogout);
     }
   }
@@ -40,6 +45,14 @@ final authStateListenerProvider = Provider<void>((ref) {
   httpService.addAuthCallback(onAuthEvent);
   ref.onDispose(() => httpService.removeAuthCallback(onAuthEvent));
 });
+
+Future<void> _clearLocalFavorites(Ref ref) async {
+  try {
+    await ref.read(favoritesNotifierProvider.notifier).clearLocal();
+  } catch (e) {
+    AppLogger.e('AUTH_STATE', 'Failed to clear favourites on logout: $e');
+  }
+}
 
 // Helper to dispose the controller (call in app shutdown)
 void disposeAuthStateController() {

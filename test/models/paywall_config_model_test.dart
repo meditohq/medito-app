@@ -91,10 +91,11 @@ void main() {
 
       final model = PaywallConfigModel.fromJson(json);
 
-      expect(
-        model.effectiveLadder('monthly', source: 'onboarding'),
-        [100, 200, 400],
-      );
+      expect(model.effectiveLadder('monthly', source: 'onboarding'), [
+        100,
+        200,
+        400,
+      ]);
       // Without a source override, amounts come from localized pricing (the
       // raw base-cent config ladder only gates offered frequencies).
       expect(model.effectiveLadder('monthly'), [500, 1000, 2000]);

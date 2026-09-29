@@ -199,4 +199,41 @@ void main() {
     expect(result[1].id, 'pack1');
     expect(result[1].type, FavoriteItemType.pack);
   });
+
+  group('mergeFavoriteLists with removedIds', () {
+    test('drops server-only items removed on this device', () {
+      final server = [
+        createTestItem(id: 'track1', timestamp: 100),
+        createTestItem(id: 'track2', timestamp: 200),
+      ];
+      final result = mergeFavoriteLists(
+        [createTestItem(id: 'track2', timestamp: 200)],
+        server,
+        removedIds: {'track1': 150},
+      );
+
+      expect(result.map((f) => f.id), ['track2']);
+    });
+
+    test('drops removed items even when the server timestamp is newer', () {
+      // Old-format server rows report timestamp = request time.
+      final result = mergeFavoriteLists(
+        [],
+        [createTestItem(id: 'track1', timestamp: 999)],
+        removedIds: {'track1': 150},
+      );
+
+      expect(result, isEmpty);
+    });
+
+    test('keeps items present locally even if listed as removed', () {
+      final result = mergeFavoriteLists(
+        [createTestItem(id: 'track1', timestamp: 300)],
+        [createTestItem(id: 'track1', timestamp: 100)],
+        removedIds: {'track1': 150},
+      );
+
+      expect(result.map((f) => f.id), ['track1']);
+    });
+  });
 }

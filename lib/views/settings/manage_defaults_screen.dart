@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -17,7 +18,10 @@ class ManageDefaultsScreen extends ConsumerWidget {
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: SafeArea(child: _buildMain(context, ref)),
+      body: AdaptivePageBody(
+        maxWidth: 760,
+        child: SafeArea(child: _buildMain(context, ref)),
+      ),
     );
   }
 

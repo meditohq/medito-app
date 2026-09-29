@@ -7,7 +7,7 @@ class AssetConstants {
   static const String onboardingImage2 = 'assets/images/relationships.png';
   static const String onboardingImage3 =
       'assets/images/palouse_mindfulness_small.png';
-  static const String splashBackground = 'assets/images/splashbg.png';
+  static const String splashBackground = 'assets/images/splashbg.svg';
 
   static const String iconAlert = 'assets/images/warning-triangle.svg';
   static const String iconArrowLeft = 'assets/images/arrow-left.svg';
@@ -51,8 +51,6 @@ class AssetConstants {
   static const String iconMoon = 'assets/images/moon-sat.svg';
   static const String iconMusicNote = 'assets/images/music-double-note.svg';
   static const String iconPause = 'assets/images/pause.svg';
-  static const String iconPin = 'assets/images/pin.svg';
-  static const String iconPinSolid = 'assets/images/pin-solid.svg';
   static const String iconPlay = 'assets/images/play.svg';
   static const String iconPlaySolid = 'assets/images/play-solid.svg';
   static const String iconPrivacy = 'assets/images/privacy-policy.svg';

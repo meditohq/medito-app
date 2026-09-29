@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/widgets/dialogs/medito_dialog.dart';
+import 'package:medito/widgets/dialogs/medito_dialog_buttons.dart';
 
 /// Everything between "user asked for reminders" and "the OS actually lets us
 /// send them". Three surfaces need it — onboarding, the end-screen card and the
@@ -24,17 +26,17 @@ Future<bool> showNotificationPermissionPrimer(BuildContext context) async {
 
   final proceed = await showDialog<bool>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: Text(l10n.reminderPrimerTitle),
-      content: Text(l10n.reminderPrimerBody),
+    builder: (dialogContext) => MeditoDialog(
+      title: l10n.reminderPrimerTitle,
+      content: MeditoDialogBody(l10n.reminderPrimerBody),
       actions: [
-        TextButton(
+        MeditoDialogSecondaryButton(
+          label: l10n.notNow,
           onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: Text(l10n.notNow),
         ),
-        TextButton(
+        MeditoDialogPrimaryButton(
+          label: l10n.reminderPrimerContinue,
           onPressed: () => Navigator.of(dialogContext).pop(true),
-          child: Text(l10n.reminderPrimerContinue),
         ),
       ],
     ),
@@ -52,17 +54,17 @@ Future<bool> showNotificationsBlockedDialog(BuildContext context) async {
 
   final proceed = await showDialog<bool>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: Text(l10n.notificationsBlockedTitle),
-      content: Text(l10n.notificationsBlockedBody),
+    builder: (dialogContext) => MeditoDialog(
+      title: l10n.notificationsBlockedTitle,
+      content: MeditoDialogBody(l10n.notificationsBlockedBody),
       actions: [
-        TextButton(
+        MeditoDialogSecondaryButton(
+          label: l10n.notNow,
           onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: Text(l10n.notNow),
         ),
-        TextButton(
+        MeditoDialogPrimaryButton(
+          label: l10n.openSettings,
           onPressed: () => Navigator.of(dialogContext).pop(true),
-          child: Text(l10n.openSettings),
         ),
       ],
     ),

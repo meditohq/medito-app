@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
@@ -468,6 +470,42 @@ void main() {
       verify(mockStatsService.fetchAllStats()).called(1);
     });
 
+    test(
+      'a sync in flight when stats are cleared does not restore them',
+      () async {
+        var testDate = DateTime(2025, 1, 15, 12, 0, 0);
+        statsManager.setCurrentDateForTesting(testDate);
+        statsManager.setStatsForTesting(LocalAllStats.empty());
+
+        final remote = Completer<LocalAllStats>();
+        when(mockStatsService.fetchAllStats()).thenAnswer((_) => remote.future);
+        when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+        final sync = statsManager.sync(force: true);
+        await pumpEventQueue();
+        await statsManager.clearAllStats();
+        remote.complete(
+          LocalAllStats.empty().copyWith(
+            totalTracksCompleted: 9,
+            audioCompleted: [
+              LocalAudioCompleted(
+                id: 'deleted-account-track',
+                timestamp: testDate.millisecondsSinceEpoch,
+              ),
+            ],
+          ),
+        );
+        await sync;
+
+        final result = await statsManager.localAllStats;
+        expect(result.totalTracksCompleted, 0);
+        expect(result.audioCompleted ?? [], isEmpty);
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString('local_all_stats'), isNull);
+        verifyNever(mockStatsService.postStats(any));
+      },
+    );
+
     test('sync - makes network call when outside TTL', () async {
       // Arrange
       var testDate = DateTime(2025, 1, 15, 12, 0, 0);
@@ -676,6 +714,43 @@ void main() {
       expect(result?.audioCompleted?.length, 1);
       expect(result?.tracksChecked?.contains('1'), true);
     });
+
+    test(
+      'addRepeatListeningTime - adds minutes of every repetition, one session',
+      () async {
+        statsManager.setStatsForTesting(LocalAllStats.empty());
+        when(mockStatsService.postStats(any)).thenAnswer((_) async => {});
+
+        final audio = LocalAudioCompleted(
+          id: '1',
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+        );
+
+        // Track played three times on repeat.
+        await statsManager.addAudioCompleted(audio, 300);
+        await statsManager.addRepeatListeningTime(300);
+        await statsManager.addRepeatListeningTime(300);
+
+        final result = statsManager.currentStats;
+        expect(result?.totalTimeListened, 900);
+        expect(result?.totalTracksCompleted, 1);
+        expect(result?.audioCompleted?.length, 1);
+      },
+    );
+
+    test(
+      'addRepeatListeningTime - keeps the local write when the post fails',
+      () async {
+        statsManager.setStatsForTesting(
+          LocalAllStats.empty().copyWith(totalTimeListened: 300),
+        );
+        when(mockStatsService.postStats(any)).thenThrow(Exception('offline'));
+
+        await statsManager.addRepeatListeningTime(300);
+
+        expect(statsManager.currentStats?.totalTimeListened, 600);
+      },
+    );
   });
 
   group('StatsManager Audio Completion Edge Cases', () {

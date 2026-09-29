@@ -16,7 +16,10 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     commands:
       - runFlow:
           when:
-            visible: "(?i)isn't responding"
+            # Maestro regexes must match the WHOLE text ("System UI isn't
+            # responding", "Pixel Launcher isn't responding"), so the pattern
+            # needs the wildcards; without them this handler never fired.
+            visible: "(?i).*isn't responding.*"
           commands:
             - tapOn:
                 text: "Wait"
@@ -34,112 +37,41 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
             - tapOn: "Cancel"
 
 # ── Splash screen ──
+# The splash primary CTA was renamed "Continue" → "Get started" (16be42f4);
+# it still starts the app as a guest and advances to the experience question.
 - extendedWaitUntil:
-    visible: "Continue"
+    visible: "Get started"
     timeout: 180000
-- tapOn: "Continue"
 
 # ── Onboarding: Experience question ──
 # First onboarding screen. Anonymous sign-in can take a while on first
 # launch (clearState wipes the account), so the timeout is generous.
-- extendedWaitUntil:
-    visible: "Never tried it"
-    timeout: 60000
+# If sign-in fails the splash comes back with "Get started" (the button shows
+# a spinner, not its label, while signing in), so tap it again like a user
+# would (run 36313758914 sat on the splash after one attempt).
+- retry:
+    maxRetries: 2
+    commands:
+      - runFlow:
+          when:
+            visible: "Get started"
+          commands:
+            - tapOn: "Get started"
+      - extendedWaitUntil:
+          visible: "Never tried it"
+          timeout: 45000
 - tapOn: "Never tried it"
 
-# Experience is now the ONLY onboarding question (the intent + attribution
-# questions were removed). Selecting an option auto-advances straight to the
-# donation primer — no second question to answer.
-
-# ── Onboarding: Donation ──
-# Two variants can render here:
-#   - NATIVE donation page — forced on internal builds via
-#     _forceNativeForInternalTesting (TODO(temp)), otherwise server-flagged.
-#     Its donate CTA renders immediately; the close X (labelled "Skip for
-#     Now") fades in top-right ~5s after load, mirroring the webview arm.
-#   - WEBVIEW intro — the previous default ("See how to help" CTA); returns
-#     when the temp force-native flag is reverted.
-# Wait for whichever appears, then branch on the webview CTA.
+# The timing test shows either the early ask (A) or reminders (B).
 - extendedWaitUntil:
-    visible: "See how to help|.*Donate.*"
+    visible: "See how to help|.*Donate.*|Stay on Track with Meditation Reminders"
     timeout: 30000
-
-# Native page path: nothing to drive without charging a card — screenshot,
-# wait out the close-X delay, dismiss.
 - runFlow:
     when:
-      notVisible: "See how to help"
-    commands:
-      - takeScreenshot: paywall-native
-      - extendedWaitUntil:
-          visible: "Skip for Now"
-          timeout: 15000
-      - tapOn: "Skip for Now"
+      notVisible: "Stay on Track with Meditation Reminders"
+    file: dismiss_onboarding_donation.yaml
 
-# Webview intro path, iOS: smoke builds enable SMOKE_TEST_MODE, which adds a
-# deterministic close control to the webview route and reveals the skip button
-# after returning. That still verifies the webview opens, without waiting on a
-# remote page close affordance that is slow and flaky on iOS CI.
-- runFlow:
-    when:
-      visible: "See how to help"
-      platform: iOS
-    commands:
-      - tapOn: "See how to help"
-
-      - extendedWaitUntil:
-          visible: "Donation webview opened"
-          timeout: 10000
-      - takeScreenshot: paywall-webview
-      - tapOn: "Donation webview opened"
-
-      - extendedWaitUntil:
-          visible: "Skip for Now"
-          timeout: 20000
-      - tapOn: "Skip for Now"
-
-# Webview intro path, Android: release smoke uses the deployable APK, so it
-# keeps the real production build settings and drives the donation webview
-# before skipping.
-- runFlow:
-    when:
-      visible: "See how to help"
-      platform: Android
-    commands:
-      - tapOn: "See how to help"
-
-      # Dismiss the webview. The webpage shows an x close glyph (aria-label
-      # "Close") in the top-right that fades in 5s after the page loads.
-      # Do NOT use waitForAnimationToEnd here -- the webview can keep loading
-      # indefinitely on CI and block the step. Wait directly for Close instead,
-      # with a generous timeout to cover slow CI network.
-      - extendedWaitUntil:
-          visible: "Close"
-          timeout: 90000
-      - takeScreenshot: paywall-webview
-
-      # One tap is not enough: "Close is visible" is an accessibility-tree
-      # check, and the glyph sits in the tree from page load while it is still
-      # opacity:0 / pointer-events:none for its first 5s, so the wait above can
-      # clear while the tap is still a no-op. That cost two release runs
-      # (32850168903, 33071182758) on the same silent miss -- the webview was
-      # still open afterwards with the X exactly where the tree said it was.
-      # Retry until the app-side screen behind it comes back, which is the only
-      # thing that actually proves the dismiss landed.
-      - retry:
-          maxRetries: 2
-          commands:
-            - runFlow:
-                when:
-                  visible: "Close"
-                commands:
-                  - tapOn: "Close"
-            - extendedWaitUntil:
-                visible: "Skip for Now"
-                timeout: 15000
-      - tapOn: "Skip for Now"
-
-# ── Onboarding: Notifications / smart reminders (re-added 26.6, sits
+# ── Onboarding: Notifications / daily reminders (re-added 26.6, sits
 # between the donation primer and battery/tracking). Skip it for the
 # smoke run — the system permission dialog is OS-driven and would
 # otherwise stall the flow. Since the time-chips A/B concluded (2026-08-25)
@@ -200,6 +132,16 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - tapOn:
     text: "Get started|Maybe later"
 
+# B ends with the donation ask; A proceeds directly to Home.
+- extendedWaitUntil:
+    visible: "See how to help|.*Donate.*|(?s).*(Start here|Continue): .*|Dismiss"
+    timeout: 60000
+- runFlow:
+    when:
+      visible: "See how to help|.*Donate.*"
+      notVisible: "(?s).*(Start here|Continue): .*"
+    file: dismiss_onboarding_donation.yaml
+
 # A donation prompt dialog ("Medito is a registered nonprofit") sometimes
 # appears on Home post-onboarding — dismiss if present.
 - runFlow:
@@ -210,59 +152,22 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
           text: "Dismiss"
           optional: true
 
-# ── Play a session via Your Path ──
-# The Your Path card's accessibility label is a merged multi-line string
-# like "Your Path: Getting started — Welcome\nYOUR PATH\n·\nGetting started\n...",
-# so we use a regex with wildcards + DOTALL ((?s)) so "." matches newlines.
-# Match on "YOUR PATH" rather than a pack title: onboarding now pins new users
-# onto the pack sequence ("Getting started" for beginners, "Deepen your
-# practice" for regulars) instead of the megapack, so the title here depends on
-# who the account is. Pre-sequence installs with no pin still read
-# "Medito's Journey", and this matches those too.
+# ── Play a session from the Home hero ──
+# Onboarding pins new users onto a pack, and Home leads with it as a hero
+# card. Its accessibility label is "<progress>, Start here: <pack> —
+# <session>\n..." (or "Continue: ..." once something in the pack has been
+# played; the leading progress value is merged in), so match the
+# eyebrow rather than a pack title, which depends on who the account is.
+# "Your Path" copy was removed from the app in e246b118.
 # On a fresh install, anonymous auth + home API can take up to 60s.
 - extendedWaitUntil:
-    visible: "(?si).*your path.*"
+    visible: "(?s).*(Start here|Continue): .*"
     timeout: 60000
-# On small screens the shortcut may be below the fold
-- scrollUntilVisible:
-    element: "(?si).*your path.*"
-    direction: DOWN
-    timeout: 15000
-    speed: 20
-    waitToSettleTimeoutMs: 500
-    centerElement: true
 - tapOn:
-    text: "(?si).*your path.*"
+    text: "(?s).*(Start here|Continue): .*"
 
-# Make sure we have actually left Home before looking for Play. The Up Next
-# card on Home carries its own circular "Play" control right next to the Your
-# Path label, so checking for "Play" straight after the tap matched Home while
-# the push transition was still running and the tap landed on the wrong
-# screen (run 34955197941: tapped at (969,1028) on the card's play circle, the
-# track view opened underneath it, playback never started). Wait for something
-# only the track view ("Share Track") or the pack list ("N - M min") shows.
-- extendedWaitUntil:
-    visible: "Share Track|(?i)\\d+ - \\d+ min"
-    timeout: 20000
-
-# Your Path may open a track (Share Track in the bottom bar) or a pack (list of
-# sessions). If it opened a pack, tap the first session to reach a track view.
-- runFlow:
-    when:
-      notVisible: "Share Track"
-    commands:
-      - extendedWaitUntil:
-          visible: "(?i)\\d+ - \\d+ min"
-          timeout: 10000
-      - scrollUntilVisible:
-          element: "(?i)\\d+ - \\d+ min"
-          direction: DOWN
-          timeout: 10000
-          visibilityPercentage: 50
-      - tapOn:
-          text: "(?i)\\d+ - \\d+ min"
-          index: 0
-
+# The hero starts a session via startSession(): a fresh install has no saved
+# guide/duration yet, so it opens the track view to pick them.
 # Track view loads with a play button. Wait for the bottom bar first so the
 # "Play" we tap is the track view's, never a card left behind on Home.
 - extendedWaitUntil:
@@ -302,25 +207,12 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       - tapOn:
           text: "Skip forward 10 seconds"
           optional: true
-      # A skip tap resolved against the player hierarchy but delivered after
-      # the end screen has taken over lands on that screen's reminder CTA
-      # instead, which raises the soft-ask dialog added in 2608.27. It is
-      # modal, so it hides the streak text from the hierarchy: the loop would
-      # spin out all 60 iterations and the assertion below would fail against
-      # an end screen that is in fact right there behind it (run 33077160666).
-      - runFlow:
-          when:
-            visible: "One quick thing"
-          commands:
-            - tapOn: "Not Now"
+      # A final skip tap can land on the end-screen reminder CTA after
+      # playback completes. Dismiss either reminder UI before checking streak.
+      - runFlow: dismiss_end_screen_reminder.yaml
 
-# Same dialog, last-moment case: raised by the final skip tap, after the loop
-# has already exited on a visible streak.
-- runFlow:
-    when:
-      visible: "One quick thing"
-    commands:
-      - tapOn: "Not Now"
+# Also cover a sheet that finishes opening after the final loop iteration.
+- runFlow: dismiss_end_screen_reminder.yaml
 
 # The end screen must now be visible — this is the actual assertion.
 - extendedWaitUntil:

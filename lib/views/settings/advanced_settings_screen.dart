@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,7 +94,6 @@ class AdvancedSettingsScreen extends ConsumerWidget {
       RowItemWidget(
         icon: MeditoIcon(assetName: MeditoIcons.privacy, color: onSurface),
         title: l10n.privacyPolicy,
-        hasUnderline: false,
         onTap: () => handleNavigation(
           TypeConstants.route,
           [RouteConstants.analytics],
@@ -101,41 +101,51 @@ class AdvancedSettingsScreen extends ConsumerWidget {
           ref: ref,
         ),
       ),
+      RowItemWidget(
+        icon: Icon(Icons.description_outlined, color: onSurface),
+        title: 'Licenses',
+        hasUnderline: false,
+        onTap: () =>
+            showLicensePage(context: context, applicationName: 'Medito'),
+      ),
     ];
 
     return Scaffold(
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: SafeArea(
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              centerTitle: false,
-              automaticallyImplyLeading: false,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              toolbarHeight: 56.0,
-              pinned: true,
-              floating: true,
-              elevation: 0.0,
-              title: HomeHeaderWidget(greeting: l10n.advanced),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.all(padding16),
-              sliver: SliverToBoxAdapter(
-                child: HomeGradientBorder(
-                  backgroundColor: Theme.of(context).cardColor,
-                  borderRadius: 14,
-                  borderWidth: 0.5,
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: Column(children: rows),
+      body: AdaptivePageBody(
+        maxWidth: 760,
+        child: SafeArea(
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                centerTitle: false,
+                automaticallyImplyLeading: false,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                toolbarHeight: 56.0,
+                pinned: true,
+                floating: true,
+                elevation: 0.0,
+                title: HomeHeaderWidget(greeting: l10n.advanced),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.all(padding16),
+                sliver: SliverToBoxAdapter(
+                  child: HomeGradientBorder(
+                    backgroundColor: Theme.of(context).cardColor,
+                    borderRadius: 14,
+                    borderWidth: 0.5,
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Column(children: rows),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

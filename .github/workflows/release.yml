@@ -217,8 +217,11 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Smoke test on emulator
-        timeout-minutes: 12
+        timeout-minutes: 20
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
         with:
           api-level: 34
           arch: x86_64
@@ -234,6 +237,19 @@ jobs:
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
             mkdir -p /tmp/maestro-debug
             $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug
+            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml --no-ansi --debug-output /tmp/maestro-debug/signed-in
+
+      - name: Scrub test account credentials from debug output
+        if: failure()
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        run: |
+          [ -d /tmp/maestro-debug ] || exit 0
+          find /tmp/maestro-debug -type f ! -name '*.png' -print0 | while IFS= read -r -d '' f; do
+            TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" \
+              perl -pi -e 's/\Q$ENV{TEST_ACCOUNT_EMAIL}\E/[redacted]/g if length $ENV{TEST_ACCOUNT_EMAIL}; s/\Q$ENV{TEST_ACCOUNT_OTP}\E/[redacted]/g if length $ENV{TEST_ACCOUNT_OTP}' "$f"
+          done
 
       - name: Upload Maestro debug output
         if: failure()
@@ -319,13 +335,16 @@ jobs:
       - name: Extract OLD seed flow from previous tag
         if: steps.prev.outputs.sha != ''
         run: |
-          git show "${{ steps.prev.outputs.sha }}:.maestro/smoke.yaml" \
-            > /tmp/old-seed.yaml || echo "Previous tag had no smoke.yaml"
+          # Extract the whole .maestro/ dir, not just smoke.yaml: the seed
+          # flow calls subflows (runFlow file:) resolved relative to itself.
+          mkdir -p /tmp/old-maestro
+          git archive "${{ steps.prev.outputs.sha }}" .maestro \
+            | tar -x -C /tmp/old-maestro || echo "Previous tag had no .maestro/"
 
       - name: Skip if no baseline available
         id: gate
         run: |
-          if [ ! -f /tmp/old/app-prod-release.apk ] || [ ! -s /tmp/old-seed.yaml ]; then
+          if [ ! -f /tmp/old/app-prod-release.apk ] || [ ! -s /tmp/old-maestro/.maestro/smoke.yaml ]; then
             echo "No usable baseline (APK or seed flow missing) — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
@@ -339,9 +358,21 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Upgrade test on emulator
+      # Two emulator sessions on the SAME AVD. The seed and the upgrade used to
+      # share one boot, and the emulator process itself died ~70s after the
+      # new APK was launched on it, three runs out of three on 2026-09-15
+      # ("Device server died", then the console port refused connections). The
+      # same APK launches fine on a fresh boot in the smoke job, so give the
+      # upgrade its own boot. The AVD's userdata disk persists between the two
+      # steps (only the quickboot snapshot is disabled), which is exactly what
+      # an in-place update followed by a reboot looks like on a real phone.
+      #
+      # NOTE: android-emulator-runner executes each line in its own shell, so
+      # env vars don't persist across lines and `\` continuations break. Keep
+      # each command on a single line and inline the app id.
+      - name: Seed old version on emulator
         if: steps.gate.outputs.run == 'true'
-        timeout-minutes: 20
+        timeout-minutes: 15
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -351,17 +382,31 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
-          # NOTE: android-emulator-runner executes each line in its own shell,
-          # so env vars don't persist across lines and `\` continuations break.
-          # Keep each command on a single line and inline the app id.
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
             mkdir -p /tmp/maestro-debug/seed /tmp/maestro-debug/upgrade
             adb install /tmp/old/app-prod-release.apk
             adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
-            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-seed.yaml --no-ansi --debug-output /tmp/maestro-debug/seed
+            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-maestro/.maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug/seed || (echo "Seed failed once (usually the donation webview not loading in time); clearing app data and retrying" && adb shell pm clear meditofoundation.medito && adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS && $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito /tmp/old-maestro/.maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug/seed-retry)
+
+      - name: Install new version and verify on a fresh boot
+        if: steps.gate.outputs.run == 'true'
+        timeout-minutes: 12
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            adb shell pm list packages | grep -q meditofoundation.medito || (echo "Seeded install did not survive the emulator restart" && exit 1)
+            adb shell 'sleep 20'   # let SystemUI and the launcher finish their cold-boot work before the app competes with them
             adb install -r /tmp/new/app-prod-release.apk
+            adb shell am force-stop com.google.android.apps.nexuslauncher || true
             $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/upgrade.yaml --no-ansi --debug-output /tmp/maestro-debug/upgrade
 
       - name: Upload upgrade-test debug output
@@ -452,6 +497,11 @@ jobs:
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
     runs-on: macos-latest
     environment: prod
+    # The XCTest driver Maestro installs can take well over its default
+    # startup timeout on a cold CI simulator ("iOS driver not ready in time",
+    # run 36309254158), failing the job before any flow runs.
+    env:
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
 
     steps:
       - uses: actions/checkout@v4
@@ -641,6 +691,41 @@ jobs:
             .maestro/smoke.yaml \
             --no-ansi --debug-output /tmp/maestro-debug
 
+      - name: Signed-in stats test on simulator
+        # Two sign-ins + two onboarding passes + a session: ~11 min on the
+        # macOS runner, so 12 cut off a run that had passed (36317083446).
+        timeout-minutes: 20
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        run: |
+          $HOME/.maestro/bin/maestro test \
+            -e APP_ID=org.meditofoundation \
+            -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" \
+            -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" \
+            .maestro/signed_in_stats.yaml \
+            --no-ansi --debug-output /tmp/maestro-debug/signed-in
+
+      - name: Save iOS app log
+        if: failure()
+        run: |
+          mkdir -p /tmp/maestro-debug
+          # The smoke build's executable is "Medito Dev" (dev flavor), not Runner.
+          xcrun simctl spawn booted log show --last 30m --style compact --info --debug \
+            --predicate 'process BEGINSWITH "Medito"' > /tmp/maestro-debug/ios-app.log 2>&1 || true
+
+      - name: Scrub test account credentials from debug output
+        if: failure()
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        run: |
+          [ -d /tmp/maestro-debug ] || exit 0
+          find /tmp/maestro-debug -type f ! -name '*.png' -print0 | while IFS= read -r -d '' f; do
+            TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" \
+              perl -pi -e 's/\Q$ENV{TEST_ACCOUNT_EMAIL}\E/[redacted]/g if length $ENV{TEST_ACCOUNT_EMAIL}; s/\Q$ENV{TEST_ACCOUNT_OTP}\E/[redacted]/g if length $ENV{TEST_ACCOUNT_OTP}' "$f"
+          done
+
       - name: Upload Maestro debug output
         if: failure()
         uses: actions/upload-artifact@v4
@@ -667,6 +752,11 @@ jobs:
     needs: [ios-smoke-test]
     runs-on: macos-latest
     if: github.event_name != 'workflow_dispatch' || inputs.ios_testflight || inputs.ios_appstore
+    # The XCTest driver Maestro installs can take well over its default
+    # startup timeout on a cold CI simulator ("iOS driver not ready in time",
+    # run 36309254158), failing the job before any flow runs.
+    env:
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
     # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
     # there's no baseline yet, or to avoid blocking ship on a flaky test.
     continue-on-error: true
@@ -722,13 +812,16 @@ jobs:
       - name: Extract OLD seed flow from previous tag
         if: steps.prev.outputs.sha != ''
         run: |
-          git show "${{ steps.prev.outputs.sha }}:.maestro/smoke.yaml" \
-            > /tmp/old-seed.yaml || echo "Previous tag had no smoke.yaml"
+          # Extract the whole .maestro/ dir, not just smoke.yaml: the seed
+          # flow calls subflows (runFlow file:) resolved relative to itself.
+          mkdir -p /tmp/old-maestro
+          git archive "${{ steps.prev.outputs.sha }}" .maestro \
+            | tar -x -C /tmp/old-maestro || echo "Previous tag had no .maestro/"
 
       - name: Skip if no baseline available
         id: gate
         run: |
-          if [ ! -f /tmp/old/medito-sim.tar ] || [ ! -s /tmp/old-seed.yaml ]; then
+          if [ ! -f /tmp/old/medito-sim.tar ] || [ ! -s /tmp/old-maestro/.maestro/smoke.yaml ]; then
             echo "No usable baseline (.app or seed flow missing) — skipping upgrade test." >> "$GITHUB_STEP_SUMMARY"
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
@@ -771,7 +864,7 @@ jobs:
           # 2. Seed state using the OLD tag's smoke.yaml — matches that
           #    binary's onboarding UI even if HEAD has renamed strings.
           $HOME/.maestro/bin/maestro test \
-            -e APP_ID=org.meditofoundation /tmp/old-seed.yaml \
+            -e APP_ID=org.meditofoundation /tmp/old-maestro/.maestro/smoke.yaml \
             --no-ansi --debug-output /tmp/maestro-debug/seed
 
           # 3. In-place upgrade. simctl install over an existing bundle ID
@@ -1008,6 +1101,41 @@ jobs:
               fi
             fi
           fi
+
+      # Keep this build's dSYMs. They are the only copy: Apple stopped retaining
+      # dSYMs for uploads when bitcode went away, the runner is thrown away
+      # with the .xcarchive, and 2609.18.0 showed the in-lane Crashlytics upload
+      # can be cut short when the job ends. With the artifact, symbols can be
+      # re-uploaded later with
+      #   upload-symbols -gsp ios/Runner/GoogleService-Info.plist -p ios <dir>
+      # Runs even when a later step failed, as long as gym produced an archive.
+      - name: Collect iOS dSYMs
+        id: dsyms
+        if: ${{ !cancelled() }}
+        run: |
+          archive=$(ls -dt ~/Library/Developer/Xcode/Archives/*/*.xcarchive 2>/dev/null | head -1)
+          if [ -z "$archive" ] || [ ! -d "$archive/dSYMs" ]; then
+            echo "No .xcarchive with a dSYMs folder found; nothing to keep."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          version=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+/-/')
+          mkdir -p /tmp/ios-dsyms
+          cp -R "$archive/dSYMs/." /tmp/ios-dsyms/
+          echo "Kept dSYMs from: $archive"
+          ls /tmp/ios-dsyms
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "name=ios-dsyms-$version" >> "$GITHUB_OUTPUT"
+
+      - name: Upload iOS dSYM artifact
+        if: ${{ !cancelled() && steps.dsyms.outputs.found == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.dsyms.outputs.name }}
+          path: /tmp/ios-dsyms
+          # Same window as the APK artifact; long enough to symbolicate a
+          # release for its whole time on the store.
+          retention-days: 90
 
   # After a successful deploy, tag the built commit with the pubspec version
   # (bare semver, no v prefix — matches existing tags). Runs only when at

@@ -9,6 +9,17 @@ part 'background_sounds_model.g.dart';
 /// localised string silently fails on every non-English locale.
 const kNoneBackgroundSoundId = '0';
 
+// A local playback mode, never a downloadable/looping ambient sound.
+const kSessionBellsId = 'medito-session-bells';
+const kSessionBellsUri = 'medito://session-bells';
+const kSessionBellAsset = 'assets/audio/session_bell_v2.wav';
+const kSessionBellsSound = BackgroundSoundsModel(
+  id: kSessionBellsId,
+  title: 'Session bells',
+  path: kSessionBellsUri,
+  duration: 0,
+);
+
 @freezed
 abstract class BackgroundSoundsModel with _$BackgroundSoundsModel {
   const factory BackgroundSoundsModel({

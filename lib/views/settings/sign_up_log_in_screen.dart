@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
@@ -6,12 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/me/me_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -20,11 +23,13 @@ import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
+import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/routes/routes.dart' as routes;
 import 'package:flutter/gestures.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
+import 'package:medito/widgets/inputs/email_typo_hint.dart';
 import 'package:app_links/app_links.dart';
 
 import '../../providers/device_and_app_info/device_and_app_info_provider.dart';
@@ -33,9 +38,18 @@ import '../../providers/pack/pack_provider.dart';
 final dev = const AppLoggerAdapter('SIGN_UP');
 
 class SignUpLogInPage extends ConsumerWidget {
-  const SignUpLogInPage({super.key, this.fromSettings = false});
+  const SignUpLogInPage({
+    super.key,
+    this.fromSettings = false,
+    this.source = AnalyticsEventConstants.sourceSettings,
+  });
 
   final bool fromSettings;
+
+  /// Where this sign-in/sign-up was launched from. Tagged onto the
+  /// [onboardingSignupCompleted] event so we can see which surface drives
+  /// account creation. See [AnalyticsEventConstants] source values.
+  final String source;
   static const routeName = '/signup';
 
   @override
@@ -68,15 +82,20 @@ class SignUpLogInPage extends ConsumerWidget {
       ); // Show loading while popping
     } else {
       dev.log('[SIGN_UP] User has no email, showing sign-up form', level: 1000);
-      return SignUpLogInForm(fromSettings: fromSettings);
+      return SignUpLogInForm(fromSettings: fromSettings, source: source);
     }
   }
 }
 
 class SignUpLogInForm extends ConsumerStatefulWidget {
-  const SignUpLogInForm({super.key, required this.fromSettings});
+  const SignUpLogInForm({
+    super.key,
+    required this.fromSettings,
+    this.source = AnalyticsEventConstants.sourceSettings,
+  });
 
   final bool fromSettings;
+  final String source;
 
   @override
   ConsumerState<SignUpLogInForm> createState() => SignUpLogInFormState();
@@ -84,6 +103,7 @@ class SignUpLogInForm extends ConsumerStatefulWidget {
 
 class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   final _emailController = TextEditingController();
+  final _emailTypoConfirmation = EmailTypoConfirmation();
   final _otpController = TextEditingController();
   var _isLoading = false;
   var _isEmailValid = false;
@@ -100,7 +120,21 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
     super.initState();
     _emailController.addListener(_validateEmail);
     _otpController.addListener(_validateOtp);
+    _prefillReceiptEmail();
     _setupDeepLinkHandling();
+  }
+
+  /// A donor who typed an email for their Stripe receipt gets it offered
+  /// here, so "add your email" is one tap. It is only a suggestion: the
+  /// field stays editable and the account email may legitimately differ.
+  void _prefillReceiptEmail() {
+    if (_emailController.text.isNotEmpty) return;
+    try {
+      final stored = ReceiptEmail.read(ref.read(sharedPreferencesProvider));
+      if (stored != null) _emailController.text = stored;
+    } catch (e) {
+      dev.log('[SIGN_UP] Could not read receipt email: $e');
+    }
   }
 
   void _setupDeepLinkHandling() {
@@ -157,6 +191,12 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
 
   Future<void> _requestOtp() async {
     if (_isLoading || _isRateLimited) return;
+
+    // A mistyped domain sends the code nowhere and strands the user.
+    if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
+      return;
+    }
+    if (!mounted) return;
 
     final hasLocalStats = await ref.read(statsManagerProvider).hasLocalStats();
 
@@ -363,9 +403,12 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           );
         }
 
-        // Log analytics event for completed signup
+        // Log analytics event for completed signup. Tag the source so we can
+        // see which surface (splash, settings, end-screen prompt, deep link)
+        // actually drives account creation.
         await FirebaseAnalyticsService().logEvent(
           name: FirebaseAnalyticsService.eventOnboardingSignupCompleted,
+          parameters: {AnalyticsEventConstants.paramSource: widget.source},
         );
 
         // Initialize first — clearAllStats touches SharedPreferences and
@@ -385,10 +428,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         ref.read(statsProvider.notifier).refresh();
         ref.invalidate(packProvider);
 
-        // Initialize favorites after successful login
-        unawaited(
-          ref.read(favoritesNotifierProvider.notifier).syncWithServer(),
-        );
+        // Same for favourites: on a different account, drop the local list
+        // rather than pushing the old account's favourites into this one.
+        // Either way, rebuild so this account's server list is merged in
+        // (and anything the server lacks, e.g. favourites made while
+        // anonymous on this same account, is pushed up).
+        if (newUserId != previousUserId) {
+          await ref.read(favoritesNotifierProvider.notifier).clearLocal();
+        }
+        ref.invalidate(favoritesNotifierProvider);
 
         if (!mounted) return;
 
@@ -483,29 +531,28 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               )
             : null,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            32.0,
-            0,
-            32.0,
-            MediaQuery.of(context).viewInsets.bottom + 32.0,
-          ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight:
-                  MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top -
-                  kToolbarHeight -
-                  MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _hasRequestedOtp
-                    ? _buildOtpVerificationView(inputTextStyle)
-                    : _buildInitialView(inputTextStyle),
-              ],
+      body: AdaptivePageBody(
+        maxWidth: 600,
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(32, 0, 32, 32),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: (constraints.maxHeight - 32).clamp(
+                    0,
+                    double.infinity,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _hasRequestedOtp
+                        ? _buildOtpVerificationView(inputTextStyle)
+                        : _buildInitialView(inputTextStyle),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -524,7 +571,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           AppLocalizations.of(context)!.emailVerificationText,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontSize: 13,
+            fontSize: 14,
             height: 1.5,
             fontWeight: FontWeight.normal,
           ),
@@ -640,35 +687,19 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   }
 
   Widget _buildEmailField(TextStyle inputTextStyle) {
-    return TextField(
+    final l10n = AppLocalizations.of(context)!;
+    final showError = !_isEmailValid && _emailController.text.isNotEmpty;
+    // In onboarding (opened from the splash) drop the keyboard straight in so
+    // the user can start typing; the Settings entry stays tap-to-focus.
+    final autofocus = widget.source == AnalyticsEventConstants.sourceSplash;
+    final field = MeditoTextField(
       controller: _emailController,
       enabled: !_hasRequestedOtp,
-      decoration:
-          getInputDecoration(
-            AppLocalizations.of(context)!.emailLabel,
-            _isEmailValid || _emailController.text.isEmpty,
-            AppLocalizations.of(context)!.invalidEmailError,
-          ).copyWith(
-            fillColor: Theme.of(context).colorScheme.surface,
-            filled: true,
-            suffixIcon: _emailController.text.isNotEmpty && !_hasRequestedOtp
-                ? IconButton(
-                    icon: Icon(
-                      Icons.clear,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacityValue(0.6),
-                    ),
-                    onPressed: () {
-                      _emailController.clear();
-                      _validateEmail();
-                    },
-                  )
-                : null,
-          ),
-      onChanged: (_) => setState(() {}),
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      autofocus: autofocus,
+      hintText: l10n.emailLabel,
+      errorText: showError ? l10n.invalidEmailError : null,
       keyboardType: TextInputType.emailAddress,
+      onChanged: (_) => setState(() {}),
       inputFormatters: [
         TextInputFormatter.withFunction(
           (oldValue, newValue) => TextEditingValue(
@@ -677,22 +708,40 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
           ),
         ),
       ],
+      suffixIcon: _emailController.text.isNotEmpty && !_hasRequestedOtp
+          ? IconButton(
+              icon: Icon(
+                Icons.clear,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacityValue(0.6),
+              ),
+              onPressed: () {
+                _emailController.clear();
+                _validateEmail();
+              },
+            )
+          : null,
+    );
+    if (_hasRequestedOtp) return field;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        field,
+        EmailTypoHint(controller: _emailController),
+      ],
     );
   }
 
   Widget _buildOtpField(TextStyle inputTextStyle) {
-    return TextField(
+    final l10n = AppLocalizations.of(context)!;
+    final showError = !_isOtpValid && _otpController.text.isNotEmpty;
+    return MeditoTextField(
       controller: _otpController,
-      decoration:
-          getInputDecoration(
-            AppLocalizations.of(context)!.otpLabel,
-            _isOtpValid || _otpController.text.isEmpty,
-            AppLocalizations.of(context)!.invalidOtpError,
-          ).copyWith(
-            fillColor: Theme.of(context).colorScheme.surface,
-            filled: true,
-          ),
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      autofocus: widget.source == AnalyticsEventConstants.sourceSplash,
+      hintText: l10n.otpLabel,
+      errorText: showError ? l10n.invalidOtpError : null,
       keyboardType: TextInputType.number,
       maxLength: 6,
     );
@@ -756,45 +805,6 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       disabledForegroundColor: context.onBrandPurple.withValues(alpha: 0.6),
       disabledBackgroundColor: context.brandPurple.withOpacityValue(0.5),
       minimumSize: const Size(double.infinity, 48),
-    );
-  }
-
-  InputDecoration getInputDecoration(
-    String hint,
-    bool isValid,
-    String? errorText,
-  ) {
-    const borderRadius = BorderRadius.all(Radius.circular(4));
-
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(
-        color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.6),
-      ),
-      filled: true,
-      fillColor: Theme.of(context).colorScheme.surface,
-      enabledBorder: const OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: ColorConstants.softGrey),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: context.brandPurple),
-      ),
-      disabledBorder: const OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: ColorConstants.softGrey),
-      ),
-      errorBorder: const OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: Colors.red),
-      ),
-      focusedErrorBorder: const OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(color: Colors.red),
-      ),
-      errorText: !isValid && errorText != null ? errorText : null,
-      errorStyle: const TextStyle(color: Colors.red),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/mock/mock_data.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/utils/logger.dart';
@@ -35,16 +36,19 @@ class MockHttpApiService extends HttpApiService {
   }
 
   @override
-  Future<Map<String, dynamic>> deleteRequest(String path) async {
+  Future<Map<String, dynamic>> deleteRequest(
+    String path, {
+    dynamic body,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 100));
     AppLogger.d('MOCK_HTTP', 'DELETE $path');
+    if (path == HTTPConstants.me) return {'deleted': true};
     return {};
   }
 
   @override
-  Future<void> signOut() async {
+  Future<void> signOut(String accessToken) async {
     AppLogger.d('MOCK_HTTP', 'Sign out (mock)');
-    clearAuthHeader();
   }
 
   Map<String, dynamic> _matchResponse(String path) {
@@ -59,6 +63,15 @@ class MockHttpApiService extends HttpApiService {
     // Announcement
     if (cleanPath.startsWith('announcements')) {
       return mockAnnouncement.toJson();
+    }
+
+    // Pack -> track ids (must precede pack detail, which matches packs/*)
+    if (cleanPath == HTTPConstants.packTracks) {
+      return {
+        'packTracks': {
+          for (final pack in mockPacks) pack.id: _mockPackTrackIds(pack.id),
+        },
+      };
     }
 
     // Pack detail: packs/{id}
@@ -100,6 +113,40 @@ class MockHttpApiService extends HttpApiService {
       return {'results': mockBackgroundSounds.map((s) => s.toJson()).toList()};
     }
 
+    // Tracks for one tag: tags/{id}
+    if (cleanPath.startsWith('${HTTPConstants.tags}/')) {
+      final id = cleanPath.split('/').last;
+      final trackIds = mockTrackTags.entries
+          .where((e) => e.value.contains(id))
+          .map((e) => e.key);
+      return {
+        'tag': {'id': id, 'group': 'goal', 'description': ''},
+        'tracks': [
+          for (final trackId in trackIds)
+            if (mockTracks[trackId] case final track?)
+              {
+                'id': track.id,
+                'title': track.title,
+                'subtitle': track.subtitle ?? '',
+                'coverUrl': track.coverUrl,
+                'path': '/tracks/${track.id}',
+                'probability': 0.9,
+              },
+        ],
+      };
+    }
+
+    // Tag catalog
+    if (cleanPath == HTTPConstants.tags) {
+      return {
+        'tags': [
+          for (final tag in mockTags)
+            {'id': tag, 'group': 'goal', 'description': ''},
+        ],
+        'trackTags': mockTrackTags,
+      };
+    }
+
     // Search tracks
     if (cleanPath.startsWith(HTTPConstants.searchTracks)) {
       return {'results': <Map<String, dynamic>>[]};
@@ -119,4 +166,19 @@ class MockHttpApiService extends HttpApiService {
     AppLogger.w('MOCK_HTTP', 'No mock data for path: $cleanPath');
     return {};
   }
+}
+
+/// Track ids in a mock pack, sub-packs included, like `GET /packs/tracks`.
+List<String> _mockPackTrackIds(String packId, [Set<String>? seen]) {
+  seen ??= {};
+  if (!seen.add(packId)) return const [];
+  final pack = mockPacks.where((p) => p.id == packId).firstOrNull;
+  if (pack == null) return const [];
+  return {
+    for (final item in pack.items)
+      if (item.type == TypeConstants.track)
+        item.id
+      else if (item.type == TypeConstants.pack)
+        ..._mockPackTrackIds(item.id, seen),
+  }.toList();
 }

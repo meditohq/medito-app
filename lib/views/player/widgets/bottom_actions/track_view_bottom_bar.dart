@@ -12,6 +12,8 @@ import '../../../../providers/favorites/favorites_provider.dart';
 import '../../../../providers/meditation/track_provider.dart';
 import '../../../../widgets/add_to_siri_util.dart';
 import '../../../../widgets/medito_icon.dart';
+import '../../../../scaffold_messenger_key.dart';
+import '../../../../widgets/snackbar_widget.dart';
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 
@@ -114,23 +116,35 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
 
   void _toggleFavorite(bool isFavorite, Track track) {
     final notifier = ref.read(favoritesNotifierProvider.notifier);
-    _favoriteController.trigger(
-      () => isFavorite
-          ? notifier.removeFromFavorites(widget.trackId)
-          : notifier.addToFavorites(
-              FavoriteItem(
-                id: widget.trackId,
-                title: widget.trackTitle,
-                coverUrl: widget.coverUrl ?? track.coverUrl,
-                subtitle: track.subtitle,
-                type: FavoriteItemType.track,
-                timestamp: DateTime.now().millisecondsSinceEpoch,
-              ),
-            ),
-      direction: isFavorite
-          ? FavoriteToggleDirection.remove
-          : FavoriteToggleDirection.add,
-    );
+    _favoriteController
+        .trigger(
+          () => isFavorite
+              ? notifier.removeFromFavorites(widget.trackId)
+              : notifier.addToFavorites(
+                  FavoriteItem(
+                    id: widget.trackId,
+                    title: widget.trackTitle,
+                    coverUrl: widget.coverUrl ?? track.coverUrl,
+                    subtitle: track.subtitle,
+                    type: FavoriteItemType.track,
+                    timestamp: DateTime.now().millisecondsSinceEpoch,
+                  ),
+                ),
+          direction: isFavorite
+              ? FavoriteToggleDirection.remove
+              : FavoriteToggleDirection.add,
+        )
+        .then((_) {
+          // The star alone is easy to miss; say what happened.
+          if (!mounted) return;
+          final l10n = AppLocalizations.of(context)!;
+          // Replace rather than queue, so a quick re-tap reads the end state.
+          scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+          showSnackBar(
+            context,
+            isFavorite ? l10n.removedFromFavorites : l10n.addedToFavorites,
+          );
+        });
   }
 
   @override

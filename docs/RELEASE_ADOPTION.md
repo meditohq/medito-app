@@ -65,7 +65,7 @@
 
 ⭐ = first build with the iOS ATT analytics fix (commit `31a676db`) — see the funnel-boundary callout up top. iOS normally takes ~2–3 days to 50%. `2606.30.0` reached 96% and held through mid-July; iOS then moved through the `2607.2x` line — `2607.20.3` (~54%) → `2607.21.0` (~89%) → `2607.24.0` (~65%, never dominated) → `2607.28.0`, which peaked at **95% on 08-21**. **`2608.18.0` is the current iOS build** — note its ramp was slower than the iOS norm: first seen 08-18 but only a handful of users until 08-22 (App Store phased release didn't open until then), so it was 5 days from first sighting to 50%, or ~1 day once the phased release actually started. It is still at its peak (93% on 08-31).
 
-**⚠️ `2608.27.0` has not shipped to iOS.** Three users total (08-27/08-28) — internal or TestFlight, not a public release. The tag exists in the repo and Android is already ~73% on it, so iOS is a whole release behind; either the App Store build is still in review/unsubmitted, or it was never submitted. Worth confirming in App Store Connect. `2606.5.0`, `26.5.19` and `2605.21.0` have aged out of this table.
+At the August 31 snapshot, iOS `2608.27.0` had only three observed users (08-27/08-28), insufficient to establish public rollout. This is historical adoption data, not current release status.
 
 ---
 

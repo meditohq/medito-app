@@ -40,53 +40,59 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
               child: Center(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24),
-                      Text(
-                        AppLocalizations.of(context)!.hey,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      MarkdownWidget(
-                        body: widget.maintenanceModel.message ?? '',
-                        textAlign: WrapAlignment.start,
-                        a: markDownTheme?.copyWith(
-                          decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        p: markDownTheme?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white70,
-                          fontSize: 16,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      if (widget.maintenanceModel.ctaLabel != null &&
-                          widget.maintenanceModel.ctaLabel!.isNotEmpty)
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: onPressed,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorConstants.lightPurple,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(widget.maintenanceModel.ctaLabel ?? ''),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 24),
+                        Text(
+                          AppLocalizations.of(context)!.hey,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                    ],
+                        const SizedBox(height: 12),
+                        MarkdownWidget(
+                          body: widget.maintenanceModel.message ?? '',
+                          textAlign: WrapAlignment.start,
+                          a: markDownTheme?.copyWith(
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          p: markDownTheme?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white70,
+                            fontSize: 16,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        if (widget.maintenanceModel.ctaLabel != null &&
+                            widget.maintenanceModel.ctaLabel!.isNotEmpty)
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: onPressed,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorConstants.lightPurple,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                widget.maintenanceModel.ctaLabel ?? '',
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),

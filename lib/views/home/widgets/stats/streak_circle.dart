@@ -40,6 +40,9 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
   @override
   Widget build(BuildContext context) {
+    // Read here, not in the controller: it needs a BuildContext, and every
+    // updateAnimation call below then honours it.
+    _controller.reduceMotion = MediaQuery.disableAnimationsOf(context);
     return Consumer(
       builder: (context, ref, child) {
         final statsAsync = ref.watch(statsProvider);
@@ -243,7 +246,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                           fontWeight: isStreakDoneToday
                               ? FontWeight.w700
                               : FontWeight.w500,
-                          fontFamily: dmSans,
+                          fontFamily: googleSans,
                           fontFeatures: const [FontFeature.tabularFigures()],
                           letterSpacing: -0.2,
                           height: StreakCircleConstants.lineHeight,

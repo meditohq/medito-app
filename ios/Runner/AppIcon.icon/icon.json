@@ -1,16 +1,6 @@
 {
   "fill" : {
-    "automatic-gradient" : "srgb:0.56863,0.49020,0.94118,1.00000",
-    "orientation" : {
-      "start" : {
-        "x" : 0.5,
-        "y" : 0
-      },
-      "stop" : {
-        "x" : 0.5,
-        "y" : 0.7
-      }
-    }
+    "solid" : "srgb:0.56863,0.49020,0.94118,1.00000"
   },
   "groups" : [
     {
@@ -43,13 +33,14 @@
         }
       ],
       "shadow" : {
-        "kind" : "neutral",
+        "kind" : "none",
         "opacity" : 0.5
       },
       "translucency" : {
-        "enabled" : true,
+        "enabled" : false,
         "value" : 0.5
-      }
+      },
+      "specular" : false
     }
   ],
   "supported-platforms" : {

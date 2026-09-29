@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -70,25 +71,28 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
         hasBackButton: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
-          child: AnimatedBuilder(
-            animation: _tabController,
-            builder: (context, _) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: padding16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildTabItem(
-                      0,
-                      AppLocalizations.of(context)!.stats,
+          child: AdaptivePageBody(
+            maxWidth: 640,
+            child: AnimatedBuilder(
+              animation: _tabController,
+              builder: (context, _) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: padding16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildTabItem(
+                        0,
+                        AppLocalizations.of(context)!.stats,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: _buildTabItem(
-                      1,
-                      AppLocalizations.of(context)!.history,
+                    Expanded(
+                      child: _buildTabItem(
+                        1,
+                        AppLocalizations.of(context)!.history,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -97,9 +101,12 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [_buildStatsTab(), _buildHistoryTab()],
+      body: AdaptivePageBody(
+        maxWidth: 640,
+        child: TabBarView(
+          controller: _tabController,
+          children: [_buildStatsTab(), _buildHistoryTab()],
+        ),
       ),
     );
   }
@@ -132,7 +139,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             Text(
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
+                fontFamily: googleSans,
                 color: isSelected ? selectedColor : unselectedColor,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
@@ -261,7 +268,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        fontFamily: dmSans,
+        fontFamily: googleSans,
       ),
     );
   }
@@ -458,7 +465,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                               context,
                             )!.alwaysShowStreakOnHomepage,
                             style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(fontSize: 14, fontFamily: dmSans),
+                                ?.copyWith(
+                                  fontSize: 14,
+                                  fontFamily: googleSans,
+                                ),
                           ),
                         ),
                       ],

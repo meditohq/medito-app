@@ -6,6 +6,8 @@ import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,14 +67,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       return const SizedBox.shrink();
     }
 
-    final rawBgColor = ColorConstants.getColorFromString(
-      widget.announcement.colorBackground,
-    );
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark
-        ? rawBgColor
-        : Color.lerp(rawBgColor, Colors.black, 0.08) ?? rawBgColor;
-
+    // The retheme uses one flat card surface everywhere; the announcement
+    // follows it instead of the server-supplied colours, which read as a
+    // heavy block against the rest of the home screen.
     return SizeTransition(
       sizeFactor: _sizeAnimation,
       alignment: AlignmentDirectional.topStart,
@@ -85,26 +82,24 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
             right: padding16,
             bottom: padding16,
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(kHomeCardRadius),
-            ),
-            padding: const EdgeInsets.only(
-              left: padding20,
-              right: padding20,
-              bottom: padding12,
-              top: padding20,
-            ),
-            child: Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [_text(context)],
-                ),
-                height16,
-                _actionBtn(context),
-              ],
+          child: _GlassCard(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: padding20,
+                right: padding20,
+                bottom: padding12,
+                top: padding20,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [_iconBadge(context), width16, _text(context)],
+                  ),
+                  height16,
+                  _actionBtn(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -112,36 +107,47 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
     );
   }
 
+  /// Leading badge that marks the card as an announcement.
+  Widget _iconBadge(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    return Container(
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: onSurface.withValues(alpha: 0.08),
+      ),
+      child: Icon(
+        Icons.campaign_rounded,
+        size: 20,
+        color: onSurface.withValues(alpha: 0.85),
+      ),
+    );
+  }
+
   Row _actionBtn(BuildContext context) {
-    var textColor = ColorConstants.getColorFromString(
-      widget.announcement.colorText,
-    );
-    var bgColor = ColorConstants.getColorFromString(
-      widget.announcement.colorBackground,
-    );
+    final theme = Theme.of(context);
 
     var actionWidgets = <Widget>[
       TextButton(
         onPressed: _handleDismiss,
         child: Text(
           AppLocalizations.of(context)!.dismiss,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(color: textColor),
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ),
       ),
       width4,
     ];
 
     if (widget.announcement.ctaPath != null) {
+      // Themed ElevatedButton: accent fill with the accent's own foreground.
       actionWidgets.add(
         ElevatedButton(
           onPressed: () => _handleCtaTitlePress(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: textColor,
-            foregroundColor: bgColor,
-            padding: const EdgeInsets.all(8),
-          ),
+          style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(8)),
           child: Text(widget.announcement.ctaTitle ?? ''),
         ),
       );
@@ -154,13 +160,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
   }
 
   Flexible _text(BuildContext context) {
-    var textColor = ColorConstants.getColorFromString(
-      widget.announcement.colorText,
+    var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      color: Theme.of(context).colorScheme.onSurface,
     );
-
-    var markDownTheme = Theme.of(
-      context,
-    ).textTheme.bodyMedium?.copyWith(color: textColor);
 
     return Flexible(
       child: MarkdownWidget(
@@ -190,6 +192,40 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       sourceRouteName: isDonation
           ? FirebaseAnalyticsService.paywallSourceAnnouncement
           : null,
+    );
+  }
+}
+
+/// Frosted, translucent card for the announcement, so the hero image shows
+/// softly through it instead of a solid block.
+class _GlassCard extends StatelessWidget {
+  const _GlassCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final radius = BorderRadius.circular(kHomeCardRadius);
+    return ClipRRect(
+      borderRadius: radius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.cardColor.withValues(alpha: 0.72),
+            borderRadius: radius,
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.08),
+              width: 0.5,
+            ),
+          ),
+          child: child,
+        ),
+      ),
     );
   }
 }

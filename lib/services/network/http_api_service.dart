@@ -59,6 +59,26 @@ class HttpApiService {
   // List of callbacks to notify on auth events
   final List<AuthStateCallback> _authCallbacks = [];
 
+  // Supplies an access token (setting the auth header as a side effect) when
+  // a request is about to go out without one. Registered by the auth
+  // repository. On a cold start the header stays empty until the first
+  // getToken(), so without this, early requests (stats, packs, home) went out
+  // with no token, got a 401, and triggered a second, parallel refresh.
+  Future<void> Function()? _tokenSupplier;
+
+  // One supplier call is shared by every request waiting on it, and after a
+  // failure (offline, auth host down) requests stop waiting for a while
+  // instead of each re-running the full refresh-with-retries.
+  Future<void>? _pendingTokenSupply;
+  DateTime? _tokenSupplyFailedAt;
+  static const _tokenSupplyTimeout = Duration(seconds: 10);
+  static const _tokenSupplyCooldown = Duration(seconds: 30);
+
+  // Bumped whenever local auth is cleared, so a refresh that was in flight
+  // when the user signed out (or deleted their account) can't put the old
+  // session's access token back on the header.
+  int _authEpoch = 0;
+
   // NOTE: The dependency on `package:medito/mock/...` above is INTENTIONAL.
   // `lib/mock/` is not test code — it's a shipped demo environment that lets
   // contributors run the app without real API keys (see lib/mock/README.md
@@ -123,7 +143,7 @@ class HttpApiService {
 
   void _initializeHeaders() {
     AppLogger.d('HTTP', 'Initializing headers for instance #$_instanceId');
-    _headers[kContentTypeHeader] = ContentType.json.value;
+    _headers[kContentTypeHeader] = ContentType.json.toString();
   }
 
   void setAuthHeader(String accessToken) {
@@ -132,11 +152,49 @@ class HttpApiService {
       'Setting auth header on instance #$_instanceId. Prefix: ${accessToken.substring(0, min(10, accessToken.length))}',
     );
     _headers[kAuthorizationHeader] = 'Bearer $accessToken';
+    _tokenSupplyFailedAt = null;
+  }
+
+  void setTokenSupplier(Future<void> Function() supplier) {
+    _tokenSupplier = supplier;
+  }
+
+  /// Waits for an access token if the request would otherwise be sent
+  /// without one. Failures are swallowed: the request then goes out as
+  /// before and the 401 handling takes over.
+  Future<void> _awaitAuthHeader() async {
+    final supplier = _tokenSupplier;
+    if (supplier == null || _headers.containsKey(kAuthorizationHeader)) return;
+    final failedAt = _tokenSupplyFailedAt;
+    if (failedAt != null &&
+        DateTime.now().difference(failedAt) < _tokenSupplyCooldown) {
+      return;
+    }
+    final pending = _pendingTokenSupply ??= supplier()
+        .timeout(_tokenSupplyTimeout)
+        .whenComplete(() => _pendingTokenSupply = null);
+    try {
+      await pending;
+    } catch (e) {
+      _tokenSupplyFailedAt = DateTime.now();
+      AppLogger.w('HTTP', 'No access token before request: $e');
+    }
   }
 
   void clearAuthHeader() {
     AppLogger.d('HTTP', 'Clearing auth header on instance #$_instanceId');
     _headers.remove(kAuthorizationHeader);
+  }
+
+  /// Drops this service's whole view of the session: the header, its own
+  /// [AuthApiService]'s tokens and any shared in-flight refresh. The
+  /// synchronous part runs before the first await, so no request that starts
+  /// afterwards can pick the old session back up.
+  Future<void> clearLocalAuth() async {
+    _authEpoch++;
+    clearAuthHeader();
+    _tokenSupplyFailedAt = null;
+    await _authService.clearAuthTokens();
   }
 
   /// Test-only accessor for the singleton-scoped retry counter. See the
@@ -149,6 +207,9 @@ class HttpApiService {
   /// refresh + retry flow.
   @visibleForTesting
   set retryCountForTesting(int value) => _retryCount = value;
+
+  @visibleForTesting
+  Future<void> awaitAuthHeaderForTesting() => _awaitAuthHeader();
 
   /// Test-only accessor for the in-progress refresh flag.
   @visibleForTesting
@@ -171,8 +232,13 @@ class HttpApiService {
   Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async =>
       _handleRequest(() async => _client.postUrl(_buildUri(path)), body: body);
 
-  Future<Map<String, dynamic>> deleteRequest(String path) async =>
-      _handleRequest(() async => _client.deleteUrl(_buildUri(path)));
+  Future<Map<String, dynamic>> deleteRequest(
+    String path, {
+    dynamic body,
+  }) async => _handleRequest(
+    () async => _client.deleteUrl(_buildUri(path)),
+    body: body,
+  );
 
   Uri _buildUri(String path, [Map<String, dynamic>? queryParams]) {
     return Uri.parse(
@@ -184,43 +250,42 @@ class HttpApiService {
     return Uri.parse('$authBaseUrl$path');
   }
 
-  Future<void> signOut() async {
-    AppLogger.i('HTTP', 'Signing out user');
+  /// The access token requests currently go out with, if any.
+  String? get accessToken {
+    final header = _headers[kAuthorizationHeader];
+    const prefix = 'Bearer ';
+    return header != null && header.startsWith(prefix)
+        ? header.substring(prefix.length)
+        : null;
+  }
 
-    if (!_headers.containsKey(kAuthorizationHeader)) {
-      AppLogger.i('HTTP', 'No auth header present, skipping signout request');
-      return;
-    }
+  /// Asks the server to end the session [accessToken] belongs to (the server
+  /// deletes the session named by the token's `jti`). Local auth state is not
+  /// touched: the auth repository clears it first, so sign-out never waits on
+  /// the network — which is why the token has to be passed in.
+  Future<void> signOut(String accessToken) async {
+    AppLogger.i('HTTP', 'Ending server session');
 
     try {
       final request = await _client.postUrl(
         _buildAuthUri(HTTPConstants.authTokensSignout),
       );
-      _headers.forEach(request.headers.set);
-
-      AppLogger.d('HTTP', 'Signout request headers set');
+      request.headers.set(kContentTypeHeader, ContentType.json.toString());
+      request.headers.set(kAuthorizationHeader, 'Bearer $accessToken');
 
       final response = await request.close().timeout(kTimeoutDuration);
       final content = await utf8.decodeStream(response);
-
-      AppLogger.d(
-        'HTTP',
-        'Signout response received. Status: ${response.statusCode}, Content: $content',
-      );
 
       if (response.statusCode >= HttpStatus.badRequest) {
         AppLogger.w(
           'HTTP',
           'Signout request failed. Status: ${response.statusCode}, Content: $content',
         );
+      } else {
+        AppLogger.i('HTTP', 'Server session ended');
       }
     } catch (e, stackTrace) {
       AppLogger.e('HTTP', 'Signout request error', e, stackTrace);
-    } finally {
-      // Always clear local auth state even if the request fails
-      clearAuthHeader();
-      await _authService.clearAuthTokens();
-      AppLogger.i('HTTP', 'Local auth state cleared during signout');
     }
   }
 
@@ -229,6 +294,7 @@ class HttpApiService {
     dynamic body,
   }) async {
     try {
+      await _awaitAuthHeader();
       final request = await requestBuilder();
       _headers.forEach(request.headers.set);
 
@@ -239,7 +305,9 @@ class HttpApiService {
 
       if (body != null) {
         final encodedBody = jsonEncode(body);
-        request.write(encodedBody);
+        // add() with explicit UTF-8: write() encodes as Latin-1 unless the
+        // content-type carries a charset, and throws on any char > U+00FF.
+        request.add(utf8.encode(encodedBody));
       }
 
       final response = await request.close().timeout(kTimeoutDuration);
@@ -382,7 +450,9 @@ class HttpApiService {
 
       if (body != null) {
         final encodedBody = jsonEncode(body);
-        request.write(encodedBody);
+        // add() with explicit UTF-8: write() encodes as Latin-1 unless the
+        // content-type carries a charset, and throws on any char > U+00FF.
+        request.add(utf8.encode(encodedBody));
       }
 
       final response = await request.close().timeout(kTimeoutDuration);
@@ -459,6 +529,8 @@ class HttpApiService {
 
   Future<void> _forceLogout([String reason = 'Unknown reason']) async {
     AppLogger.w('HTTP', 'Force logout initiated: $reason');
+    _authEpoch++;
+    AuthApiService.clearRefreshCache();
 
     // Check if we're already logged out before proceeding
     try {
@@ -637,6 +709,9 @@ class HttpApiService {
     // Set up a new refresh operation
     _isRefreshingToken = true;
     _refreshTokenCompleter = Completer<void>();
+    // Waiters still get the error; this only stops a failure with no waiter
+    // from surfacing as an uncaught async error.
+    _refreshTokenCompleter.future.ignore();
 
     String? refreshToken;
     try {
@@ -715,7 +790,12 @@ class HttpApiService {
 
       // Attempt the actual refresh with the server
       // This might throw RefreshTokenError if server rejects it
+      final epoch = _authEpoch;
       final tokens = await _authService.refreshToken(refreshToken);
+      if (epoch != _authEpoch) {
+        AppLogger.w('HTTP', 'Signed out during token refresh, dropping result');
+        throw const UnauthorizedError();
+      }
 
       AppLogger.i(
         'HTTP',

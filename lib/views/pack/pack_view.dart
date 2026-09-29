@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -7,8 +10,10 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/pack/widgets/pack_item_widget.dart';
+import 'package:medito/views/pack/widgets/pack_path_button.dart';
 import 'package:medito/views/player/widgets/bottom_actions/pack_view_bottom_bar.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
+import 'package:medito/views/tags/widgets/tag_chips.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +32,18 @@ class PackView extends ConsumerStatefulWidget {
 class _PackViewState extends ConsumerState<PackView>
     with AutomaticKeepAliveClientMixin<PackView> {
   final ScrollController _scrollController = ScrollController();
+  // The inline play button and the Stack it docks into, measured on scroll.
+  final _playButtonKey = GlobalKey();
+  final _bodyKey = GlobalKey();
+
+  /// Where the inline play button's slot sits at scroll offset 0. The slot's
+  /// on-screen top is always this minus the offset (content below the app bar
+  /// moves 1:1 with scrolling), so the floating button can be placed from the
+  /// current offset without waiting a frame for a measurement.
+  double? _playSlotTopAtZero;
+
+  /// SliverAppBar.large's collapsed toolbar height (Material 3).
+  static const _collapsedAppBarHeight = 64.0;
   final _analytics = FirebaseAnalyticsService();
   bool _markingAll = false;
 
@@ -69,19 +86,52 @@ class _PackViewState extends ConsumerState<PackView>
         loading: () => backButton,
         error: (_, _) => backButton,
       ),
-      body: packAsyncValue.when(
-        skipLoadingOnRefresh: false,
-        skipLoadingOnReload: false,
-        data: (data) => _buildScaffoldWithData(data, ref),
-        error: (err, stack) {
-          final error = err is AppError ? err : const UnknownError();
-          return MeditoErrorWidget(
-            error: error,
-            onTap: () => ref.refresh(packDataProvider(packId: widget.id)),
-            isLoading: packAsyncValue.isLoading,
-          );
-        },
-        loading: () => const FolderShimmerWidget(),
+      body: AdaptivePageBody(
+        maxWidth: 960,
+        child: packAsyncValue.when(
+          skipLoadingOnRefresh: false,
+          skipLoadingOnReload: false,
+          data: (data) {
+            final playable = PackPathButton.isPlayable(data);
+            if (playable) {
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => mounted ? _measurePlaySlot() : null,
+              );
+            }
+            final slotTop = _playSlotTopAtZero;
+            final offset = _scrollController.hasClients
+                ? _scrollController.offset
+                : 0.0;
+            return Stack(
+              key: _bodyKey,
+              children: [
+                _buildScaffoldWithData(
+                  data,
+                  ref,
+                  floatingPlay: playable && slotTop != null,
+                ),
+                // One button, drawn above the app bar: it rides with the
+                // content, then sticks straddling the collapsed bar's edge
+                // (Spotify-style). No swap between copies, so no jump.
+                if (playable && slotTop != null)
+                  Positioned(
+                    top: math.max(slotTop - offset, _dockedPlayTop),
+                    right: PackPathButton.rightInset,
+                    child: PackPlayButton(pack: data),
+                  ),
+              ],
+            );
+          },
+          error: (err, stack) {
+            final error = err is AppError ? err : const UnknownError();
+            return MeditoErrorWidget(
+              error: error,
+              onTap: () => ref.refresh(packDataProvider(packId: widget.id)),
+              isLoading: packAsyncValue.isLoading,
+            );
+          },
+          loading: () => const FolderShimmerWidget(),
+        ),
       ),
     );
   }
@@ -90,7 +140,32 @@ class _PackViewState extends ConsumerState<PackView>
     setState(() => {});
   }
 
-  RefreshIndicator _buildScaffoldWithData(PackModel pack, WidgetRef ref) {
+  /// Re-measures the play slot after layout (description, tags or text scale
+  /// can move it); only rebuilds when it actually moved.
+  void _measurePlaySlot() {
+    final slot = _playButtonKey.currentContext?.findRenderObject();
+    final body = _bodyKey.currentContext?.findRenderObject();
+    if (slot is! RenderBox || body is! RenderBox || !slot.attached) return;
+    final offset = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0.0;
+    final atZero = slot.localToGlobal(Offset.zero, ancestor: body).dy + offset;
+    final previous = _playSlotTopAtZero;
+    if (previous == null || (previous - atZero).abs() > 0.5) {
+      setState(() => _playSlotTopAtZero = atZero);
+    }
+  }
+
+  double get _dockedPlayTop =>
+      MediaQuery.paddingOf(context).top +
+      _collapsedAppBarHeight -
+      PackPathButton.buttonSize / 2;
+
+  RefreshIndicator _buildScaffoldWithData(
+    PackModel pack,
+    WidgetRef ref, {
+    bool floatingPlay = false,
+  }) {
     return RefreshIndicator(
       onRefresh: () async {
         if (widget.id == 'favorites') {
@@ -111,13 +186,50 @@ class _PackViewState extends ConsumerState<PackView>
           ),
           SliverList(
             delegate: SliverChildListDelegate([
-              DescriptionWidget(description: pack.description ?? ''),
+              // Description surface with the play button on its lower edge.
+              PackPathButton(
+                pack: pack,
+                buttonKey: _playButtonKey,
+                // The floating copy takes over once the slot is measured.
+                hideButton: floatingPlay,
+                child: Column(
+                  children: [
+                    DescriptionWidget(
+                      description: pack.description ?? '',
+                      endReserve: PackPathButton.endReserve,
+                    ),
+                    _packTags(pack),
+                  ],
+                ),
+              ),
               ..._listItems(pack, ref),
               _markAllButton(pack),
               height32,
             ]),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Tags shared by most of the pack's tracks; nothing when unavailable.
+  Widget _packTags(PackModel pack) {
+    final trackIds = pack.items
+        .where((item) => item.type == TypeConstants.track)
+        .map((item) => item.id)
+        .toList();
+    if (trackIds.isEmpty) return const SizedBox.shrink();
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: PackTagChips(
+        trackIds: trackIds,
+        // Right inset clears the play button on the header's lower edge.
+        padding: const EdgeInsets.fromLTRB(
+          20,
+          0,
+          20 + PackPathButton.endReserve,
+          16,
+        ),
       ),
     );
   }

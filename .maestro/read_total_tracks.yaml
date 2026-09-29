@@ -1,0 +1,29 @@
+appId: ${APP_ID}
+name: Read "Total Tracks Completed" from the stats screen into output[STATS_KEY]
+---
+# Call from Home with env STATS_KEY set to the output key to fill, e.g.
+#   - runFlow: { file: read_total_tracks.yaml, env: { STATS_KEY: before } }
+# Leaves the app back on Home.
+
+# The Home streak circle opens stats. Its label is "N day streak", or
+# "Consistency Score: N%" when the user switched the circle over.
+- extendedWaitUntil:
+    visible: "(?s).*day streak.*|Consistency Score: .*"
+    timeout: 30000
+- tapOn: "(?s).*day streak.*|Consistency Score: .*"
+
+# Each stat row merges value and label into one node, "12\nTotal Tracks
+# Completed", so the regex needs (?s) to span the newline.
+- scrollUntilVisible:
+    element: "(?s)\\d+\\s+Total Tracks Completed"
+    direction: DOWN
+    timeout: 30000
+- copyTextFrom: "(?s)\\d+\\s+Total Tracks Completed"
+- evalScript: ${output[STATS_KEY] = parseInt(maestro.copiedText, 10)}
+- evalScript: ${console.log('Total Tracks Completed [' + STATS_KEY + '] = ' + output[STATS_KEY])}
+- takeScreenshot: stats-${STATS_KEY}
+
+- tapOn: "Go Back"
+- extendedWaitUntil:
+    visible: "(?s).*day streak.*|Consistency Score: .*"
+    timeout: 15000

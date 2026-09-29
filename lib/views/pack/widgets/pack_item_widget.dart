@@ -4,6 +4,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:medito/views/pack/widgets/pack_complete_badge.dart';
 
 class PackItemWidget extends StatelessWidget {
   const PackItemWidget({super.key, required this.item, this.onSetComplete});
@@ -38,8 +39,7 @@ class PackItemWidget extends StatelessWidget {
                       if (item.title.isNotNullAndNotEmpty())
                         Text(
                           item.title,
-                          style: Theme.of(context).textTheme.headlineMedium
-                              ?.copyWith(fontFamily: dmSans, fontSize: 16),
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       if (hasSubtitle)
                         Flexible(
@@ -47,12 +47,7 @@ class PackItemWidget extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               item.subtitle ?? '',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
-                                    fontFamily: dmMono,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ),
                         ),
@@ -77,6 +72,21 @@ class PackItemWidget extends StatelessWidget {
       return _CompletionToggle(
         isCompleted: item.isCompleted ?? false,
         onSetComplete: onSetComplete!,
+      );
+    }
+
+    if (item.type == TypeConstants.pack && item.isCompleted == true) {
+      // Same 48px slot and left gap as the track toggle, so ticks line up.
+      return const Padding(
+        padding: EdgeInsets.only(left: 8),
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: PackCompleteBadge(),
+          ),
+        ),
       );
     }
 
@@ -185,15 +195,19 @@ class _CompletionToggleState extends State<_CompletionToggle> {
                     border: Border.all(
                       color: _shown
                           ? context.brandPurple
-                          : ColorConstants.graphite,
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.4),
                       width: 2,
                     ),
                   ),
+                  // Glyph in the accent's own foreground: the accent is
+                  // near-white in dark mode, so plain white disappeared.
                   child: _shown
-                      ? const Icon(
+                      ? Icon(
                           Icons.check,
                           size: 16,
-                          color: ColorConstants.white,
+                          color: context.onBrandPurple,
                         )
                       : null,
                 ),

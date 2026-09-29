@@ -54,6 +54,24 @@ void main() async {
   });
 
   group('SecureStorageService', () {
+    test(
+      'clearUserEmail removes the prefs copy even if the keystore delete throws',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          SecureStorageService.userEmailPrefsKey: 'gone@example.com',
+        });
+        when(
+          () => mockSecureStorage.delete(key: any(named: 'key')),
+        ).thenThrow(PlatformException(code: 'keystore-broken'));
+
+        await secureStorageService.clearUserEmail();
+
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString(SecureStorageService.userEmailPrefsKey), isNull);
+        expect(await secureStorageService.getUserEmail(), isNull);
+      },
+    );
+
     const testToken = 'test-refresh-token';
     const testKey = 'medito_refresh_token';
     const backupTestKey = 'medito_backup_refresh_token';

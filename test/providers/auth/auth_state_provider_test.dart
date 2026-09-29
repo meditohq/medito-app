@@ -12,7 +12,9 @@
 // after rebuild).
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medito/models/favorites/favorite_item.dart';
 import 'package:medito/providers/auth/auth_state_provider.dart';
+import 'package:medito/repositories/favorites/favorites_repository.dart';
 import 'package:medito/providers/network/http_api_service_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/network/http_api_service.dart';
@@ -45,6 +47,23 @@ class _FakeHttpApiService extends Mock implements HttpApiService {
   }
 }
 
+/// Local favourites that must be dropped on a forced logout.
+class _FakeFavoritesRepository implements FavoritesRepository {
+  int clearLocalCalls = 0;
+
+  @override
+  Future<List<FavoriteItem>> loadFavorites() async => [];
+
+  @override
+  Future<List<FavoriteItem>> loadFavoritesFromServer() async => [];
+
+  @override
+  Future<void> clearLocal() async => clearLocalCalls++;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _FakeAuthRepository implements AuthRepository {
   int resetAuthStateCallCount = 0;
 
@@ -71,6 +90,9 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> signInAnonymously() async {}
   @override
   Future<bool> signOut() async => true;
+
+  @override
+  Future<void> signOutLocally() async {}
   @override
   Future<bool> verifyOtp(String email, String otp) async => false;
 }
@@ -79,10 +101,12 @@ void main() {
   group('authStateListenerProvider', () {
     late _FakeHttpApiService fakeHttp;
     late _FakeAuthRepository fakeAuth;
+    late _FakeFavoritesRepository fakeFavorites;
 
     setUp(() {
       fakeHttp = _FakeHttpApiService();
       fakeAuth = _FakeAuthRepository();
+      fakeFavorites = _FakeFavoritesRepository();
     });
 
     test('registers a callback with the HTTP service when first read', () {
@@ -90,6 +114,7 @@ void main() {
         overrides: [
           httpApiServiceProvider.overrideWithValue(fakeHttp),
           authRepositorySyncProvider.overrideWithValue(fakeAuth),
+          favoritesRepositoryProvider.overrideWithValue(fakeFavorites),
         ],
       );
       addTearDown(container.dispose);
@@ -113,6 +138,7 @@ void main() {
         overrides: [
           httpApiServiceProvider.overrideWithValue(fakeHttp),
           authRepositorySyncProvider.overrideWithValue(fakeAuth),
+          favoritesRepositoryProvider.overrideWithValue(fakeFavorites),
         ],
       );
       addTearDown(container.dispose);
@@ -143,6 +169,11 @@ void main() {
         isTrue,
         reason: 'forceLogout should be emitted on the auth state stream',
       );
+      expect(
+        fakeFavorites.clearLocalCalls,
+        1,
+        reason: 'the next account must not inherit these favourites',
+      );
     });
 
     test('removes the registered callback when the container is disposed', () {
@@ -150,6 +181,7 @@ void main() {
         overrides: [
           httpApiServiceProvider.overrideWithValue(fakeHttp),
           authRepositorySyncProvider.overrideWithValue(fakeAuth),
+          favoritesRepositoryProvider.overrideWithValue(fakeFavorites),
         ],
       );
 
@@ -177,6 +209,7 @@ void main() {
         overrides: [
           httpApiServiceProvider.overrideWithValue(fakeHttp),
           authRepositorySyncProvider.overrideWithValue(fakeAuth),
+          favoritesRepositoryProvider.overrideWithValue(fakeFavorites),
         ],
       );
       c1.read(authStateListenerProvider);
@@ -191,6 +224,7 @@ void main() {
         overrides: [
           httpApiServiceProvider.overrideWithValue(fakeHttp),
           authRepositorySyncProvider.overrideWithValue(fakeAuth),
+          favoritesRepositoryProvider.overrideWithValue(fakeFavorites),
         ],
       );
       addTearDown(c2.dispose);

@@ -251,7 +251,6 @@ final mockTracks = <String, Track>{
 const mockMe = MeModel(
   id: 'mock-user-001',
   email: 'contributor@medito.app',
-  hasActiveSubscription: false,
 );
 
 // ---------------------------------------------------------------------------
@@ -349,3 +348,15 @@ const mockDonation = DonationPageModel(
 // ---------------------------------------------------------------------------
 
 const mockMaintenance = MaintenanceModel(isUnderMaintenance: false);
+
+/// Content tags (see `GET /tags`). Ids match the server taxonomy so the
+/// app's translated labels apply.
+const mockTags = ['sleep', 'stress', 'breathing', 'body_scan', 'beginners'];
+
+const mockTrackTags = <String, List<String>>{
+  'track-1': ['beginners', 'breathing', 'stress'],
+  'track-2': ['body_scan', 'stress'],
+  'track-3': ['breathing', 'beginners'],
+  'track-4': ['sleep', 'body_scan'],
+  'track-5': ['sleep'],
+};

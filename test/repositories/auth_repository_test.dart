@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
@@ -65,6 +68,7 @@ void main() {
     registerFallbackValue(<String, String>{});
 
     when(() => mockUuid.v4()).thenReturn('test-uuid-value-1234');
+    when(() => mockHttpApiService.clearLocalAuth()).thenAnswer((_) async {});
   });
 
   group('AuthRepositoryImpl', () {
@@ -142,9 +146,7 @@ void main() {
         );
 
         // Only the original client ID was tried; nothing was minted or stored
-        verify(
-          () => mockAuthApiService.signIn(clientId: clientId),
-        ).called(1);
+        verify(() => mockAuthApiService.signIn(clientId: clientId)).called(1);
         verifyNever(
           () => mockPreferences.setString(
             SharedPreferenceConstants.userId,
@@ -314,35 +316,62 @@ void main() {
       verify(() => mockSecureStorageService.storeUserEmail(email)).called(1);
     });
 
-    test('signOut clears tokens', () async {
-      // Setup
-      when(() => mockHttpApiService.signOut()).thenAnswer((_) async {});
+    void stubSignOutState() {
       when(
         () => mockSecureStorageService.clearRefreshToken(),
       ).thenAnswer((_) async {});
       when(
         () => mockSecureStorageService.clearUserEmail(),
       ).thenAnswer((_) async {});
-      when(() => mockHttpApiService.clearAuthHeader()).thenAnswer((_) async {});
       when(
         () => mockPreferences.setBool(any(), any()),
       ).thenAnswer((_) async => true);
+      when(() => mockHttpApiService.signOut(any())).thenAnswer((_) async {});
+    }
 
-      // Action
+    test('signOut clears local state, then ends the server session', () async {
+      stubSignOutState();
+      when(() => mockHttpApiService.accessToken).thenReturn('access-123');
+
       final result = await authRepository.signOut();
 
-      // Verify
       expect(result, isTrue);
-      verify(() => mockHttpApiService.signOut()).called(1);
       verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
       verify(() => mockSecureStorageService.clearUserEmail()).called(1);
-      verify(() => mockHttpApiService.clearAuthHeader()).called(1);
       verify(
         () => mockPreferences.setBool(
           SharedPreferenceConstants.isLoggedIn,
           false,
         ),
       ).called(1);
+      // The token is read before the reset clears the header, and the server
+      // call carries it explicitly.
+      verifyInOrder([
+        () => mockHttpApiService.accessToken,
+        () => mockHttpApiService.clearLocalAuth(),
+        () => mockHttpApiService.signOut('access-123'),
+      ]);
+    });
+
+    test('signOut skips the server call without an access token', () async {
+      stubSignOutState();
+      when(() => mockHttpApiService.accessToken).thenReturn(null);
+
+      await authRepository.signOut();
+
+      verify(() => mockHttpApiService.clearLocalAuth()).called(1);
+      verifyNever(() => mockHttpApiService.signOut(any()));
+    });
+
+    test('a failing server sign out does not fail sign out', () async {
+      stubSignOutState();
+      when(() => mockHttpApiService.accessToken).thenReturn('access-123');
+      when(
+        () => mockHttpApiService.signOut(any()),
+      ).thenAnswer((_) async => throw const SocketException('offline'));
+
+      expect(await authRepository.signOut(), isTrue);
+      await pumpEventQueue();
     });
 
     test('initiateUser creates client ID with expected format', () async {
@@ -681,7 +710,7 @@ void main() {
         verify(() => mockAuthApiService.refreshToken(refreshToken)).called(1);
         verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
         verify(() => mockSecureStorageService.clearUserEmail()).called(1);
-        verify(() => mockHttpApiService.clearAuthHeader()).called(1);
+        verify(() => mockHttpApiService.clearLocalAuth()).called(1);
         verify(
           () => mockPreferences.setBool(
             SharedPreferenceConstants.isLoggedIn,
@@ -713,6 +742,96 @@ void main() {
         // Verify called 3 times (max retries)
         verify(() => mockAuthApiService.refreshToken(refreshToken)).called(3);
       });
+    });
+  });
+
+  group('sign-out guards', () {
+    const refreshToken = 'test-refresh-token';
+
+    Future<void> Function() capturedSupplier() =>
+        verify(
+              () => mockHttpApiService.setTokenSupplier(captureAny()),
+            ).captured.single
+            as Future<void> Function();
+
+    void stubSignOutStorage() {
+      when(
+        () => mockPreferences.setBool(any(), any()),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockSecureStorageService.clearRefreshToken(),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockSecureStorageService.clearUserEmail(),
+      ).thenAnswer((_) async {});
+      when(() => mockAuthApiService.clearAuthTokens()).thenAnswer((_) async {});
+    }
+
+    test('the token supplier never refreshes for a signed-out user', () async {
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(false);
+      when(
+        () => mockSecureStorageService.getRefreshToken(),
+      ).thenAnswer((_) async => 'leftover-keychain-token');
+
+      await capturedSupplier()();
+
+      verifyNever(() => mockSecureStorageService.getRefreshToken());
+      verifyNever(() => mockAuthApiService.refreshToken(any()));
+      verifyNever(() => mockHttpApiService.setAuthHeader(any()));
+    });
+
+    test('the token supplier sets the header for a signed-in user', () async {
+      when(
+        () => mockPreferences.getBool(SharedPreferenceConstants.isLoggedIn),
+      ).thenReturn(true);
+      when(
+        () => mockSecureStorageService.getRefreshToken(),
+      ).thenAnswer((_) async => refreshToken);
+      when(() => mockAuthApiService.refreshToken(refreshToken)).thenAnswer(
+        (_) async => AuthTokens(
+          accessToken: 'fresh',
+          refreshToken: refreshToken,
+          expiresIn: 7200,
+          clientId: 'client',
+        ),
+      );
+
+      await capturedSupplier()();
+
+      verify(
+        () => mockHttpApiService.setAuthHeader('fresh'),
+      ).called(greaterThan(0));
+    });
+
+    test('a refresh that finishes after signOutLocally is dropped', () async {
+      stubSignOutStorage();
+      when(
+        () => mockSecureStorageService.getRefreshToken(),
+      ).thenAnswer((_) async => refreshToken);
+      final pending = Completer<AuthTokens>();
+      when(
+        () => mockAuthApiService.refreshToken(refreshToken),
+      ).thenAnswer((_) => pending.future);
+
+      final token = authRepository.getToken();
+      await pumpEventQueue();
+      await authRepository.signOutLocally();
+      pending.complete(
+        AuthTokens(
+          accessToken: 'deleted-account-access',
+          refreshToken: refreshToken,
+          expiresIn: 7200,
+          clientId: 'deleted-client',
+          email: 'gone@example.com',
+        ),
+      );
+
+      await expectLater(token, throwsA(isA<UnauthorizedError>()));
+      verifyNever(() => mockHttpApiService.setAuthHeader(any()));
+      verifyNever(() => mockSecureStorageService.storeUserEmail(any()));
+      verify(() => mockHttpApiService.clearLocalAuth()).called(1);
     });
   });
 
@@ -764,11 +883,7 @@ void main() {
           () => mockSecureStorageService.storeUserEmail(any()),
         ).thenAnswer((_) async {});
         when(() => mockHttpApiService.getRequest(any())).thenAnswer(
-          (_) async => MeModel(
-            id: 'test-id',
-            email: email,
-            hasActiveSubscription: false,
-          ).toJson(),
+          (_) async => MeModel(id: 'test-id', email: email).toJson(),
         );
 
         authRepository.setCurrentUserForTesting(mockUser);
@@ -787,13 +902,9 @@ void main() {
       when(
         () => mockSecureStorageService.getUserEmail(),
       ).thenAnswer((_) async => null);
-      when(() => mockHttpApiService.getRequest(any())).thenAnswer(
-        (_) async => MeModel(
-          id: 'test-id',
-          email: null,
-          hasActiveSubscription: false,
-        ).toJson(),
-      );
+      when(
+        () => mockHttpApiService.getRequest(any()),
+      ).thenAnswer((_) async => MeModel(id: 'test-id', email: null).toJson());
 
       authRepository.setCurrentUserForTesting(mockUser);
       await authRepository.migrateEmailToStorage();

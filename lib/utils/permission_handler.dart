@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionHandler {
-  // Requests permission to show notifications, which is all that smart
+  // Requests permission to show notifications, which is all that daily
   // reminders need. SCHEDULE_EXACT_ALARM is not required because reminders
   // are scheduled with AndroidScheduleMode.inexactAllowWhileIdle.
   static Future<bool> requestNotificationPermission(

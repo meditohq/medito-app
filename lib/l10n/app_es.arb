@@ -10,6 +10,8 @@
   "backgroundSoundDownloadFailed": "No se pudo descargar. Toca para reintentar.",
   "none": "Ninguno",
   "removed": "Eliminado",
+  "undo": "Deshacer",
+  "reorder": "Reordenar",
   "meditationProducts": "Tienda para Apoyar",
   "blackFridayTitle": "Apoya Meditación Gratuita",
   "blackFridaySubtitle": "Este Black Friday, apoya la meditación gratuita para todos. Tu compra ayuda a mantener Medito gratis y accesible para millones en todo el mundo",
@@ -134,6 +136,8 @@
   "invalidEmailError": "Por favor ingresa un correo electrónico válido",
   "createAccountButtonText": "Crear Cuenta",
   "createAccountLogInButtonText": "Iniciar sesión o Registrarse",
+  "getStarted": "Empezar",
+  "splashSignInOrSignUp": "Iniciar sesión o registrarse",
   "sendMeMyPasswordText": "Continuar",
   "logInButtonText": "Iniciar Sesión",
   "authenticationFailed": "Autenticación fallida",
@@ -160,10 +164,26 @@
   "signOutSuccessMessage": "Has cerrado sesión exitosamente",
   "signOutErrorMessage": "Error al cerrar sesión. Por favor inténtalo de nuevo.",
   "deleteAccountTitle": "Eliminar Cuenta",
-  "deleteAccountConfirmation": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y debes seguir las instrucciones en la siguiente página.",
+  "deleteAccountConfirmation": "Esto elimina tu cuenta de forma permanente, incluidas tus estadísticas y favoritos. No se puede deshacer.",
   "deleteAccountButtonText": "Eliminar Cuenta",
   "accountMarkedForDeletion": "Tu cuenta ha sido marcada para eliminación.",
   "deleteAccountError": "Error al eliminar la cuenta.",
+  "deleteAccountDonationNotice": "Eliminar tu cuenta no cancela una donación recurrente (mensual o anual). Puedes cancelarla en el portal de donaciones con el correo con el que donaste.",
+  "deleteAccountManageDonations": "Gestionar donaciones",
+  "deleteAccountReasonTitle": "¿Por qué te vas?",
+  "deleteAccountReasonSubtitle": "Es opcional, pero nos ayuda a mejorar Medito.",
+  "deleteAccountReasonNotUsing": "Ya no la uso",
+  "deleteAccountReasonPrivacy": "Preocupaciones de privacidad",
+  "deleteAccountReasonSwitchingApp": "Me cambio a otra app",
+  "deleteAccountReasonTechnicalIssues": "Problemas técnicos",
+  "deleteAccountReasonTooManyNotifications": "Demasiadas notificaciones",
+  "deleteAccountReasonOther": "Otra cosa",
+  "deleteAccountDetailsHint": "¿Algo más que quieras contarnos? (opcional)",
+  "deleteAccountFinalButton": "Eliminar mi cuenta",
+  "deleteAccountFailed": "No se pudo eliminar la cuenta, inténtalo de nuevo.",
+  "deleteAccountUnconfirmed": "No pudimos confirmar que tu cuenta se eliminó. Revisa tu conexión e inténtalo de nuevo.",
+  "accountDeletedTitle": "Tu cuenta ha sido eliminada",
+  "accountDeletedBody": "Tu perfil, estadísticas y favoritos se han eliminado. Puedes seguir usando Medito sin una cuenta.",
   "accountMarkedForDeletionError": "Esta cuenta ha sido marcada para eliminación y no se puede acceder.",
   "faqTitle": "Preguntas Frecuentes",
   "editStatsTitle": "Editar estadísticas",
@@ -176,7 +196,6 @@
   "stepTitle": "Paso",
   "completed": "Completado",
   "locked": "Bloqueado",
-  "loadingPath": "Cargando tu ruta...",
   "pathLoadError": "Error al cargar la ruta. Por favor inténtalo de nuevo.",
   "stepCompleted": "¡Paso completado!",
   "stepCompletionError": "Error al completar el paso. Por favor inténtalo de nuevo.",
@@ -288,6 +307,8 @@
   "notificationPreviewTimestamp": "ahora",
   "notificationPreviewTitleB": "Una mente más tranquila empieza aquí",
   "notificationPreviewBodyB": "Tu respiración diaria te espera. Solo toca para empezar.",
+  "onboardingStepIndicator": "Paso {current} de {total}",
+  "onboardingReminderCurrentlySet": "Recordatorio diario configurado para las {time}",
   "reminderChipsQuestion": "¿Cuándo vas a meditar?",
   "reminderSlotMorning": "Mañana",
   "reminderSlotAfternoon": "Tarde",
@@ -311,11 +332,6 @@
   "onboardingBatteryOptimize": "Desactivar Optimización de Batería",
   "skipForNow": "Omitir por Ahora",
   "skip": "Omitir",
-  "packSetAsUpNext": "Este paquete ahora aparecerá en la sección Tu Camino en la página de inicio",
-  "packUnpinnedFromUpNext": "Este paquete ha sido eliminado de la sección Tu Camino",
-  "smartReminders": "Recordatorios Inteligentes",
-  "turnOnSmartReminders": "Activar Recordatorios Inteligentes",
-  "smartRemindersOn": "Recordatorios Inteligentes Activados",
   "donationTitle": "Millones encuentran calma aquí gratis. Ayuda a que siga así.",
   "donationBody": "Medito es gestionado por un pequeño equipo sin fines de lucro. Sin anuncios, sin inversores, sin muros de pago — solo donaciones de personas que usan la app.",
   "donateNow": "Conviértete en colaborador",
@@ -325,18 +341,22 @@
   "allSetTitle": "¡Todo Listo!",
   "startMeditating": "Comenzar a Meditar",
   "splashHeadline": "Meditación Hecha Simple",
-  "splashBenefit1Title": "Gratis para Todos, Para Siempre",
+  "splashSubtitle": "Gratis para siempre. Sin anuncios. Sin ánimo de lucro.",
   "splashBenefit1Subtitle": "Explora horas de meditaciones guiadas, cursos avanzados y más. Sin muro de pago.",
-  "splashBenefit2Title": "Desafíos y Recordatorios",
   "splashBenefit2Subtitle": "Mantente motivado diariamente, rastrea el progreso y construye hábitos duraderos.",
-  "splashBenefit3Title": "Sin Fines de Lucro y Sin Anuncios",
   "splashBenefit3Subtitle": "Las donaciones nos mantienen funcionando para que todos puedan acceder a la atención plena—sin necesidad de anuncios.",
   "continueText": "Continuar",
   "setReminderB": "Recuérdamelo Cada Día",
+  "donationContinueToPayment": "Continuar al pago",
   "donationEmailLabel": "Correo electr\u00f3nico",
   "donationEmailHelper": "Para tu recibo y para gestionar tu donaci\u00f3n.",
   "donationEmailRequired": "Introduce tu correo para poder enviarte el recibo.",
   "donationEmailInvalid": "Ese correo electr\u00f3nico no parece correcto.",
+  "emailTypoSuggestion": "¿Quisiste decir {email}?",
+  "emailTypoDialogTitle": "Revisa tu correo",
+  "emailTypoDialogTyped": "Escribiste {email}.",
+  "emailTypoUseSuggestion": "Usar este",
+  "emailTypoKeepTyped": "Dejar el mío",
   "donationThankYouTitle": "¡Gracias por Tu Apoyo!",
   "donationThankYouBody": "Tu generosidad ayuda a mantener Medito gratis y accesible para todos. Estamos profundamente agradecidos por tu contribución a difundir la atención plena en todo el mundo.",
   "donationVisitFoundation": "Visitar Fundación Medito",
@@ -693,10 +713,6 @@
   "@donorSupportMessage": {
     "description": "Message shown to existing donors explaining their importance"
   },
-  "donateAgain": "Donar Nuevamente",
-  "@donateAgain": {
-    "description": "Texto del botón para donar nuevamente después de una donación previa"
-  },
   "donationInfoTitle": "Por Qué Puedes Ver Esto",
   "@donationInfoTitle": {
     "description": "Título del diálogo de información sobre donaciones que explica por qué los usuarios pueden ver la solicitud de donación"
@@ -713,29 +729,25 @@
   "@donationAskHiddenMessage": {
     "description": "Mensaje mostrado después de ocultar la solicitud de donación"
   },
-  "smartReminders": "Recordatorios Inteligentes",
-  "@smartReminders": {
-    "description": "Label for the smart reminders feature toggle"
+  "dailyReminders": "Recordatorios Diarios",
+  "@dailyReminders": {
+    "description": "Label for the daily reminders opt-in card on the end screen"
   },
-  "turnOnSmartReminders": "Activar Recordatorios Inteligentes",
-  "@turnOnSmartReminders": {
-    "description": "Button text to enable smart reminders"
-  },
-  "smartRemindersOn": "Recordatorios Inteligentes Activados",
-  "@smartRemindersOn": {
-    "description": "Status text when smart reminders are enabled"
+  "turnOnReminders": "Activar recordatorios",
+  "@turnOnReminders": {
+    "description": "Button text to enable daily reminders"
   },
   "reminderPromptDismissedMessage": "Puedes activar o desactivar los recordatorios en Configuración",
   "@reminderPromptDismissedMessage": {
     "description": "Message shown when user dismisses the reminder prompt on the end screen"
   },
-  "smartReminderDay1TitleVar1": "Mantén tu racha 🌱",
-  "@smartReminderDay1TitleVar1": {
-    "description": "Smart reminder day 1 title variant 1"
+  "reminderDay1TitleVar1": "Mantén tu racha 🌱",
+  "@reminderDay1TitleVar1": {
+    "description": "Daily reminder day 1 title variant 1"
   },
-  "smartReminderDay1BodyVar1": "Tienes una racha de {streak} días. ¿La mantienes?",
-  "@smartReminderDay1BodyVar1": {
-    "description": "Smart reminder day 1 body variant 1",
+  "reminderDay1BodyVar1": "Tienes una racha de {streak} días. ¿La mantienes?",
+  "@reminderDay1BodyVar1": {
+    "description": "Daily reminder day 1 body variant 1",
     "placeholders": {
       "streak": {
         "type": "String",
@@ -743,13 +755,13 @@
       }
     }
   },
-  "smartReminderDay1TitleVar2": "Paso fuerte ✨",
-  "@smartReminderDay1TitleVar2": {
-    "description": "Smart reminder day 1 title variant 2"
+  "reminderDay1TitleVar2": "Paso fuerte ✨",
+  "@reminderDay1TitleVar2": {
+    "description": "Daily reminder day 1 title variant 2"
   },
-  "smartReminderDay1BodyVar2": "Consistencia {consistency}%. Sigamos adelante.",
-  "@smartReminderDay1BodyVar2": {
-    "description": "Smart reminder day 1 body variant 2",
+  "reminderDay1BodyVar2": "Consistencia {consistency}%. Sigamos adelante.",
+  "@reminderDay1BodyVar2": {
+    "description": "Daily reminder day 1 body variant 2",
     "placeholders": {
       "consistency": {
         "type": "String",
@@ -757,213 +769,213 @@
       }
     }
   },
-  "smartReminderDay1TitleVar3": "Las victorias pequeñas suman 💜",
-  "@smartReminderDay1TitleVar3": {
-    "description": "Smart reminder day 1 title variant 3"
+  "reminderDay1TitleVar3": "Las victorias pequeñas suman 💜",
+  "@reminderDay1TitleVar3": {
+    "description": "Daily reminder day 1 title variant 3"
   },
-  "smartReminderDay1BodyVar3": "Unos minutos ahora mantienen tu impulso vivo.",
-  "@smartReminderDay1BodyVar3": {
-    "description": "Smart reminder day 1 body variant 3"
+  "reminderDay1BodyVar3": "Unos minutos ahora mantienen tu impulso vivo.",
+  "@reminderDay1BodyVar3": {
+    "description": "Daily reminder day 1 body variant 3"
   },
-  "smartReminderDay1TitleVar4": "Tu práctica te espera 🌸",
-  "@smartReminderDay1TitleVar4": {
-    "description": "Smart reminder day 1 title variant 4"
+  "reminderDay1TitleVar4": "Tu práctica te espera 🌸",
+  "@reminderDay1TitleVar4": {
+    "description": "Daily reminder day 1 title variant 4"
   },
-  "smartReminderDay1BodyVar4": "Tómate un momento para reconectar contigo mismo.",
-  "@smartReminderDay1BodyVar4": {
-    "description": "Smart reminder day 1 body variant 4"
+  "reminderDay1BodyVar4": "Tómate un momento para reconectar contigo mismo.",
+  "@reminderDay1BodyVar4": {
+    "description": "Daily reminder day 1 body variant 4"
   },
-  "smartReminderDay1TitleVar5": "Una respiración a la vez 🫧",
-  "@smartReminderDay1TitleVar5": {
-    "description": "Smart reminder day 1 title variant 5"
+  "reminderDay1TitleVar5": "Una respiración a la vez 🫧",
+  "@reminderDay1TitleVar5": {
+    "description": "Daily reminder day 1 title variant 5"
   },
-  "smartReminderDay1BodyVar5": "Cada sesión cuenta, sin importar cuán corta sea.",
-  "@smartReminderDay1BodyVar5": {
-    "description": "Smart reminder day 1 body variant 5"
+  "reminderDay1BodyVar5": "Cada sesión cuenta, sin importar cuán corta sea.",
+  "@reminderDay1BodyVar5": {
+    "description": "Daily reminder day 1 body variant 5"
   },
-  "smartReminderDay2TitleVar1": "Mantén el flujo 🔁",
-  "@smartReminderDay2TitleVar1": {
-    "description": "Smart reminder day 2 title variant 1"
+  "reminderDay2TitleVar1": "Mantén el flujo 🔁",
+  "@reminderDay2TitleVar1": {
+    "description": "Daily reminder day 2 title variant 1"
   },
-  "smartReminderDay2BodyVar1": "Recuperemos esa racha. Unos minutos pueden marcar una gran diferencia.",
-  "@smartReminderDay2BodyVar1": {
-    "description": "Smart reminder day 2 body variant 1"
+  "reminderDay2BodyVar1": "Recuperemos esa racha. Unos minutos pueden marcar una gran diferencia.",
+  "@reminderDay2BodyVar1": {
+    "description": "Daily reminder day 2 body variant 1"
   },
-  "smartReminderDay2TitleVar2": "Construye tu ritmo 🧘",
-  "@smartReminderDay2TitleVar2": {
-    "description": "Smart reminder day 2 title variant 2"
+  "reminderDay2TitleVar2": "Construye tu ritmo 🧘",
+  "@reminderDay2TitleVar2": {
+    "description": "Daily reminder day 2 title variant 2"
   },
-  "smartReminderDay2BodyVar2": "Otra práctica suave te espera.",
-  "@smartReminderDay2BodyVar2": {
-    "description": "Smart reminder day 2 body variant 2"
+  "reminderDay2BodyVar2": "Otra práctica suave te espera.",
+  "@reminderDay2BodyVar2": {
+    "description": "Daily reminder day 2 body variant 2"
   },
-  "smartReminderDay2TitleVar3": "Tú puedes 🌟",
-  "@smartReminderDay2TitleVar3": {
-    "description": "Smart reminder day 2 title variant 3"
+  "reminderDay2TitleVar3": "Tú puedes 🌟",
+  "@reminderDay2TitleVar3": {
+    "description": "Daily reminder day 2 title variant 3"
   },
-  "smartReminderDay2BodyVar3": "Regresa a tu respiración, un momento a la vez.",
-  "@smartReminderDay2BodyVar3": {
-    "description": "Smart reminder day 2 body variant 3"
+  "reminderDay2BodyVar3": "Regresa a tu respiración, un momento a la vez.",
+  "@reminderDay2BodyVar3": {
+    "description": "Daily reminder day 2 body variant 3"
   },
-  "smartReminderDay2TitleVar4": "Pequeños pasos adelante 🚶",
-  "@smartReminderDay2TitleVar4": {
-    "description": "Smart reminder day 2 title variant 4"
+  "reminderDay2TitleVar4": "Pequeños pasos adelante 🚶",
+  "@reminderDay2TitleVar4": {
+    "description": "Daily reminder day 2 title variant 4"
   },
-  "smartReminderDay2BodyVar4": "La consistencia construye fuerza. Empieza con solo unos minutos.",
-  "@smartReminderDay2BodyVar4": {
-    "description": "Smart reminder day 2 body variant 4"
+  "reminderDay2BodyVar4": "La consistencia construye fuerza. Empieza con solo unos minutos.",
+  "@reminderDay2BodyVar4": {
+    "description": "Daily reminder day 2 body variant 4"
   },
-  "smartReminderDay2TitleVar5": "Regreso suave 💚",
-  "@smartReminderDay2TitleVar5": {
-    "description": "Smart reminder day 2 title variant 5"
+  "reminderDay2TitleVar5": "Regreso suave 💚",
+  "@reminderDay2TitleVar5": {
+    "description": "Daily reminder day 2 title variant 5"
   },
-  "smartReminderDay2BodyVar5": "Tu práctica consciente está aquí cuando estés listo.",
-  "@smartReminderDay2BodyVar5": {
-    "description": "Smart reminder day 2 body variant 5"
+  "reminderDay2BodyVar5": "Tu práctica consciente está aquí cuando estés listo.",
+  "@reminderDay2BodyVar5": {
+    "description": "Daily reminder day 2 body variant 5"
   },
-  "smartReminderDay3TitleVar1": "Construye el hábito 📆",
-  "@smartReminderDay3TitleVar1": {
-    "description": "Smart reminder day 3 title variant 1"
+  "reminderDay3TitleVar1": "Construye el hábito 📆",
+  "@reminderDay3TitleVar1": {
+    "description": "Daily reminder day 3 title variant 1"
   },
-  "smartReminderDay3BodyVar1": "El impulso importa. Tú puedes.",
-  "@smartReminderDay3BodyVar1": {
-    "description": "Smart reminder day 3 body variant 1"
+  "reminderDay3BodyVar1": "El impulso importa. Tú puedes.",
+  "@reminderDay3BodyVar1": {
+    "description": "Daily reminder day 3 body variant 1"
   },
-  "smartReminderDay3TitleVar2": " Chispa de tres días ✴️",
-  "@smartReminderDay3TitleVar2": {
-    "description": "Smart reminder day 3 title variant 2"
+  "reminderDay3TitleVar2": " Chispa de tres días ✴️",
+  "@reminderDay3TitleVar2": {
+    "description": "Daily reminder day 3 title variant 2"
   },
-  "smartReminderDay3BodyVar2": "Tu práctica está tomando forma.",
-  "@smartReminderDay3BodyVar2": {
-    "description": "Smart reminder day 3 body variant 2"
+  "reminderDay3BodyVar2": "Tu práctica está tomando forma.",
+  "@reminderDay3BodyVar2": {
+    "description": "Daily reminder day 3 body variant 2"
   },
-  "smartReminderDay3TitleVar3": "Un suave empujón 🤍",
-  "@smartReminderDay3TitleVar3": {
-    "description": "Smart reminder day 3 title variant 3"
+  "reminderDay3TitleVar3": "Un suave empujón 🤍",
+  "@reminderDay3TitleVar3": {
+    "description": "Daily reminder day 3 title variant 3"
   },
-  "smartReminderDay3BodyVar3": "Dos minutos conscientes son suficientes.",
-  "@smartReminderDay3BodyVar3": {
-    "description": "Smart reminder day 3 body variant 3"
+  "reminderDay3BodyVar3": "Dos minutos conscientes son suficientes.",
+  "@reminderDay3BodyVar3": {
+    "description": "Daily reminder day 3 body variant 3"
   },
-  "smartReminderDay3TitleVar4": "Creciendo más fuerte 🌿",
-  "@smartReminderDay3TitleVar4": {
-    "description": "Smart reminder day 3 title variant 4"
+  "reminderDay3TitleVar4": "Creciendo más fuerte 🌿",
+  "@reminderDay3TitleVar4": {
+    "description": "Daily reminder day 3 title variant 4"
   },
-  "smartReminderDay3BodyVar4": "Cada día que practicas, construyes algo significativo.",
-  "@smartReminderDay3BodyVar4": {
-    "description": "Smart reminder day 3 body variant 4"
+  "reminderDay3BodyVar4": "Cada día que practicas, construyes algo significativo.",
+  "@reminderDay3BodyVar4": {
+    "description": "Daily reminder day 3 body variant 4"
   },
-  "smartReminderDay3TitleVar5": "Encuentra tu calma 🕊️",
-  "@smartReminderDay3TitleVar5": {
-    "description": "Smart reminder day 3 title variant 5"
+  "reminderDay3TitleVar5": "Encuentra tu calma 🕊️",
+  "@reminderDay3TitleVar5": {
+    "description": "Daily reminder day 3 title variant 5"
   },
-  "smartReminderDay3BodyVar5": "Una breve pausa puede resetear todo tu día.",
-  "@smartReminderDay3BodyVar5": {
-    "description": "Smart reminder day 3 body variant 5"
+  "reminderDay3BodyVar5": "Una breve pausa puede resetear todo tu día.",
+  "@reminderDay3BodyVar5": {
+    "description": "Daily reminder day 3 body variant 5"
   },
-  "smartReminderDay4Title": "Pasos pequeños 🪴",
-  "@smartReminderDay4Title": {
-    "description": "Smart reminder day 4 title"
+  "reminderDay4Title": "Pasos pequeños 🪴",
+  "@reminderDay4Title": {
+    "description": "Daily reminder day 4 title"
   },
-  "smartReminderDay4Body": "Han pasado 4 días. Reinicia tu práctica con una sesión corta.",
-  "@smartReminderDay4Body": {
-    "description": "Smart reminder day 4 body"
+  "reminderDay4Body": "Han pasado 4 días. Reinicia tu práctica con una sesión corta.",
+  "@reminderDay4Body": {
+    "description": "Daily reminder day 4 body"
   },
-  "smartReminderDay5Title": "Tiempo de reconectar 💪",
-  "@smartReminderDay5Title": {
-    "description": "Smart reminder day 5 title"
+  "reminderDay5Title": "Tiempo de reconectar 💪",
+  "@reminderDay5Title": {
+    "description": "Daily reminder day 5 title"
   },
-  "smartReminderDay5Body": "Han pasado 5 días. Una pausa calmada ahora puede ayudarte a volver al camino.",
-  "@smartReminderDay5Body": {
-    "description": "Smart reminder day 5 body"
+  "reminderDay5Body": "Han pasado 5 días. Una pausa calmada ahora puede ayudarte a volver al camino.",
+  "@reminderDay5Body": {
+    "description": "Daily reminder day 5 body"
   },
-  "smartReminderDay6Title": "Casi una semana ⏰",
-  "@smartReminderDay6Title": {
-    "description": "Smart reminder day 6 title"
+  "reminderDay6Title": "Casi una semana ⏰",
+  "@reminderDay6Title": {
+    "description": "Daily reminder day 6 title"
   },
-  "smartReminderDay6Body": "Han pasado casi una semana desde que meditaste. Cierra el ciclo con un momento consciente.",
-  "@smartReminderDay6Body": {
-    "description": "Smart reminder day 6 body"
+  "reminderDay6Body": "Han pasado casi una semana desde que meditaste. Cierra el ciclo con un momento consciente.",
+  "@reminderDay6Body": {
+    "description": "Daily reminder day 6 body"
   },
-  "smartReminderDay7Title": "Revisión semanal 📅",
-  "@smartReminderDay7Title": {
-    "description": "Smart reminder day 7 title"
+  "reminderDay7Title": "Revisión semanal 📅",
+  "@reminderDay7Title": {
+    "description": "Daily reminder day 7 title"
   },
-  "smartReminderDay7Body": "Ha pasado una semana desde que meditaste. ¿Listo para regresar?",
-  "@smartReminderDay7Body": {
-    "description": "Smart reminder day 7 body"
+  "reminderDay7Body": "Ha pasado una semana desde que meditaste. ¿Listo para regresar?",
+  "@reminderDay7Body": {
+    "description": "Daily reminder day 7 body"
   },
-  "smartReminderDay8Title": "Nuevo comienzo 🌤️",
-  "@smartReminderDay8Title": {
-    "description": "Smart reminder day 8 title"
+  "reminderDay8Title": "Nuevo comienzo 🌤️",
+  "@reminderDay8Title": {
+    "description": "Daily reminder day 8 title"
   },
-  "smartReminderDay8Body": "Han pasado más de una semana. Un nuevo comienzo con solo unos minutos conscientes.",
-  "@smartReminderDay8Body": {
-    "description": "Smart reminder day 8 body"
+  "reminderDay8Body": "Han pasado más de una semana. Un nuevo comienzo con solo unos minutos conscientes.",
+  "@reminderDay8Body": {
+    "description": "Daily reminder day 8 body"
   },
-  "smartReminderDay9Title": "Encuentra tu centro 🎯",
-  "@smartReminderDay9Title": {
-    "description": "Smart reminder day 9 title"
+  "reminderDay9Title": "Encuentra tu centro 🎯",
+  "@reminderDay9Title": {
+    "description": "Daily reminder day 9 title"
   },
-  "smartReminderDay9Body": "Una sesión corta puede resetear tu día.",
-  "@smartReminderDay9Body": {
-    "description": "Smart reminder day 9 body"
+  "reminderDay9Body": "Una sesión corta puede resetear tu día.",
+  "@reminderDay9Body": {
+    "description": "Daily reminder day 9 body"
   },
-  "smartReminderDay10Title": "Dos dígitos 🔟",
-  "@smartReminderDay10Title": {
-    "description": "Smart reminder day 10 title"
+  "reminderDay10Title": "Dos dígitos 🔟",
+  "@reminderDay10Title": {
+    "description": "Daily reminder day 10 title"
   },
-  "smartReminderDay10Body": "Han pasado 10 días. Continúa donde lo dejaste.",
-  "@smartReminderDay10Body": {
-    "description": "Smart reminder day 10 body"
+  "reminderDay10Body": "Han pasado 10 días. Continúa donde lo dejaste.",
+  "@reminderDay10Body": {
+    "description": "Daily reminder day 10 body"
   },
-  "smartReminderDay11Title": "Suave empujón 🤍",
-  "@smartReminderDay11Title": {
-    "description": "Smart reminder day 11 title"
+  "reminderDay11Title": "Suave empujón 🤍",
+  "@reminderDay11Title": {
+    "description": "Daily reminder day 11 title"
   },
-  "smartReminderDay11Body": "Detente, respira y nota cómo te sientes.",
-  "@smartReminderDay11Body": {
-    "description": "Smart reminder day 11 body"
+  "reminderDay11Body": "Detente, respira y nota cómo te sientes.",
+  "@reminderDay11Body": {
+    "description": "Daily reminder day 11 body"
   },
-  "smartReminderDay12Title": "Mantén la estabilidad 🧭",
-  "@smartReminderDay12Title": {
-    "description": "Smart reminder day 12 title"
+  "reminderDay12Title": "Mantén la estabilidad 🧭",
+  "@reminderDay12Title": {
+    "description": "Daily reminder day 12 title"
   },
-  "smartReminderDay12Body": "Un momento calmado te espera.",
-  "@smartReminderDay12Body": {
-    "description": "Smart reminder day 12 body"
+  "reminderDay12Body": "Un momento calmado te espera.",
+  "@reminderDay12Body": {
+    "description": "Daily reminder day 12 body"
   },
-  "smartReminderDay13Title": "Acercándose a dos semanas ⏳",
-  "@smartReminderDay13Title": {
-    "description": "Smart reminder day 13 title"
+  "reminderDay13Title": "Acercándose a dos semanas ⏳",
+  "@reminderDay13Title": {
+    "description": "Daily reminder day 13 title"
   },
-  "smartReminderDay13Body": "Han pasado casi dos semanas desde que meditaste. Intenta un reinicio de dos minutos.",
-  "@smartReminderDay13Body": {
-    "description": "Smart reminder day 13 body"
+  "reminderDay13Body": "Han pasado casi dos semanas desde que meditaste. Intenta un reinicio de dos minutos.",
+  "@reminderDay13Body": {
+    "description": "Daily reminder day 13 body"
   },
-  "smartReminderDay14Title": "Revisión de dos semanas 🔔",
-  "@smartReminderDay14Title": {
-    "description": "Smart reminder day 14 title"
+  "reminderDay14Title": "Revisión de dos semanas 🔔",
+  "@reminderDay14Title": {
+    "description": "Daily reminder day 14 title"
   },
-  "smartReminderDay14Body": "Han pasado 14 días. Comienza de nuevo ahora, gentilmente.",
-  "@smartReminderDay14Body": {
-    "description": "Smart reminder day 14 body"
+  "reminderDay14Body": "Han pasado 14 días. Comienza de nuevo ahora, gentilmente.",
+  "@reminderDay14Body": {
+    "description": "Daily reminder day 14 body"
   },
-  "smartReminderDay15Title": "Pausaremos los recordatorios 🌿",
-  "@smartReminderDay15Title": {
-    "description": "Smart reminder day 15 title"
+  "reminderDay15Title": "Pausaremos los recordatorios 🌿",
+  "@reminderDay15Title": {
+    "description": "Daily reminder day 15 title"
   },
-  "smartReminderDay15Body": "Estamos pausando los recordatorios por ahora. Estamos aquí cuando estés listo.",
-  "@smartReminderDay15Body": {
-    "description": "Smart reminder day 15 body"
+  "reminderDay15Body": "Estamos pausando los recordatorios por ahora. Estamos aquí cuando estés listo.",
+  "@reminderDay15Body": {
+    "description": "Daily reminder day 15 body"
   },
-  "smartReminderDay30Title": "Un suave empujón 🤗",
-  "@smartReminderDay30Title": {
-    "description": "Smart reminder day 30 title"
+  "reminderDay30Title": "Un suave empujón 🤗",
+  "@reminderDay30Title": {
+    "description": "Daily reminder day 30 title"
   },
-  "smartReminderDay30Body": "Ha pasado un mes desde que meditaste. Solo 2 minutos pueden ayudarte a sentirte mejor. Estamos aquí cuando estés listo.",
-  "@smartReminderDay30Body": {
-    "description": "Smart reminder day 30 body"
+  "reminderDay30Body": "Ha pasado un mes desde que meditaste. Solo 2 minutos pueden ayudarte a sentirte mejor. Estamos aquí cuando estés listo.",
+  "@reminderDay30Body": {
+    "description": "Daily reminder day 30 body"
   },
   "repeatModeNormal": "Normal",
   "@repeatModeNormal": {
@@ -976,6 +988,22 @@
   "repeatModeForever": "Repetir siempre",
   "@repeatModeForever": {
     "description": "Tooltip text for repeat mode when set to repeat forever"
+  },
+  "repeatModeOff": "Desactivado",
+  "@repeatModeOff": {
+    "description": "Repeat sheet option: no repeat"
+  },
+  "repeatModeOffDescription": "Se reproduce una vez y termina.",
+  "@repeatModeOffDescription": {
+    "description": "Repeat sheet: description of no repeat"
+  },
+  "repeatModeOnceDescription": "Se reproduce dos veces y termina.",
+  "@repeatModeOnceDescription": {
+    "description": "Repeat sheet: description of repeat once"
+  },
+  "repeatModeForeverDescription": "Sigue sonando hasta que lo detengas.",
+  "@repeatModeForeverDescription": {
+    "description": "Repeat sheet: description of repeat forever"
   },
   "addSession": "Agregar sesión",
   "@addSession": {
@@ -1101,10 +1129,12 @@
   "downloadAudio": "Descargar audio",
   "deleteDownload": "Eliminar descarga",
   "playbackSpeed": "Velocidad de reproducción",
+  "speedReset": "Restablecer",
+  "backgroundSoundsSection": "Sonidos",
   "reportIssue": "Reportar problema",
   "viewStreak": "Ver racha",
   "refresh": "Actualizar",
-  "upNext": "Tu Camino",
+  "upNext": "Continuar",
   "dismiss": "Cerrar",
   "donationInfo": "Información sobre donaciones",
   "clearSearch": "Borrar búsqueda",
@@ -1131,9 +1161,11 @@
   "onboardingResultPracticeBody": "Tu Diario es un gran lugar para mantener tu práctica. Una nueva sesión te espera cada día.",
   "onboardingResultCta": "Empezar",
   "addToFavorites": "Agregar a favoritos",
+  "addedToFavorites": "Añadido a Favoritos",
+  "removedFromFavorites": "Quitado de Favoritos",
   "removeFromFavorites": "Quitar de favoritos",
-  "pinToUpNext": "Fijar en Tu Camino",
-  "unpinFromUpNext": "Desfijar de Tu Camino",
+  "openPack": "Abrir paquete",
+  "yourPathAllDone": "Todas las sesiones completadas",
   "connectionErrorTitle": "No se pudo cargar el paywall",
   "connectionErrorMessage": "Por favor revisa tu conexión e inténtalo de nuevo.",
   "tryAgainButton": "Reintentar",
@@ -1147,7 +1179,104 @@
   "upNextPackCompletedSubtitle": "{count, plural, =1{1 session complete} other{{count} sessions complete}}",
   "upNextPackCompletedCta": "Start the next pack",
   "upNextPackCompletedCtaNamed": "Start {packTitle}",
-  "upNextPathCompletedTitle": "You've completed your path",
-  "upNextPathCompletedSubtitle": "Every pack in your path is done. Explore the library to choose what's next.",
-  "upNextNextPackPinnedSnack": "Your next pack is ready in Your Path"
+  "upNextPathCompletedTitle": "Has terminado todos los paquetes de la serie",
+  "upNextPathCompletedSubtitle": "Explora la biblioteca para encontrar lo siguiente.",
+  "upNextNextPackPinnedSnack": "{packTitle} está listo en Inicio",
+  "accountPromptTitle": "Guarda tu progreso",
+  "accountPromptBody": "Añade tu correo para que tu racha y tu historial te acompañen en un teléfono nuevo.",
+  "accountPromptCta": "Guardar mi progreso",
+  "donateAmountPerMonth": "Donar {amount}/mes",
+  "donateWithApplePayPrefix": "Donar con",
+  "donateOtherAmount": "Otra cantidad",
+  "donateMostPopular": "Más popular",
+  "donateMonthlyDisclosure": "Mensual, cancela cuando quieras. Pago seguro con Stripe.",
+  "tagSleep": "Sueño",
+  "tagStress": "Estrés",
+  "tagAnxiety": "Ansiedad",
+  "tagLowMood": "Ánimo bajo",
+  "tagFocus": "Concentración",
+  "tagCalm": "Calma",
+  "tagSelfCompassion": "Autocompasión",
+  "tagGratitude": "Gratitud",
+  "tagEmotions": "Emociones difíciles",
+  "tagPain": "Dolor",
+  "tagConfidence": "Confianza",
+  "tagRelationships": "Relaciones",
+  "tagGrief": "Duelo",
+  "tagHabitBuilding": "Crear el hábito",
+  "tagBreathing": "Respiración",
+  "tagBodyScan": "Escaneo corporal",
+  "tagLovingKindness": "Bondad amorosa",
+  "tagOpenAwareness": "Conciencia abierta",
+  "tagVisualization": "Visualización",
+  "tagMantra": "Mantra",
+  "tagWalking": "Caminar",
+  "tagReflection": "Reflexión",
+  "tagSound": "Sonido",
+  "tagGuidedMeditation": "Meditación guiada",
+  "tagTalk": "Charlas",
+  "tagSleepStory": "Cuentos para dormir",
+  "tagMusic": "Música",
+  "tagNatureSounds": "Sonidos de la naturaleza",
+  "tagCourseLesson": "Lecciones del curso",
+  "tagBeginners": "Para principiantes",
+  "tagExperienced": "Con experiencia",
+  "tagTeensStudents": "Adolescentes y estudiantes",
+  "tagTeachers": "Docentes",
+  "tagWorkplace": "Trabajo",
+  "tagKids": "Niños",
+  "tagMorning": "Mañana",
+  "tagEvening": "Noche",
+  "tagSos": "SOS",
+  "tagOnTheGo": "En movimiento",
+  "tagCrisis": "Tiempos de crisis",
+  "tagSpanish": "Español",
+  "tagNoTracks": "Aún no hay sesiones con esta etiqueta",
+  "sessionBells": "Campanas de sesión",
+  "sessionBellsDescription": "Una campana al principio, a la mitad y al final",
+  "upNextTitle": "Continuar",
+  "upNextStartHere": "Empieza aquí",
+  "removeFromHomeShort": "Quitar",
+  "removeFromHome": "Quitar de Inicio",
+  "removedFromHome": "Quitado de Inicio.",
+  "packStart": "Empezar",
+  "packContinue": "Continuar",
+  "packAddedToHome": "Añadido a Inicio para que retomes donde lo dejaste.",
+  "shopSubtitle": "Cada compra ayuda a que Medito siga siendo gratis para todos.",
+  "shopAllCollection": "Todo",
+  "shopFromPrice": "Desde {price}",
+  "shopSoldOut": "Agotado",
+  "shopAddToBag": "Añadir a la bolsa",
+  "shopAddedToBag": "Añadido a la bolsa",
+  "shopSelectSize": "Elige una talla",
+  "shopColour": "Color",
+  "shopSize": "Talla",
+  "shopOption": "Opción",
+  "shopBagTitle": "Tu bolsa",
+  "shopBagEmpty": "Tu bolsa está vacía",
+  "shopBagEmptyBody": "Lo que añadas te esperará aquí hasta que estés listo.",
+  "shopBrowse": "Explorar la tienda",
+  "shopSubtotal": "Subtotal",
+  "shopShippingNote": "El envío y los impuestos se calculan al pagar.",
+  "shopCheckout": "Pagar",
+  "shopCheckoutPrompt": "¿Ya hiciste tu pedido?",
+  "shopClearBag": "Vaciar bolsa",
+  "shopSupportNote": "Medito es una organización sin ánimo de lucro. Cada compra apoya la meditación gratuita para todos.",
+  "shopLoadError": "No pudimos cargar la tienda en este momento.",
+  "shopOpenInBrowser": "Abrir en el navegador",
+  "shopRemoveItem": "Quitar",
+  "shopIncreaseQuantity": "Aumentar cantidad",
+  "shopDecreaseQuantity": "Disminuir cantidad",
+  "shopViewBag": "Ver bolsa",
+  "shopMoreDetails": "Detalles",
+  "shopBagItemCount": "{count, plural, =1{1 artículo} other{{count} artículos}}",
+  "shopSeeAll": "Ver todo",
+  "shopAddOnsTitle": "Añade un detalle",
+  "shopSizeGuide": "Guía de tallas",
+  "shopSizeChartNote": "Medidas de la prenda en plano, del proveedor. Pueden variar hasta 5 cm, así que compáralas con una camiseta que tengas.",
+  "shopMeasureLength": "Largo",
+  "shopMeasureWidth": "Ancho",
+  "shopMeasureSleeve": "Manga",
+  "shopInches": "in",
+  "shopCentimetres": "cm"
 }

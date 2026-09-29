@@ -4,13 +4,13 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/models.dart';
 
-import '../../constants/strings/shared_preference_constants.dart';
 import '../../models/player/repeat_mode.dart' as app_repeat;
 import '../../src/audio_pigeon.g.dart' as pigeon;
 import '../../utils/utils.dart';
-import '../shared_preference/shared_preference_provider.dart';
+import 'audio_state_provider.dart';
 import 'download/audio_downloader_provider.dart';
 import 'ios_audio_handler.dart';
+import 'repeat_state_provider.dart';
 import '../../utils/audio_session_tracker.dart';
 import '../../utils/logger.dart';
 
@@ -41,6 +41,9 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
       'Loading track: ${request.title}, fileId: ${request.fileId}',
     );
 
+    // The audio state outlives sessions; drop the previous track's (possibly
+    // completed, full-position) values so nothing reads them as this one's.
+    ref.read(audioStateProvider.notifier).resetState();
     await _playTrack(request);
     state = request;
 
@@ -56,11 +59,15 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     );
   }
 
-  /// Warm-prepares the state without actually starting playback. Used for
-  /// preloading next-up tracks so the player screen has data immediately when
-  /// the user taps play.
+  /// Sets the current request WITHOUT starting playback, so the player screen
+  /// can be pushed immediately and render its title/cover/duration from this
+  /// request while the audio loads. [PlayerView] then calls [play] itself.
+  /// Also used to warm-prepare next-up tracks.
+  ///
+  /// Compares the whole request (not just trackId) so switching voice or
+  /// duration on the same track still updates the pending file.
   void prepare(PlaybackRequest request) {
-    if (state?.trackId == request.trackId) return;
+    if (state == request) return;
     state = request;
   }
 
@@ -76,6 +83,12 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
 
     final url = downloadPath ?? request.remoteUrl;
     AppLogger.d('PLAYER', 'Will use path: $url');
+
+    // Both engines outlive the player screen and keep their last repeat mode
+    // and speed across tracks, while each player screen starts at repeat off /
+    // 1.0x. Reset them so a leftover "repeat forever" can't loop a session
+    // (and block the end screen) and a slowed-down speed doesn't carry over.
+    final repeatMode = ref.read(repeatStateProvider);
 
     final trackData = pigeon.Track(
       id: request.trackId,
@@ -114,6 +127,8 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
         );
         await Future.delayed(const Duration(seconds: 1));
       }
+      setRepeatMode(repeatMode);
+      setSpeed(1.0);
       await _playAudioWithRetry(url, trackData);
     } else {
       AppLogger.d('PLAYER', 'On iOS - setting up audio');
@@ -121,6 +136,8 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
       // Android path). _playAudioWithRetry on Android already rethrows after
       // its retry budget — iOS has no such retry layer, so a single failure
       // here propagates immediately. That's intentional: callers need to know.
+      setRepeatMode(repeatMode);
+      setSpeed(1.0);
       await iosAudioHandler.setUrl(downloadPath, request, trackData);
       AppLogger.d('PLAYER', 'iOS setUrl succeeded');
       await iosAudioHandler.play();
@@ -197,12 +214,6 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
         }
       }
     }
-  }
-
-  String? getUserToken() {
-    return ref
-        .read(sharedPreferencesProvider)
-        .getString(SharedPreferenceConstants.userToken);
   }
 
   String _constructFileName(PlaybackRequest request) =>

@@ -39,7 +39,7 @@ class DropdownWidget<T> extends StatelessWidget {
       bottomRight: Radius.circular(bottomRight),
     );
     var textStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
-      fontFamily: dmMono,
+      fontFamily: googleSans,
       fontWeight: FontWeight.w400,
       fontSize: 16,
       color: Theme.of(context).colorScheme.onSurface,

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/widgets/inputs/medito_text_field.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
@@ -16,9 +17,12 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/secure_storage_service.dart';
 import 'package:medito/utils/currency.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/receipt_email.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/widgets/inputs/email_typo_hint.dart';
 
 enum _Frequency {
   oneTime('oneTime', 'one_time', 'One-time'),
@@ -101,6 +105,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   // recurring charge the donor cannot cancel themselves. Always shown (even
   // when known) to match the webview arm, which always collects one.
   final _emailController = TextEditingController();
+  final _emailTypoConfirmation = EmailTypoConfirmation();
   String? _emailError;
 
   // Custom "other amount" field — mirrors the webview arm's input, which the
@@ -333,6 +338,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
     // Block before the sheet opens: the Customer is created upstream of it, so
     // an email captured later would never reach the Customer record.
+    if (!await _emailTypoConfirmation.confirm(context, _emailController)) {
+      return;
+    }
+    if (!mounted) return;
     final typedEmail = _emailController.text.trim();
     if (!_emailPattern.hasMatch(typedEmail)) {
       final l10n = AppLocalizations.of(context)!;
@@ -344,6 +353,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       return;
     }
     if (_emailError != null) setState(() => _emailError = null);
+    try {
+      await ReceiptEmail.save(ref.read(sharedPreferencesProvider), typedEmail);
+    } catch (e) {
+      AppLogger.w(_logTag, 'Could not store receipt email: $e');
+    }
+    if (!mounted) return;
 
     if (!_donateTapLogged) {
       _donateTapLogged = true;
@@ -528,7 +543,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           eyebrow.toUpperCase(),
           style: TextStyle(
             color: context.brandPurple,
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
             letterSpacing: 1.3,
           ),
@@ -539,7 +554,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           heading,
           style: TextStyle(
             color: onSurface,
-            fontSize: 26,
+            fontSize: 24,
             fontWeight: FontWeight.w600,
             height: 1.2,
           ),
@@ -550,7 +565,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           subcopy,
           style: TextStyle(
             color: onSurface.withValues(alpha: 0.7),
-            fontSize: 15,
+            fontSize: 16,
             height: 1.5,
           ),
           textAlign: TextAlign.center,
@@ -716,7 +731,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                       _mostPopularLabel,
                       style: TextStyle(
                         color: accent,
-                        fontSize: 10,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -743,72 +758,49 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         _customAmountError == null &&
         _customAmountController.text.isNotEmpty &&
         _selectedAmount > 0;
-    return TextField(
-      key: customAmountFieldKey,
+    return MeditoTextField(
+      fieldKey: customAmountFieldKey,
       controller: _customAmountController,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       enabled: !_isProcessingPayment,
-      style: TextStyle(color: onSurface, fontSize: 16),
-      decoration: InputDecoration(
-        hintText:
-            'Other amount (min '
-            '${formatCurrencyAmount(minimum, widget.config.currencyCode)})',
-        hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.5)),
-        errorText: _customAmountError,
-        helperText: showPreview
-            ? '= ${formatCurrencyAmount(_selectedAmount, widget.config.currencyCode)}'
-            : null,
-        helperStyle: TextStyle(color: onSurface.withValues(alpha: 0.7)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: onSurface.withValues(alpha: 0.2)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: context.brandPurple),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      ),
+      hintText:
+          'Other amount (min '
+          '${formatCurrencyAmount(minimum, widget.config.currencyCode)})',
+      errorText: _customAmountError,
+      helperText: showPreview
+          ? '= ${formatCurrencyAmount(_selectedAmount, widget.config.currencyCode)}'
+          : null,
       onChanged: _onCustomAmountChanged,
     );
   }
 
   Widget _buildEmailField(BuildContext context, Color onSurface) {
     final l10n = AppLocalizations.of(context)!;
+    final field = MeditoTextField(
+      fieldKey: donationEmailFieldKey,
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.done,
+      autocorrect: false,
+      enabled: !_isProcessingPayment,
+      labelText: l10n.donationEmailLabel,
+      helperText: l10n.donationEmailHelper,
+      helperMaxLines: 2,
+      errorText: _emailError,
+      onChanged: (_) {
+        if (_emailError != null) setState(() => _emailError = null);
+      },
+    );
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextField(
-          key: donationEmailFieldKey,
+        field,
+        EmailTypoHint(
           controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.done,
-          autocorrect: false,
-          enabled: !_isProcessingPayment,
-          style: TextStyle(color: onSurface, fontSize: 16),
-          decoration: InputDecoration(
-            labelText: l10n.donationEmailLabel,
-            helperText: l10n.donationEmailHelper,
-            helperMaxLines: 2,
-            errorText: _emailError,
-            labelStyle: TextStyle(color: onSurface.withValues(alpha: 0.7)),
-            helperStyle: TextStyle(
-              color: onSurface.withValues(alpha: 0.6),
-              fontSize: 12,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: onSurface.withValues(alpha: 0.4)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: context.brandPurple),
-            ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          onChanged: (_) {
+          onAccepted: () {
             if (_emailError != null) setState(() => _emailError = null);
           },
         ),
@@ -853,7 +845,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                 children: const [
                   Text(
                     'Donate with',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   SizedBox(width: 6),
                   // U+F8FF (Apple logo), drawn by the iOS system font — this
@@ -865,7 +857,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   SizedBox(width: 3),
                   Text(
                     'Pay',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -942,9 +934,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             // unpatchable asset diff (see Apple Pay button above).
             MeditoIcon(assetName: MeditoIcons.shield, color: faint, size: 13),
             const SizedBox(width: 4),
-            Text(
-              _stripeTrustCopy,
-              style: TextStyle(color: faint, fontSize: 12),
+            Flexible(
+              child: Text(
+                _stripeTrustCopy,
+                style: TextStyle(color: faint, fontSize: 12),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),

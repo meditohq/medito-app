@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:medito/widgets/onboarding/onboarding_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/colors/color_constants.dart';
@@ -108,6 +109,12 @@ class _OnboardingResultScreenState
   bool _done = false;
   bool _completionHandled = false;
   int _priorStreak = 0;
+
+  // Keep the regular-practice experience fixed while its offered/control
+  // experiment is running. Beginner presentation changes must stay behind this
+  // gate, even though both audiences share this screen and audio.
+  bool get _useBeginnerPresentation =>
+      widget.showMeditation && widget.state != OnboardingResultState.stateC;
 
   /// Experiment tag for the first-meditation events; empty when not enrolled.
   /// Reads the variant without assigning — assigning here would over-enrol.
@@ -247,66 +254,68 @@ class _OnboardingResultScreenState
         children: [
           if (widget.headerImage != null)
             OnboardingHeaderImage(imagePath: widget.headerImage!),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              padding24,
-              padding16,
-              padding24,
-              padding24,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  heading,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    height: 1.25,
-                  ),
-                ),
-                // When the meditation card is shown the screen leads with action, not
-                // reading, so the longer personalised body is dropped — the card's
-                // own one-liner carries the reassurance.
-                if (!widget.showMeditation) ...[
-                  const SizedBox(height: 12),
+          OnboardingContent(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                padding24,
+                padding16,
+                padding24,
+                padding24,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    body,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withAlpha(160),
-                      height: 1.5,
+                    heading,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
                     ),
                   ),
-                ],
-                if (widget.showMeditation) ...[
+                  // When the meditation card is shown the screen leads with action, not
+                  // reading, so the longer personalised body is dropped — the card's
+                  // own one-liner carries the reassurance.
+                  if (!widget.showMeditation) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      body,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withAlpha(160),
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                  if (widget.showMeditation) ...[
+                    const SizedBox(height: 24),
+                    _buildMeditation(context, l10n),
+                  ],
                   const SizedBox(height: 24),
-                  _buildMeditation(context, l10n),
-                ],
-                const SizedBox(height: 24),
-                // While the session is the focus (meditation shown, not yet finished)
-                // the play button is the hero, so "Get started" steps back to a quiet
-                // skip link. It returns as the prominent CTA once the session is done
-                // (or for the control arm, where there's no session to compete with).
-                if (!widget.showMeditation || _done)
-                  _GetStartedButton(
-                    label: l10n.onboardingResultCta,
-                    onPressed: _handleGetStarted,
-                  )
-                else
-                  Center(
-                    child: TextButton(
+                  // While the session is the focus (meditation shown, not yet finished)
+                  // the play button is the hero, so "Get started" steps back to a quiet
+                  // skip link. It returns as the prominent CTA once the session is done
+                  // (or for the control arm, where there's no session to compete with).
+                  if (!widget.showMeditation || _done)
+                    _GetStartedButton(
+                      label: l10n.onboardingResultCta,
                       onPressed: _handleGetStarted,
-                      child: Text(
-                        _started
-                            ? l10n.onboardingFirstMeditationSkipShort
-                            : l10n.onboardingFirstMeditationSkip,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: onSurface.withOpacityValue(0.55),
-                          fontWeight: FontWeight.w500,
+                    )
+                  else
+                    Center(
+                      child: TextButton(
+                        onPressed: _handleGetStarted,
+                        child: Text(
+                          _started
+                              ? l10n.onboardingFirstMeditationSkipShort
+                              : l10n.onboardingFirstMeditationSkip,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: onSurface.withOpacityValue(0.55),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -340,6 +349,16 @@ class _OnboardingResultScreenState
 
     return Column(
       children: [
+        if (_useBeginnerPresentation) ...[
+          Text(
+            l10n.onboardingFirstMeditationTitle,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+        ],
         // Duration cue only matters before they commit; once playing it's
         // noise, so hide it (and the time readout below).
         if (!_started) ...[
@@ -383,31 +402,64 @@ class _OnboardingResultScreenState
           ),
         ],
         const SizedBox(height: 16),
-        SizedBox(
-          width: 64,
-          height: 64,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              shape: const CircleBorder(),
-              padding: EdgeInsets.zero,
+        if (_useBeginnerPresentation)
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(0, 56),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
+              icon: busy
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+              label: Text(
+                !_started
+                    ? l10n.onboardingFirstMeditationBegin
+                    : isPlaying
+                    ? l10n.pause
+                    : l10n.play,
+                textAlign: TextAlign.center,
+              ),
             ),
-            onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
-            child: busy
-                ? SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
+          )
+        else
+          SizedBox(
+            width: 64,
+            height: 64,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+                padding: EdgeInsets.zero,
+              ),
+              onPressed: busy ? null : (_started ? _togglePlayPause : _begin),
+              child: busy
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: context.onBrandPurple,
+                      ),
+                    )
+                  : Icon(
+                      isPlaying ? Icons.pause : Icons.play_arrow,
                       color: context.onBrandPurple,
+                      size: 32,
                     ),
-                  )
-                : Icon(
-                    isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: context.onBrandPurple,
-                    size: 32,
-                  ),
+            ),
           ),
-        ),
       ],
     );
   }

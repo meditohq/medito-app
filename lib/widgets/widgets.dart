@@ -4,6 +4,7 @@ export 'drop_down_widget.dart';
 export 'errors/medito_error_widget.dart';
 export 'handle_bar_widget.dart';
 export 'headers/medito_app_bar_large.dart';
+export 'inputs/medito_text_field.dart';
 export 'long_press_detector_widget.dart';
 export 'markdown_widget.dart';
 export 'network_image_widget.dart';

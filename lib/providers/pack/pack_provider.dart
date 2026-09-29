@@ -14,6 +14,33 @@ Future<List<PackItemsModel>> fetchAllPacks(Ref ref) {
   );
 }
 
+/// Every pack's track ids (sub-packs included), from `GET /packs/tracks`.
+/// Empty on failure: a pack then simply shows no tick, never a wrong one.
+@Riverpod(keepAlive: true)
+Future<Map<String, List<String>>> packTrackIds(Ref ref) async {
+  try {
+    return await ref.read(packRepositoryProvider).fetchPackTrackIds();
+  } catch (_) {
+    return const {};
+  }
+}
+
+/// Ids of packs whose tracks are all completed. Completion is per track, so a
+/// track shared by several packs counts towards each of them.
+@Riverpod(keepAlive: true)
+Set<String> completedPackIds(Ref ref) {
+  final packTracks = ref.watch(packTrackIdsProvider).value ?? const {};
+  final checked = ref.watch(statsProvider).value?.tracksChecked;
+  if (packTracks.isEmpty || checked == null || checked.isEmpty) return const {};
+
+  final completed = checked.toSet();
+  return {
+    for (final entry in packTracks.entries)
+      if (entry.value.isNotEmpty && entry.value.every(completed.contains))
+        entry.key,
+  };
+}
+
 /// Raw pack fetched from the API. Refresh this provider for pull-to-refresh
 /// or error-retry; it doesn't watch stats, so completion changes don't
 /// trigger a re-fetch.
@@ -34,12 +61,17 @@ class Pack extends _$Pack {
     final rawPack = ref.watch(packDataProvider(packId: packId));
     final stats = ref.watch(statsProvider);
     final completed = stats.value?.tracksChecked ?? const <String>[];
+    final completedPacks = ref.watch(completedPackIdsProvider);
 
     return rawPack.whenData(
       (pack) => pack.copyWith(
         items: pack.items
             .map(
-              (item) => item.copyWith(isCompleted: completed.contains(item.id)),
+              (item) => item.copyWith(
+                isCompleted: item.type == TypeConstants.pack
+                    ? completedPacks.contains(item.id)
+                    : completed.contains(item.id),
+              ),
             )
             .toList(),
       ),

@@ -5,8 +5,6 @@ import 'package:medito/utils/logger.dart';
 import '../../models/me/me_model.dart';
 import '../../repositories/me/me_repository.dart';
 import '../../repositories/auth/auth_repository.dart';
-import '../../constants/strings/shared_preference_constants.dart';
-import '../shared_preference/shared_preference_provider.dart';
 
 part 'me_provider.g.dart';
 
@@ -36,12 +34,6 @@ Future<MeModel> me(Ref ref) async {
           await authRepo.migrateEmailToStorage();
         }
 
-        final prefs = ref.read(sharedPreferencesProvider);
-        await prefs.setBool(
-          SharedPreferenceConstants.hasActiveSubscription,
-          meData.hasActiveSubscription,
-        );
-
         return meData;
       } catch (e) {
         AppLogger.e('ME_PROVIDER', 'Error fetching me data', e);
@@ -52,17 +44,8 @@ Future<MeModel> me(Ref ref) async {
       // If token refresh fails but we have a user with email, return that basic info
       if (currentUser != null && currentUser.email != null) {
         AppLogger.d('ME_PROVIDER', 'Using cached user data due to token error');
-        final prefs = ref.read(sharedPreferencesProvider);
-        await prefs.setBool(
-          SharedPreferenceConstants.hasActiveSubscription,
-          false,
-        );
 
-        return MeModel(
-          id: currentUser.id,
-          email: currentUser.email,
-          hasActiveSubscription: false,
-        );
+        return MeModel(id: currentUser.id, email: currentUser.email);
       }
       // Fall through to check local state
     }
@@ -74,29 +57,14 @@ Future<MeModel> me(Ref ref) async {
     // If we have an email, ensure it's stored in secure storage
     if (email != null && email.isNotEmpty) {
       await authRepo.migrateEmailToStorage();
-      final prefs = ref.read(sharedPreferencesProvider);
-      await prefs.setBool(
-        SharedPreferenceConstants.hasActiveSubscription,
-        false,
-      );
 
-      return MeModel(
-        id: currentUser?.id ?? '',
-        email: email,
-        hasActiveSubscription: false,
-      );
+      return MeModel(id: currentUser?.id ?? '', email: email);
     }
 
     // If no email found anywhere, return anonymous user
     AppLogger.d('ME_PROVIDER', 'No email found, user likely not authenticated');
-    final prefs = ref.read(sharedPreferencesProvider);
-    await prefs.setBool(SharedPreferenceConstants.hasActiveSubscription, false);
 
-    return MeModel(
-      id: currentUser?.id ?? '',
-      email: null,
-      hasActiveSubscription: false,
-    );
+    return MeModel(id: currentUser?.id ?? '', email: null);
   } catch (e) {
     AppLogger.e('ME_PROVIDER', 'Error checking auth state', e);
     rethrow;

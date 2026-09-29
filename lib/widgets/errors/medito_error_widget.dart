@@ -216,8 +216,8 @@ class MeditoErrorWidget extends ConsumerWidget {
                         ], context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorConstants.lightPurple,
-                        foregroundColor: ColorConstants.white,
+                        backgroundColor: context.brandPurple,
+                        foregroundColor: context.onBrandPurple,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

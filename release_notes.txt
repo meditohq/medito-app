@@ -1,6 +1,82 @@
 Unreleased
 -
 
+2609.27.0
+- Start or continue a pack with one tap from its page, which also puts it on Home
+- Fixed the keyboard closing after the first letter when typing your email
+- Fixed a new session sometimes opening the previous session's end screen
+- Delete your account directly from Settings
+- Signing in to a different account no longer brings the previous account's favourites with it
+- Signing in from Settings now takes you back to Settings
+- Finished sessions are saved straight away, even while Apple Health asks for permission
+- More reliable first launch on Android
+
+2609.26.0
+- Spot a mistyped email address before you sign up or donate (e.g. "gmial.com").
+- Fixed a crash on some Android phones with Medito home screen widgets.
+
+2609.24.0
+- New "Session bells" background option: a bell at the beginning, middle and end of your session.
+- Repeat, playback speed and background sounds now open simple pickers in the player.
+- Background sounds open over the player, with the volume always in view.
+- Repeat and playback speed now start fresh for each new session.
+- Fixed sessions sometimes repeating forever instead of finishing.
+- Sessions on repeat now count the minutes of every repetition in your stats.
+- Fixed going back from the end-of-session screen sometimes returning to the player.
+- Fixed the play button flickering when a session starts.
+- Tidier reminder and account cards on the end-of-session screen.
+- Better layouts on tablets and foldable phones.
+- Fixed quote sharing on wide and short screens.
+- Removed favorites no longer come back, and favorites now sync reliably.
+- Your Path: swipe the Home card to open the pack or skip, and use "Show on Home" on any pack (with Undo).
+- Refreshed downloads screen: drag to reorder, and swipe to remove with Undo.
+- App icon choices now show as large previews.
+- Flat, cleaner app icons on iOS.
+- The background sound button now spins like a vinyl record.
+- Reminder permission dialogs now match the rest of the app.
+
+2609.22.0
+- Browse meditation topics from Explore, tracks and packs.
+- Clearer controls for your first meditation during onboarding.
+- Smoother transitions on the end-of-session screen.
+- Donation email entry now appears when you tap Donate.
+- Clearer onboarding progress.
+
+2609.21.1
+- The keyboard now opens automatically when creating an account during onboarding.
+
+2609.21.0
+- Search now has its own tab for easier browsing.
+- Meditation sessions open immediately, with clearer loading and retry options.
+- Refreshed text and input fields throughout the app.
+- Choose a daily reminder time directly after a session.
+- Clearer onboarding progress and reminder choices.
+- Closing the donation page now continues onboarding automatically.
+
+2609.20.0
+- Pack screens: the pin icon is now a clear "Set as Your Path" row, showing your progress once set
+- Tapping the star now confirms "Added to Favorites" / "Removed from Favorites"
+
+2609.18.1
+- Fixes a crash when opening the app on some iPhones running iOS 17 or 18
+
+2609.18.0
+- After a session you can now save your progress by creating a free account, so your streak and stats are kept safe
+- A simpler welcome screen with one clear button to get started
+
+2609.17.0
+- Home: the announcement now sits up top with a cleaner, clearer card
+- Home: removed the "learn one minute at a time" tip from Your Path
+- Home: smoother image fades and tidier spacing on the redesigned home screen
+- Navigation: a cleaner bottom bar, with search that opens above the keyboard
+
+2609.16.0
+- A fresh new look across the app: cleaner cards, a bolder theme and a redesigned home screen with a large image at the top
+- New floating navigation bar with a built-in search button that opens search from anywhere
+- Settings: theme, app icon and Zen Mode now open clearer pickers
+- Smoother streak animation that respects your reduced-motion setting
+- Fixes: completed sessions now read clearly, the streak updates at the right time, and reminders keep the time you chose
+
 2609.10.0
 - Settings: pick when your daily reminder arrives (morning, evening, night or your own time) instead of a simple on/off switch
 - Settings: theme and app icon now open a picker that shows your current choice

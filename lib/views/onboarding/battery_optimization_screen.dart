@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:medito/widgets/onboarding/onboarding_content.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:flutter/material.dart';
@@ -85,68 +86,71 @@ class _BatteryOptimizationScreenState extends State<BatteryOptimizationScreen>
                 children: [
                   if (widget.headerImage != null)
                     OnboardingHeaderImage(imagePath: widget.headerImage!),
-                  Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: (constraints.maxHeight - 64 - headerHeight)
-                            .clamp(0.0, double.infinity),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            children: [
-                              MeditoIcon(
-                                assetName: MeditoIcons.alert,
-                                size: 48,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                l10n.onboardingBatteryTitle,
-                                style: Theme.of(context).textTheme.displayLarge
-                                    ?.copyWith(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                l10n.onboardingBatteryBody,
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(fontSize: 16, height: 1.5),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 32),
-                          Column(
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: _isProcessing
-                                      ? null
-                                      : _handleOptimize,
-                                  child: Text(
-                                    l10n.onboardingBatteryOptimize,
-                                    style: const TextStyle(color: Colors.white),
+                  OnboardingContent(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: (constraints.maxHeight - 64 - headerHeight)
+                              .clamp(0.0, double.infinity),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              children: [
+                                MeditoIcon(
+                                  assetName: MeditoIcons.alert,
+                                  size: 48,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  l10n.onboardingBatteryTitle,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displayLarge
+                                      ?.copyWith(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  l10n.onboardingBatteryBody,
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontSize: 16, height: 1.5),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                            Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _isProcessing
+                                        ? null
+                                        : _handleOptimize,
+                                    child: Text(l10n.onboardingBatteryOptimize),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              SizedBox(
-                                width: double.infinity,
-                                child: TextButton(
-                                  onPressed: () => widget.onNext?.call(),
-                                  child: Text(l10n.skipForNow),
+                                const SizedBox(height: 12),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextButton(
+                                    onPressed: () => widget.onNext?.call(),
+                                    child: Text(l10n.skipForNow),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

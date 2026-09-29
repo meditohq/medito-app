@@ -28,6 +28,9 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> signInAnonymously() async {}
   @override
   Future<bool> signOut() async => true;
+
+  @override
+  Future<void> signOutLocally() async {}
   @override
   Future<bool> verifyOtp(String email, String otp) async => false;
 }

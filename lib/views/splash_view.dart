@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/firebase_options.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -24,6 +25,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/app_globals.dart' show appReadyCompleter;
 import 'package:medito/views/bottom_navigation/bottom_navigation_bar_view.dart';
 import 'package:medito/views/downloads/downloads_view.dart';
+import 'package:medito/views/splash_welcome_layout.dart';
 import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
@@ -44,51 +46,17 @@ class SplashViewState extends ConsumerState<SplashView>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   var _showAccountButtons = false;
   var _isLoading = true;
-  var _currentTextIndex = 0;
   var _isSigningIn = false;
-  late AnimationController _textAnimationController;
-  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _setupTextAnimation();
     _initialiseApp();
-  }
-
-  void _setupTextAnimation() {
-    _textAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _textAnimationController,
-        curve: Curves.easeInOut,
-      ),
-    );
-    _textAnimationController.forward();
-    _startTextCycle();
-  }
-
-  void _startTextCycle() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      _textAnimationController.reverse().then((_) {
-        if (!mounted) return;
-        setState(() {
-          _currentTextIndex = (_currentTextIndex + 1) % 3;
-        });
-        _textAnimationController.forward();
-        _startTextCycle();
-      });
-    });
   }
 
   @override
   void dispose() {
-    _textAnimationController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -477,7 +445,11 @@ class SplashViewState extends ConsumerState<SplashView>
       if (shouldUseExistingAccount == true) {
         await Navigator.of(context)
             .push(
-              MaterialPageRoute(builder: (context) => const SignUpLogInPage()),
+              MaterialPageRoute(
+                builder: (context) => const SignUpLogInPage(
+                  source: AnalyticsEventConstants.sourceSplash,
+                ),
+              ),
             )
             .then((value) {
               if (value == true) {
@@ -598,243 +570,38 @@ class SplashViewState extends ConsumerState<SplashView>
                   width: 168,
                 ),
               )
-            : LayoutBuilder(
-                builder: (context, constraints) {
-                  return Stack(
-                    children: [
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: SizedBox(
-                          height: 500,
-                          child: Image.asset(
-                            AssetConstants.splashBackground,
-                            fit: BoxFit.fitWidth,
-                            alignment: Alignment.bottomCenter,
-                          ),
-                        ),
-                      ),
-                      SafeArea(
-                        bottom: false,
-                        child: SingleChildScrollView(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight:
-                                  constraints.maxHeight -
-                                  MediaQuery.of(context).padding.top,
-                            ),
-                            child: IntrinsicHeight(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 16,
-                                      top: 16,
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withAlpha(
-                                              ((0.1).clamp(0.0, 1.0) * 255)
-                                                  .round(),
-                                            ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: SvgPicture.asset(
-                                            AssetConstants.icLogo,
-                                            width: 40,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Text(
-                                          AppLocalizations.of(context)!.appName,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .displayLarge
-                                              ?.copyWith(
-                                                fontSize: 24,
-                                                color: Colors.white,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      32,
-                                      24,
-                                      32,
-                                      0,
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(
-                                            context,
-                                          )!.splashHeadline,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .displayLarge
-                                              ?.copyWith(
-                                                fontSize: 40,
-                                                fontWeight: FontWeight.bold,
-                                                height: 1.2,
-                                                color: Colors.white,
-                                              ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        FadeTransition(
-                                          opacity: _fadeAnimation,
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            heightFactor: 1.0,
-                                            child: Text(
-                                              _getBenefitTitle(
-                                                _currentTextIndex,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .displayLarge
-                                                  ?.copyWith(
-                                                    fontSize: 28,
-                                                    fontWeight: FontWeight.bold,
-                                                    height: 1.0,
-                                                    color: Colors.white,
-                                                  ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  if (_showAccountButtons) ...[
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                        32,
-                                        0,
-                                        32,
-                                        250,
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          SizedBox(
-                                            width: double.infinity,
-                                            height: 48,
-                                            child: ElevatedButton(
-                                              onPressed: () async {
-                                                // Log analytics event for signup button tap
-                                                await FirebaseAnalyticsService()
-                                                    .logEvent(
-                                                      name: FirebaseAnalyticsService
-                                                          .eventOnboardingSplashscreenSignupTap,
-                                                    );
-
-                                                await Navigator.of(context)
-                                                    .push(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const SignUpLogInPage(),
-                                                      ),
-                                                    )
-                                                    .then((value) {
-                                                      if (value == true) {
-                                                        _checkAuthAndInitialize();
-                                                      }
-                                                    });
-                                              },
-                                              child: Text(
-                                                AppLocalizations.of(
-                                                  context,
-                                                )!.createAccountLogInButtonText,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          SizedBox(
-                                            width: double.infinity,
-                                            height: 48,
-                                            child: OutlinedButton(
-                                              style: OutlinedButton.styleFrom(
-                                                backgroundColor: Theme.of(
-                                                  context,
-                                                ).colorScheme.surface,
-                                                foregroundColor: Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurface,
-                                                side: BorderSide(
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).colorScheme.outline,
-                                                ),
-                                              ),
-                                              onPressed: _isSigningIn
-                                                  ? null
-                                                  : () async {
-                                                      // Log analytics event for continue button tap
-                                                      await FirebaseAnalyticsService()
-                                                          .logEvent(
-                                                            name: FirebaseAnalyticsService
-                                                                .eventOnboardingSplashscreenContinueTap,
-                                                          );
-
-                                                      await _handleAnonymousSignIn();
-                                                    },
-                                              child: _isSigningIn
-                                                  ? const SizedBox(
-                                                      width: 20,
-                                                      height: 20,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                            strokeWidth: 2,
-                                                          ),
-                                                    )
-                                                  : Text(
-                                                      AppLocalizations.of(
-                                                        context,
-                                                      )!.continueAsGuest,
-                                                    ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ), // IntrinsicHeight
-                          ),
-                        ),
-                      ),
-                    ],
+            : SplashWelcomeLayout(
+                showAccountButtons: _showAccountButtons,
+                isSigningIn: _isSigningIn,
+                onGetStarted: () async {
+                  await FirebaseAnalyticsService().logEvent(
+                    name: FirebaseAnalyticsService
+                        .eventOnboardingSplashscreenContinueTap,
                   );
+                  await _handleAnonymousSignIn();
+                },
+                onSignIn: () async {
+                  await FirebaseAnalyticsService().logEvent(
+                    name: FirebaseAnalyticsService
+                        .eventOnboardingSplashscreenSignupTap,
+                  );
+                  await Navigator.of(context)
+                      .push(
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpLogInPage(
+                            source: AnalyticsEventConstants.sourceSplash,
+                          ),
+                        ),
+                      )
+                      .then((value) {
+                        if (value == true) {
+                          _checkAuthAndInitialize();
+                        }
+                      });
                 },
               ),
       ),
     );
-  }
-
-  String _getBenefitTitle(int index) {
-    switch (index) {
-      case 0:
-        return AppLocalizations.of(context)!.splashBenefit1Title;
-      case 1:
-        return AppLocalizations.of(context)!.splashBenefit2Title;
-      case 2:
-        return AppLocalizations.of(context)!.splashBenefit3Title;
-      default:
-        return '';
-    }
   }
 
   // Public method that can be called from outside the class

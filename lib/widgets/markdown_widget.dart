@@ -41,7 +41,7 @@ class MarkdownWidget extends StatelessWidget {
         p:
             p ??
             titleMedium?.copyWith(
-              fontFamily: dmMono,
+              fontFamily: googleSans,
               fontSize: pFontSize,
               letterSpacing: 0,
               color: walterWhite,
@@ -50,7 +50,7 @@ class MarkdownWidget extends StatelessWidget {
         a:
             a ??
             titleMedium?.copyWith(
-              fontFamily: dmMono,
+              fontFamily: googleSans,
               color: walterWhite,
               fontSize: aFontSize,
               fontWeight: FontWeight.w600,

@@ -11,10 +11,10 @@ class SharedPreferenceConstants {
   static const String lastSelectedGuideName = 'lastSelectedGuideName';
   static const String favoritePacks = 'favorite_packs';
   static const String favorites = 'favorites';
+  static const String removedFavorites = 'removed_favorites';
 
   static const String userId = 'userId';
   static const String userEmail = 'userEmail';
-  static const String userToken = 'userToken';
 
   // New constants for stats
   static const String localAllStatsKey = 'local_all_stats';
@@ -32,15 +32,13 @@ class SharedPreferenceConstants {
   static const String dndEnabled = 'dnd_enabled';
   static const String isLoggedIn = 'is_logged_in';
 
-  static const String hasActiveSubscription = 'has_active_subscription';
-
   // Locale preference - stores the user's preferred language setting
   static const String localePreference = 'locale_preference';
 
   // Theme preference - stores the user's preferred theme mode
   static const String themePreference = 'theme_preference';
 
-  // Smart Reminders
+  // Daily reminders
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
   static const String reminderPromptDismissedForever =
       'reminder_prompt_dismissed_forever';
@@ -50,6 +48,14 @@ class SharedPreferenceConstants {
   /// Set by a soft dismiss ("Not now") instead of the permanent dismiss.
   static const String reminderPromptSnoozeUntil =
       'reminder_prompt_snooze_until';
+
+  // Account conversion (anonymous -> email) soft-ask on the end screen.
+  static const String accountPromptDismissedForever =
+      'account_prompt_dismissed_forever';
+
+  /// Epoch millis until which the post-session account-conversion prompt is
+  /// suppressed. Set by a soft dismiss ("Not now").
+  static const String accountPromptSnoozeUntil = 'account_prompt_snooze_until';
 
   // Zen Mode
   static const String zenModeEnabled = 'zen_mode_enabled';
@@ -79,21 +85,32 @@ class SharedPreferenceConstants {
   static const String lastSuccessfulDonationFrequency =
       'last_successful_donation_frequency';
 
+  // Email the donor typed for their Stripe receipt in a native donation
+  // flow. Separate from the account email (they need not match): only used
+  // to prefill the sign-up screen so "add your email" is one tap.
+  static const String emailAddressForReceipt = 'email_address_for_receipt';
+
   // Up Next pack preference
   static const String upNextPackId = 'up_next_pack_id';
+
+  /// The series pack Home returns to when a hand-picked pack is removed from
+  /// it. Absent means the no-pin default.
+  static const String upNextReturnPackId = 'up_next_return_pack_id';
 
   // Onboarding custom-time-picker entry-mode A/B test (dial vs keyboard) —
   // sticky per-install variant.
   static const String onboardingReminderPickerModeVariant =
       'onboarding_reminder_picker_mode_variant';
 
+  // End-screen donation card A/B test (webview CTA vs inline amount chips +
+  // pay sheet) — sticky per-install variant.
+  static const String endScreenDonationAskVariant =
+      'end_screen_donation_ask_variant';
+
   // First-meditation-for-experienced-users A/B test — sticky per-install
   // variant. Only assigned for users who answer `regular_practice`.
   static const String onboardingExperiencedMeditationVariant =
       'onboarding_experienced_meditation_variant';
-
-  // Your Path explainer strip — set to true once the strip has been dismissed
-  static const String hasSeenYourPathExplainer = 'has_seen_your_path_explainer';
 
   // Last selected main tab (home=0, explore=1)
   static const String lastMainTabIndex = 'last_main_tab_index';
@@ -121,4 +138,13 @@ class SharedPreferenceConstants {
   // onboarded before this was captured or skipped the question. Used to
   // segment the first-session experience and downstream personalisation.
   static const String onboardingExperienceLevel = 'onboarding_experience_level';
+
+  // Native shop bag: JSON list of BagItem (variant id, quantity, and enough
+  // product detail to render offline). Cleared by the user after checkout.
+  static const String shopBag = 'shop_bag';
+
+  // Set when the user leaves for Fourthwall checkout with a non-empty bag, so
+  // the bag can offer to clear itself on return. We can't observe the order
+  // completing (checkout runs in the system browser sheet).
+  static const String shopBagCheckoutStarted = 'shop_bag_checkout_started';
 }

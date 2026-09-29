@@ -156,7 +156,7 @@ class FirebaseMessagingHandler {
         final data = _decodePayload(response.payload);
         unawaited(_logNotificationOpen(data));
 
-        // Only deep-link when the payload actually asks for one. The smart
+        // Only deep-link when the payload actually asks for one. The daily
         // reminder series carries no type/path, and routing it through
         // _navigate would push a second home view on top of the current
         // screen — the OS opening the app is already the whole intent.

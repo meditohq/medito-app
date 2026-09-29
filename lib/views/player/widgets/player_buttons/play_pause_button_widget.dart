@@ -12,15 +12,40 @@ class PlayPauseButtonWidget extends ConsumerWidget {
     this.iconSize = 72,
     required this.isPlaying,
     required this.onPlayPause,
+    this.isLoading = false,
   });
 
   final double iconSize;
   final bool isPlaying;
   final Function() onPlayPause;
 
+  /// While the audio is still spinning up, show a spinner in place of the
+  /// icon (same box size, so nothing shifts) and ignore taps.
+  final bool isLoading;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+
+    if (isLoading) {
+      return Semantics(
+        label: l10n.loading,
+        child: SizedBox(
+          width: iconSize,
+          height: iconSize,
+          child: Center(
+            child: SizedBox(
+              width: iconSize * 0.5,
+              height: iconSize * 0.5,
+              child: const CircularProgressIndicator(
+                strokeWidth: 3,
+                valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Semantics(
       label: isPlaying ? l10n.pause : l10n.play,

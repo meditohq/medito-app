@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -152,6 +154,10 @@ class AudioDownloadWidget extends ConsumerWidget {
   }
 
   Future<void> _handleDownload(WidgetRef ref, BuildContext context) async {
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.playerDownloadTapped,
+      parameters: {'track_id': request.trackId, 'file_id': request.fileId},
+    );
     try {
       await ref
           .read(audioDownloaderProvider.notifier)
@@ -188,6 +194,10 @@ class AudioDownloadWidget extends ConsumerWidget {
     );
 
     if (confirmDelete == true) {
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.playerDownloadDeleteConfirmed,
+        parameters: {'track_id': request.trackId, 'file_id': request.fileId},
+      );
       try {
         await ref
             .read(audioDownloaderProvider.notifier)

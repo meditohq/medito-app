@@ -17,6 +17,15 @@ class DonationSnoozeState {
     this.lastDonationAt,
     this.snoozedUntil,
   });
+
+  /// True when this install has ever completed a donation in-app. The
+  /// thank-you card is shown for both donors and "Hide for now" snoozers;
+  /// analytics use this to tell the two apart.
+  bool get isDonor => lastDonationAt != null;
+
+  /// 'donor' | 'hidden' — why the ask is suppressed. Only meaningful while
+  /// [isSnoozed] is true.
+  String get snoozeReason => isDonor ? 'donor' : 'hidden';
 }
 
 @riverpod

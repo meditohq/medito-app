@@ -231,3 +231,38 @@ Future<PaywallConfigModel> paywallConfig(Ref ref) {
     source: AnalyticsEventConstants.paywallSourceOnboarding,
   );
 }
+
+/// Resolved paywall config for the END-SCREEN donation card (variant B of the
+/// `end_screen_inline_pay` experiment renders its monthly ladder inline).
+/// Same endpoint as [paywallConfig] with `source=end_screen`, so the server's
+/// per-source ladder override applies exactly as it does for the webview.
+///
+/// Auto-dispose with keepAlive-on-success only: the end screen is frequently
+/// mounted on app resume with the radio not yet up (see
+/// donation_page_provider.dart), and a pinned error here would silently
+/// degrade every later B exposure to the control CTA.
+@riverpod
+Future<PaywallConfigModel> endScreenPaywallConfig(Ref ref) async {
+  final service = ref.watch(paymentServiceProvider);
+  final deviceInfo = ref.watch(deviceAndAppInfoProvider).value;
+
+  String? userId;
+  String? email;
+  try {
+    final currentUser = ref.read(authRepositorySyncProvider).currentUser;
+    userId = currentUser?.id;
+    email = currentUser?.email;
+  } catch (e) {
+    AppLogger.w('PAYMENT', 'End-screen paywall config: auth not ready ($e)');
+  }
+
+  final config = await service.getPaywallConfig(
+    currency: deviceInfo?.currency,
+    country: deviceInfo?.country,
+    userId: userId,
+    email: email,
+    source: AnalyticsEventConstants.paywallSourceEndScreen,
+  );
+  ref.keepAlive();
+  return config;
+}

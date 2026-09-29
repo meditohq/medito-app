@@ -51,7 +51,7 @@ class _DayBoundaryOffsetDialogState extends State<DayBoundaryOffsetDialog> {
               'usually meditate late at night and want sessions after '
               'midnight to still count for the previous day.',
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: dmSans,
+                fontFamily: googleSans,
                 height: 1.5,
                 color: onSurface.withOpacityValue(0.75),
               ),
@@ -89,7 +89,7 @@ class _DayBoundaryOffsetDialogState extends State<DayBoundaryOffsetDialog> {
                       'session is grouped into days, so your current and '
                       'longest streak may shift.',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        fontFamily: dmSans,
+                        fontFamily: googleSans,
                         height: 1.4,
                         color: onSurface.withOpacityValue(0.75),
                       ),
@@ -151,7 +151,7 @@ class _OffsetOptionTile extends StatelessWidget {
               child: Text(
                 label,
                 style: theme.textTheme.labelMedium?.copyWith(
-                  fontFamily: dmSans,
+                  fontFamily: googleSans,
                   color: onSurface,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                 ),

@@ -27,9 +27,7 @@ void main() {
     statsManager.resetForTesting();
   });
 
-  final fixtureFile = File(
-    'test/fixtures/consistency_score_fixtures.json',
-  );
+  final fixtureFile = File('test/fixtures/consistency_score_fixtures.json');
   final fixture =
       jsonDecode(fixtureFile.readAsStringSync()) as Map<String, dynamic>;
   final referenceDate = DateTime.parse(fixture['referenceDate'] as String);

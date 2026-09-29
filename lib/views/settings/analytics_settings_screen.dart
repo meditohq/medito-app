@@ -1,3 +1,4 @@
+import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -33,73 +34,86 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.analyticsTrackingTitle),
-        centerTitle: false,
+        centerTitle: true,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(AppLocalizations.of(context)!.analyticsTrackingTitle),
-              const SizedBox(height: 12),
-              Text(AppLocalizations.of(context)!.analyticsTrackingContent),
-              const SizedBox(height: 24),
-              _SwitchTile(
-                label: 'Firebase Analytics',
-                provider: _firebaseEnabledProvider,
-                onConfirmDisableMessage: Platform.isIOS
-                    ? AppLocalizations.of(context)!.iosTrackingDialogContent
-                    : AppLocalizations.of(context)!.analyticsTrackingContent,
-                onChanged: (value) async {
-                  await ref
-                      .read(sharedPreferencesProvider)
-                      .setBool(
-                        SharedPreferenceConstants.analyticsFirebaseEnabled,
+      body: AdaptivePageBody(
+        maxWidth: 760,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(AppLocalizations.of(context)!.analyticsTrackingTitle),
+                  const SizedBox(height: 12),
+                  Text(AppLocalizations.of(context)!.analyticsTrackingContent),
+                  const SizedBox(height: 24),
+                  _SwitchTile(
+                    label: 'Firebase Analytics',
+                    provider: _firebaseEnabledProvider,
+                    onConfirmDisableMessage: Platform.isIOS
+                        ? AppLocalizations.of(context)!.iosTrackingDialogContent
+                        : AppLocalizations.of(
+                            context,
+                          )!.analyticsTrackingContent,
+                    onChanged: (value) async {
+                      await ref
+                          .read(sharedPreferencesProvider)
+                          .setBool(
+                            SharedPreferenceConstants.analyticsFirebaseEnabled,
+                            value,
+                          );
+                      // Disable/enable the SDKs at the native level
+                      await FirebaseAnalyticsService().setCollectionEnabled(
                         value,
                       );
-                  // Disable/enable the SDKs at the native level
-                  await FirebaseAnalyticsService().setCollectionEnabled(value);
-                  await CrashlyticsService().setCollectionEnabled(value);
-                  ref.invalidate(_firebaseEnabledProvider);
-                },
-              ),
-              _SwitchTile(
-                label: 'Meta (Facebook) App Events',
-                provider: _metaEnabledProvider,
-                onConfirmDisableMessage: Platform.isIOS
-                    ? AppLocalizations.of(context)!.iosTrackingDialogContent
-                    : AppLocalizations.of(context)!.analyticsTrackingContent,
-                onChanged: (value) async {
-                  await ref
-                      .read(sharedPreferencesProvider)
-                      .setBool(
-                        SharedPreferenceConstants.analyticsMetaEnabled,
-                        value,
+                      await CrashlyticsService().setCollectionEnabled(value);
+                      ref.invalidate(_firebaseEnabledProvider);
+                    },
+                  ),
+                  _SwitchTile(
+                    label: 'Meta (Facebook) App Events',
+                    provider: _metaEnabledProvider,
+                    onConfirmDisableMessage: Platform.isIOS
+                        ? AppLocalizations.of(context)!.iosTrackingDialogContent
+                        : AppLocalizations.of(
+                            context,
+                          )!.analyticsTrackingContent,
+                    onChanged: (value) async {
+                      await ref
+                          .read(sharedPreferencesProvider)
+                          .setBool(
+                            SharedPreferenceConstants.analyticsMetaEnabled,
+                            value,
+                          );
+                      // Disable/enable the Meta SDK at runtime
+                      await MetaSdkService.instance.setEnabled(value);
+                      ref.invalidate(_metaEnabledProvider);
+                    },
+                  ),
+                  if (Platform.isIOS) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      AppLocalizations.of(context)!.iosTrackingDialogContent,
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  TextButton.icon(
+                    onPressed: () {
+                      handleNavigation(
+                        'url',
+                        ['https://meditofoundation.org/privacy'],
+                        context,
+                        ref: ref,
                       );
-                  // Disable/enable the Meta SDK at runtime
-                  await MetaSdkService.instance.setEnabled(value);
-                  ref.invalidate(_metaEnabledProvider);
-                },
+                    },
+                    icon: const Icon(Icons.privacy_tip_outlined),
+                    label: Text(AppLocalizations.of(context)!.privacyPolicy),
+                  ),
+                ],
               ),
-              if (Platform.isIOS) ...[
-                const SizedBox(height: 24),
-                Text(AppLocalizations.of(context)!.iosTrackingDialogContent),
-              ],
-              const SizedBox(height: 24),
-              TextButton.icon(
-                onPressed: () {
-                  handleNavigation(
-                    'url',
-                    ['https://meditofoundation.org/privacy'],
-                    context,
-                    ref: ref,
-                  );
-                },
-                icon: const Icon(Icons.privacy_tip_outlined),
-                label: Text(AppLocalizations.of(context)!.privacyPolicy),
-              ),
-            ],
+            ),
           ),
         ),
       ),

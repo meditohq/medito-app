@@ -122,7 +122,7 @@ class MeditoDialogTitle extends StatelessWidget {
     return Text(
       text,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        fontFamily: dmSans,
+        fontFamily: googleSans,
         fontWeight: FontWeight.w600,
         color: Theme.of(context).colorScheme.onSurface,
       ),
@@ -141,7 +141,7 @@ class MeditoDialogBody extends StatelessWidget {
     return Text(
       text,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-        fontFamily: dmSans,
+        fontFamily: googleSans,
         height: 1.5,
         color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.75),
       ),

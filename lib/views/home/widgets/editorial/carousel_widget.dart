@@ -17,7 +17,7 @@ import '../../home_styles.dart';
 import '../home_gradient_border.dart';
 
 const _kCardBorderRadius = kHomeCardRadius;
-const _kChipFontSize = 11.0;
+const _kChipFontSize = 12.0;
 const _kCarouselHeight = 180.0;
 
 class CarouselWidget extends ConsumerStatefulWidget {
@@ -96,7 +96,6 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
           child: Text(
             AppLocalizations.of(context)!.carouselTitle,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              fontFamily: teachers,
               fontSize: 20,
               fontWeight: FontWeight.w400,
               height: 28 / 24,
@@ -250,8 +249,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                   child: Text(
                     item.title,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontFamily: dmSans,
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                       height: 1.2,
                       color: Colors.white,
@@ -292,7 +290,6 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
               child: Text(
                 item.bannerLabel ?? AppLocalizations.of(context)!.neww,
                 style: TextStyle(
-                  fontFamily: dmSans,
                   fontSize: _kChipFontSize,
                   fontWeight: FontWeight.w600,
                   height: 1.2,
