@@ -251,11 +251,13 @@ class AnalyticsEventConstants {
   static const String secureStoragePersistentFailure =
       'secure_storage_persistent_failure';
 
-  /// Event logged when token backup storage is attempted
+  /// Event logged when token backup storage is attempted.
+  /// No longer sent since Sep 2026 (was pure volume); kept for old builds' data.
   static const String tokenBackupStorageAttempt =
       'token_backup_storage_attempt';
 
-  /// Event logged with result of token backup storage attempt
+  /// Event logged with result of token backup storage attempt.
+  /// Since Sep 2026 only 'failure' is sent; older builds also sent 'success'.
   static const String tokenBackupStorageResult = 'token_backup_storage_result';
 
   /// Event logged when token is retrieved from backup storage
@@ -422,12 +424,14 @@ class AnalyticsEventConstants {
   static const String upNextPackOpened = 'up_next_pack_opened';
 
   /// The pinned pack is finished and the completed state was shown.
+  /// Once per pack per install; before Sep 2026 it fired on every Home mount.
   static const String upNextPackCompleted = 'up_next_pack_completed';
 
   /// The completed-state CTA was accepted and the next pack pinned.
   static const String upNextNextPackPinned = 'up_next_next_pack_pinned';
 
   /// The user finished the last pack on the path (or the megapack).
+  /// Once per pack per install; before Sep 2026 it fired on every Home mount.
   static const String upNextPathCompleted = 'up_next_path_completed';
 
   /// Parameter name for the session/track ID in up next events
@@ -763,6 +767,10 @@ class AnalyticsEventConstants {
 
   /// Parameter name for the shortcut destination type (e.g. pack, track, link)
   static const String paramShortcutType = 'shortcut_type';
+
+  /// The user opened a tag's track list (TagView).
+  /// Parameters: 'tag_id', 'tag_group'.
+  static const String tagOpened = 'tag_opened';
 
   // Search events
   /// Event logged once per settled (debounced) non-empty query on the Search

@@ -177,11 +177,29 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
   @override
   void initState() {
     super.initState();
-    // Once per mount, not per rebuild; the key is keyed on the pack id.
+    // Once per pack, not per mount — see _logShown.
     WidgetsBinding.instance.addPostFrameCallback((_) => _logShown());
   }
 
+  /// Logged once per pack per install. The card stays on Home until the next
+  /// pack is pinned, so logging per mount counted Home visits, not completions
+  /// (~10 up_next_path_completed per user, Sep 2026).
   void _logShown() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    final logged =
+        prefs.getStringList(
+          SharedPreferenceConstants.upNextCompletedLoggedPacks,
+        ) ??
+        const <String>[];
+    final packId = widget.data.pack.id;
+    if (logged.contains(packId)) return;
+    unawaited(
+      prefs.setStringList(
+        SharedPreferenceConstants.upNextCompletedLoggedPacks,
+        [...logged, packId],
+      ),
+    );
+
     final analytics = ref.read(analyticsServiceProvider);
 
     unawaited(

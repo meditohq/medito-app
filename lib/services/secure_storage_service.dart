@@ -243,27 +243,11 @@ class SecureStorageService {
       // still continue to try backup so user isn't logged out entirely.
     }
 
-    // 2. Emit analytics that we are about to write the backup copy.
-    FirebaseAnalyticsService().logEvent(
-      name: FirebaseAnalyticsService.eventTokenBackupStorageAttempt,
-      parameters: {
-        'timestamp': DateTime.now().toIso8601String(),
-        'token_length': token.length,
-      },
-    );
-
-    // 3. Write the XOR-encrypted backup to SharedPreferences.
+    // 2. Write the XOR-encrypted backup to SharedPreferences. Only failures are
+    // logged: attempt/success fired ~9x per user per fortnight (the busiest
+    // custom events) with zero failures in 680k (Sep 2026).
     try {
       await _storeRefreshToken(token);
-
-      FirebaseAnalyticsService().logEvent(
-        name: FirebaseAnalyticsService.eventTokenBackupStorageResult,
-        parameters: {
-          'result': 'success',
-          'timestamp': DateTime.now().toIso8601String(),
-          'token_length': token.length,
-        },
-      );
     } catch (e) {
       // Log and bubble up.
       FirebaseAnalyticsService().logEvent(
