@@ -508,6 +508,12 @@ class AnalyticsEventConstants {
   /// test — can be segmented by experience level in BigQuery.
   static const String userPropExperienceLevel = 'experience_level';
 
+  /// GA4 user properties sizing the audience for a watch app: whether the
+  /// phone has a paired Apple Watch / Wear OS watch set up, and whether the
+  /// Medito watch app is on it ('true' / 'false'). Set on every Home launch.
+  static const String userPropHasPairedWatch = 'has_paired_watch';
+  static const String userPropWatchAppInstalled = 'watch_app_installed';
+
   /// Parameter carrying the free-text response from the onboarding attribution
   /// question when the user picks the "other" path and types their own answer.
   static const String paramOtherText = 'other_text';
