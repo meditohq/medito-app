@@ -263,5 +263,59 @@ void main() {
       await tracker.replayIfAbandoned();
       expect(events, isEmpty);
     });
+
+    group('with a completion grace (Android)', () {
+      const record =
+          '{"fileId":"f9","guide":"Sky","durationMs":60000,'
+          '"startMs":111,"lastPositionMs":18000}';
+      const grace = Duration(milliseconds: 50);
+
+      setUp(() {
+        SharedPreferences.setMockInitialValues({
+          SharedPreferenceConstants.incompleteAudioSession: record,
+        });
+        tracker.resetForTesting();
+        events.clear();
+      });
+
+      test(
+        'late completion for the same file suppresses the abandon',
+        () async {
+          final replay = tracker.replayIfAbandoned(completionGrace: grace);
+          await pumpEventQueue(); // let it read the record and start waiting
+          await tracker.onCompleted(fileId: 'f9');
+          await replay;
+
+          expect(of(AnalyticsEventConstants.audioSessionAbandoned), isEmpty);
+        },
+      );
+
+      test('no completion within the grace still fires the abandon', () async {
+        await tracker.replayIfAbandoned(completionGrace: grace);
+
+        expect(of(AnalyticsEventConstants.audioSessionAbandoned), hasLength(1));
+      });
+
+      test('completion for a different file does not suppress it', () async {
+        final replay = tracker.replayIfAbandoned(completionGrace: grace);
+        await pumpEventQueue(); // let it read the record and start waiting
+        await tracker.onCompleted(fileId: 'other');
+        await replay;
+
+        expect(of(AnalyticsEventConstants.audioSessionAbandoned), hasLength(1));
+      });
+
+      test('a session started during the grace is not reported', () async {
+        final replay = tracker.replayIfAbandoned(completionGrace: grace);
+        await pumpEventQueue(); // let it read the record and start waiting
+        await tracker.onStarted(fileId: 'new', guide: 'Will', durationMs: 1000);
+        await replay;
+
+        final ab = of(AnalyticsEventConstants.audioSessionAbandoned);
+        expect(ab, hasLength(1));
+        expect(ab.first.params[AnalyticsEventConstants.paramAudioFileId], 'f9');
+        expect(await persisted(), contains('"fileId":"new"'));
+      });
+    });
   });
 }

@@ -183,7 +183,9 @@ Future<bool> handleStats(
 
     // Tell the session tracker this session completed so it clears the
     // in-progress record and does not also fire audio_session_abandoned.
-    await AudioSessionTracker.instance.onCompleted();
+    await AudioSessionTracker.instance.onCompleted(
+      fileId: payload[TypeConstants.fileIdKey] as String?,
+    );
 
     // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
