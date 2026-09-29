@@ -29,10 +29,11 @@ const _kProgressBarHeight = 3.0;
 
 /// Shared context for every Up Next event so the four are comparable.
 /// Experience level is omitted — it is a user property, already on every event.
-Map<String, Object> _upNextEventParams(UpNextData data) {
+Map<String, Object> _upNextEventParams(UpNextData data, UpNextStyle style) {
   final packId = data.pack.id;
   final position = PackSequence.positionOf(packId);
   return {
+    AnalyticsEventConstants.paramUpNextStyle: style.name,
     AnalyticsEventConstants.paramPackId: packId,
     AnalyticsEventConstants.paramUpNextMode: PackSequence.modeFor(packId),
     AnalyticsEventConstants.paramPackSequencePosition:
@@ -178,7 +179,25 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
   void initState() {
     super.initState();
     // Once per pack, not per mount — see _logShown.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _logShown());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _logShown();
+      _logImpression();
+    });
+  }
+
+  void _logImpression() {
+    if (!mounted) return;
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.upNextShown,
+            parameters: {
+              ..._upNextEventParams(widget.data, widget.style),
+              AnalyticsEventConstants.paramUpNextState: 'completed',
+            },
+          ),
+    );
   }
 
   /// Logged once per pack per install. The card stays on Home until the next
@@ -206,7 +225,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
       analytics.logEvent(
         name: AnalyticsEventConstants.upNextPackCompleted,
         parameters: {
-          ..._upNextEventParams(widget.data),
+          ..._upNextEventParams(widget.data, widget.style),
           AnalyticsEventConstants.paramHasNextPack:
               widget.data.nextPackId != null ? 'true' : 'false',
         },
@@ -217,7 +236,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
       unawaited(
         analytics.logEvent(
           name: AnalyticsEventConstants.upNextPathCompleted,
-          parameters: _upNextEventParams(widget.data),
+          parameters: _upNextEventParams(widget.data, widget.style),
         ),
       );
     }
@@ -235,7 +254,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
           .logEvent(
             name: AnalyticsEventConstants.upNextNextPackPinned,
             parameters: {
-              ..._upNextEventParams(widget.data),
+              ..._upNextEventParams(widget.data, widget.style),
               AnalyticsEventConstants.paramNextPackId: nextPackId,
               AnalyticsEventConstants.paramNextPackSequencePosition:
                   PackSequence.positionOf(nextPackId)?.toString() ?? 'none',
@@ -441,6 +460,29 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
   // Swiping reveals Open pack / Skip; a tap while open should close the menu
   // rather than start a session.
   late final SlidableController _slidable = SlidableController(this);
+
+  @override
+  void initState() {
+    super.initState();
+    // Keyed by session id, so this runs again when the card moves on to the
+    // next session.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.upNextShown,
+              parameters: {
+                AnalyticsEventConstants.paramSessionId:
+                    widget.data.nextSession!.id,
+                ..._upNextEventParams(widget.data, widget.style),
+                AnalyticsEventConstants.paramUpNextState: 'session',
+              },
+            ),
+      );
+    });
+  }
 
   @override
   void dispose() {
@@ -692,7 +734,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
           .read(analyticsServiceProvider)
           .logEvent(
             name: AnalyticsEventConstants.upNextPackOpened,
-            parameters: _upNextEventParams(widget.data),
+            parameters: _upNextEventParams(widget.data, widget.style),
           ),
     );
     handleNavigation(
@@ -754,7 +796,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
             name: AnalyticsEventConstants.upNextSkipped,
             parameters: {
               AnalyticsEventConstants.paramSessionId: nextSession.id,
-              ..._upNextEventParams(widget.data),
+              ..._upNextEventParams(widget.data, widget.style),
             },
           ),
     );
@@ -792,7 +834,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
             name: AnalyticsEventConstants.upNextTapped,
             parameters: {
               AnalyticsEventConstants.paramSessionId: nextSession.id,
-              ..._upNextEventParams(widget.data),
+              ..._upNextEventParams(widget.data, widget.style),
             },
           ),
     );

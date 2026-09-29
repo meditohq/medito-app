@@ -434,7 +434,25 @@ class AnalyticsEventConstants {
   /// Once per pack per install; before Sep 2026 it fired on every Home mount.
   static const String upNextPathCompleted = 'up_next_path_completed';
 
-  /// Parameter name for the session/track ID in up next events
+  /// The Up Next card was on screen. Fires once each time the card is built
+  /// (a Home mount, or the card moving on to a new session), so it counts Home
+  /// visits with the card visible, not distinct users — read it as distinct
+  /// users per day. It is the denominator [upNextTapped] never had.
+  /// Params: [paramUpNextState] ('session' | 'completed'), [paramUpNextStyle],
+  /// [paramSessionId] (session state only), plus the usual pack params.
+  static const String upNextShown = 'up_next_shown';
+
+  /// How the card is presented: 'card' (its own row) or 'hero' (laid over the
+  /// Home image). Also added to the other up_next_* events.
+  static const String paramUpNextStyle = 'style';
+
+  /// What the card showed: 'session' (next track to play) or 'completed'
+  /// (the pinned pack is finished).
+  static const String paramUpNextState = 'state';
+
+  /// Parameter name for the session/track ID in up next events. On the
+  /// Start/Continue button it is the track that button plays, the same id
+  /// [upNextTapped] reports, so the two join on it.
   static const String paramSessionId = 'session_id';
 
   /// Parameter name for the pack ID in up next events
@@ -469,6 +487,20 @@ class AnalyticsEventConstants {
   /// The user removed the pack from Your Path via the pack screen sheet.
   /// Params: [paramPackId].
   static const String packUnpinned = 'pack_unpinned';
+
+  /// The pack screen's Start/Continue play button was tapped — every tap, not
+  /// just the ones that change Home (that is [packPinned], which stays silent
+  /// when the pack is already pinned and so hid the common Continue case).
+  /// Params: [paramPackId], [paramSessionId] (the track it plays),
+  /// [paramButtonLabel], [paramAlreadyPinned], [paramSessionIndexInPack],
+  /// [paramPackTotalSessions], [paramPackSequencePosition], [paramUpNextMode].
+  static const String packPathButtonTapped = 'pack_path_button_tapped';
+
+  /// 'start' (nothing finished yet) or 'continue'.
+  static const String paramButtonLabel = 'label';
+
+  /// 'true' when the pack was already what Home continues.
+  static const String paramAlreadyPinned = 'already_pinned';
 
   /// Pack that was Your Path before this one replaced it.
   static const String paramPreviousPackId = 'previous_pack_id';
