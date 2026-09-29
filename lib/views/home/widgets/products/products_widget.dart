@@ -454,7 +454,11 @@ class _BagPill extends ConsumerWidget {
           ),
           child: InkWell(
             customBorder: const StadiumBorder(),
-            onTap: () => showShopBag(context, onBrowse: onBrowse),
+            onTap: () => showShopBag(
+              context,
+              source: AnalyticsEventConstants.sourceHomeCard,
+              onBrowse: onBrowse,
+            ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Row(

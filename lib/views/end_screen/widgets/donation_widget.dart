@@ -124,16 +124,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
 
   /// Compact, low-cardinality label for the failure event so the next readout
   /// can tell "radio not up yet" from "server down".
-  static String _errorKind(Object err) => switch (err) {
-    NetworkConnectionError(:final kind) => 'network_${kind.name}',
-    TimeoutError() => 'timeout',
-    ServerError() => 'server',
-    UnauthorizedError() || RefreshTokenError() => 'unauthorized',
-    RateLimitError() => 'rate_limit',
-    NotFoundError() => 'not_found',
-    AppError() => 'app_error',
-    _ => 'unknown',
-  };
+  static String _errorKind(Object err) => analyticsErrorKind(err);
 
   void _logOnce(String event, {Map<String, Object>? parameters}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {

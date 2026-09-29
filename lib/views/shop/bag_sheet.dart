@@ -4,6 +4,7 @@ import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/shop/shop_models.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/shop/shop_providers.dart';
 import 'package:medito/views/home/home_styles.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
@@ -15,21 +16,27 @@ import 'package:medito/widgets/medito_icon.dart';
 
 /// Opens the bag. [onBrowse] backs the empty state's "Browse the shop"
 /// button; leave it null where the shop is already underneath.
-Future<void> showShopBag(BuildContext context, {VoidCallback? onBrowse}) {
+Future<void> showShopBag(
+  BuildContext context, {
+  required String source,
+  VoidCallback? onBrowse,
+}) {
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
-    builder: (_) => ShopBagSheet(onBrowse: onBrowse),
+    builder: (_) => ShopBagSheet(source: source, onBrowse: onBrowse),
   );
 }
 
 /// Bag icon with a unit count badge; opens [showShopBag].
 class ShopBagButton extends ConsumerWidget {
-  const ShopBagButton({super.key, this.onBrowse});
+  const ShopBagButton({super.key, required this.source, this.onBrowse});
 
+  /// Where the button sits, for [AnalyticsEventConstants.shopBagViewed].
+  final String source;
   final VoidCallback? onBrowse;
 
   @override
@@ -40,7 +47,7 @@ class ShopBagButton extends ConsumerWidget {
 
     return IconButton(
       tooltip: l10n.shopViewBag,
-      onPressed: () => showShopBag(context, onBrowse: onBrowse),
+      onPressed: () => showShopBag(context, source: source, onBrowse: onBrowse),
       icon: Badge(
         isLabelVisible: count > 0,
         label: Text('$count'),
@@ -55,13 +62,42 @@ class ShopBagButton extends ConsumerWidget {
   }
 }
 
-class ShopBagSheet extends ConsumerWidget {
-  const ShopBagSheet({super.key, this.onBrowse});
+class ShopBagSheet extends ConsumerStatefulWidget {
+  const ShopBagSheet({super.key, required this.source, this.onBrowse});
 
+  final String source;
   final VoidCallback? onBrowse;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShopBagSheet> createState() => _ShopBagSheetState();
+}
+
+/// The bag's contents as event params, shared by the bag-level events.
+Map<String, Object> _bagParams(ShopBag bag, {Map<String, Object>? extra}) => {
+  ...?extra,
+  'items': bag.items.length,
+  'quantity': bag.quantity,
+  'value': bag.subtotal?.value ?? 0,
+  'currency': bag.subtotal?.currency ?? '',
+};
+
+class _ShopBagSheetState extends ConsumerState<ShopBagSheet> {
+  @override
+  void initState() {
+    super.initState();
+    ref
+        .read(analyticsServiceProvider)
+        .logEvent(
+          name: AnalyticsEventConstants.shopBagViewed,
+          parameters: _bagParams(
+            ref.read(shopBagProvider),
+            extra: {'source': widget.source},
+          ),
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final bag = ref.watch(shopBagProvider);
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -97,7 +133,7 @@ class ShopBagSheet extends ConsumerWidget {
             ),
           ),
           if (bag.isEmpty)
-            _EmptyBag(onBrowse: onBrowse)
+            _EmptyBag(onBrowse: widget.onBrowse)
           else ...[
             Flexible(
               child: ListView(
@@ -190,7 +226,23 @@ class _BagLine extends ConsumerWidget {
                 const SizedBox(height: 10),
                 _QuantityStepper(
                   quantity: item.quantity,
-                  onChanged: (q) => notifier.setQuantity(item.variantId, q),
+                  onChanged: (q) {
+                    ref
+                        .read(analyticsServiceProvider)
+                        .logEvent(
+                          name: q <= 0
+                              ? AnalyticsEventConstants.shopBagItemRemoved
+                              : AnalyticsEventConstants.shopBagQuantityChanged,
+                          parameters: {
+                            'product_slug': item.productSlug,
+                            'variant_id': item.variantId,
+                            if (q <= 0) 'quantity': item.quantity,
+                            if (q > 0) 'from': item.quantity,
+                            if (q > 0) 'to': q,
+                          },
+                        );
+                    notifier.setQuantity(item.variantId, q);
+                  },
                 ),
               ],
             ),
@@ -273,11 +325,28 @@ class _QuantityStepper extends StatelessWidget {
 
 /// We can't see whether checkout finished, so after a trip there the bag
 /// offers to clear itself rather than guessing.
-class _CheckoutReturnCard extends ConsumerWidget {
+class _CheckoutReturnCard extends ConsumerStatefulWidget {
   const _CheckoutReturnCard();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_CheckoutReturnCard> createState() =>
+      _CheckoutReturnCardState();
+}
+
+class _CheckoutReturnCardState extends ConsumerState<_CheckoutReturnCard> {
+  @override
+  void initState() {
+    super.initState();
+    ref
+        .read(analyticsServiceProvider)
+        .logEvent(
+          name: AnalyticsEventConstants.shopCheckoutReturned,
+          parameters: _bagParams(ref.read(shopBagProvider)),
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
@@ -300,7 +369,18 @@ class _CheckoutReturnCard extends ConsumerWidget {
                 ),
               ),
               TextButton(
-                onPressed: () => ref.read(shopBagProvider.notifier).clear(),
+                onPressed: () {
+                  ref
+                      .read(analyticsServiceProvider)
+                      .logEvent(
+                        name: AnalyticsEventConstants.shopBagCleared,
+                        parameters: _bagParams(
+                          ref.read(shopBagProvider),
+                          extra: {'reason': 'checkout_return'},
+                        ),
+                      );
+                  ref.read(shopBagProvider.notifier).clear();
+                },
                 style: TextButton.styleFrom(
                   textStyle: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,

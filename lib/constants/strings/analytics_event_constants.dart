@@ -863,7 +863,9 @@ class AnalyticsEventConstants {
   /// Shop grid opened. Params: source.
   static const String shopViewed = 'shop_viewed';
 
-  /// Native product page opened. Params: product_slug, source.
+  /// Native product page opened. Params: product_slug, source, and — when the
+  /// caller already had the product (grid, Home tile, bag add-on) —
+  /// product_name, value (lowest variant price) and currency.
   static const String shopProductViewed = 'shop_product_viewed';
 
   /// "Add to bag" tapped on a product page. Params: product_slug,
@@ -874,7 +876,42 @@ class AnalyticsEventConstants {
   /// Params: items (lines), quantity (units), value, currency.
   static const String shopCheckoutStarted = 'shop_checkout_started';
 
+  /// The bag sheet opened. Without it "added but never opened the bag" was
+  /// indistinguishable from "opened the bag and left".
+  /// Params: source (where the bag button was tapped: shop_grid, product_page,
+  /// home_card), items (lines), quantity (units), value, currency.
+  static const String shopBagViewed = 'shop_bag_viewed';
+
+  /// A line was taken out of the bag (minus at quantity 1).
+  /// Params: product_slug, variant_id, quantity (units removed).
+  static const String shopBagItemRemoved = 'shop_bag_item_removed';
+
+  /// A bag line's quantity was changed with the stepper, not removed.
+  /// Params: product_slug, variant_id, from, to.
+  static const String shopBagQuantityChanged = 'shop_bag_quantity_changed';
+
+  /// The bag's "we sent you to checkout" card rendered — the user is back in
+  /// the app after a checkout trip. Fires once per time the bag is opened in
+  /// that state, so it can repeat until the bag is cleared. Hosted checkout
+  /// gives no completion signal; this and [shopBagCleared] are the proxy.
+  /// Params: items, quantity, value, currency.
+  static const String shopCheckoutReturned = 'shop_checkout_returned';
+
+  /// The bag was emptied in one go. Params: reason ('checkout_return'), items,
+  /// quantity, value, currency.
+  static const String shopBagCleared = 'shop_bag_cleared';
+
+  /// A shop screen showed its load-failure view (an impression that could never
+  /// convert). Params: surface ('grid' | 'product'), error_kind (same labels as
+  /// the donation card), product_slug on the product surface.
+  static const String shopLoadFailed = 'shop_load_failed';
+
+  /// A collection chip was tapped on the shop grid (not the one already
+  /// selected). Params: collection (slug).
+  static const String shopCollectionSelected = 'shop_collection_selected';
+
   static const String sourceHomeHeader = 'home_header';
+  static const String sourceProductPage = 'product_page';
   static const String sourceHomeCard = 'home_card';
   static const String sourceShopGrid = 'shop_grid';
   static const String sourceBagAddOn = 'bag_add_on';

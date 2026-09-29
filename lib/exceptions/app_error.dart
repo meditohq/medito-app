@@ -170,3 +170,16 @@ class InactiveEmailError extends AppError {
         'This email address is currently unable to receive messages due to email provider restrictions or delivery issues. Please try using a different email address.',
   });
 }
+
+/// Compact, low-cardinality label for a failure, for analytics params
+/// ('network_offline', 'timeout', 'server', ...).
+String analyticsErrorKind(Object err) => switch (err) {
+  NetworkConnectionError(:final kind) => 'network_${kind.name}',
+  TimeoutError() => 'timeout',
+  ServerError() => 'server',
+  UnauthorizedError() || RefreshTokenError() => 'unauthorized',
+  RateLimitError() => 'rate_limit',
+  NotFoundError() => 'not_found',
+  AppError() => 'app_error',
+  _ => 'unknown',
+};
