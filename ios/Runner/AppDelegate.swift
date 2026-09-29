@@ -167,23 +167,22 @@ extension AppDelegate: INUIAddVoiceShortcutViewControllerDelegate {
 /// has claimed the session it activates it itself; if another delegate owns
 /// it (the watch app's WatchSessionManager), it just waits for that
 /// activation and reads the state.
-final class WatchPresence: NSObject, WCSessionDelegate {
+final class WatchPresence: NSObject, WatchPresenceApi, WCSessionDelegate {
     static let shared = WatchPresence()
-    private var waiting: [FlutterResult] = []
+    private typealias Completion = (Result<WatchStatus, Error>) -> Void
+    private var waiting: [Completion] = []
 
     func register(with messenger: FlutterBinaryMessenger) {
-        let channel = FlutterMethodChannel(name: "medito.app/watch_presence", binaryMessenger: messenger)
-        channel.setMethodCallHandler { [weak self] call, result in
-            guard call.method == "getStatus" else { return result(FlutterMethodNotImplemented) }
-            self?.status(result)
-        }
+        WatchPresenceApiSetup.setUp(binaryMessenger: messenger, api: self)
     }
 
-    private func status(_ result: @escaping FlutterResult) {
-        guard WCSession.isSupported() else { return result(["paired": false, "appInstalled": false]) }
+    func getStatus(completion: @escaping (Result<WatchStatus, Error>) -> Void) {
+        guard WCSession.isSupported() else {
+            return completion(.success(WatchStatus(paired: false, appInstalled: false)))
+        }
         let session = WCSession.default
-        if session.activationState == .activated { return result(snapshot(session)) }
-        waiting.append(result)
+        if session.activationState == .activated { return completion(.success(snapshot(session))) }
+        waiting.append(completion)
         if session.delegate == nil {
             session.delegate = self
             session.activate()
@@ -193,8 +192,8 @@ final class WatchPresence: NSObject, WCSessionDelegate {
         }
     }
 
-    private func snapshot(_ session: WCSession) -> [String: Bool] {
-        ["paired": session.isPaired, "appInstalled": session.isWatchAppInstalled]
+    private func snapshot(_ session: WCSession) -> WatchStatus {
+        WatchStatus(paired: session.isPaired, appInstalled: session.isWatchAppInstalled)
     }
 
     private func flush() {
@@ -203,13 +202,10 @@ final class WatchPresence: NSObject, WCSessionDelegate {
         // rather than a false "no watch" that would skew the audience count.
         let pending = waiting
         waiting.removeAll()
-        if session.activationState == .activated {
-            let status = snapshot(session)
-            pending.forEach { $0(status) }
-        } else {
-            let err = FlutterError(code: "activation_failed", message: "WCSession not activated", details: nil)
-            pending.forEach { $0(err) }
-        }
+        let result: Result<WatchStatus, Error> = session.activationState == .activated
+            ? .success(snapshot(session))
+            : .failure(WatchPresencePigeonError(code: "activation_failed", message: "WCSession not activated", details: nil))
+        pending.forEach { $0(result) }
     }
 
     func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {

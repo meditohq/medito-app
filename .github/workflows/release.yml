@@ -123,13 +123,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         env:
@@ -564,13 +565,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-ios-app.outputs.cache-hit != 'true' && steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
@@ -964,13 +966,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         env:
