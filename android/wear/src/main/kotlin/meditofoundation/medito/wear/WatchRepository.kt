@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.json.JSONObject
+import org.json.JSONArray
 import java.io.File
 
 /**
@@ -38,6 +39,10 @@ object WatchRepository {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var appContext: Context
+    private var snapshot = JSONObject()
+    private var pending = mutableListOf<JSONObject>()
+    private val prefs get() = appContext.getSharedPreferences("watch_progress_v2", Context.MODE_PRIVATE)
+
 
     private val listener = DataClient.OnDataChangedListener { events ->
         events.filter { it.type == DataEvent.TYPE_CHANGED && it.dataItem.uri.path == CONTEXT_PATH }
@@ -47,12 +52,21 @@ object WatchRepository {
 
     fun init(context: Context) {
         appContext = context.applicationContext
+        WatchDownloads.init(appContext)
+        synchronized(this) {
+            snapshot = JSONObject(prefs.getString("context", "{}")!!)
+            val stored = JSONArray(prefs.getString("pending", "[]"))
+            pending = (0 until stored.length()).map { stored.getJSONObject(it) }.toMutableList()
+            render()
+            resendPending()
+        }
         Wearable.getDataClient(appContext).addListener(listener)
         refresh()
     }
 
     /** Reads the persisted context DataItem (from whichever phone node). */
     fun refresh() {
+        synchronized(this) { render(); resendPending() }
         scope.launch {
             val raw = runCatching {
                 val items = Wearable.getDataClient(appContext)
@@ -71,10 +85,37 @@ object WatchRepository {
         }
     }
 
+    @Synchronized
     private fun apply(raw: String?) {
         raw ?: return
-        _state.value = WatchState.parse(raw)
+        val incoming = runCatching { JSONObject(raw) }.getOrNull() ?: return
+        if (incoming.optLong("sentAt") < snapshot.optLong("sentAt")) return
+        val oldAccount = snapshot.optString("accountId")
+        if (incoming.optBoolean("signedOut") ||
+            (oldAccount.isNotEmpty() && oldAccount != incoming.optString("accountId"))) {
+            pending.clear()
+            WatchDownloads.clear()
+        }
+        WatchDownloads.setSignedOut(incoming.optBoolean("signedOut"))
+        snapshot = incoming
+        val ack = WatchProgress.recordedKeys(incoming)
+        pending.removeAll { WatchProgress.recordKey(it) in ack }
+        persist()
+        render()
+        resendPending()
     }
+
+    private fun persist() {
+        check(prefs.edit().putString("context", snapshot.toString())
+            .putString("pending", JSONArray(pending).toString()).commit())
+    }
+
+    private fun render() {
+        if (snapshot.length() == 0) { _state.value = WatchState(); return }
+        _state.value = WatchState.parse(WatchProgress.project(snapshot, pending).toString())
+    }
+
+    private fun resendPending() { pending.forEach(::send) }
 
     /**
      * Debug builds only: with no paired phone (e.g. a lone emulator), read a
@@ -88,6 +129,7 @@ object WatchRepository {
     }
 
     /** Queues a completed session for the phone. */
+    @Synchronized
     fun reportCompleted(
         trackId: String,
         fileId: String,
@@ -97,12 +139,22 @@ object WatchRepository {
     ) {
         val payload = JSONObject()
             .put("type", "sessionCompleted")
+            .put("accountId", snapshot.optString("accountId"))
             .put("trackId", trackId)
             .put("fileId", fileId)
             .put("guide", guide)
             .put("duration", durationMs)
             .put("timestamp", endedAt)
-        val request = PutDataMapRequest.create("$SESSION_PATH/$endedAt").apply {
+        payload.put("statsTimestamp", WatchProgress.recordedTimestamp(payload))
+        pending.add(payload)
+        // Persist before submitting a transfer; failed transfers retry on refresh.
+        persist()
+        render()
+        send(payload)
+    }
+
+    private fun send(payload: JSONObject) {
+        val request = PutDataMapRequest.create("$SESSION_PATH/${payload.optLong("timestamp")}").apply {
             dataMap.putString("json", payload.toString())
         }.asPutDataRequest().setUrgent()
 

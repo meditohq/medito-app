@@ -49,6 +49,7 @@ private val MeditoColors = ColorScheme(
 
 private object Routes {
     const val HOME = "home"
+    const val DOWNLOADS = "downloads"
     const val FAVORITES = "favorites"
     const val PLAYER = "player"
 }
@@ -77,9 +78,11 @@ fun MeditoWatchApp() {
                     HomeScreen(
                         state = state,
                         onPlay = play,
+                        onDownloads = { navController.navigate(Routes.DOWNLOADS) },
                         onFavorites = { navController.navigate(Routes.FAVORITES) },
                     )
                 }
+                composable(Routes.DOWNLOADS) { DownloadsScreen(onPlay = play) }
                 composable(Routes.FAVORITES) {
                     FavoritesScreen(favorites = state.favorites, onPlay = play)
                 }

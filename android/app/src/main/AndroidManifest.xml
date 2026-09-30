@@ -375,7 +375,7 @@
                 android:resource="@xml/up_next_widget_provider" />
         </receiver>
     
-        <!-- Sessions finished on the Wear OS app (WatchSyncBridge.kt). -->
+        <!-- Sessions finished on the Wear OS app and watch download statuses. -->
         <service
             android:name=".WatchDataListenerService"
             android:exported="true">
@@ -383,7 +383,7 @@
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
                 <data
                     android:host="*"
-                    android:pathPrefix="/medito/session"
+                    android:pathPrefix="/medito/"
                     android:scheme="wear" />
             </intent-filter>
         </service>

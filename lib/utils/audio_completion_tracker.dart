@@ -43,7 +43,7 @@ class AudioCompletionTracker {
     final newDuration = duration + (stats.totalTimeListened);
     final newTotalTracks = 1 + (stats.totalTracksCompleted);
 
-    var updatedTracksCompleted = stats.tracksChecked ?? [];
+    var updatedTracksCompleted = [...?stats.tracksChecked];
     if (!updatedTracksCompleted.contains(audioCompleted.id)) {
       updatedTracksCompleted.add(audioCompleted.id);
     }

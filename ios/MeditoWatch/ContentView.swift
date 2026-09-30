@@ -3,6 +3,7 @@ import SwiftUI
 enum Route: Hashable {
     case player(WatchTrack)
     case favorites
+    case downloads
 }
 
 struct ContentView: View {
@@ -15,6 +16,8 @@ struct ContentView: View {
             // the clock, full-bleed like the phone's Home hero.
             GeometryReader { geo in
                 let topInset = geo.safeAreaInsets.top
+                let shortcutCount = store.hasSynced ? (store.daily == nil ? 2 : 3) : 1
+                let shortcutWidth = (geo.size.width - 8 - CGFloat(shortcutCount - 1) * 8) / CGFloat(shortcutCount)
                 ScrollView {
                     VStack(spacing: 8) {
                         if let upNext = store.upNext {
@@ -23,6 +26,7 @@ struct ContentView: View {
                                 UpNextCard(upNext: upNext, stat: stat?.onImage(), topInset: topInset)
                             }
                             .buttonStyle(.plain)
+                            .disabled(!upNext.canPlay)
                         } else {
                             Color.clear.frame(height: topInset)
                             if let stat {
@@ -32,22 +36,29 @@ struct ContentView: View {
                             }
                         }
 
-                        if store.hasSynced {
-                            // Icon tiles, like the phone's Home shortcuts.
-                            HStack(spacing: 8) {
-                                if let daily = store.daily {
-                                    ShortcutTile(title: "Daily", image: "Sun") {
-                                        path.append(.player(daily))
-                                    }
-                                }
-                                ShortcutTile(title: "Favorites", image: "Star") {
-                                    path.append(.favorites)
-                                }
-                            }
-                            .padding(.horizontal, 4)
-                        } else {
+                        if !store.hasSynced {
                             EmptyStateRow()
                         }
+                        // Icon tiles, like the phone's Home shortcuts.
+                        HStack(spacing: 8) {
+                            if store.hasSynced {
+                                if let daily = store.daily {
+                                    ShortcutTile(title: "Daily", image: Image("Sun")) {
+                                        path.append(.player(daily))
+                                    }
+                                    .frame(width: shortcutWidth)
+                                }
+                                ShortcutTile(title: "Favorites", image: Image("Star")) {
+                                    path.append(.favorites)
+                                }
+                                .frame(width: shortcutWidth)
+                            }
+                            ShortcutTile(title: "Downloads", image: Image(systemName: "arrow.down.circle")) {
+                                path.append(.downloads)
+                            }
+                            .frame(width: shortcutWidth)
+                        }
+                        .padding(.horizontal, 4)
                     }
                     .padding(.bottom, 8)
                 }
@@ -58,11 +69,12 @@ struct ContentView: View {
                 switch route {
                 case .player(let track): PlayerScreen(track: track)
                 case .favorites: FavoritesScreen()
+                case .downloads: WatchDownloadsScreen()
                 }
             }
         }
         .tint(.white)
-        .onChange(of: store.hasSynced) { _, synced in
+        .onChange(of: store.hasSynced) { synced in
             // Signed out on the phone: leave whatever that account had open.
             if !synced { path.removeAll() }
         }
@@ -132,13 +144,13 @@ private struct StatPill: View {
 /// phone) on a tile, label below.
 private struct ShortcutTile: View {
     let title: String
-    let image: String
+    let image: Image
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 6) {
-                Image(image)
+                image
                     .resizable()
                     .scaledToFit()
                     .frame(width: 24, height: 24)
@@ -150,10 +162,11 @@ private struct ShortcutTile: View {
                 Text(title)
                     .font(.caption2)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.65)
+                    .frame(maxWidth: .infinity)
             }
         }
-        // Plain, so both tiles in the one list row are tappable separately.
+        // Each shortcut has its own full tile tap target.
         .buttonStyle(.plain)
     }
 }
@@ -207,18 +220,15 @@ private struct UpNextCard: View {
 
     private var content: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(eyebrow)
+            ScrollingTitle(eyebrow)
                 .font(.system(size: 10, weight: .semibold))
                 .tracking(0.8)
                 .foregroundStyle(.white.opacity(0.85))
-                .lineLimit(1)
 
             HStack(alignment: .center, spacing: 8) {
-                Text(upNext.track.title)
+                ScrollingTitle(upNext.track.title)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Image(systemName: "play.fill")
                     .font(.system(size: 12, weight: .bold))
@@ -280,4 +290,32 @@ private struct EmptyStateRow: View {
 
 #Preview {
     ContentView()
+}
+
+struct WatchDownloadsScreen: View {
+    @ObservedObject private var store = WatchStore.shared
+
+    var body: some View {
+        List {
+            if store.downloads.isEmpty {
+                Text("Send sessions from Downloads in the Medito iPhone app to listen offline.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            ForEach(store.downloads, id: \.fileId) { track in
+                NavigationLink(value: Route.player(track)) {
+                    VStack(alignment: .leading) {
+                        Text(track.title)
+                        Text("\(track.guide) · \(track.minutes) min · Offline")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .swipeActions {
+                    Button("Remove", role: .destructive) { store.removeDownload(track) }
+                }
+            }
+        }
+        .navigationTitle("Downloads")
+    }
 }

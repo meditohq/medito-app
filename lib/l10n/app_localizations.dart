@@ -5113,6 +5113,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'cm'**
   String get shopCentimetres;
+
+  /// No description provided for @onPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'On phone'**
+  String get onPhone;
+
+  /// No description provided for @onWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'On watch'**
+  String get onWatch;
+
+  /// No description provided for @sendToWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to watch'**
+  String get sendToWatch;
+
+  /// No description provided for @removeFromWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from watch'**
+  String get removeFromWatch;
+
+  /// No description provided for @waitingForWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for watch'**
+  String get waitingForWatch;
+
+  /// No description provided for @sendingToWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get sendingToWatch;
+
+  /// No description provided for @readyOnWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready on watch'**
+  String get readyOnWatch;
+
+  /// No description provided for @watchRemovalPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Removal pending'**
+  String get watchRemovalPending;
+
+  /// No description provided for @watchStorageFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough space on your watch. Remove some downloads and try again.'**
+  String get watchStorageFull;
+
+  /// No description provided for @watchTransferFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send this session. Try again.'**
+  String get watchTransferFailed;
+
+  /// No description provided for @emptyWatchDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Send sessions from On phone to listen offline on your watch.'**
+  String get emptyWatchDownloads;
+
+  /// No description provided for @watchStatusUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check your watch. Try again.'**
+  String get watchStatusUnavailable;
+
+  /// No description provided for @watchCopyIndependent.
+  ///
+  /// In en, this message translates to:
+  /// **'Removing a phone download keeps its watch copy.'**
+  String get watchCopyIndependent;
+
+  /// No description provided for @cancelWatchTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel transfer'**
+  String get cancelWatchTransfer;
+
+  /// No description provided for @selectSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get selectSessions;
+
+  /// No description provided for @checkingWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking watch…'**
+  String get checkingWatch;
+
+  /// No description provided for @watchSimulatorTransferUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending downloads to Apple Watch requires a real paired iPhone and watch.'**
+  String get watchSimulatorTransferUnavailable;
+
+  /// No description provided for @noWatchConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'No watch connected'**
+  String get noWatchConnected;
 }
 
 class _AppLocalizationsDelegate

@@ -60,14 +60,11 @@ final watchSyncProvider = Provider.autoDispose<void>((ref) {
   ref.listen(streakCircleDisplayProvider, (_, _) => sync.schedule());
   ref.listen(zenModeProvider, (_, _) => sync.schedule());
 
-  sync.drainPendingSessions();
+  unawaited(ref.read(watchCompletionSyncProvider).drainPendingSessions());
 });
 
 class _WatchSync {
   _WatchSync(this._ref, this._prefs) {
-    _channel.setMethodCallHandler((call) async {
-      if (call.method == 'sessionsAvailable') await drainPendingSessions();
-    });
     // Your Daily changes at midnight with nothing else changing, so re-check
     // whenever the app comes back to the foreground.
     _lifecycle = AppLifecycleListener(onResume: schedule);
@@ -88,7 +85,6 @@ class _WatchSync {
   final _resolved = <String, Map<String, Object>>{};
   Timer? _timer;
   String? _lastSignature;
-  bool _draining = false;
 
   void schedule() {
     _timer?.cancel();
@@ -99,11 +95,14 @@ class _WatchSync {
     _disposed = true;
     _timer?.cancel();
     _lifecycle.dispose();
-    _channel.setMethodCallHandler(null);
     if (signedOut) {
       _prefs.remove(_persistedKey).ignore();
       _channel
-          .invokeMethod('updateContext', {'v': 1, 'signedOut': true})
+          .invokeMethod('updateContext', {
+            'v': 2,
+            'signedOut': true,
+            'sentAt': DateTime.now().millisecondsSinceEpoch,
+          })
           .catchError((Object e) {
             AppLogger.w('WATCH', 'Failed to clear watch on sign-out: $e');
             return null;
@@ -114,22 +113,57 @@ class _WatchSync {
 
   Future<void> _push() async {
     try {
+      final snapshotAt = DateTime.now().millisecondsSinceEpoch;
       final upNext = _ref.read(upNextProvider).value;
       final favorites = _ref.read(favoritesNotifierProvider).value ?? [];
       final stats = _ref.read(statsProvider).value;
 
-      final context = <String, Object>{'v': 1};
+      final manager = _ref.read(statsManagerProvider);
+      final context = <String, Object>{
+        'v': 2,
+        'accountId': _prefs.getString(SharedPreferenceConstants.userId) ?? '',
+        // Compress the acknowledgement history: years of track IDs otherwise
+        // exceed WatchConnectivity's small application-context payload budget.
+        'recordedSessionsGzip': base64Encode(
+          gzip.encode(
+            utf8.encode(
+              jsonEncode([
+                for (final entry
+                    in stats?.audioCompleted ?? <LocalAudioCompleted>[])
+                  '${entry.id}|${entry.timestamp}',
+              ]),
+            ),
+          ),
+        ),
+        'freezeTimestamps': stats?.freezeUsageDates ?? <int>[],
+        'dayBoundaryOffsetMs': manager.dayBoundaryOffset.inMilliseconds,
+      };
 
       final next = upNext?.nextSession;
       if (upNext != null && next != null) {
         final track = await _resolve(next.id);
         if (track != null) {
+          final items = upNext.pack.items;
+          final remaining = items.where((item) => item.isCompleted != true);
+          final resolved = <Map<String, Object>>[];
+          // A bounded look-ahead lets the watch advance without the phone.
+          for (final item in remaining.take(10)) {
+            final entry = await _resolve(item.id);
+            if (entry == null) break;
+            resolved.add(entry);
+          }
           context['upNext'] = {
             ...track,
             'packTitle': upNext.pack.title,
             'coverUrl': _watchCoverUrl(upNext.pack.coverUrl),
             'completed': upNext.completedCount,
             'total': upNext.totalCount,
+            'packTrackIds': items.map((item) => item.id).toList(),
+            'completedTrackIds': items
+                .where((item) => item.isCompleted == true)
+                .map((item) => item.id)
+                .toList(),
+            'remainingTracks': resolved,
           };
         }
       }
@@ -159,6 +193,11 @@ class _WatchSync {
         );
       }
 
+      // Do not publish an old stats snapshot after asynchronous resolution.
+      if (!identical(stats, _ref.read(statsProvider).value)) {
+        schedule();
+        return;
+      }
       final signature = jsonEncode(context);
       // Signed out while resolving: don't re-fill the watch that dispose()
       // just cleared.
@@ -169,7 +208,7 @@ class _WatchSync {
       final delivered =
           await _channel.invokeMethod<bool>('updateContext', {
             ...context,
-            'sentAt': DateTime.now().millisecondsSinceEpoch,
+            'sentAt': snapshotAt,
           }) ??
           false;
       // Only remember what actually reached the watch, so a later push
@@ -293,28 +332,99 @@ class _WatchSync {
     }
     _prefs.setString(_persistedKey, jsonEncode(all)).ignore();
   }
+}
+
+/// Completion ingestion lives for the app's ProviderScope, independent of Home
+/// or the end screen. Rendering and context resolution stay in watchSyncProvider.
+final watchCompletionSyncProvider = Provider<WatchCompletionSync>((ref) {
+  final sync = WatchCompletionSync(ref, ref.read(sharedPreferencesProvider));
+  ref.onDispose(sync.dispose);
+  if (Platform.isIOS || Platform.isAndroid) sync.start();
+  return sync;
+});
+
+class WatchCompletionSync {
+  WatchCompletionSync(this._ref, this._prefs);
+  static const _channel = MethodChannel('medito.app/watch');
+  final Ref _ref;
+  final SharedPreferences _prefs;
+  AppLifecycleListener? _lifecycle;
+  bool _disposed = false;
+  bool _draining = false;
+  bool _drainAgain = false;
+
+  void start() {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'sessionsAvailable') await drainPendingSessions();
+    });
+    _lifecycle = AppLifecycleListener(
+      onResume: () {
+        unawaited(drainPendingSessions());
+      },
+    );
+    unawaited(drainPendingSessions());
+  }
+
+  void dispose() {
+    _disposed = true;
+    _lifecycle?.dispose();
+    _channel.setMethodCallHandler(null);
+  }
 
   /// Records sessions the watch finished. They are queued natively (the watch
   /// can deliver while Flutter isn't running) and drained here.
   Future<void> drainPendingSessions() async {
-    if (_draining) return;
+    if (_disposed ||
+        !(_prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false)) {
+      return;
+    }
+    if (_draining) {
+      _drainAgain = true;
+      return;
+    }
     _draining = true;
+    var savedAny = false;
     try {
       final pending =
           await _channel.invokeListMethod<Map>('takePendingSessions') ?? [];
       if (pending.isEmpty) return;
 
       final statsManager = _ref.read(statsManagerProvider);
+      final accepted = <Map>[];
       for (final session in pending) {
         final trackId = session['trackId'] as String?;
         final timestamp = session['timestamp'] as int?;
         final duration = session['duration'] as int? ?? 0;
+        if (_disposed ||
+            !(_prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false)) {
+          return;
+        }
         if (trackId == null || timestamp == null) continue;
+        final account = session['accountId'] as String?;
+        if (account != null &&
+            account.isNotEmpty &&
+            account != _prefs.getString(SharedPreferenceConstants.userId)) {
+          await _channel.invokeMethod('acknowledgeSessions', {
+            'keys': ['$trackId|$timestamp'],
+          });
+          continue;
+        }
 
         await statsManager.addAudioCompleted(
-          LocalAudioCompleted(id: trackId, timestamp: timestamp),
+          LocalAudioCompleted(
+            id: trackId,
+            timestamp: session['statsTimestamp'] as int? ?? timestamp,
+          ),
           duration,
+          skipPost: true,
+          deduplicate: true,
+          timestampIsNormalized: session['statsTimestamp'] is int,
         );
+        savedAny = true;
+        accepted.add(session);
+        await _channel.invokeMethod('acknowledgeSessions', {
+          'keys': ['$trackId|$timestamp'],
+        });
         unawaited(
           FirebaseAnalyticsService().logEvent(
             name: AnalyticsEventConstants.watchSessionCompleted,
@@ -330,10 +440,16 @@ class _WatchSync {
         AppLogger.d('WATCH', 'Recorded watch session $trackId');
       }
       await _ref.read(statsProvider.notifier).refreshFromLocal();
+      // Recording and acknowledgement depend on the local save, not network.
+      unawaited(
+        statsManager.flushPendingPost().catchError((Object e) {
+          AppLogger.w('WATCH', 'Watch stats upload deferred: $e');
+        }),
+      );
 
       // As after a phone session: move the Daily reminder series on from the
       // latest session so today's reminder doesn't nag after a watch session.
-      final latest = pending
+      final latest = accepted
           .where((p) => p['trackId'] != null && p['timestamp'] is int)
           .fold<Map?>(
             null,
@@ -350,7 +466,7 @@ class _WatchSync {
       }
 
       // Last, as on the phone: this can show the Health permission sheet.
-      for (final session in pending) {
+      for (final session in accepted) {
         final timestamp = session['timestamp'] as int?;
         if (session['trackId'] == null || timestamp == null) continue;
         await syncSessionToHealth({
@@ -364,6 +480,14 @@ class _WatchSync {
       AppLogger.e('WATCH', 'Failed to record watch sessions', e, st);
     } finally {
       _draining = false;
+      if (!_disposed && savedAny) {
+        // Earlier entries may have saved even when a later one failed.
+        await _ref.read(statsProvider.notifier).refreshFromLocal();
+      }
+      if (!_disposed && _drainAgain) {
+        _drainAgain = false;
+        unawaited(drainPendingSessions());
+      }
     }
   }
 }

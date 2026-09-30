@@ -1,5 +1,6 @@
 package meditofoundation.medito.wear
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -82,7 +83,9 @@ fun FavoritesScreen(favorites: List<WatchTrack>, onPlay: (WatchTrack) -> Unit) {
                         label = {
                             Text(
                                 track.packTitle.ifEmpty { track.title },
-                                maxLines = 2,
+                                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
+                                softWrap = false,
+                                maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         },
@@ -90,6 +93,8 @@ fun FavoritesScreen(favorites: List<WatchTrack>, onPlay: (WatchTrack) -> Unit) {
                             Text(
                                 if (track.packTitle.isEmpty()) "${track.minutes} min"
                                 else "${track.title} · ${track.minutes} min",
+                                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
+                                softWrap = false,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )

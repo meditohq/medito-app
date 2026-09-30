@@ -2782,4 +2782,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopCentimetres => 'cm';
+
+  @override
+  String get onPhone => 'On phone';
+
+  @override
+  String get onWatch => 'On watch';
+
+  @override
+  String get sendToWatch => 'Send to watch';
+
+  @override
+  String get removeFromWatch => 'Remove from watch';
+
+  @override
+  String get waitingForWatch => 'Waiting for watch';
+
+  @override
+  String get sendingToWatch => 'Sending…';
+
+  @override
+  String get readyOnWatch => 'Ready on watch';
+
+  @override
+  String get watchRemovalPending => 'Removal pending';
+
+  @override
+  String get watchStorageFull =>
+      'Not enough space on your watch. Remove some downloads and try again.';
+
+  @override
+  String get watchTransferFailed => 'Could not send this session. Try again.';
+
+  @override
+  String get emptyWatchDownloads =>
+      'Send sessions from On phone to listen offline on your watch.';
+
+  @override
+  String get watchStatusUnavailable => 'Could not check your watch. Try again.';
+
+  @override
+  String get watchCopyIndependent =>
+      'Removing a phone download keeps its watch copy.';
+
+  @override
+  String get cancelWatchTransfer => 'Cancel transfer';
+
+  @override
+  String get selectSessions => 'Select';
+
+  @override
+  String get checkingWatch => 'Checking watch…';
+
+  @override
+  String get watchSimulatorTransferUnavailable =>
+      'Sending downloads to Apple Watch requires a real paired iPhone and watch.';
+
+  @override
+  String get noWatchConnected => 'No watch connected';
 }

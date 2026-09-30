@@ -2,6 +2,7 @@ package meditofoundation.medito.wear
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +52,7 @@ fun HomeScreen(
     state: WatchState,
     onPlay: (WatchTrack) -> Unit,
     onFavorites: () -> Unit,
+    onDownloads: () -> Unit,
 ) {
     val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
     val stat = statKind(state)
@@ -93,6 +95,13 @@ fun HomeScreen(
                 }
             } else {
                 item { EmptyState() }
+            }
+            item {
+                androidx.wear.compose.material3.Button(
+                    onClick = onDownloads,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    label = { Text("Downloads") },
+                )
             }
         }
     }
@@ -166,7 +175,7 @@ private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
             .fillMaxWidth()
             .height(height)
             .background(Color.White.copy(alpha = 0.1f))
-            .clickable(onClick = onPlay),
+            .clickable(enabled = upNext.canPlay, onClick = onPlay),
     ) {
         AsyncImage(
             model = upNext.coverUrl,
@@ -200,6 +209,8 @@ private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
         ) {
             Text(
                 eyebrow,
+                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
+                softWrap = false,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = 0.8.sp,
@@ -215,7 +226,8 @@ private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
                     color = Color.White,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).basicMarquee(iterations = Int.MAX_VALUE),
+                    softWrap = false,
                 )
                 Spacer(Modifier.width(8.dp))
                 Box(

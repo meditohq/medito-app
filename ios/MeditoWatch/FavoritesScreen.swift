@@ -74,12 +74,10 @@ private struct FavoriteRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             // A pack shows its name; the line below is the session it plays.
-            Text(track.packTitle.isEmpty ? track.title : track.packTitle)
-                .lineLimit(2)
-            Text(detail)
+            ScrollingTitle(track.packTitle.isEmpty ? track.title : track.packTitle)
+            ScrollingTitle(detail)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
-                .lineLimit(1)
         }
     }
 

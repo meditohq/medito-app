@@ -28,7 +28,9 @@ final class WatchPlayer: ObservableObject {
     var remaining: Double { max(duration - elapsed, 0) }
 
     func start() async {
-        guard phase == .idle, let url = URL(string: track.audioUrl) else { return }
+        guard phase == .idle,
+              let url = WatchStore.shared.localURL(track) ?? URL(string: track.audioUrl)
+        else { return }
         phase = .connecting
 
         let session = AVAudioSession.sharedInstance()

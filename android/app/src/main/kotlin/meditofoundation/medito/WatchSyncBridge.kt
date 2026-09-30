@@ -43,10 +43,19 @@ object WatchSyncBridge {
 
     fun register(messenger: BinaryMessenger, context: Context) {
         val appContext = context.applicationContext
+        WatchDownloadBridge.register(messenger, appContext)
         channel = MethodChannel(messenger, "medito.app/watch").apply {
             setMethodCallHandler { call, result ->
                 when (call.method) {
+                    "downloadsGet" -> WatchDownloadBridge.snapshot(appContext, result)
+                    "downloadsSend" -> WatchDownloadBridge.send(appContext, call.arguments as? Map<*, *> ?: emptyMap<Any, Any>(), result)
+                    "downloadsRemove" -> WatchDownloadBridge.remove(appContext, call.arguments as? Map<*, *> ?: emptyMap<Any, Any>(), result)
                     "updateContext" -> updateContext(appContext, call.arguments as? Map<*, *>, result)
+                    "acknowledgeSessions" -> {
+                        val args = call.arguments as? Map<*, *>
+                        acknowledgeSessions(appContext, args?.get("keys") as? List<*> ?: emptyList<Any>())
+                        result.success(true)
+                    }
                     "takePendingSessions" -> result.success(takePendingSessions(appContext))
                     else -> result.notImplemented()
                 }
@@ -56,6 +65,7 @@ object WatchSyncBridge {
 
     private fun updateContext(context: Context, payload: Map<*, *>?, result: MethodChannel.Result) {
         if (payload == null) return result.success(false)
+        WatchDownloadBridge.setSignedOut(context, payload["signedOut"] == true)
         try {
             val request = PutDataMapRequest.create(CONTEXT_PATH).apply {
                 dataMap.putString("json", JSONObject(payload).toString())
@@ -74,14 +84,26 @@ object WatchSyncBridge {
         }
     }
 
+    @Synchronized
     private fun takePendingSessions(context: Context): List<Map<String, Any?>> {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val pending = JSONArray(prefs.getString(PENDING_KEY, "[]"))
-        prefs.edit().remove(PENDING_KEY).apply()
         return (0 until pending.length()).map { i ->
             val obj = pending.getJSONObject(i)
             obj.keys().asSequence().associateWith { obj.get(it) }
         }
+    }
+
+    @Synchronized
+    private fun acknowledgeSessions(context: Context, keys: List<*>) {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val pending = JSONArray(prefs.getString(PENDING_KEY, "[]"))
+        val remaining = JSONArray()
+        for (i in 0 until pending.length()) {
+            val item = pending.getJSONObject(i)
+            if ("${item.optString("trackId")}|${item.optLong("timestamp")}" !in keys) remaining.put(item)
+        }
+        check(prefs.edit().putString(PENDING_KEY, remaining.toString()).commit())
     }
 
     /** Called from [WatchDataListenerService] for each finished session. */
@@ -94,14 +116,20 @@ object WatchSyncBridge {
         // Remember recent sessions so a redelivered item isn't recorded twice.
         val key = "${session.optString("trackId")}|${session.optLong("timestamp")}"
         val seen = JSONArray(prefs.getString(SEEN_KEY, "[]"))
-        if ((0 until seen.length()).any { seen.getString(it) == key }) return
+        val queued = JSONArray(prefs.getString(PENDING_KEY, "[]"))
+        if ((0 until seen.length()).any { seen.getString(it) == key } ||
+            (0 until queued.length()).any {
+                val item = queued.getJSONObject(it)
+                "${item.optString("trackId")}|${item.optLong("timestamp")}" == key
+            }) return
         seen.put(key)
         val trimmed = JSONArray((maxOf(0, seen.length() - 50) until seen.length()).map { seen.getString(it) })
         val pending = JSONArray(prefs.getString(PENDING_KEY, "[]")).put(session)
         prefs.edit()
             .putString(SEEN_KEY, trimmed.toString())
             .putString(PENDING_KEY, pending.toString())
-            .apply()
+            .commit()
+            .also { check(it) { "Could not persist watch completion" } }
 
         main.post { channel?.invokeMethod("sessionsAvailable", null) }
     }
@@ -114,6 +142,14 @@ object WatchSyncBridge {
 class WatchDataListenerService : WearableListenerService() {
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         val client = Wearable.getDataClient(this)
+        dataEvents.filter {
+            it.type == DataEvent.TYPE_CHANGED &&
+                it.dataItem.uri.path?.startsWith(WatchDownloadBridge.STATUS) == true
+        }.forEach { event ->
+            DataMapItem.fromDataItem(event.dataItem).dataMap.getString("json")?.let {
+                WatchDownloadBridge.receive(this, it)
+            }
+        }
         dataEvents.filter {
             it.type == DataEvent.TYPE_CHANGED &&
                 it.dataItem.uri.path?.startsWith(WatchSyncBridge.SESSION_PREFIX) == true

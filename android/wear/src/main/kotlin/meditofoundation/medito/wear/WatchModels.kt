@@ -50,6 +50,7 @@ data class UpNext(
     val coverUrl: String,
     val completed: Int,
     val total: Int,
+    val canPlay: Boolean = true,
 )
 
 /** What the phone last sent. `synced` is false until anything has arrived. */
@@ -80,6 +81,7 @@ data class WatchState(
                         coverUrl = dict.optString("coverUrl"),
                         completed = dict.optInt("completed"),
                         total = dict.optInt("total"),
+                        canPlay = dict.optBoolean("canPlay", true),
                     )
                 }
             }

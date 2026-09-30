@@ -5,6 +5,7 @@ import android.content.Context
 import android.media.AudioManager
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -155,6 +156,8 @@ fun PlayerScreen(track: WatchTrack, onDone: () -> Unit) {
         ) {
             Text(
                 track.title,
+                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
+                softWrap = false,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,

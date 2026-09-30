@@ -2818,4 +2818,64 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get shopCentimetres => 'cm';
+
+  @override
+  String get onPhone => 'En el teléfono';
+
+  @override
+  String get onWatch => 'En el reloj';
+
+  @override
+  String get sendToWatch => 'Enviar al reloj';
+
+  @override
+  String get removeFromWatch => 'Eliminar del reloj';
+
+  @override
+  String get waitingForWatch => 'Esperando al reloj';
+
+  @override
+  String get sendingToWatch => 'Enviando…';
+
+  @override
+  String get readyOnWatch => 'Disponible en el reloj';
+
+  @override
+  String get watchRemovalPending => 'Eliminación pendiente';
+
+  @override
+  String get watchStorageFull =>
+      'No hay suficiente espacio en tu reloj. Elimina algunas descargas e inténtalo de nuevo.';
+
+  @override
+  String get watchTransferFailed =>
+      'No se pudo enviar esta sesión. Inténtalo de nuevo.';
+
+  @override
+  String get emptyWatchDownloads =>
+      'Envía sesiones desde En el teléfono para escuchar sin conexión en tu reloj.';
+
+  @override
+  String get watchStatusUnavailable =>
+      'No se pudo comprobar tu reloj. Inténtalo de nuevo.';
+
+  @override
+  String get watchCopyIndependent =>
+      'Eliminar una descarga del teléfono conserva su copia en el reloj.';
+
+  @override
+  String get cancelWatchTransfer => 'Cancelar envío';
+
+  @override
+  String get selectSessions => 'Seleccionar';
+
+  @override
+  String get checkingWatch => 'Comprobando el reloj…';
+
+  @override
+  String get watchSimulatorTransferUnavailable =>
+      'Para enviar descargas al Apple Watch necesitas un iPhone y un reloj reales enlazados.';
+
+  @override
+  String get noWatchConnected => 'No hay ningún reloj conectado';
 }

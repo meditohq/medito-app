@@ -17,6 +17,9 @@ class DownloadListItemWidget extends StatelessWidget {
     required this.subtitle,
     required this.coverUrl,
     required this.index,
+    this.trailing,
+    this.status,
+    this.showReorder = true,
   });
 
   final String title;
@@ -25,6 +28,9 @@ class DownloadListItemWidget extends StatelessWidget {
 
   /// Position in the reorderable list, for the drag handle.
   final int index;
+  final Widget? trailing;
+  final Widget? status;
+  final bool showReorder;
 
   @override
   Widget build(BuildContext context) {
@@ -58,29 +64,32 @@ class DownloadListItemWidget extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(subtitle, style: textTheme.titleMedium),
                 ],
+                ?status,
               ],
             ),
           ),
+          ?trailing,
           // Explicit handle: the default long-press-to-drag on phones gave no
           // hint that the list could be reordered at all.
-          ReorderableDragStartListener(
-            index: index,
-            child: Semantics(
-              label: AppLocalizations.of(context)!.reorder,
-              child: SizedBox(
-                width: 48,
-                height: 48,
-                child: Center(
-                  child: MeditoIcon(
-                    assetName: MeditoIcons.dragHandle,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+          if (showReorder)
+            ReorderableDragStartListener(
+              index: index,
+              child: Semantics(
+                label: AppLocalizations.of(context)!.reorder,
+                child: SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: Center(
+                    child: MeditoIcon(
+                      assetName: MeditoIcons.dragHandle,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

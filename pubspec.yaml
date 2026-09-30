@@ -93,6 +93,7 @@ dev_dependencies:
   mocktail: ^1.0.5
   mockito: ^5.6.4
   plugin_platform_interface: any
+  shared_preferences_platform_interface: any
   pigeon: ^26.3.2
   riverpod_generator: ^4.0.3
   integration_test:

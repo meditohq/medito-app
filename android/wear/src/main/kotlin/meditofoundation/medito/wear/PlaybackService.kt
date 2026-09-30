@@ -88,7 +88,7 @@ class PlaybackService : MediaSessionService() {
             .setMediaId(track.id)
             .setRequestMetadata(
                 MediaItem.RequestMetadata.Builder()
-                    .setMediaUri(android.net.Uri.parse(track.audioUrl))
+                    .setMediaUri(WatchDownloads.localUri(track) ?: android.net.Uri.parse(track.audioUrl))
                     .build()
             )
             .setMediaMetadata(
