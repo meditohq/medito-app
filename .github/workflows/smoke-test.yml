@@ -167,6 +167,10 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
