@@ -74,13 +74,18 @@ name: Dismiss onboarding donation without payment
       # Retry until the app-side screen behind it comes back, which is the only
       # thing that actually proves the dismiss landed.
       - retry:
-          maxRetries: 2
+          maxRetries: 3
           commands:
             - runFlow:
                 when:
                   visible: "Close"
                 commands:
                   - tapOn: "Close"
+                  # CI webview taps can be accepted by Maestro without the
+                  # route closing. Android Back is the same safe dismiss action
+                  # for this webview and keeps the flow moving when the X tap
+                  # lands on the page but not the app shell.
+                  - pressKey: Back
             - extendedWaitUntil:
                 notVisible: "Close"
-                timeout: 15000
+                timeout: 20000

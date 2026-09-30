@@ -572,7 +572,7 @@ jobs:
     # startup timeout on a cold CI simulator ("iOS driver not ready in time",
     # run 36309254158), failing the job before any flow runs.
     env:
-      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 300000
 
     steps:
       - uses: actions/checkout@v4
@@ -839,7 +839,7 @@ jobs:
     # startup timeout on a cold CI simulator ("iOS driver not ready in time",
     # run 36309254158), failing the job before any flow runs.
     env:
-      MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 300000
     # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
     # there's no baseline yet, or to avoid blocking ship on a flaky test.
     continue-on-error: true
