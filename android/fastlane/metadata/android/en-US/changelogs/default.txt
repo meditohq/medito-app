@@ -1,0 +1,1 @@
+Apple Watch and Wear OS sessions now update progress and streaks without needing to open the phone app. Downloads can be sent to your watch again for offline listening, and long watch titles now scroll instead of staying cut off.

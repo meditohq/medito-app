@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2609.30.0
+- Apple Watch and Wear OS sessions now update progress and streaks without needing to open the phone app.
+- Watch progress now catches up safely after reconnecting to your phone.
+- Downloads can be sent to your watch again for offline listening.
+- Long session titles on watch now scroll instead of staying cut off.
+
 2609.28.0
 - New Apple Watch app: continue your pack, or play your Daily or a favourite, right from your wrist (with headphones). Sessions count towards your stats and streak.
 - Refreshed look for the home screen widgets

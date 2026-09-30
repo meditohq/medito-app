@@ -7,6 +7,10 @@ on:
         description: 'Android – Internal track'
         type: boolean
         default: false
+      android_beta:
+        description: 'Android – Open testing track'
+        type: boolean
+        default: false
       android_production:
         description: 'Android – Production track'
         type: boolean
@@ -72,7 +76,7 @@ jobs:
     name: Android – Build
     runs-on: ubuntu-latest
     environment: prod
-    if: github.event_name != 'workflow_dispatch' || inputs.android_internal || inputs.android_production
+    if: github.event_name != 'workflow_dispatch' || inputs.android_internal || inputs.android_beta || inputs.android_production
 
     steps:
       - uses: actions/checkout@v4
@@ -510,11 +514,20 @@ jobs:
                 track:"internal" \
                 promote_to:"production" \
                 submit_review:"${{ inputs.submit_for_review }}"
+            elif [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_beta }}" = "true" ]; then
+              bundle exec fastlane android upload_apk \
+                apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+                track:"internal" \
+                promote_to:"beta"
             elif [ "${{ inputs.android_production }}" = "true" ]; then
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
                 track:"production" \
                 submit_review:"${{ inputs.submit_for_review }}"
+            elif [ "${{ inputs.android_beta }}" = "true" ]; then
+              bundle exec fastlane android upload_apk \
+                apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
+                track:"beta"
             elif [ "${{ inputs.android_internal }}" = "true" ]; then
               bundle exec fastlane android upload_apk \
                 apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
@@ -536,9 +549,15 @@ jobs:
             bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
               track:"wear:internal" promote_to:"wear:production" \
               submit_review:"${{ inputs.submit_for_review }}"
+          elif [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_beta }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:internal" promote_to:"wear:beta"
           elif [ "${{ inputs.android_production }}" = "true" ]; then
             bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
               track:"wear:production" submit_review:"${{ inputs.submit_for_review }}"
+          elif [ "${{ inputs.android_beta }}" = "true" ]; then
+            bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
+              track:"wear:beta"
           elif [ "${{ inputs.android_internal }}" = "true" ]; then
             bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
               track:"wear:internal"
