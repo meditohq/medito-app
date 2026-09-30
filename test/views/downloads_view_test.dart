@@ -3,6 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/constants/theme/app_theme.dart';
+import 'package:medito/views/downloads/widgets/download_list_item.dart';
 import 'package:medito/models/track/track.dart';
 import 'package:medito/repositories/downloader/downloader_repository.dart';
 import 'package:medito/repositories/track/track_repository.dart';
@@ -69,6 +71,66 @@ Future<void> _settle(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('download cards fit a narrow screen with larger text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Builder(
+            builder: (context) => Theme(
+              data: appTheme(context, mode),
+              child: MediaQuery(
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: const TextScaler.linear(1.6)),
+                child: Scaffold(
+                  body: ReorderableListView(
+                    padding: const EdgeInsets.all(20),
+                    onReorderItem: (_, _) {},
+                    children: const [
+                      DownloadListItemWidget(
+                        key: ValueKey('long-track'),
+                        title: 'A longer meditation title for a quiet evening',
+                        subtitle: 'A guide with a longer name · 20 minutes',
+                        coverUrl: '',
+                        index: 0,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await _settle(tester);
+      expect(tester.takeException(), isNull);
+    }
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(width: 280, child: DownloadListShimmer()),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+
   late _FakeTrackRepository tracks;
   late _FakeDownloaderRepository files;
 
