@@ -160,40 +160,37 @@ name: Sign in to the prod test account from a fresh install and reach Home
 
       # B ends with the donation ask; A goes straight to Home. Home can carry
       # an announcement with a "Donate now" button, so only treat ".*Donate.*"
-      # as the onboarding ask while the stats circle is not on screen.
-      - extendedWaitUntil:
-          visible: "See how to help|.*Donate.*|.*day streak.*|Consistency Score: .*|Dismiss"
-          timeout: 60000
+      # as the onboarding ask while the stats circle is not on screen. On
+      # Android CI the post-onboarding transition can leave Maestro waiting
+      # until the emulator disappears, so relaunch after the final onboarding
+      # tap and verify the persisted signed-in Home state instead.
       - runFlow:
           when:
             platform: Android
-            visible: "See how to help|.*Donate.*"
-            notVisible: ".*day streak.*|Consistency Score: .*"
           commands:
-            # The signed-in stats smoke only needs to reach Home. Opening the
-            # hosted donation webview a second time on Android CI has made the
-            # emulator disappear, so back out of this optional ask instead.
-            - pressKey: Back
+            - launchApp
+            - extendedWaitUntil:
+                visible: ".*day streak.*|Consistency Score: .*|Dismiss|See how to help|.*Donate.*"
+                timeout: 60000
             - runFlow:
                 when:
-                  visible: "Get started|Maybe later"
+                  visible: "See how to help|.*Donate.*"
+                  notVisible: ".*day streak.*|Consistency Score: .*"
                 commands:
-                  - tapOn:
-                      text: "Get started|Maybe later"
-                      optional: true
-            - runFlow:
-                when:
-                  visible: "Dismiss"
-                commands:
-                  - tapOn:
-                      text: "Dismiss"
-                      optional: true
+                  - pressKey: Back
+                  - launchApp
       - runFlow:
           when:
             platform: iOS
-            visible: "See how to help|.*Donate.*"
-            notVisible: ".*day streak.*|Consistency Score: .*"
-          file: dismiss_onboarding_donation.yaml
+          commands:
+            - extendedWaitUntil:
+                visible: "See how to help|.*Donate.*|.*day streak.*|Consistency Score: .*|Dismiss"
+                timeout: 60000
+            - runFlow:
+                when:
+                  visible: "See how to help|.*Donate.*"
+                  notVisible: ".*day streak.*|Consistency Score: .*"
+                file: dismiss_onboarding_donation.yaml
 
 # Home announcement card (e.g. a fundraising note), if one is live.
 - runFlow:
