@@ -81,10 +81,14 @@ name: Dismiss onboarding donation without payment
                   visible: "Close"
                 commands:
                   - tapOn: "Close"
+            - runFlow:
+                when:
+                  visible: "Close"
+                commands:
                   # CI webview taps can be accepted by Maestro without the
                   # route closing. Android Back is the same safe dismiss action
-                  # for this webview and keeps the flow moving when the X tap
-                  # lands on the page but not the app shell.
+                  # for this webview, but only use it after the X tap failed;
+                  # pressing Back after a successful close returns to launcher.
                   - pressKey: Back
             - extendedWaitUntil:
                 notVisible: "Close"
