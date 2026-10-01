@@ -65,14 +65,10 @@ name: Dismiss onboarding donation without payment
           timeout: 90000
       - takeScreenshot: paywall-webview
 
-      # One tap is not enough: "Close is visible" is an accessibility-tree
-      # check, and the glyph sits in the tree from page load while it is still
-      # opacity:0 / pointer-events:none for its first 5s, so the wait above can
-      # clear while the tap is still a no-op. That cost two release runs
-      # (32850168903, 33071182758) on the same silent miss -- the webview was
-      # still open afterwards with the X exactly where the tree said it was.
-      # Retry until the app-side screen behind it comes back, which is the only
-      # thing that actually proves the dismiss landed.
+      # The page can expose a "Close" accessibility node before the close
+      # affordance is actually visible or tappable. Drive the Android-native
+      # webview dismissal instead: Back closes the route while the webview is
+      # open, and retry until the Close node is gone.
       - retry:
           maxRetries: 3
           commands:
@@ -80,15 +76,6 @@ name: Dismiss onboarding donation without payment
                 when:
                   visible: "Close"
                 commands:
-                  - tapOn: "Close"
-            - runFlow:
-                when:
-                  visible: "Close"
-                commands:
-                  # CI webview taps can be accepted by Maestro without the
-                  # route closing. Android Back is the same safe dismiss action
-                  # for this webview, but only use it after the X tap failed;
-                  # pressing Back after a successful close returns to launcher.
                   - pressKey: Back
             - extendedWaitUntil:
                 notVisible: "Close"
