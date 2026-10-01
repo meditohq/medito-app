@@ -19,6 +19,10 @@ on:
         description: 'Also ship the Wear OS app to the matching Wear track(s) (wear:qa / wear:production). Needs the Wear OS form factor enabled in Play Console.'
         type: boolean
         default: false
+      wear_only:
+        description: 'Only upload the Wear OS APK; skip the phone Play upload. Useful after the phone APK was already uploaded.'
+        type: boolean
+        default: false
       ios_testflight:
         description: 'iOS – TestFlight'
         type: boolean
@@ -502,7 +506,9 @@ jobs:
         env:
           PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
         run: |
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+          if [ "${{ inputs.wear_only }}" = "true" ]; then
+            echo "Skipping phone Play upload because wear_only=true"
+          elif [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             bundle exec fastlane android upload_apk \
               apk_path:"../build/app/outputs/apk/prod/release/app-prod-release.apk" \
               track:"production"
