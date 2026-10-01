@@ -8,9 +8,9 @@ name: Read "Total Tracks Completed" from the stats screen into output[STATS_KEY]
 # The Home streak circle opens stats. Its label is "N day streak", or
 # "Consistency Score: N%" when the user switched the circle over.
 - extendedWaitUntil:
-    visible: "(?s).*day streak.*|Consistency Score: .*"
+    visible: ".*day streak.*|Consistency Score: .*"
     timeout: 30000
-- tapOn: "(?s).*day streak.*|Consistency Score: .*"
+- tapOn: ".*day streak.*|Consistency Score: .*"
 
 # Each stat row merges value and label into one node, "12\nTotal Tracks
 # Completed", so the regex needs (?s) to span the newline.
@@ -25,5 +25,5 @@ name: Read "Total Tracks Completed" from the stats screen into output[STATS_KEY]
 
 - tapOn: "Go Back"
 - extendedWaitUntil:
-    visible: "(?s).*day streak.*|Consistency Score: .*"
+    visible: ".*day streak.*|Consistency Score: .*"
     timeout: 15000

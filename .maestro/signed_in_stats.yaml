@@ -50,7 +50,7 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
 - repeat:
     times: 60
     while:
-      notVisible: "(?s).*day streak.*"
+      notVisible: ".*day streak.*"
     commands:
       - tapOn:
           text: "Skip forward 10 seconds"
@@ -59,7 +59,7 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
 - runFlow: dismiss_end_screen_reminder.yaml
 
 - extendedWaitUntil:
-    visible: "(?s).*day streak.*"
+    visible: ".*day streak.*"
     timeout: 30000
 - takeScreenshot: signed-in-end-screen
 
@@ -67,7 +67,7 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
 # before clearState throws the app away: this wait is expected to time out
 # (the end screen stays up), and optional turns that into a plain pause.
 - extendedWaitUntil:
-    notVisible: "(?s).*day streak.*"
+    notVisible: ".*day streak.*"
     timeout: 8000
     optional: true
 

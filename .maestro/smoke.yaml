@@ -182,7 +182,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # before Maestro observes the elapsed timer on iOS CI, so accept the end screen
 # as proof that tapping Play advanced the session.
 - extendedWaitUntil:
-    visible: "00:[0-5][1-9]|(?s).*day streak.*"
+    visible: "00:[0-5][1-9]|.*day streak.*"
     timeout: 20000
 - takeScreenshot: player-playing
 
@@ -194,7 +194,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # has already completed.
 - runFlow:
     when:
-      notVisible: "(?s).*day streak.*"
+      notVisible: ".*day streak.*"
     commands:
       - extendedWaitUntil:
           visible: "00:0[5-9]|00:[1-5][0-9]"
@@ -209,7 +209,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - repeat:
     times: 60
     while:
-      notVisible: "(?s).*day streak.*"
+      notVisible: ".*day streak.*"
     commands:
       - tapOn:
           text: "Skip forward 10 seconds"
@@ -223,6 +223,6 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # The end screen must now be visible — this is the actual assertion.
 - extendedWaitUntil:
-    visible: "(?s).*day streak.*"
+    visible: ".*day streak.*"
     timeout: 30000
 - takeScreenshot: end-screen
