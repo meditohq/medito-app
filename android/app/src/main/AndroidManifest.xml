@@ -54,7 +54,7 @@
         android:label="@string/app_name_override"
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
-        android:icon="@mipmap/ic_launcher_dusk"
+        android:icon="@mipmap/ic_launcher_classic"
         android:usesCleartextTraffic="true">
 
         <meta-data
@@ -166,7 +166,7 @@
             android:exported="true"
             android:icon="@mipmap/ic_launcher_dusk"
             android:label="@string/app_name_override"
-            android:enabled="true">
+            android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -192,7 +192,7 @@
             android:exported="true"
             android:icon="@mipmap/ic_launcher_classic"
             android:label="@string/app_name_override"
-            android:enabled="false">
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

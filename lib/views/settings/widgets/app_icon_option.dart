@@ -5,9 +5,9 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
 enum AppIconOption {
-  defaultIcon(null, iosOnly: true),
-  purple('purple', androidOnly: true),
   classic('classic'),
+  purple('purple', androidOnly: true),
+  dusk('dusk', androidOnly: true),
   nearblack('nearblack'),
   goldenHour('goldenhour', androidIconName: 'pink'),
   ocean('ocean'),
@@ -17,13 +17,11 @@ enum AppIconOption {
   final String? iconName;
   final String? androidIconName;
   final bool androidOnly;
-  final bool iosOnly;
 
   const AppIconOption(
     this.iconName, {
     this.androidIconName,
     this.androidOnly = false,
-    this.iosOnly = false,
   });
 
   String? get effectiveIconName =>
@@ -34,9 +32,7 @@ enum AppIconOption {
   static List<AppIconOption> get availableOptions => values
       .where(
         (o) =>
-            (!o.androidOnly ||
-                defaultTargetPlatform == TargetPlatform.android) &&
-            (!o.iosOnly || defaultTargetPlatform == TargetPlatform.iOS),
+            !o.androidOnly || defaultTargetPlatform == TargetPlatform.android,
       )
       .toList();
 
@@ -46,10 +42,7 @@ enum AppIconOption {
   }
 
   List<Color> get gradientColors => switch (this) {
-    AppIconOption.defaultIcon => [
-      const Color(0xFFC86D8D),
-      const Color(0xFFE9AEB6),
-    ],
+    AppIconOption.dusk => [const Color(0xFF2D1559), const Color(0xFF3D2066)],
     AppIconOption.purple => [const Color(0xFF917CF0), const Color(0xFF917CF0)],
     AppIconOption.classic => [const Color(0xFFFFFFFF), const Color(0xFFFFFFFF)],
     AppIconOption.nearblack => [
@@ -69,7 +62,7 @@ enum AppIconOption {
     final l10n = AppLocalizations.of(context)!;
 
     return switch (this) {
-      AppIconOption.defaultIcon => l10n.appIconDefault,
+      AppIconOption.dusk => l10n.appIconDusk,
       AppIconOption.purple => l10n.appIconPurple,
       AppIconOption.classic => l10n.appIconClassic,
       AppIconOption.nearblack => l10n.appIconNearBlack,

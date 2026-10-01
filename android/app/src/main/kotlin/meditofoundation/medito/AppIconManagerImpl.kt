@@ -9,8 +9,8 @@ import meditofoundation.medito.pigeon.MeditoAppIconManager
 class AppIconManagerImpl(private val context: Context) : MeditoAppIconManager {
 
     companion object {
-        // The alias name used for the default (dusk) icon. Null iconName in Dart maps to this.
-        private const val DEFAULT_ALIAS = "dusk"
+        // The alias name used for the default (classic) icon. Null iconName in Dart maps to this.
+        private const val DEFAULT_ALIAS = "classic"
     }
 
     // Discovers all launcher activity aliases for this package.
@@ -35,7 +35,7 @@ class AppIconManagerImpl(private val context: Context) : MeditoAppIconManager {
         return aliases
     }
 
-    // Returns null when the default (dusk) alias is active, matching iOS plugin behaviour.
+    // Returns null when the default (classic) alias is active, matching iOS plugin behaviour.
     override fun getAlternateIconName(callback: (Result<String?>) -> Unit) {
         val pm = context.packageManager
         for ((iconName, component) in findAliasComponents()) {
@@ -47,7 +47,7 @@ class AppIconManagerImpl(private val context: Context) : MeditoAppIconManager {
         callback(Result.success(null))
     }
 
-    // null means "restore default" — we enable the dusk alias.
+    // null means "restore default" — we enable the classic alias.
     // MainActivity is never touched so flutter run always works.
     override fun setAlternateIconName(iconName: String?, callback: (Result<Unit>) -> Unit) {
         try {
