@@ -57,7 +57,8 @@ class _AppIconTileState extends State<AppIconTile> {
     final options = AppIconOption.availableOptions;
     return options.firstWhere(
       (o) => o.effectiveIconName == _currentIconName,
-      orElse: () => options.first,
+      // The native primary icon is Classic; OS-stored alternate names win.
+      orElse: () => AppIconOption.classic,
     );
   }
 
