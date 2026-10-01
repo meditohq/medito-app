@@ -42,6 +42,7 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumnDefaults
 import androidx.wear.compose.foundation.lazy.ScalingLazyListAnchorType
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -65,12 +66,13 @@ fun HomeScreen(
             autoCentering = null,
             anchorType = ScalingLazyListAnchorType.ItemStart,
             scalingParams = ScalingLazyColumnDefaults.scalingParams(edgeScale = 1f, edgeAlpha = 1f),
-            contentPadding = PaddingValues(bottom = 36.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(bottom = 48.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             val upNext = state.upNext
             if (upNext != null) {
-                item { UpNextHero(upNext = upNext, stat = stat, onPlay = { onPlay(upNext.track) }) }
+                stat?.let { item { Box(Modifier.fillMaxWidth().padding(top = 16.dp), contentAlignment = Alignment.Center) { StatPill(it, onImage = false) } } }
+                item { UpNextHero(upNext = upNext, onPlay = { onPlay(upNext.track) }) }
             } else if (stat != null) {
                 item {
                     Box(Modifier.fillMaxWidth().padding(top = 36.dp), contentAlignment = Alignment.Center) {
@@ -83,9 +85,9 @@ fun HomeScreen(
                 item {
                     // Icon tiles, like the phone's Home shortcuts.
                     Row(
-                        // Inset: the circle is narrow this far down.
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        // Keep the shortcuts away from the round screen edges.
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 46.dp),
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
                     ) {
                         state.daily?.let { daily ->
                             ShortcutTile("Daily", R.drawable.ic_sun, Modifier.weight(1f)) { onPlay(daily) }
@@ -96,10 +98,12 @@ fun HomeScreen(
             } else {
                 item { EmptyState() }
             }
+            item { Spacer(Modifier.height(24.dp)) }
             item {
                 androidx.wear.compose.material3.Button(
                     onClick = onDownloads,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 36.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(),
                     label = { Text("Downloads") },
                 )
             }
@@ -161,19 +165,15 @@ fun StatPill(kind: StatKind, onImage: Boolean, modifier: Modifier = Modifier) {
  * progress, with the stat pill just under the time.
  */
 @Composable
-private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
-    // Short enough that the tiles below still fit inside a round screen.
-    val height = (LocalConfiguration.current.screenHeightDp * 0.6f).dp
-    val eyebrow = buildString {
-        // Same rule as the phone hero: "Start here" until something is played.
-        append(if (upNext.completed == 0) "START HERE" else "CONTINUE")
-        if (upNext.packTitle.isNotEmpty()) append(" · ").append(upNext.packTitle)
-    }
-
+private fun UpNextHero(upNext: UpNext, onPlay: () -> Unit) {
+    // Leave room for the shortcuts so the first screen doesn't feel crammed.
+    val height = (LocalConfiguration.current.screenHeightDp * 0.36f).dp
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(start = 24.dp, end = 24.dp)
             .height(height)
+            .clip(RoundedCornerShape(28.dp))
             .background(Color.White.copy(alpha = 0.1f))
             .clickable(enabled = upNext.canPlay, onClick = onPlay),
     ) {
@@ -200,48 +200,36 @@ private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
             )
         )
 
-        // Round screens clip the corners, so the pill sits centred under the time.
-        stat?.let { StatPill(it, onImage = true, modifier = Modifier.align(Alignment.TopCenter).padding(top = 28.dp)) }
+        Box(
+            Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 18.dp)
+                .size(34.dp)
+                .clip(CircleShape)
+                .background(Color.White),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painterResource(R.drawable.ic_play),
+                contentDescription = "Play",
+                tint = Color.Black,
+                modifier = Modifier.size(15.dp),
+            )
+        }
 
         Column(
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = 22.dp, end = 22.dp, bottom = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(3.dp),
+            modifier = Modifier.align(Alignment.BottomStart).padding(start = 18.dp, end = 58.dp, bottom = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
-                eyebrow,
-                modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
-                softWrap = false,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 0.8.sp,
-                color = Color.White.copy(alpha = 0.85f),
-                maxLines = 1,
+                upNext.track.title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+                softWrap = true,
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    upNext.track.title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f).basicMarquee(iterations = Int.MAX_VALUE),
-                    softWrap = false,
-                )
-                Spacer(Modifier.width(8.dp))
-                Box(
-                    Modifier.size(28.dp).clip(CircleShape).background(Color.White),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painterResource(R.drawable.ic_play),
-                        contentDescription = "Play",
-                        tint = Color.Black,
-                        modifier = Modifier.size(14.dp),
-                    )
-                }
-            }
             if (upNext.total > 0) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     ProgressBar(upNext.completed.toFloat() / upNext.total, Modifier.weight(1f))
@@ -277,13 +265,13 @@ private fun ShortcutTile(title: String, @DrawableRes icon: Int, modifier: Modifi
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(
-            Modifier.fillMaxWidth().height(42.dp).clip(RoundedCornerShape(14.dp))
+            Modifier.fillMaxWidth().height(40.dp).clip(RoundedCornerShape(15.dp))
                 .background(Color.White.copy(alpha = 0.14f)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(22.dp))
+            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(21.dp))
         }
-        Text(title, fontSize = 12.sp, maxLines = 1)
+        Text(title, fontSize = 11.sp, maxLines = 1)
     }
 }
 
