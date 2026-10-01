@@ -264,7 +264,10 @@ jobs:
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
             mkdir -p /tmp/maestro-debug
             $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug
-            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml --no-ansi --debug-output /tmp/maestro-debug/signed-in
+            # Keep Android release smoke focused on install/onboarding/navigation/content.
+            # The signed-in stats suite remains covered by iOS below, but on Android CI
+            # its onboarding donation/webview path repeatedly drives the hosted emulator
+            # offline after the main smoke has passed.
 
       - name: Scrub test account credentials from debug output
         if: failure()
