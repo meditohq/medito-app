@@ -531,10 +531,6 @@ class AnalyticsEventConstants {
   static const String onboardingExperienceAnswered =
       'onboarding_experience_answered';
 
-  /// Event logged when the user answers the intent question
-  /// Parameter: paramAnswer ('learn_properly', 'build_habit', 'stress_sleep_emotions')
-  static const String onboardingIntentAnswered = 'onboarding_intent_answered';
-
   /// Parameter for the selected answer in onboarding question events
   static const String paramAnswer = 'answer';
 
@@ -550,10 +546,6 @@ class AnalyticsEventConstants {
   static const String userPropHasPairedWatch = 'has_paired_watch';
   static const String userPropWatchAppInstalled = 'watch_app_installed';
 
-  /// Parameter carrying the free-text response from the onboarding attribution
-  /// question when the user picks the "other" path and types their own answer.
-  static const String paramOtherText = 'other_text';
-
   /// Event logged when the new onboarding question flow is completed
   /// Parameter: paramResultState — 'state_a', 'state_b', or 'state_c'
   static const String onboardingQuestionFlowCompleted =
@@ -561,15 +553,6 @@ class AnalyticsEventConstants {
 
   /// Parameter for the result state shown on the onboarding result screen
   static const String paramResultState = 'result_state';
-
-  /// Event logged when the user abandons the new onboarding question flow before completion
-  static const String onboardingQuestionFlowAbandoned =
-      'onboarding_question_flow_abandoned';
-
-  /// Event logged when the user answers the attribution question ("how did you hear about us?")
-  /// Parameter: paramAnswer ('google_ad', 'social_ad', 'friend', 'therapist', 'app_store', 'play_store', 'other')
-  static const String onboardingAttributionAnswered =
-      'onboarding_attribution_answered';
 
   /// Event logged when the end-screen donation card first becomes visible in
   /// its ASK state (the amount/CTA card, not the post-donation thank-you).
@@ -805,13 +788,21 @@ class AnalyticsEventConstants {
   static const String tagOpened = 'tag_opened';
 
   // Search events
-  /// Event logged once per settled (debounced) non-empty query on the Search
-  /// tab. Parameters: paramSearchTerm, paramSearchTermLength.
+  /// One search the user committed to: they opened a result, submitted, cleared
+  /// the field, or stopped typing for 3s (see SearchQueryLogger). Before Oct
+  /// 2026 it fired on every 500ms pause, so older data is full of half-typed
+  /// words. Parameters: paramSearchTerm (trimmed, lowercased, '[redacted]' if it
+  /// looked like an email or phone number), paramSearchTermLength,
+  /// paramHasResults ('true'/'false'; absent if results were still loading).
   static const String searchPerformed = 'search_performed';
 
-  /// Event logged when a settled non-empty query returns zero packs and zero
-  /// tracks — i.e. a content/discovery gap. Parameters: paramSearchTerm.
+  /// A committed search with zero packs and zero tracks, i.e. a
+  /// content/discovery gap. Sent alongside [searchPerformed] with the same
+  /// term. Parameters: paramSearchTerm.
   static const String searchNoResults = 'search_no_results';
+
+  /// Whether a committed search found anything: 'true' or 'false'.
+  static const String paramHasResults = 'has_results';
 
   /// The query text the user searched for.
   static const String paramSearchTerm = 'search_term';
@@ -820,18 +811,27 @@ class AnalyticsEventConstants {
   /// searches independent of the term itself).
   static const String paramSearchTermLength = 'search_term_length';
 
-  // Favourite events
-  /// Event logged when user adds a track to favourites from the track screen
+  // Favourite events. Defined long before they were wired up: nothing logged
+  // them until Oct 2026, so there is no favourites history in BigQuery before
+  // that release.
+  /// User added a track to favourites from the track screen.
+  /// Parameter: [paramTrackId].
   static const String trackFavourited = 'track_favourited';
 
-  /// Event logged when user removes a track from favourites on the track screen
+  /// User removed a track from favourites on the track screen.
+  /// Parameter: [paramTrackId].
   static const String trackUnfavourited = 'track_unfavourited';
 
-  /// Event logged when user adds a pack to favourites from the pack screen
+  /// User added a pack to favourites from the pack screen.
+  /// Parameter: [paramPackId].
   static const String packFavourited = 'pack_favourited';
 
-  /// Event logged when user removes a pack from favourites on the pack screen
+  /// User removed a pack from favourites on the pack screen.
+  /// Parameter: [paramPackId].
   static const String packUnfavourited = 'pack_unfavourited';
+
+  /// Track id (not the audio file id) on the favourite events.
+  static const String paramTrackId = 'track_id';
 
   // Quote share events
   /// Event logged when the user opens the quote share screen by tapping the
@@ -947,4 +947,20 @@ class AnalyticsEventConstants {
   static const String sourceHomeCard = 'home_card';
   static const String sourceShopGrid = 'shop_grid';
   static const String sourceBagAddOn = 'bag_add_on';
+
+  // Retired events. Nothing in this codebase sends these any more, but they
+  // still arrive in BigQuery from older installed builds, so they are listed
+  // here (not as constants) to explain them when they turn up in a query.
+  //
+  // - onboarding_attribution_answered, onboarding_intent_answered: questions
+  //   removed from onboarding 2026-05-18 (a1f254fc).
+  // - your_path_explainer_shown / _dismissed: Your Path strip, removed
+  //   2026-09-16 (7a2cd300). "shown" re-fired on every Home build for anyone
+  //   who never tapped "Got it", so it was never a reach metric.
+  // - media_permission_banner_shown: 2606.x builds only.
+  // - screen_view_with_params: 26.4.x-26.5.x builds only.
+  // - audio_started, fcmSave, connectivity_error, user_initialization_*:
+  //   3.x builds only.
+  // - token_backup_storage_attempt (and result='success'): no longer sent
+  //   since Sep 2026; see [tokenBackupStorageResult].
 }
