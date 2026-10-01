@@ -16,7 +16,7 @@ on:
         type: boolean
         default: true
       wear_os:
-        description: 'Also ship the Wear OS app to the matching Wear track(s) (wear:internal / wear:production). Needs the Wear OS form factor enabled in Play Console.'
+        description: 'Also ship the Wear OS app to the matching Wear track(s) (wear:qa / wear:production). Needs the Wear OS form factor enabled in Play Console.'
         type: boolean
         default: false
       ios_testflight:
@@ -550,11 +550,11 @@ jobs:
           CODE=$((1000000000 + BUILD))
           if [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_production }}" = "true" ]; then
             bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
-              track:"wear:internal" promote_to:"wear:production" \
+              track:"wear:qa" promote_to:"wear:production" \
               submit_review:"${{ inputs.submit_for_review }}"
           elif [ "${{ inputs.android_internal }}" = "true" ] && [ "${{ inputs.android_beta }}" = "true" ]; then
             bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
-              track:"wear:internal" promote_to:"wear:beta"
+              track:"wear:qa" promote_to:"wear:beta"
           elif [ "${{ inputs.android_production }}" = "true" ]; then
             bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
               track:"wear:production" submit_review:"${{ inputs.submit_for_review }}"
@@ -563,7 +563,7 @@ jobs:
               track:"wear:beta"
           elif [ "${{ inputs.android_internal }}" = "true" ]; then
             bundle exec fastlane android upload_apk apk_path:"$APK" version_code:"$CODE" \
-              track:"wear:internal"
+              track:"wear:qa"
           fi
 
   ios-smoke-test:
