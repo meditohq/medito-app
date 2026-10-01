@@ -166,6 +166,31 @@ name: Sign in to the prod test account from a fresh install and reach Home
           timeout: 60000
       - runFlow:
           when:
+            platform: Android
+            visible: "See how to help|.*Donate.*"
+            notVisible: ".*day streak.*|Consistency Score: .*"
+          commands:
+            # The signed-in stats smoke only needs to reach Home. Opening the
+            # hosted donation webview a second time on Android CI has made the
+            # emulator disappear, so back out of this optional ask instead.
+            - pressKey: Back
+            - runFlow:
+                when:
+                  visible: "Get started|Maybe later"
+                commands:
+                  - tapOn:
+                      text: "Get started|Maybe later"
+                      optional: true
+            - runFlow:
+                when:
+                  visible: "Dismiss"
+                commands:
+                  - tapOn:
+                      text: "Dismiss"
+                      optional: true
+      - runFlow:
+          when:
+            platform: iOS
             visible: "See how to help|.*Donate.*"
             notVisible: ".*day streak.*|Consistency Score: .*"
           file: dismiss_onboarding_donation.yaml
