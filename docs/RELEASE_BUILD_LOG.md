@@ -12,6 +12,7 @@ Keep this file updated whenever a build number/version code is successfully uplo
 | 2026-10-02 | 2610.2.0 | 302468 | Android phone | Internal testing | Uploaded successfully. Tag `2610.2.0` at 4ba60dc5 (includes develop merge). | [36990159827](https://github.com/meditohq/medito-app/actions/runs/36990159827) |
 | 2026-10-02 | 2610.2.0 | 1000302468 | Wear OS | wear:internal | Uploaded successfully (status completed). | [36990159827](https://github.com/meditohq/medito-app/actions/runs/36990159827) |
 | 2026-10-02 | 2610.2.0 | 302468 | iOS | TestFlight | Uploaded successfully. | [36990159827](https://github.com/meditohq/medito-app/actions/runs/36990159827) |
+| 2026-10-02 | 2610.2.1 | 1000302469 | Wear OS | wear:internal | Wear-only (speaker playback, load timeout, incoming downloads). Phone stays 302468. Tag `2610.2.1` at e0980976. | [37008936015](https://github.com/meditohq/medito-app/actions/runs/37008936015) |
 
 ## Release checklist
 
