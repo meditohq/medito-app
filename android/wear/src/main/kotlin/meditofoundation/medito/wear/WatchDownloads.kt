@@ -23,6 +23,10 @@ object WatchDownloads {
     private val mutex = Mutex()
     private val _tracks = MutableStateFlow<List<WatchTrack>>(emptyList())
     val tracks: StateFlow<List<WatchTrack>> = _tracks
+    // Sent from the phone but still copying; shown so Downloads isn't empty
+    // while a long session transfers.
+    private val _incoming = MutableStateFlow<List<WatchTrack>>(emptyList())
+    val incoming: StateFlow<List<WatchTrack>> = _incoming
     private lateinit var context: Context
     private var initialized = false
     private fun prefs() = context.getSharedPreferences("watch_downloads", Context.MODE_PRIVATE)
@@ -49,8 +53,11 @@ object WatchDownloads {
     fun accept(data: DataMap) {
         val metadata = data.getString("json") ?: return
         val asset = data.getAsset("audio")
+        val pending = runCatching { JSONObject(metadata) }.getOrNull()
+            ?.takeIf { it.optString("action") != "remove" }?.let { WatchTrack.from(it) }
+        if (pending != null) _incoming.value = _incoming.value.filter { it.fileId != pending.fileId } + pending
         scope.launch {
-            mutex.withLock {
+            try { mutex.withLock {
                 val entry = runCatching { JSONObject(metadata) }.getOrNull() ?: return@withLock
                 val request = entry.optString("requestId")
                 if (runCatching { UUID.fromString(request) }.isFailure) return@withLock
@@ -77,6 +84,8 @@ object WatchDownloads {
                     save(entries().filter { it.optString("fileId") != entry.optString("fileId") } + entry)
                     acknowledge(entry, "ready")
                 } catch (_: Exception) { temporary.delete(); acknowledge(entry, "failed", "save_failed") }
+            } } finally {
+                if (pending != null) _incoming.value = _incoming.value.filter { it.fileId != pending.fileId }
             }
         }
     }

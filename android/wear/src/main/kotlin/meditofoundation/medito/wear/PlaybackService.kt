@@ -6,23 +6,36 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 
 /**
- * Streams one session on the watch. Wear OS routes media to Bluetooth
- * headphones; in release builds playback waits (and the system output
- * switcher opens) when none are connected, rather than using the speaker.
+ * Streams one session on the watch, through Bluetooth headphones or the
+ * watch's own speaker (Pixel Watch and others have one for media).
  */
 class PlaybackService : MediaSessionService() {
     private var session: MediaSession? = null
 
     override fun onCreate() {
         super.onCreate()
+        // Same HTTP setup as the phone's AudioPlayerService: some session
+        // URLs redirect across http/https, which ExoPlayer refuses by default.
+        val http = DefaultHttpDataSource.Factory()
+            .setUserAgent("Medito-WearOS")
+            .setConnectTimeoutMs(15_000)
+            .setReadTimeoutMs(30_000)
+            .setAllowCrossProtocolRedirects(true)
         val player = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(this)
+                    .setDataSourceFactory(DefaultDataSource.Factory(this, http))
+            )
             .setAudioAttributes(
                 AudioAttributes.Builder()
                     .setUsage(C.USAGE_MEDIA)
@@ -31,8 +44,6 @@ class PlaybackService : MediaSessionService() {
                 /* handleAudioFocus = */ true,
             )
             .setHandleAudioBecomingNoisy(true)
-            // Emulators have no Bluetooth headphones; keep them playable.
-            .setSuppressPlaybackOnUnsuitableOutput(!BuildConfig.DEBUG)
             .build()
 
         player.addListener(object : Player.Listener {

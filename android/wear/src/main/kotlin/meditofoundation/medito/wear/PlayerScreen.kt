@@ -51,7 +51,7 @@ import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import kotlinx.coroutines.delay
 
-private enum class Phase { Connecting, Playing, Paused, Finished, NeedsHeadphones, Failed }
+private enum class Phase { Connecting, Playing, Paused, Finished, Failed }
 
 /**
  * A progress ring round the edge of the screen, play/pause in the middle, time
@@ -71,15 +71,17 @@ fun PlayerScreen(track: WatchTrack, onDone: () -> Unit) {
         val token = SessionToken(context, ComponentName(context, PlaybackService::class.java))
         val future = MediaController.Builder(context, token).buildAsync()
         future.addListener({
-            val c = runCatching { future.get() }.getOrNull() ?: return@addListener
+            val c = runCatching { future.get() }.getOrNull()
+            if (c == null) {
+                phase = Phase.Failed
+                return@addListener
+            }
             controller = c
             c.addListener(object : Player.Listener {
                 override fun onEvents(player: Player, events: Player.Events) {
                     phase = when {
                         player.playerError != null -> Phase.Failed
                         player.playbackState == Player.STATE_ENDED -> Phase.Finished
-                        player.playbackSuppressionReason ==
-                            Player.PLAYBACK_SUPPRESSION_REASON_UNSUITABLE_AUDIO_OUTPUT -> Phase.NeedsHeadphones
                         player.isPlaying -> Phase.Playing
                         player.playbackState == Player.STATE_BUFFERING ||
                             player.playbackState == Player.STATE_IDLE -> Phase.Connecting
@@ -109,6 +111,12 @@ fun PlayerScreen(track: WatchTrack, onDone: () -> Unit) {
             MediaController.releaseFuture(future)
             controller = null
         }
+    }
+
+    // Never spin forever: a stream that hasn't started in 30s has failed.
+    LaunchedEffect(track.rowKey) {
+        delay(30_000)
+        if (phase == Phase.Connecting) phase = Phase.Failed
     }
 
     LaunchedEffect(controller) {
@@ -191,7 +199,6 @@ fun PlayerScreen(track: WatchTrack, onDone: () -> Unit) {
             Text(
                 when (phase) {
                     Phase.Finished -> "Well done"
-                    Phase.NeedsHeadphones -> "Connect headphones to listen"
                     Phase.Failed -> "Couldn't play this session"
                     Phase.Connecting -> "${track.minutes} min"
                     else -> "-" + format(durationMs - positionMs)
