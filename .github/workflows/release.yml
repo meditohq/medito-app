@@ -231,6 +231,7 @@ jobs:
     name: Android – Smoke Test
     needs: [android-build]
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.wear_only != true }}
 
     steps:
       - uses: actions/checkout@v4
@@ -310,6 +311,7 @@ jobs:
     name: Android – Upgrade Test
     needs: [android-smoke-test]
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.wear_only != true }}
     # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
     # there's no baseline yet, or to avoid blocking ship on a flaky test.
     continue-on-error: true
@@ -464,9 +466,10 @@ jobs:
 
   android-deploy:
     name: Android – Deploy
-    needs: [android-smoke-test, android-upgrade-test]
+    needs: [android-build, android-smoke-test, android-upgrade-test]
     runs-on: ubuntu-latest
     environment: prod
+    if: ${{ always() && needs.android-build.result == 'success' && (inputs.wear_only == true || needs.android-smoke-test.result == 'success') }}
 
     steps:
       - uses: actions/checkout@v4
