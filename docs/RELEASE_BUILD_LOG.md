@@ -9,6 +9,12 @@ Keep this file updated whenever a build number/version code is successfully uplo
 | 2026-10-02 | 2609.30.0 | 302467 | Android phone | Internal testing | Re-upload rejected: `Cannot update a published APK`. Use `wear_only=true` for Wear-only retries. | [36983933785](https://github.com/meditohq/medito-app/actions/runs/36983933785) |
 | 2026-10-02 | 2609.30.0 | 1000302467 | Wear OS | wear:qa | Upload rejected: `Track not found: wear:qa`. Wait for Play Console to expose/approve the Wear OS internal track before retrying this version code. | [36986690581](https://github.com/meditohq/medito-app/actions/runs/36986690581) |
 
+## Release checklist
+
+- Before dispatching any store release, bump the app version/build number in the repo for the target release.
+- After a successful store upload, create/update the git release tag so the tag matches the uploaded version/build.
+- Record the uploaded build number/version code and the tag in this file before starting any retry.
+
 ## Notes
 
 - Wear OS uses a separate APK with version code offset from the phone APK. For `2609.30.0+302467`, the Wear OS APK reported version code `1000302467` in the Play upload logs.
