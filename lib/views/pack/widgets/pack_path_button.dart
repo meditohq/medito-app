@@ -227,6 +227,7 @@ class _PackPlayButtonState extends ConsumerState<PackPlayButton> {
     if (_starting) return;
     setState(() => _starting = true);
     try {
+      _logTap(next);
       await _putOnHome(context);
       if (!context.mounted) return;
       await widget.onStartSession(
@@ -238,6 +239,38 @@ class _PackPlayButtonState extends ConsumerState<PackPlayButton> {
     } finally {
       if (mounted) setState(() => _starting = false);
     }
+  }
+
+  /// Every tap on the button, before it changes anything. [packPinned] alone
+  /// misses the usual case: continuing a pack that is already on Home.
+  void _logTap(PackItemsModel next) {
+    final completed = pack.items
+        .where((item) => item.isCompleted == true)
+        .length;
+    final position = PackSequence.positionOf(pack.id);
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.packPathButtonTapped,
+            parameters: {
+              AnalyticsEventConstants.paramPackId: pack.id,
+              AnalyticsEventConstants.paramSessionId: next.id,
+              AnalyticsEventConstants.paramButtonLabel: completed == 0
+                  ? 'start'
+                  : 'continue',
+              AnalyticsEventConstants.paramAlreadyPinned:
+                  ref.read(upNextPackIdProvider) == pack.id ? 'true' : 'false',
+              AnalyticsEventConstants.paramSessionIndexInPack: completed + 1,
+              AnalyticsEventConstants.paramPackTotalSessions: pack.items.length,
+              AnalyticsEventConstants.paramPackSequencePosition:
+                  position?.toString() ?? 'none',
+              AnalyticsEventConstants.paramUpNextMode: PackSequence.modeFor(
+                pack.id,
+              ),
+            },
+          ),
+    );
   }
 
   /// Makes this pack the one Home continues. A no-op (and no snackbar) when it

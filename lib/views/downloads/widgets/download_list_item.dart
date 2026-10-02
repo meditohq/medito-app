@@ -5,9 +5,9 @@ import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
-const _coverSize = 64.0;
-const _coverRadius = 12.0;
-const _rowPadding = EdgeInsets.fromLTRB(16, 8, 4, 8);
+const _coverSize = 72.0;
+const _coverRadius = 14.0;
+const _rowPadding = EdgeInsets.fromLTRB(12, 12, 4, 12);
 
 //ignore:prefer-match-file-name
 class DownloadListItemWidget extends StatelessWidget {
@@ -45,7 +45,29 @@ class DownloadListItemWidget extends StatelessWidget {
             // The cached image path ignores width/height, so size it here.
             child: SizedBox.square(
               dimension: _coverSize,
-              child: NetworkImageWidget(url: coverUrl, shouldCache: true),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  NetworkImageWidget(url: coverUrl, shouldCache: true),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      margin: const EdgeInsets.all(5),
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.65),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.play_arrow_rounded,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -56,13 +78,18 @@ class DownloadListItemWidget extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: textTheme.headlineMedium,
-                  maxLines: 1,
+                  style: textTheme.headlineMedium?.copyWith(letterSpacing: 0),
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (subtitle.isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  Text(subtitle, style: textTheme.titleMedium),
+                  Text(
+                    subtitle,
+                    style: textTheme.titleMedium?.copyWith(letterSpacing: 0),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
                 ?status,
               ],
@@ -84,7 +111,7 @@ class DownloadListItemWidget extends StatelessWidget {
                       assetName: MeditoIcons.dragHandle,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ).colorScheme.onSurface.withValues(alpha: 0.45),
                     ),
                   ),
                 ),
@@ -105,28 +132,40 @@ class DownloadListShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.fromLTRB(20, 64, 20, 24),
       physics: const NeverScrollableScrollPhysics(),
       itemCount: rows,
-      itemBuilder: (context, _) => const Padding(
-        padding: _rowPadding,
-        child: Row(
-          children: [
-            BoxShimmerWidget(
-              width: _coverSize,
-              height: _coverSize,
-              borderRadius: _coverRadius,
-            ),
-            SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      itemBuilder: (context, _) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Padding(
+            padding: _rowPadding,
+            child: Row(
               children: [
-                BoxShimmerWidget(width: 180, height: 18, borderRadius: 6),
-                SizedBox(height: 8),
-                BoxShimmerWidget(width: 120, height: 14, borderRadius: 6),
+                BoxShimmerWidget(
+                  width: _coverSize,
+                  height: _coverSize,
+                  borderRadius: _coverRadius,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BoxShimmerWidget(width: 180, height: 18, borderRadius: 6),
+                      SizedBox(height: 8),
+                      BoxShimmerWidget(width: 120, height: 14, borderRadius: 6),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 48),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

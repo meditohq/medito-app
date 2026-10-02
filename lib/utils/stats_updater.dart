@@ -130,10 +130,23 @@ Future<void> _rescheduleReminders({
   }
 }
 
+// Completions already recorded by this engine, keyed by track + timestamp.
+// Android persists each completion natively and replays it on resume, so a
+// replay can race the live callback for the same session and record it (stats
+// and the audio_session_completed event) twice. Dropped again on failure so a
+// retry of a genuinely failed completion still goes through.
+final Set<String> _recordedCompletions = {};
+
 Future<bool> handleStats(
   Map<String, dynamic> payload, {
   StatsManager? statsManager, // For testing
 }) async {
+  final completionKey =
+      '${payload[TypeConstants.trackIdKey]}@${payload[TypeConstants.timestampIdKey]}';
+  if (!_recordedCompletions.add(completionKey)) {
+    AppLogger.d('STATS', 'Duplicate completion $completionKey ignored');
+    return true;
+  }
   try {
     statsManager ??= StatsManager()..initialize();
 
@@ -170,7 +183,9 @@ Future<bool> handleStats(
 
     // Tell the session tracker this session completed so it clears the
     // in-progress record and does not also fire audio_session_abandoned.
-    await AudioSessionTracker.instance.onCompleted();
+    await AudioSessionTracker.instance.onCompleted(
+      fileId: payload[TypeConstants.fileIdKey] as String?,
+    );
 
     // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
@@ -205,6 +220,7 @@ Future<bool> handleStats(
 
     return true;
   } catch (e) {
+    _recordedCompletions.remove(completionKey);
     AppLogger.e('STATS', 'Failed to update stats', e);
     return false;
   }

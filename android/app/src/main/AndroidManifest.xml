@@ -20,6 +20,10 @@
     <uses-permission android:name="android.permission.health.WRITE_MINDFULNESS" />
 
     <queries>
+        <!-- Watch companion apps, for WatchPresence.kt. -->
+        <package android:name="com.google.android.wearable.app" />
+        <package android:name="com.google.android.apps.wear.companion" />
+        <package android:name="com.samsung.android.app.watchmanager" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />

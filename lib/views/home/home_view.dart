@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:medito/widgets/adaptive/adaptive_home_sections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

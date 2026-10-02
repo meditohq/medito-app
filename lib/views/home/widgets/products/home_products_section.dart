@@ -66,18 +66,30 @@ class _HomeProductsSectionState extends ConsumerState<HomeProductsSection> {
       error: (_, _) => const SizedBox.shrink(),
       data: (home) => home.products.isEmpty
           ? const SizedBox.shrink()
-          : ProductsWidget(
-              key: key,
-              products: home.curated
-                  ? home.products
-                  : dailyShuffle(home.products),
-            ),
+          : ProductsWidget(key: key, products: homeProductsForDay(home)),
     );
   }
 }
 
+/// Keep the collection's lead product featured while giving each remaining
+/// product a turn beside it. The order stays stable throughout a calendar day.
+List<ShopProduct> homeProductsForDay(HomeShopProducts home, [DateTime? now]) {
+  if (!home.curated) return dailyShuffle(home.products, now);
+  if (home.products.length < 3) return List.of(home.products);
+  final others = home.products.sublist(1);
+  final offset = _calendarDay(now ?? DateTime.now()) % others.length;
+  return [home.products.first, ...others.skip(offset), ...others.take(offset)];
+}
+
+// Count civil dates, so daylight saving changes don't repeat or skip a day.
+int _calendarDay(DateTime now) => DateTime.utc(
+  now.year,
+  now.month,
+  now.day,
+).difference(DateTime.utc(2024)).inDays;
+
 /// Varies the order day to day without reshuffling on every rebuild.
 List<ShopProduct> dailyShuffle(List<ShopProduct> products, [DateTime? now]) {
-  final day = (now ?? DateTime.now()).difference(DateTime(2024)).inDays;
+  final day = _calendarDay(now ?? DateTime.now());
   return List.of(products)..shuffle(Random(day));
 }

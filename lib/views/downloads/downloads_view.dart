@@ -14,7 +14,6 @@ import 'package:medito/scaffold_messenger_key.dart';
 import 'package:flutter/services.dart';
 import 'package:medito/services/watch_download_service.dart';
 import 'package:medito/views/downloads/widgets/download_list_item.dart';
-import 'package:medito/views/empty_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -22,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../bottom_navigation/bottom_navigation_bar_view.dart';
+import '../empty_widget.dart';
 import '../player/player_view.dart';
 
 class DownloadsView extends ConsumerStatefulWidget {
@@ -261,7 +261,36 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     if (visible.isEmpty) return _getEmptyWidget();
 
     return ReorderableListView(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      header: Padding(
+        padding: const EdgeInsets.only(bottom: 20, top: 8),
+        child: Row(
+          children: [
+            Icon(
+              Icons.offline_pin_outlined,
+              size: 20,
+              color: Theme.of(context).textTheme.titleMedium?.color,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              AppLocalizations.of(context)!.tracks,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '${visible.length}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+          ],
+        ),
+      ),
       buildDefaultDragHandles: false,
       onReorderItem: (int oldIndex, int newIndex) {
         // Saving the order while a removal is pending would drop that track
@@ -279,27 +308,66 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     );
   }
 
-  Widget _getEmptyWidget() => EmptyStateWidget(
-    message: AppLocalizations.of(context)!.emptyDownloadsMessage,
+  Widget _getEmptyWidget() => Center(
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.download_rounded,
+              size: 36,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            AppLocalizations.of(context)!.emptyDownloadsMessage,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ],
+      ),
+    ),
   );
 
   String _fileId(Track track) => track.voices.first.audioFiles.first.id;
 
   Widget _getSlidingItem(Track item, int index) {
-    return Dismissible(
-      // Stable across rebuilds so an undone row slots straight back in.
+    return Padding(
       key: ValueKey('${item.id}-${_fileId(item)}'),
-      direction: _selecting
-          ? DismissDirection.none
-          : DismissDirection.endToStart,
-      background: _getDismissibleBackgroundWidget(),
-      onDismissed: (_) => _removeWithUndo(item),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () =>
-              _selecting ? _toggleSelection(item) : _openPlayer(ref, item),
-          child: _getListItemWidget(item, index),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Dismissible(
+        // Stable across rebuilds so an undone row slots straight back in.
+        key: ValueKey('${item.id}-${_fileId(item)}'),
+        direction: _selecting
+            ? DismissDirection.none
+            : DismissDirection.endToStart,
+        background: _getDismissibleBackgroundWidget(),
+        onDismissed: (_) => _removeWithUndo(item),
+        child: Material(
+          color: Theme.of(context).cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.06),
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () =>
+                _selecting ? _toggleSelection(item) : _openPlayer(ref, item),
+            child: _getListItemWidget(item, index),
+          ),
         ),
       ),
     );
@@ -309,7 +377,10 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      color: colorScheme.error,
+      decoration: BoxDecoration(
+        color: colorScheme.error,
+        borderRadius: BorderRadius.circular(20),
+      ),
       alignment: Alignment.centerRight,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Icon(Icons.delete_outline, color: colorScheme.onError),

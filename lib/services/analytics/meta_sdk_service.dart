@@ -27,6 +27,12 @@ class MetaSdkService {
 
     AppLogger.d('META', 'Init Facebook App Events (appId=$facebookAppId)');
 
+    if (isDevFlavor) {
+      AppLogger.d('META', 'Dev flavor, skipping SDK init');
+      _initialised = true;
+      return;
+    }
+
     if (facebookAppId.isEmpty) {
       AppLogger.w('META', 'Facebook App ID is empty, skipping SDK init');
       _initialised = true;
@@ -56,7 +62,10 @@ class MetaSdkService {
   /// disable requires a process restart, but dropping _events prevents
   /// all Dart-side event logging immediately.
   Future<void> setEnabled(bool enabled) async {
-    if (enabled && _events == null && facebookAppId.isNotEmpty) {
+    if (enabled &&
+        _events == null &&
+        facebookAppId.isNotEmpty &&
+        !isDevFlavor) {
       _events = FacebookAppEvents();
       _initialised = true;
       AppLogger.d('META', 'Meta SDK enabled at runtime');

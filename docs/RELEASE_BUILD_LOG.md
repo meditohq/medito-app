@@ -8,6 +8,7 @@ Keep this file updated whenever a build number/version code is successfully uplo
 | 2026-10-01 | 2609.30.0 | 302467 | iOS | TestFlight | Uploaded successfully and release tag created. | [36852107988](https://github.com/meditohq/medito-app/actions/runs/36852107988) |
 | 2026-10-02 | 2609.30.0 | 302467 | Android phone | Internal testing | Re-upload rejected: `Cannot update a published APK`. Use `wear_only=true` for Wear-only retries. | [36983933785](https://github.com/meditohq/medito-app/actions/runs/36983933785) |
 | 2026-10-02 | 2609.30.0 | 1000302467 | Wear OS | wear:qa | Upload rejected: `Track not found: wear:qa`. Wait for Play Console to expose/approve the Wear OS internal track before retrying this version code. | [36986690581](https://github.com/meditohq/medito-app/actions/runs/36986690581) |
+| 2026-10-02 | 2609.30.0 | 1000302467 | Wear OS | wear:internal | Uploaded successfully (status completed). Tag `wear-2609.30.0` at e97af585. Do not re-upload this version code. | [36989197407](https://github.com/meditohq/medito-app/actions/runs/36989197407) |
 
 ## Release checklist
 

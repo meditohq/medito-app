@@ -100,7 +100,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache Gradle
@@ -135,13 +135,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         env:
@@ -259,6 +260,10 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
@@ -415,6 +420,10 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
@@ -435,6 +444,10 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
@@ -604,7 +617,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache CocoaPods
@@ -619,7 +632,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/ios/iphonesimulator/Medito Dev.app
-          key: ${{ runner.os }}-ios-app-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'ios/Podfile.lock', 'ios/Runner.xcodeproj/project.pbxproj') }}
+          key: ${{ runner.os }}-ios-app-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'ios/Podfile.lock', 'ios/Runner.xcodeproj/project.pbxproj', 'ios/Runner/**', 'ios/MeditoWidget/**', 'ios/*.entitlements', 'ios/*.plist') }}
 
       - name: Flutter pub get
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
@@ -647,13 +660,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-ios-app.outputs.cache-hit != 'true' && steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
@@ -1007,7 +1021,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache CocoaPods
@@ -1049,13 +1063,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         env:

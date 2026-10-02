@@ -45,9 +45,12 @@ name: Dismiss onboarding donation without payment
                 timeout: 10000
 
 
-# Webview intro path, Android: release smoke uses the deployable APK, so it
-# keeps the real production build settings and drives the donation webview
-# before skipping.
+# Webview intro path, Android: release smoke uses the deployable APK (no
+# SMOKE_TEST_MODE close control). Leave with system back instead of the page's
+# X: back pops the webview route just like Close (both callers ignore the
+# result and advance), and it doesn't depend on the remote page loading. The
+# X fades in 5s after load and a tap on it can silently miss (runs
+# 32850168903, 33071182758, 36687309807), which made this the flakiest step.
 - runFlow:
     when:
       visible: "See how to help"
@@ -55,28 +58,11 @@ name: Dismiss onboarding donation without payment
     commands:
       - tapOn: "See how to help"
 
-      # Dismiss the webview. The webpage shows an x close glyph (aria-label
-      # "Close") in the top-right that fades in 5s after the page loads.
-      # Do NOT use waitForAnimationToEnd here -- the webview can keep loading
-      # indefinitely on CI and block the step. Wait directly for Close instead,
-      # with a generous timeout to cover slow CI network.
+      # The route is pushed only after the payment config preload (up to 5s),
+      # so wait until it covers the intro — back any earlier would pop the
+      # onboarding screen instead.
       - extendedWaitUntil:
-          visible: "Close"
-          timeout: 90000
+          notVisible: "See how to help"
+          timeout: 20000
       - takeScreenshot: paywall-webview
-
-      # The page can expose a "Close" accessibility node before the close
-      # affordance is actually visible or tappable. Drive the Android-native
-      # webview dismissal instead: Back closes the route while the webview is
-      # open, and retry until the Close node is gone.
-      - retry:
-          maxRetries: 3
-          commands:
-            - runFlow:
-                when:
-                  visible: "Close"
-                commands:
-                  - pressKey: Back
-            - extendedWaitUntil:
-                notVisible: "Close"
-                timeout: 20000
+      - back

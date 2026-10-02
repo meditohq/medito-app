@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/dialogs/medito_dialog.dart';
 import 'package:medito/widgets/dialogs/medito_dialog_buttons.dart';
@@ -10,6 +12,39 @@ import 'package:medito/widgets/dialogs/medito_dialog_buttons.dart';
 /// Everything between "user asked for reminders" and "the OS actually lets us
 /// send them". Three surfaces need it — onboarding, the end-screen card and the
 /// settings tile — and each previously handled it differently, or not at all.
+
+/// Records that a reminder was asked for but never granted.
+///
+/// A time chip saves the chosen hour before the permission is asked, and
+/// `ReminderEnabledNotifier` treats "a saved time and no explicit flag" as
+/// "reminders on". Without an explicit false, a user who declines here reads as
+/// enabled: the end-screen card never asks again and settings shows a reminder
+/// that can't fire. The saved time is kept so a later enable reuses it.
+Future<void> recordReminderNotEnabled(SharedPreferences prefs) =>
+    prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, false);
+
+/// One-time repair for installs that declined before [recordReminderNotEnabled]
+/// existed: a saved time, no flag, and no permission. Writes the explicit false
+/// so the end-screen card can ask again. Never touches a flag that is already
+/// set, or an install whose reminders can actually fire.
+Future<void> repairReminderFlagOnce(
+  SharedPreferences prefs, {
+  required Future<bool> Function() isGranted,
+}) async {
+  if (prefs.getBool(SharedPreferenceConstants.reminderFlagRepaired) ?? false) {
+    return;
+  }
+  await prefs.setBool(SharedPreferenceConstants.reminderFlagRepaired, true);
+
+  final flagUnset =
+      prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) == null;
+  final hasSavedTime =
+      prefs.getInt(SharedPreferenceConstants.savedHours) != null;
+  if (!flagUnset || !hasSavedTime) return;
+  if (await isGranted()) return;
+
+  await recordReminderNotEnabled(prefs);
+}
 
 /// Soft-ask shown immediately before the OS notification permission dialog.
 ///

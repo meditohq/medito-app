@@ -1,10 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/explore/explore_list_item.dart';
@@ -48,12 +45,21 @@ enum SearchFilter {
 /// overlay above the tabs while the nav capsule holds the search field, so
 /// the bottom padding follows the bar height from the enclosing Scaffold.
 class SearchResults extends ConsumerStatefulWidget {
-  const SearchResults({super.key, required this.query, this.onBeforeNavigate});
+  const SearchResults({
+    super.key,
+    required this.query,
+    this.onBeforeNavigate,
+    this.onResults,
+  });
 
   final String query;
 
   /// Runs before a result navigates, e.g. to dismiss the keyboard.
   final VoidCallback? onBeforeNavigate;
+
+  /// Called once per query when its results have loaded, with whether there
+  /// were any. Analytics is the caller's (see SearchQueryLogger).
+  final void Function(String query, bool hasResults)? onResults;
 
   @override
   ConsumerState<SearchResults> createState() => _SearchResultsState();
@@ -65,9 +71,9 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
   int? _previousTracksCount;
   bool _filterSwitchScheduled = false;
 
-  /// The last query we logged a "no results" event for, so a settled
-  /// zero-result query is only reported once (not on every rebuild).
-  String? _loggedNoResultsQuery;
+  /// The last query reported via [SearchResults.onResults], so each query is
+  /// reported once (not on every rebuild).
+  String? _reportedQuery;
 
   @override
   void didUpdateWidget(covariant SearchResults oldWidget) {
@@ -177,22 +183,11 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
 
     return tracksAsync.when(
       data: (tracks) {
-        // A settled, non-empty query with nothing in either bucket is a
-        // content/discovery gap — report it once per query.
-        if (query.isNotEmpty &&
-            packs.isEmpty &&
-            tracks.isEmpty &&
-            _loggedNoResultsQuery != query) {
-          _loggedNoResultsQuery = query;
-          final analytics = ref.read(analyticsServiceProvider);
+        if (query.isNotEmpty && _reportedQuery != query) {
+          _reportedQuery = query;
+          final hasResults = packs.isNotEmpty || tracks.isNotEmpty;
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) return;
-            unawaited(
-              analytics.logEvent(
-                name: AnalyticsEventConstants.searchNoResults,
-                parameters: {AnalyticsEventConstants.paramSearchTerm: query},
-              ),
-            );
+            if (mounted) widget.onResults?.call(query, hasResults);
           });
         }
 

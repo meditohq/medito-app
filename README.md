@@ -27,7 +27,7 @@ Contributors can run the app without any API keys or Firebase setup using mock m
 
 1. Generate required code (Pigeon + Riverpod):
    ```
-   flutter pub run pigeon --input pigeon_conf.dart
+   for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f"; done
    dart run build_runner build --delete-conflicting-outputs
    ```
 
@@ -82,10 +82,10 @@ In mock mode, Firebase, the paywall webview, Stripe, and Meta SDK are all skippe
 
 ### Generating Code
 
-To generate Pigeon code. This is required to communicate with native iOS and Android code.
+To generate Pigeon code. This is required to communicate with native iOS and Android code. `pigeon_conf.dart` holds the Android-only APIs; each file in `pigeons/` is a separate input (e.g. `watch_presence.dart`, which also generates Swift).
 
 ```
-flutter pub run pigeon --input pigeon_conf.dart
+for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f"; done
 ```
 
 To generate API and state management code with Riverpod:

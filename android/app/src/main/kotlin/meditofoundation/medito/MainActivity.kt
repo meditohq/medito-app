@@ -85,6 +85,7 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
         WatchSyncBridge.register(flutterEngine.dartExecutor.binaryMessenger, this)
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
+        WatchPresence.register(flutterEngine.dartExecutor.binaryMessenger, this)
         checkAndSendCompletionData()
         
         // Set up platform channel for widget updates

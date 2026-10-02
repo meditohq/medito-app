@@ -6,6 +6,7 @@ import Intents
 import IntentsUI
 import AppTrackingTransparency
 import FBSDKCoreKit
+import WatchConnectivity
 
 @main
 class AppDelegate: FlutterAppDelegate {
@@ -119,6 +120,8 @@ class AppDelegate: FlutterAppDelegate {
                 result(FlutterMethodNotImplemented)
             }
         }
+
+        WatchPresence.shared.register(with: controller.binaryMessenger)
     }
 
     private func presentAddVoiceShortcutUI(title: String, id: String, url: String) {
@@ -161,4 +164,59 @@ extension AppDelegate: INUIAddVoiceShortcutViewControllerDelegate {
     func addVoiceShortcutViewControllerDidCancel(_ controller: INUIAddVoiceShortcutViewController) {
         controller.dismiss(animated: true, completion: nil)
     }
+}
+
+/// Tells Dart whether an Apple Watch is paired (and whether the Medito watch
+/// app is on it) so analytics can size the audience for a watch app.
+///
+/// Both flags are only valid once WCSession has activated. If nothing else
+/// has claimed the session it activates it itself; if another delegate owns
+/// it (the watch app's WatchSessionManager), it just waits for that
+/// activation and reads the state.
+final class WatchPresence: NSObject, WatchPresenceApi, WCSessionDelegate {
+    static let shared = WatchPresence()
+    private typealias Completion = (Result<WatchStatus, Error>) -> Void
+    private var waiting: [Completion] = []
+
+    func register(with messenger: FlutterBinaryMessenger) {
+        WatchPresenceApiSetup.setUp(binaryMessenger: messenger, api: self)
+    }
+
+    func getStatus(completion: @escaping (Result<WatchStatus, Error>) -> Void) {
+        guard WCSession.isSupported() else {
+            return completion(.success(WatchStatus(paired: false, appInstalled: false)))
+        }
+        let session = WCSession.default
+        if session.activationState == .activated { return completion(.success(snapshot(session))) }
+        waiting.append(completion)
+        if session.delegate == nil {
+            session.delegate = self
+            session.activate()
+        } else {
+            // Someone else activates it; read once they have.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { self.flush() }
+        }
+    }
+
+    private func snapshot(_ session: WCSession) -> WatchStatus {
+        WatchStatus(paired: session.isPaired, appInstalled: session.isWatchAppInstalled)
+    }
+
+    private func flush() {
+        let session = WCSession.default
+        // If activation didn't succeed, report an error (Dart skips the update)
+        // rather than a false "no watch" that would skew the audience count.
+        let pending = waiting
+        waiting.removeAll()
+        let result: Result<WatchStatus, Error> = session.activationState == .activated
+            ? .success(snapshot(session))
+            : .failure(WatchPresencePigeonError(code: "activation_failed", message: "WCSession not activated", details: nil))
+        pending.forEach { $0(result) }
+    }
+
+    func session(_ session: WCSession, activationDidCompleteWith state: WCSessionActivationState, error: Error?) {
+        DispatchQueue.main.async { self.flush() }
+    }
+    func sessionDidBecomeInactive(_ session: WCSession) {}
+    func sessionDidDeactivate(_ session: WCSession) { session.activate() }
 }

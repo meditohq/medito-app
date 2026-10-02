@@ -292,6 +292,12 @@ class SplashViewState extends ConsumerState<SplashView>
         );
       }
 
+      try {
+        await FirebaseAnalyticsService.applyStoredZenMode();
+      } catch (e, stackTrace) {
+        AppLogger.e('SPLASH', 'Error applying stored zen mode', e, stackTrace);
+      }
+
       final currentUser = auth.currentUser;
       final isLoggedIn = await auth.isLoggedIn();
       AppLogger.i(

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// Toggles "mock mode": a fully self-contained demo environment that runs
 /// the app against hardcoded fake data instead of the real backend. This
@@ -13,6 +14,12 @@ import 'package:flutter/foundation.dart';
 /// lib/mock/README.md for the full picture.
 bool get isMockMode =>
     const String.fromEnvironment('MOCK_MODE', defaultValue: 'false') == 'true';
+
+/// True for builds made with `--flavor dev` (simulator/emulator and internal
+/// dev builds). These share the prod Firebase app ID and bundle ID, so any
+/// analytics they send lands in the prod GA4/Meta data; gate on this to keep
+/// them out.
+bool get isDevFlavor => appFlavor == 'dev';
 
 /// Enables small test-only shortcuts for end-to-end smoke runs without switching
 /// the app to full mock data.
