@@ -19,5 +19,7 @@ Keep this file updated whenever a build number/version code is successfully uplo
 
 - Wear OS uses a separate APK with version code offset from the phone APK. For `2609.30.0+302467`, the Wear OS APK reported version code `1000302467` in the Play upload logs.
 - If the phone APK/version code is already listed above as uploaded, do not rerun the normal Android upload for the same version code. Use the workflow's `wear_only=true` input for Wear-only retries.
-- The current Wear OS internal track name in the release workflow is `wear:qa`, matching Google's documented Wear OS QA/internal track name. If Play returns `Track not found: wear:qa`, the Wear OS form factor/track is not available to the API yet.
+- The Wear OS internal track is `wear:internal` (verified via the Play API track list 2026-10-02: `wear:internal`, `wear:beta`, `wear:production`). `wear:qa` does NOT exist for this app.
+- Never add the phone APK (e.g. 302467) to a `wear:*` release in Play Console — it fails with "must require android.hardware.type.watch". Only the Wear APK (`1000000000 + build`) goes there.
+- Wear-only builds made after a version's phone/iOS tag are tagged `wear-<version>` (that prefix keeps them out of the `N.N.N` previous-tag lookup).
 - `wear_only=true` skips phone Play upload and, as of workflow commit `451b4743`, skips phone smoke/upgrade so a Wear-only retry is not blocked by phone-only smoke flakes.
