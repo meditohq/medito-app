@@ -546,6 +546,11 @@ class AnalyticsEventConstants {
   static const String userPropHasPairedWatch = 'has_paired_watch';
   static const String userPropWatchAppInstalled = 'watch_app_installed';
 
+  /// GA4 user property for the Zen Mode setting ('on' / 'off'). Set on every
+  /// launch and whenever the user toggles it, so adoption can be read from
+  /// BigQuery and other metrics segmented by it.
+  static const String userPropZenMode = 'zen_mode';
+
   /// Event logged when the new onboarding question flow is completed
   /// Parameter: paramResultState — 'state_a', 'state_b', or 'state_c'
   static const String onboardingQuestionFlowCompleted =

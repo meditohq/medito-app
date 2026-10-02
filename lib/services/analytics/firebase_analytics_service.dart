@@ -704,6 +704,33 @@ class FirebaseAnalyticsService {
     }
   }
 
+  /// Re-asserts `zen_mode` from prefs on launch, so users who enabled Zen Mode
+  /// before the property existed (or before granting consent) are counted.
+  static Future<void> applyStoredZenMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    await setZenModeProperty(
+      prefs.getBool(SharedPreferenceConstants.zenModeEnabled) ?? false,
+    );
+  }
+
+  static Future<void> setZenModeProperty(bool enabled) async {
+    try {
+      final analyticsService = FirebaseAnalyticsService();
+      await analyticsService.initialize();
+      await analyticsService.setUserProperty(
+        name: AnalyticsEventConstants.userPropZenMode,
+        value: enabled ? 'on' : 'off',
+      );
+    } catch (e, stackTrace) {
+      AppLogger.e(
+        'FIREBASE_ANALYTICS',
+        'Failed to set zen mode user property',
+        e,
+        stackTrace,
+      );
+    }
+  }
+
   static Future<void> applyStoredUtmParameters() async {
     try {
       if (_runningInTest) return;
