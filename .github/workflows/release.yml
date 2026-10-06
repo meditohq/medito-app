@@ -218,7 +218,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Smoke test on emulator
-        timeout-minutes: 20
+        timeout-minutes: 35
         uses: reactivecircus/android-emulator-runner@v2
         env:
           TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
@@ -226,7 +226,10 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
           profile: pixel_6
           # The donation webview renders in software (swiftshader); on the default
           # RAM/cores the emulator froze and went offline mid-run (09-30).
@@ -241,8 +244,8 @@ jobs:
             adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
             mkdir -p /tmp/maestro-debug
-            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug
-            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml --no-ansi --debug-output /tmp/maestro-debug/signed-in
+            .maestro/run_flow.sh /tmp/maestro-debug -e APP_ID=meditofoundation.medito .maestro/smoke.yaml
+            .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
 
       - name: Scrub test account credentials from debug output
         if: failure()
@@ -382,7 +385,10 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
           profile: pixel_6
           # The donation webview renders in software (swiftshader); on the default
           # RAM/cores the emulator froze and went offline mid-run (09-30).
@@ -406,7 +412,10 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
           profile: pixel_6
           # The donation webview renders in software (swiftshader); on the default
           # RAM/cores the emulator froze and went offline mid-run (09-30).
@@ -696,31 +705,31 @@ jobs:
         run: curl -Ls "https://get.maestro.mobile.dev" | bash
 
       - name: Smoke test on simulator
-        timeout-minutes: 12
+        # ~6 min per attempt; run_flow.sh may retry once.
+        timeout-minutes: 20
         run: |
           xcrun simctl install booted "build/ios/iphonesimulator/Medito Dev.app"
           # Give SpringBoard a few extra seconds to settle before Maestro connects
           sleep 5
           mkdir -p /tmp/maestro-debug
-          $HOME/.maestro/bin/maestro test \
+          .maestro/run_flow.sh /tmp/maestro-debug \
             -e APP_ID=org.meditofoundation \
-            .maestro/smoke.yaml \
-            --no-ansi --debug-output /tmp/maestro-debug
+            .maestro/smoke.yaml
 
       - name: Signed-in stats test on simulator
         # Two sign-ins + two onboarding passes + a session: ~11 min on the
         # macOS runner, so 12 cut off a run that had passed (36317083446).
-        timeout-minutes: 20
+        # run_flow.sh may retry once.
+        timeout-minutes: 35
         env:
           TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
           TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
         run: |
-          $HOME/.maestro/bin/maestro test \
+          .maestro/run_flow.sh /tmp/maestro-debug/signed-in \
             -e APP_ID=org.meditofoundation \
             -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" \
             -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" \
-            .maestro/signed_in_stats.yaml \
-            --no-ansi --debug-output /tmp/maestro-debug/signed-in
+            .maestro/signed_in_stats.yaml
 
       - name: Save iOS app log
         if: failure()
