@@ -222,7 +222,7 @@ platform :ios do
     UI.user_error!("No App Store version #{version_string}") unless version
 
     state = version.app_version_state || version.app_store_state
-    UI.message("App Store version #{version_string}: #{state}")
+    UI.message("App Store version #{version_string}: #{state}, build #{version.build&.version || 'none'}")
     if state == "PENDING_DEVELOPER_RELEASE"
       version.create_app_store_version_release_request
       UI.success("Released #{version_string} to the App Store")
