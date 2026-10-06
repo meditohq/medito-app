@@ -216,6 +216,10 @@ dependencies {
 
     // Health Connect (MindfulnessSessionRecord added in 1.1.0, Oct 2025)
     implementation "androidx.health.connect:connect-client:1.1.0"
+
+    // Play install referrer (InstallReferrer.kt). Already pulled in by the
+    // Facebook SDK; declared because we call it directly.
+    implementation "com.android.installreferrer:installreferrer:2.2"
 }
 
 

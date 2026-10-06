@@ -20,6 +20,7 @@ import 'package:medito/services/analytics/apple_ads_attribution_service.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:medito/services/analytics/play_install_referrer_service.dart';
 import 'package:medito/services/deep_link_service.dart';
 import 'package:medito/services/network/header_service.dart';
 import 'package:medito/utils/logger.dart';
@@ -282,9 +283,10 @@ class SplashViewState extends ConsumerState<SplashView>
         );
       }
 
-      // Apple Ads installs without a deep link carry no UTMs; ask Apple.
-      // Network-bound with retries, so don't hold up the splash.
+      // Ad installs without a deep link carry no UTMs; ask Apple (iOS) or the
+      // Play install referrer (Android). Don't hold up the splash for either.
       unawaited(AppleAdsAttributionService().attributeOnce());
+      unawaited(PlayInstallReferrerService().attributeOnce());
 
       try {
         await FirebaseAnalyticsService.applyStoredExperienceLevel();

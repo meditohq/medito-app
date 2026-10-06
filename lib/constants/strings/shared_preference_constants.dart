@@ -85,6 +85,11 @@ class SharedPreferenceConstants {
   static const String appleAdsAttributionChecked =
       'apple_ads_attribution_checked';
 
+  /// Set once the Play install referrer has been read for this install (see
+  /// PlayInstallReferrerService).
+  static const String playInstallReferrerChecked =
+      'play_install_referrer_checked';
+
   // Donation snooze tracking
   static const String donationAskSnoozedUntilMs =
       'donation_ask_snoozed_until_ms';

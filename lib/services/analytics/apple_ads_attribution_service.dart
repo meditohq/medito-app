@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/analytics/install_source_utms.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -135,19 +136,13 @@ class AppleAdsAttributionService {
     });
     if (!attributed) return;
 
-    // A tagged deep link is more specific (named campaign), so keep its UTMs.
-    if (prefs.getString(SharedPreferenceConstants.utmSource) != null) return;
-    final utms = {
+    await storeInstallSourceUtms(prefs, {
       SharedPreferenceConstants.utmSource: utmSource,
       SharedPreferenceConstants.utmMedium: utmMedium,
       SharedPreferenceConstants.utmCampaign: payload['campaignId'],
       SharedPreferenceConstants.utmContent: payload['adGroupId'],
       SharedPreferenceConstants.utmTerm: payload['keywordId'],
-    };
-    for (final MapEntry(:key, :value) in utms.entries) {
-      if (value != null) await prefs.setString(key, '$value');
-    }
-    await FirebaseAnalyticsService.applyStoredUtmParameters();
+    });
   }
 
   static Future<void> _logToFirebase(
