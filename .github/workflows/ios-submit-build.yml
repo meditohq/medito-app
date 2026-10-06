@@ -1,0 +1,83 @@
+# Attaches a build that is already on App Store Connect to its App Store
+# version and (optionally) submits it for review, without rebuilding.
+#
+# For when release.yml uploaded the binary but the submission step failed:
+# re-running that job rebuilds and re-uploads the same build number, which App
+# Store Connect rejects. 2610.6.3 (run 37491234725) failed this way with "The
+# specified pre-release build could not be added", one second after processing
+# finished.
+name: iOS – submit existing build
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: 'Marketing version, e.g. 2610.6.3'
+        required: true
+        type: string
+      build_number:
+        description: 'Build number already on App Store Connect, e.g. 302473'
+        required: true
+        type: string
+      submit_for_review:
+        description: 'Submit for review (otherwise just attach the build to the draft)'
+        type: boolean
+        default: true
+
+jobs:
+  submit:
+    name: Attach build and submit
+    runs-on: macos-latest
+    environment: prod
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Release notes come from the tagged release, not from whatever the
+          # dispatch ref has in Unreleased.
+          ref: ${{ inputs.app_version }}
+          path: tagged
+
+      - uses: actions/checkout@v4
+        with:
+          path: current
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: current/ios
+
+      - name: Set release notes
+        working-directory: tagged
+        run: |
+          notes=$(awk -v v="${{ inputs.app_version }}" '
+            $0 == v { in_v = 1; next }
+            in_v && /^[0-9]/ { exit }
+            in_v && /^-/ { print; next }
+            in_v && NF && !/^- / { exit }
+          ' release_notes.txt)
+          if [ -z "$notes" ]; then
+            echo "::error::No release notes for ${{ inputs.app_version }} in release_notes.txt"
+            exit 1
+          fi
+          # Same per-platform filter as release.yml.
+          notes=$(printf '%s\n' "$notes" | sed -e '/^- \[android\] /d' -e 's/^- \[ios\] /- /')
+          notes="${notes:0:500}"
+          printf '%s\n' "$notes"
+          { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
+
+      - name: Attach build and submit
+        working-directory: current/ios
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+          DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
+          APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+          DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
+        run: |
+          bundle exec fastlane ios release \
+            submit_for_review:"${{ inputs.submit_for_review }}" \
+            app_version:"${{ inputs.app_version }}" \
+            build_number:"${{ inputs.build_number }}"
