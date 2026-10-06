@@ -78,11 +78,21 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
+      # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the
+      # build and timed out over the iOS build tree, failing a job whose tests
+      # had passed (run 37440292038 attempt 2).
+      - name: Cache Flutter SDK
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+
       - uses: subosito/flutter-action@v2.12.0
         with:
           flutter-version: '3.47.2'
           channel: stable
-          cache: true
+          cache: false
 
       - name: Cache pub packages
         uses: actions/cache@v4
@@ -218,11 +228,8 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Smoke test on emulator
-        timeout-minutes: 35
+        timeout-minutes: 25
         uses: reactivecircus/android-emulator-runner@v2
-        env:
-          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
-          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
         with:
           api-level: 34
           arch: x86_64
@@ -245,6 +252,64 @@ jobs:
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
             mkdir -p /tmp/maestro-debug
             .maestro/run_flow.sh /tmp/maestro-debug -e APP_ID=meditofoundation.medito .maestro/smoke.yaml
+
+      - name: Signed-in stats test on emulator
+        # Its own emulator boot: the emulator has crashed outright (adb
+        # "device not found") after rendering the donation webview late in
+        # a long session (run 37446734529), which no in-session retry can
+        # survive. The AVD keeps the installed app between boots.
+        id: signed_in
+        continue-on-error: true
+        timeout-minutes: 25
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        with:
+          api-level: 34
+          arch: x86_64
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
+          profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            adb shell am force-stop com.google.android.apps.nexuslauncher || true
+            .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
+
+      - name: Signed-in stats test on emulator (retry on a fresh boot)
+        if: steps.signed_in.outcome == 'failure'
+        timeout-minutes: 25
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        with:
+          api-level: 34
+          arch: x86_64
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
+          profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            adb shell am force-stop com.google.android.apps.nexuslauncher || true
             .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
 
       - name: Scrub test account credentials from debug output
@@ -535,11 +600,21 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
+      # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
+      # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the
+      # build and timed out over the iOS build tree, failing a job whose tests
+      # had passed (run 37440292038 attempt 2).
+      - name: Cache Flutter SDK
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+
       - uses: subosito/flutter-action@v2.12.0
         with:
           flutter-version: '3.47.2'
           channel: stable
-          cache: true
+          cache: false
 
       - name: Cache pub packages
         uses: actions/cache@v4
@@ -937,11 +1012,21 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
+      # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
+      # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the
+      # build and timed out over the iOS build tree, failing a job whose tests
+      # had passed (run 37440292038 attempt 2).
+      - name: Cache Flutter SDK
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+
       - uses: subosito/flutter-action@v2.12.0
         with:
           flutter-version: '3.47.2'
           channel: stable
-          cache: true
+          cache: false
 
       - name: Cache pub packages
         uses: actions/cache@v4
