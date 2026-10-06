@@ -283,6 +283,8 @@ jobs:
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
+            mkdir -p /tmp/maestro-debug
+            sh -c 'nohup adb logcat -b all -v threadtime > /tmp/maestro-debug/signed-in-logcat.txt 2>&1 &'
             .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
 
       - name: Signed-in stats test on emulator (retry on a fresh boot)
@@ -310,6 +312,8 @@ jobs:
           script: |
             curl -Ls "https://get.maestro.mobile.dev" | bash
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
+            mkdir -p /tmp/maestro-debug
+            sh -c 'nohup adb logcat -b all -v threadtime > /tmp/maestro-debug/signed-in-retry-logcat.txt 2>&1 &'
             .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
 
       - name: Host diagnostics (emulator crash)
