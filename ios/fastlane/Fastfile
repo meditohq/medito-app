@@ -16,7 +16,11 @@ DART_DEFINES = [
 
 platform :ios do
 
-  before_all do
+  before_all do |lane|
+    # release_if_approved only calls the App Store Connect API and runs on a
+    # Linux runner, which has no Xcode to select.
+    next if lane == :release_if_approved
+
     # Honour the Xcode that the environment has already selected rather than
     # forcing the runner's *default* `/Applications/Xcode.app` symlink.
     #
