@@ -5,6 +5,7 @@ import app_links
 import Intents
 import IntentsUI
 import AppTrackingTransparency
+import AdServices
 import FBSDKCoreKit
 import WatchConnectivity
 
@@ -112,6 +113,31 @@ class AppDelegate: FlutterAppDelegate {
                 }
             } else {
                 result(FlutterMethodNotImplemented)
+            }
+        }
+
+        // Apple Ads attribution token; Dart exchanges it with Apple's
+        // AdServices API (see AppleAdsAttributionService). Needs no ATT consent.
+        let adServicesChannel = FlutterMethodChannel(
+            name: "com.medito.app/adservices",
+            binaryMessenger: controller.binaryMessenger
+        )
+
+        adServicesChannel.setMethodCallHandler { call, result in
+            guard call.method == "attributionToken" else {
+                result(FlutterMethodNotImplemented)
+                return
+            }
+            // attributionToken() can block, so keep it off the main thread.
+            DispatchQueue.global(qos: .utility).async {
+                do {
+                    let token = try AAAttribution.attributionToken()
+                    DispatchQueue.main.async { result(token) }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError(code: "token_failed", message: error.localizedDescription, details: nil))
+                    }
+                }
             }
         }
 

@@ -551,6 +551,16 @@ class AnalyticsEventConstants {
   /// BigQuery and other metrics segmented by it.
   static const String userPropZenMode = 'zen_mode';
 
+  /// Logged once per iOS install with Apple's AdServices answer for whether
+  /// the install came from an Apple Ads campaign. Params: attributed
+  /// ('true' / 'false'); when attributed also campaign_id, ad_group_id,
+  /// keyword_id, claim_type ('Click' / 'Impression'), conversion_type
+  /// ('Download' / 'Redownload'), country_or_region. Attributed installs also
+  /// get utm_source 'apple-search' / utm_medium 'asa' (unless a deep link
+  /// already set UTMs), which flow into GA4 user properties and Stripe
+  /// metadata like deep-link UTMs do.
+  static const String appleAdsAttribution = 'apple_ads_attribution';
+
   /// Event logged when the new onboarding question flow is completed
   /// Parameter: paramResultState — 'state_a', 'state_b', or 'state_c'
   static const String onboardingQuestionFlowCompleted =

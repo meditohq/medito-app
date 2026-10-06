@@ -16,6 +16,7 @@ import 'package:medito/providers/root/root_combine_provider.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
+import 'package:medito/services/analytics/apple_ads_attribution_service.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
@@ -280,6 +281,10 @@ class SplashViewState extends ConsumerState<SplashView>
           stackTrace,
         );
       }
+
+      // Apple Ads installs without a deep link carry no UTMs; ask Apple.
+      // Network-bound with retries, so don't hold up the splash.
+      unawaited(AppleAdsAttributionService().attributeOnce());
 
       try {
         await FirebaseAnalyticsService.applyStoredExperienceLevel();
