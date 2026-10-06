@@ -470,6 +470,8 @@ jobs:
           if [ -z "$notes" ]; then
             notes=$(awk '/^[0-9]/{if(in_v)exit; in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
+          # "- [ios] ..." lines are iOS-only; "- [android] ..." lines lose their tag.
+          notes=$(printf '%s\n' "$notes" | sed -e '/^- \[ios\] /d' -e 's/^- \[android\] /- /')
           notes="${notes:0:500}"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
@@ -1063,6 +1065,8 @@ jobs:
               in_v && NF && !/^- / { exit }
             ' release_notes.txt)
           fi
+          # "- [android] ..." lines are Android-only; "- [ios] ..." lines lose their tag.
+          notes=$(printf '%s\n' "$notes" | sed -e '/^- \[android\] /d' -e 's/^- \[ios\] /- /')
           notes="${notes:0:500}"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 

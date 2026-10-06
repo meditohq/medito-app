@@ -58,6 +58,7 @@ For each user-facing change found:
 - Focus on what the user can now *do* or what feels *better* — not what changed in code
 - No jargon, no technical terms
 - No version numbers
+- **Platform-only changes get a tag:** start the line with `[android]` or `[ios]` (e.g. `- [android] Fixed widgets freezing the app`). The release workflow drops the line from the other store's notes and strips the tag, so don't also write "on Android" in the text. Untagged lines go to both stores.
 
 Good examples:
 - `Classic purple theme is now available on Android`
