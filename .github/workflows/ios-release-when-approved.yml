@@ -32,6 +32,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The build number the tagged release was cut with, so the lane refuses
+      # to release a version that carries some other build.
+      - name: Expected build number
+        run: |
+          build=$(git show "$APP_VERSION:pubspec.yaml" | sed -n 's/^version: *[^+]*+//p')
+          if [ -z "$build" ]; then
+            echo "::error::Could not read the build number from tag $APP_VERSION"
+            exit 1
+          fi
+          echo "EXPECTED_BUILD=$build" >> "$GITHUB_ENV"
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -48,4 +61,4 @@ jobs:
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
           APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
           DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
-        run: bundle exec fastlane ios release_if_approved app_version:"$APP_VERSION"
+        run: bundle exec fastlane ios release_if_approved app_version:"$APP_VERSION" build_number:"$EXPECTED_BUILD"

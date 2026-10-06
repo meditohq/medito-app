@@ -207,7 +207,7 @@ platform :ios do
   # false). Any other state is only logged, so this is safe to run on a timer:
   # see .github/workflows/ios-release-when-approved.yml.
   #
-  #   fastlane ios release_if_approved app_version:2610.6.3
+  #   fastlane ios release_if_approved app_version:2610.6.3 [build_number:302473]
   lane :release_if_approved do |options|
     version_string = options[:app_version].to_s
     UI.user_error!("app_version is required") if version_string.empty?
@@ -227,6 +227,13 @@ platform :ios do
 
     state = version.app_version_state || version.app_store_state
     UI.message("App Store version #{version_string}: #{state}, build #{version.build&.version || 'none'}")
+    expected_build = options[:build_number].to_s
+    attached_build = version.build&.version.to_s
+    if !expected_build.empty? && attached_build != expected_build
+      # 2610.6.3 was once in review with 302471 (2610.6.1's binary) instead of
+      # 302473; never release a version carrying a different build than tagged.
+      UI.user_error!("#{version_string} has build #{attached_build}, expected #{expected_build}: not releasing")
+    end
     if state == "PENDING_DEVELOPER_RELEASE"
       version.create_app_store_version_release_request
       UI.success("Released #{version_string} to the App Store")
