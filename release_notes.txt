@@ -1,6 +1,14 @@
 Unreleased
 -
 
+2610.6.3
+- [android] Fixed the app sometimes freezing when home screen widgets update
+- A fresh default app icon (you can still pick another in Settings)
+- Refreshed home screen widgets with a cleaner look
+- A tidier Downloads screen
+- The end-of-session reminder card now shows if you said no to notifications earlier
+- Smoother dismissing of announcements on Home
+
 2610.6.2
 - [android] Fixed the app sometimes freezing when home screen widgets update
 - Refreshed home screen widgets with a cleaner look
