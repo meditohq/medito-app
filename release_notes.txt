@@ -1,6 +1,13 @@
 Unreleased
 -
 
+2610.6.0
+- [android] Fixed the app sometimes freezing when home screen widgets update
+- Refreshed home screen widgets with a cleaner look
+- A tidier Downloads screen
+- The end-of-session reminder card now shows if you said no to notifications earlier
+- Smoother dismissing of announcements on Home
+
 2609.27.0
 - Start or continue a pack with one tap from its page, which also puts it on Home
 - Fixed the keyboard closing after the first letter when typing your email
