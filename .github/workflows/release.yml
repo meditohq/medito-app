@@ -32,6 +32,10 @@ on:
         description: 'Submit builds to store review automatically (Play: production release publishes on approval; iOS: App Store version is submitted, released manually after approval)'
         type: boolean
         default: false
+      skip_android_signed_in_test:
+        description: 'Skip ONLY the Android signed-in Maestro test (the CI emulator crashes in it, Oct 2026). Verify sign-in on a real phone instead.'
+        type: boolean
+        default: false
       android_promote_to_production:
         description: 'Promote the latest Android INTERNAL release to production — no new build; goes to Play review and publishes on approval. Standalone: other toggles can stay off.'
         type: boolean
@@ -259,6 +263,7 @@ jobs:
         # a long session (run 37446734529), which no in-session retry can
         # survive. The AVD keeps the installed app between boots.
         id: signed_in
+        if: ${{ !inputs.skip_android_signed_in_test }}
         continue-on-error: true
         timeout-minutes: 25
         uses: reactivecircus/android-emulator-runner@v2
@@ -288,7 +293,7 @@ jobs:
             .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
 
       - name: Signed-in stats test on emulator (retry on a fresh boot)
-        if: steps.signed_in.outcome == 'failure'
+        if: ${{ !inputs.skip_android_signed_in_test && steps.signed_in.outcome == 'failure' }}
         timeout-minutes: 25
         uses: reactivecircus/android-emulator-runner@v2
         env:
