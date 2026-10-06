@@ -194,6 +194,37 @@ platform :ios do
     upload_dsyms_to_crashlytics
   end
 
+  # Releases an App Store version that Apple has approved and that is waiting
+  # for a manual release (the release lane submits with automatic_release:
+  # false). Any other state is only logged, so this is safe to run on a timer:
+  # see .github/workflows/ios-release-when-approved.yml.
+  #
+  #   fastlane ios release_if_approved app_version:2610.6.3
+  lane :release_if_approved do |options|
+    version_string = options[:app_version].to_s
+    UI.user_error!("app_version is required") if version_string.empty?
+
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      is_key_content_base64: false,
+      in_house: false
+    )
+
+    app = Spaceship::ConnectAPI::App.find(CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+    UI.user_error!("App not found in App Store Connect") unless app
+    version = app.get_app_store_versions(filter: { versionString: version_string, platform: "IOS" }).first
+    UI.user_error!("No App Store version #{version_string}") unless version
+
+    state = version.app_version_state || version.app_store_state
+    UI.message("App Store version #{version_string}: #{state}")
+    if state == "PENDING_DEVELOPER_RELEASE"
+      version.create_app_store_version_release_request
+      UI.success("Released #{version_string} to the App Store")
+    end
+  end
+
 end
 
 # Builds and code-signs the .ipa with `flutter build ios --no-codesign` +
