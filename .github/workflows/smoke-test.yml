@@ -252,6 +252,15 @@ jobs:
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
             .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
 
+      - name: Host diagnostics (emulator crash)
+        # The emulator has vanished mid-flow with no output of its own (adb
+        # "device not found", runs 37454547179 and 37462825805). The host
+        # kernel log shows whether qemu was OOM-killed or segfaulted.
+        if: failure() || steps.signed_in.outcome == 'failure'
+        run: |
+          free -m || true
+          sudo dmesg -T | grep -iE 'oom|killed process|segfault|qemu|emulator|out of memory' | tail -60 || true
+
       - name: Scrub test account credentials from debug output
         if: failure()
         env:
