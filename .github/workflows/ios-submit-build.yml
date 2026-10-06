@@ -23,6 +23,10 @@ on:
         description: 'Submit for review (otherwise just attach the build to the draft)'
         type: boolean
         default: true
+      reject_if_possible:
+        description: 'Pull the version out of review first if it is already Waiting for Review with another build (loses the queue position)'
+        type: boolean
+        default: false
 
 jobs:
   submit:
@@ -80,4 +84,5 @@ jobs:
           bundle exec fastlane ios release \
             submit_for_review:"${{ inputs.submit_for_review }}" \
             app_version:"${{ inputs.app_version }}" \
-            build_number:"${{ inputs.build_number }}"
+            build_number:"${{ inputs.build_number }}" \
+            reject_if_possible:"${{ inputs.reject_if_possible }}"

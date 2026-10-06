@@ -126,6 +126,10 @@ platform :ios do
       # attached by hand in ASC — same as the build-and-upload path, where
       # uploading the binary doesn't attach it to the version either.
       upload_options[:skip_binary_upload] = true
+      # A version that is already Waiting for Review can't change its build
+      # ("The specified pre-release build could not be added"). Pull it from
+      # review first when asked, as 2610.6.3 needed (302471 was in review).
+      upload_options[:reject_if_possible] = true if options[:reject_if_possible].to_s == 'true'
       upload_options[:app_version] = options[:app_version]
       upload_options[:build_number] = options[:build_number]
     end
