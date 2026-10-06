@@ -264,6 +264,13 @@ class PaymentUIController extends _$PaymentUIController {
           parameters: {
             AnalyticsEventConstants.paramAmount: amount.toDouble(),
             AnalyticsEventConstants.paramDonationCurrency: currency,
+            // GA4's standard value/currency (major units, ISO code), which
+            // Google Ads reads when these events are imported as conversions.
+            AnalyticsEventConstants.paramValue: currencyAmountToUnits(
+              amount,
+              currency,
+            ),
+            AnalyticsEventConstants.paramCurrency: currency.toUpperCase(),
             AnalyticsEventConstants.paramPaywallId: paywallId ?? 'unknown',
             AnalyticsEventConstants.paramMeditoUserId: userId ?? 'unknown',
             AnalyticsEventConstants.paramPaywallSource:

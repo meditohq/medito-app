@@ -410,8 +410,13 @@ class AnalyticsEventConstants {
   /// Parameter name for revenue (used by Meta)
   static const String paramRevenue = 'revenue';
 
-  /// Parameter name for currency (used by Meta)
+  /// Parameter name for currency: ISO code, upper case on the GA4 donation
+  /// events (also used by Meta)
   static const String paramCurrency = 'currency';
+
+  /// GA4's standard monetary value, in major units (10.0 for $10). Google Ads
+  /// reads value + currency when GA4 events are imported as conversions.
+  static const String paramValue = 'value';
 
   // Up Next widget events
   /// Event logged when user taps the Up Next widget to start a session
