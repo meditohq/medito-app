@@ -56,6 +56,7 @@
 		CC9F9E6509D2EF1445F7D052 /* ocean@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8569F526DAB5AAE67011AF21 /* ocean@2x.png */; };
 		EDFD4D0B2C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0A2C9359BF0066E874 /* MeditoWidgetBundle.swift */; };
 		EDFD4D0D2C9359BF0066E874 /* WidgetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */; };
+		A1B2C3D42F1A000100000002 /* StatCalculators.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F1A000100000001 /* StatCalculators.swift */; };
 		EDFD4D0F2C9359BF0066E874 /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */; };
 		EDFD4D112C9359BF0066E874 /* ConsistencyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */; };
 		EDFD4D122C9359BF0066E874 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDFD4D072C9359BF0066E874 /* Assets.xcassets */; };
@@ -170,6 +171,7 @@
 		EDFD4D092C9359BF0066E874 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EDFD4D0A2C9359BF0066E874 /* MeditoWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoWidgetBundle.swift; sourceTree = "<group>"; };
 		EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetShared.swift; sourceTree = "<group>"; };
+		A1B2C3D42F1A000100000001 /* StatCalculators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatCalculators.swift; sourceTree = "<group>"; };
 		EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidget.swift; sourceTree = "<group>"; };
 		EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsistencyWidget.swift; sourceTree = "<group>"; };
 		EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpNextWidget.swift; sourceTree = "<group>"; };
@@ -453,6 +455,7 @@
 				270582592DE8CCDB00033AF9 /* MeditoWidgetExtensionRelease.entitlements */,
 				EDFD4D0A2C9359BF0066E874 /* MeditoWidgetBundle.swift */,
 				EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */,
+				A1B2C3D42F1A000100000001 /* StatCalculators.swift */,
 				EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */,
 				EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */,
 				EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */,
@@ -869,6 +872,7 @@
 			files = (
 				EDFD4D0B2C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */,
 				EDFD4D0D2C9359BF0066E874 /* WidgetShared.swift in Sources */,
+				A1B2C3D42F1A000100000002 /* StatCalculators.swift in Sources */,
 				EDFD4D0F2C9359BF0066E874 /* StreakWidget.swift in Sources */,
 				EDFD4D112C9359BF0066E874 /* ConsistencyWidget.swift in Sources */,
 				EDFD4D2B2C9359BF0066E874 /* UpNextWidget.swift in Sources */,

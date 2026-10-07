@@ -17,8 +17,6 @@ func logicalDayStart(_ date: Date, offsetHours: Int) -> Date {
 }
 
 struct WidgetData {
-    let streakCurrent: Int
-    let consistencyScore: Int
     let meditationDates: Set<Date>
     let freezeDates: Set<Date>
     let dayLabel: String
@@ -26,11 +24,38 @@ struct WidgetData {
     let themePreference: String
     let dayBoundaryOffsetHours: Int
 
+    var allActivityDates: Set<Date> { meditationDates.union(freezeDates) }
+
+    func today(at now: Date) -> Date {
+        logicalDayStart(now, offsetHours: dayBoundaryOffsetHours)
+    }
+
+    // The streak and score are recomputed here (like the Android widgets) rather than read from
+    // the "streak_current" / "consistency_score" the app pushes, which only change when the app
+    // runs: a missed day left the old streak showing until the next app open.
+    func streak(at now: Date) -> Int {
+        StatCalculator.streak(activityDays: allActivityDates, today: today(at: now))
+    }
+
+    func consistencyScore(at now: Date) -> Int {
+        StatCalculator.consistencyScore(activityDays: allActivityDates, today: today(at: now))
+    }
+
+    /// Timeline entries for the stat widgets: now, and the moment the logical day rolls over, so
+    /// the streak and the strip turn over on time without the app.
+    func timelineDates(from now: Date) -> [Date] {
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today(at: now))!
+        return [now, tomorrow.addingTimeInterval(Double(dayBoundaryOffsetHours) * 3600)]
+    }
+
+    /// Seven days running plus one earlier session: a 7-day streak at 67%.
     static var placeholder: WidgetData {
-        WidgetData(
-            streakCurrent: 7,
-            consistencyScore: 85,
-            meditationDates: [Calendar.current.startOfDay(for: Date())],
+        let today = Calendar.current.startOfDay(for: Date())
+        let days = [0, -1, -2, -3, -4, -5, -6, -11].map {
+            Calendar.current.date(byAdding: .day, value: $0, to: today)!
+        }
+        return WidgetData(
+            meditationDates: Set(days),
             freezeDates: [],
             dayLabel: "day",
             daysLabel: "days",
@@ -43,8 +68,6 @@ struct WidgetData {
         let defaults = UserDefaults(suiteName: appGroupId)
         let offsetHours = defaults?.integer(forKey: "day_boundary_offset_hours") ?? 0
         return WidgetData(
-            streakCurrent: defaults?.integer(forKey: "streak_current") ?? 0,
-            consistencyScore: defaults?.integer(forKey: "consistency_score") ?? 0,
             meditationDates: parseDates(
                 from: defaults?.string(forKey: "meditation_dates") ?? "[]",
                 offsetHours: offsetHours
@@ -141,14 +164,13 @@ func weekdayLetter(_ date: Date) -> String {
 struct CalendarStrip: View {
     let allActivityDates: Set<Date>
     let colors: WidgetColors
+    /// The logical day (`logicalDayStart`) being shown, so the strip's day keys match the
+    /// offset-bucketed `allActivityDates`.
+    let today: Date
     var circleSize: CGFloat = 20
-    var dayBoundaryOffsetHours: Int = 0
 
     private var last5Days: [Date] {
         let cal = Calendar.current
-        // Logical "today" under the day-boundary offset, so the strip's day
-        // keys match the offset-bucketed `allActivityDates`.
-        let today = logicalDayStart(Date(), offsetHours: dayBoundaryOffsetHours)
         return (0 ..< 5).reversed().map { cal.date(byAdding: .day, value: -$0, to: today)! }
     }
 
@@ -184,11 +206,9 @@ struct CalendarStrip: View {
 struct ActivityGrid: View {
     let allActivityDates: Set<Date>
     let colors: WidgetColors
+    let today: Date
     var weeks = 5
     var dotSize: CGFloat = 16
-    var dayBoundaryOffsetHours: Int = 0
-
-    private var today: Date { logicalDayStart(Date(), offsetHours: dayBoundaryOffsetHours) }
 
     /// `weeks` rows of seven days, the last one ending today.
     private var rows: [[Date]] {
@@ -234,6 +254,64 @@ struct ActivityGrid: View {
     }
 }
 
+/// The app's flame (assets/images/fire-flame.svg), as on Android: outlined until today is
+/// practised, then lit — solid, with the inner flame cut out (widget_flame_filled.xml).
+struct MeditoFlame: View {
+    let lit: Bool
+    let color: Color
+    let size: CGFloat
+
+    var body: some View {
+        Group {
+            if lit {
+                FlameShape.lit.fill(color, style: FillStyle(eoFill: true))
+            } else {
+                FlameShape.outline.stroke(
+                    color,
+                    style: StrokeStyle(lineWidth: size * 1.5 / 24, lineCap: .round, lineJoin: .round)
+                )
+            }
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+/// Closed cubic subpaths in the icon's 24×24 grid, each a flat x, y list: a start point, then
+/// (control 1, control 2, end) triples.
+private struct FlameShape: Shape {
+    let subpaths: [[CGFloat]]
+
+    static let outline = FlameShape(subpaths: [
+        [8, 18, 8, 20.4148, 9.79086, 21, 12, 21, 15.7587, 21, 17, 18.5, 14.5, 13.5,
+         11, 18, 10.5, 11, 11, 9, 9.5, 12, 8, 14.8177, 8, 18],
+        [12, 21, 17.0495, 21, 20, 18.0956, 20, 13.125, 20, 8.15444, 12, 3, 12, 3,
+         12, 3, 4, 8.15444, 4, 13.125, 4, 18.0956, 6.95054, 21, 12, 21],
+    ])
+
+    static let lit = FlameShape(subpaths: [
+        [12, 21.75, 17.4, 21.75, 20.75, 18.6, 20.75, 13.125, 20.75, 7.75, 12, 2.1, 12, 2.1,
+         12, 2.1, 3.25, 7.75, 3.25, 13.125, 3.25, 18.6, 6.6, 21.75, 12, 21.75],
+        [8.75, 18, 8.75, 19.9, 10.2, 20.25, 12, 20.25, 15.1, 20.25, 16.1, 18.3, 14.35, 14.6,
+         11, 18.2, 9.9, 12.6, 10.35, 11, 9.4, 13.1, 8.75, 15.4, 8.75, 18],
+    ])
+
+    func path(in rect: CGRect) -> Path {
+        let scale = min(rect.width, rect.height) / 24
+        var path = Path()
+        for subpath in subpaths {
+            let p = stride(from: 0, to: subpath.count, by: 2).map {
+                CGPoint(x: rect.minX + subpath[$0] * scale, y: rect.minY + subpath[$0 + 1] * scale)
+            }
+            path.move(to: p[0])
+            for i in stride(from: 1, to: p.count, by: 3) {
+                path.addCurve(to: p[i + 2], control1: p[i], control2: p[i + 1])
+            }
+            path.closeSubpath()
+        }
+        return path
+    }
+}
+
 /// The in-app consistency chip's ring: the score as an arc over a faint track.
 struct ConsistencyRing: View {
     let score: Int
@@ -267,7 +345,7 @@ struct StatWidgetBody: View {
     var ringScore: Int? = nil
     let doneToday: Bool
     let allActivityDates: Set<Date>
-    let dayBoundaryOffsetHours: Int
+    let today: Date
     let colors: WidgetColors
     let isMedium: Bool
 
@@ -278,9 +356,8 @@ struct StatWidgetBody: View {
         if let ringScore {
             ConsistencyRing(score: ringScore, color: iconColor, colors: colors, size: size, lineWidth: size * 0.12)
         } else {
-            Image(systemName: doneToday ? "flame.fill" : "flame")
-                .font(.system(size: size, weight: .semibold))
-                .foregroundStyle(iconColor)
+            // The glyph fills 18 of its 24-unit box; scale up to sit level with the ring.
+            MeditoFlame(lit: doneToday, color: iconColor, size: size * 4 / 3)
         }
     }
 
@@ -310,11 +387,7 @@ struct StatWidgetBody: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
 
-                    ActivityGrid(
-                        allActivityDates: allActivityDates,
-                        colors: colors,
-                        dayBoundaryOffsetHours: dayBoundaryOffsetHours
-                    )
+                    ActivityGrid(allActivityDates: allActivityDates, colors: colors, today: today)
                 }
             } else {
                 VStack(spacing: 8) {
@@ -330,11 +403,7 @@ struct StatWidgetBody: View {
                     }
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                    CalendarStrip(
-                        allActivityDates: allActivityDates,
-                        colors: colors,
-                        dayBoundaryOffsetHours: dayBoundaryOffsetHours
-                    )
+                    CalendarStrip(allActivityDates: allActivityDates, colors: colors, today: today)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
