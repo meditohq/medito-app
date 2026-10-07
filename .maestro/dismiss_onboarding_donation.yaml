@@ -64,5 +64,14 @@ name: Dismiss onboarding donation without payment
       - extendedWaitUntil:
           notVisible: "See how to help"
           timeout: 20000
+      # Let the page finish loading before leaving. Backing out while it was
+      # still a loading skeleton crashed the emulator outright (adb "device
+      # not found") on both boots of run 37454547179; runs where the page had
+      # already loaded survived. Optional: a page that never loads still
+      # gets the back below.
+      - extendedWaitUntil:
+          visible: "Support Medito|Monthly|Yearly"
+          timeout: 30000
+          optional: true
       - takeScreenshot: paywall-webview
       - back

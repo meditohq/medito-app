@@ -80,6 +80,16 @@ class SharedPreferenceConstants {
   static const String utmTerm = 'utm_term';
   static const String utmContent = 'utm_content';
 
+  /// Set once Apple's AdServices API has answered for this install, so the
+  /// Apple Ads attribution lookup runs once (see AppleAdsAttributionService).
+  static const String appleAdsAttributionChecked =
+      'apple_ads_attribution_checked';
+
+  /// Set once the Play install referrer has been read for this install (see
+  /// PlayInstallReferrerService).
+  static const String playInstallReferrerChecked =
+      'play_install_referrer_checked';
+
   // Donation snooze tracking
   static const String donationAskSnoozedUntilMs =
       'donation_ask_snoozed_until_ms';

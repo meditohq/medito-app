@@ -8,6 +8,7 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
 import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
 import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
@@ -506,6 +507,9 @@ class OneTimePaymentController extends _$OneTimePaymentController {
         ...OnboardingDonationTimingExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
+        ...EndScreenDonationExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
       };
 
       final request = PaymentIntentRequest(
@@ -599,6 +603,9 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
         'paywall_source': ?paywallSource,
         ...utmParams,
         ...OnboardingDonationTimingExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
+        ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
       };
@@ -696,6 +703,9 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
         'paywall_source': ?paywallSource,
         ...utmParams,
         ...OnboardingDonationTimingExperiment.paymentMetadata(
+          ref.read(sharedPreferencesProvider),
+        ),
+        ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
       };

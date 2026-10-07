@@ -13,7 +13,10 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
+import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
 import 'package:medito/providers/locale_provider.dart';
+import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
@@ -253,6 +256,13 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     if (source != null && source.isNotEmpty) query['source'] = source;
     if (email != null && email.isNotEmpty) query['email'] = email;
     if (userId != null && userId.isNotEmpty) query['user_id'] = userId;
+    // Client-side experiment arms, so the page can stamp them onto the Stripe
+    // metadata of web-checkout donations (native-sheet ones get them in
+    // payment_providers). Without this, webview donors can't be split by arm.
+    final prefs = ref.read(sharedPreferencesProvider);
+    query
+      ..addAll(EndScreenDonationExperiment.paymentMetadata(prefs))
+      ..addAll(OnboardingDonationTimingExperiment.paymentMetadata(prefs));
 
     try {
       final config = await ref.read(paymentConfigProvider.future);

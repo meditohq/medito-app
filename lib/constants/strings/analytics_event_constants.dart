@@ -415,8 +415,13 @@ class AnalyticsEventConstants {
   /// Parameter name for revenue (used by Meta)
   static const String paramRevenue = 'revenue';
 
-  /// Parameter name for currency (used by Meta)
+  /// Parameter name for currency: ISO code, upper case on the GA4 donation
+  /// events (also used by Meta)
   static const String paramCurrency = 'currency';
+
+  /// GA4's standard monetary value, in major units (10.0 for $10). Google Ads
+  /// reads value + currency when GA4 events are imported as conversions.
+  static const String paramValue = 'value';
 
   // Up Next widget events
   /// Event logged when user taps the Up Next widget to start a session
@@ -555,6 +560,16 @@ class AnalyticsEventConstants {
   /// launch and whenever the user toggles it, so adoption can be read from
   /// BigQuery and other metrics segmented by it.
   static const String userPropZenMode = 'zen_mode';
+
+  /// Logged once per iOS install with Apple's AdServices answer for whether
+  /// the install came from an Apple Ads campaign. Params: attributed
+  /// ('true' / 'false'); when attributed also campaign_id, ad_group_id,
+  /// keyword_id, claim_type ('Click' / 'Impression'), conversion_type
+  /// ('Download' / 'Redownload'), country_or_region. Attributed installs also
+  /// get utm_source 'apple-search' / utm_medium 'asa' (unless a deep link
+  /// already set UTMs), which flow into GA4 user properties and Stripe
+  /// metadata like deep-link UTMs do.
+  static const String appleAdsAttribution = 'apple_ads_attribution';
 
   /// Event logged when the new onboarding question flow is completed
   /// Parameter: paramResultState — 'state_a', 'state_b', or 'state_c'

@@ -61,4 +61,26 @@ void main() {
     // 400 fair coin flips land in [140, 260] with overwhelming probability.
     expect(inline, inInclusiveRange(140, 260));
   });
+
+  test('payment metadata carries the assigned arm and never assigns', () async {
+    final prefs = await SharedPreferences.getInstance();
+    expect(EndScreenDonationExperiment.paymentMetadata(prefs), isEmpty);
+    expect(
+      prefs.getString(SharedPreferenceConstants.endScreenDonationAskVariant),
+      isNull,
+    );
+
+    final variant = EndScreenDonationExperiment.resolveVariant(prefs);
+    expect(EndScreenDonationExperiment.paymentMetadata(prefs), {
+      'end_screen_inline_pay': variant,
+    });
+  });
+
+  test('payment metadata ignores a corrupt stored value', () async {
+    SharedPreferences.setMockInitialValues({
+      SharedPreferenceConstants.endScreenDonationAskVariant: 'garbage',
+    });
+    final prefs = await SharedPreferences.getInstance();
+    expect(EndScreenDonationExperiment.paymentMetadata(prefs), isEmpty);
+  });
 }
