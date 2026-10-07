@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,15 +37,14 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumnDefaults
 import androidx.wear.compose.foundation.lazy.ScalingLazyListAnchorType
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import coil3.compose.AsyncImage
@@ -57,6 +58,7 @@ fun HomeScreen(
 ) {
     val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
     val stat = statKind(state)
+    val tileInset = (LocalConfiguration.current.screenWidthDp * 0.13f).dp
 
     ScreenScaffold(scrollState = listState) {
         ScalingLazyColumn(
@@ -66,46 +68,37 @@ fun HomeScreen(
             autoCentering = null,
             anchorType = ScalingLazyListAnchorType.ItemStart,
             scalingParams = ScalingLazyColumnDefaults.scalingParams(edgeScale = 1f, edgeAlpha = 1f),
-            contentPadding = PaddingValues(bottom = 48.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = 40.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             val upNext = state.upNext
             if (upNext != null) {
-                stat?.let { item { Box(Modifier.fillMaxWidth().padding(top = 16.dp), contentAlignment = Alignment.Center) { StatPill(it, onImage = false) } } }
-                item { UpNextHero(upNext = upNext, onPlay = { onPlay(upNext.track) }) }
-            } else if (stat != null) {
+                item { UpNextHero(upNext = upNext, stat = stat, onPlay = { onPlay(upNext.track) }) }
+            } else {
                 item {
                     Box(Modifier.fillMaxWidth().padding(top = 36.dp), contentAlignment = Alignment.Center) {
-                        StatPill(stat, onImage = false)
+                        stat?.let { StatPill(it, onImage = false) }
                     }
                 }
             }
 
-            if (state.synced) {
-                item {
-                    // Icon tiles, like the phone's Home shortcuts.
-                    Row(
-                        // Keep the shortcuts away from the round screen edges.
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 46.dp),
-                        horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    ) {
+            if (!state.synced) item { EmptyState() }
+
+            item {
+                // Icon tiles, like the phone's Home shortcuts: equal widths,
+                // inset from the round screen's edges.
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = tileInset),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    if (state.synced) {
                         state.daily?.let { daily ->
                             ShortcutTile("Daily", R.drawable.ic_sun, Modifier.weight(1f)) { onPlay(daily) }
                         }
                         ShortcutTile("Favorites", R.drawable.ic_star, Modifier.weight(1f), onFavorites)
                     }
+                    ShortcutTile("Downloads", R.drawable.ic_download, Modifier.weight(1f), onDownloads)
                 }
-            } else {
-                item { EmptyState() }
-            }
-            item { Spacer(Modifier.height(24.dp)) }
-            item {
-                androidx.wear.compose.material3.Button(
-                    onClick = onDownloads,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 36.dp),
-                    colors = ButtonDefaults.filledTonalButtonColors(),
-                    label = { Text("Downloads") },
-                )
             }
         }
     }
@@ -161,19 +154,18 @@ fun StatPill(kind: StatKind, onImage: Boolean, modifier: Modifier = Modifier) {
 
 /**
  * The phone's Home hero in miniature: pack cover full-bleed from the top of
- * the screen, "CONTINUE · Pack" eyebrow, title, white play button and
- * progress, with the stat pill just under the time.
+ * the screen, "CONTINUE · Pack" eyebrow, title beside a white play button and
+ * progress, with the stat pill just under the time (centred, as a round
+ * screen clips the corners).
  */
 @Composable
-private fun UpNextHero(upNext: UpNext, onPlay: () -> Unit) {
-    // Leave room for the shortcuts so the first screen doesn't feel crammed.
-    val height = (LocalConfiguration.current.screenHeightDp * 0.36f).dp
+private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
+    // Tall enough for the stat pill and the text on small screens too.
+    val height = maxOf((LocalConfiguration.current.screenHeightDp * 0.56f).dp, 128.dp)
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp)
             .height(height)
-            .clip(RoundedCornerShape(28.dp))
             .background(Color.White.copy(alpha = 0.1f))
             .clickable(enabled = upNext.canPlay, onClick = onPlay),
     ) {
@@ -200,36 +192,45 @@ private fun UpNextHero(upNext: UpNext, onPlay: () -> Unit) {
             )
         )
 
-        Box(
-            Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 18.dp)
-                .size(34.dp)
-                .clip(CircleShape)
-                .background(Color.White),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painterResource(R.drawable.ic_play),
-                contentDescription = "Play",
-                tint = Color.Black,
-                modifier = Modifier.size(15.dp),
-            )
+        stat?.let {
+            StatPill(it, onImage = true, modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp))
         }
 
         Column(
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = 18.dp, end = 58.dp, bottom = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.align(Alignment.BottomStart).padding(start = 26.dp, end = 26.dp, bottom = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
-                upNext.track.title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                softWrap = true,
+                eyebrow(upNext),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.8.sp,
+                color = Color.White.copy(alpha = 0.85f),
+                maxLines = 1,
+                modifier = Modifier.basicMarquee(),
             )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    upNext.track.title,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f).basicMarquee(),
+                )
+                Spacer(Modifier.width(8.dp))
+                Box(
+                    Modifier.size(28.dp).clip(CircleShape).background(Color.White),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painterResource(R.drawable.ic_play),
+                        contentDescription = "Play",
+                        tint = Color.Black,
+                        modifier = Modifier.size(14.dp),
+                    )
+                }
+            }
             if (upNext.total > 0) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     ProgressBar(upNext.completed.toFloat() / upNext.total, Modifier.weight(1f))
@@ -238,12 +239,19 @@ private fun UpNextHero(upNext: UpNext, onPlay: () -> Unit) {
                     Text(
                         "${upNext.completed} of ${upNext.total}",
                         fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium,
                         color = Color.White.copy(alpha = 0.85f),
                     )
                 }
             }
         }
     }
+}
+
+/** Same rule as the phone hero: "Start here" until something is played. */
+private fun eyebrow(upNext: UpNext): String {
+    val label = if (upNext.completed == 0) "START HERE" else "CONTINUE"
+    return if (upNext.packTitle.isEmpty()) label else "$label · ${upNext.packTitle}"
 }
 
 @Composable
@@ -265,13 +273,19 @@ private fun ShortcutTile(title: String, @DrawableRes icon: Int, modifier: Modifi
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Box(
-            Modifier.fillMaxWidth().height(40.dp).clip(RoundedCornerShape(15.dp))
+            Modifier.fillMaxWidth().height(38.dp).clip(RoundedCornerShape(14.dp))
                 .background(Color.White.copy(alpha = 0.14f)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(21.dp))
+            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(22.dp))
         }
-        Text(title, fontSize = 11.sp, maxLines = 1)
+        // Shrinks to fit narrow tiles, like the iOS tile's minimumScaleFactor.
+        BasicText(
+            title,
+            style = MaterialTheme.typography.labelSmall.copy(color = Color.White, textAlign = TextAlign.Center),
+            maxLines = 1,
+            autoSize = TextAutoSize.StepBased(minFontSize = 7.sp, maxFontSize = 10.sp, stepSize = 0.5.sp),
+        )
     }
 }
 
