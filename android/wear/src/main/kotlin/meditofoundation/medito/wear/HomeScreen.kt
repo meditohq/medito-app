@@ -58,7 +58,10 @@ fun HomeScreen(
 ) {
     val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
     val stat = statKind(state)
-    val tileInset = (LocalConfiguration.current.screenWidthDp * 0.13f).dp
+    val config = LocalConfiguration.current
+    // Round screens clip the corners, so keep the tiles in from the edge;
+    // square ones can use the width, like the Apple Watch.
+    val tileInset = if (config.isScreenRound) (config.screenWidthDp * 0.13f).dp else 8.dp
 
     ScreenScaffold(scrollState = listState) {
         ScalingLazyColumn(
@@ -154,14 +157,20 @@ fun StatPill(kind: StatKind, onImage: Boolean, modifier: Modifier = Modifier) {
 
 /**
  * The phone's Home hero in miniature: pack cover full-bleed from the top of
- * the screen, "CONTINUE · Pack" eyebrow, title beside a white play button and
- * progress, with the stat pill just under the time (centred, as a round
- * screen clips the corners).
+ * the screen, title beside a white play button, and progress, with the stat
+ * pill just under the time. No "Continue · Pack" eyebrow: too busy for a watch.
  */
 @Composable
 private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
     // Tall enough for the stat pill and the text on small screens too.
-    val height = maxOf((LocalConfiguration.current.screenHeightDp * 0.56f).dp, 128.dp)
+    val config = LocalConfiguration.current
+    val height = if (config.isScreenRound) {
+        maxOf((config.screenHeightDp * 0.52f).dp, 112.dp)
+    } else {
+        // Square: the cover takes everything above one row of tiles.
+        maxOf(config.screenHeightDp.dp - 66.dp, 104.dp)
+    }
+    val textInset = if (config.isScreenRound) 26.dp else 12.dp
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -193,22 +202,16 @@ private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
         )
 
         stat?.let {
-            StatPill(it, onImage = true, modifier = Modifier.align(Alignment.TopCenter).padding(top = 24.dp))
+            // Centred under the time: round screens clip the corners, and a
+            // small square has no room beside the time.
+            val top = if (config.isScreenRound) 24.dp else 21.dp
+            StatPill(it, onImage = true, modifier = Modifier.align(Alignment.TopCenter).padding(top = top))
         }
 
         Column(
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = 26.dp, end = 26.dp, bottom = 8.dp),
+            modifier = Modifier.align(Alignment.BottomStart).padding(start = textInset, end = textInset, bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            Text(
-                eyebrow(upNext),
-                fontSize = 10.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 0.8.sp,
-                color = Color.White.copy(alpha = 0.85f),
-                maxLines = 1,
-                modifier = Modifier.basicMarquee(),
-            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     upNext.track.title,
@@ -246,12 +249,6 @@ private fun UpNextHero(upNext: UpNext, stat: StatKind?, onPlay: () -> Unit) {
             }
         }
     }
-}
-
-/** Same rule as the phone hero: "Start here" until something is played. */
-private fun eyebrow(upNext: UpNext): String {
-    val label = if (upNext.completed == 0) "START HERE" else "CONTINUE"
-    return if (upNext.packTitle.isEmpty()) label else "$label · ${upNext.packTitle}"
 }
 
 @Composable
