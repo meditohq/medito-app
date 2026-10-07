@@ -144,13 +144,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get buildNumber => 'buildNumber';
 
   @override
-  String get dismiss => 'Cerrar';
-
-  @override
   String get debugInfo => 'Información de depuración';
-
-  @override
-  String get writeBelowThisLine => '--- Escribe debajo de esta línea ---';
 
   @override
   String get explore => 'Explorar';
@@ -247,13 +241,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get meditoReliesOnYourDonationsToSurvive =>
       'Medito depende únicamente de tus donaciones para sobrevivir. Producimos contenido gratuito para ayudar a la humanidad.';
-
-  @override
-  String get reminderNotificationBody =>
-      'Es hora de tu meditación diaria. Tómate un momento para relajarte y concentrarte.';
-
-  @override
-  String get reminderNotificationTitle => 'Recordatorio de Meditación Diaria';
 
   @override
   String get pickTimeHelpText => 'Selecciona la hora de tu recordatorio diario';
@@ -401,9 +388,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hourFull => 'hora';
 
   @override
-  String get minutes => 'Minutos';
-
-  @override
   String get minute => 'minuto';
 
   @override
@@ -433,9 +417,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get emailLabel => 'Correo electrónico';
-
-  @override
-  String get invalidEmailError => 'Correo electrónico inválido.';
 
   @override
   String get createAccountButtonText => 'Crear Cuenta';
@@ -961,25 +942,25 @@ class AppLocalizationsEs extends AppLocalizations {
       'Habilita las notificaciones para que nunca te pierdas una sesión.';
 
   @override
-  String get enableNotificationsTitleLearn => 'Keep the learning going';
+  String get enableNotificationsTitleLearn => 'Sigue aprendiendo';
 
   @override
   String get enableNotificationsBodyLearn =>
-      'A daily reminder is the single biggest thing that helps beginners stick with it.';
+      'Un recordatorio diario es lo que más ayuda a los principiantes a mantener la práctica.';
 
   @override
-  String get enableNotificationsTitleHabit => 'Build the habit you\'re after';
+  String get enableNotificationsTitleHabit => 'Crea el hábito que buscas';
 
   @override
   String get enableNotificationsBodyHabit =>
-      'People who set a reminder are far more likely to meditate regularly.';
+      'Las personas que configuran un recordatorio tienen muchas más probabilidades de meditar con regularidad.';
 
   @override
-  String get enableNotificationsTitleStress => 'Make it part of your day';
+  String get enableNotificationsTitleStress => 'Hazlo parte de tu día';
 
   @override
   String get enableNotificationsBodyStress =>
-      'Just a few minutes daily is enough to start feeling the difference.';
+      'Solo unos minutos al día bastan para empezar a notar la diferencia.';
 
   @override
   String get enableNotificationsCta => 'Habilitar Notificaciones';
@@ -1090,7 +1071,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Medito es gestionado por un pequeño equipo sin fines de lucro. Sin anuncios, sin inversores, sin muros de pago — solo donaciones de personas que usan la app.';
 
   @override
-  String get donationPrimerCta => 'See how to help';
+  String get donationPrimerCta => 'Descubre cómo ayudar';
 
   @override
   String get donateNow => 'Conviértete en colaborador';
@@ -1111,46 +1092,46 @@ class AppLocalizationsEs extends AppLocalizations {
   String get startMeditating => 'Comenzar a Meditar';
 
   @override
-  String get trackingPermissionTitle => 'Help Us Improve Medito';
+  String get trackingPermissionTitle => 'Ayúdanos a Mejorar Medito';
 
   @override
   String get trackingPermissionBody =>
-      'Your privacy matters. We use anonymous data to understand how people use Medito, so we can make it better for everyone. We never collect personal information or sell your data.';
+      'Tu privacidad importa. Usamos datos anónimos para entender cómo se usa Medito y así mejorarlo para todos. Nunca recopilamos información personal ni vendemos tus datos.';
 
   @override
   String get trackingPermissionPrivacyNote =>
-      'Your data stays anonymous and is never shared with third parties.';
+      'Tus datos siguen siendo anónimos y nunca se comparten con terceros.';
 
   @override
-  String get trackingPermissionAllow => 'Continue';
+  String get trackingPermissionAllow => 'Continuar';
 
   @override
-  String get onboardingFirstMeditationTitle => 'Your first meditation';
+  String get onboardingFirstMeditationTitle => 'Tu primera meditación';
 
   @override
-  String get onboardingFirstMeditationHook => 'Your first moment of calm.';
+  String get onboardingFirstMeditationHook => 'Tu primer momento de calma.';
 
   @override
-  String get onboardingFirstMeditationDuration => 'Just over 2 minutes';
+  String get onboardingFirstMeditationDuration => 'Poco más de 2 minutos';
 
   @override
   String get onboardingFirstMeditationSubtitle =>
-      'Nothing to get right. Just sit back and listen.';
+      'No hay nada que hacer bien. Solo relájate y escucha.';
 
   @override
-  String get onboardingFirstMeditationBegin => 'Start';
+  String get onboardingFirstMeditationBegin => 'Empezar';
 
   @override
-  String get onboardingFirstMeditationSkip => 'Maybe later';
+  String get onboardingFirstMeditationSkip => 'Quizás más tarde';
 
   @override
-  String get onboardingFirstMeditationSkipShort => 'Skip';
+  String get onboardingFirstMeditationSkipShort => 'Omitir';
 
   @override
-  String get onboardingFirstMeditationDone => 'That\'s it. You just meditated.';
+  String get onboardingFirstMeditationDone => 'Eso es todo. Acabas de meditar.';
 
   @override
-  String get onboardingFirstMeditationContinue => 'Continue';
+  String get onboardingFirstMeditationContinue => 'Continuar';
 
   @override
   String get splashHeadline => 'Meditación Hecha Simple';
@@ -1729,6 +1710,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get german => 'Deutsch';
+
+  @override
   String get spanish => 'Español (beta)';
 
   @override
@@ -1774,7 +1758,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get debugInfoLabel => 'Información de depuración';
 
   @override
+  String get writeBelowThisLine => '--- Escribe debajo de esta línea ---';
+
+  @override
   String get fieldRequiredError => 'Campo requerido';
+
+  @override
+  String get invalidEmailError => 'Correo electrónico inválido.';
 
   @override
   String get invalidInputError => 'Entrada inválida';
@@ -1792,6 +1782,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ocurrió un error desconocido. O tenemos problemas o estás sin conexión.';
 
   @override
+  String get reminderNotificationTitle => 'Recordatorio de Meditación Diaria';
+
+  @override
+  String get reminderNotificationBody =>
+      'Es hora de tu meditación diaria. Tómate un momento para relajarte y concentrarte.';
+
+  @override
   String get helpLegalSection => 'Ayuda';
 
   @override
@@ -1801,7 +1798,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get customizationSection => 'Personalización';
 
   @override
-  String get addHomeScreenWidget => 'Add Home Screen Widget';
+  String get addHomeScreenWidget => 'Añadir Widget a la Pantalla de Inicio';
 
   @override
   String get themeTitle => 'Tema';
@@ -2182,6 +2179,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get durationInMinutes => 'Duración (minutos)';
 
   @override
+  String get minutes => 'Minutos';
+
+  @override
   String get optional => 'Opcional';
 
   @override
@@ -2263,42 +2263,42 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String upNextSessionCount(int current, int total) {
-    return 'Session $current of $total';
+    return 'Sesión $current de $total';
   }
 
   @override
-  String get manageDefaults => 'Manage Defaults';
+  String get manageDefaults => 'Gestionar Predeterminados';
 
   @override
-  String get defaults => 'Defaults';
+  String get defaults => 'Predeterminados';
 
   @override
-  String get defaultGuideName => 'Default Guide Name';
+  String get defaultGuideName => 'Guía Predeterminado';
 
   @override
-  String get defaultDuration => 'Default Duration';
+  String get defaultDuration => 'Duración Predeterminada';
 
   @override
-  String get defaultGuideNameCleared => 'Default guide name cleared';
+  String get defaultGuideNameCleared => 'Guía predeterminado eliminado';
 
   @override
-  String get defaultDurationCleared => 'Default duration cleared';
+  String get defaultDurationCleared => 'Duración predeterminada eliminada';
 
   @override
-  String get notSet => 'Not set';
+  String get notSet => 'Sin configurar';
 
   @override
   String get defaultsNote =>
-      'These defaults are set from your last selection on any track. Home uses them to skip the selection screen when you continue a pack.';
+      'Estos valores predeterminados se basan en tu última selección en cualquier pista. Inicio los usa para omitir la pantalla de selección cuando continúas un paquete.';
 
   @override
-  String get streakFreezeUsed => 'Streak freeze used';
+  String get streakFreezeUsed => 'Congelación de racha usada';
 
   @override
-  String get session => 'session';
+  String get session => 'sesión';
 
   @override
-  String get sessions => 'sessions';
+  String get sessions => 'sesiones';
 
   @override
   String get play => 'Reproducir';
@@ -2346,6 +2346,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get upNext => 'Continuar';
 
   @override
+  String get dismiss => 'Cerrar';
+
+  @override
   String get donationInfo => 'Información sobre donaciones';
 
   @override
@@ -2362,17 +2365,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get yourPathExplainerText =>
-      'Learn meditation one minute at a time. Sessions get longer as you learn.';
+      'Aprende a meditar minuto a minuto. Las sesiones se alargan a medida que aprendes.';
 
   @override
   String get yourPathExplainerSwipeHint =>
-      'Swipe left to skip or open the pack.';
-
-  @override
-  String get onboardingStep1of2 => '1 de 2';
-
-  @override
-  String get onboardingStep2of2 => '2 de 2';
+      'Desliza a la izquierda para omitir o abrir el paquete.';
 
   @override
   String get onboardingExperienceQuestion => '¿Has meditado antes?';
@@ -2408,24 +2405,30 @@ class AppLocalizationsEs extends AppLocalizations {
       'Gestionar el estrés, el sueño o las emociones';
 
   @override
-  String get onboardingAttributionQuestion => 'How did you hear about Medito?';
+  String get onboardingStep1of2 => '1 de 2';
+
+  @override
+  String get onboardingStep2of2 => '2 de 2';
+
+  @override
+  String get onboardingAttributionQuestion => '¿Cómo conociste Medito?';
 
   @override
   String get onboardingAttributionSubtext =>
-      'This helps us reach more people who need it.';
+      'Esto nos ayuda a llegar a más personas que lo necesitan.';
 
   @override
-  String get onboardingAttributionGoogleAd => 'Google ad';
+  String get onboardingAttributionGoogleAd => 'Anuncio de Google';
 
   @override
-  String get onboardingAttributionSocialAd => 'Instagram or Facebook ad';
+  String get onboardingAttributionSocialAd => 'Anuncio de Instagram o Facebook';
 
   @override
-  String get onboardingAttributionFriend => 'A friend told me';
+  String get onboardingAttributionFriend => 'Me lo recomendó un amigo';
 
   @override
   String get onboardingAttributionTherapist =>
-      'Therapist or healthcare professional';
+      'Terapeuta o profesional de la salud';
 
   @override
   String get onboardingAttributionAppStore => 'App Store';
@@ -2434,14 +2437,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get onboardingAttributionPlayStore => 'Play Store';
 
   @override
-  String get onboardingAttributionOther => 'Other';
+  String get onboardingAttributionOther => 'Otro';
 
   @override
-  String get onboardingAttributionOtherLabel => 'Something else?';
+  String get onboardingAttributionOtherLabel => '¿Otra cosa?';
 
   @override
-  String get onboardingAttributionOtherHint =>
-      'Tell us where you heard about us';
+  String get onboardingAttributionOtherHint => 'Cuéntanos dónde nos conociste';
 
   @override
   String get onboardingResultLearnHeading => 'Estás en el lugar correcto.';

@@ -143,13 +143,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buildNumber => 'buildNumber';
 
   @override
-  String get dismiss => 'Dismiss';
-
-  @override
   String get debugInfo => 'Debug info';
-
-  @override
-  String get writeBelowThisLine => '--- Write below this line ---';
 
   @override
   String get explore => 'Explore';
@@ -245,13 +239,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get meditoReliesOnYourDonationsToSurvive =>
       'Medito relies only on your donations to survive. We produce free content to help humanity.';
-
-  @override
-  String get reminderNotificationBody =>
-      'It\'s time for your daily meditation. Take a moment to relax and focus.';
-
-  @override
-  String get reminderNotificationTitle => 'Daily Meditation Reminder';
 
   @override
   String get pickTimeHelpText => 'Select your daily reminder time';
@@ -396,9 +383,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hourFull => 'hour';
 
   @override
-  String get minutes => 'Minutes';
-
-  @override
   String get minute => 'minute';
 
   @override
@@ -427,9 +411,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emailLabel => 'Email';
-
-  @override
-  String get invalidEmailError => 'Invalid Email.';
 
   @override
   String get createAccountButtonText => 'Create Account';
@@ -1697,6 +1678,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get german => 'Deutsch';
+
+  @override
   String get spanish => 'Español (beta)';
 
   @override
@@ -1743,7 +1727,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get debugInfoLabel => 'Debug info';
 
   @override
+  String get writeBelowThisLine => '--- Write below this line ---';
+
+  @override
   String get fieldRequiredError => 'Field is Required';
+
+  @override
+  String get invalidEmailError => 'Invalid Email.';
 
   @override
   String get invalidInputError => 'Invalid Input';
@@ -1759,6 +1749,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get anErrorOccurredMessage =>
       'An unknown error occurred. Either we\'re having issues or you\'re offline.';
+
+  @override
+  String get reminderNotificationTitle => 'Daily Meditation Reminder';
+
+  @override
+  String get reminderNotificationBody =>
+      'It\'s time for your daily meditation. Take a moment to relax and focus.';
 
   @override
   String get helpLegalSection => 'Help';
@@ -2147,6 +2144,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get durationInMinutes => 'Duration (minutes)';
 
   @override
+  String get minutes => 'Minutes';
+
+  @override
   String get optional => 'Optional';
 
   @override
@@ -2310,6 +2310,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get upNext => 'Continue';
 
   @override
+  String get dismiss => 'Dismiss';
+
+  @override
   String get donationInfo => 'Donation info';
 
   @override
@@ -2331,12 +2334,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get yourPathExplainerSwipeHint =>
       'Swipe left to skip or open the pack.';
-
-  @override
-  String get onboardingStep1of2 => '1 of 2';
-
-  @override
-  String get onboardingStep2of2 => '2 of 2';
 
   @override
   String get onboardingExperienceQuestion => 'Have you meditated before?';
@@ -2370,6 +2367,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingIntentStress => 'Manage stress, sleep, or emotions';
+
+  @override
+  String get onboardingStep1of2 => '1 of 2';
+
+  @override
+  String get onboardingStep2of2 => '2 of 2';
 
   @override
   String get onboardingAttributionQuestion => 'How did you hear about Medito?';

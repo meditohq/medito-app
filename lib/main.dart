@@ -378,7 +378,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              supportedLocales: const [Locale('en'), Locale('es')],
+              supportedLocales: AppLocalizations.supportedLocales,
               initialRoute: '/',
               routes: {
                 '/': (context) => const SplashView(),

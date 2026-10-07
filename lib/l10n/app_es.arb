@@ -43,7 +43,7 @@
   "deviceOs": "deviceOs",
   "devicePlatform": "devicePlatform",
   "buildNumber": "buildNumber",
-  "dismiss": "Descartar",
+  "dismiss": "Cerrar",
   "debugInfo": "Información de depuración",
   "writeBelowThisLine": "--- Escribe debajo de esta línea ---",
   "explore": "Explorar",
@@ -55,10 +55,10 @@
   "min": "min",
   "hey": "👋 Hola",
   "someThingWentWrong": "Algo salió mal",
-    "invalidEmail": "Correo electrónico inválido.",
-    "emailForReceipt": "Correo electrónico para recibo",
-    "emailForReceiptDescription": "Enviaremos el recibo de tu donación a esta dirección de correo electrónico. Esto nos ayuda a identificar tu pago para soporte y registros.",
-    "fieldRequired": "Campo requerido",
+  "invalidEmail": "Correo electrónico inválido.",
+  "emailForReceipt": "Correo electrónico para recibo",
+  "emailForReceiptDescription": "Enviaremos el recibo de tu donación a esta dirección de correo electrónico. Esto nos ayuda a identificar tu pago para soporte y registros.",
+  "fieldRequired": "Campo requerido",
   "invalidInput": "Entrada inválida",
   "connectionTimeout": "Error de tiempo de espera de conexión",
   "noInternetConnection": "Sin conexión a internet",
@@ -122,7 +122,7 @@
   "hours": "h",
   "hoursFull": "horas",
   "hourFull": "hora",
-  "minutes": "minutos",
+  "minutes": "Minutos",
   "minute": "minuto",
   "showConsistencyScore": "Mostrar Puntuación de Consistencia",
   "showCurrentStreak": "Mostrar Racha Actual",
@@ -133,7 +133,7 @@
   "createAccountTitle": "Crear cuenta",
   "signInAgain": "Iniciar sesión de nuevo",
   "emailLabel": "Correo electrónico",
-  "invalidEmailError": "Por favor ingresa un correo electrónico válido",
+  "invalidEmailError": "Correo electrónico inválido.",
   "createAccountButtonText": "Crear Cuenta",
   "createAccountLogInButtonText": "Iniciar sesión o Registrarse",
   "getStarted": "Empezar",
@@ -268,9 +268,15 @@
   "backupSummary": "Racha {streak} · {sessions, plural, =1{1 sesión} other{{sessions} sesiones}} · {minutes} min",
   "@backupSummary": {
     "placeholders": {
-      "streak": {"type": "int"},
-      "sessions": {"type": "int"},
-      "minutes": {"type": "int"}
+      "streak": {
+        "type": "int"
+      },
+      "sessions": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "restoreStatsConfirmTitle": "¿Restaurar estas estadísticas?",
@@ -280,20 +286,32 @@
   "restoreStatsFailed": "No se pudieron restaurar las estadísticas. Inténtalo de nuevo.",
   "daysSelected": "{count, plural, =1{1 día seleccionado} other{{count} días seleccionados}}",
   "@daysSelected": {
-    "placeholders": {"count": {"type": "int"}}
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "newStreak": "Nueva racha",
   "newSessions": "Nuevas sesiones",
   "addSessionsToSelectedDays": "Añadir sesiones a los días seleccionados",
   "addSessionsTitle": "{count, plural, =1{Añadir 1 sesión} other{Añadir {count} sesiones}}",
   "@addSessionsTitle": {
-    "placeholders": {"count": {"type": "int"}}
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "daysAlreadyHaveSession": "{filled, plural, =1{1 de {total} días ya tiene una sesión y se omitirá.} other{{filled} de {total} días ya tienen una sesión y se omitirán.}}",
   "@daysAlreadyHaveSession": {
     "placeholders": {
-      "filled": {"type": "int"},
-      "total": {"type": "int"}
+      "filled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "minutesPerDayOptional": "Minutos por día (opcional)",
@@ -303,6 +321,12 @@
   },
   "enableNotificationsTitle": "Mantente en el Camino con Recordatorios de Meditación",
   "enableNotificationsBody": "Habilita las notificaciones para que nunca te pierdas una sesión.",
+  "enableNotificationsTitleLearn": "Sigue aprendiendo",
+  "enableNotificationsBodyLearn": "Un recordatorio diario es lo que más ayuda a los principiantes a mantener la práctica.",
+  "enableNotificationsTitleHabit": "Crea el hábito que buscas",
+  "enableNotificationsBodyHabit": "Las personas que configuran un recordatorio tienen muchas más probabilidades de meditar con regularidad.",
+  "enableNotificationsTitleStress": "Hazlo parte de tu día",
+  "enableNotificationsBodyStress": "Solo unos minutos al día bastan para empezar a notar la diferencia.",
   "enableNotificationsCta": "Habilitar Notificaciones",
   "notificationPreviewTimestamp": "ahora",
   "notificationPreviewTitleB": "Una mente más tranquila empieza aquí",
@@ -334,12 +358,26 @@
   "skip": "Omitir",
   "donationTitle": "Millones encuentran calma aquí gratis. Ayuda a que siga así.",
   "donationBody": "Medito es gestionado por un pequeño equipo sin fines de lucro. Sin anuncios, sin inversores, sin muros de pago — solo donaciones de personas que usan la app.",
+  "donationPrimerCta": "Descubre cómo ayudar",
   "donateNow": "Conviértete en colaborador",
   "noThanks": "No gracias",
   "next": "Siguiente",
   "remindLater": "Recordármelo Más Tarde",
   "allSetTitle": "¡Todo Listo!",
   "startMeditating": "Comenzar a Meditar",
+  "trackingPermissionTitle": "Ayúdanos a Mejorar Medito",
+  "trackingPermissionBody": "Tu privacidad importa. Usamos datos anónimos para entender cómo se usa Medito y así mejorarlo para todos. Nunca recopilamos información personal ni vendemos tus datos.",
+  "trackingPermissionPrivacyNote": "Tus datos siguen siendo anónimos y nunca se comparten con terceros.",
+  "trackingPermissionAllow": "Continuar",
+  "onboardingFirstMeditationTitle": "Tu primera meditación",
+  "onboardingFirstMeditationHook": "Tu primer momento de calma.",
+  "onboardingFirstMeditationDuration": "Poco más de 2 minutos",
+  "onboardingFirstMeditationSubtitle": "No hay nada que hacer bien. Solo relájate y escucha.",
+  "onboardingFirstMeditationBegin": "Empezar",
+  "onboardingFirstMeditationSkip": "Quizás más tarde",
+  "onboardingFirstMeditationSkipShort": "Omitir",
+  "onboardingFirstMeditationDone": "Eso es todo. Acabas de meditar.",
+  "onboardingFirstMeditationContinue": "Continuar",
   "splashHeadline": "Meditación Hecha Simple",
   "splashSubtitle": "Gratis para siempre. Sin anuncios. Sin ánimo de lucro.",
   "splashBenefit1Subtitle": "Explora horas de meditaciones guiadas, cursos avanzados y más. Sin muro de pago.",
@@ -348,10 +386,10 @@
   "continueText": "Continuar",
   "setReminderB": "Recuérdamelo Cada Día",
   "donationContinueToPayment": "Continuar al pago",
-  "donationEmailLabel": "Correo electr\u00f3nico",
-  "donationEmailHelper": "Para tu recibo y para gestionar tu donaci\u00f3n.",
+  "donationEmailLabel": "Correo electrónico",
+  "donationEmailHelper": "Para tu recibo y para gestionar tu donación.",
   "donationEmailRequired": "Introduce tu correo para poder enviarte el recibo.",
-  "donationEmailInvalid": "Ese correo electr\u00f3nico no parece correcto.",
+  "donationEmailInvalid": "Ese correo electrónico no parece correcto.",
   "emailTypoSuggestion": "¿Quisiste decir {email}?",
   "emailTypoDialogTitle": "Revisa tu correo",
   "emailTypoDialogTyped": "Escribiste {email}.",
@@ -534,6 +572,7 @@
   "selectLanguage": "Seleccionar idioma",
   "systemLanguage": "Sistema",
   "english": "English",
+  "german": "Deutsch",
   "spanish": "Español (beta)",
   "reportTrack": "Reportar Track",
   "reportForThisTrack": "Reportar para este track",
@@ -575,7 +614,6 @@
   "@debugInfoLabel": {
     "description": "Label for debug information"
   },
-  "writeBelowThisLine": "--- Escribe debajo de esta línea ---",
   "@writeBelowThisLine": {
     "description": "Text indicating where to write in debug reports"
   },
@@ -583,7 +621,6 @@
   "@fieldRequiredError": {
     "description": "Error message when a required field is empty"
   },
-  "invalidEmailError": "Correo electrónico inválido.",
   "@invalidEmailError": {
     "description": "Error message for invalid email format"
   },
@@ -603,11 +640,9 @@
   "@anErrorOccurredMessage": {
     "description": "Generic error message for unknown errors"
   },
-  "reminderNotificationTitle": "Recordatorio de Meditación Diaria",
   "@reminderNotificationTitle": {
     "description": "Title for daily meditation reminder notifications"
   },
-  "reminderNotificationBody": "Es hora de tu meditación diaria. Tómate un momento para relajarte y concentrarte.",
   "@reminderNotificationBody": {
     "description": "Body text for daily meditation reminder notifications"
   },
@@ -623,6 +658,7 @@
   "@customizationSection": {
     "description": "Section title for customization settings"
   },
+  "addHomeScreenWidget": "Añadir Widget a la Pantalla de Inicio",
   "themeTitle": "Tema",
   "@themeTitle": {
     "description": "Title for theme selection setting in customization section"
@@ -677,7 +713,7 @@
         "description": "The donation amount"
       },
       "currency": {
-        "type": "String", 
+        "type": "String",
         "description": "The currency code"
       }
     }
@@ -1060,7 +1096,6 @@
   "@durationInMinutes": {
     "description": "Placeholder text for duration input in minutes"
   },
-  "minutes": "Minutos",
   "@minutes": {
     "description": "Short placeholder text for duration input"
   },
@@ -1134,12 +1169,13 @@
   "viewStreak": "Ver racha",
   "refresh": "Actualizar",
   "upNext": "Continuar",
-  "dismiss": "Cerrar",
   "donationInfo": "Información sobre donaciones",
   "clearSearch": "Borrar búsqueda",
   "saveJournalEntry": "Guardar entrada del diario",
   "clearDefault": "Borrar guía predeterminada",
   "lockedContent": "Bloqueado",
+  "yourPathExplainerText": "Aprende a meditar minuto a minuto. Las sesiones se alargan a medida que aprendes.",
+  "yourPathExplainerSwipeHint": "Desliza a la izquierda para omitir o abrir el paquete.",
   "onboardingStep1of2": "1 de 2",
   "onboardingStep2of2": "2 de 2",
   "onboardingExperienceQuestion": "¿Has meditado antes?",
@@ -1152,6 +1188,17 @@
   "onboardingIntentLearn": "Aprender a meditar correctamente",
   "onboardingIntentHabit": "Crear un hábito diario",
   "onboardingIntentStress": "Gestionar el estrés, el sueño o las emociones",
+  "onboardingAttributionQuestion": "¿Cómo conociste Medito?",
+  "onboardingAttributionSubtext": "Esto nos ayuda a llegar a más personas que lo necesitan.",
+  "onboardingAttributionGoogleAd": "Anuncio de Google",
+  "onboardingAttributionSocialAd": "Anuncio de Instagram o Facebook",
+  "onboardingAttributionFriend": "Me lo recomendó un amigo",
+  "onboardingAttributionTherapist": "Terapeuta o profesional de la salud",
+  "onboardingAttributionAppStore": "App Store",
+  "onboardingAttributionPlayStore": "Play Store",
+  "onboardingAttributionOther": "Otro",
+  "onboardingAttributionOtherLabel": "¿Otra cosa?",
+  "onboardingAttributionOtherHint": "Cuéntanos dónde nos conociste",
   "onboardingResultLearnHeading": "Estás en el lugar correcto.",
   "onboardingResultLearnBody": "Empezaremos con solo 1 minuto e iremos avanzando. Sin experiencia necesaria, solo preséntate.",
   "onboardingResultEaseInHeading": "Qué bueno tenerte aquí.",
@@ -1181,6 +1228,18 @@
   "upNextPathCompletedTitle": "Has terminado todos los paquetes de la serie",
   "upNextPathCompletedSubtitle": "Explora la biblioteca para encontrar lo siguiente.",
   "upNextNextPackPinnedSnack": "{packTitle} está listo en Inicio",
+  "upNextSessionCount": "Sesión {current} de {total}",
+  "manageDefaults": "Gestionar Predeterminados",
+  "defaults": "Predeterminados",
+  "defaultGuideName": "Guía Predeterminado",
+  "defaultDuration": "Duración Predeterminada",
+  "defaultGuideNameCleared": "Guía predeterminado eliminado",
+  "defaultDurationCleared": "Duración predeterminada eliminada",
+  "notSet": "Sin configurar",
+  "defaultsNote": "Estos valores predeterminados se basan en tu última selección en cualquier pista. Inicio los usa para omitir la pantalla de selección cuando continúas un paquete.",
+  "streakFreezeUsed": "Congelación de racha usada",
+  "session": "sesión",
+  "sessions": "sesiones",
   "accountPromptTitle": "Guarda tu progreso",
   "accountPromptBody": "Añade tu correo para que tu racha y tu historial te acompañen en un teléfono nuevo.",
   "accountPromptCta": "Guardar mi progreso",
