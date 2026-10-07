@@ -5,6 +5,9 @@ import 'dart:io' show Platform;
 import 'package:share_plus/share_plus.dart';
 
 import 'package:medito/constants/icons/medito_icons.dart';
+import 'dart:async';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/providers/providers.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../models/favorites/favorite_item.dart';
 import '../../../../models/track/track.dart';
@@ -116,6 +119,16 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
 
   void _toggleFavorite(bool isFavorite, Track track) {
     final notifier = ref.read(favoritesNotifierProvider.notifier);
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: isFavorite
+                ? AnalyticsEventConstants.trackUnfavourited
+                : AnalyticsEventConstants.trackFavourited,
+            parameters: {AnalyticsEventConstants.paramTrackId: widget.trackId},
+          ),
+    );
     _favoriteController
         .trigger(
           () => isFavorite
@@ -187,7 +200,7 @@ class _TrackViewBottomBarState extends ConsumerState<TrackViewBottomBar> {
     bool isDailyMeditation,
   ) {
     final colour = isFavorite
-        ? context.brandPurple
+        ? context.brandAccent
         : Theme.of(context).colorScheme.onSurface;
 
     final l10n = AppLocalizations.of(context)!;

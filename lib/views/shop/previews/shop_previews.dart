@@ -158,7 +158,7 @@ Widget _sheetOver(Map<String, Object> prefs, ThemeMode mode) => PreviewShell(
           shape: Theme.of(context).bottomSheetTheme.shape,
           child: Padding(
             padding: const EdgeInsets.only(top: 24),
-            child: ShopBagSheet(onBrowse: () {}),
+            child: ShopBagSheet(source: 'preview', onBrowse: () {}),
           ),
         ),
       ),

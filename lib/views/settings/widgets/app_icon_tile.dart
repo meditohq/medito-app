@@ -57,7 +57,8 @@ class _AppIconTileState extends State<AppIconTile> {
     final options = AppIconOption.availableOptions;
     return options.firstWhere(
       (o) => o.effectiveIconName == _currentIconName,
-      orElse: () => options.first,
+      // The native primary icon is Classic; OS-stored alternate names win.
+      orElse: () => AppIconOption.classic,
     );
   }
 
@@ -193,7 +194,7 @@ class _AppIconChoice extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    final accent = context.brandPurple;
+    final accent = context.brandAccent;
     const radius = _kPreviewSize * 0.22;
     const ringInset = _ringGap + _ringWidth;
 

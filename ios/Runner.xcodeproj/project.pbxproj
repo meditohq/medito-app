@@ -16,6 +16,7 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		A0B1C2D3000000000000000A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3000000000000000F /* SceneDelegate.swift */; };
+		2467F21AEE3AE9185ACAC5D0 /* WatchPresencePigeon.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D326E08984B2290ABEC442 /* WatchPresencePigeon.g.swift */; };
 		27250C9F2E843752008B6308 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		27250CA32E843752008B6308 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		27250CA42E843752008B6308 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -31,6 +32,7 @@
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		A0B1C2D3000000000000000B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B1C2D3000000000000000F /* SceneDelegate.swift */; };
+		53632A0D3B806475AB2C207E /* WatchPresencePigeon.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78D326E08984B2290ABEC442 /* WatchPresencePigeon.g.swift */; };
 		75FFF940D93AA63726585B1C /* ocean@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1642F495F0BF67E432218A44 /* ocean@3x.png */; };
 		7F3A591E80D70D658C77967D /* goldenhour@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AC169176E7723242F1D76211 /* goldenhour@2x.png */; };
 		8779BC35DF1AAC24F2EB5EC0 /* forest@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A6E4B2292C6E7C1E5F56AFA5 /* forest@2x.png */; };
@@ -123,6 +125,7 @@
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A0B1C2D3000000000000000F /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		78D326E08984B2290ABEC442 /* WatchPresencePigeon.g.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchPresencePigeon.g.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		8569F526DAB5AAE67011AF21 /* ocean@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "ocean@2x.png"; sourceTree = "<group>"; };
 		8B72EB2FA75CFF73922EBDE7 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
@@ -313,6 +316,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				A0B1C2D3000000000000000F /* SceneDelegate.swift */,
+				78D326E08984B2290ABEC442 /* WatchPresencePigeon.g.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				DD285FFF1378316BD5FCFEC6 /* nearblack@2x.png */,
 				3695491DE3C75B6C6589CADB /* nearblack@3x.png */,
@@ -835,6 +839,7 @@
 			files = (
 				27250C9A2E843752008B6308 /* AppDelegate.swift in Sources */,
 				A0B1C2D3000000000000000A /* SceneDelegate.swift in Sources */,
+				2467F21AEE3AE9185ACAC5D0 /* WatchPresencePigeon.g.swift in Sources */,
 				27250C9F2E843752008B6308 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -853,6 +858,7 @@
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				A0B1C2D3000000000000000B /* SceneDelegate.swift in Sources */,
+				53632A0D3B806475AB2C207E /* WatchPresencePigeon.g.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

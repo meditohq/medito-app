@@ -42,6 +42,13 @@ import 'widgets/donation_widget.dart';
 import 'widgets/soft_ask_card.dart';
 import 'widgets/zen_mode_animation.dart';
 
+/// Tags every end-screen prompt event with where it came from, so they can be
+/// swept with `source = 'end_screen'` alongside the events shared with other
+/// surfaces (notifications_enabled, onboarding_signup_completed, ...).
+const _endScreenSourceParams = <String, Object>{
+  AnalyticsEventConstants.paramSource: AnalyticsEventConstants.sourceEndScreen,
+};
+
 class EndScreenView extends ConsumerStatefulWidget {
   final PlaybackRequest request;
 
@@ -361,7 +368,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 fontSize: 40,
                 fontWeight: FontWeight.w400,
                 height: 1,
-                color: context.brandPurple,
+                color: context.brandAccent,
               ),
               textAlign: TextAlign.left,
             ),
@@ -502,7 +509,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   color: isFreeze
                       ? ColorConstants.graphite
                       : isMeditated
-                      ? context.brandPurple
+                      ? context.brandAccent
                       : ColorConstants.moon,
                 ),
               ),
@@ -538,7 +545,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                       MeditoIcon(
                         assetName: MeditoIcons.checkCircleSolid,
                         size: 32,
-                        color: context.brandPurple,
+                        color: context.brandAccent,
                       )
                     else
                       _buildCircle(32, ColorConstants.moon),
@@ -567,6 +574,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
           .read(analyticsServiceProvider)
           .logEvent(
             name: AnalyticsEventConstants.endScreenReminderPromptDismissed,
+            parameters: _endScreenSourceParams,
           ),
     );
     if (mounted) {
@@ -595,6 +603,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 .read(analyticsServiceProvider)
                 .logEvent(
                   name: AnalyticsEventConstants.endScreenReminderPromptShown,
+                  parameters: _endScreenSourceParams,
                 ),
           );
         }
@@ -632,6 +641,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 .read(analyticsServiceProvider)
                 .logEvent(
                   name: AnalyticsEventConstants.endScreenAccountPromptShown,
+                  parameters: _endScreenSourceParams,
                 ),
           );
         }
@@ -654,7 +664,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     unawaited(
       ref
           .read(analyticsServiceProvider)
-          .logEvent(name: AnalyticsEventConstants.endScreenAccountPromptTapped),
+          .logEvent(
+            name: AnalyticsEventConstants.endScreenAccountPromptTapped,
+            parameters: _endScreenSourceParams,
+          ),
     );
 
     // Make sure the session that just finished is on the server before we link
@@ -701,10 +714,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   /// Returns true if permission is now granted.
   Future<bool> _recoverBlockedPermission() async {
     final analytics = ref.read(analyticsServiceProvider);
-    const params = {
-      AnalyticsEventConstants.paramSource:
-          AnalyticsEventConstants.sourceEndScreen,
-    };
+    const params = _endScreenSourceParams;
 
     unawaited(
       analytics.logEvent(
@@ -749,6 +759,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
           .read(analyticsServiceProvider)
           .logEvent(
             name: AnalyticsEventConstants.endScreenReminderPromptSnoozed,
+            parameters: _endScreenSourceParams,
           ),
     );
   }
@@ -758,7 +769,10 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     unawaited(
       ref
           .read(analyticsServiceProvider)
-          .logEvent(name: AnalyticsEventConstants.endScreenReminderPrimerShown),
+          .logEvent(
+            name: AnalyticsEventConstants.endScreenReminderPrimerShown,
+            parameters: _endScreenSourceParams,
+          ),
     );
 
     final proceed = await showNotificationPermissionPrimer(context);
@@ -769,6 +783,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             .read(analyticsServiceProvider)
             .logEvent(
               name: AnalyticsEventConstants.endScreenReminderPrimerDeclined,
+              parameters: _endScreenSourceParams,
             ),
       );
       return false;
@@ -784,6 +799,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     unawaited(
       analytics.logEvent(
         name: AnalyticsEventConstants.endScreenReminderSheetShown,
+        parameters: _endScreenSourceParams,
       ),
     );
 
@@ -817,6 +833,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       unawaited(
         analytics.logEvent(
           name: AnalyticsEventConstants.endScreenReminderSheetDismissed,
+          parameters: _endScreenSourceParams,
         ),
       );
     }
@@ -857,6 +874,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               .read(analyticsServiceProvider)
               .logEvent(
                 name: AnalyticsEventConstants.endScreenReminderOsDenied,
+                parameters: _endScreenSourceParams,
               ),
         );
         return;
@@ -904,6 +922,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             .read(analyticsServiceProvider)
             .logEvent(
               name: AnalyticsEventConstants.endScreenReminderEnableFailed,
+              parameters: _endScreenSourceParams,
             ),
       );
     }

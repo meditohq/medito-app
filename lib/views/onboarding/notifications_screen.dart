@@ -139,6 +139,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         );
         // Must clear _isProcessing or the chips and CTA stay disabled and the
         // screen becomes the dead end this release is fixing.
+        await recordReminderNotEnabled(ref.read(sharedPreferencesProvider));
         if (mounted) setState(() => _isProcessing = false);
         return;
       }
@@ -161,6 +162,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       // Automatically set up reminders and advance
       await _setupRemindersAndAdvance();
     } else {
+      // The chip already saved a time; without an explicit "off" that alone
+      // reads as enabled and hides the end-screen reminder card from this user.
+      // Written before the recovery flow below, which sets it true on success.
+      await recordReminderNotEnabled(ref.read(sharedPreferencesProvider));
+
       // Permission denied - log analytics event for onboarding context
       if (status.isDenied || status.isPermanentlyDenied) {
         await FirebaseAnalyticsService().logEvent(
@@ -583,7 +589,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: ColorConstants.lightPurple,
+              color: ColorConstants.accentDark,
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,

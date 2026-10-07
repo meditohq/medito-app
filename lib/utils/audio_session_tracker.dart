@@ -37,9 +37,16 @@ class AudioSessionTracker {
   // Active session, or null when nothing is playing.
   _Session? _active;
 
+  // File ids completed during this process, for [replayIfAbandoned].
+  final Set<String> _completedFileIds = {};
+
   /// How often, at most, the persisted record's position is rewritten. We do
   /// NOT persist on every position tick — that would be needless disk churn.
   static const _persistThrottle = Duration(seconds: 3);
+
+  /// A persisted position this close to the end counts as finished. Slightly
+  /// wider than [_persistThrottle] because the record can be up to that stale.
+  static const _nearEndWindowMs = 5000;
   DateTime? _lastPersistAt;
 
   /// Called from `PlayerProvider.play()` when a track starts. If a prior session
@@ -103,7 +110,11 @@ class AudioSessionTracker {
 
   /// Called from `handleStats` when a session completes. Clears the record and
   /// guards against a subsequent abandon for the same session.
-  Future<void> onCompleted() async {
+  ///
+  /// [fileId] is remembered so a launch replay waiting on a late Android
+  /// completion (see [replayIfAbandoned]) can tell its session finished.
+  Future<void> onCompleted({String? fileId}) async {
+    if (fileId != null) _completedFileIds.add(fileId);
     final session = _active;
     if (session != null) {
       session.ended = true;
@@ -138,7 +149,15 @@ class AudioSessionTracker {
 
   /// Run once early on app launch. If a prior run left an in-progress record
   /// (force-quit / OS-kill), fire the abandoned event from it and clear it.
-  Future<void> replayIfAbandoned() async {
+  ///
+  /// [completionGrace]: on Android a completion that finished while the app was
+  /// dead is pushed from MainActivity.onResume, asynchronously and often after
+  /// this runs. The record is read and cleared immediately (so a new session
+  /// can't be mistaken for it), then the abandon is held back for the grace
+  /// period and dropped if a completion for the same file arrives meanwhile.
+  Future<void> replayIfAbandoned({
+    Duration completionGrace = Duration.zero,
+  }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(
@@ -152,6 +171,29 @@ class AudioSessionTracker {
       final session = _Session.fromJson(
         Map<String, dynamic>.from(jsonDecode(raw) as Map),
       );
+
+      // The app died at the very end of the track: the completion is (or is
+      // about to be) delivered separately, so this is not an abandon.
+      if (session.durationMs > 0 &&
+          session.durationMs - session.lastPositionMs <= _nearEndWindowMs) {
+        AppLogger.d(
+          'SESSION',
+          'launch replay skipped, session reached the end: ${session.fileId}',
+        );
+        return;
+      }
+
+      if (completionGrace > Duration.zero) {
+        await Future<void>.delayed(completionGrace);
+        if (_completedFileIds.contains(session.fileId)) {
+          AppLogger.d(
+            'SESSION',
+            'launch replay skipped, completion arrived: ${session.fileId}',
+          );
+          return;
+        }
+      }
+
       await _fireAbandoned(session, reason: 'launch_replay');
       AppLogger.d(
         'SESSION',
@@ -168,6 +210,7 @@ class AudioSessionTracker {
   void resetForTesting() {
     _active = null;
     _lastPersistAt = null;
+    _completedFileIds.clear();
   }
 
   // --- internals -----------------------------------------------------------

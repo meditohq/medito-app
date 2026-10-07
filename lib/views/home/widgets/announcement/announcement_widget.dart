@@ -38,13 +38,18 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+    // Reverse curves are the mirrors of the forward ones: reversing through
+    // an ease-out plays it backwards, so the dismiss would start slow and
+    // speed up into the collapse. The mirrors decelerate on the way out too.
     _sizeAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
     );
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOut,
+      reverseCurve: Curves.easeIn,
     );
     _animationController.forward();
   }

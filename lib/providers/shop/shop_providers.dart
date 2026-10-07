@@ -169,8 +169,8 @@ class ShopListingNotifier extends AsyncNotifier<ShopListing> {
 }
 
 /// The Home row. If the shop has an [FourthwallService.homeCollection]
-/// collection it's used as curated, in its admin order; otherwise the first
-/// page of the whole shop (shared with the grid, so either opens instantly
+/// collection it's used as curated, with its first product featured; otherwise
+/// the first page of the whole shop (shared with the grid, so either opens instantly
 /// after the other), shuffled daily by the caller. In stock only.
 final homeShopProductsProvider = FutureProvider<HomeShopProducts>((ref) async {
   List<ShopProduct> inStock(ShopListing l) =>
@@ -198,7 +198,8 @@ class HomeShopProducts {
 
   final List<ShopProduct> products;
 
-  /// Ordered by hand in Fourthwall admin; keep that order.
+  /// Ordered by hand in Fourthwall admin; feature the first product and rotate
+  /// the rest daily. This is editorial order, not an inferred sales ranking.
   final bool curated;
 }
 

@@ -16,7 +16,11 @@ DART_DEFINES = [
 
 platform :ios do
 
-  before_all do
+  before_all do |lane|
+    # release_if_approved only calls the App Store Connect API and runs on a
+    # Linux runner, which has no Xcode to select.
+    next if lane == :release_if_approved
+
     # Honour the Xcode that the environment has already selected rather than
     # forcing the runner's *default* `/Applications/Xcode.app` symlink.
     #
@@ -122,6 +126,10 @@ platform :ios do
       # attached by hand in ASC — same as the build-and-upload path, where
       # uploading the binary doesn't attach it to the version either.
       upload_options[:skip_binary_upload] = true
+      # A version that is already Waiting for Review can't change its build
+      # ("The specified pre-release build could not be added"). Pull it from
+      # review first when asked, as 2610.6.3 needed (302471 was in review).
+      upload_options[:reject_if_possible] = true if options[:reject_if_possible].to_s == 'true'
       upload_options[:app_version] = options[:app_version]
       upload_options[:build_number] = options[:build_number]
     end
@@ -192,6 +200,44 @@ platform :ios do
       lane_context[SharedValues::XCODEBUILD_ARCHIVE] = options[:archive]
     end
     upload_dsyms_to_crashlytics
+  end
+
+  # Releases an App Store version that Apple has approved and that is waiting
+  # for a manual release (the release lane submits with automatic_release:
+  # false). Any other state is only logged, so this is safe to run on a timer:
+  # see .github/workflows/ios-release-when-approved.yml.
+  #
+  #   fastlane ios release_if_approved app_version:2610.6.3 [build_number:302473]
+  lane :release_if_approved do |options|
+    version_string = options[:app_version].to_s
+    UI.user_error!("app_version is required") if version_string.empty?
+
+    app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_CONTENT"],
+      is_key_content_base64: false,
+      in_house: false
+    )
+
+    app = Spaceship::ConnectAPI::App.find(CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+    UI.user_error!("App not found in App Store Connect") unless app
+    version = app.get_app_store_versions(filter: { versionString: version_string, platform: "IOS" }).first
+    UI.user_error!("No App Store version #{version_string}") unless version
+
+    state = version.app_version_state || version.app_store_state
+    UI.message("App Store version #{version_string}: #{state}, build #{version.build&.version || 'none'}")
+    expected_build = options[:build_number].to_s
+    attached_build = version.build&.version.to_s
+    if !expected_build.empty? && attached_build != expected_build
+      # 2610.6.3 was once in review with 302471 (2610.6.1's binary) instead of
+      # 302473; never release a version carrying a different build than tagged.
+      UI.user_error!("#{version_string} has build #{attached_build}, expected #{expected_build}: not releasing")
+    end
+    if state == "PENDING_DEVELOPER_RELEASE"
+      version.create_app_store_version_release_request
+      UI.success("Released #{version_string} to the App Store")
+    end
   end
 
 end

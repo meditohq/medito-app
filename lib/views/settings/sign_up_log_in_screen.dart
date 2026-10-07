@@ -77,7 +77,7 @@ class SignUpLogInPage extends ConsumerWidget {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
-          child: CircularProgressIndicator(color: context.brandPurple),
+          child: CircularProgressIndicator(color: context.brandAccent),
         ),
       ); // Show loading while popping
     } else {
@@ -591,7 +591,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      context.onBrandPurple,
+                      context.onBrandAccent,
                     ),
                   ),
                 )
@@ -652,7 +652,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      context.onBrandPurple,
+                      context.onBrandAccent,
                     ),
                   ),
                 )
@@ -801,9 +801,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   ButtonStyle _getButtonStyle() {
     return ElevatedButton.styleFrom(
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      backgroundColor: context.brandPurple,
-      disabledForegroundColor: context.onBrandPurple.withValues(alpha: 0.6),
-      disabledBackgroundColor: context.brandPurple.withOpacityValue(0.5),
+      backgroundColor: context.brandAccent,
+      disabledForegroundColor: context.onBrandAccent.withValues(alpha: 0.6),
+      disabledBackgroundColor: context.brandAccent.withOpacityValue(0.5),
       minimumSize: const Size(double.infinity, 48),
     );
   }

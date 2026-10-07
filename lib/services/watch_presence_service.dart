@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/src/watch_presence_pigeon.g.dart';
 import 'package:medito/utils/logger.dart';
-
-const _channel = MethodChannel('medito.app/watch_presence');
 
 /// Records whether the user has a paired watch (and the Medito watch app) as
 /// GA4 user properties, to size the audience for the watch apps before
@@ -15,21 +13,21 @@ const _channel = MethodChannel('medito.app/watch_presence');
 Future<void> reportWatchPresence({FirebaseAnalyticsService? analytics}) async {
   if (!Platform.isIOS && !Platform.isAndroid) return;
   try {
-    final status = await _channel
-        .invokeMapMethod<String, dynamic>('getStatus')
-        .timeout(const Duration(seconds: 10));
-    if (status == null) return;
+    final status = await WatchPresenceApi().getStatus().timeout(
+      const Duration(seconds: 10),
+    );
     final service = analytics ?? FirebaseAnalyticsService();
     await service.setUserProperty(
       name: AnalyticsEventConstants.userPropHasPairedWatch,
-      value: '${status['paired'] == true}',
+      value: '${status.paired}',
     );
     await service.setUserProperty(
       name: AnalyticsEventConstants.userPropWatchAppInstalled,
-      value: '${status['appInstalled'] == true}',
+      value: '${status.appInstalled}',
     );
   } catch (e) {
-    // Missing channel (tests, other platforms) or a timeout: just skip.
+    // Missing channel (tests, other platforms), failed WCSession activation
+    // or a timeout: just skip.
     AppLogger.w('WATCH_PRESENCE', 'Could not read watch presence: $e');
   }
 }

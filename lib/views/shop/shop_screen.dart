@@ -67,6 +67,12 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
   void _selectCollection(String slug) {
     if (slug == _collection) return;
+    ref
+        .read(analyticsServiceProvider)
+        .logEvent(
+          name: AnalyticsEventConstants.shopCollectionSelected,
+          parameters: {'collection': slug},
+        );
     setState(() => _collection = slug);
     if (_scrollController.hasClients) _scrollController.jumpTo(0);
   }
@@ -115,7 +121,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                 ),
               ),
               const Spacer(),
-              const ShopBagButton(),
+              const ShopBagButton(
+                source: AnalyticsEventConstants.sourceShopGrid,
+              ),
             ],
           ),
         ),
@@ -162,6 +170,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: ShopErrorView(
+                        surface: 'grid',
+                        error: error,
                         onRetry: () =>
                             ref.invalidate(shopListingProvider(_collection)),
                       ),

@@ -130,7 +130,7 @@ class _OffsetOptionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    final purple = context.brandPurple;
+    final accent = context.brandAccent;
 
     return InkWell(
       onTap: onTap,
@@ -144,7 +144,7 @@ class _OffsetOptionTile extends StatelessWidget {
                   ? Icons.radio_button_checked
                   : Icons.radio_button_unchecked,
               size: 20,
-              color: selected ? purple : onSurface.withOpacityValue(0.5),
+              color: selected ? accent : onSurface.withOpacityValue(0.5),
             ),
             const SizedBox(width: 12),
             Expanded(

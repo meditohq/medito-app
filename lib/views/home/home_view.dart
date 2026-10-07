@@ -291,7 +291,7 @@ class _HomeLoadingViewState extends State<_HomeLoadingView> {
                     child: Text(
                       AppLocalizations.of(context)!.goToDownloads,
                       style: TextStyle(
-                        color: context.brandPurple.withValues(alpha: 0.8),
+                        color: context.brandAccent.withValues(alpha: 0.8),
                       ),
                     ),
                   ),

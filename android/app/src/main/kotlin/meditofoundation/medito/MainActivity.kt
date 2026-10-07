@@ -83,6 +83,7 @@ class MainActivity : FlutterFragmentActivity(), MeditoAndroidAudioServiceManager
 
         meditoAudioApi = MeditoAudioServiceCallbackApi(flutterEngine.dartExecutor.binaryMessenger)
         WatchPresence.register(flutterEngine.dartExecutor.binaryMessenger, this)
+        InstallReferrer.register(flutterEngine.dartExecutor.binaryMessenger, this)
         checkAndSendCompletionData()
         
         // Set up platform channel for widget updates

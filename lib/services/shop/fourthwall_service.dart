@@ -32,7 +32,9 @@ class FourthwallService {
   static const allCollection = 'all';
 
   /// Optional collection, curated in Fourthwall admin, that sets which
-  /// products the Home row shows and in what order. Absent → whole shop.
+  /// products the Home row shows. The first stays featured, the rest rotate
+  /// daily. Absent → whole shop. Sales ranking must be supplied by the shop;
+  /// the public Storefront API exposes neither sales counts nor sales sorting.
   static const homeCollection = 'app-home';
 
   /// Cheap add-ons offered in the bag.

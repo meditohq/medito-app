@@ -4,7 +4,7 @@ import 'package:medito/constants/styles/widget_styles.dart';
 
 /// A tappable card with a radio indicator, title and description, for picking
 /// one option from a short list (settings sheets). The selected card gets a
-/// brand-purple border; the rest keep a hairline so the layout never shifts.
+/// brand-accent border; the rest keep a hairline so the layout never shifts.
 class RadioOptionCard extends StatelessWidget {
   const RadioOptionCard({
     super.key,
@@ -32,7 +32,7 @@ class RadioOptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    final accent = context.brandPurple;
+    final accent = context.brandAccent;
     final border = selected ? accent : onSurface.withValues(alpha: 0.10);
 
     return Semantics(

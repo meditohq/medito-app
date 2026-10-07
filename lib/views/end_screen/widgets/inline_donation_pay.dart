@@ -15,11 +15,12 @@ const inlineDonationPayButtonKey = Key('inline_donation_pay_button');
 @visibleForTesting
 const inlineDonationOtherAmountKey = Key('inline_donation_other_amount');
 
-typedef InlinePayCallback = Future<void> Function({
-  required int amount,
-  required String email,
-  required payment_models.PaymentMethodType method,
-});
+typedef InlinePayCallback =
+    Future<void> Function({
+      required int amount,
+      required String email,
+      required payment_models.PaymentMethodType method,
+    });
 
 /// Variant B body of the end-screen donation card (`end_screen_inline_pay`):
 /// the localized monthly ladder as chips, a donate button, and an
@@ -28,8 +29,8 @@ typedef InlinePayCallback = Future<void> Function({
 /// is testable without Stripe or Riverpod. Anonymous donors reveal an
 /// autofill-enabled email field on the first tap, then continue to payment.
 ///
-/// Drawn on the brand-purple card, so every foreground uses
-/// `context.onBrandPurple` like the control CTA does.
+/// Drawn on the brand-accent card, so every foreground uses
+/// `context.onBrandAccent` like the control CTA does.
 class InlineDonationPay extends StatefulWidget {
   const InlineDonationPay({
     super.key,
@@ -167,7 +168,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final fg = context.onBrandPurple;
+    final fg = context.onBrandAccent;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -308,7 +309,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                   maxLines: 1,
                   softWrap: false,
                   style: TextStyle(
-                    color: isSelected ? context.brandPurple : fg,
+                    color: isSelected ? context.brandAccent : fg,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -431,9 +432,9 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
         key: inlineDonationPayButtonKey,
         onPressed: widget.isProcessing ? null : _submit,
         style: ElevatedButton.styleFrom(
-          backgroundColor: context.onBrandPurple,
-          foregroundColor: context.brandPurple,
-          disabledBackgroundColor: context.onBrandPurple.withValues(alpha: 0.7),
+          backgroundColor: context.onBrandAccent,
+          foregroundColor: context.brandAccent,
+          disabledBackgroundColor: context.onBrandAccent.withValues(alpha: 0.7),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: widget.isProcessing
@@ -442,7 +443,7 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: context.brandPurple,
+                  color: context.brandAccent,
                 ),
               )
             : Text(

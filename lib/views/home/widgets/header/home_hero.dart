@@ -110,9 +110,8 @@ class HomeHero extends ConsumerWidget {
           Positioned.fill(
             child: _HeroBackdrop(coverUrl: coverUrl, banner: !overlay),
           ),
-          // Floor for the stack height: with an overlay a short section
-          // still gets a big image; as a banner this is the whole height.
-          SizedBox(height: minHeight, width: double.infinity),
+          // As a banner this is the whole height.
+          if (!overlay) SizedBox(height: minHeight, width: double.infinity),
           if (overlay)
             Padding(
               padding: EdgeInsets.only(
@@ -125,7 +124,22 @@ class HomeHero extends ConsumerWidget {
                 children: [
                   // Own colours, so kept outside the on-image theme.
                   ?announcement,
-                  _OnImageTheme(child: child!),
+                  // Floor for the stack height, so a short section still
+                  // gets a big image. It sits under the announcement rather
+                  // than around it: the card adds to the height instead of
+                  // filling the floor, so its collapse shrinks the hero the
+                  // whole way instead of stopping dead at the floor.
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight:
+                          (minHeight - topInset - _headerReserve - padding8)
+                              .clamp(0.0, double.infinity),
+                    ),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: _OnImageTheme(child: child!),
+                    ),
+                  ),
                 ],
               ),
             ),

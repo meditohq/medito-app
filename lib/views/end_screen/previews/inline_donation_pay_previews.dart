@@ -4,7 +4,7 @@
 //   flutter widget-preview start --web-server
 //
 // InlineDonationPay is pure presentation, so it previews without Stripe or
-// Riverpod. It is wrapped in the same brand-purple card chrome the real
+// Riverpod. It is wrapped in the same brand-accent card chrome the real
 // DonationWidget draws around it. Axes: wallet vs card button, known vs
 // unknown email, currency width (USD / BRL / JPY / INR), theme, locale and
 // large text.
@@ -46,7 +46,7 @@ class _CardFrame extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: HomeGradientBorder(
-              backgroundColor: context.brandPurple,
+              backgroundColor: context.brandAccent,
               borderRadius: 14,
               borderWidth: 0.5,
               child: Padding(
@@ -63,7 +63,7 @@ class _CardFrame extends StatelessWidget {
                             fontSize: 22,
                             fontWeight: FontWeight.w400,
                             height: 1.2,
-                            color: context.onBrandPurple,
+                            color: context.onBrandAccent,
                           ),
                     ),
                     const SizedBox(height: 10),
@@ -75,7 +75,7 @@ class _CardFrame extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                             height: 1.4,
-                            color: context.onBrandPurple.withValues(alpha: 0.9),
+                            color: context.onBrandAccent.withValues(alpha: 0.9),
                           ),
                     ),
                     const SizedBox(height: 20),

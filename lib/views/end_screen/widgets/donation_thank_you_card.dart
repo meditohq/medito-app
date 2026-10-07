@@ -19,7 +19,7 @@ class DonationThankYouCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return HomeGradientBorder(
-      backgroundColor: context.brandPurple,
+      backgroundColor: context.brandAccent,
       borderRadius: 14,
       borderWidth: 0.5,
       child: Padding(
@@ -35,7 +35,7 @@ class DonationThankYouCard extends StatelessWidget {
                 fontFamily: googleSans,
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
-                color: context.onBrandPurple,
+                color: context.onBrandAccent,
               ),
             ),
             const SizedBox(height: 6),
@@ -46,7 +46,7 @@ class DonationThankYouCard extends StatelessWidget {
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 height: 1.4,
-                color: context.onBrandPurple.withValues(alpha: 0.9),
+                color: context.onBrandAccent.withValues(alpha: 0.9),
               ),
             ),
           ],

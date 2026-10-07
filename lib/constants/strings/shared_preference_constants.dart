@@ -44,6 +44,9 @@ class SharedPreferenceConstants {
       'reminder_prompt_dismissed_forever';
   static const String notifPermissionFixNeeded = 'notif_permission_fix_needed';
 
+  /// Set once repairReminderFlagOnce has run on this install.
+  static const String reminderFlagRepaired = 'reminder_flag_repair_v1';
+
   /// Epoch millis until which the post-session reminder prompt is suppressed.
   /// Set by a soft dismiss ("Not now") instead of the permanent dismiss.
   static const String reminderPromptSnoozeUntil =
@@ -76,6 +79,16 @@ class SharedPreferenceConstants {
   static const String utmCampaign = 'utm_campaign';
   static const String utmTerm = 'utm_term';
   static const String utmContent = 'utm_content';
+
+  /// Set once Apple's AdServices API has answered for this install, so the
+  /// Apple Ads attribution lookup runs once (see AppleAdsAttributionService).
+  static const String appleAdsAttributionChecked =
+      'apple_ads_attribution_checked';
+
+  /// Set once the Play install referrer has been read for this install (see
+  /// PlayInstallReferrerService).
+  static const String playInstallReferrerChecked =
+      'play_install_referrer_checked';
 
   // Donation snooze tracking
   static const String donationAskSnoozedUntilMs =
@@ -132,6 +145,11 @@ class SharedPreferenceConstants {
   // as an audio_session_abandoned event on next launch if a force-quit left it
   // behind. See docs/ANALYTICS_SESSION_EVENTS.md.
   static const String incompleteAudioSession = 'incompleteAudioSession';
+
+  /// Pack ids whose Up Next completed state has been logged, so
+  /// up_next_pack_completed / up_next_path_completed fire once per pack.
+  static const String upNextCompletedLoggedPacks =
+      'up_next_completed_logged_packs';
 
   // The onboarding "experience" answer, persisted as an int index:
   // 0 = never tried, 1 = a little, 2 = regular practice. Absent if the user

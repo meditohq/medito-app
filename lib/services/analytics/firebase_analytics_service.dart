@@ -140,6 +140,12 @@ class FirebaseAnalyticsService {
       // Initialize the analytics instance now that Firebase should be ready
       if (_runningInTest || isMockMode) {
         _analytics = _NoopAnalytics() as dynamic; // cast to satisfy type
+      } else if (isDevFlavor) {
+        // Dev builds must never post to prod analytics. Disabling collection
+        // persists natively, so automatic events (first_open, session_start)
+        // stop on later launches too.
+        await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
+        _analytics = _NoopAnalytics() as dynamic;
       } else {
         _analytics = FirebaseAnalytics.instance;
       }
@@ -692,6 +698,33 @@ class FirebaseAnalyticsService {
       AppLogger.e(
         'FIREBASE_ANALYTICS',
         'Failed to re-apply stored experience level',
+        e,
+        stackTrace,
+      );
+    }
+  }
+
+  /// Re-asserts `zen_mode` from prefs on launch, so users who enabled Zen Mode
+  /// before the property existed (or before granting consent) are counted.
+  static Future<void> applyStoredZenMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    await setZenModeProperty(
+      prefs.getBool(SharedPreferenceConstants.zenModeEnabled) ?? false,
+    );
+  }
+
+  static Future<void> setZenModeProperty(bool enabled) async {
+    try {
+      final analyticsService = FirebaseAnalyticsService();
+      await analyticsService.initialize();
+      await analyticsService.setUserProperty(
+        name: AnalyticsEventConstants.userPropZenMode,
+        value: enabled ? 'on' : 'off',
+      );
+    } catch (e, stackTrace) {
+      AppLogger.e(
+        'FIREBASE_ANALYTICS',
+        'Failed to set zen mode user property',
         e,
         stackTrace,
       );

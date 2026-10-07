@@ -53,4 +53,19 @@ class EndScreenDonationExperiment {
   static bool isInlineVariant(SharedPreferences prefs) =>
       prefs.getString(SharedPreferenceConstants.endScreenDonationAskVariant) ==
       variantInline;
+
+  /// Stripe metadata / paywall URL key. Separate from experiment_variant
+  /// (which belongs to the donate-api's server experiment) so webview
+  /// donations can be attributed to an arm without clobbering that tag.
+  static const paymentMetadataKey = experimentName;
+
+  /// `{end_screen_inline_pay: A|B}` once assigned, else empty. Never assigns.
+  static Map<String, String> paymentMetadata(SharedPreferences prefs) {
+    final value = prefs.getString(
+      SharedPreferenceConstants.endScreenDonationAskVariant,
+    );
+    return value == variantControl || value == variantInline
+        ? {paymentMetadataKey: value!}
+        : const {};
+  }
 }

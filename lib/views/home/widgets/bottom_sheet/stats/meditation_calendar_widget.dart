@@ -596,14 +596,14 @@ class _MeditationCalendarWidgetState
       weekendTextStyle: _dayTextStyle(context),
       defaultTextStyle: _dayTextStyle(context),
       selectedDecoration: BoxDecoration(
-        color: context.brandPurple,
+        color: context.brandAccent,
         shape: BoxShape.circle,
       ),
       todayTextStyle: _dayTextStyle(context, fontWeight: FontWeight.w600),
       todayDecoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         shape: BoxShape.circle,
-        border: Border.all(color: context.brandPurple, width: 2),
+        border: Border.all(color: context.brandAccent, width: 2),
       ),
     );
   }
@@ -634,7 +634,7 @@ class _MeditationCalendarWidgetState
       return _buildDayCircle(
         context,
         date,
-        color: context.brandPurple.withOpacityValue(0.20),
+        color: context.brandAccent.withOpacityValue(0.20),
       );
     }
 
@@ -642,7 +642,7 @@ class _MeditationCalendarWidgetState
       return _buildDayCircle(
         context,
         date,
-        color: context.brandPurple.withOpacityValue(inRange ? 0.32 : 0.15),
+        color: context.brandAccent.withOpacityValue(inRange ? 0.32 : 0.15),
         fontWeight: FontWeight.w600,
       );
     }
@@ -669,7 +669,7 @@ class _MeditationCalendarWidgetState
     final hasMeditation = meditationDates.contains(dayStart);
     final hasFreeze = freezeDates.contains(dayStart);
     final backgroundColor = hasMeditation
-        ? context.brandPurple.withOpacityValue(0.25)
+        ? context.brandAccent.withOpacityValue(0.25)
         : hasFreeze
         ? ColorConstants.lightBlue.withOpacityValue(0.25)
         : Theme.of(context).colorScheme.surface;
@@ -679,7 +679,7 @@ class _MeditationCalendarWidgetState
       date,
       color: backgroundColor,
       fontWeight: FontWeight.w600,
-      border: Border.all(color: context.brandPurple, width: 2),
+      border: Border.all(color: context.brandAccent, width: 2),
     );
   }
 
@@ -691,7 +691,7 @@ class _MeditationCalendarWidgetState
     final dayStart = startOfDay(date);
     final fillColor = freezeDates.contains(dayStart)
         ? ColorConstants.lightBlue
-        : context.brandPurple;
+        : context.brandAccent;
 
     if (_isRangeEndpoint(date)) {
       return Container(
@@ -878,7 +878,7 @@ class _MeditationCalendarWidgetState
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
-          child: CircularProgressIndicator(color: context.brandPurple),
+          child: CircularProgressIndicator(color: context.brandAccent),
         ),
       );
     }
@@ -921,7 +921,7 @@ class _MeditationCalendarWidgetState
           padding: const EdgeInsets.all(14),
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: context.brandPurple.withOpacityValue(0.1),
+            color: context.brandAccent.withOpacityValue(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -966,7 +966,7 @@ class _MeditationCalendarWidgetState
             style: OutlinedButton.styleFrom(
               backgroundColor: Colors.transparent,
               foregroundColor: Theme.of(context).colorScheme.onSurface,
-              side: BorderSide(color: context.brandPurple),
+              side: BorderSide(color: context.brandAccent),
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1091,7 +1091,7 @@ class _SessionItemWidget extends ConsumerWidget {
             width: 8,
             height: 8,
             decoration: BoxDecoration(
-              color: isManual ? ColorConstants.graphite : context.brandPurple,
+              color: isManual ? ColorConstants.graphite : context.brandAccent,
               shape: BoxShape.circle,
             ),
           ),
@@ -1202,7 +1202,7 @@ class _RangePreviewRow extends StatelessWidget {
             fontFamily: googleSans,
             fontWeight: FontWeight.w700,
             color: emphasize
-                ? context.brandPurple
+                ? context.brandAccent
                 : theme.colorScheme.onSurface,
           ),
         ),

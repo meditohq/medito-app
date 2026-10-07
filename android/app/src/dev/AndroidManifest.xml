@@ -5,5 +5,9 @@
     <application
         android:icon="@mipmap/ic_launcher"
         tools:replace="android:icon">
+        <!-- Dev builds share the prod Firebase app ID; never send analytics. -->
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true" />
     </application>
 </manifest>

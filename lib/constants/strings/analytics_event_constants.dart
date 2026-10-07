@@ -251,11 +251,13 @@ class AnalyticsEventConstants {
   static const String secureStoragePersistentFailure =
       'secure_storage_persistent_failure';
 
-  /// Event logged when token backup storage is attempted
+  /// Event logged when token backup storage is attempted.
+  /// No longer sent since Sep 2026 (was pure volume); kept for old builds' data.
   static const String tokenBackupStorageAttempt =
       'token_backup_storage_attempt';
 
-  /// Event logged with result of token backup storage attempt
+  /// Event logged with result of token backup storage attempt.
+  /// Since Sep 2026 only 'failure' is sent; older builds also sent 'success'.
   static const String tokenBackupStorageResult = 'token_backup_storage_result';
 
   /// Event logged when token is retrieved from backup storage
@@ -408,8 +410,13 @@ class AnalyticsEventConstants {
   /// Parameter name for revenue (used by Meta)
   static const String paramRevenue = 'revenue';
 
-  /// Parameter name for currency (used by Meta)
+  /// Parameter name for currency: ISO code, upper case on the GA4 donation
+  /// events (also used by Meta)
   static const String paramCurrency = 'currency';
+
+  /// GA4's standard monetary value, in major units (10.0 for $10). Google Ads
+  /// reads value + currency when GA4 events are imported as conversions.
+  static const String paramValue = 'value';
 
   // Up Next widget events
   /// Event logged when user taps the Up Next widget to start a session
@@ -422,15 +429,35 @@ class AnalyticsEventConstants {
   static const String upNextPackOpened = 'up_next_pack_opened';
 
   /// The pinned pack is finished and the completed state was shown.
+  /// Once per pack per install; before Sep 2026 it fired on every Home mount.
   static const String upNextPackCompleted = 'up_next_pack_completed';
 
   /// The completed-state CTA was accepted and the next pack pinned.
   static const String upNextNextPackPinned = 'up_next_next_pack_pinned';
 
   /// The user finished the last pack on the path (or the megapack).
+  /// Once per pack per install; before Sep 2026 it fired on every Home mount.
   static const String upNextPathCompleted = 'up_next_path_completed';
 
-  /// Parameter name for the session/track ID in up next events
+  /// The Up Next card was on screen. Fires once each time the card is built
+  /// (a Home mount, or the card moving on to a new session), so it counts Home
+  /// visits with the card visible, not distinct users — read it as distinct
+  /// users per day. It is the denominator [upNextTapped] never had.
+  /// Params: [paramUpNextState] ('session' | 'completed'), [paramUpNextStyle],
+  /// [paramSessionId] (session state only), plus the usual pack params.
+  static const String upNextShown = 'up_next_shown';
+
+  /// How the card is presented: 'card' (its own row) or 'hero' (laid over the
+  /// Home image). Also added to the other up_next_* events.
+  static const String paramUpNextStyle = 'style';
+
+  /// What the card showed: 'session' (next track to play) or 'completed'
+  /// (the pinned pack is finished).
+  static const String paramUpNextState = 'state';
+
+  /// Parameter name for the session/track ID in up next events. On the
+  /// Start/Continue button it is the track that button plays, the same id
+  /// [upNextTapped] reports, so the two join on it.
   static const String paramSessionId = 'session_id';
 
   /// Parameter name for the pack ID in up next events
@@ -466,6 +493,20 @@ class AnalyticsEventConstants {
   /// Params: [paramPackId].
   static const String packUnpinned = 'pack_unpinned';
 
+  /// The pack screen's Start/Continue play button was tapped — every tap, not
+  /// just the ones that change Home (that is [packPinned], which stays silent
+  /// when the pack is already pinned and so hid the common Continue case).
+  /// Params: [paramPackId], [paramSessionId] (the track it plays),
+  /// [paramButtonLabel], [paramAlreadyPinned], [paramSessionIndexInPack],
+  /// [paramPackTotalSessions], [paramPackSequencePosition], [paramUpNextMode].
+  static const String packPathButtonTapped = 'pack_path_button_tapped';
+
+  /// 'start' (nothing finished yet) or 'continue'.
+  static const String paramButtonLabel = 'label';
+
+  /// 'true' when the pack was already what Home continues.
+  static const String paramAlreadyPinned = 'already_pinned';
+
   /// Pack that was Your Path before this one replaced it.
   static const String paramPreviousPackId = 'previous_pack_id';
 
@@ -495,10 +536,6 @@ class AnalyticsEventConstants {
   static const String onboardingExperienceAnswered =
       'onboarding_experience_answered';
 
-  /// Event logged when the user answers the intent question
-  /// Parameter: paramAnswer ('learn_properly', 'build_habit', 'stress_sleep_emotions')
-  static const String onboardingIntentAnswered = 'onboarding_intent_answered';
-
   /// Parameter for the selected answer in onboarding question events
   static const String paramAnswer = 'answer';
 
@@ -514,9 +551,20 @@ class AnalyticsEventConstants {
   static const String userPropHasPairedWatch = 'has_paired_watch';
   static const String userPropWatchAppInstalled = 'watch_app_installed';
 
-  /// Parameter carrying the free-text response from the onboarding attribution
-  /// question when the user picks the "other" path and types their own answer.
-  static const String paramOtherText = 'other_text';
+  /// GA4 user property for the Zen Mode setting ('on' / 'off'). Set on every
+  /// launch and whenever the user toggles it, so adoption can be read from
+  /// BigQuery and other metrics segmented by it.
+  static const String userPropZenMode = 'zen_mode';
+
+  /// Logged once per iOS install with Apple's AdServices answer for whether
+  /// the install came from an Apple Ads campaign. Params: attributed
+  /// ('true' / 'false'); when attributed also campaign_id, ad_group_id,
+  /// keyword_id, claim_type ('Click' / 'Impression'), conversion_type
+  /// ('Download' / 'Redownload'), country_or_region. Attributed installs also
+  /// get utm_source 'apple-search' / utm_medium 'asa' (unless a deep link
+  /// already set UTMs), which flow into GA4 user properties and Stripe
+  /// metadata like deep-link UTMs do.
+  static const String appleAdsAttribution = 'apple_ads_attribution';
 
   /// Event logged when the new onboarding question flow is completed
   /// Parameter: paramResultState — 'state_a', 'state_b', or 'state_c'
@@ -525,15 +573,6 @@ class AnalyticsEventConstants {
 
   /// Parameter for the result state shown on the onboarding result screen
   static const String paramResultState = 'result_state';
-
-  /// Event logged when the user abandons the new onboarding question flow before completion
-  static const String onboardingQuestionFlowAbandoned =
-      'onboarding_question_flow_abandoned';
-
-  /// Event logged when the user answers the attribution question ("how did you hear about us?")
-  /// Parameter: paramAnswer ('google_ad', 'social_ad', 'friend', 'therapist', 'app_store', 'play_store', 'other')
-  static const String onboardingAttributionAnswered =
-      'onboarding_attribution_answered';
 
   /// Event logged when the end-screen donation card first becomes visible in
   /// its ASK state (the amount/CTA card, not the post-donation thank-you).
@@ -764,14 +803,26 @@ class AnalyticsEventConstants {
   /// Parameter name for the shortcut destination type (e.g. pack, track, link)
   static const String paramShortcutType = 'shortcut_type';
 
+  /// The user opened a tag's track list (TagView).
+  /// Parameters: 'tag_id', 'tag_group'.
+  static const String tagOpened = 'tag_opened';
+
   // Search events
-  /// Event logged once per settled (debounced) non-empty query on the Search
-  /// tab. Parameters: paramSearchTerm, paramSearchTermLength.
+  /// One search the user committed to: they opened a result, submitted, cleared
+  /// the field, or stopped typing for 3s (see SearchQueryLogger). Before Oct
+  /// 2026 it fired on every 500ms pause, so older data is full of half-typed
+  /// words. Parameters: paramSearchTerm (trimmed, lowercased, '[redacted]' if it
+  /// looked like an email or phone number), paramSearchTermLength,
+  /// paramHasResults ('true'/'false'; absent if results were still loading).
   static const String searchPerformed = 'search_performed';
 
-  /// Event logged when a settled non-empty query returns zero packs and zero
-  /// tracks — i.e. a content/discovery gap. Parameters: paramSearchTerm.
+  /// A committed search with zero packs and zero tracks, i.e. a
+  /// content/discovery gap. Sent alongside [searchPerformed] with the same
+  /// term. Parameters: paramSearchTerm.
   static const String searchNoResults = 'search_no_results';
+
+  /// Whether a committed search found anything: 'true' or 'false'.
+  static const String paramHasResults = 'has_results';
 
   /// The query text the user searched for.
   static const String paramSearchTerm = 'search_term';
@@ -780,18 +831,27 @@ class AnalyticsEventConstants {
   /// searches independent of the term itself).
   static const String paramSearchTermLength = 'search_term_length';
 
-  // Favourite events
-  /// Event logged when user adds a track to favourites from the track screen
+  // Favourite events. Defined long before they were wired up: nothing logged
+  // them until Oct 2026, so there is no favourites history in BigQuery before
+  // that release.
+  /// User added a track to favourites from the track screen.
+  /// Parameter: [paramTrackId].
   static const String trackFavourited = 'track_favourited';
 
-  /// Event logged when user removes a track from favourites on the track screen
+  /// User removed a track from favourites on the track screen.
+  /// Parameter: [paramTrackId].
   static const String trackUnfavourited = 'track_unfavourited';
 
-  /// Event logged when user adds a pack to favourites from the pack screen
+  /// User added a pack to favourites from the pack screen.
+  /// Parameter: [paramPackId].
   static const String packFavourited = 'pack_favourited';
 
-  /// Event logged when user removes a pack from favourites on the pack screen
+  /// User removed a pack from favourites on the pack screen.
+  /// Parameter: [paramPackId].
   static const String packUnfavourited = 'pack_unfavourited';
+
+  /// Track id (not the audio file id) on the favourite events.
+  static const String paramTrackId = 'track_id';
 
   // Quote share events
   /// Event logged when the user opens the quote share screen by tapping the
@@ -855,7 +915,9 @@ class AnalyticsEventConstants {
   /// Shop grid opened. Params: source.
   static const String shopViewed = 'shop_viewed';
 
-  /// Native product page opened. Params: product_slug, source.
+  /// Native product page opened. Params: product_slug, source, and — when the
+  /// caller already had the product (grid, Home tile, bag add-on) —
+  /// product_name, value (lowest variant price) and currency.
   static const String shopProductViewed = 'shop_product_viewed';
 
   /// "Add to bag" tapped on a product page. Params: product_slug,
@@ -866,8 +928,59 @@ class AnalyticsEventConstants {
   /// Params: items (lines), quantity (units), value, currency.
   static const String shopCheckoutStarted = 'shop_checkout_started';
 
+  /// The bag sheet opened. Without it "added but never opened the bag" was
+  /// indistinguishable from "opened the bag and left".
+  /// Params: source (where the bag button was tapped: shop_grid, product_page,
+  /// home_card), items (lines), quantity (units), value, currency.
+  static const String shopBagViewed = 'shop_bag_viewed';
+
+  /// A line was taken out of the bag (minus at quantity 1).
+  /// Params: product_slug, variant_id, quantity (units removed).
+  static const String shopBagItemRemoved = 'shop_bag_item_removed';
+
+  /// A bag line's quantity was changed with the stepper, not removed.
+  /// Params: product_slug, variant_id, from, to.
+  static const String shopBagQuantityChanged = 'shop_bag_quantity_changed';
+
+  /// The bag's "we sent you to checkout" card rendered — the user is back in
+  /// the app after a checkout trip. Fires once per time the bag is opened in
+  /// that state, so it can repeat until the bag is cleared. Hosted checkout
+  /// gives no completion signal; this and [shopBagCleared] are the proxy.
+  /// Params: items, quantity, value, currency.
+  static const String shopCheckoutReturned = 'shop_checkout_returned';
+
+  /// The bag was emptied in one go. Params: reason ('checkout_return'), items,
+  /// quantity, value, currency.
+  static const String shopBagCleared = 'shop_bag_cleared';
+
+  /// A shop screen showed its load-failure view (an impression that could never
+  /// convert). Params: surface ('grid' | 'product'), error_kind (same labels as
+  /// the donation card), product_slug on the product surface.
+  static const String shopLoadFailed = 'shop_load_failed';
+
+  /// A collection chip was tapped on the shop grid (not the one already
+  /// selected). Params: collection (slug).
+  static const String shopCollectionSelected = 'shop_collection_selected';
+
   static const String sourceHomeHeader = 'home_header';
+  static const String sourceProductPage = 'product_page';
   static const String sourceHomeCard = 'home_card';
   static const String sourceShopGrid = 'shop_grid';
   static const String sourceBagAddOn = 'bag_add_on';
+
+  // Retired events. Nothing in this codebase sends these any more, but they
+  // still arrive in BigQuery from older installed builds, so they are listed
+  // here (not as constants) to explain them when they turn up in a query.
+  //
+  // - onboarding_attribution_answered, onboarding_intent_answered: questions
+  //   removed from onboarding 2026-05-18 (a1f254fc).
+  // - your_path_explainer_shown / _dismissed: Your Path strip, removed
+  //   2026-09-16 (7a2cd300). "shown" re-fired on every Home build for anyone
+  //   who never tapped "Got it", so it was never a reach metric.
+  // - media_permission_banner_shown: 2606.x builds only.
+  // - screen_view_with_params: 26.4.x-26.5.x builds only.
+  // - audio_started, fcmSave, connectivity_error, user_initialization_*:
+  //   3.x builds only.
+  // - token_backup_storage_attempt (and result='success'): no longer sent
+  //   since Sep 2026; see [tokenBackupStorageResult].
 }

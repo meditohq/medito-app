@@ -218,8 +218,8 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
                     key: _shareButtonKey,
                     onPressed: _sharing ? null : _share,
                     style: FilledButton.styleFrom(
-                      backgroundColor: context.brandPurple,
-                      foregroundColor: context.onBrandPurple,
+                      backgroundColor: context.brandAccent,
+                      foregroundColor: context.onBrandAccent,
                       padding: const EdgeInsets.symmetric(vertical: padding16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -231,7 +231,7 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: context.onBrandPurple,
+                              color: context.onBrandAccent,
                             ),
                           )
                         : const Text(

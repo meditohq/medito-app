@@ -1,18 +1,18 @@
 package meditofoundation.medito.widget
 
 import android.content.Context
-import android.content.res.Configuration
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import android.content.Intent
 import android.net.Uri
 import androidx.glance.GlanceId
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
@@ -28,21 +28,21 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.state.GlanceStateDefinition
-import androidx.glance.text.FontWeight
-import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
 import androidx.glance.appwidget.action.actionStartActivity
 import es.antonborri.home_widget.HomeWidgetGlanceState
+import androidx.glance.unit.ColorProvider
 import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
 import meditofoundation.medito.R
 
 // Size thresholds — one per layout tier
-private val TINY   = DpSize(80.dp,  50.dp)   // 1×1 / cramped 2×1
-private val MEDIUM = DpSize(155.dp, 50.dp)   // comfortable 3×1
-private val WIDE   = DpSize(270.dp, 50.dp)   // 4×1 and larger
+private val TINY      = DpSize(80.dp,  50.dp)   // 1×1 / cramped 2×1
+private val MEDIUM    = DpSize(155.dp, 50.dp)   // comfortable 3×1
+private val SQUARE    = DpSize(150.dp, 140.dp)  // 2×2 / 3×2
+private val WIDE      = DpSize(270.dp, 50.dp)   // 4×1
+private val WIDE_TALL = DpSize(270.dp, 110.dp)  // 4×2 and larger
 
 class UpNextWidget : GlanceAppWidget() {
 
@@ -50,7 +50,7 @@ class UpNextWidget : GlanceAppWidget() {
         get() = HomeWidgetGlanceStateDefinition()
 
     override val sizeMode: SizeMode
-        get() = SizeMode.Responsive(setOf(TINY, MEDIUM, WIDE))
+        get() = SizeMode.Responsive(setOf(TINY, MEDIUM, SQUARE, WIDE, WIDE_TALL))
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent { WidgetContent(context) }
@@ -63,38 +63,26 @@ class UpNextWidget : GlanceAppWidget() {
         val subtitle = prefs.getString("up_next_subtitle",   "") ?: ""
         val packTitle = prefs.getString("up_next_pack_title", "") ?: ""
         val trackId  = prefs.getString("up_next_track_id",   "") ?: ""
-        // Matches the app's Home hero: "Start here" before anything in the
-        // pack is played, "Continue" after.
-        val label = if (prefs.getInt("up_next_completed", 0) == 0) "START HERE" else "CONTINUE"
-        val themePreference = prefs.getString("theme_preference", "system") ?: "system"
+        val completed = prefs.getInt("up_next_completed", 0)
+        val total = prefs.getInt("up_next_total", 0)
+        val palette = WidgetPalette.resolve(context, prefs.getString("theme_preference", "system") ?: "system")
 
-        val isDark = when (themePreference) {
-            "light" -> false
-            "dark"  -> true
-            else    -> isDarkMode(context)
+        // Matches the app's Home hero: "START HERE · Pack" before anything in the pack is
+        // played, "CONTINUE · Pack" after. No eyebrow once the pack is finished.
+        val eyebrow = when {
+            title.isEmpty() -> ""
+            packTitle.isEmpty() -> upNextLabel(completed)
+            else -> "${upNextLabel(completed)} · $packTitle"
         }
+        val progress = if (title.isNotEmpty() && total > 0) Progress(completed, total) else null
 
-        val colors = if (isDark) {
-            ThemeColors(
-                backgroundColor    = Color(0xFF121212),
-                textColor          = Color(0xFFFFFFFF),
-                secondaryTextColor = Color(0xFFB3B3B3),
-                labelColor         = Color(0xFF808080),
-            )
-        } else {
-            ThemeColors(
-                backgroundColor    = Color(0xFFF8F9FA),
-                textColor          = Color(0xFF000000),
-                secondaryTextColor = Color(0xFF666666),
-                labelColor         = Color(0xFF999999),
-            )
-        }
-
-        val width = LocalSizeCompat.current.width
+        val size = LocalSize.current
         val layout = when {
-            width >= WIDE.width   -> Layout.WIDE
-            width >= MEDIUM.width -> Layout.MEDIUM
-            else                  -> Layout.TINY
+            size.width >= WIDE.width && size.height >= WIDE_TALL.height -> Layout.WIDE_TALL
+            size.width >= WIDE.width   -> Layout.WIDE
+            size.width >= SQUARE.width && size.height >= SQUARE.height -> Layout.SQUARE
+            size.width >= MEDIUM.width -> Layout.MEDIUM
+            else                       -> Layout.TINY
         }
 
         // Append source params so DeepLinkService can attribute the tap to the
@@ -117,86 +105,76 @@ class UpNextWidget : GlanceAppWidget() {
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(colors.backgroundColor)
+                .background(palette.background)
                 .clickable(tapAction),
             contentAlignment = Alignment.Center,
         ) {
             when (layout) {
-                Layout.TINY   -> TinyLayout(title, colors)
-                Layout.MEDIUM -> MediumLayout(title, label, packTitle, colors)
-                Layout.WIDE   -> WideLayout(title, subtitle, label, packTitle, colors)
+                Layout.TINY      -> TinyLayout(title, size, palette)
+                Layout.MEDIUM    -> MediumLayout(title, eyebrow, size, palette)
+                Layout.SQUARE    -> SquareLayout(title, upNextLabel(completed), progress, size, palette)
+                Layout.WIDE      -> WideLayout(title, eyebrow, size, palette)
+                Layout.WIDE_TALL -> WideTallLayout(title, subtitle, eyebrow, progress, size, palette)
             }
         }
     }
 
-    // 1×1 / small 2×1 — play circle + one line of title
+    // 1×1 / small 2×1 — play button + one line of title
     @Composable
-    private fun TinyLayout(title: String, colors: ThemeColors) {
+    private fun TinyLayout(title: String, size: DpSize, palette: WidgetPalette) {
         Column(
             modifier = GlanceModifier.padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                provider = ImageProvider(R.drawable.ic_play_circle_purple),
-                contentDescription = "Play",
-                modifier = GlanceModifier.width(44.dp).height(44.dp),
-            )
+            PlayButton(size = 40.dp, palette = palette)
             Spacer(modifier = GlanceModifier.height(6.dp))
-            Text(
-                text = if (title.isEmpty()) "Medito" else title,
-                style = TextStyle(
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = ColorProvider(colors.textColor),
-                ),
-                maxLines = 1,
+            WidgetText(
+                text = title.ifEmpty { "Medito" },
+                fontSize = 12f,
+                weight = WidgetWeight.SemiBold,
+                color = palette.foreground,
+                maxWidth = size.width - 20.dp,
+                centered = true,
             )
         }
     }
 
-    // Comfortable 3×1 — label row + title + play button side-by-side
+    // Comfortable 3×1 — eyebrow over title, play button alongside
     @Composable
-    private fun MediumLayout(title: String, label: String, packTitle: String, colors: ThemeColors) {
+    private fun MediumLayout(title: String, eyebrow: String, size: DpSize, palette: WidgetPalette) {
+        val textWidth = size.width - 24.dp - 8.dp - 36.dp
         Column(
             modifier = GlanceModifier
                 .fillMaxWidth()
                 .padding(12.dp),
         ) {
-            LabelRow(label, packTitle, 9.sp.value, colors)
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            Eyebrow(eyebrow, size.width - 24.dp, palette)
             Row(
                 modifier = GlanceModifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
-                Text(
-                    text = if (title.isEmpty()) EMPTY_TITLE else title,
-                    style = TextStyle(
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ColorProvider(colors.textColor),
-                    ),
-                    maxLines = 2,
-                    modifier = GlanceModifier.defaultWeight(),
-                )
+                // A weighted image would centre the bitmap; keep the title flush left.
+                Box(modifier = GlanceModifier.defaultWeight(), contentAlignment = Alignment.CenterStart) {
+                    WidgetText(
+                        text = title.ifEmpty { EMPTY_TITLE },
+                        fontSize = 16f,
+                        weight = WidgetWeight.Bold,
+                        color = palette.foreground,
+                        maxWidth = textWidth,
+                        maxLines = 2,
+                        lineHeight = 1.05f,
+                    )
+                }
                 Spacer(modifier = GlanceModifier.width(8.dp))
-                Image(
-                    provider = ImageProvider(R.drawable.ic_play_circle_purple),
-                    contentDescription = "Play",
-                    modifier = GlanceModifier.width(36.dp).height(36.dp),
-                )
+                PlayButton(size = 36.dp, palette = palette)
             }
         }
     }
 
-    // 4×1 and larger — two columns: text block on left, play button on right
+    // 4×1 — text block on the left, play button on the right
     @Composable
-    private fun WideLayout(
-        title: String,
-        subtitle: String,
-        label: String,
-        packTitle: String,
-        colors: ThemeColors,
-    ) {
+    private fun WideLayout(title: String, eyebrow: String, size: DpSize, palette: WidgetPalette) {
+        val textWidth = size.width - 32.dp - 14.dp - 44.dp
         Row(
             modifier = GlanceModifier
                 .fillMaxSize()
@@ -204,83 +182,155 @@ class UpNextWidget : GlanceAppWidget() {
             verticalAlignment = Alignment.Vertical.CenterVertically,
         ) {
             Column(modifier = GlanceModifier.defaultWeight()) {
-                LabelRow(label, packTitle, 10.sp.value, colors)
-                Spacer(modifier = GlanceModifier.height(5.dp))
-                Text(
-                    text = if (title.isEmpty()) EMPTY_TITLE else title,
-                    style = TextStyle(
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ColorProvider(colors.textColor),
-                    ),
-                    maxLines = 2,
+                Eyebrow(eyebrow, textWidth, palette)
+                WidgetText(
+                    text = title.ifEmpty { EMPTY_TITLE },
+                    fontSize = 18f,
+                    weight = WidgetWeight.Bold,
+                    color = palette.foreground,
+                    maxWidth = textWidth,
                 )
-                if (subtitle.isNotEmpty()) {
-                    Spacer(modifier = GlanceModifier.height(3.dp))
-                    Text(
-                        text = subtitle,
-                        style = TextStyle(
-                            fontSize = 12.sp,
-                            color = ColorProvider(colors.secondaryTextColor),
-                        ),
-                        maxLines = 1,
+            }
+            Spacer(modifier = GlanceModifier.width(14.dp))
+            PlayButton(size = 44.dp, palette = palette)
+        }
+    }
+
+    // 2×2 / 3×2 — label and play button along the top, title and progress along the bottom
+    // (mirrors iOS small)
+    @Composable
+    private fun SquareLayout(title: String, label: String, progress: Progress?, size: DpSize, palette: WidgetPalette) {
+        val contentWidth = size.width - 28.dp
+        Column(modifier = GlanceModifier.fillMaxSize().padding(14.dp)) {
+            TopRow(if (title.isEmpty()) "" else label, contentWidth - 40.dp - 8.dp, 40.dp, palette)
+            Spacer(modifier = GlanceModifier.defaultWeight())
+            WidgetText(
+                text = title.ifEmpty { EMPTY_TITLE },
+                fontSize = 18f,
+                weight = WidgetWeight.Bold,
+                color = palette.foreground,
+                maxWidth = contentWidth,
+                maxLines = 3,
+                lineHeight = 1.05f,
+            )
+            if (progress != null) {
+                Box(modifier = GlanceModifier.padding(top = 8.dp)) {
+                    ProgressBar(fraction = progress.fraction, width = contentWidth, palette = palette)
+                }
+            }
+        }
+    }
+
+    // 4×2 and larger — the same arrangement with room for the pack, subtitle and a "3/10"
+    // count (mirrors iOS medium)
+    @Composable
+    private fun WideTallLayout(
+        title: String,
+        subtitle: String,
+        eyebrow: String,
+        progress: Progress?,
+        size: DpSize,
+        palette: WidgetPalette,
+    ) {
+        val contentWidth = size.width - 32.dp
+        Column(modifier = GlanceModifier.fillMaxSize().padding(16.dp)) {
+            TopRow(eyebrow, contentWidth - 44.dp - 12.dp, 44.dp, palette)
+            Spacer(modifier = GlanceModifier.defaultWeight())
+            WidgetText(
+                text = title.ifEmpty { EMPTY_TITLE },
+                fontSize = 22f,
+                weight = WidgetWeight.Bold,
+                color = palette.foreground,
+                maxWidth = contentWidth,
+                maxLines = 2,
+                lineHeight = 1.05f,
+            )
+            if (title.isNotEmpty() && subtitle.isNotEmpty()) {
+                WidgetText(
+                    text = subtitle,
+                    fontSize = 14f,
+                    weight = WidgetWeight.Medium,
+                    color = palette.muted,
+                    maxWidth = contentWidth,
+                    modifier = GlanceModifier.padding(top = 2.dp),
+                )
+            }
+            if (progress != null) {
+                Row(
+                    modifier = GlanceModifier.padding(top = 10.dp),
+                    verticalAlignment = Alignment.Vertical.CenterVertically,
+                ) {
+                    ProgressBar(fraction = progress.fraction, width = contentWidth - 44.dp, palette = palette)
+                    Spacer(modifier = GlanceModifier.width(8.dp))
+                    WidgetText(
+                        text = "${progress.completed}/${progress.total}",
+                        fontSize = 12f,
+                        weight = WidgetWeight.SemiBold,
+                        color = palette.muted,
                     )
                 }
             }
-            Spacer(modifier = GlanceModifier.width(14.dp))
-            Image(
-                provider = ImageProvider(R.drawable.ic_play_circle_purple),
-                contentDescription = "Play",
-                modifier = GlanceModifier.width(48.dp).height(48.dp),
-            )
         }
     }
 
+    /** Eyebrow (or, once the pack is finished, a quiet tick) with the play button top-right. */
     @Composable
-    private fun LabelRow(label: String, packTitle: String, fontSize: Float, colors: ThemeColors) {
-        Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
-            Text(
-                text = label,
-                style = TextStyle(
-                    fontSize = fontSize.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = ColorProvider(colors.labelColor),
-                ),
-            )
-            if (packTitle.isNotEmpty()) {
-                Spacer(modifier = GlanceModifier.width(4.dp))
-                Text(
-                    text = "· $packTitle",
-                    style = TextStyle(
-                        fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = ColorProvider(Color(0xFF917DF0)),
-                    ),
-                )
+    private fun TopRow(eyebrow: String, eyebrowWidth: Dp, playSize: Dp, palette: WidgetPalette) {
+        Row(modifier = GlanceModifier.fillMaxWidth()) {
+            Box(modifier = GlanceModifier.defaultWeight().padding(top = 2.dp)) {
+                if (eyebrow.isEmpty()) {
+                    Box(modifier = GlanceModifier.size(20.dp), contentAlignment = Alignment.Center) {
+                        Image(
+                            provider = ImageProvider(R.drawable.widget_dot),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(ColorProvider(palette.muted)),
+                            modifier = GlanceModifier.size(20.dp),
+                        )
+                        Image(
+                            provider = ImageProvider(R.drawable.widget_check),
+                            contentDescription = "Pack complete",
+                            colorFilter = ColorFilter.tint(ColorProvider(palette.background)),
+                            modifier = GlanceModifier.size(20.dp),
+                        )
+                    }
+                } else {
+                    WidgetText(
+                        text = eyebrow,
+                        fontSize = 12f,
+                        weight = WidgetWeight.SemiBold,
+                        color = palette.muted,
+                        maxWidth = eyebrowWidth,
+                        letterSpacing = 0.08f,
+                    )
+                }
             }
+            PlayButton(size = playSize, palette = palette)
         }
     }
 
-    private fun isDarkMode(context: Context): Boolean {
-        val nightModeFlags =
-            context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
+    private class Progress(val completed: Int, val total: Int) {
+        val fraction get() = completed.toFloat() / total
     }
 
-    private data class ThemeColors(
-        val backgroundColor: Color,
-        val textColor: Color,
-        val secondaryTextColor: Color,
-        val labelColor: Color,
-    )
+    /** "CONTINUE · Pack" in the hero eyebrow's voice: small, semibold, tracked, muted. */
+    @Composable
+    private fun Eyebrow(text: String, maxWidth: Dp, palette: WidgetPalette) {
+        if (text.isEmpty()) return
+        WidgetText(
+            text = text,
+            fontSize = 12f,
+            weight = WidgetWeight.SemiBold,
+            color = palette.muted,
+            maxWidth = maxWidth,
+            letterSpacing = 0.08f,
+        )
+        Spacer(modifier = GlanceModifier.height(4.dp))
+    }
 
-    private enum class Layout { TINY, MEDIUM, WIDE }
+    private fun upNextLabel(completed: Int) = if (completed == 0) "START HERE" else "CONTINUE"
+
+    private enum class Layout { TINY, MEDIUM, SQUARE, WIDE, WIDE_TALL }
 }
 
 /** Shown when the pinned pack is finished (the app clears the session). */
 private const val EMPTY_TITLE = "Choose what's next"
-
-private object LocalSizeCompat {
-    val current: DpSize
-        @Composable get() = androidx.glance.LocalSize.current
-}

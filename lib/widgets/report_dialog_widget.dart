@@ -57,7 +57,7 @@ class ReportDialogWidget extends ConsumerWidget {
                 child: Text(
                   l10n.reportDialogHelpLink,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: context.brandPurple,
+                    color: context.brandAccent,
                     decoration: TextDecoration.underline,
                   ),
                 ),

@@ -445,7 +445,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                           child: Checkbox(
                             value: isStreakSelected,
                             onChanged: (_) => handleToggle(),
-                            activeColor: context.brandPurple,
+                            activeColor: context.brandAccent,
                             checkColor: Theme.of(context).colorScheme.onPrimary,
                             side: BorderSide(
                               color: Theme.of(

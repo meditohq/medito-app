@@ -136,14 +136,14 @@ class _SpeedSheetState extends State<SpeedSheet> {
               data: SliderTheme.of(context).copyWith(
                 trackHeight: 4,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-                activeTrackColor: context.brandPurple,
+                activeTrackColor: context.brandAccent,
                 inactiveTrackColor: onSurface.withValues(alpha: 0.15),
-                thumbColor: context.brandPurple,
-                activeTickMarkColor: context.onBrandPurple.withValues(
+                thumbColor: context.brandAccent,
+                activeTickMarkColor: context.onBrandAccent.withValues(
                   alpha: 0.6,
                 ),
                 inactiveTickMarkColor: onSurface.withValues(alpha: 0.3),
-                overlayColor: context.brandPurple.withValues(alpha: 0.12),
+                overlayColor: context.brandAccent.withValues(alpha: 0.12),
                 showValueIndicator: ShowValueIndicator.never,
               ),
               child: Slider(

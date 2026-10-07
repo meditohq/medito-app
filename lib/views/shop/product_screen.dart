@@ -55,11 +55,20 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
   @override
   void initState() {
     super.initState();
+    final product = widget.product;
+    final price = product?.fromPrice;
+    final name = product?.name ?? widget.preview?.name;
     ref
         .read(analyticsServiceProvider)
         .logEvent(
           name: AnalyticsEventConstants.shopProductViewed,
-          parameters: {'product_slug': widget.slug, 'source': widget.source},
+          parameters: {
+            'product_slug': widget.slug,
+            'source': widget.source,
+            'product_name': ?name,
+            if (price != null) 'value': price.value,
+            if (price != null) 'currency': price.currency,
+          },
         );
   }
 
@@ -153,6 +162,8 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
     if (product == null && error != null) {
       body = Center(
         child: ShopErrorView(
+          surface: 'product',
+          error: error,
           productSlug: widget.slug,
           onRetry: () => ref.invalidate(shopProductProvider(widget.slug)),
         ),
@@ -877,7 +888,10 @@ class _ActionBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              ShopBagButton(onBrowse: onBrowse),
+              ShopBagButton(
+                source: AnalyticsEventConstants.sourceProductPage,
+                onBrowse: onBrowse,
+              ),
             ],
           ),
         ),

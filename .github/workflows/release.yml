@@ -32,6 +32,10 @@ on:
         description: 'Submit builds to store review automatically (Play: production release publishes on approval; iOS: App Store version is submitted, released manually after approval)'
         type: boolean
         default: false
+      skip_android_signed_in_test:
+        description: 'Skip ONLY the Android signed-in Maestro test (the CI emulator crashes in it, Oct 2026). Verify sign-in on a real phone instead.'
+        type: boolean
+        default: false
       android_promote_to_production:
         description: 'Promote the latest Android INTERNAL release to production — no new build; goes to Play review and publishes on approval. Standalone: other toggles can stay off.'
         type: boolean
@@ -78,17 +82,27 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
+      # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the
+      # build and timed out over the iOS build tree, failing a job whose tests
+      # had passed (run 37440292038 attempt 2).
+      - name: Cache Flutter SDK
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+
       - uses: subosito/flutter-action@v2.12.0
         with:
           flutter-version: '3.47.2'
           channel: stable
-          cache: true
+          cache: false
 
       - name: Cache pub packages
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache Gradle
@@ -123,13 +137,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         env:
@@ -217,16 +232,20 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Smoke test on emulator
-        timeout-minutes: 20
+        timeout-minutes: 25
         uses: reactivecircus/android-emulator-runner@v2
-        env:
-          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
-          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
           profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
@@ -236,8 +255,80 @@ jobs:
             adb shell pm grant meditofoundation.medito android.permission.POST_NOTIFICATIONS || true
             adb shell am force-stop com.google.android.apps.nexuslauncher || true
             mkdir -p /tmp/maestro-debug
-            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito .maestro/smoke.yaml --no-ansi --debug-output /tmp/maestro-debug
-            $HOME/.maestro/bin/maestro test -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml --no-ansi --debug-output /tmp/maestro-debug/signed-in
+            .maestro/run_flow.sh /tmp/maestro-debug -e APP_ID=meditofoundation.medito .maestro/smoke.yaml
+
+      - name: Signed-in stats test on emulator
+        # Its own emulator boot: the emulator has crashed outright (adb
+        # "device not found") after rendering the donation webview late in
+        # a long session (run 37446734529), which no in-session retry can
+        # survive. The AVD keeps the installed app between boots.
+        id: signed_in
+        if: ${{ !inputs.skip_android_signed_in_test }}
+        continue-on-error: true
+        timeout-minutes: 25
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        with:
+          api-level: 34
+          arch: x86_64
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
+          profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            adb shell am force-stop com.google.android.apps.nexuslauncher || true
+            mkdir -p /tmp/maestro-debug
+            sh -c 'nohup adb logcat -b all -v threadtime > /tmp/maestro-debug/signed-in-logcat.txt 2>&1 &'
+            .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
+
+      - name: Signed-in stats test on emulator (retry on a fresh boot)
+        if: ${{ !inputs.skip_android_signed_in_test && steps.signed_in.outcome == 'failure' }}
+        timeout-minutes: 25
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
+          TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
+        with:
+          api-level: 34
+          arch: x86_64
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
+          profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            adb shell am force-stop com.google.android.apps.nexuslauncher || true
+            mkdir -p /tmp/maestro-debug
+            sh -c 'nohup adb logcat -b all -v threadtime > /tmp/maestro-debug/signed-in-retry-logcat.txt 2>&1 &'
+            .maestro/run_flow.sh /tmp/maestro-debug/signed-in -e APP_ID=meditofoundation.medito -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" .maestro/signed_in_stats.yaml
+
+      - name: Host diagnostics (emulator crash)
+        # The emulator has vanished mid-flow with no output of its own (adb
+        # "device not found", runs 37454547179 and 37462825805). The host
+        # kernel log shows whether qemu was OOM-killed or segfaulted.
+        if: failure() || steps.signed_in.outcome == 'failure'
+        run: |
+          free -m || true
+          sudo dmesg -T | grep -iE 'oom|killed process|segfault|qemu|emulator|out of memory' | tail -60 || true
 
       - name: Scrub test account credentials from debug output
         if: failure()
@@ -377,8 +468,15 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
           profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
@@ -397,8 +495,15 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          # No Google Play services: on google_apis, Android restarted GMS mid-run
+          # and killed the app with it (the donation webview binds GMS fonts,
+          # run 37440292038). Without Play the app takes its webview paths.
+          target: default
           profile: pixel_6
+          # The donation webview renders in software (swiftshader); on the default
+          # RAM/cores the emulator froze and went offline mid-run (09-30).
+          ram-size: 4096M
+          cores: 4
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
@@ -457,6 +562,8 @@ jobs:
           if [ -z "$notes" ]; then
             notes=$(awk '/^[0-9]/{if(in_v)exit; in_v=1;next} in_v && /^-/{print} in_v && !/^-/{if(NF)exit}' release_notes.txt)
           fi
+          # "- [ios] ..." lines are iOS-only; "- [android] ..." lines lose their tag.
+          notes=$(printf '%s\n' "$notes" | sed -e '/^- \[ios\] /d' -e 's/^- \[android\] /- /')
           notes="${notes:0:500}"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 
@@ -511,17 +618,27 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
+      # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
+      # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the
+      # build and timed out over the iOS build tree, failing a job whose tests
+      # had passed (run 37440292038 attempt 2).
+      - name: Cache Flutter SDK
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+
       - uses: subosito/flutter-action@v2.12.0
         with:
           flutter-version: '3.47.2'
           channel: stable
-          cache: true
+          cache: false
 
       - name: Cache pub packages
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache CocoaPods
@@ -536,7 +653,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/ios/iphonesimulator/Medito Dev.app
-          key: ${{ runner.os }}-ios-app-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'ios/Podfile.lock', 'ios/Runner.xcodeproj/project.pbxproj') }}
+          key: ${{ runner.os }}-ios-app-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'ios/Podfile.lock', 'ios/Runner.xcodeproj/project.pbxproj', 'ios/Runner/**', 'ios/MeditoWidget/**', 'ios/*.entitlements', 'ios/*.plist') }}
 
       - name: Flutter pub get
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
@@ -564,13 +681,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-ios-app.outputs.cache-hit != 'true' && steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
@@ -680,31 +798,31 @@ jobs:
         run: curl -Ls "https://get.maestro.mobile.dev" | bash
 
       - name: Smoke test on simulator
-        timeout-minutes: 12
+        # ~6 min per attempt; run_flow.sh may retry once.
+        timeout-minutes: 20
         run: |
           xcrun simctl install booted "build/ios/iphonesimulator/Medito Dev.app"
           # Give SpringBoard a few extra seconds to settle before Maestro connects
           sleep 5
           mkdir -p /tmp/maestro-debug
-          $HOME/.maestro/bin/maestro test \
+          .maestro/run_flow.sh /tmp/maestro-debug \
             -e APP_ID=org.meditofoundation \
-            .maestro/smoke.yaml \
-            --no-ansi --debug-output /tmp/maestro-debug
+            .maestro/smoke.yaml
 
       - name: Signed-in stats test on simulator
         # Two sign-ins + two onboarding passes + a session: ~11 min on the
         # macOS runner, so 12 cut off a run that had passed (36317083446).
-        timeout-minutes: 20
+        # run_flow.sh may retry once.
+        timeout-minutes: 35
         env:
           TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
           TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
         run: |
-          $HOME/.maestro/bin/maestro test \
+          .maestro/run_flow.sh /tmp/maestro-debug/signed-in \
             -e APP_ID=org.meditofoundation \
             -e TEST_ACCOUNT_EMAIL="$TEST_ACCOUNT_EMAIL" \
             -e TEST_ACCOUNT_OTP="$TEST_ACCOUNT_OTP" \
-            .maestro/signed_in_stats.yaml \
-            --no-ansi --debug-output /tmp/maestro-debug/signed-in
+            .maestro/signed_in_stats.yaml
 
       - name: Save iOS app log
         if: failure()
@@ -912,17 +1030,27 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
+      # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
+      # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the
+      # build and timed out over the iOS build tree, failing a job whose tests
+      # had passed (run 37440292038 attempt 2).
+      - name: Cache Flutter SDK
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.tool_cache }}/flutter
+          key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
+
       - uses: subosito/flutter-action@v2.12.0
         with:
           flutter-version: '3.47.2'
           channel: stable
-          cache: true
+          cache: false
 
       - name: Cache pub packages
         uses: actions/cache@v4
         with:
           path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache CocoaPods
@@ -964,13 +1092,14 @@ jobs:
         with:
           path: |
             lib/src/audio_pigeon.g.dart
+            lib/src/watch_presence_pigeon.g.dart
             android/app/src/main/kotlin/meditofoundation/medito/pigeon/AudioPigeon.g.kt
-          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pubspec.lock') }}
+          key: ${{ runner.os }}-pigeon-${{ hashFiles('pigeon_conf.dart', 'pigeons/**', 'pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pigeon-
 
       - name: Run pigeon
         if: steps.cache-pigeon.outputs.cache-hit != 'true'
-        run: flutter pub run pigeon --input pigeon_conf.dart --package_name=medito
+        run: for f in pigeon_conf.dart pigeons/*.dart; do flutter pub run pigeon --input "$f" --package_name=medito || exit 1; done
 
       - name: Write .prod.json
         env:
@@ -1048,6 +1177,8 @@ jobs:
               in_v && NF && !/^- / { exit }
             ' release_notes.txt)
           fi
+          # "- [android] ..." lines are Android-only; "- [ios] ..." lines lose their tag.
+          notes=$(printf '%s\n' "$notes" | sed -e '/^- \[android\] /d' -e 's/^- \[ios\] /- /')
           notes="${notes:0:500}"
           { echo "RELEASE_NOTES<<EOF"; echo "$notes"; echo "EOF"; } >> "$GITHUB_ENV"
 

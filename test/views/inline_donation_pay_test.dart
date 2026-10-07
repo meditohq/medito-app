@@ -41,10 +41,10 @@ void main() {
               knownEmail: knownEmail,
               applePayAvailable: applePay,
               isProcessing: false,
-              onPay: (
-                  {required amount, required email, required method}) async {
-                calls.add(_PayCall(amount, email, method));
-              },
+              onPay:
+                  ({required amount, required email, required method}) async {
+                    calls.add(_PayCall(amount, email, method));
+                  },
               onOtherAmount: onOtherAmount ?? () {},
             ),
           ),
@@ -61,7 +61,7 @@ void main() {
     ) async {
       await pump(tester, themeMode: mode);
       final context = tester.element(find.byType(InlineDonationPay));
-      final background = context.brandPurple;
+      final background = context.brandAccent;
       final l10n = AppLocalizations.of(context)!;
 
       void expectReadable(String text, Color surface) {
@@ -85,7 +85,7 @@ void main() {
       expectReadable(l10n.donateMonthlyDisclosure, background);
       expectReadable(l10n.donateOtherAmount, background);
       expectReadable('\$3', background);
-      expectReadable('\$10', context.onBrandPurple);
+      expectReadable('\$10', context.onBrandAccent);
 
       final field = tester.widget<TextField>(
         find.byKey(inlineDonationEmailFieldKey),
@@ -96,7 +96,7 @@ void main() {
       final button = tester.widget<ElevatedButton>(
         find.byKey(inlineDonationPayButtonKey),
       );
-      expect(button.style!.backgroundColor!.resolve({}), context.onBrandPurple);
+      expect(button.style!.backgroundColor!.resolve({}), context.onBrandAccent);
       expect(button.style!.foregroundColor!.resolve({}), background);
 
       await tester.tap(find.byKey(inlineDonationPayButtonKey));
@@ -168,12 +168,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(calls, isEmpty);
     expect(find.text('Continue to payment'), findsOneWidget);
-    final field =
-        tester.widget<TextField>(find.byKey(inlineDonationEmailFieldKey));
+    final field = tester.widget<TextField>(
+      find.byKey(inlineDonationEmailFieldKey),
+    );
     expect(field.autofillHints, [AutofillHints.email]);
     expect(field.focusNode!.hasFocus, isTrue);
     expect(
-        find.text('Enter your email so we can send a receipt.'), findsNothing);
+      find.text('Enter your email so we can send a receipt.'),
+      findsNothing,
+    );
 
     await tester.tap(find.byKey(inlineDonationPayButtonKey));
     await tester.pumpAndSettle();
@@ -238,8 +241,9 @@ void main() {
     expect(calls.single.method, PaymentMethodType.applePay);
   });
 
-  testWidgets('anonymous Apple Pay donor supplies email before wallet opens',
-      (tester) async {
+  testWidgets('anonymous Apple Pay donor supplies email before wallet opens', (
+    tester,
+  ) async {
     final calls = await pump(tester, applePay: true, knownEmail: '   ');
     expect(find.byKey(inlineDonationEmailFieldKey), findsNothing);
     await tester.tap(find.text('\$5'));
@@ -248,7 +252,9 @@ void main() {
     expect(calls, isEmpty);
     expect(find.text('Continue to payment'), findsOneWidget);
     await tester.enterText(
-        find.byKey(inlineDonationEmailFieldKey), 'wallet@example.com');
+      find.byKey(inlineDonationEmailFieldKey),
+      'wallet@example.com',
+    );
     await tester.tap(find.byKey(inlineDonationPayButtonKey));
     await tester.pumpAndSettle();
     expect(calls.single.email, 'wallet@example.com');

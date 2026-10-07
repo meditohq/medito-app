@@ -450,12 +450,12 @@ class _OnboardingResultScreenState
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: context.onBrandPurple,
+                        color: context.onBrandAccent,
                       ),
                     )
                   : Icon(
                       isPlaying ? Icons.pause : Icons.play_arrow,
-                      color: context.onBrandPurple,
+                      color: context.onBrandAccent,
                       size: 32,
                     ),
             ),
@@ -492,7 +492,7 @@ class _OnboardingResultScreenState
               MeditoIcon(
                 assetName: MeditoIcons.fire,
                 size: 44,
-                color: context.brandPurple,
+                color: context.brandAccent,
               ),
               const SizedBox(width: 10),
               Text(
