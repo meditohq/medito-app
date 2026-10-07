@@ -145,14 +145,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get buildNumber => 'buildNumber';
 
   @override
-  String get dismiss => 'Schließen';
-
-  @override
   String get debugInfo => 'Debug-Informationen';
-
-  @override
-  String get writeBelowThisLine =>
-      '--- Bitte unterhalb dieser Linie schreiben ---';
 
   @override
   String get explore => 'Entdecken';
@@ -249,14 +242,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get meditoReliesOnYourDonationsToSurvive =>
       'Medito finanziert sich ausschließlich durch deine Spenden. Wir erstellen kostenlose Inhalte, um Menschen zu helfen.';
-
-  @override
-  String get reminderNotificationBody =>
-      'Zeit für deine tägliche Meditation. Nimm dir einen Moment zum Entspannen und Fokussieren.';
-
-  @override
-  String get reminderNotificationTitle =>
-      'Erinnerung an deine tägliche Meditation';
 
   @override
   String get pickTimeHelpText =>
@@ -405,9 +390,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get hourFull => 'Stunde';
 
   @override
-  String get minutes => 'Minuten';
-
-  @override
   String get minute => 'Minute';
 
   @override
@@ -437,9 +419,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get emailLabel => 'E-Mail-Adresse';
-
-  @override
-  String get invalidEmailError => 'Bitte gib eine gültige E-Mail-Adresse ein.';
 
   @override
   String get createAccountButtonText => 'Konto erstellen';
@@ -1790,7 +1769,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get debugInfoLabel => 'Debug-Informationen';
 
   @override
+  String get writeBelowThisLine =>
+      '--- Bitte unterhalb dieser Linie schreiben ---';
+
+  @override
   String get fieldRequiredError => 'Dieses Feld ist erforderlich';
+
+  @override
+  String get invalidEmailError => 'Bitte gib eine gültige E-Mail-Adresse ein.';
 
   @override
   String get invalidInputError => 'Ungültige Eingabe';
@@ -1806,6 +1792,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get anErrorOccurredMessage =>
       'Es ist ein unbekannter Fehler aufgetreten. Entweder liegen bei uns Probleme vor oder du bist offline.';
+
+  @override
+  String get reminderNotificationTitle =>
+      'Erinnerung an deine tägliche Meditation';
+
+  @override
+  String get reminderNotificationBody =>
+      'Zeit für deine tägliche Meditation. Nimm dir einen Moment zum Entspannen und Fokussieren.';
 
   @override
   String get helpLegalSection => 'Hilfe';
@@ -2125,7 +2119,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reminderDay15Body =>
-      'We\'re pausing reminders for now. We are here whenever you are ready.';
+      'Wir pausieren die Erinnerungen vorerst. Wir sind für dich da, wann immer du bereit bist.';
 
   @override
   String get reminderDay30Title => 'Eine sanfte Erinnerung 🤗';
@@ -2199,6 +2193,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get durationInMinutes => 'Dauer (Minuten)';
+
+  @override
+  String get minutes => 'Minuten';
 
   @override
   String get optional => 'Optional';
@@ -2365,6 +2362,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get upNext => 'Weitermachen';
 
   @override
+  String get dismiss => 'Schließen';
+
+  @override
   String get donationInfo => 'Spendeninformationen';
 
   @override
@@ -2386,12 +2386,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get yourPathExplainerSwipeHint =>
       'Wische nach links, um zu überspringen oder das Paket zu öffnen.';
-
-  @override
-  String get onboardingStep1of2 => '1 von 2';
-
-  @override
-  String get onboardingStep2of2 => '2 von 2';
 
   @override
   String get onboardingExperienceQuestion => 'Hast du schon einmal meditiert?';
@@ -2425,6 +2419,12 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get onboardingIntentStress =>
       'Besser mit Stress, Schlafproblemen oder Gefühlen umgehen';
+
+  @override
+  String get onboardingStep1of2 => '1 von 2';
+
+  @override
+  String get onboardingStep2of2 => '2 von 2';
 
   @override
   String get onboardingAttributionQuestion =>
@@ -2466,7 +2466,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Erzähle uns, wo du von uns gehört hast';
 
   @override
-  String get onboardingResultLearnHeading => 'You\'re in the right place.';
+  String get onboardingResultLearnHeading => 'Du bist hier genau richtig.';
 
   @override
   String get onboardingResultLearnBody =>

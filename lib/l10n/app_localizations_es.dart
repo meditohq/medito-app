@@ -144,13 +144,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get buildNumber => 'buildNumber';
 
   @override
-  String get dismiss => 'Cerrar';
-
-  @override
   String get debugInfo => 'Información de depuración';
-
-  @override
-  String get writeBelowThisLine => '--- Escribe debajo de esta línea ---';
 
   @override
   String get explore => 'Explorar';
@@ -247,13 +241,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get meditoReliesOnYourDonationsToSurvive =>
       'Medito depende únicamente de tus donaciones para sobrevivir. Producimos contenido gratuito para ayudar a la humanidad.';
-
-  @override
-  String get reminderNotificationBody =>
-      'Es hora de tu meditación diaria. Tómate un momento para relajarte y concentrarte.';
-
-  @override
-  String get reminderNotificationTitle => 'Recordatorio de Meditación Diaria';
 
   @override
   String get pickTimeHelpText => 'Selecciona la hora de tu recordatorio diario';
@@ -401,9 +388,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hourFull => 'hora';
 
   @override
-  String get minutes => 'Minutos';
-
-  @override
   String get minute => 'minuto';
 
   @override
@@ -433,9 +417,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get emailLabel => 'Correo electrónico';
-
-  @override
-  String get invalidEmailError => 'Correo electrónico inválido.';
 
   @override
   String get createAccountButtonText => 'Crear Cuenta';
@@ -1777,7 +1758,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get debugInfoLabel => 'Información de depuración';
 
   @override
+  String get writeBelowThisLine => '--- Escribe debajo de esta línea ---';
+
+  @override
   String get fieldRequiredError => 'Campo requerido';
+
+  @override
+  String get invalidEmailError => 'Correo electrónico inválido.';
 
   @override
   String get invalidInputError => 'Entrada inválida';
@@ -1793,6 +1780,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get anErrorOccurredMessage =>
       'Ocurrió un error desconocido. O tenemos problemas o estás sin conexión.';
+
+  @override
+  String get reminderNotificationTitle => 'Recordatorio de Meditación Diaria';
+
+  @override
+  String get reminderNotificationBody =>
+      'Es hora de tu meditación diaria. Tómate un momento para relajarte y concentrarte.';
 
   @override
   String get helpLegalSection => 'Ayuda';
@@ -2185,6 +2179,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get durationInMinutes => 'Duración (minutos)';
 
   @override
+  String get minutes => 'Minutos';
+
+  @override
   String get optional => 'Opcional';
 
   @override
@@ -2349,6 +2346,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get upNext => 'Continuar';
 
   @override
+  String get dismiss => 'Cerrar';
+
+  @override
   String get donationInfo => 'Información sobre donaciones';
 
   @override
@@ -2370,12 +2370,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get yourPathExplainerSwipeHint =>
       'Desliza a la izquierda para omitir o abrir el paquete.';
-
-  @override
-  String get onboardingStep1of2 => '1 de 2';
-
-  @override
-  String get onboardingStep2of2 => '2 de 2';
 
   @override
   String get onboardingExperienceQuestion => '¿Has meditado antes?';
@@ -2409,6 +2403,12 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get onboardingIntentStress =>
       'Gestionar el estrés, el sueño o las emociones';
+
+  @override
+  String get onboardingStep1of2 => '1 de 2';
+
+  @override
+  String get onboardingStep2of2 => '2 de 2';
 
   @override
   String get onboardingAttributionQuestion => '¿Cómo conociste Medito?';

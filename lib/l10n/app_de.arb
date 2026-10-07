@@ -1105,7 +1105,7 @@
   "@reminderDay15Title": {
     "description": "Smart reminder day 15 title"
   },
-  "reminderDay15Body": "We're pausing reminders for now. We are here whenever you are ready.",
+  "reminderDay15Body": "Wir pausieren die Erinnerungen vorerst. Wir sind für dich da, wann immer du bereit bist.",
   "@reminderDay15Body": {
     "description": "Smart reminder day 15 body"
   },
@@ -1515,7 +1515,7 @@
   "@onboardingAttributionOtherHint": {
     "description": "Placeholder text inside the free-text attribution field"
   },
-  "onboardingResultLearnHeading": "You're in the right place.",
+  "onboardingResultLearnHeading": "Du bist hier genau richtig.",
   "@onboardingResultLearnHeading": {
     "description": "Heading on the onboarding result screen for users who are new or want to learn (State A)"
   },

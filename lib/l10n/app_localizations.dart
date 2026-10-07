@@ -358,23 +358,11 @@ abstract class AppLocalizations {
   /// **'buildNumber'**
   String get buildNumber;
 
-  /// Accessibility label for dismiss/close buttons
-  ///
-  /// In en, this message translates to:
-  /// **'Dismiss'**
-  String get dismiss;
-
   /// No description provided for @debugInfo.
   ///
   /// In en, this message translates to:
   /// **'Debug info'**
   String get debugInfo;
-
-  /// Text indicating where to write in debug reports
-  ///
-  /// In en, this message translates to:
-  /// **'--- Write below this line ---'**
-  String get writeBelowThisLine;
 
   /// No description provided for @explore.
   ///
@@ -549,18 +537,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Medito relies only on your donations to survive. We produce free content to help humanity.'**
   String get meditoReliesOnYourDonationsToSurvive;
-
-  /// Body text for daily meditation reminder notifications
-  ///
-  /// In en, this message translates to:
-  /// **'It\'s time for your daily meditation. Take a moment to relax and focus.'**
-  String get reminderNotificationBody;
-
-  /// Title for daily meditation reminder notifications
-  ///
-  /// In en, this message translates to:
-  /// **'Daily Meditation Reminder'**
-  String get reminderNotificationTitle;
 
   /// No description provided for @pickTimeHelpText.
   ///
@@ -832,12 +808,6 @@ abstract class AppLocalizations {
   /// **'hour'**
   String get hourFull;
 
-  /// Short placeholder text for duration input
-  ///
-  /// In en, this message translates to:
-  /// **'Minutes'**
-  String get minutes;
-
   /// No description provided for @minute.
   ///
   /// In en, this message translates to:
@@ -897,12 +867,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Email'**
   String get emailLabel;
-
-  /// Error message for invalid email format
-  ///
-  /// In en, this message translates to:
-  /// **'Invalid Email.'**
-  String get invalidEmailError;
 
   /// No description provided for @createAccountButtonText.
   ///
@@ -3220,11 +3184,23 @@ abstract class AppLocalizations {
   /// **'Debug info'**
   String get debugInfoLabel;
 
+  /// Text indicating where to write in debug reports
+  ///
+  /// In en, this message translates to:
+  /// **'--- Write below this line ---'**
+  String get writeBelowThisLine;
+
   /// Error message when a required field is empty
   ///
   /// In en, this message translates to:
   /// **'Field is Required'**
   String get fieldRequiredError;
+
+  /// Error message for invalid email format
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Email.'**
+  String get invalidEmailError;
 
   /// Error message for invalid input
   ///
@@ -3249,6 +3225,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An unknown error occurred. Either we\'re having issues or you\'re offline.'**
   String get anErrorOccurredMessage;
+
+  /// Title for daily meditation reminder notifications
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Meditation Reminder'**
+  String get reminderNotificationTitle;
+
+  /// Body text for daily meditation reminder notifications
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s time for your daily meditation. Take a moment to relax and focus.'**
+  String get reminderNotificationBody;
 
   /// Section title for help settings
   ///
@@ -3958,6 +3946,12 @@ abstract class AppLocalizations {
   /// **'Duration (minutes)'**
   String get durationInMinutes;
 
+  /// Short placeholder text for duration input
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes'**
+  String get minutes;
+
   /// Text to indicate an optional field
   ///
   /// In en, this message translates to:
@@ -4240,6 +4234,12 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get upNext;
 
+  /// Accessibility label for dismiss/close buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
+
   /// Accessibility label for the donation information button
   ///
   /// In en, this message translates to:
@@ -4281,18 +4281,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Swipe left to skip or open the pack.'**
   String get yourPathExplainerSwipeHint;
-
-  /// Step indicator label on onboarding question screen 1 (of 2)
-  ///
-  /// In en, this message translates to:
-  /// **'1 of 2'**
-  String get onboardingStep1of2;
-
-  /// Step indicator label on onboarding question screen 2 (of 2)
-  ///
-  /// In en, this message translates to:
-  /// **'2 of 2'**
-  String get onboardingStep2of2;
 
   /// Question on onboarding screen 1 — asking about the user's meditation experience
   ///
@@ -4353,6 +4341,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage stress, sleep, or emotions'**
   String get onboardingIntentStress;
+
+  /// Step indicator label on onboarding question screen 1 (of 2)
+  ///
+  /// In en, this message translates to:
+  /// **'1 of 2'**
+  String get onboardingStep1of2;
+
+  /// Step indicator label on onboarding question screen 2 (of 2)
+  ///
+  /// In en, this message translates to:
+  /// **'2 of 2'**
+  String get onboardingStep2of2;
 
   /// Question on onboarding attribution screen — asking how the user discovered Medito
   ///

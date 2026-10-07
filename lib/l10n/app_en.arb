@@ -55,9 +55,7 @@
   "deviceOs": "deviceOs",
   "devicePlatform": "devicePlatform",
   "buildNumber": "buildNumber",
-  "dismiss": "Dismiss",
   "debugInfo": "Debug info",
-  "writeBelowThisLine": "--- Write below this line ---",
   "explore": "Explore",
   "welcome": "👋 Welcome",
   "thanksForSharing": "Thanks for sharing  💜",
@@ -87,8 +85,6 @@
   "yourFeedbackHelpsUs": "Your feedback helps us improve our content and allows you to reflect on your experience.",
   "didYouKnow": "Did you know?",
   "meditoReliesOnYourDonationsToSurvive": "Medito relies only on your donations to survive. We produce free content to help humanity.",
-  "reminderNotificationBody": "It's time for your daily meditation. Take a moment to relax and focus.",
-  "reminderNotificationTitle": "Daily Meditation Reminder",
   "pickTimeHelpText": "Select your daily reminder time",
   "reminderNotificationScheduled": "Reminder notification scheduled at",
   "dailyReminderTitle": "Daily Reminder",
@@ -134,7 +130,6 @@
   "hours": "h",
   "hoursFull": "hours",
   "hourFull": "hour",
-  "minutes": "minutes",
   "minute": "minute",
   "showConsistencyScore": "Show Consistency Score",
   "showCurrentStreak": "Show Current Streak",
@@ -145,7 +140,6 @@
   "createAccountTitle": "Create account",
   "signInAgain": "Sign in again",
   "emailLabel": "Email",
-  "invalidEmailError": "Please enter a valid email",
   "createAccountButtonText": "Create Account",
   "createAccountLogInButtonText": "Sign in or Sign up",
   "getStarted": "Get started",
@@ -1575,14 +1569,6 @@
   "yourPathExplainerSwipeHint": "Swipe left to skip or open the pack.",
   "@yourPathExplainerSwipeHint": {
     "description": "Stage 2 text in the Your Path explainer strip, shown after the user taps Got it"
-  },
-  "onboardingStep1of2": "1 of 2",
-  "@onboardingStep1of2": {
-    "description": "Step indicator label on onboarding question screen 1"
-  },
-  "onboardingStep2of2": "2 of 2",
-  "@onboardingStep2of2": {
-    "description": "Step indicator label on onboarding question screen 2"
   },
   "onboardingExperienceQuestion": "Have you meditated before?",
   "@onboardingExperienceQuestion": {
