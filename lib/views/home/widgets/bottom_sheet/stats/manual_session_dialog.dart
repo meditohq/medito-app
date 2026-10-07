@@ -1,3 +1,4 @@
+import 'package:medito/widgets/inputs/medito_segmented_tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -193,47 +194,11 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
   }
 
   Widget _buildTabBar(BuildContext context, AppLocalizations l10n) {
-    return Row(
-      children: [
-        Expanded(child: _buildTabItem(0, l10n.singleDay)),
-        Expanded(child: _buildTabItem(1, l10n.dateRange)),
-      ],
-    );
-  }
-
-  Widget _buildTabItem(int index, String label) {
-    final theme = Theme.of(context);
-    final isSelected = _tabController!.index == index;
-    final selectedColor = theme.colorScheme.onSurface;
-    final unselectedColor = theme.colorScheme.onSurface.withOpacityValue(0.5);
-
-    return InkWell(
-      onTap: () => _tabController!.animateTo(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.outline.withOpacityValue(0.2),
-              width: isSelected ? 2 : 1,
-            ),
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontFamily: googleSans,
-              color: isSelected ? selectedColor : unselectedColor,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
+    return MeditoSegmentedTabs(
+      labels: [l10n.singleDay, l10n.dateRange],
+      selectedIndex: _tabController!.index,
+      onChanged: _tabController!.animateTo,
+      height: 44,
     );
   }
 

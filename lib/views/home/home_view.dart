@@ -1,3 +1,4 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -41,6 +42,9 @@ class HomeView extends ConsumerStatefulWidget {
 class _HomeViewState extends ConsumerState<HomeView>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   final _analytics = FirebaseAnalyticsService();
+
+  /// Lets a tap on the hero image do what Up Next's play button does.
+  final _upNextPrimaryAction = UpNextPrimaryAction();
   @override
   void initState() {
     super.initState();
@@ -142,6 +146,9 @@ class _HomeViewState extends ConsumerState<HomeView>
                   HomeHero(
                     onStatsButtonTap: () => _onStatsButtonTapped(context),
                     announcement: const HomeAnnouncementSection(),
+                    onImageTap: heroType == HomeWidgetType.upNext
+                        ? _upNextPrimaryAction.trigger
+                        : null,
                     child: heroType == null
                         ? null
                         : _buildSection(heroType, homeData, inHero: true),
@@ -205,6 +212,7 @@ class _HomeViewState extends ConsumerState<HomeView>
       HomeWidgetType.upNext => UpNextWidget(
         key: key,
         style: inHero ? UpNextStyle.hero : UpNextStyle.card,
+        primaryAction: inHero ? _upNextPrimaryAction : null,
       ),
     };
   }
@@ -282,18 +290,42 @@ class _HomeLoadingViewState extends State<_HomeLoadingView> {
                 child: AnimatedOpacity(
                   opacity: _showDownloadsButton ? 1 : 0,
                   duration: const Duration(milliseconds: 500),
-                  child: TextButton(
-                    onPressed: _showDownloadsButton
-                        ? () => handleNavigation(TypeConstants.flow, [
-                            TypeConstants.downloads,
-                          ], context)
-                        : null,
-                    child: Text(
-                      AppLocalizations.of(context)!.goToDownloads,
-                      style: TextStyle(
-                        color: context.brandAccent.withValues(alpha: 0.8),
+                  // Both work without a connection: downloaded sessions and
+                  // the timer (local silent audio).
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: _showDownloadsButton
+                            ? () => handleNavigation(TypeConstants.flow, [
+                                TypeConstants.downloads,
+                              ], context)
+                            : null,
+                        child: Text(
+                          AppLocalizations.of(context)!.goToDownloads,
+                          style: TextStyle(
+                            color: context.brandAccent.withValues(alpha: 0.8),
+                          ),
+                        ),
                       ),
-                    ),
+                      TextButton(
+                        onPressed: _showDownloadsButton
+                            ? () => handleNavigation(
+                                TypeConstants.route,
+                                [RouteConstants.timer],
+                                context,
+                                timerSource:
+                                    AnalyticsEventConstants.sourceOffline,
+                              )
+                            : null,
+                        child: Text(
+                          AppLocalizations.of(context)!.openTimer,
+                          style: TextStyle(
+                            color: context.brandAccent.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

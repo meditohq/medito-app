@@ -3,7 +3,6 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:medito/models/models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/background_sounds/background_sounds_notifier.dart';
@@ -16,11 +15,9 @@ class VolumeSliderWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bgSoundState = ref.watch(backgroundSoundsNotifierProvider);
     final currentVolume = bgSoundState.volume;
-    // With no background sound there is nothing to adjust, so the bar is
-    // dimmed and inert until a sound is picked.
-    final hasSound =
-        (bgSoundState.selectedBgSound?.id ?? kNoneBackgroundSoundId) !=
-        kNoneBackgroundSoundId;
+    // With nothing playing over the session there is nothing to adjust, so
+    // the bar is dimmed and inert. Bells use this volume too.
+    final hasSound = bgSoundState.hasAnySound;
 
     final slider = SliderTheme(
       data: SliderThemeData(

@@ -48,6 +48,7 @@ class ShortcutsItemsWidget extends ConsumerWidget {
       [element.path.toString().getIdFromPath()],
       context,
       ref: ref,
+      timerSource: AnalyticsEventConstants.sourceShortcut,
     );
   }
 

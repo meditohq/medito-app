@@ -735,7 +735,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
                     .setTitle(audioData.track.title)
                     .setArtist(audioData.track.artist)
                     .setDescription(audioData.track.description)
-                    .setArtworkUri(audioData.track.imageUrl?.let { Uri.parse(it) })
+                    .setArtworkUri(audioData.track.imageUrl?.takeIf { it.isNotEmpty() }?.let { Uri.parse(it) })
                     .setExtras(android.os.Bundle().apply {
                         putString(KEY_ARTIST_URL, audioData.track.artistUrl)
                         putString(KEY_FILE_ID, audioData.track.fileId)
@@ -1062,8 +1062,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
 
         // Now set the new URI
         this.backgroundSoundUri = uri
-        if (uri == SessionBellPlayer.URI) sessionBells.enable(backgroundMusicVolume)
-        else sessionBells.disable()
 
         if (uri == null) {
             Log.d(TAG, "🔊 Background sound cleared")
@@ -1073,7 +1071,6 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     override fun stopBackgroundSound() {
-        sessionBells.disable()
         try {
             Log.d(TAG, "🔊 Stopping background sound")
             if (::backgroundMusicPlayer.isInitialized) {
@@ -1085,6 +1082,15 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
             Log.e(TAG, "❌ Error stopping background sound: ${e.message}")
             e.printStackTrace()
         }
+    }
+
+    // Bells are independent of the ambient sound: both can play at once.
+    override fun setSessionBells(enabled: Boolean) {
+        if (!::sessionBells.isInitialized) {
+            Log.w(TAG, "setSessionBells($enabled) before the service was ready")
+            return
+        }
+        if (enabled) sessionBells.enable(backgroundMusicVolume) else sessionBells.disable()
     }
 
     override fun setBackgroundSoundVolume(volume: Double) {

@@ -1,8 +1,10 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/models/timer/timer_session.dart';
 
 import '../../models/player/repeat_mode.dart' as app_repeat;
 import '../../src/audio_pigeon.g.dart' as pigeon;
@@ -53,7 +55,9 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     unawaited(
       AudioSessionTracker.instance.onStarted(
         fileId: request.fileId,
-        guide: request.guideName,
+        guide: request.isTimer
+            ? AnalyticsEventConstants.timerGuide
+            : request.guideName,
         durationMs: request.duration,
       ),
     );
@@ -77,9 +81,12 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
       '_playTrack called for track: ${request.trackId}, file: ${request.fileId}',
     );
 
-    final downloadPath = await ref
-        .read(audioDownloaderProvider.notifier)
-        .getTrackPath(_constructFileName(request));
+    // A timer's silent file is generated locally and is never a download.
+    final downloadPath = request.isTimer
+        ? null
+        : await ref
+              .read(audioDownloaderProvider.notifier)
+              .getTrackPath(_constructFileName(request));
 
     final url = downloadPath ?? request.remoteUrl;
     AppLogger.d('PLAYER', 'Will use path: $url');
@@ -88,7 +95,10 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
     // and speed across tracks, while each player screen starts at repeat off /
     // 1.0x. Reset them so a leftover "repeat forever" can't loop a session
     // (and block the end screen) and a slowed-down speed doesn't carry over.
-    final repeatMode = ref.read(repeatStateProvider);
+    // A timer has no repeat control; its length is the session.
+    final repeatMode = request.isTimer
+        ? app_repeat.RepeatMode.none
+        : ref.read(repeatStateProvider);
 
     final trackData = pigeon.Track(
       id: request.trackId,

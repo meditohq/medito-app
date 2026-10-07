@@ -1278,5 +1278,19 @@
   "shopMeasureWidth": "Ancho",
   "shopMeasureSleeve": "Manga",
   "shopInches": "in",
-  "shopCentimetres": "cm"
+  "shopCentimetres": "cm",
+  "timerTitle": "Temporizador",
+  "timerModeStopwatch": "Cronómetro",
+  "timerHoursLabel": "Horas",
+  "timerMinutesLabel": "Minutos",
+  "timerStopwatchCaption": "El tiempo cuenta desde cero. Pulsa detener cuando termines y la sesión se guarda.",
+  "timerStart": "Empezar",
+  "timerEndSession": "Terminar sesión",
+  "timerElapsed": "transcurrido",
+  "timerTooShort": "Las sesiones de menos de un minuto no se guardan",
+  "timerHistoryTitle": "Temporizador · {duration}",
+  "timerPresetSemantics": "{minutes} minutos",
+  "soundNeedsConnection": "No descargado. Conéctate para reproducirlo",
+  "timerStopwatchTitle": "Medita el tiempo que quieras",
+  "openTimer": "Abrir temporizador"
 }

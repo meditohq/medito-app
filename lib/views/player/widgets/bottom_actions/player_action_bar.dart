@@ -5,6 +5,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/scaffold_messenger_key.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/bg_sound_widget.dart';
@@ -31,6 +32,28 @@ class PlayerActionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    // A timer is local silence: nothing to download, and speed would only
+    // change how long the session takes. Keep close and the sound picker.
+    if (request.isTimer) {
+      return BottomActionBar(
+        leftItem: BottomActionBarItem(
+          child: const Icon(Icons.close, color: ColorConstants.white),
+          onTap: onClosePressed,
+          semanticLabel: l10n.close,
+        ),
+        rightItem: BottomActionBarItem(
+          child: _buildBackgroundSoundWidget(),
+          onTap: () {
+            FirebaseAnalyticsService().logEvent(
+              name: AnalyticsEventConstants.playerBackgroundSoundsOpened,
+            );
+            showBackgroundSoundSheet(context);
+          },
+          semanticLabel: l10n.backgroundSounds,
+        ),
+      );
+    }
 
     return BottomActionBar(
       layout: BottomActionBarLayout.edgeAligned,

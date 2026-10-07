@@ -41,9 +41,14 @@ class HomeHero extends ConsumerWidget {
     required this.onStatsButtonTap,
     this.child,
     this.announcement,
+    this.onImageTap,
   });
 
   final VoidCallback onStatsButtonTap;
+
+  /// Tap on the bare image (not on [child], the announcement or the pill).
+  /// Home passes Up Next's play action when Up Next is the overlaid section.
+  final VoidCallback? onImageTap;
 
   /// The section laid over the image. Rendered inside an on-image theme:
   /// white text, dark translucent cards, no page-coloured fades.
@@ -108,7 +113,12 @@ class HomeHero extends ConsumerWidget {
         alignment: Alignment.bottomCenter,
         children: [
           Positioned.fill(
-            child: _HeroBackdrop(coverUrl: coverUrl, banner: !overlay),
+            child: GestureDetector(
+              onTap: onImageTap,
+              // The section over the image already exposes the action.
+              excludeFromSemantics: true,
+              child: _HeroBackdrop(coverUrl: coverUrl, banner: !overlay),
+            ),
           ),
           // As a banner this is the whole height.
           if (!overlay) SizedBox(height: minHeight, width: double.infinity),
@@ -118,29 +128,27 @@ class HomeHero extends ConsumerWidget {
                 top: topInset + _headerReserve,
                 bottom: padding8,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Own colours, so kept outside the on-image theme.
-                  ?announcement,
-                  // Floor for the stack height, so a short section still
-                  // gets a big image. It sits under the announcement rather
-                  // than around it: the card adds to the height instead of
-                  // filling the floor, so its collapse shrinks the hero the
-                  // whole way instead of stopping dead at the floor.
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight:
-                          (minHeight - topInset - _headerReserve - padding8)
-                              .clamp(0.0, double.infinity),
-                    ),
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: _OnImageTheme(child: child!),
-                    ),
-                  ),
-                ],
+              // Floor for the stack height, so a short section still gets a
+              // big image. It wraps the announcement too: a card fills the
+              // image's empty band above the section instead of stacking on
+              // top of the floor (which left a gap under the card the height
+              // of that band). Both sit on the bottom edge, so dismissing the
+              // card leaves exactly the no-announcement layout.
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: (minHeight - topInset - _headerReserve - padding8)
+                      .clamp(0.0, double.infinity),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Own colours, so kept outside the on-image theme.
+                    ?announcement,
+                    _OnImageTheme(child: child!),
+                  ],
+                ),
               ),
             ),
           Positioned(top: 0, left: 0, right: 0, child: header),

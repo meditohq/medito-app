@@ -1,5 +1,6 @@
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/utils/day_boundary.dart';
 
 class AudioCompletionTracker {
@@ -30,10 +31,13 @@ class AudioCompletionTracker {
     required LocalAudioCompleted audioCompleted,
     required int duration,
   }) {
+    // tracksChecked marks catalogue tracks as done. Timer ids carry their
+    // length, so each one would be a new, meaningless entry.
+    final checksTrack = !isTimerSessionId(audioCompleted.id);
     if (stats == null) {
       return LocalAllStats.empty().copyWith(
         audioCompleted: [audioCompleted],
-        tracksChecked: [audioCompleted.id],
+        tracksChecked: [if (checksTrack) audioCompleted.id],
         totalTracksCompleted: 1,
         totalTimeListened: duration,
         updated: DateTime.now().toUtc().millisecondsSinceEpoch,
@@ -44,7 +48,7 @@ class AudioCompletionTracker {
     final newTotalTracks = 1 + (stats.totalTracksCompleted);
 
     var updatedTracksCompleted = stats.tracksChecked ?? [];
-    if (!updatedTracksCompleted.contains(audioCompleted.id)) {
+    if (checksTrack && !updatedTracksCompleted.contains(audioCompleted.id)) {
       updatedTracksCompleted.add(audioCompleted.id);
     }
 

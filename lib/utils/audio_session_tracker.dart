@@ -238,12 +238,15 @@ class AudioSessionTracker {
     final elapsedMs = session.lastPositionMs < 0 ? 0 : session.lastPositionMs;
     final elapsedSeconds = (elapsedMs / 1000).round();
     final percent = _bucketedPercent(elapsedMs, session.durationMs);
+    // A stopwatch has no length (its file is just a long cap), so a percent
+    // would always read ~0; elapsed_seconds is the measure there.
+    final isStopwatch = session.fileId.startsWith('timer-stopwatch-');
 
     await _log(AnalyticsEventConstants.audioSessionAbandoned, {
       AnalyticsEventConstants.paramAudioFileId: session.fileId,
       AnalyticsEventConstants.paramAudioFileGuide: session.guide,
       AnalyticsEventConstants.paramAudioFileDuration: session.durationMs,
-      AnalyticsEventConstants.paramPercentCompleted: percent,
+      if (!isStopwatch) AnalyticsEventConstants.paramPercentCompleted: percent,
       AnalyticsEventConstants.paramElapsedSeconds: elapsedSeconds,
       AnalyticsEventConstants.paramReason: reason,
     });

@@ -13,6 +13,8 @@ import 'package:medito/views/downloads/downloads_view.dart';
 import 'package:medito/views/pack/pack_view.dart';
 import 'package:medito/views/settings/settings_screen.dart';
 import 'package:medito/views/track/track_view.dart';
+import 'package:medito/views/timer/timer_view.dart';
+import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:medito/views/home/customise_home_layout_screen.dart';
@@ -40,13 +42,15 @@ Future<void> handleNavigation(
   WidgetRef? ref,
   VoidCallback? onNavigationComplete,
   String? sourceRouteName,
+  // Where a Timer opened from, for timer_opened; deeplink when unset.
+  String? timerSource,
 }) async {
   ids.removeWhere((element) => element == null);
 
   if (type == null) return;
 
   if (type.contains('tracks') || type.contains('track')) {
-    await _handleTrackNavigation(ids, ref);
+    await _handleTrackNavigation(ids, ref, timerSource: timerSource);
   } else if (type.contains('pack')) {
     var packId = type.contains('pack3')
         ? ids[2]!
@@ -115,6 +119,12 @@ Future<void> handleNavigation(
       ref,
     );
   } else if (type == TypeConstants.route &&
+      ids.contains(RouteConstants.timer)) {
+    await _pushRoute(
+      TimerView(source: timerSource ?? AnalyticsEventConstants.sourceDeeplink),
+      ref,
+    );
+  } else if (type == TypeConstants.route &&
       ids.contains(RouteConstants.analytics)) {
     await _pushRoute(const AnalyticsSettingsScreen(), ref);
   } else if (type == '/debug_info') {
@@ -156,9 +166,24 @@ bool _isDonationRoute(String? type, List<String?> ids) {
       (type == TypeConstants.route && ids.contains(RouteConstants.donation));
 }
 
-Future<void> _handleTrackNavigation(List<String?> ids, WidgetRef? ref) async {
+Future<void> _handleTrackNavigation(
+  List<String?> ids,
+  WidgetRef? ref, {
+  String? timerSource,
+}) async {
   try {
     var trackId = ids.first!;
+    // The home Timer shortcut still points at the old bell-only track; the
+    // native timer replaces it wherever it is linked from.
+    if (trackId == kLegacyTimerTrackId) {
+      await _pushRoute(
+        TimerView(
+          source: timerSource ?? AnalyticsEventConstants.sourceDeeplink,
+        ),
+        ref,
+      );
+      return;
+    }
     await _pushRoute(TrackView(trackId: trackId), ref);
     ref?.read(statsProvider.notifier).refresh();
   } catch (e, s) {

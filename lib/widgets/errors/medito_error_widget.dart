@@ -1,3 +1,4 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -223,6 +224,26 @@ class MeditoErrorWidget extends ConsumerWidget {
                         ),
                       ),
                       child: Text(AppLocalizations.of(context)!.goToDownloads),
+                    ),
+                  ),
+                  // The timer plays local audio, so it works offline too.
+                  SizedBox(
+                    width: 300,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        handleNavigation(
+                          TypeConstants.route,
+                          [RouteConstants.timer],
+                          context,
+                          timerSource: AnalyticsEventConstants.sourceOffline,
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(AppLocalizations.of(context)!.openTimer),
                     ),
                   ),
                 ],

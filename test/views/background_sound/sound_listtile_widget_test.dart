@@ -30,6 +30,7 @@ class _FakeNotifier extends BackgroundSoundsNotifier {
   final BackgroundSoundsState _initialState;
   final retried = <String>[];
   final changed = <String?>[];
+  final bells = <bool>[];
 
   @override
   BackgroundSoundsState build() => _initialState;
@@ -42,6 +43,12 @@ class _FakeNotifier extends BackgroundSoundsNotifier {
     BackgroundSoundsModel? sound, {
     bool preview = true,
   }) => changed.add(sound?.id);
+
+  @override
+  void setSessionBells(bool enabled, {bool preview = true}) {
+    bells.add(enabled);
+    state = state.copyWith(bellsEnabled: enabled);
+  }
 }
 
 void main() {
@@ -166,7 +173,7 @@ void main() {
     expect(find.text('Campanas de sesión'), findsOneWidget);
   });
 
-  testWidgets('bundled bells remain available when remote sounds fail', (
+  testWidgets('bundled bells stay switchable when remote sounds fail', (
     tester,
   ) async {
     final notifier = _FakeNotifier(const BackgroundSoundsState());
@@ -188,7 +195,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Session bells'), findsOneWidget);
     await tester.tap(find.text('Session bells'));
-    expect(notifier.changed, [kSessionBellsId]);
+    await tester.pump();
+    // A switch now, not a sound: no ambient change, bells on.
+    expect(notifier.changed, isEmpty);
+    expect(notifier.bells, [true]);
+    expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
     expect(tester.takeException(), isNull);
   });
 }

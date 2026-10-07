@@ -803,6 +803,42 @@ class AnalyticsEventConstants {
   /// Parameter name for the shortcut destination type (e.g. pack, track, link)
   static const String paramShortcutType = 'shortcut_type';
 
+  /// The user started a session from the home Timer screen. The session
+  /// itself then logs audio_session_started/completed/abandoned with an
+  /// audioFileId of `timer-<mode>-<ms>`. Parameters: timer_mode
+  /// (countdown/stopwatch), duration_minutes (0 for stopwatch), sound_id.
+  static const String timerStarted = 'timer_started';
+  static const String paramTimerMode = 'timer_mode';
+  static const String paramDurationMinutes = 'duration_minutes';
+  static const String paramSoundId = 'sound_id';
+  static const String paramSessionBells = 'session_bells';
+
+  /// How the countdown length on [timerStarted] was set: preset (a chip),
+  /// wheel (scrolled), remembered (last session's, untouched) or default
+  /// (first visit, untouched). Absent for a stopwatch.
+  static const String paramLengthSource = 'length_source';
+
+  /// The Timer screen opened. Parameter: source — shortcut (home tile),
+  /// offline (Home's no-connection screen), history (a timer row in History)
+  /// or deeplink (anything else that routes to the timer).
+  static const String timerOpened = 'timer_opened';
+  static const String sourceShortcut = 'shortcut';
+  static const String sourceOffline = 'offline';
+  static const String sourceHistory = 'history';
+
+  /// Guide reported on the audio_session_* events of a Timer session.
+  static const String timerGuide = 'timer';
+
+  /// User switches session bells on/off in the sound sheet. Parameters:
+  /// enabled (1/0), is_timer (1/0).
+  static const String sessionBellsToggled = 'session_bells_toggled';
+
+  /// The user tapped End session in a timer. Parameters: timer_mode,
+  /// elapsed_seconds ([paramElapsedSeconds]), recorded (1 if it was long
+  /// enough to save, else 0).
+  static const String timerEnded = 'timer_ended';
+  static const String paramRecorded = 'recorded';
+
   /// The user opened a tag's track list (TagView).
   /// Parameters: 'tag_id', 'tag_group'.
   static const String tagOpened = 'tag_opened';
