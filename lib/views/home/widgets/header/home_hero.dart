@@ -41,9 +41,14 @@ class HomeHero extends ConsumerWidget {
     required this.onStatsButtonTap,
     this.child,
     this.announcement,
+    this.onImageTap,
   });
 
   final VoidCallback onStatsButtonTap;
+
+  /// Tap on the bare image (not on [child], the announcement or the pill).
+  /// Home passes Up Next's play action when Up Next is the overlaid section.
+  final VoidCallback? onImageTap;
 
   /// The section laid over the image. Rendered inside an on-image theme:
   /// white text, dark translucent cards, no page-coloured fades.
@@ -108,7 +113,12 @@ class HomeHero extends ConsumerWidget {
         alignment: Alignment.bottomCenter,
         children: [
           Positioned.fill(
-            child: _HeroBackdrop(coverUrl: coverUrl, banner: !overlay),
+            child: GestureDetector(
+              onTap: onImageTap,
+              // The section over the image already exposes the action.
+              excludeFromSemantics: true,
+              child: _HeroBackdrop(coverUrl: coverUrl, banner: !overlay),
+            ),
           ),
           // As a banner this is the whole height.
           if (!overlay) SizedBox(height: minHeight, width: double.infinity),

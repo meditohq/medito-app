@@ -101,10 +101,34 @@ class _UpNextPalette {
   final Color skipBackground;
 }
 
+/// Lets something outside the Up Next content (the home hero image) trigger
+/// its primary action: start the next session, or pin the next pack once this
+/// one is complete. Whichever content is showing registers itself.
+class UpNextPrimaryAction {
+  VoidCallback? _handler;
+
+  void trigger() => _handler?.call();
+
+  void _attach(VoidCallback handler) => _handler = handler;
+
+  /// Only clears [handler]: during the AnimatedSwitcher cross-fade the
+  /// incoming content attaches before the outgoing one disposes.
+  void _detach(VoidCallback handler) {
+    if (_handler == handler) _handler = null;
+  }
+}
+
 class UpNextWidget extends ConsumerWidget {
   final UpNextStyle style;
 
-  const UpNextWidget({super.key, this.style = UpNextStyle.card});
+  /// Bound to the visible content's primary action, if given.
+  final UpNextPrimaryAction? primaryAction;
+
+  const UpNextWidget({
+    super.key,
+    this.style = UpNextStyle.card,
+    this.primaryAction,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -120,6 +144,7 @@ class UpNextWidget extends ConsumerWidget {
             key: ValueKey('completed_${upNextData.pack.id}'),
             data: upNextData,
             style: style,
+            primaryAction: primaryAction,
           );
         }
 
@@ -131,6 +156,7 @@ class UpNextWidget extends ConsumerWidget {
           key: ValueKey(upNextData.nextSession!.id),
           data: upNextData,
           style: style,
+          primaryAction: primaryAction,
         );
       },
     );
@@ -161,11 +187,13 @@ class UpNextWidget extends ConsumerWidget {
 class _UpNextCompleted extends ConsumerStatefulWidget {
   final UpNextData data;
   final UpNextStyle style;
+  final UpNextPrimaryAction? primaryAction;
 
   const _UpNextCompleted({
     super.key,
     required this.data,
     this.style = UpNextStyle.card,
+    this.primaryAction,
   });
 
   @override
@@ -178,11 +206,27 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
   @override
   void initState() {
     super.initState();
+    widget.primaryAction?._attach(_onStartNextPack);
     // Once per pack, not per mount — see _logShown.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _logShown();
       _logImpression();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant _UpNextCompleted oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.primaryAction != widget.primaryAction) {
+      oldWidget.primaryAction?._detach(_onStartNextPack);
+      widget.primaryAction?._attach(_onStartNextPack);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.primaryAction?._detach(_onStartNextPack);
+    super.dispose();
   }
 
   void _logImpression() {
@@ -444,11 +488,13 @@ class _CompletedCta extends StatelessWidget {
 class _UpNextContent extends ConsumerStatefulWidget {
   final UpNextData data;
   final UpNextStyle style;
+  final UpNextPrimaryAction? primaryAction;
 
   const _UpNextContent({
     super.key,
     required this.data,
     this.style = UpNextStyle.card,
+    this.primaryAction,
   });
 
   @override
@@ -461,9 +507,13 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
   // rather than start a session.
   late final SlidableController _slidable = SlidableController(this);
 
+  // Same as the play button. A stable tear-off so detach can match it.
+  void _onPrimaryAction() => _onTap(context);
+
   @override
   void initState() {
     super.initState();
+    widget.primaryAction?._attach(_onPrimaryAction);
     // Keyed by session id, so this runs again when the card moves on to the
     // next session.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -485,7 +535,17 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
   }
 
   @override
+  void didUpdateWidget(covariant _UpNextContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.primaryAction != widget.primaryAction) {
+      oldWidget.primaryAction?._detach(_onPrimaryAction);
+      widget.primaryAction?._attach(_onPrimaryAction);
+    }
+  }
+
+  @override
   void dispose() {
+    widget.primaryAction?._detach(_onPrimaryAction);
     _slidable.dispose();
     super.dispose();
   }
