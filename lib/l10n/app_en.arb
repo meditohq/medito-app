@@ -2052,5 +2052,39 @@
   "shopInches": "in",
   "@shopInches": {"description": "Size chart unit toggle: inches (abbreviation)"},
   "shopCentimetres": "cm",
-  "@shopCentimetres": {"description": "Size chart unit toggle: centimetres (abbreviation)"}
+  "@shopCentimetres": {"description": "Size chart unit toggle: centimetres (abbreviation)"},
+  "timerTitle": "Timer",
+  "@timerTitle": {"description": "Title of the home Timer screen and of a timer session in the player"},
+  "timerModeStopwatch": "Stopwatch",
+  "@timerModeStopwatch": {"description": "Timer screen mode toggle: counts up until the user ends the session"},
+  "timerHoursLabel": "Hours",
+  "@timerHoursLabel": {"description": "Label under the hours wheel on the Timer screen"},
+  "timerMinutesLabel": "Minutes",
+  "@timerMinutesLabel": {"description": "Label under the minutes wheel on the Timer screen"},
+  "timerStopwatchCaption": "The time counts up from zero. Tap stop when you're done and the session is saved.",
+  "@timerStopwatchCaption": {"description": "Body of the card explaining Stopwatch mode on the Timer screen"},
+  "timerStart": "Start",
+  "@timerStart": {"description": "Timer screen primary button"},
+  "timerEndSession": "End session",
+  "@timerEndSession": {"description": "Player button that ends a timer session early (or finishes a stopwatch) and records it"},
+  "timerElapsed": "elapsed",
+  "@timerElapsed": {"description": "Caption under the elapsed time in a stopwatch session"},
+  "timerTooShort": "Sessions under a minute aren't saved",
+  "@timerTooShort": {"description": "Snackbar when a timer session is ended before one minute"},
+  "timerHistoryTitle": "Timer · {duration}",
+  "@timerHistoryTitle": {
+    "description": "History row for a timer session, e.g. 'Timer \u00b7 20 min'",
+    "placeholders": {"duration": {"type": "String"}}
+  },
+  "timerPresetSemantics": "{minutes} minutes",
+  "@timerPresetSemantics": {
+    "description": "Screen reader label of a duration chip on the Timer screen",
+    "placeholders": {"minutes": {"type": "int"}}
+  },
+  "soundNeedsConnection": "Not downloaded. Connect to play",
+  "@soundNeedsConnection": {"description": "Background sound row offline when the sound was never downloaded, so it cannot play"},
+  "timerStopwatchTitle": "Sit for as long as you like",
+  "@timerStopwatchTitle": {"description": "Title of the card explaining Stopwatch mode on the Timer screen"},
+  "openTimer": "Open timer",
+  "@openTimer": {"description": "Offline screen link that opens the Timer, which works without a connection"}
 }

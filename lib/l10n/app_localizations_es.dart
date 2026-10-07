@@ -2818,4 +2818,53 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get shopCentimetres => 'cm';
+
+  @override
+  String get timerTitle => 'Temporizador';
+
+  @override
+  String get timerModeStopwatch => 'Cronómetro';
+
+  @override
+  String get timerHoursLabel => 'Horas';
+
+  @override
+  String get timerMinutesLabel => 'Minutos';
+
+  @override
+  String get timerStopwatchCaption =>
+      'El tiempo cuenta desde cero. Pulsa detener cuando termines y la sesión se guarda.';
+
+  @override
+  String get timerStart => 'Empezar';
+
+  @override
+  String get timerEndSession => 'Terminar sesión';
+
+  @override
+  String get timerElapsed => 'transcurrido';
+
+  @override
+  String get timerTooShort =>
+      'Las sesiones de menos de un minuto no se guardan';
+
+  @override
+  String timerHistoryTitle(String duration) {
+    return 'Temporizador · $duration';
+  }
+
+  @override
+  String timerPresetSemantics(int minutes) {
+    return '$minutes minutos';
+  }
+
+  @override
+  String get soundNeedsConnection =>
+      'No descargado. Conéctate para reproducirlo';
+
+  @override
+  String get timerStopwatchTitle => 'Medita el tiempo que quieras';
+
+  @override
+  String get openTimer => 'Abrir temporizador';
 }

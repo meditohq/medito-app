@@ -5113,6 +5113,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'cm'**
   String get shopCentimetres;
+
+  /// Title of the home Timer screen and of a timer session in the player
+  ///
+  /// In en, this message translates to:
+  /// **'Timer'**
+  String get timerTitle;
+
+  /// Timer screen mode toggle: counts up until the user ends the session
+  ///
+  /// In en, this message translates to:
+  /// **'Stopwatch'**
+  String get timerModeStopwatch;
+
+  /// Label under the hours wheel on the Timer screen
+  ///
+  /// In en, this message translates to:
+  /// **'Hours'**
+  String get timerHoursLabel;
+
+  /// Label under the minutes wheel on the Timer screen
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes'**
+  String get timerMinutesLabel;
+
+  /// Body of the card explaining Stopwatch mode on the Timer screen
+  ///
+  /// In en, this message translates to:
+  /// **'The time counts up from zero. Tap stop when you\'re done and the session is saved.'**
+  String get timerStopwatchCaption;
+
+  /// Timer screen primary button
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get timerStart;
+
+  /// Player button that ends a timer session early (or finishes a stopwatch) and records it
+  ///
+  /// In en, this message translates to:
+  /// **'End session'**
+  String get timerEndSession;
+
+  /// Caption under the elapsed time in a stopwatch session
+  ///
+  /// In en, this message translates to:
+  /// **'elapsed'**
+  String get timerElapsed;
+
+  /// Snackbar when a timer session is ended before one minute
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions under a minute aren\'t saved'**
+  String get timerTooShort;
+
+  /// History row for a timer session, e.g. 'Timer · 20 min'
+  ///
+  /// In en, this message translates to:
+  /// **'Timer · {duration}'**
+  String timerHistoryTitle(String duration);
+
+  /// Screen reader label of a duration chip on the Timer screen
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} minutes'**
+  String timerPresetSemantics(int minutes);
+
+  /// Background sound row offline when the sound was never downloaded, so it cannot play
+  ///
+  /// In en, this message translates to:
+  /// **'Not downloaded. Connect to play'**
+  String get soundNeedsConnection;
+
+  /// Title of the card explaining Stopwatch mode on the Timer screen
+  ///
+  /// In en, this message translates to:
+  /// **'Sit for as long as you like'**
+  String get timerStopwatchTitle;
+
+  /// Offline screen link that opens the Timer, which works without a connection
+  ///
+  /// In en, this message translates to:
+  /// **'Open timer'**
+  String get openTimer;
 }
 
 class _AppLocalizationsDelegate

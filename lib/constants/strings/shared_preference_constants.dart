@@ -3,6 +3,9 @@ class SharedPreferenceConstants {
   static const String bgSoundVolume = 'bgSoundVolume';
   static const String bgSound = 'bgSound';
   static const String listBgSound = 'listBgSound';
+  // The full background sound list as last fetched (JSON list), so the
+  // pickers can list sounds offline and grey out the ones not downloaded.
+  static const String bgSoundCatalog = 'bgSoundCatalog';
   static const String downloads = 'downloads';
   static const String currentPlayingTrack = 'currentPlayingTrack';
   static const String shortcuts = 'shortcuts';
@@ -165,4 +168,14 @@ class SharedPreferenceConstants {
   // the bag can offer to clear itself on return. We can't observe the order
   // completing (checkout runs in the system browser sheet).
   static const String shopBagCheckoutStarted = 'shop_bag_checkout_started';
+
+  // Home Timer: last countdown length in minutes.
+  static const String timerMinutes = 'timer_minutes';
+  // Session bells on/off, separate from the ambient sound so both can play.
+  // Tracks default off; the Timer defaults on.
+  static const String sessionBellsEnabled = 'session_bells_enabled';
+  static const String timerSessionBellsEnabled = 'timer_session_bells_enabled';
+  // Cover URL of the timer track, last fetched; shown behind the Timer
+  // screen (offline from the image disk cache).
+  static const String timerCoverUrl = 'timer_cover_url';
 }

@@ -124,7 +124,10 @@ class IosAudioHandler extends BaseAudioHandler {
           title: event.track.title,
           artist: event.track.artist,
           duration: event.duration,
-          artUri: Uri.parse(event.track.imageUrl),
+          // A timer session has no cover; an empty URI is not "no art".
+          artUri: event.track.imageUrl.isEmpty
+              ? null
+              : Uri.parse(event.track.imageUrl),
           playable: true,
           displayTitle: event.track.title,
           displaySubtitle: event.track.artist,
@@ -391,7 +394,8 @@ class IosAudioHandler extends BaseAudioHandler {
     await session.setActive(true);
 
     unawaited(_player.play());
-    if (!sessionBells.enabled) unawaited(iosBackgroundPlayer.play());
+    // Bells follow _player on their own; resume the ambient sound if any.
+    if (iosAmbientActive) unawaited(iosBackgroundPlayer.play());
   }
 
   @override

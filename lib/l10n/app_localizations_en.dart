@@ -2782,4 +2782,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopCentimetres => 'cm';
+
+  @override
+  String get timerTitle => 'Timer';
+
+  @override
+  String get timerModeStopwatch => 'Stopwatch';
+
+  @override
+  String get timerHoursLabel => 'Hours';
+
+  @override
+  String get timerMinutesLabel => 'Minutes';
+
+  @override
+  String get timerStopwatchCaption =>
+      'The time counts up from zero. Tap stop when you\'re done and the session is saved.';
+
+  @override
+  String get timerStart => 'Start';
+
+  @override
+  String get timerEndSession => 'End session';
+
+  @override
+  String get timerElapsed => 'elapsed';
+
+  @override
+  String get timerTooShort => 'Sessions under a minute aren\'t saved';
+
+  @override
+  String timerHistoryTitle(String duration) {
+    return 'Timer · $duration';
+  }
+
+  @override
+  String timerPresetSemantics(int minutes) {
+    return '$minutes minutes';
+  }
+
+  @override
+  String get soundNeedsConnection => 'Not downloaded. Connect to play';
+
+  @override
+  String get timerStopwatchTitle => 'Sit for as long as you like';
+
+  @override
+  String get openTimer => 'Open timer';
 }

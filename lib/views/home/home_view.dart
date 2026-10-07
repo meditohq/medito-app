@@ -1,3 +1,4 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -282,18 +283,42 @@ class _HomeLoadingViewState extends State<_HomeLoadingView> {
                 child: AnimatedOpacity(
                   opacity: _showDownloadsButton ? 1 : 0,
                   duration: const Duration(milliseconds: 500),
-                  child: TextButton(
-                    onPressed: _showDownloadsButton
-                        ? () => handleNavigation(TypeConstants.flow, [
-                            TypeConstants.downloads,
-                          ], context)
-                        : null,
-                    child: Text(
-                      AppLocalizations.of(context)!.goToDownloads,
-                      style: TextStyle(
-                        color: context.brandAccent.withValues(alpha: 0.8),
+                  // Both work without a connection: downloaded sessions and
+                  // the timer (local silent audio).
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: _showDownloadsButton
+                            ? () => handleNavigation(TypeConstants.flow, [
+                                TypeConstants.downloads,
+                              ], context)
+                            : null,
+                        child: Text(
+                          AppLocalizations.of(context)!.goToDownloads,
+                          style: TextStyle(
+                            color: context.brandAccent.withValues(alpha: 0.8),
+                          ),
+                        ),
                       ),
-                    ),
+                      TextButton(
+                        onPressed: _showDownloadsButton
+                            ? () => handleNavigation(
+                                TypeConstants.route,
+                                [RouteConstants.timer],
+                                context,
+                                timerSource:
+                                    AnalyticsEventConstants.sourceOffline,
+                              )
+                            : null,
+                        child: Text(
+                          AppLocalizations.of(context)!.openTimer,
+                          style: TextStyle(
+                            color: context.brandAccent.withValues(alpha: 0.8),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

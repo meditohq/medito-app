@@ -1,3 +1,7 @@
+import 'package:medito/providers/providers.dart';
+import 'package:medito/models/timer/timer_session.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
@@ -12,6 +16,12 @@ import 'widgets/volume_slider_widget.dart';
 /// Opens the background-sound picker as a draggable bottom sheet over the
 /// player, so the session stays in view instead of being pushed off-screen.
 Future<void> showBackgroundSoundSheet(BuildContext context) {
+  // A failed fetch is kept (keepAlive); retry it each time the sheet opens so
+  // coming back online shows every sound again.
+  final container = ProviderScope.containerOf(context);
+  if (container.read(backgroundSoundsProvider).hasError) {
+    container.invalidate(backgroundSoundsProvider);
+  }
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
@@ -32,6 +42,10 @@ Future<void> showBackgroundSoundSheet(BuildContext context) {
 /// Background-sound picker: volume bar plus the list of sounds. Shown inside
 /// [showBackgroundSoundSheet]; [scrollController] ties the list to the
 /// sheet's drag so scrolling past the top expands or dismisses it.
+///
+/// Renders from [backgroundSoundCatalogProvider]: the live list once it
+/// loads, the cached one meanwhile, and offline the sounds that aren't
+/// downloaded are greyed out instead of the sheet loading forever.
 class BackgroundSoundView extends ConsumerWidget {
   const BackgroundSoundView({super.key, this.scrollController});
 
@@ -39,38 +53,26 @@ class BackgroundSoundView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final backgroundSounds = ref.watch(backgroundSoundsProvider);
-
-    return backgroundSounds.when(
-      skipLoadingOnRefresh: false,
-      data: (data) => _mainContent(context, ref, data),
-      error: (err, stack) {
-        final error = err is AppError ? err : const UnknownError();
-
-        return _mainContent(
-          context,
-          ref,
-          [],
-          footer: MeditoErrorWidget(
-            error: error,
-            onTap: () => ref.refresh(backgroundSoundsProvider),
-            isScaffold: false,
-          ),
-        );
-      },
-      loading: () => _mainContent(
-        context,
-        ref,
-        [],
-        footer: const BackgroundSoundsShimmerWidget(),
-      ),
-    );
+    final catalog = ref.watch(backgroundSoundCatalogProvider);
+    final Widget? footer;
+    if (catalog.loading) {
+      footer = const BackgroundSoundsShimmerWidget();
+    } else if (catalog.offline && catalog.sounds.isEmpty) {
+      footer = MeditoErrorWidget(
+        error: const UnknownError(),
+        onTap: () => ref.invalidate(backgroundSoundsProvider),
+        isScaffold: false,
+      );
+    } else {
+      footer = null;
+    }
+    return _mainContent(context, ref, catalog, footer: footer);
   }
 
   Widget _mainContent(
     BuildContext context,
     WidgetRef ref,
-    List<BackgroundSoundsModel> data, {
+    BackgroundSoundCatalog catalog, {
     Widget? footer,
   }) {
     final theme = Theme.of(context);
@@ -91,19 +93,10 @@ class BackgroundSoundView extends ConsumerWidget {
               bottom: MediaQuery.paddingOf(context).bottom + 16,
             ),
             children: [
-              // "Off" and bells come first, split from the sound list by the
-              // section label, so None reads as turning sound off, not a track.
-              const SoundListTileWidget(
-                sound: BackgroundSoundsModel(
-                  id: kNoneBackgroundSoundId,
-                  title: 'None',
-                  path: '',
-                  duration: 0,
-                ),
-              ),
-              const SoundListTileWidget(sound: kSessionBellsSound),
+              // Bells are a switch: they play alongside any sound below.
+              const _SessionBellsSwitch(),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                 child: Text(
                   AppLocalizations.of(
                     context,
@@ -116,18 +109,96 @@ class BackgroundSoundView extends ConsumerWidget {
                   ),
                 ),
               ),
-              ...data
-                  .where(
-                    (sound) =>
-                        sound.id != kNoneBackgroundSoundId &&
-                        sound.id != kSessionBellsId,
-                  )
-                  .map((e) => SoundListTileWidget(sound: e)),
+              // None first, so it reads as turning the sound off.
+              const SoundListTileWidget(
+                sound: BackgroundSoundsModel(
+                  id: kNoneBackgroundSoundId,
+                  title: 'None',
+                  path: '',
+                  duration: 0,
+                ),
+              ),
+              ...catalog.sounds.map(
+                (e) => SoundListTileWidget(
+                  sound: e,
+                  available: catalog.isAvailable(e),
+                ),
+              ),
               ?footer,
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SessionBellsSwitch extends ConsumerWidget {
+  const _SessionBellsSwitch();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final l10n = AppLocalizations.of(context)!;
+    final enabled = ref.watch(
+      backgroundSoundsNotifierProvider.select((s) => s.bellsEnabled),
+    );
+
+    void toggle(bool value) {
+      FirebaseAnalyticsService().logEvent(
+        name: AnalyticsEventConstants.sessionBellsToggled,
+        parameters: {
+          'enabled': value ? 1 : 0,
+          'is_timer': (ref.read(playerProvider)?.isTimer ?? false) ? 1 : 0,
+        },
+      );
+      ref
+          .read(backgroundSoundsNotifierProvider.notifier)
+          .setSessionBells(value);
+    }
+
+    // Same type and margins as the sound rows below.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: InkWell(
+        onTap: () => toggle(!enabled),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.sessionBells,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.sessionBellsDescription,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
+                        color: onSurface.withValues(alpha: 0.7),
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Switch(value: enabled, onChanged: toggle),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
