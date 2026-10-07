@@ -29,6 +29,7 @@ import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
 import meditofoundation.medito.R
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
 
@@ -136,7 +137,11 @@ internal fun WidgetText(
         fontFeatureSettings = "tnum"
     }
     val limit = if (maxWidth == Dp.Unspecified) Int.MAX_VALUE else (maxWidth.value * metrics.density).toInt()
-    val width = min(ceil(Layout.getDesiredWidth(text, paint)).toInt(), limit).coerceAtLeast(1)
+    // Pad by one letter-space: on Android 16, StaticLayout measures a single glyph with negative
+    // letter spacing wider than getDesiredWidth, so an exact-fit width ellipsized a one-digit
+    // streak to "…".
+    val desired = Layout.getDesiredWidth(text, paint) + abs(paint.letterSpacing) * paint.textSize
+    val width = min(ceil(desired).toInt(), limit).coerceAtLeast(1)
     val layout = StaticLayout.Builder.obtain(text, 0, text.length, paint, width)
         .setAlignment(if (centered) Layout.Alignment.ALIGN_CENTER else Layout.Alignment.ALIGN_NORMAL)
         .setIncludePad(false)
