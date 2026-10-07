@@ -296,17 +296,20 @@ class _StopwatchInfo extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Same type as the sound rows in the player's sheet.
                   Text(
                     l10n.timerStopwatchTitle,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: onSurface,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
+                      color: onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     l10n.timerStopwatchCaption,
                     style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
                       color: onSurface.withValues(alpha: 0.7),
                       height: 1.4,
                     ),
