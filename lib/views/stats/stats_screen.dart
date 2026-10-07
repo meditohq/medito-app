@@ -1,4 +1,5 @@
 import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
+import 'package:medito/widgets/inputs/medito_segmented_tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -70,28 +71,21 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       appBar: MeditoAppBarSmall(
         hasBackButton: false,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
+          preferredSize: const Size.fromHeight(52),
           child: AdaptivePageBody(
             maxWidth: 640,
             child: AnimatedBuilder(
               animation: _tabController,
               builder: (context, _) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: padding16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildTabItem(
-                        0,
-                        AppLocalizations.of(context)!.stats,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildTabItem(
-                        1,
-                        AppLocalizations.of(context)!.history,
-                      ),
-                    ),
+                padding: const EdgeInsets.fromLTRB(padding16, 0, padding16, 4),
+                child: MeditoSegmentedTabs(
+                  labels: [
+                    AppLocalizations.of(context)!.stats,
+                    AppLocalizations.of(context)!.history,
                   ],
+                  selectedIndex: _tabController.index,
+                  position: _tabController.animation,
+                  onChanged: _tabController.animateTo,
                 ),
               ),
             ),
@@ -106,45 +100,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
         child: TabBarView(
           controller: _tabController,
           children: [_buildStatsTab(), _buildHistoryTab()],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabItem(int index, String label) {
-    final theme = Theme.of(context);
-    final isSelected = _tabController.index == index;
-    final selectedColor = theme.colorScheme.onSurface;
-    final unselectedColor = theme.colorScheme.onSurface.withOpacityValue(0.5);
-
-    return InkWell(
-      onTap: () => _tabController.animateTo(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.outline.withOpacityValue(0.2),
-              width: isSelected ? 2 : 1,
-            ),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
-                color: isSelected ? selectedColor : unselectedColor,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              ),
-            ),
-          ],
         ),
       ),
     );
