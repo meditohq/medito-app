@@ -2,7 +2,7 @@ Unreleased
 -
 
 2610.8.0
-- A new Timer: pick a length or use the stopwatch, with optional bells and background sounds. Timer sessions count towards your stats.
+- A new Timer: pick a length or use the stopwatch. Timer sessions count towards your stats.
 - Tap the picture on Home to start your next session
 - Home screen widgets now follow the app's theme
 - [ios] Home screen widgets keep your streak up to date without opening the app
