@@ -219,6 +219,8 @@ dependencies {
 
     // Wear OS companion (android/wear) — Data Layer sync, see WatchSyncBridge.kt
     implementation 'com.google.android.gms:play-services-wearable:19.0.0'
+    // Opens Medito's Play Store page on the watch (WatchPresence.kt).
+    implementation 'androidx.wear:wear-remote-interactions:1.1.0'
 
     // Play install referrer (InstallReferrer.kt). Already pulled in by the
     // Facebook SDK; declared because we call it directly.

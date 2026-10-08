@@ -55,6 +55,7 @@ class MeditoIcons {
   static const shop = AssetConstants.iconShop;
   static const siri = AssetConstants.iconSiri;
   static const sleep = AssetConstants.iconSleep;
+  static const smartwatch = AssetConstants.iconSmartwatch;
   static const snow = AssetConstants.iconSnow;
   static const star = AssetConstants.iconStar;
   static const starSolid = AssetConstants.iconStarSolid;

@@ -5221,6 +5221,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No watch connected'**
   String get noWatchConnected;
+
+  /// Settings row shown when a watch is paired but the Medito watch app isn't installed on it
+  ///
+  /// In en, this message translates to:
+  /// **'Medito on your watch'**
+  String get watchInstallTitle;
+
+  /// No description provided for @watchInstallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Meditate from your wrist'**
+  String get watchInstallSubtitle;
+
+  /// Snackbar after the Play Store was opened on the user's Wear OS watch
+  ///
+  /// In en, this message translates to:
+  /// **'Check your watch to install Medito'**
+  String get watchInstallAndroidOpened;
+
+  /// No description provided for @watchInstallAndroidFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach your watch. Open the Play Store on your watch and search for Medito.'**
+  String get watchInstallAndroidFailed;
+
+  /// No description provided for @watchInstallIosIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Medito has an Apple Watch app. To install it:'**
+  String get watchInstallIosIntro;
+
+  /// No description provided for @watchInstallIosStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the Watch app on your iPhone'**
+  String get watchInstallIosStep1;
+
+  /// Must match the section name in Apple's Watch app (iOS: 'Available Apps')
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll down to Available Apps'**
+  String get watchInstallIosStep2;
+
+  /// No description provided for @watchInstallIosStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Install next to Medito'**
+  String get watchInstallIosStep3;
+
+  /// No description provided for @watchInstallOpenWatchApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Watch app'**
+  String get watchInstallOpenWatchApp;
 }
 
 class _AppLocalizationsDelegate

@@ -30,12 +30,20 @@ class WatchStatus {
   bool appInstalled;
 }
 
-/// Watch presence for analytics. Native side: WatchPresence in
-/// AppDelegate.swift (WCSession) and WatchPresence.kt (companion apps).
+/// Watch presence for analytics and the Settings install prompt. Native side:
+/// WatchPresence in AppDelegate.swift (WCSession) and WatchPresence.kt (Data
+/// Layer nodes / capability, companion apps as a fallback).
 @HostApi()
 abstract class WatchPresenceApi {
   /// Fails (instead of reporting no watch) when the state can't be read, e.g.
   /// WCSession didn't activate.
   @async
   WatchStatus getStatus();
+
+  /// Starts installing the Medito watch app. Android opens Medito's Play
+  /// Store page on each connected watch that lacks it; iOS opens the Watch
+  /// app (there is no API to install from the phone). Returns false when
+  /// nothing could be opened.
+  @async
+  bool openWatchInstall();
 }

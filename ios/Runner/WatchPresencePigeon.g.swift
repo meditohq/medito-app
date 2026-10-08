@@ -250,14 +250,20 @@ class WatchPresencePigeonPigeonCodec: FlutterStandardMessageCodec, @unchecked Se
 }
 
 
-/// Watch presence for analytics. Native side: WatchPresence in
-/// AppDelegate.swift (WCSession) and WatchPresence.kt (companion apps).
+/// Watch presence for analytics and the Settings install prompt. Native side:
+/// WatchPresence in AppDelegate.swift (WCSession) and WatchPresence.kt (Data
+/// Layer nodes / capability, companion apps as a fallback).
 ///
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WatchPresenceApi {
   /// Fails (instead of reporting no watch) when the state can't be read, e.g.
   /// WCSession didn't activate.
   func getStatus(completion: @escaping (Result<WatchStatus, Error>) -> Void)
+  /// Starts installing the Medito watch app. Android opens Medito's Play
+  /// Store page on each connected watch that lacks it; iOS opens the Watch
+  /// app (there is no API to install from the phone). Returns false when
+  /// nothing could be opened.
+  func openWatchInstall(completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -282,6 +288,25 @@ class WatchPresenceApiSetup {
       }
     } else {
       getStatusChannel.setMessageHandler(nil)
+    }
+    /// Starts installing the Medito watch app. Android opens Medito's Play
+    /// Store page on each connected watch that lacks it; iOS opens the Watch
+    /// app (there is no API to install from the phone). Returns false when
+    /// nothing could be opened.
+    let openWatchInstallChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.medito.WatchPresenceApi.openWatchInstall\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      openWatchInstallChannel.setMessageHandler { _, reply in
+        api.openWatchInstall { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      openWatchInstallChannel.setMessageHandler(nil)
     }
   }
 }

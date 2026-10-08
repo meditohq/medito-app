@@ -193,7 +193,7 @@ extension AppDelegate: INUIAddVoiceShortcutViewControllerDelegate {
 }
 
 /// Tells Dart whether an Apple Watch is paired (and whether the Medito watch
-/// app is on it) so analytics can size the audience for a watch app.
+/// app is on it) for analytics and the Settings install prompt.
 ///
 /// Both flags are only valid once WCSession has activated. If nothing else
 /// has claimed the session it activates it itself; if another delegate owns
@@ -222,6 +222,14 @@ final class WatchPresence: NSObject, WatchPresenceApi, WCSessionDelegate {
             // Someone else activates it; read once they have.
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { self.flush() }
         }
+    }
+
+    /// iOS can't install a watch app from the phone, so open the Watch app
+    /// where Medito can be installed. `itms-watchs://` is undocumented but
+    /// long-standing; Dart shows the manual steps too in case it stops working.
+    func openWatchInstall(completion: @escaping (Result<Bool, Error>) -> Void) {
+        guard let url = URL(string: "itms-watchs://") else { return completion(.success(false)) }
+        UIApplication.shared.open(url) { opened in completion(.success(opened)) }
     }
 
     private func snapshot(_ session: WCSession) -> WatchStatus {

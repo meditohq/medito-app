@@ -556,6 +556,11 @@ class AnalyticsEventConstants {
   static const String userPropHasPairedWatch = 'has_paired_watch';
   static const String userPropWatchAppInstalled = 'watch_app_installed';
 
+  /// Settings "Medito on your watch" row (shown when a watch is paired but the
+  /// Medito watch app isn't on it). Tapped when the row is opened; `opened`
+  /// says whether the watch's store / the Watch app could be opened.
+  static const String watchInstallPromptTapped = 'watch_install_prompt_tapped';
+
   /// GA4 user property for the Zen Mode setting ('on' / 'off'). Set on every
   /// launch and whenever the user toggles it, so adoption can be read from
   /// BigQuery and other metrics segmented by it.

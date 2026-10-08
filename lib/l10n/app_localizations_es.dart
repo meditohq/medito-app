@@ -2878,4 +2878,33 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noWatchConnected => 'No hay ningún reloj conectado';
+
+  @override
+  String get watchInstallTitle => 'Medito en tu reloj';
+
+  @override
+  String get watchInstallSubtitle => 'Medita desde tu muñeca';
+
+  @override
+  String get watchInstallAndroidOpened => 'Mira tu reloj para instalar Medito';
+
+  @override
+  String get watchInstallAndroidFailed =>
+      'No se pudo conectar con tu reloj. Abre Play Store en el reloj y busca Medito.';
+
+  @override
+  String get watchInstallIosIntro =>
+      'Medito tiene app para Apple Watch. Para instalarla:';
+
+  @override
+  String get watchInstallIosStep1 => 'Abre la app Watch en tu iPhone';
+
+  @override
+  String get watchInstallIosStep2 => 'Desplázate hasta Apps disponibles';
+
+  @override
+  String get watchInstallIosStep3 => 'Toca Instalar junto a Medito';
+
+  @override
+  String get watchInstallOpenWatchApp => 'Abrir app Watch';
 }

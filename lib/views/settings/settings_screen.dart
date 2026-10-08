@@ -24,6 +24,7 @@ import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
 import 'package:medito/views/settings/widgets/reminder_tile.dart';
 import 'package:medito/views/settings/widgets/app_icon_tile.dart';
 import 'package:medito/views/settings/widgets/theme_tile.dart';
+import 'package:medito/views/settings/widgets/watch_install_tile.dart';
 import 'package:medito/views/settings/widgets/widget_option_tile.dart';
 import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -439,6 +440,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     // Other customization card children
     final otherCustomizationChildren = <Widget>[
+      // Collapses to nothing unless a watch is paired without the Medito app.
+      // Always followed by other rows, so it always keeps its underline.
+      const WatchInstallTile(),
       if (widgetItem != null)
         _buildMenuItemTile(
           context,

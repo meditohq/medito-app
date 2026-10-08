@@ -1295,5 +1295,14 @@
   "selectSessions": "Seleccionar",
   "checkingWatch": "Comprobando el reloj…",
   "watchSimulatorTransferUnavailable": "Para enviar descargas al Apple Watch necesitas un iPhone y un reloj reales enlazados.",
-  "noWatchConnected": "No hay ningún reloj conectado"
+  "noWatchConnected": "No hay ningún reloj conectado",
+  "watchInstallTitle": "Medito en tu reloj",
+  "watchInstallSubtitle": "Medita desde tu muñeca",
+  "watchInstallAndroidOpened": "Mira tu reloj para instalar Medito",
+  "watchInstallAndroidFailed": "No se pudo conectar con tu reloj. Abre Play Store en el reloj y busca Medito.",
+  "watchInstallIosIntro": "Medito tiene app para Apple Watch. Para instalarla:",
+  "watchInstallIosStep1": "Abre la app Watch en tu iPhone",
+  "watchInstallIosStep2": "Desplázate hasta Apps disponibles",
+  "watchInstallIosStep3": "Toca Instalar junto a Medito",
+  "watchInstallOpenWatchApp": "Abrir app Watch"
 }

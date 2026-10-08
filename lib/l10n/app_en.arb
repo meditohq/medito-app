@@ -2070,5 +2070,17 @@
   "selectSessions": "Select",
   "checkingWatch": "Checking watch…",
   "watchSimulatorTransferUnavailable": "Sending downloads to Apple Watch requires a real paired iPhone and watch.",
-  "noWatchConnected": "No watch connected"
+  "noWatchConnected": "No watch connected",
+  "watchInstallTitle": "Medito on your watch",
+  "@watchInstallTitle": {"description": "Settings row shown when a watch is paired but the Medito watch app isn't installed on it"},
+  "watchInstallSubtitle": "Meditate from your wrist",
+  "watchInstallAndroidOpened": "Check your watch to install Medito",
+  "@watchInstallAndroidOpened": {"description": "Snackbar after the Play Store was opened on the user's Wear OS watch"},
+  "watchInstallAndroidFailed": "Couldn't reach your watch. Open the Play Store on your watch and search for Medito.",
+  "watchInstallIosIntro": "Medito has an Apple Watch app. To install it:",
+  "watchInstallIosStep1": "Open the Watch app on your iPhone",
+  "watchInstallIosStep2": "Scroll down to Available Apps",
+  "@watchInstallIosStep2": {"description": "Must match the section name in Apple's Watch app (iOS: 'Available Apps')"},
+  "watchInstallIosStep3": "Tap Install next to Medito",
+  "watchInstallOpenWatchApp": "Open Watch app"
 }

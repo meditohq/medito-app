@@ -258,8 +258,9 @@ private open class WatchPresencePigeonPigeonCodec : StandardMessageCodec() {
 
 
 /**
- * Watch presence for analytics. Native side: WatchPresence in
- * AppDelegate.swift (WCSession) and WatchPresence.kt (companion apps).
+ * Watch presence for analytics and the Settings install prompt. Native side:
+ * WatchPresence in AppDelegate.swift (WCSession) and WatchPresence.kt (Data
+ * Layer nodes / capability, companion apps as a fallback).
  *
  * Generated interface from Pigeon that represents a handler of messages from Flutter.
  */
@@ -269,6 +270,13 @@ interface WatchPresenceApi {
    * WCSession didn't activate.
    */
   fun getStatus(callback: (Result<WatchStatus>) -> Unit)
+  /**
+   * Starts installing the Medito watch app. Android opens Medito's Play
+   * Store page on each connected watch that lacks it; iOS opens the Watch
+   * app (there is no API to install from the phone). Returns false when
+   * nothing could be opened.
+   */
+  fun openWatchInstall(callback: (Result<Boolean>) -> Unit)
 
   companion object {
     /** The codec used by WatchPresenceApi. */
@@ -284,6 +292,24 @@ interface WatchPresenceApi {
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             api.getStatus{ result: Result<WatchStatus> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(WatchPresencePigeonPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(WatchPresencePigeonPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.medito.WatchPresenceApi.openWatchInstall$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.openWatchInstall{ result: Result<Boolean> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(WatchPresencePigeonPigeonUtils.wrapError(error))
