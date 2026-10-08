@@ -1,6 +1,18 @@
 Unreleased
 -
 
+2610.8.0
+- A new Timer: pick a length or use the stopwatch, with optional bells and background sounds. Timer sessions count towards your stats.
+- Got a watch without Medito on it? Settings now helps you install it
+- Tap the picture on Home to start your next session
+- Home screen widgets now follow the app's theme
+- [ios] Home screen widgets keep your streak up to date without opening the app
+- [android] Fixed home screen widgets showing "… days" for streaks under 10
+- Fixed the player clock for sessions longer than 100 minutes
+- Fixed the background sound picker loading forever when offline
+- Fixed an empty gap under announcements on Home
+- Fixed items being cut off in the shop bag
+
 2610.7.0
 - [ios] New Apple Watch app: continue your pack, or play your Daily or a favourite, right from your wrist. Sessions count towards your stats and streak.
 - [android] New Wear OS app: continue your pack, or play your Daily or a favourite, right from your watch. Sessions count towards your stats and streak.
