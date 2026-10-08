@@ -2843,91 +2843,94 @@ class AppLocalizationsDe extends AppLocalizations {
   String get shopCentimetres => 'cm';
 
   @override
-  String get onPhone => 'On phone';
+  String get onPhone => 'Auf dem Handy';
 
   @override
-  String get onWatch => 'On watch';
+  String get onWatch => 'Auf der Uhr';
 
   @override
-  String get sendToWatch => 'Send to watch';
+  String get sendToWatch => 'An die Uhr senden';
 
   @override
-  String get removeFromWatch => 'Remove from watch';
+  String get removeFromWatch => 'Von der Uhr entfernen';
 
   @override
-  String get waitingForWatch => 'Waiting for watch';
+  String get waitingForWatch => 'Warte auf die Uhr';
 
   @override
-  String get sendingToWatch => 'Sending…';
+  String get sendingToWatch => 'Wird gesendet …';
 
   @override
-  String get readyOnWatch => 'Ready on watch';
+  String get readyOnWatch => 'Auf der Uhr bereit';
 
   @override
-  String get watchRemovalPending => 'Removal pending';
+  String get watchRemovalPending => 'Entfernen ausstehend';
 
   @override
   String get watchStorageFull =>
-      'Not enough space on your watch. Remove some downloads and try again.';
+      'Nicht genug Speicher auf deiner Uhr. Entferne einige Downloads und versuche es erneut.';
 
   @override
-  String get watchTransferFailed => 'Could not send this session. Try again.';
+  String get watchTransferFailed =>
+      'Diese Sitzung konnte nicht gesendet werden. Versuche es erneut.';
 
   @override
   String get emptyWatchDownloads =>
-      'Send sessions from On phone to listen offline on your watch.';
+      'Sende Sitzungen von „Auf dem Handy“, um sie offline auf deiner Uhr zu hören.';
 
   @override
-  String get watchStatusUnavailable => 'Could not check your watch. Try again.';
+  String get watchStatusUnavailable =>
+      'Deine Uhr konnte nicht geprüft werden. Versuche es erneut.';
 
   @override
   String get watchCopyIndependent =>
-      'Removing a phone download keeps its watch copy.';
+      'Wenn du einen Download vom Handy entfernst, bleibt die Kopie auf der Uhr erhalten.';
 
   @override
-  String get cancelWatchTransfer => 'Cancel transfer';
+  String get cancelWatchTransfer => 'Übertragung abbrechen';
 
   @override
-  String get selectSessions => 'Select';
+  String get selectSessions => 'Auswählen';
 
   @override
-  String get checkingWatch => 'Checking watch…';
+  String get checkingWatch => 'Uhr wird geprüft …';
 
   @override
   String get watchSimulatorTransferUnavailable =>
-      'Sending downloads to Apple Watch requires a real paired iPhone and watch.';
+      'Zum Senden von Downloads an die Apple Watch brauchst du ein echtes, gekoppeltes iPhone und eine Uhr.';
 
   @override
-  String get noWatchConnected => 'No watch connected';
+  String get noWatchConnected => 'Keine Uhr verbunden';
 
   @override
-  String get watchInstallTitle => 'Medito on your watch';
+  String get watchInstallTitle => 'Medito auf deiner Uhr';
 
   @override
-  String get watchInstallSubtitle => 'Meditate from your wrist';
+  String get watchInstallSubtitle => 'Meditiere direkt am Handgelenk';
 
   @override
-  String get watchInstallAndroidOpened => 'Check your watch to install Medito';
+  String get watchInstallAndroidOpened =>
+      'Sieh auf deine Uhr, um Medito zu installieren';
 
   @override
   String get watchInstallAndroidFailed =>
-      'Couldn\'t reach your watch. Open the Play Store on your watch and search for Medito.';
+      'Deine Uhr ist nicht erreichbar. Öffne den Play Store auf deiner Uhr und suche nach Medito.';
 
   @override
   String get watchInstallIosIntro =>
-      'Medito has an Apple Watch app. To install it:';
+      'Medito gibt es auch für die Apple Watch. So installierst du die App:';
 
   @override
-  String get watchInstallIosStep1 => 'Open the Watch app on your iPhone';
+  String get watchInstallIosStep1 => 'Öffne die Watch-App auf deinem iPhone';
 
   @override
-  String get watchInstallIosStep2 => 'Scroll down to Available Apps';
+  String get watchInstallIosStep2 => 'Scrolle nach unten zu „Verfügbare Apps“';
 
   @override
-  String get watchInstallIosStep3 => 'Tap Install next to Medito';
+  String get watchInstallIosStep3 => 'Tippe neben Medito auf „Installieren“';
 
   @override
-  String get watchInstallOpenWatchApp => 'Open Watch app';
+  String get watchInstallOpenWatchApp => 'Watch-App öffnen';
 
   @override
   String get timerTitle => 'Timer';
