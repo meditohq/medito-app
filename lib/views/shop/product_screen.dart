@@ -1,3 +1,4 @@
+import 'package:medito/widgets/inputs/medito_segmented_tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -987,15 +988,14 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: SegmentedButton<bool>(
-              showSelectedIcon: false,
-              style: const ButtonStyle(visualDensity: VisualDensity.compact),
-              segments: [
-                ButtonSegment(value: false, label: Text(l10n.shopCentimetres)),
-                ButtonSegment(value: true, label: Text(l10n.shopInches)),
-              ],
-              selected: {_inches},
-              onSelectionChanged: (v) => setState(() => _inches = v.first),
+            child: SizedBox(
+              width: 140,
+              child: MeditoSegmentedTabs(
+                labels: [l10n.shopCentimetres, l10n.shopInches],
+                selectedIndex: _inches ? 1 : 0,
+                onChanged: (i) => setState(() => _inches = i == 1),
+                height: 40,
+              ),
             ),
           ),
           const SizedBox(height: 12),

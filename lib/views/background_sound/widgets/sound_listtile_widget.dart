@@ -12,8 +12,16 @@ import 'package:medito/widgets/radio_option_card.dart';
 import '../../../providers/background_sounds/background_sounds_notifier.dart';
 
 class SoundListTileWidget extends ConsumerWidget {
-  const SoundListTileWidget({super.key, required this.sound});
+  const SoundListTileWidget({
+    super.key,
+    required this.sound,
+    this.available = true,
+  });
   final BackgroundSoundsModel sound;
+
+  /// False offline for a sound that isn't downloaded: shown greyed out and
+  /// not selectable, since it can't be fetched.
+  final bool available;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,58 +38,79 @@ class SoundListTileWidget extends ConsumerWidget {
     // Styled like the settings sheets (same radio dot, type and 16pt margins)
     // but as plain rows rather than bordered cards: the list is long and
     // cards would push most of it below the fold.
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: InkWell(
-        onTap: () => _handleItemTap(ref, context, hasFailed: hasFailed),
-        borderRadius: BorderRadius.circular(12),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 56),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-            child: Row(
-              children: [
-                RadioDot(selected: isSelected, accent: context.brandAccent),
-                const SizedBox(width: padding12),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        // The repository builds the "None" row with a
-                        // hardcoded English title, to be localised here.
-                        sound.id == kNoneBackgroundSoundId
-                            ? AppLocalizations.of(context)!.none
-                            : sound.id == kSessionBellsId
-                            ? AppLocalizations.of(context)!.sessionBells
-                            : sound.title,
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: onSurface,
-                        ),
-                      ),
-                      if (sound.id == kSessionBellsId) ...[
-                        const SizedBox(height: 4),
+    return Opacity(
+      opacity: available ? 1 : 0.4,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: InkWell(
+          onTap: available
+              ? () => _handleItemTap(ref, context, hasFailed: hasFailed)
+              : null,
+          borderRadius: BorderRadius.circular(12),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 56),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              child: Row(
+                children: [
+                  RadioDot(selected: isSelected, accent: context.brandAccent),
+                  const SizedBox(width: padding12),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          AppLocalizations.of(context)!.sessionBellsDescription,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 14,
-                            color: onSurface.withValues(alpha: 0.7),
-                            height: 1.4,
+                          // The repository builds the "None" row with a
+                          // hardcoded English title, to be localised here.
+                          sound.id == kNoneBackgroundSoundId
+                              ? AppLocalizations.of(context)!.none
+                              : sound.id == kSessionBellsId
+                              ? AppLocalizations.of(context)!.sessionBells
+                              : sound.title,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: onSurface,
                           ),
                         ),
+                        if (sound.id == kSessionBellsId) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.sessionBellsDescription,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontSize: 14,
+                              color: onSurface.withValues(alpha: 0.7),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                        if (!available)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.soundNeedsConnection,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontFamily: googleSans,
+                                color: onSurface.withValues(alpha: 0.7),
+                              ),
+                            ),
+                          )
+                        else if (hasFailed)
+                          _failureMessage(context),
                       ],
-                      if (hasFailed) _failureMessage(context),
-                    ],
+                    ),
                   ),
-                ),
-                if (isDownloading)
-                  _loadingSpinner(context)
-                else if (hasFailed)
-                  _retryIcon(context),
-              ],
+                  if (isDownloading)
+                    _loadingSpinner(context)
+                  else if (hasFailed)
+                    _retryIcon(context),
+                ],
+              ),
             ),
           ),
         ),

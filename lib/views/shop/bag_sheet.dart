@@ -574,58 +574,59 @@ class _AddOns extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 10),
-          SizedBox(
-            height: _photoWidth / kShopPhotoAspect + 40,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: addOns.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 10),
-              itemBuilder: (context, index) {
-                final product = addOns[index];
-                final price = product.fromPrice;
-                return Semantics(
-                  button: true,
-                  label: product.name,
-                  child: GestureDetector(
-                    onTap: () => open(product),
-                    child: SizedBox(
-                      width: _photoWidth,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: _photoWidth / kShopPhotoAspect,
-                            child: HomeGradientBorder(
-                              backgroundColor: theme.colorScheme.surface,
-                              borderRadius: 12,
-                              borderWidth: 0.5,
-                              child: ShopPhoto(url: product.leadImage?.url),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            product.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: onSurface,
-                              letterSpacing: 0.2,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          if (price != null)
-                            Text(
-                              price.format(),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                letterSpacing: 0.2,
+          // A Row (not a fixed-height ListView) so the strip sizes to the
+          // name + price lines at any text scale. The add-on collection is a
+          // handful of products, so building them all is fine.
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              children: [
+                for (final product in addOns)
+                  Semantics(
+                    button: true,
+                    label: product.name,
+                    child: GestureDetector(
+                      onTap: () => open(product),
+                      child: SizedBox(
+                        width: _photoWidth,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: _photoWidth / kShopPhotoAspect,
+                              child: HomeGradientBorder(
+                                backgroundColor: theme.colorScheme.surface,
+                                borderRadius: 12,
+                                borderWidth: 0.5,
+                                child: ShopPhoto(url: product.leadImage?.url),
                               ),
                             ),
-                        ],
+                            const SizedBox(height: 6),
+                            Text(
+                              product.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: onSurface,
+                                letterSpacing: 0.2,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            if (product.fromPrice case final price?)
+                              Text(
+                                price.format(),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                );
-              },
+              ],
             ),
           ),
         ],

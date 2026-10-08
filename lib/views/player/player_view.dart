@@ -8,10 +8,11 @@ import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/exceptions/app_error.dart';
-import 'package:medito/models/background_sounds/background_sounds_model.dart';
 import 'package:medito/models/events/donation/donation_page_model.dart';
 import 'package:medito/models/local_all_stats.dart';
+import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/utils/audio_session_tracker.dart';
+import 'package:medito/utils/stats_updater.dart' show handleStats;
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/models/stripe/paywall_config_model.dart';
@@ -26,7 +27,11 @@ import 'package:medito/views/player/session_completion_gate.dart';
 import 'package:medito/views/player/widgets/artist_title_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/player_action_bar.dart';
 import 'package:medito/views/player/widgets/duration_indicator_widget.dart';
+import 'package:medito/views/player/widgets/stopwatch_elapsed_widget.dart';
 import 'package:medito/views/player/widgets/player_buttons/player_buttons_widget.dart';
+import 'package:medito/services/audio/session_bell_preview.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/report_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,6 +87,11 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   void initState() {
     super.initState();
     _statsAtSessionStart = ref.read(statsProvider).value;
+    // Bells are remembered per scope (on by default for a timer, off under
+    // tracks); set before _initializePlayer restores them.
+    ref
+        .read(backgroundSoundsNotifierProvider.notifier)
+        .setTimerScope(ref.read(playerProvider)?.isTimer ?? false);
     _logScreenView();
     // A listener rather than build(): build only sees the latest value, and a
     // not-completed reading between two completed ones must still arm the gate.
@@ -328,7 +338,75 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         onSpeedChanged: (speed) =>
             ref.read(playerProvider.notifier).setSpeed(speed),
         onClosePressed: () => _handleClose(),
+        onEndSession: _endTimerSession,
       ),
+    );
+  }
+
+  /// End session on a timer: records the time sat so far as a session (a
+  /// stopwatch only ever ends this way) and opens the end screen, like a
+  /// track finishing. Under a minute it is discarded, like closing a track.
+  void _endTimerSession() {
+    final request = ref.read(playerProvider);
+    if (request == null || !request.isTimer) return;
+    if (_endScreenOpened || _isClosing) return;
+
+    final elapsed = Duration(
+      seconds: ref.read(audioStateProvider).position ~/ 1000,
+    );
+    final recorded = elapsed >= kMinRecordedTimerSession;
+    unawaited(
+      _analytics.logEvent(
+        name: AnalyticsEventConstants.timerEnded,
+        parameters: {
+          AnalyticsEventConstants.paramTimerMode: request.timerMode.name,
+          AnalyticsEventConstants.paramElapsedSeconds: elapsed.inSeconds,
+          AnalyticsEventConstants.paramRecorded: recorded ? 1 : 0,
+        },
+      ),
+    );
+
+    if (!recorded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.timerTooShort)),
+      );
+      _handleClose();
+      return;
+    }
+
+    // Marks the analytics session complete before _stopAudio's stop() would
+    // log it as abandoned; handleStats confirms it again once recorded.
+    unawaited(AudioSessionTracker.instance.onCompleted(fileId: request.fileId));
+    // Same path as a native completion, so stats, history, streak, Health,
+    // reminders and the home widget all update, offline included.
+    unawaited(
+      handleStats({
+        TypeConstants.trackIdKey: timerSessionId(elapsed),
+        TypeConstants.durationIdKey: elapsed.inMilliseconds,
+        TypeConstants.fileIdKey: request.fileId,
+        TypeConstants.guideIdKey: '',
+        TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
+      }),
+    );
+
+    // A countdown that runs out rings its closing bell before the end; ending
+    // early (or finishing a stopwatch) rings it as the end screen opens.
+    final bgSounds = ref.read(backgroundSoundsNotifierProvider.notifier);
+    final bellsOn = ref.read(backgroundSoundsNotifierProvider).bellsEnabled;
+    final volume = bgSounds.scaledVolume(
+      ref.read(backgroundSoundsNotifierProvider).volume,
+    );
+    final bell = ref.read(sessionBellPreviewProvider);
+    _openEndScreen(
+      // Rung just after the player has stopped: on iOS stop() releases the
+      // audio session asynchronously, which would clip a bell started in the
+      // same frame. The bell's own player reactivates the session.
+      afterStop: bellsOn
+          ? () => Future.delayed(
+              const Duration(milliseconds: 400),
+              () => bell.play(volume),
+            )
+          : null,
     );
   }
 
@@ -351,9 +429,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final bgSoundNotifier = ref.watch(backgroundSoundsNotifierProvider);
     final isPlaying = ref.watch(audioStateProvider.select((s) => s.isPlaying));
 
-    return isPlaying &&
-        bgSoundNotifier.selectedBgSound != null &&
-        bgSoundNotifier.selectedBgSound?.id != kNoneBackgroundSoundId;
+    return isPlaying && bgSoundNotifier.hasAnySound;
   }
 
   void _handleClose({bool shouldPop = true}) {
@@ -388,11 +464,12 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     });
   }
 
-  void _openEndScreen() {
+  void _openEndScreen({VoidCallback? afterStop}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_endScreenOpened && mounted) {
         _resetState();
         _stopAudio();
+        afterStop?.call();
         final currentlyPlayingTrack = ref.read(playerProvider);
         if (currentlyPlayingTrack == null) return;
 
@@ -441,6 +518,7 @@ class PlayerScreenLayout extends StatelessWidget {
     required this.onPlayPausePressed,
     required this.onSpeedChanged,
     required this.onClosePressed,
+    this.onEndSession,
   });
 
   final PlaybackRequest currentlyPlayingTrack;
@@ -451,12 +529,20 @@ class PlayerScreenLayout extends StatelessWidget {
   final ValueChanged<double> onSpeedChanged;
   final VoidCallback onClosePressed;
 
+  /// Ends a timer session early and records it. Unused for tracks.
+  final VoidCallback? onEndSession;
+
   @override
   Widget build(BuildContext context) {
     final title = currentlyPlayingTrack.title;
     final artistName = currentlyPlayingTrack.guideName;
     final artistUrl = currentlyPlayingTrack.artist?.path;
     final imageUrl = currentlyPlayingTrack.coverUrl;
+    final isTimer = currentlyPlayingTrack.isTimer;
+    final isStopwatch =
+        isTimer && currentlyPlayingTrack.timerMode == TimerMode.stopwatch;
+    // A timer ends with the stop button; tracks keep their repeat control.
+    final onStop = isTimer ? onEndSession : null;
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -471,6 +557,21 @@ class PlayerScreenLayout extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
+                    // No cover (a timer): a dark backdrop so the white
+                    // controls read the same as over a blurred cover.
+                    if (imageUrl.isEmpty)
+                      const DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              ColorConstants.onyx,
+                              ColorConstants.greyIsTheNewBlack,
+                            ],
+                          ),
+                        ),
+                      ),
                     if (imageUrl.isNotEmpty &&
                         !HTTPConstants.isDeadDomain(imageUrl))
                       // ImageFiltered (not BackdropFilter) — blurs only the
@@ -509,6 +610,8 @@ class PlayerScreenLayout extends StatelessWidget {
                                     isPlaying: isPlaying,
                                     isLoading: isAudioLoading,
                                     onPlayPause: onPlayPausePressed,
+                                    isStopwatch: isStopwatch,
+                                    onStop: onStop,
                                   )
                                 : ConstrainedBox(
                                     constraints: const BoxConstraints(
@@ -523,18 +626,21 @@ class PlayerScreenLayout extends StatelessWidget {
                                       isPlaying: isPlaying,
                                       isLoading: isAudioLoading,
                                       onPlayPause: onPlayPausePressed,
+                                      isStopwatch: isStopwatch,
+                                      onStop: onStop,
                                     ),
                                   ),
                           ),
                         ),
                       ),
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: ReportButtonWidget(
-                          request: currentlyPlayingTrack,
+                      if (!isTimer)
+                        Positioned(
+                          top: 16,
+                          right: 16,
+                          child: ReportButtonWidget(
+                            request: currentlyPlayingTrack,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -564,6 +670,8 @@ class _PortraitPlayerLayout extends ConsumerWidget {
     required this.isPlaying,
     required this.isLoading,
     required this.onPlayPause,
+    this.isStopwatch = false,
+    this.onStop,
   });
 
   final bool expanded;
@@ -574,6 +682,8 @@ class _PortraitPlayerLayout extends ConsumerWidget {
   final bool isPlaying;
   final bool isLoading;
   final VoidCallback onPlayPause;
+  final bool isStopwatch;
+  final VoidCallback? onStop;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -588,12 +698,15 @@ class _PortraitPlayerLayout extends ConsumerWidget {
       controls: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          DurationIndicatorWidget(
-            fallbackDurationMs: totalDurationMs,
-            onSeekEnd: (value) {
-              ref.read(playerProvider.notifier).seekToPosition(value);
-            },
-          ),
+          if (isStopwatch)
+            const StopwatchElapsedWidget()
+          else
+            DurationIndicatorWidget(
+              fallbackDurationMs: totalDurationMs,
+              onSeekEnd: (value) {
+                ref.read(playerProvider.notifier).seekToPosition(value);
+              },
+            ),
           const SizedBox(height: 24),
           PlayerButtonsWidget(
             isPlaying: isPlaying,
@@ -604,6 +717,8 @@ class _PortraitPlayerLayout extends ConsumerWidget {
             onSkip10SecondsForward: () =>
                 ref.read(playerProvider.notifier).skip10SecondsForward(),
             isPortrait: true,
+            showSkipButtons: !isStopwatch,
+            onStop: onStop,
           ),
         ],
       ),
@@ -620,6 +735,8 @@ class _LandscapePlayerLayout extends ConsumerWidget {
     required this.isPlaying,
     required this.isLoading,
     required this.onPlayPause,
+    this.isStopwatch = false,
+    this.onStop,
   });
 
   final String title;
@@ -629,6 +746,8 @@ class _LandscapePlayerLayout extends ConsumerWidget {
   final bool isPlaying;
   final bool isLoading;
   final VoidCallback onPlayPause;
+  final bool isStopwatch;
+  final VoidCallback? onStop;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -642,12 +761,15 @@ class _LandscapePlayerLayout extends ConsumerWidget {
           artistUrlPath: artistUrl,
           isPlayerScreen: true,
         ),
-        DurationIndicatorWidget(
-          fallbackDurationMs: totalDurationMs,
-          onSeekEnd: (value) {
-            ref.read(playerProvider.notifier).seekToPosition(value);
-          },
-        ),
+        if (isStopwatch)
+          const StopwatchElapsedWidget()
+        else
+          DurationIndicatorWidget(
+            fallbackDurationMs: totalDurationMs,
+            onSeekEnd: (value) {
+              ref.read(playerProvider.notifier).seekToPosition(value);
+            },
+          ),
         PlayerButtonsWidget(
           isPlaying: isPlaying,
           isLoading: isLoading,
@@ -657,6 +779,8 @@ class _LandscapePlayerLayout extends ConsumerWidget {
           onSkip10SecondsForward: () =>
               ref.read(playerProvider.notifier).skip10SecondsForward(),
           isPortrait: false,
+          showSkipButtons: !isStopwatch,
+          onStop: onStop,
         ),
       ],
     );

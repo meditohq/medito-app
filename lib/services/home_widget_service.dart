@@ -13,8 +13,6 @@ import '../utils/logger.dart';
 
 class HomeWidgetService {
   static const String _appGroupId = 'group.org.medito.widget';
-  static const String _widgetName = 'MeditationWidgetReceiver';
-  static const String _consistencyWidgetName = 'ConsistencyWidgetReceiver';
 
   // Coalesces rapid back-to-back broadcast requests into a single platform
   // round trip. Multiple sources (stats refresh, up-next change, theme change)
@@ -46,19 +44,22 @@ class HomeWidgetService {
 
   /// Saves the theme preference to the widget
   static Future<void> saveThemePreference(String themePreference) async {
-    if (!Platform.isAndroid) {
+    if (!Platform.isAndroid && !Platform.isIOS) {
       return;
     }
 
     try {
+      await _configure();
       await HomeWidget.saveWidgetData<String>(
         _themePreferenceKey,
         themePreference,
       );
       AppLogger.d('WIDGET', 'Saved theme preference: $themePreference');
 
-      await _updateWidget(_widgetName);
-      await _updateWidget(_consistencyWidgetName);
+      await _triggerWidgetRefresh();
+      if (Platform.isIOS) {
+        await HomeWidget.updateWidget(iOSName: 'UpNextWidget');
+      }
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to save theme preference', e);
     }
@@ -213,14 +214,6 @@ class HomeWidgetService {
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to trigger iOS widget reload', e);
     }
-  }
-
-  static Future<void> _updateWidget(String widgetName) async {
-    if (!Platform.isAndroid) {
-      return;
-    }
-
-    await _sendWidgetUpdateBroadcast();
   }
 
   static Future<void> _sendWidgetUpdateBroadcast() async {

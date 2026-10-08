@@ -20,6 +20,8 @@ class PlayerButtonsWidget extends ConsumerWidget {
     required this.onPlayPause,
     this.isPortrait = true,
     this.isLoading = false,
+    this.showSkipButtons = true,
+    this.onStop,
   });
 
   final Function() onSkip10SecondsBackward;
@@ -28,6 +30,13 @@ class PlayerButtonsWidget extends ConsumerWidget {
   final Function() onPlayPause;
   final bool isPortrait;
   final bool isLoading;
+
+  /// False for a stopwatch, which has no length to skip through.
+  final bool showSkipButtons;
+
+  /// Ends a timer session. When set, a stop button takes the repeat
+  /// button's place (a timer's length is the session; it never repeats).
+  final VoidCallback? onStop;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,11 +57,15 @@ class PlayerButtonsWidget extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _rewindButton(l10n),
-              const SizedBox(width: 32),
-              _repeatButton(context, repeatMode, l10n),
-              const SizedBox(width: 32),
-              _forwardButton(l10n),
+              if (showSkipButtons) ...[
+                _rewindButton(l10n),
+                const SizedBox(width: 32),
+              ],
+              _repeatOrStopButton(context, repeatMode, l10n),
+              if (showSkipButtons) ...[
+                const SizedBox(width: 32),
+                _forwardButton(l10n),
+              ],
             ],
           ),
         ],
@@ -62,17 +75,21 @@ class PlayerButtonsWidget extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _rewindButton(l10n),
-          const SizedBox(width: 32),
+          if (showSkipButtons) ...[
+            _rewindButton(l10n),
+            const SizedBox(width: 32),
+          ],
           PlayPauseButtonWidget(
             isPlaying: isPlaying,
             onPlayPause: onPlayPause,
             isLoading: isLoading,
           ),
+          if (showSkipButtons) ...[
+            const SizedBox(width: 32),
+            _forwardButton(l10n),
+          ],
           const SizedBox(width: 32),
-          _forwardButton(l10n),
-          const SizedBox(width: 32),
-          _repeatButton(context, repeatMode, l10n),
+          _repeatOrStopButton(context, repeatMode, l10n),
         ],
       );
     }
@@ -102,12 +119,22 @@ class PlayerButtonsWidget extends ConsumerWidget {
     );
   }
 
-  Widget _repeatButton(
+  Widget _repeatOrStopButton(
     BuildContext context,
     medito_repeat.RepeatMode repeatMode,
     AppLocalizations l10n,
   ) {
-    return _RepeatButton(l10n: l10n);
+    final stop = onStop;
+    if (stop == null) return _RepeatButton(l10n: l10n);
+    return IconButton(
+      onPressed: stop,
+      tooltip: l10n.timerEndSession,
+      icon: const Icon(
+        Icons.stop_rounded,
+        size: 40,
+        color: ColorConstants.white,
+      ),
+    );
   }
 }
 

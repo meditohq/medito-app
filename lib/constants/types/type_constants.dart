@@ -42,6 +42,9 @@ class RouteConstants {
   static const String stats = 'stats';
   static const String analytics = 'analytics';
 
+  /// Native home Timer (countdown / stopwatch).
+  static const String timer = 'timer';
+
   /// Native shop. `shop` opens the grid, `shop:<product-slug>` a product.
   static const String shop = 'shop';
 }
@@ -50,4 +53,5 @@ class LocaleConstants {
   static const String system = 'system';
   static const String english = 'en';
   static const String spanish = 'es';
+  static const String german = 'de';
 }

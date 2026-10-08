@@ -1,4 +1,8 @@
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/models/timer/timer_session.dart';
+import 'package:medito/views/timer/timer_format.dart';
+import 'package:medito/views/timer/timer_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
@@ -1055,7 +1059,9 @@ class _SessionItemWidget extends ConsumerWidget {
     final date = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
     final timeFormat = DateFormat('h:mm a');
     final isManual = isManualSession(session);
-    final trackAsync = isManual
+    final timerLength = timerSessionDuration(session.id);
+    final isTimer = timerLength != null;
+    final trackAsync = isManual || isTimer
         ? null
         : ref.watch(tracksProvider(trackId: session.id));
 
@@ -1097,7 +1103,21 @@ class _SessionItemWidget extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: isManual
+            child: isTimer
+                ? Text(
+                    AppLocalizations.of(context)!.timerHistoryTitle(
+                      formatTimerLength(
+                        timerLength,
+                        AppLocalizations.of(context)!,
+                      ),
+                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontFamily: googleSans,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  )
+                : isManual
                 ? Text(
                     getManualSessionTitle(
                       session.id,
@@ -1161,7 +1181,9 @@ class _SessionItemWidget extends ConsumerWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TrackView(trackId: session.id),
+            builder: (context) => isTimer
+                ? const TimerView(source: AnalyticsEventConstants.sourceHistory)
+                : TrackView(trackId: session.id),
           ),
         );
       },

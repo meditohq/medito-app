@@ -1,3 +1,4 @@
+import '../models/timer/timer_session.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -166,7 +167,11 @@ Future<bool> handleStats(
     // Log Firebase analytics event for audio session completion
     try {
       final fileId = payload[TypeConstants.fileIdKey] as String?;
-      final guide = payload[TypeConstants.guideIdKey] as String?;
+      // Timer sessions report a fixed guide (native completion passes the
+      // empty artist), so they filter out of narrator stats in one place.
+      final guide = isTimerSessionId('${payload[TypeConstants.trackIdKey]}')
+          ? AnalyticsEventConstants.timerGuide
+          : payload[TypeConstants.guideIdKey] as String?;
 
       await FirebaseAnalyticsService().logEvent(
         name: AnalyticsEventConstants.audioSessionCompleted,

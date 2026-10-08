@@ -106,6 +106,59 @@ void main() {
       },
     );
 
+    test('a stopwatch abandon reports elapsed time, not a percent', () async {
+      await tracker.onStarted(
+        fileId: 'timer-stopwatch-0',
+        guide: AnalyticsEventConstants.timerGuide,
+        durationMs: 5 * 60 * 60 * 1000,
+      );
+      tracker.onPositionUpdate(
+        positionMs: 12 * 60 * 1000,
+        durationMs: 5 * 60 * 60 * 1000,
+        isPlaying: false,
+        isCompleted: false,
+      );
+      await tracker.onStopped();
+      final abandoned = of(
+        AnalyticsEventConstants.audioSessionAbandoned,
+      ).single;
+      expect(
+        abandoned.params.containsKey(
+          AnalyticsEventConstants.paramPercentCompleted,
+        ),
+        isFalse,
+      );
+      expect(
+        abandoned.params[AnalyticsEventConstants.paramElapsedSeconds],
+        720,
+      );
+      expect(
+        abandoned.params[AnalyticsEventConstants.paramAudioFileGuide],
+        AnalyticsEventConstants.timerGuide,
+      );
+    });
+
+    test('a countdown timer abandon keeps its percent', () async {
+      await tracker.onStarted(
+        fileId: 'timer-countdown-600000',
+        guide: AnalyticsEventConstants.timerGuide,
+        durationMs: 600000,
+      );
+      tracker.onPositionUpdate(
+        positionMs: 300000,
+        durationMs: 600000,
+        isPlaying: false,
+        isCompleted: false,
+      );
+      await tracker.onStopped();
+      expect(
+        of(
+          AnalyticsEventConstants.audioSessionAbandoned,
+        ).single.params[AnalyticsEventConstants.paramPercentCompleted],
+        50,
+      );
+    });
+
     test('percent is clamped to 90 even past ~95%', () async {
       await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
       tracker.onPositionUpdate(

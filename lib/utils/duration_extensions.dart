@@ -1,21 +1,19 @@
 import 'package:medito/utils/utils.dart';
 
 extension DurationExtensions on Duration {
-  /// Converts the duration into a readable string
-  /// 05:35 -> 05 min 35 sec
+  /// A player clock: `05:35`, or `1:05:35` from an hour up. Minutes used to
+  /// wrap at 100 (4 h 28 m read `68:00`), which only showed once timers
+  /// allowed sessions over 100 minutes.
   String toMinutesSeconds() {
-    var twoDigitMinutes = _toTwoDigits(
-      inMinutes.remainder(100),
-    ); //NB: if it's over 100 min it'll show 0:00!!
-    var twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
-
-    return '$twoDigitMinutes:$twoDigitSeconds';
+    final twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
+    if (inHours > 0) {
+      return '$inHours:${_toTwoDigits(inMinutes.remainder(60))}:$twoDigitSeconds';
+    }
+    return '${_toTwoDigits(inMinutes)}:$twoDigitSeconds';
   }
 
   String toReadable() {
-    var twoDigitMinutes = _toTwoDigits(
-      inMinutes.remainder(100),
-    ); //NB: if it's over 100 min it'll show 0:00!!
+    var twoDigitMinutes = _toTwoDigits(inMinutes);
     var twoDigitSeconds = _toTwoDigits(inSeconds.remainder(60));
 
     if (twoDigitSeconds.isNotNullAndNotEmpty() && twoDigitMinutes != '00') {

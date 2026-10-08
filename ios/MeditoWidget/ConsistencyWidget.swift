@@ -16,9 +16,11 @@ struct ConsistencyProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<ConsistencyEntry>) -> Void) {
-        let entry = ConsistencyEntry(date: Date(), data: .load())
-        let nextRefresh = Calendar.current.date(byAdding: .hour, value: 1, to: Date())!
-        completion(Timeline(entries: [entry], policy: .after(nextRefresh)))
+        let data = WidgetData.load()
+        let now = Date()
+        let entries = data.timelineDates(from: now).map { ConsistencyEntry(date: $0, data: data) }
+        let nextRefresh = Calendar.current.date(byAdding: .hour, value: 1, to: now)!
+        completion(Timeline(entries: entries, policy: .after(nextRefresh)))
     }
 }
 
@@ -38,23 +40,16 @@ struct ConsistencyWidgetView: View {
     private var colors: WidgetColors { effectiveDark ? .dark : .light }
     private var isMedium: Bool { family == .systemMedium }
 
-    private var allActivityDates: Set<Date> {
-        entry.data.meditationDates.union(entry.data.freezeDates)
-    }
-
-    private var hasActivityToday: Bool {
-        allActivityDates.contains(
-            logicalDayStart(Date(), offsetHours: entry.data.dayBoundaryOffsetHours)
-        )
-    }
+    private var today: Date { entry.data.today(at: entry.date) }
 
     var body: some View {
+        let score = entry.data.consistencyScore(at: entry.date)
         StatWidgetBody(
-            value: "\(entry.data.consistencyScore)%",
-            ringScore: entry.data.consistencyScore,
-            doneToday: hasActivityToday,
-            allActivityDates: allActivityDates,
-            dayBoundaryOffsetHours: entry.data.dayBoundaryOffsetHours,
+            value: "\(score)%",
+            ringScore: score,
+            doneToday: entry.data.allActivityDates.contains(today),
+            allActivityDates: entry.data.allActivityDates,
+            today: today,
             colors: colors,
             isMedium: isMedium
         )
