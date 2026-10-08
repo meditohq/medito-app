@@ -519,6 +519,11 @@ class AnalyticsEventConstants {
   /// (Android only — iOS doesn't expose a programmatic pin API).
   static const String homeWidgetPinRequested = 'home_widget_pin_requested';
 
+  /// Event logged when the iOS "how to add a widget" sheet is opened from
+  /// Settings (iOS has no pin API, so this stands in for the Android pin).
+  static const String homeWidgetInstructionsShown =
+      'home_widget_instructions_shown';
+
   /// Parameter naming the widget kind: `up_next`, `streak`, `consistency`.
   static const String paramWidgetType = 'widget_type';
 
@@ -550,6 +555,11 @@ class AnalyticsEventConstants {
   /// Medito watch app is on it ('true' / 'false'). Set on every Home launch.
   static const String userPropHasPairedWatch = 'has_paired_watch';
   static const String userPropWatchAppInstalled = 'watch_app_installed';
+
+  /// GA4 user property listing the home-screen widget kinds the user has
+  /// placed, sorted and comma-joined ('consistency,up_next'), or 'none'.
+  /// Set on every Home launch so passive (never-tapped) widgets are visible.
+  static const String userPropHomeWidgets = 'home_widgets';
 
   /// GA4 user property for the Zen Mode setting ('on' / 'off'). Set on every
   /// launch and whenever the user toggles it, so adoption can be read from

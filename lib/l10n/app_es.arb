@@ -659,6 +659,12 @@
     "description": "Section title for customization settings"
   },
   "addHomeScreenWidget": "Añadir Widget a la Pantalla de Inicio",
+  "addWidgetSheetTitle": "Añade un widget de Medito",
+  "addWidgetStepHold": "Mantén pulsado un espacio vacío de la pantalla de inicio hasta que las apps empiecen a moverse.",
+  "addWidgetStepEdit": "Toca Editar en la esquina superior y luego Añadir widget. En versiones anteriores de iOS, toca +.",
+  "addWidgetStepSearch": "Busca Medito y elige Streak, Consistency o Continue.",
+  "addWidgetStepAdd": "Toca Añadir widget y luego OK.",
+  "addWidgetFootnote": "Tu widget se actualiza después de cada meditación.",
   "themeTitle": "Tema",
   "@themeTitle": {
     "description": "Title for theme selection setting in customization section"

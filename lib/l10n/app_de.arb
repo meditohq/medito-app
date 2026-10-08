@@ -729,6 +729,12 @@
   "@addHomeScreenWidget": {
     "description": "Title for adding home screen widget option in customization section"
   },
+  "addWidgetSheetTitle": "Medito-Widget hinzufügen",
+  "addWidgetStepHold": "Halte eine freie Stelle auf deinem Home-Bildschirm gedrückt, bis die Apps wackeln.",
+  "addWidgetStepEdit": "Tippe oben auf „Bearbeiten“ und dann auf „Widget hinzufügen“. Bei älteren iOS-Versionen tippst du auf +.",
+  "addWidgetStepSearch": "Suche nach Medito und wähle Streak, Consistency oder Continue.",
+  "addWidgetStepAdd": "Tippe auf „Widget hinzufügen“ und dann auf „Fertig“.",
+  "addWidgetFootnote": "Dein Widget aktualisiert sich nach jeder Meditation.",
   "themeTitle": "Erscheinungsbild",
   "@themeTitle": {
     "description": "Title for theme selection setting in customization section"

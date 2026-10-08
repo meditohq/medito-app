@@ -24,6 +24,7 @@ import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
 import 'package:medito/views/settings/widgets/reminder_tile.dart';
 import 'package:medito/views/settings/widgets/app_icon_tile.dart';
 import 'package:medito/views/settings/widgets/theme_tile.dart';
+import 'package:medito/views/settings/widgets/add_widget_sheet.dart';
 import 'package:medito/views/settings/widgets/widget_option_tile.dart';
 import 'package:medito/views/settings/widgets/zen_mode_tile.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -209,7 +210,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         path: TypeConstants.toggleZenMode,
       ),
-      if (!kIsWeb && Platform.isAndroid)
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS))
         SettingsItem(
           section: AppLocalizations.of(context)!.customizationSection,
           type: TypeConstants.route,
@@ -240,6 +241,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void handleItemPress(BuildContext context, SettingsItem item) async {
     if (item.path == TypeConstants.addWidget) {
+      if (Platform.isIOS) {
+        unawaited(
+          ref
+              .read(analyticsServiceProvider)
+              .logEvent(
+                name: AnalyticsEventConstants.homeWidgetInstructionsShown,
+              ),
+        );
+        await showAddWidgetSheet(context);
+        return;
+      }
       try {
         final widgetManager = MeditoWidgetManager();
         final dialogShown = await widgetManager.pinWidget('consistency');
