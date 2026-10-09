@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:medito/services/notifications/local_notifications.dart';
 
 final reminderProvider = Provider<ReminderProvider>((ref) {
   return ReminderProvider();
@@ -12,29 +12,10 @@ final reminderProvider = Provider<ReminderProvider>((ref) {
 
 class ReminderProvider {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  late final Future<void> _initFuture;
-
-  ReminderProvider() {
-    _initFuture = _initializeNotifications();
-  }
-
-  Future<void> _initializeNotifications() async {
-    tz.initializeTimeZones();
-    const initializationSettingsAndroid = AndroidInitializationSettings('logo');
-    const initializationSettingsIOS = DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
-    );
-    const initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
-    await _flutterLocalNotificationsPlugin.initialize(
-      settings: initializationSettings,
-    );
-  }
+      LocalNotifications.plugin;
+  // Shared with push: initialising the plugin separately here replaced its
+  // tap callback with none, so reminder taps were never recorded.
+  final Future<void> _initFuture = LocalNotifications.ensureInitialized();
 
   Future<void> clearBadge() async {
     await _initFuture;

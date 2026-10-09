@@ -10,6 +10,7 @@ import 'package:medito/services/app_tracking_transparency_service.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // Lightweight stand-in so unit tests don't depend on firebase_core.
 class _NoopAnalytics {
@@ -711,6 +712,38 @@ class FirebaseAnalyticsService {
     await setZenModeProperty(
       prefs.getBool(SharedPreferenceConstants.zenModeEnabled) ?? false,
     );
+  }
+
+  /// Sets `reminders_on` from the reminder pref and the OS notification
+  /// permission, which the user can revoke in system settings at any time.
+  static Future<void> applyRemindersOnProperty() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // Same fallback as ReminderEnabledNotifier: users from before the
+      // explicit flag only have a saved time.
+      final enabled =
+          prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ??
+          (prefs.getInt(SharedPreferenceConstants.savedHours) != null &&
+              prefs.getInt(SharedPreferenceConstants.savedMinutes) != null);
+      final granted = enabled && await Permission.notification.isGranted;
+      final analyticsService = FirebaseAnalyticsService();
+      await analyticsService.initialize();
+      await analyticsService.setUserProperty(
+        name: AnalyticsEventConstants.userPropRemindersOn,
+        value: !enabled
+            ? 'off'
+            : granted
+            ? 'on'
+            : 'blocked',
+      );
+    } catch (e, stackTrace) {
+      AppLogger.e(
+        'FIREBASE_ANALYTICS',
+        'Failed to set reminders_on user property',
+        e,
+        stackTrace,
+      );
+    }
   }
 
   static Future<void> setZenModeProperty(bool enabled) async {

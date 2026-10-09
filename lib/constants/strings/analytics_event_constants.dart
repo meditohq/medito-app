@@ -572,6 +572,12 @@ class AnalyticsEventConstants {
   /// BigQuery and other metrics segmented by it.
   static const String userPropZenMode = 'zen_mode';
 
+  /// GA4 user property for whether daily reminders can actually reach the
+  /// user: 'on' (enabled and notification permission granted), 'blocked'
+  /// (enabled in the app but permission off in system settings), or 'off'.
+  /// Set on every launch and foreground, and when the user toggles reminders.
+  static const String userPropRemindersOn = 'reminders_on';
+
   /// Logged once per iOS install with Apple's AdServices answer for whether
   /// the install came from an Apple Ads campaign. Params: attributed
   /// ('true' / 'false'); when attributed also campaign_id, ad_group_id,

@@ -30,6 +30,7 @@ import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
+import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/history/app_history_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -258,6 +259,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     unawaited(_recoverPreviousSession());
+    unawaited(ref.read(firebaseMessagingProvider).registerOpenTracking(ref));
+    unawaited(FirebaseAnalyticsService.applyRemindersOnProperty());
   }
 
   /// If a previous run was force-quit mid-session and sent no event, recover
@@ -411,6 +414,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
   void _onAppForegrounded() async {
     ref.read(firebaseMessagingProvider).ref.read(reminderProvider).clearBadge();
     ref.read(statsProvider.notifier).refresh();
+    // Notification permission can be revoked in system settings while away.
+    unawaited(FirebaseAnalyticsService.applyRemindersOnProperty());
 
     // Diagnose token state for debug purposes
     _diagnoseSecurity();
