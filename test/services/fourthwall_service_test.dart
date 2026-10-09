@@ -113,6 +113,68 @@ void main() {
     expect(uri.queryParameters['currency'], 'GBP');
     expect(uri.queryParameters['utm_source'], 'medito_app');
   });
+
+  group('resolveCheckoutUri', () {
+    final items = [_item('v1', 1)];
+
+    FourthwallService redirectingTo(
+      String? location, {
+      int status = 303,
+      void Function(http.BaseRequest)? onRequest,
+    }) => FourthwallService(
+      client: MockClient((request) async {
+        onRequest?.call(request);
+        return http.Response(
+          '',
+          status,
+          headers: {if (location != null) 'location': location},
+        );
+      }),
+    );
+
+    test('opens the hosted checkout page with the UTM tags put back', () async {
+      late http.BaseRequest sent;
+      final uri = await redirectingTo(
+        '/checkout/ch_abc',
+        onRequest: (r) => sent = r,
+      ).resolveCheckoutUri(items, currency: 'EUR');
+
+      expect(sent.followRedirects, isFalse);
+      expect(sent.url.path, '/cart/checkout');
+      expect(sent.url.queryParameters['utm_source'], 'medito_app');
+      expect(
+        uri.toString(),
+        'https://shop.medito.app/checkout/ch_abc'
+        '?utm_source=medito_app&utm_medium=app',
+      );
+    });
+
+    test(
+      'falls back to the cart link when Fourthwall redirects to an error',
+      () async {
+        final uri = await redirectingTo(
+          '/?error_message=Checkout%20unknown%20error',
+        ).resolveCheckoutUri(items, currency: 'EUR');
+        expect(uri, FourthwallService.checkoutUri(items, currency: 'EUR'));
+      },
+    );
+
+    test('falls back to the cart link on a non-redirect response', () async {
+      final uri = await redirectingTo(
+        null,
+        status: 500,
+      ).resolveCheckoutUri(items, currency: 'EUR');
+      expect(uri, FourthwallService.checkoutUri(items, currency: 'EUR'));
+    });
+
+    test('falls back to the cart link when the request fails', () async {
+      final service = FourthwallService(
+        client: MockClient((_) async => throw const SocketException('offline')),
+      );
+      final uri = await service.resolveCheckoutUri(items, currency: 'EUR');
+      expect(uri, FourthwallService.checkoutUri(items, currency: 'EUR'));
+    });
+  });
 }
 
 BagItem _item(String id, int quantity) => BagItem(

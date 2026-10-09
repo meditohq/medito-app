@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/shop/shop_models.dart';
+import 'package:medito/utils/logger.dart';
 
 /// Read-only client for the Fourthwall Storefront API behind
 /// shop.medito.app. Checkout itself stays on Fourthwall's hosted page — we
@@ -95,10 +96,47 @@ class FourthwallService {
     return Uri.https(shopDomain, '/cart/checkout', {
       'products': items.map((i) => '${i.variantId}:${i.quantity}').join(','),
       'currency': currency,
-      'utm_source': 'medito_app',
-      'utm_medium': 'app',
+      ..._utm,
     });
   }
+
+  /// The hosted checkout page itself (`/checkout/ch_…`), with the UTM tags.
+  ///
+  /// [checkoutUri]'s 303 drops the query string, so GA4 on the checkout page
+  /// saw neither UTM nor referrer and filed every app order under "(direct)".
+  /// We follow that redirect here instead and re-add the tags; the checkout
+  /// id is all the page needs (no session cookie). Any failure falls back to
+  /// [checkoutUri], which still works, just unattributed.
+  Future<Uri> resolveCheckoutUri(
+    List<BagItem> items, {
+    required String currency,
+  }) async {
+    final start = checkoutUri(items, currency: currency);
+    try {
+      final request = http.Request('GET', start)..followRedirects = false;
+      final response = await _client.send(request).timeout(_checkoutTimeout);
+      await response.stream.drain<void>();
+      final location = response.headers['location'];
+      if (response.statusCode ~/ 100 != 3 || location == null) return start;
+      final target = start.resolve(location);
+      if (target.host != shopDomain || !target.path.startsWith('/checkout/')) {
+        // e.g. `/?error_message=…` for a sold-out variant: let the browser
+        // follow the original link and show Fourthwall's own error.
+        return start;
+      }
+      return target.replace(
+        queryParameters: {...target.queryParameters, ..._utm},
+      );
+    } catch (e) {
+      AppLogger.w('SHOP', 'Checkout redirect lookup failed: $e');
+      return start;
+    }
+  }
+
+  static const _utm = {'utm_source': 'medito_app', 'utm_medium': 'app'};
+
+  /// Short: the user is waiting on a tapped button.
+  static const _checkoutTimeout = Duration(seconds: 4);
 
   static Uri productWebUri(String slug) =>
       Uri.https(shopDomain, '/products/$slug');

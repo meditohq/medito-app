@@ -396,13 +396,32 @@ class _CheckoutReturnCardState extends ConsumerState<_CheckoutReturnCard> {
   }
 }
 
-class _BagFooter extends ConsumerWidget {
+class _BagFooter extends ConsumerStatefulWidget {
   const _BagFooter({required this.bag});
 
   final ShopBag bag;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_BagFooter> createState() => _BagFooterState();
+}
+
+class _BagFooterState extends ConsumerState<_BagFooter> {
+  /// Set while the checkout link is resolved (one short request), so the
+  /// button shows progress and a second tap can't open a second checkout.
+  bool _opening = false;
+
+  Future<void> _checkout() async {
+    setState(() => _opening = true);
+    try {
+      await startShopCheckout(ref);
+    } finally {
+      if (mounted) setState(() => _opening = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bag = widget.bag;
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
@@ -450,7 +469,7 @@ class _BagFooter extends ConsumerWidget {
               SizedBox(
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () => startShopCheckout(ref),
+                  onPressed: _opening ? null : _checkout,
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -459,7 +478,13 @@ class _BagFooter extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.lock_outline_rounded, size: 18),
+                      if (_opening)
+                        const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      else
+                        const Icon(Icons.lock_outline_rounded, size: 18),
                       const SizedBox(width: 8),
                       Text(l10n.shopCheckout),
                     ],
