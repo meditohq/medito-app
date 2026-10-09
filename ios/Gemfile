@@ -4,4 +4,4 @@ gem 'cocoapods', '~> 1.16.2'
 gem 'xcodeproj', '1.27.0'
 # fastlane stays bundler-managed (rather than a global `gem install` in CI) so
 # the version CI runs is pinned here; invoke it as `bundle exec fastlane`.
-gem 'fastlane', '2.226.0'
+gem 'fastlane', '2.228.0'

@@ -178,9 +178,11 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 15000
 - tapOn: "Play"
 
-# Player screen: verify playback started (timer advances past 00:00)
+# Player screen: verify playback started. Very short intro tracks can complete
+# before Maestro observes the elapsed timer on iOS CI, so accept the end screen
+# as proof that tapping Play advanced the session.
 - extendedWaitUntil:
-    visible: "00:[0-5][1-9]"
+    visible: "00:[0-5][1-9]|.*day streak.*"
     timeout: 20000
 - takeScreenshot: player-playing
 
@@ -188,10 +190,15 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 # Let the session play for a few seconds first, then skip to the end so the
 # track completes and the end screen must appear. (00:0X-00:5X only
 # — a minutes pattern would instantly match the always-visible total-duration
-# label instead of the elapsed timer.)
-- extendedWaitUntil:
-    visible: "00:0[5-9]|00:[1-5][0-9]"
-    timeout: 30000
+# label instead of the elapsed timer.) Skip this wait if a very short session
+# has already completed.
+- runFlow:
+    when:
+      notVisible: ".*day streak.*"
+    commands:
+      - extendedWaitUntil:
+          visible: "00:0[5-9]|00:[1-5][0-9]"
+          timeout: 30000
 
 # Tap the skip-forward button (labelled "Skip forward 10 seconds", though it
 # skips 15s) until the track completes: the native seek clamps at the track
@@ -202,7 +209,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 - repeat:
     times: 60
     while:
-      notVisible: "(?s).*day streak.*"
+      notVisible: ".*day streak.*"
     commands:
       - tapOn:
           text: "Skip forward 10 seconds"
@@ -216,6 +223,6 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
 
 # The end screen must now be visible — this is the actual assertion.
 - extendedWaitUntil:
-    visible: "(?s).*day streak.*"
+    visible: ".*day streak.*"
     timeout: 30000
 - takeScreenshot: end-screen
