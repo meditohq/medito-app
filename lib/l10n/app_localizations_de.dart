@@ -2901,7 +2901,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String timerPresetSemantics(int minutes) {
-    return '$minutes Minuten';
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes Minuten',
+      one: '1 Minute',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -2913,4 +2919,24 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get openTimer => 'Timer öffnen';
+
+  @override
+  String get downloadingAudio => 'Wird heruntergeladen';
+
+  @override
+  String get playbackPosition => 'Wiedergabeposition';
+
+  @override
+  String playbackPositionValue(String position, String duration) {
+    return '$position von $duration';
+  }
+
+  @override
+  String get dayMeditated => 'Meditiert';
+
+  @override
+  String get dayNotMeditated => 'Nicht meditiert';
+
+  @override
+  String get clearEmail => 'E-Mail löschen';
 }

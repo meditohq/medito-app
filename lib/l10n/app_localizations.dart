@@ -385,13 +385,13 @@ abstract class AppLocalizations {
   /// No description provided for @thanksForSharingNeutral.
   ///
   /// In en, this message translates to:
-  /// **'Happy face'**
+  /// **'Neutral face'**
   String get thanksForSharingNeutral;
 
   /// No description provided for @thanksForSharingHappy.
   ///
   /// In en, this message translates to:
-  /// **'Neutral face'**
+  /// **'Happy face'**
   String get thanksForSharingHappy;
 
   /// No description provided for @thanksForSharingSad.
@@ -5221,7 +5221,7 @@ abstract class AppLocalizations {
   /// Screen reader label of a duration chip on the Timer screen
   ///
   /// In en, this message translates to:
-  /// **'{minutes} minutes'**
+  /// **'{minutes, plural, =1{1 minute} other{{minutes} minutes}}'**
   String timerPresetSemantics(int minutes);
 
   /// Background sound row offline when the sound was never downloaded, so it cannot play
@@ -5241,6 +5241,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open timer'**
   String get openTimer;
+
+  /// Screen-reader label for the player's download button while a download is in progress (value is the percentage)
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading'**
+  String get downloadingAudio;
+
+  /// Screen-reader label for the player's seek bar
+  ///
+  /// In en, this message translates to:
+  /// **'Playback position'**
+  String get playbackPosition;
+
+  /// Screen-reader value for the seek bar, e.g. 3:12 of 10:00
+  ///
+  /// In en, this message translates to:
+  /// **'{position} of {duration}'**
+  String playbackPositionValue(String position, String duration);
+
+  /// Screen-reader status for a day on the streak row / calendar when the user meditated that day, read after the weekday
+  ///
+  /// In en, this message translates to:
+  /// **'Meditated'**
+  String get dayMeditated;
+
+  /// Screen-reader status for a day on the streak row / calendar with no meditation
+  ///
+  /// In en, this message translates to:
+  /// **'Not meditated'**
+  String get dayNotMeditated;
+
+  /// Tooltip / screen-reader label of the button that clears the email field on the sign-in screen
+  ///
+  /// In en, this message translates to:
+  /// **'Clear email'**
+  String get clearEmail;
 }
 
 class _AppLocalizationsDelegate

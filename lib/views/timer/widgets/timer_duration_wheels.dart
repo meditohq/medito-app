@@ -104,6 +104,7 @@ class TimerDurationWheelsState extends State<TimerDurationWheels> {
           child: _Wheel(
             controller: _hours,
             label: l10n.timerHoursLabel,
+            maxValue: kMaxTimerHours,
             onSelectedItemChanged: (_) => _onWheelChanged(),
             delegate: ListWheelChildBuilderDelegate(
               childCount: kMaxTimerHours + 1,
@@ -116,6 +117,7 @@ class TimerDurationWheelsState extends State<TimerDurationWheels> {
           child: _Wheel(
             controller: _minutes,
             label: l10n.timerMinutesLabel,
+            loopLength: 60,
             onSelectedItemChanged: (_) => _onWheelChanged(),
             delegate: ListWheelChildLoopingListDelegate(
               children: [for (var i = 0; i < 60; i++) _Digits(i)],
@@ -133,6 +135,8 @@ class _Wheel extends StatelessWidget {
     required this.label,
     required this.onSelectedItemChanged,
     required this.delegate,
+    this.maxValue,
+    this.loopLength,
   });
 
   final FixedExtentScrollController controller;
@@ -140,8 +144,50 @@ class _Wheel extends StatelessWidget {
   final ValueChanged<int> onSelectedItemChanged;
   final ListWheelChildDelegate delegate;
 
+  /// Highest item of a non-looping wheel.
+  final int? maxValue;
+
+  /// Items per turn of a looping wheel (its item index runs on past this).
+  final int? loopLength;
+
+  int get _item =>
+      controller.hasClients ? controller.selectedItem : controller.initialItem;
+
+  int _display(int item) => loopLength == null ? item : item % loopLength!;
+
+  bool get _canIncrease => maxValue == null || _item < maxValue!;
+  bool get _canDecrease => loopLength != null || _item > 0;
+
+  void _step(int by) {
+    if (!controller.hasClients) return;
+    controller.animateToItem(
+      _item + by,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // The wheel's own semantics are a run of loose numbers ("04", "05",
+    // "06") with nothing saying which is chosen or what they count. Expose it
+    // as one adjustable control instead: "Minutes, 10", swipe up/down to step.
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, child) => Semantics(
+        label: label,
+        value: '${_display(_item)}',
+        increasedValue: _canIncrease ? '${_display(_item + 1)}' : null,
+        decreasedValue: _canDecrease ? '${_display(_item - 1)}' : null,
+        onIncrease: _canIncrease ? () => _step(1) : null,
+        onDecrease: _canDecrease ? () => _step(-1) : null,
+        child: ExcludeSemantics(child: child),
+      ),
+      child: _buildWheel(context),
+    );
+  }
+
+  Widget _buildWheel(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
       children: [

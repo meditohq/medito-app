@@ -59,8 +59,8 @@
   "explore": "Explore",
   "welcome": "👋 Welcome",
   "thanksForSharing": "Thanks for sharing  💜",
-  "thanksForSharingNeutral": "Happy face",
-  "thanksForSharingHappy": "Neutral face",
+  "thanksForSharingNeutral": "Neutral face",
+  "thanksForSharingHappy": "Happy face",
   "thanksForSharingSad": "Sad face",
   "min": "min",
   "hey": "👋 Hey",
@@ -2087,7 +2087,7 @@
     "description": "History row for a timer session, e.g. 'Timer \u00b7 20 min'",
     "placeholders": {"duration": {"type": "String"}}
   },
-  "timerPresetSemantics": "{minutes} minutes",
+  "timerPresetSemantics": "{minutes, plural, =1{1 minute} other{{minutes} minutes}}",
   "@timerPresetSemantics": {
     "description": "Screen reader label of a duration chip on the Timer screen",
     "placeholders": {"minutes": {"type": "int"}}
@@ -2097,5 +2097,37 @@
   "timerStopwatchTitle": "Sit for as long as you like",
   "@timerStopwatchTitle": {"description": "Title of the card explaining Stopwatch mode on the Timer screen"},
   "openTimer": "Open timer",
-  "@openTimer": {"description": "Offline screen link that opens the Timer, which works without a connection"}
+  "@openTimer": {"description": "Offline screen link that opens the Timer, which works without a connection"},
+  "downloadingAudio": "Downloading",
+  "@downloadingAudio": {
+    "description": "Screen-reader label for the player's download button while a download is in progress (value is the percentage)"
+  },
+  "playbackPosition": "Playback position",
+  "@playbackPosition": {
+    "description": "Screen-reader label for the player's seek bar"
+  },
+  "playbackPositionValue": "{position} of {duration}",
+  "@playbackPositionValue": {
+    "description": "Screen-reader value for the seek bar, e.g. 3:12 of 10:00",
+    "placeholders": {
+      "position": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "dayMeditated": "Meditated",
+  "@dayMeditated": {
+    "description": "Screen-reader status for a day on the streak row / calendar when the user meditated that day, read after the weekday"
+  },
+  "dayNotMeditated": "Not meditated",
+  "@dayNotMeditated": {
+    "description": "Screen-reader status for a day on the streak row / calendar with no meditation"
+  },
+  "clearEmail": "Clear email",
+  "@clearEmail": {
+    "description": "Tooltip / screen-reader label of the button that clears the email field on the sign-in screen"
+  }
 }

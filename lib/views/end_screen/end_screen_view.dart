@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -348,7 +349,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   ),
                 );
               },
-              child: Container(
+              // Read with the caption below as one phrase, "5 day streak".
+              child: ExcludeSemantics(
                 key: ValueKey<int>(streak),
                 child: Text(
                   streak.toString(),
@@ -363,6 +365,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             ),
             Text(
               AppLocalizations.of(context)!.dayStreak,
+              semanticsLabel:
+                  '$streak ${AppLocalizations.of(context)!.dayStreak}',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontFamily: googleSans,
                 fontSize: 40,
@@ -492,67 +496,81 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                           )[0],
                         )));
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                dayLetters[index],
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontFamily: googleSans,
-                  fontSize: 14,
-                  fontWeight: (isMeditated || isFreeze)
-                      ? FontWeight.w600
-                      : FontWeight.w500,
-                  height: 1.2,
-                  color: isFreeze
-                      ? ColorConstants.graphite
-                      : isMeditated
-                      ? context.brandAccent
-                      : ColorConstants.moon,
+        final l10n = AppLocalizations.of(context)!;
+        // A lone weekday letter and an unlabelled icon told screen readers
+        // nothing; say the day and whether it counted.
+        final daySemantics =
+            '${DateFormat.EEEE(Localizations.localeOf(context).toString()).format(day)}, '
+            '${isFreeze
+                ? l10n.streakFreezeUsed
+                : isMeditated
+                ? l10n.dayMeditated
+                : l10n.dayNotMeditated}';
+
+        return Semantics(
+          label: daySemantics,
+          excludeSemantics: true,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  dayLetters[index],
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontFamily: googleSans,
+                    fontSize: 14,
+                    fontWeight: (isMeditated || isFreeze)
+                        ? FontWeight.w600
+                        : FontWeight.w500,
+                    height: 1.2,
+                    color: isFreeze
+                        ? ColorConstants.graphite
+                        : isMeditated
+                        ? context.brandAccent
+                        : ColorConstants.moon,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              SizedBox(
-                width: 36,
-                height: 36,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isConsecutive
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.12)
-                              : Colors.transparent,
-                          width: 2,
+                const SizedBox(height: 4),
+                SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isConsecutive
+                                ? Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.12)
+                                : Colors.transparent,
+                            width: 2,
+                          ),
                         ),
                       ),
-                    ),
-                    if (isFreeze)
-                      MeditoIcon(
-                        assetName: MeditoIcons.snow,
-                        size: 32,
-                        color: ColorConstants.graphite,
-                      )
-                    else if (isMeditated)
-                      MeditoIcon(
-                        assetName: MeditoIcons.checkCircleSolid,
-                        size: 32,
-                        color: context.brandAccent,
-                      )
-                    else
-                      _buildCircle(32, ColorConstants.moon),
-                  ],
+                      if (isFreeze)
+                        MeditoIcon(
+                          assetName: MeditoIcons.snow,
+                          size: 32,
+                          color: ColorConstants.graphite,
+                        )
+                      else if (isMeditated)
+                        MeditoIcon(
+                          assetName: MeditoIcons.checkCircleSolid,
+                          size: 32,
+                          color: context.brandAccent,
+                        )
+                      else
+                        _buildCircle(32, ColorConstants.moon),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       }),

@@ -38,6 +38,8 @@ class ShopProductCard extends StatelessWidget {
       button: true,
       label: '${product.name}, $priceLabel',
       excludeSemantics: true,
+      // excludeSemantics drops the child's tap action, so give it here.
+      onTap: onTap,
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,

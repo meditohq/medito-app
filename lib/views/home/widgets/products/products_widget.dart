@@ -212,6 +212,8 @@ class _ProductTile extends ConsumerWidget {
       button: true,
       label: '${product.name}, $priceLabel',
       excludeSemantics: true,
+      // excludeSemantics drops the child's tap action, so give it here.
+      onTap: () => _open(context, ref),
       child: GestureDetector(
         onTap: () => _open(context, ref),
         behavior: HitTestBehavior.opaque,
@@ -447,6 +449,12 @@ class _BagPill extends ConsumerWidget {
         button: true,
         label: '${l10n.shopViewBag}, ${l10n.shopBagItemCount(count)}',
         excludeSemantics: true,
+        // excludeSemantics drops the InkWell's tap action, so give it here.
+        onTap: () => showShopBag(
+          context,
+          source: AnalyticsEventConstants.sourceHomeCard,
+          onBrowse: onBrowse,
+        ),
         child: Material(
           color: theme.cardColor,
           shape: StadiumBorder(

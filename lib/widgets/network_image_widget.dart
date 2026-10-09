@@ -38,8 +38,13 @@ class NetworkImageWidget extends StatelessWidget {
     return '$contentBaseUrl$imagePath$suffix';
   }
 
+  // Artwork only, never labelled: excluded so each card doesn't pick up an
+  // "image" trait (or a stray unlabelled image stop) from it.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ExcludeSemantics(child: _buildImage(context));
+
+  Widget _buildImage(BuildContext context) {
     // Skip loading images from dead domains
     if (HTTPConstants.isDeadDomain(url)) {
       return errorWidget ??

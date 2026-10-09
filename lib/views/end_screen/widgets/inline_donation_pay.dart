@@ -197,20 +197,23 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
               ),
             ),
             const SizedBox(width: 8),
-            GestureDetector(
-              key: inlineDonationOtherAmountKey,
-              onTap: widget.isProcessing ? null : widget.onOtherAmount,
-              behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Text(
-                  l10n.donateOtherAmount,
-                  style: TextStyle(
-                    color: fg,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline,
-                    decorationColor: fg,
+            Semantics(
+              button: true,
+              child: GestureDetector(
+                key: inlineDonationOtherAmountKey,
+                onTap: widget.isProcessing ? null : widget.onOtherAmount,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    l10n.donateOtherAmount,
+                    style: TextStyle(
+                      color: fg,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      decoration: TextDecoration.underline,
+                      decorationColor: fg,
+                    ),
                   ),
                 ),
               ),
@@ -258,14 +261,19 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
     final isSelected = amount == _selectedAmount;
     final label = formatCurrencyAmount(amount, widget.currencyCode);
 
+    void select() => setState(() => _selectedAmount = amount);
+
+    // One label, amount first: an explicit label on top of the child texts
+    // read as "$5, Most popular, $5". excludeSemantics also drops the
+    // GestureDetector's tap, so it's given here.
     return Semantics(
       button: true,
       selected: isSelected,
-      label: label,
+      label: isSuggested ? '$label, $badge' : label,
+      excludeSemantics: true,
+      onTap: widget.isProcessing ? null : select,
       child: GestureDetector(
-        onTap: widget.isProcessing
-            ? null
-            : () => setState(() => _selectedAmount = amount),
+        onTap: widget.isProcessing ? null : select,
         behavior: HitTestBehavior.opaque,
         child: Column(
           mainAxisSize: MainAxisSize.min,

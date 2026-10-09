@@ -21,6 +21,7 @@ class RowItemWidget extends StatelessWidget {
     this.iconColor,
     this.trailingIcon = Icons.chevron_right_rounded,
     this.trailing,
+    this.selected,
   });
 
   final String title;
@@ -42,6 +43,10 @@ class RowItemWidget extends StatelessWidget {
   /// of the current selection (theme swatch, app icon).
   final Widget? trailing;
 
+  /// For rows in a pick-one list (e.g. reminder times): announced as
+  /// selected / not selected, which sighted users see from a check mark.
+  final bool? selected;
+
   @override
   Widget build(BuildContext context) {
     var border = Border(
@@ -56,59 +61,65 @@ class RowItemWidget extends StatelessWidget {
     );
 
     return MergeSemantics(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
-            decoration: BoxDecoration(border: border),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      _buildIconWithColor(),
-                      width16,
-                      Expanded(
-                        child: Text.rich(
-                          TextSpan(
-                            style: const TextStyle(fontSize: 18),
-                            children: [
-                              TextSpan(
-                                text: title,
-                                style:
-                                    titleStyle ??
-                                    Theme.of(
-                                      context,
-                                    ).textTheme.labelMedium?.copyWith(
-                                      color: Theme.of(
+      // Without the button role, rows that open something were read as plain
+      // text. Switch rows get their role from the Switch.
+      child: Semantics(
+        button: onTap != null && !isSwitch,
+        selected: selected,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              decoration: BoxDecoration(border: border),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        _buildIconWithColor(),
+                        width16,
+                        Expanded(
+                          child: Text.rich(
+                            TextSpan(
+                              style: const TextStyle(fontSize: 18),
+                              children: [
+                                TextSpan(
+                                  text: title,
+                                  style:
+                                      titleStyle ??
+                                      Theme.of(
                                         context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                              ),
-                              if (subTitle != null) _subtitle(context),
-                            ],
+                                      ).textTheme.labelMedium?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                ),
+                                if (subTitle != null) _subtitle(context),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (trailing != null) ...[trailing!, width16],
-                if (isTrailingIcon && !isSwitch)
-                  Icon(
-                    trailingIcon,
-                    size: trailingIconSize,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                if (isSwitch)
-                  Switch(
-                    value: switchValue ?? false,
-                    onChanged: onSwitchChanged,
-                  ),
-              ],
+                  if (trailing != null) ...[trailing!, width16],
+                  if (isTrailingIcon && !isSwitch)
+                    Icon(
+                      trailingIcon,
+                      size: trailingIconSize,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  if (isSwitch)
+                    Switch(
+                      value: switchValue ?? false,
+                      onChanged: onSwitchChanged,
+                    ),
+                ],
+              ),
             ),
           ),
         ),

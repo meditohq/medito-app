@@ -156,10 +156,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get thanksForSharing => 'Gracias por compartir  💜';
 
   @override
-  String get thanksForSharingNeutral => 'Cara feliz';
+  String get thanksForSharingNeutral => 'Cara neutral';
 
   @override
-  String get thanksForSharingHappy => 'Cara neutral';
+  String get thanksForSharingHappy => 'Cara feliz';
 
   @override
   String get thanksForSharingSad => 'Cara triste';
@@ -2879,7 +2879,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String timerPresetSemantics(int minutes) {
-    return '$minutes minutos';
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -2891,4 +2897,24 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get openTimer => 'Abrir temporizador';
+
+  @override
+  String get downloadingAudio => 'Descargando';
+
+  @override
+  String get playbackPosition => 'Posición de reproducción';
+
+  @override
+  String playbackPositionValue(String position, String duration) {
+    return '$position de $duration';
+  }
+
+  @override
+  String get dayMeditated => 'Meditaste';
+
+  @override
+  String get dayNotMeditated => 'Sin meditar';
+
+  @override
+  String get clearEmail => 'Borrar correo electrónico';
 }

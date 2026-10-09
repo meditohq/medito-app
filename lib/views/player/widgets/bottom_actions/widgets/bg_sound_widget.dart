@@ -54,21 +54,26 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
   // whole button area responds, not just a nested inner button.
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: widget.isBackgroundSoundSelected
-          ? BoxDecoration(
-              color: ColorConstants.graphite.withAlpha(200),
-              borderRadius: BorderRadius.circular(6),
-            )
-          : null,
-      child: widget.isBackgroundSoundSelected
-          ? _spinningIcon()
-          : MeditoIcon(
-              assetName: MeditoIcons.musicNote,
-              color: Colors.white,
-              size: 23,
-            ),
+    // Merges into the action-bar button: "Background sound, selected" while a
+    // sound is playing, which sighted users see from the spinning record.
+    return Semantics(
+      selected: widget.isBackgroundSoundSelected,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: widget.isBackgroundSoundSelected
+            ? BoxDecoration(
+                color: ColorConstants.graphite.withAlpha(200),
+                borderRadius: BorderRadius.circular(6),
+              )
+            : null,
+        child: widget.isBackgroundSoundSelected
+            ? _spinningIcon()
+            : MeditoIcon(
+                assetName: MeditoIcons.musicNote,
+                color: Colors.white,
+                size: 23,
+              ),
+      ),
     );
   }
 
@@ -118,11 +123,7 @@ class _VinylPainter extends CustomPainter {
     groove(0.74, 20, 45);
 
     canvas.drawCircle(center, r * 0.34, cut);
-    canvas.drawCircle(
-      center,
-      r * 0.1,
-      Paint()..blendMode = BlendMode.clear,
-    );
+    canvas.drawCircle(center, r * 0.1, Paint()..blendMode = BlendMode.clear);
     canvas.restore();
   }
 

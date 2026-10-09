@@ -522,6 +522,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         leading: _hasRequestedOtp
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
+                tooltip: AppLocalizations.of(context)!.goBack,
                 onPressed: () {
                   setState(() {
                     _hasRequestedOtp = false;
@@ -710,6 +711,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       ],
       suffixIcon: _emailController.text.isNotEmpty && !_hasRequestedOtp
           ? IconButton(
+              tooltip: AppLocalizations.of(context)!.clearEmail,
               icon: Icon(
                 Icons.clear,
                 color: Theme.of(

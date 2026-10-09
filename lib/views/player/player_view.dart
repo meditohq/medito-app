@@ -819,6 +819,8 @@ class _FadingNetworkImageState extends State<_FadingNetworkImage> {
           child: Image.network(
             widget.imageUrl,
             fit: BoxFit.cover,
+            // Blurred backdrop: decorative.
+            excludeFromSemantics: true,
             cacheWidth: MediaQuery.of(context).size.width.toInt(),
             errorBuilder: (context, error, stackTrace) {
               return Container(color: backgroundColor);
