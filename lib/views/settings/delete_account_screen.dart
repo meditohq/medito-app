@@ -224,27 +224,34 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                             child: Column(
                               children: [
                                 for (final reason in DeleteAccountReason.values)
-                                  InkWell(
-                                    onTap: () => _selectReason(reason),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 4,
-                                        vertical: 2,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Radio<DeleteAccountReason>(
-                                            value: reason,
-                                            activeColor: onSurface,
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              _reasonLabel(l10n, reason),
-                                              style: theme.textTheme.bodyLarge
-                                                  ?.copyWith(color: onSurface),
+                                  // One stop per reason: the radio was an
+                                  // unlabelled "radio button" apart from its
+                                  // text.
+                                  MergeSemantics(
+                                    child: InkWell(
+                                      onTap: () => _selectReason(reason),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 2,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Radio<DeleteAccountReason>(
+                                              value: reason,
+                                              activeColor: onSurface,
                                             ),
-                                          ),
-                                        ],
+                                            Expanded(
+                                              child: Text(
+                                                _reasonLabel(l10n, reason),
+                                                style: theme.textTheme.bodyLarge
+                                                    ?.copyWith(
+                                                      color: onSurface,
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),

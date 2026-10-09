@@ -18,6 +18,7 @@ import 'package:medito/views/player/widgets/bottom_actions/single_back_action_ba
 import 'package:medito/widgets/headers/medito_app_bar_small.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../bottom_navigation/bottom_navigation_bar_view.dart';
@@ -362,11 +363,24 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
             ),
           ),
           clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: () =>
-                _selecting ? _toggleSelection(item) : _openPlayer(ref, item),
-            child: _getListItemWidget(item, index),
+          // Swipe-to-delete is unreachable with a screen reader; offer the
+          // same delete (with undo) as an action on the row. Swipe is off
+          // while selecting, so the action is too.
+          child: Semantics(
+            customSemanticsActions: _selecting
+                ? null
+                : {
+                    CustomSemanticsAction(
+                      label: AppLocalizations.of(context)!.deleteDownload,
+                    ): () =>
+                        _removeWithUndo(item),
+                  },
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () =>
+                  _selecting ? _toggleSelection(item) : _openPlayer(ref, item),
+              child: _getListItemWidget(item, index),
+            ),
           ),
         ),
       ),

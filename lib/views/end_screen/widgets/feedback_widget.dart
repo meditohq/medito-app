@@ -148,7 +148,11 @@ class FeedbackWidgetState extends State<FeedbackWidget> {
               ? ColorConstants.ebony
               : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         ),
-        child: Text(emoji, style: const TextStyle(fontSize: 32)),
+        // The Semantics label around this button names the feeling; the
+        // emoji itself would be read again after it.
+        child: ExcludeSemantics(
+          child: Text(emoji, style: const TextStyle(fontSize: 32)),
+        ),
       ),
     );
   }

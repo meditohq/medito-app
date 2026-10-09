@@ -108,37 +108,42 @@ class AudioDownloadWidget extends ConsumerWidget {
   ) {
     var progress = _getDownloadProgress(downloadAudioState, downloadFileKey);
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-            color: ColorConstants.graphite.withAlpha(100),
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          child: Container(
+    return Semantics(
+      label: AppLocalizations.of(context)!.downloadingAudio,
+      value: '${(progress * 100).round()}%',
+      excludeSemantics: true,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
             width: 48,
-            height: 48 * progress,
+            height: 48,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
-              color: ColorConstants.graphite.withAlpha(200),
+              color: ColorConstants.graphite.withAlpha(100),
             ),
           ),
-        ),
-        const SizedBox(
-          width: 16,
-          height: 16,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
+          Positioned(
+            bottom: 0,
+            child: Container(
+              width: 48,
+              height: 48 * progress,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: ColorConstants.graphite.withAlpha(200),
+              ),
+            ),
           ),
-        ),
-      ],
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

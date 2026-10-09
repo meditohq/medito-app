@@ -126,6 +126,8 @@ class ShortcutsItemsWidget extends ConsumerWidget {
       label: e.title,
       button: true,
       excludeSemantics: true,
+      // excludeSemantics drops the child's tap action, so give it here.
+      onTap: () => _handleChipPress(context, ref, e),
       child: SizedBox(
         width: width,
         child: Column(

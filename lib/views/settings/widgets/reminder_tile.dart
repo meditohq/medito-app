@@ -307,6 +307,7 @@ class ReminderOptionsSheet extends StatelessWidget {
         hasUnderline: hasUnderline,
         isTrailingIcon: selected,
         trailingIcon: Icons.check_rounded,
+        selected: selected,
         onTap: () => Navigator.of(context).pop(choice),
       );
     }

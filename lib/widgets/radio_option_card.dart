@@ -38,7 +38,9 @@ class RadioOptionCard extends StatelessWidget {
     return Semantics(
       inMutuallyExclusiveGroup: true,
       checked: selected,
-      label: title,
+      // The card's content is excluded below, so the description has to be
+      // in the label or it's never read.
+      label: description == null ? title : '$title, $description',
       child: Material(
         color: Colors.transparent,
         child: InkWell(

@@ -275,50 +275,60 @@ class _FilterTab extends StatelessWidget {
     final primary = theme.colorScheme.primary;
     final textColor = selected ? onSurface : onSurface.withOpacityValue(0.5);
 
-    return InkWell(
+    // Was plain text read as "Packs", then a bare "12": no role, no
+    // selection, no hint what the number counts.
+    return Semantics(
+      button: true,
+      selected: selected,
+      label:
+          '$label, ${AppLocalizations.of(context)!.searchResultsCount(count)}',
+      excludeSemantics: true,
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: selected
-                  ? primary
-                  : theme.colorScheme.outline.withOpacityValue(0.2),
-              width: selected ? 2 : 1,
+      child: InkWell(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: selected
+                    ? primary
+                    : theme.colorScheme.outline.withOpacityValue(0.2),
+                width: selected ? 2 : 1,
+              ),
             ),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: textColor,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: selected
-                    ? primary.withOpacityValue(0.15)
-                    : onSurface.withOpacityValue(0.08),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                '$count',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: selected ? primary : textColor,
-                  fontWeight: FontWeight.w600,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: textColor,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? primary.withOpacityValue(0.15)
+                      : onSurface.withOpacityValue(0.08),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$count',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: selected ? primary : textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

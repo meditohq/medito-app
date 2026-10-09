@@ -1,5 +1,6 @@
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/views/timer/timer_format.dart';
 import 'package:medito/views/timer/timer_view.dart';
@@ -583,11 +584,13 @@ class _MeditationCalendarWidgetState
           ),
       leftChevronIcon: MeditoIcon(
         assetName: MeditoIcons.arrowLeft,
+        semanticLabel: AppLocalizations.of(context)!.previousMonth,
         size: 20,
         color: theme.colorScheme.onSurface,
       ),
       rightChevronIcon: MeditoIcon(
         assetName: MeditoIcons.arrowRight,
+        semanticLabel: AppLocalizations.of(context)!.nextMonth,
         size: 20,
         color: theme.colorScheme.onSurface,
       ),
@@ -1139,7 +1142,7 @@ class _SessionItemWidget extends ConsumerWidget {
                       ),
                     ),
                     loading: () => Text(
-                      'Loading...',
+                      AppLocalizations.of(context)!.loading,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontFamily: googleSans,
                         fontWeight: FontWeight.w600,
@@ -1168,28 +1171,47 @@ class _SessionItemWidget extends ConsumerWidget {
       ),
     );
 
+    // Long-press delete has no discoverable VoiceOver equivalent: offer it as
+    // a named action on the row too.
+    Widget withDeleteAction(Widget row) => onLongPress == null
+        ? row
+        : Semantics(
+            customSemanticsActions: {
+              CustomSemanticsAction(
+                label: AppLocalizations.of(context)!.deleteSessionTitle,
+              ): onLongPress!,
+            },
+            child: row,
+          );
+
     if (isManual) {
-      return InkWell(
-        onLongPress: onLongPress,
-        borderRadius: BorderRadius.circular(8),
-        child: content,
+      return withDeleteAction(
+        InkWell(
+          onLongPress: onLongPress,
+          borderRadius: BorderRadius.circular(8),
+          child: content,
+        ),
       );
     }
 
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => isTimer
-                ? const TimerView(source: AnalyticsEventConstants.sourceHistory)
-                : TrackView(trackId: session.id),
-          ),
-        );
-      },
-      onLongPress: onLongPress,
-      borderRadius: BorderRadius.circular(8),
-      child: content,
+    return withDeleteAction(
+      InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => isTimer
+                  ? const TimerView(
+                      source: AnalyticsEventConstants.sourceHistory,
+                    )
+                  : TrackView(trackId: session.id),
+            ),
+          );
+        },
+        onLongPress: onLongPress,
+        borderRadius: BorderRadius.circular(8),
+        child: content,
+      ),
     );
   }
 }

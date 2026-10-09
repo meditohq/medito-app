@@ -455,7 +455,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                                   ),
                                 ],
                                 const SizedBox(height: 24),
-                                _buildNotificationPreview(context),
+                                // Decorative illustration: without the
+                                // exclusion, screen readers read the mock
+                                // card ("MEDITO", time, title, body) as if a
+                                // real notification had arrived mid-screen.
+                                ExcludeSemantics(
+                                  child: _buildNotificationPreview(context),
+                                ),
                                 const SizedBox(height: 24),
                                 // Always the chips: first-timers pick a time
                                 // (which sets it and auto-advances), and returning
@@ -731,51 +737,55 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: _isProcessing
-          ? null
-          : () => _onSlotSelected(slot.analyticsId, slot.time),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: onSurface.withValues(alpha: 0.24)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            MeditoIcon(
-              assetName: switch (slot) {
-                ReminderSlot.morning => MeditoIcons.sun,
-                ReminderSlot.evening => MeditoIcons.bell,
-                ReminderSlot.night => MeditoIcons.moon,
-              },
-              color: onSurface,
-              size: 20,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              slot.label(l10n),
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
+    // Custom card: without the button role it's announced as plain text.
+    return Semantics(
+      button: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _isProcessing
+            ? null
+            : () => _onSlotSelected(slot.analyticsId, slot.time),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: onSurface.withValues(alpha: 0.24)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              MeditoIcon(
+                assetName: switch (slot) {
+                  ReminderSlot.morning => MeditoIcons.sun,
+                  ReminderSlot.evening => MeditoIcons.bell,
+                  ReminderSlot.night => MeditoIcons.moon,
+                },
+                color: onSurface,
+                size: 20,
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              slot.time.format(context),
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 14,
-                height: 1.2,
-                color: onSurface.withValues(alpha: 0.7),
+              const SizedBox(height: 8),
+              Text(
+                slot.label(l10n),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                slot.time.format(context),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 14,
+                  height: 1.2,
+                  color: onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

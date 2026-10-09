@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/widgets/onboarding/onboarding_option_button.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/widgets.dart';
 
 /// A single question screen in the onboarding question flow.
@@ -215,6 +216,7 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
             suffixIcon: hasText && !disabled
                 ? IconButton(
                     icon: const Icon(Icons.arrow_forward_rounded),
+                    tooltip: AppLocalizations.of(context)!.submit,
                     onPressed: _onFreeTextSubmit,
                   )
                 : null,

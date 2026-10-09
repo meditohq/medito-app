@@ -165,23 +165,27 @@ class _SpeedSheetState extends State<SpeedSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   for (var i = 0; i < playbackSpeedOptions.length; i++)
-                    InkWell(
-                      onTap: () => _commit(i),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 8,
-                        ),
-                        child: Text(
-                          formatSpeed(playbackSpeedOptions[i]),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontSize: 14,
-                            fontWeight: i == _index
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                            color: onSurface.withValues(
-                              alpha: i == _index ? 1 : 0.6,
+                    Semantics(
+                      button: true,
+                      selected: i == _index,
+                      child: InkWell(
+                        onTap: () => _commit(i),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
+                          child: Text(
+                            formatSpeed(playbackSpeedOptions[i]),
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontSize: 14,
+                              fontWeight: i == _index
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                              color: onSurface.withValues(
+                                alpha: i == _index ? 1 : 0.6,
+                              ),
                             ),
                           ),
                         ),

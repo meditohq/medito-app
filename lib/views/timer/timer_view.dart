@@ -384,6 +384,9 @@ class _PresetChip extends StatelessWidget {
       button: true,
       selected: selected,
       excludeSemantics: true,
+      // excludeSemantics also drops the InkWell's tap action below, so the
+      // chip was announced as a button that did nothing.
+      onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: _PresetChips.height,

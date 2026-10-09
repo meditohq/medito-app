@@ -170,9 +170,11 @@ class StreakCircleState extends ConsumerState<StreakCircle>
     bool showConsistencyScore,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    final semanticLabel = showConsistencyScore
-        ? '${l10n.consistencyScore}: $displayValue%'
-        : '$displayValue ${l10n.dayStreak}';
+    // Says whether today is done, which sighted users see from the lit ring
+    // and flame.
+    final semanticLabel =
+        '${showConsistencyScore ? '${l10n.consistencyScore}: $displayValue%' : '$displayValue ${l10n.dayStreak}'}'
+        '${isStreakDoneToday ? ', ${l10n.meditatedToday}' : ''}';
 
     return _ring(
       active: isStreakDoneToday,
@@ -181,6 +183,9 @@ class StreakCircleState extends ConsumerState<StreakCircle>
         child: Semantics(
           label: semanticLabel,
           button: true,
+          // The figure inside repeated the label ("5 day streak, 5").
+          excludeSemantics: true,
+          onTap: widget.onTap,
           child: InkWell(
             onTap: widget.onTap,
             borderRadius: BorderRadius.circular(

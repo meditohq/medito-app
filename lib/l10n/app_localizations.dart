@@ -385,13 +385,13 @@ abstract class AppLocalizations {
   /// No description provided for @thanksForSharingNeutral.
   ///
   /// In en, this message translates to:
-  /// **'Happy face'**
+  /// **'Neutral face'**
   String get thanksForSharingNeutral;
 
   /// No description provided for @thanksForSharingHappy.
   ///
   /// In en, this message translates to:
-  /// **'Neutral face'**
+  /// **'Happy face'**
   String get thanksForSharingHappy;
 
   /// No description provided for @thanksForSharingSad.
@@ -5383,7 +5383,7 @@ abstract class AppLocalizations {
   /// Screen reader label of a duration chip on the Timer screen
   ///
   /// In en, this message translates to:
-  /// **'{minutes} minutes'**
+  /// **'{minutes, plural, =1{1 minute} other{{minutes} minutes}}'**
   String timerPresetSemantics(int minutes);
 
   /// Background sound row offline when the sound was never downloaded, so it cannot play
@@ -5403,6 +5403,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open timer'**
   String get openTimer;
+
+  /// Screen-reader label for the player's download button while a download is in progress (value is the percentage)
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading'**
+  String get downloadingAudio;
+
+  /// Screen-reader label for the player's seek bar
+  ///
+  /// In en, this message translates to:
+  /// **'Playback position'**
+  String get playbackPosition;
+
+  /// Screen-reader value for the seek bar, e.g. 3:12 of 10:00
+  ///
+  /// In en, this message translates to:
+  /// **'{position} of {duration}'**
+  String playbackPositionValue(String position, String duration);
+
+  /// Screen-reader status for a day on the streak row / calendar when the user meditated that day, read after the weekday
+  ///
+  /// In en, this message translates to:
+  /// **'Meditated'**
+  String get dayMeditated;
+
+  /// Screen-reader status for a day on the streak row / calendar with no meditation
+  ///
+  /// In en, this message translates to:
+  /// **'Not meditated'**
+  String get dayNotMeditated;
+
+  /// Tooltip / screen-reader label of the button that clears the email field on the sign-in screen
+  ///
+  /// In en, this message translates to:
+  /// **'Clear email'**
+  String get clearEmail;
+
+  /// Screen-reader label of the stats calendar's previous-month arrow
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get previousMonth;
+
+  /// Screen-reader label of the stats calendar's next-month arrow
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get nextMonth;
+
+  /// Screen-reader count on a search filter tab, read after the tab name
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 result} other{{count} results}}'**
+  String searchResultsCount(int count);
+
+  /// Tooltip / screen-reader label of an icon button that clears a text field
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearField;
+
+  /// Screen-reader reading of a sale price with the struck-through original price, e.g. '£25, was £30'
+  ///
+  /// In en, this message translates to:
+  /// **'{price}, was {compareAt}'**
+  String shopPriceWas(String price, String compareAt);
+
+  /// Screen-reader reading of the quantity number between the bag's minus and plus buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity: {count}'**
+  String shopQuantity(int count);
+
+  /// Screen-reader label of the link icon on pack rows that open a web page
+  ///
+  /// In en, this message translates to:
+  /// **'External link'**
+  String get externalLink;
+
+  /// Screen-reader suffix on the Home streak circle once today's meditation is done
+  ///
+  /// In en, this message translates to:
+  /// **'Meditated today'**
+  String get meditatedToday;
 }
 
 class _AppLocalizationsDelegate

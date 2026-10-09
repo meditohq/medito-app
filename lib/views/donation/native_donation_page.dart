@@ -681,10 +681,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final accent = context.brandAccent;
     final label = formatCurrencyAmount(amount, widget.config.currencyCode);
 
+    // No explicit label: the child Text already provides it, and an explicit
+    // one would merge with it and be announced twice ("$5 $5").
     return Semantics(
       button: true,
       selected: isSelected,
-      label: label,
       child: GestureDetector(
         onTap: () => _selectPresetAmount(amount),
         child: Stack(
@@ -840,26 +841,41 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    'Donate with',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(width: 6),
-                  // U+F8FF (Apple logo), drawn by the iOS system font — this
-                  // button is iOS-only.
-                  Text(
-                    '',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(width: 3),
-                  Text(
-                    'Pay',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                ],
+              // Screen readers can't speak the U+F8FF glyph below, which left
+              // this announced as "Donate with Pay".
+              child: Semantics(
+                label: 'Donate with Apple Pay',
+                excludeSemantics: true,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      'Donate with',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    // U+F8FF (Apple logo), drawn by the iOS system font — this
+                    // button is iOS-only.
+                    Text(
+                      '',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(width: 3),
+                    Text(
+                      'Pay',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

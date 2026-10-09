@@ -65,7 +65,11 @@ class PackItemWidget extends StatelessWidget {
 
   Widget _getTrailing(BuildContext context) {
     if (item.type == TypeConstants.link) {
-      return SvgPicture.asset(AssetConstants.icLink);
+      // Tells link rows apart from sessions, which otherwise sound the same.
+      return SvgPicture.asset(
+        AssetConstants.icLink,
+        semanticsLabel: AppLocalizations.of(context)!.externalLink,
+      );
     }
 
     if (item.type == TypeConstants.track && onSetComplete != null) {

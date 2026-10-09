@@ -1,4 +1,5 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/duration_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -75,34 +76,50 @@ class _DurationIndicatorWidgetState
               trackShape: CustomTrackShape(addTopPadding: false),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
             ),
-            child: Slider(
-              min: 0.0,
-              max: totalDuration > 0.0 ? totalDuration : 1.0,
-              activeColor: ColorConstants.white,
-              inactiveColor: ColorConstants.onyx,
-              value: _isSeekbarBeingDragged
-                  ? _dragSeekbarValue
-                  : currentDuration.clamp(
-                      0.0,
-                      (totalDuration > 0.0 ? totalDuration : 1.0),
+            // Without a label and formatter the seek bar read as "Slider, 37%".
+            child: Semantics(
+              label: AppLocalizations.of(context)!.playbackPosition,
+              child: Slider(
+                semanticFormatterCallback: (value) =>
+                    AppLocalizations.of(context)!.playbackPositionValue(
+                      Duration(
+                        milliseconds: (value * 100).round(),
+                      ).toMinutesSeconds(),
+                      Duration(
+                        milliseconds: rawTotalDuration.round(),
+                      ).toMinutesSeconds(),
                     ),
-              onChanged: (val) {
-                if (!_isSeekbarBeingDragged) {
-                  _isSeekbarBeingDragged = true;
-                }
-                setState(() {
-                  _dragSeekbarValue = val;
-                });
-              },
-              onChangeEnd: _onChangeEnd,
+                min: 0.0,
+                max: totalDuration > 0.0 ? totalDuration : 1.0,
+                activeColor: ColorConstants.white,
+                inactiveColor: ColorConstants.onyx,
+                value: _isSeekbarBeingDragged
+                    ? _dragSeekbarValue
+                    : currentDuration.clamp(
+                        0.0,
+                        (totalDuration > 0.0 ? totalDuration : 1.0),
+                      ),
+                onChanged: (val) {
+                  if (!_isSeekbarBeingDragged) {
+                    _isSeekbarBeingDragged = true;
+                  }
+                  setState(() {
+                    _dragSeekbarValue = val;
+                  });
+                },
+                onChangeEnd: _onChangeEnd,
+              ),
             ),
           ),
-          Transform.translate(
-            offset: const Offset(0, -14),
-            child: _durationLabels(
-              context,
-              rawTotalDuration,
-              rawCurrentPosition,
+          // The slider's value already says "3:12 of 10:00".
+          ExcludeSemantics(
+            child: Transform.translate(
+              offset: const Offset(0, -14),
+              child: _durationLabels(
+                context,
+                rawTotalDuration,
+                rawCurrentPosition,
+              ),
             ),
           ),
         ],

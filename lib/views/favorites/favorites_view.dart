@@ -177,18 +177,21 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
         final item = favorites[index];
         return Material(
           color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _onItemTap(item, context),
-            child: Column(
-              children: [
-                PackItemWidget(item: _buildPackItemModel(item, statsState)),
-                if (index < favorites.length - 1)
-                  Divider(
-                    color: Theme.of(context).colorScheme.outline,
-                    thickness: 0.5,
-                    height: 1,
-                  ),
-              ],
+          child: Semantics(
+            button: true,
+            child: InkWell(
+              onTap: () => _onItemTap(item, context),
+              child: Column(
+                children: [
+                  PackItemWidget(item: _buildPackItemModel(item, statsState)),
+                  if (index < favorites.length - 1)
+                    Divider(
+                      color: Theme.of(context).colorScheme.outline,
+                      thickness: 0.5,
+                      height: 1,
+                    ),
+                ],
+              ),
             ),
           ),
         );

@@ -14,30 +14,33 @@ class StopwatchElapsedWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final positionMs = ref.watch(audioStateProvider.select((s) => s.position));
     final textTheme = Theme.of(context).textTheme;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          formatTimerClock(Duration(milliseconds: positionMs)),
-          style: textTheme.displayMedium?.copyWith(
-            color: ColorConstants.white,
-            fontFamily: googleSans,
-            fontSize: 44,
-            fontWeight: FontWeight.w300,
-            height: 1,
-            fontFeatures: const [FontFeature.tabularFigures()],
+    // One announcement ("12:34 elapsed"), not the time and caption apart.
+    return MergeSemantics(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            formatTimerClock(Duration(milliseconds: positionMs)),
+            style: textTheme.displayMedium?.copyWith(
+              color: ColorConstants.white,
+              fontFamily: googleSans,
+              fontSize: 44,
+              fontWeight: FontWeight.w300,
+              height: 1,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          AppLocalizations.of(context)!.timerElapsed,
-          style: textTheme.titleSmall?.copyWith(
-            color: ColorConstants.white.withValues(alpha: 0.7),
-            fontFamily: googleSans,
-            fontSize: 12,
+          const SizedBox(height: 6),
+          Text(
+            AppLocalizations.of(context)!.timerElapsed,
+            style: textTheme.titleSmall?.copyWith(
+              color: ColorConstants.white.withValues(alpha: 0.7),
+              fontFamily: googleSans,
+              fontSize: 12,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

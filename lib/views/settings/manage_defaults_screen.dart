@@ -185,6 +185,12 @@ class ManageDefaultsScreen extends ConsumerWidget {
                         min: 1,
                         max: 60,
                         divisions: 59,
+                        // Otherwise read as a percentage of the range
+                        // (10 minutes was "15%").
+                        semanticFormatterCallback: (value) =>
+                            AppLocalizations.of(
+                              context,
+                            )!.timerPresetSemantics(value.round()),
                         activeColor: context.brandAccent,
                         inactiveColor: ColorConstants.greyIsTheNewGrey,
                         onChanged: (double newValue) {

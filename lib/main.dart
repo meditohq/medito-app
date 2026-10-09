@@ -34,6 +34,7 @@ import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/analytics/meta_sdk_service.dart';
 import 'package:medito/services/history/app_history_service.dart';
+import 'package:medito/services/home_widget_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:audio_service/audio_service.dart';
@@ -359,6 +360,9 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         );
 
         final locale = ref.watch(localeProvider);
+        // Keep the widgets' "day"/"days" unit in the app's language. No-op
+        // unless the locale changed.
+        HomeWidgetService.setLocale(locale);
         final themeMode = ref.watch(themeProvider);
 
         // Update system UI to match current theme

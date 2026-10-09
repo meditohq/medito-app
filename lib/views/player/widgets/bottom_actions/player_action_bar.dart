@@ -62,9 +62,8 @@ class PlayerActionBar extends StatelessWidget {
         onTap: onClosePressed,
         semanticLabel: l10n.close,
       ),
-      leftCenterItem: BottomActionBarItem(
+      leftCenterItem: BottomActionBarItem.custom(
         child: AudioDownloadWidget(request: request),
-        onTap: () {}, // The AudioDownloadWidget handles its own tap
       ),
       rightCenterItem: BottomActionBarItem(
         child: _buildBackgroundSoundWidget(),

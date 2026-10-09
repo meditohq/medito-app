@@ -11,12 +11,21 @@ class BottomActionBarItem {
   final Widget child;
   final VoidCallback? onTap;
   final String? semanticLabel;
+  final bool isCustom;
 
   const BottomActionBarItem({
     required this.child,
     required this.onTap,
     this.semanticLabel,
-  });
+  }) : isCustom = false;
+
+  /// For a child that is its own control (e.g. the download button): shown
+  /// as-is in a 48pt slot. Wrapping it in another IconButton left screen
+  /// readers an extra unlabelled "Button" that did nothing.
+  const BottomActionBarItem.custom({required this.child})
+    : onTap = null,
+      semanticLabel = null,
+      isCustom = true;
 }
 
 class BottomActionBar extends StatelessWidget {
@@ -38,6 +47,9 @@ class BottomActionBar extends StatelessWidget {
   Widget _buildItem(BottomActionBarItem? item) {
     if (item == null) {
       return const SizedBox(width: 48);
+    }
+    if (item.isCustom) {
+      return SizedBox(width: 48, height: 48, child: Center(child: item.child));
     }
 
     return IconButton(
