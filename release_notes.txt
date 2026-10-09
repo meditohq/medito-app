@@ -1,6 +1,9 @@
 Unreleased
 -
 
+2610.9.0
+- [android] Wear OS: try a meditation on your watch before Medito on your phone is set up
+
 2610.8.0
 - A new Timer: pick a length or use the stopwatch. Timer sessions count towards your stats.
 - Tap the picture on Home to start your next session
