@@ -1,15 +1,27 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' show Locale;
 
 import 'package:home_widget/home_widget.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/strings/shared_preference_constants.dart';
 import '../utils/logger.dart';
+
+/// The singular/plural streak unit ("day"/"days") the widgets show, in
+/// [locale]'s language. Falls back to English for a null or unsupported
+/// locale, matching the app's own fallback.
+({String day, String days}) widgetStreakUnitLabels(Locale? locale) {
+  final l10n = lookupAppLocalizations(
+    locale != null && AppLocalizations.delegate.isSupported(locale)
+        ? locale
+        : const Locale('en'),
+  );
+  return (day: l10n.day, days: l10n.days);
+}
 
 class HomeWidgetService {
   static const String _appGroupId = 'group.org.medito.widget';
@@ -80,64 +92,27 @@ class HomeWidgetService {
     }
   }
 
-  /// Updates the home widget with the latest stats data
-  static Future<void> updateWidget({
-    required LocalAllStats stats,
-    BuildContext? context,
-  }) async {
-    if (!Platform.isAndroid && !Platform.isIOS) {
-      return;
-    }
+  // The in-app language, set from the app root once [localeProvider] is read.
+  // Null until then, which resolves to English like the app itself.
+  static Locale? _locale;
+
+  /// Records the app's current language so the streak unit written to the
+  /// widgets matches it, and rewrites the labels immediately if it changed.
+  static Future<void> setLocale(Locale? locale) async {
+    if (locale == _locale) return;
+    _locale = locale;
+    if (!Platform.isAndroid && !Platform.isIOS) return;
 
     try {
-      // Resolve localised strings before any await so we never touch BuildContext
-      // across an async gap.
-      final l10n = context != null ? AppLocalizations.of(context) : null;
-      final dayLabel = l10n?.day ?? 'day';
-      final daysLabel = l10n?.days ?? 'days';
-
       await _configure();
-
-      final meditationDates = _extractMeditationDates(stats);
-      final freezeDates = stats.freezeUsageDates.toList();
-      final dayBoundaryOffsetHours = await _readDayBoundaryOffsetHours();
-
-      final consistencyPercentage = (stats.consistencyScore * 100)
-          .round()
-          .clamp(0, 100);
+      final labels = widgetStreakUnitLabels(locale);
       await Future.wait([
-        HomeWidget.saveWidgetData<int>(_streakCurrentKey, stats.streakCurrent),
-        HomeWidget.saveWidgetData<String>(
-          _meditationDatesKey,
-          jsonEncode(meditationDates),
-        ),
-        HomeWidget.saveWidgetData<String>(
-          _freezeDatesKey,
-          jsonEncode(freezeDates),
-        ),
-        HomeWidget.saveWidgetData<String>(_dayLabelKey, dayLabel),
-        HomeWidget.saveWidgetData<String>(_daysLabelKey, daysLabel),
-        HomeWidget.saveWidgetData<int>(
-          _lastUpdatedKey,
-          DateTime.now().millisecondsSinceEpoch,
-        ),
-        HomeWidget.saveWidgetData<int>(
-          _totalTracksCompletedKey,
-          stats.totalTracksCompleted,
-        ),
-        HomeWidget.saveWidgetData<int>(
-          _consistencyScoreKey,
-          consistencyPercentage,
-        ),
-        HomeWidget.saveWidgetData<int>(
-          _dayBoundaryOffsetHoursKey,
-          dayBoundaryOffsetHours,
-        ),
+        _saveWithTimeout(_dayLabelKey, labels.day),
+        _saveWithTimeout(_daysLabelKey, labels.days),
       ]);
-
       await _triggerWidgetRefresh();
     } catch (e) {
-      AppLogger.e('WIDGET', 'Failed to update widget', e);
+      AppLogger.e('WIDGET', 'Failed to save widget day labels', e);
     }
   }
 
@@ -150,6 +125,7 @@ class HomeWidgetService {
     try {
       await _configure();
 
+      final labels = widgetStreakUnitLabels(_locale);
       final meditationDates = _extractMeditationDates(stats);
       final freezeDates = stats.freezeUsageDates.toList();
       final consistencyPercentage = (stats.consistencyScore * 100)
@@ -162,8 +138,8 @@ class HomeWidgetService {
         _saveWithTimeout(_streakCurrentKey, stats.streakCurrent),
         _saveWithTimeout(_meditationDatesKey, jsonEncode(meditationDates)),
         _saveWithTimeout(_freezeDatesKey, jsonEncode(freezeDates)),
-        _saveWithTimeout(_dayLabelKey, 'day'),
-        _saveWithTimeout(_daysLabelKey, 'days'),
+        _saveWithTimeout(_dayLabelKey, labels.day),
+        _saveWithTimeout(_daysLabelKey, labels.days),
         _saveWithTimeout(
           _lastUpdatedKey,
           DateTime.now().millisecondsSinceEpoch,
