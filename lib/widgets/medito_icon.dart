@@ -22,6 +22,10 @@ class MeditoIcon extends StatelessWidget {
     if (assetName.isEmpty) return const SizedBox.shrink();
 
     final iconColour = color ?? Theme.of(context).colorScheme.onSurface;
+    // Unlabelled icons are decorative (the row or button around them carries
+    // the label). Left in, each one adds an "image" trait to its parent, so a
+    // settings row reads "Theme, Dark, image".
+    final decorative = semanticLabel == null;
 
     if (assetName.endsWith('.svg')) {
       return SvgPicture.asset(
@@ -31,6 +35,7 @@ class MeditoIcon extends StatelessWidget {
         fit: BoxFit.contain,
         colorFilter: ColorFilter.mode(iconColour, BlendMode.srcIn),
         semanticsLabel: semanticLabel,
+        excludeFromSemantics: decorative,
       );
     }
 
@@ -39,6 +44,7 @@ class MeditoIcon extends StatelessWidget {
       width: size,
       height: size,
       semanticLabel: semanticLabel,
+      excludeFromSemantics: decorative,
     );
   }
 }
