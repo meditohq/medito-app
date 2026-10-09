@@ -25,34 +25,28 @@ struct StreakProvider: TimelineProvider {
 }
 
 struct StreakWidgetView: View {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.widgetFamily) var family
     let entry: StreakEntry
 
-    private var effectiveDark: Bool {
-        switch entry.data.themePreference {
-        case "dark": return true
-        case "light": return false
-        default: return colorScheme == .dark
-        }
-    }
-
-    private var colors: WidgetColors { effectiveDark ? .dark : .light }
     private var isMedium: Bool { family == .systemMedium }
 
     private var today: Date { entry.data.today(at: entry.date) }
 
     var body: some View {
         let streak = entry.data.streak(at: entry.date)
-        StatWidgetBody(
-            value: "\(streak)",
-            unit: streak == 1 ? entry.data.dayLabel : entry.data.daysLabel,
-            doneToday: entry.data.allActivityDates.contains(today),
-            allActivityDates: entry.data.allActivityDates,
-            today: today,
-            colors: colors,
-            isMedium: isMedium
-        )
+        WidgetContextReader(themePreference: entry.data.themePreference) { colors, standBy in
+            StatWidgetBody(
+                value: "\(streak)",
+                unit: streak == 1 ? entry.data.dayLabel : entry.data.daysLabel,
+                doneToday: entry.data.allActivityDates.contains(today),
+                allActivityDates: entry.data.allActivityDates,
+                today: today,
+                colors: colors,
+                isMedium: isMedium
+            )
+            // Source params let DeepLinkService attribute the tap for analytics.
+            .widgetURL(widgetTapURL("streak", placement: standBy ? "standby" : "home_screen"))
+        }
     }
 }
 
@@ -62,8 +56,6 @@ struct StreakWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: StreakProvider()) { entry in
             StreakWidgetView(entry: entry)
-                // Source params let DeepLinkService attribute the tap for analytics.
-                .widgetURL(URL(string: "org.meditofoundation://medito/?source=home_widget&widget=streak"))
         }
         .configurationDisplayName("Streak")
         .description("See your current meditation streak.")

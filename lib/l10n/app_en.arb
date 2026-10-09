@@ -829,6 +829,30 @@
   "@addHomeScreenWidget": {
     "description": "Title for adding home screen widget option in customization section"
   },
+  "addWidgetSheetTitle": "Add a Medito widget",
+  "@addWidgetSheetTitle": {
+    "description": "Title of the iOS sheet explaining how to add a home screen widget"
+  },
+  "addWidgetStepHold": "Touch and hold an empty spot on your Home Screen until the apps jiggle.",
+  "@addWidgetStepHold": {
+    "description": "Step 1 of adding an iOS home screen widget"
+  },
+  "addWidgetStepEdit": "Tap Edit in the top corner, then Add Widget. On older iOS versions, tap +.",
+  "@addWidgetStepEdit": {
+    "description": "Step 2 of adding an iOS home screen widget; Edit / Add Widget are iOS button labels"
+  },
+  "addWidgetStepSearch": "Search for Medito and choose Streak, Consistency or Continue.",
+  "@addWidgetStepSearch": {
+    "description": "Step 3; Streak, Consistency and Continue are the iOS widget gallery names (English-only in the widget extension), keep them untranslated"
+  },
+  "addWidgetStepAdd": "Tap Add Widget, then Done.",
+  "@addWidgetStepAdd": {
+    "description": "Step 4; Add Widget / Done are iOS button labels"
+  },
+  "addWidgetFootnote": "Your widget updates after every meditation. For your Lock Screen, touch and hold it, then tap Customise and Add Widgets.",
+  "@addWidgetFootnote": {
+    "description": "Footnote under the add-widget steps"
+  },
   "themeTitle": "Theme",
   "@themeTitle": {
     "description": "Title for theme selection setting in customization section"

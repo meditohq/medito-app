@@ -1801,6 +1801,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addHomeScreenWidget => 'Añadir Widget a la Pantalla de Inicio';
 
   @override
+  String get addWidgetSheetTitle => 'Añade un widget de Medito';
+
+  @override
+  String get addWidgetStepHold =>
+      'Mantén pulsado un espacio vacío de la pantalla de inicio hasta que las apps empiecen a moverse.';
+
+  @override
+  String get addWidgetStepEdit =>
+      'Toca Editar en la esquina superior y luego Añadir widget. En versiones anteriores de iOS, toca +.';
+
+  @override
+  String get addWidgetStepSearch =>
+      'Busca Medito y elige Streak, Consistency o Continue.';
+
+  @override
+  String get addWidgetStepAdd => 'Toca Añadir widget y luego OK.';
+
+  @override
+  String get addWidgetFootnote =>
+      'Tu widget se actualiza después de cada meditación. Para la pantalla bloqueada, mantenla pulsada y toca Personalizar y luego Añadir widgets.';
+
+  @override
   String get themeTitle => 'Tema';
 
   @override

@@ -524,8 +524,18 @@ class AnalyticsEventConstants {
   /// (Android only — iOS doesn't expose a programmatic pin API).
   static const String homeWidgetPinRequested = 'home_widget_pin_requested';
 
-  /// Parameter naming the widget kind: `up_next`, `streak`, `consistency`.
+  /// Event logged when the iOS "how to add a widget" sheet is opened from
+  /// Settings (iOS has no pin API, so this stands in for the Android pin).
+  static const String homeWidgetInstructionsShown =
+      'home_widget_instructions_shown';
+
+  /// Parameter naming the widget kind: `up_next`, `streak`, `consistency`,
+  /// or the Lock Screen's `lock_streak` / `lock_consistency`.
   static const String paramWidgetType = 'widget_type';
+
+  /// Parameter for where the tapped widget sits (iOS): `home_screen`,
+  /// `standby` or `lock_screen`. Absent on Android and older builds.
+  static const String paramWidgetPlacement = 'placement';
 
   /// Sentinel value for the `source` deep-link query param that identifies
   /// the link as coming from a home-screen widget tap.
@@ -561,10 +571,22 @@ class AnalyticsEventConstants {
   /// says whether the watch's store / the Watch app could be opened.
   static const String watchInstallPromptTapped = 'watch_install_prompt_tapped';
 
+  /// GA4 user property listing the home-screen widget kinds the user has
+  /// placed, sorted and comma-joined ('consistency,up_next'), or 'none'.
+  /// 'lock' is the iOS Lock Screen widget.
+  /// Set on every Home launch so passive (never-tapped) widgets are visible.
+  static const String userPropHomeWidgets = 'home_widgets';
+
   /// GA4 user property for the Zen Mode setting ('on' / 'off'). Set on every
   /// launch and whenever the user toggles it, so adoption can be read from
   /// BigQuery and other metrics segmented by it.
   static const String userPropZenMode = 'zen_mode';
+
+  /// GA4 user property for whether daily reminders can actually reach the
+  /// user: 'on' (enabled and notification permission granted), 'blocked'
+  /// (enabled in the app but permission off in system settings), or 'off'.
+  /// Set on every launch and foreground, and when the user toggles reminders.
+  static const String userPropRemindersOn = 'reminders_on';
 
   /// Logged once per iOS install with Apple's AdServices answer for whether
   /// the install came from an Apple Ads campaign. Params: attributed

@@ -50,6 +50,7 @@ class ReminderEnabledNotifier extends Notifier<bool> {
     final prefs = ref.read(sharedPreferencesProvider);
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, value);
     state = value;
+    unawaited(FirebaseAnalyticsService.applyRemindersOnProperty());
   }
 }
 

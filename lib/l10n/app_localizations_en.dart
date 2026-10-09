@@ -1770,6 +1770,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addHomeScreenWidget => 'Add Home Screen Widget';
 
   @override
+  String get addWidgetSheetTitle => 'Add a Medito widget';
+
+  @override
+  String get addWidgetStepHold =>
+      'Touch and hold an empty spot on your Home Screen until the apps jiggle.';
+
+  @override
+  String get addWidgetStepEdit =>
+      'Tap Edit in the top corner, then Add Widget. On older iOS versions, tap +.';
+
+  @override
+  String get addWidgetStepSearch =>
+      'Search for Medito and choose Streak, Consistency or Continue.';
+
+  @override
+  String get addWidgetStepAdd => 'Tap Add Widget, then Done.';
+
+  @override
+  String get addWidgetFootnote =>
+      'Your widget updates after every meditation. For your Lock Screen, touch and hold it, then tap Customise and Add Widgets.';
+
+  @override
   String get themeTitle => 'Theme';
 
   @override

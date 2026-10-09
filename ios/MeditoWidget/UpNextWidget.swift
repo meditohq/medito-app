@@ -57,7 +57,7 @@ struct UpNextProvider: TimelineProvider {
 
 // MARK: - Shared sub-views
 
-/// The app's play button: accent disc, rounded play glyph in `onAccent`.
+/// The app's play button: accent disc, rounded play glyph in `onAccent` (cut out when monochrome).
 private struct PlayCircleView: View {
     let colors: WidgetColors
     var size: CGFloat = 40
@@ -67,9 +67,10 @@ private struct PlayCircleView: View {
             Circle().fill(colors.accent)
             Image(systemName: "play.fill")
                 .font(.system(size: size * 0.36, weight: .bold))
-                .foregroundStyle(colors.onAccent)
+                .onAccentGlyph(colors)
                 .offset(x: size * 0.035)
         }
+        .compositingGroup()
         .frame(width: size, height: size)
     }
 }
@@ -81,14 +82,6 @@ private func upNextLabel(_ entry: UpNextEntry) -> String {
 }
 
 private let emptyTitle = "Choose what's next"
-
-private func widgetColors(_ entry: UpNextEntry, _ colorScheme: ColorScheme) -> WidgetColors {
-    switch entry.themePreference {
-    case "dark": return .dark
-    case "light": return .light
-    default: return colorScheme == .dark ? .dark : .light
-    }
-}
 
 /// "CONTINUE · Pack" in the hero eyebrow's voice: small, semibold, tracked, muted. Hidden once
 /// the pack is finished.
@@ -151,10 +144,8 @@ private func hasProgress(_ entry: UpNextEntry) -> Bool { !entry.title.isEmpty &&
 // Eyebrow and play button along the top, title and progress along the bottom.
 
 private struct UpNextSmallView: View {
-    @Environment(\.colorScheme) var colorScheme
     let entry: UpNextEntry
-
-    private var colors: WidgetColors { widgetColors(entry, colorScheme) }
+    let colors: WidgetColors
     private var displayTitle: String { entry.title.isEmpty ? emptyTitle : entry.title }
 
     var body: some View {
@@ -189,10 +180,8 @@ private struct UpNextSmallView: View {
 // Same arrangement with room for the pack, subtitle and a "3/10" count — mirrors Android WIDE_TALL.
 
 private struct UpNextMediumView: View {
-    @Environment(\.colorScheme) var colorScheme
     let entry: UpNextEntry
-
-    private var colors: WidgetColors { widgetColors(entry, colorScheme) }
+    let colors: WidgetColors
     private var displayTitle: String { entry.title.isEmpty ? emptyTitle : entry.title }
 
     var body: some View {
@@ -239,23 +228,26 @@ struct UpNextWidgetEntryView: View {
     // Source params let DeepLinkService attribute the tap to the home-screen
     // widget for analytics. Empty-state tap still gets a deep link so the
     // open is attributable; no path segments → app just opens.
-    private var deepLinkURL: URL? {
+    private func deepLinkURL(standBy: Bool) -> URL? {
+        let placement = standBy ? "standby" : "home_screen"
         if entry.trackId.isEmpty {
-            return URL(string: "org.meditofoundation://medito/?source=home_widget&widget=up_next")
+            return widgetTapURL("up_next", placement: placement)
         }
-        return URL(string: "org.meditofoundation://tracks/\(entry.trackId)?source=home_widget&widget=up_next")
+        return widgetTapURL("up_next", path: "tracks/\(entry.trackId)", placement: placement)
     }
 
     var body: some View {
-        Group {
-            switch family {
-            case .systemSmall:
-                UpNextSmallView(entry: entry)
-            default:
-                UpNextMediumView(entry: entry)
+        WidgetContextReader(themePreference: entry.themePreference) { colors, standBy in
+            Group {
+                switch family {
+                case .systemSmall:
+                    UpNextSmallView(entry: entry, colors: colors)
+                default:
+                    UpNextMediumView(entry: entry, colors: colors)
+                }
             }
+            .widgetURL(deepLinkURL(standBy: standBy))
         }
-        .widgetURL(deepLinkURL)
     }
 }
 

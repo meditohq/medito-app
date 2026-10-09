@@ -1814,6 +1814,29 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addHomeScreenWidget => 'Widget zum Startbildschirm hinzufügen';
 
   @override
+  String get addWidgetSheetTitle => 'Medito-Widget hinzufügen';
+
+  @override
+  String get addWidgetStepHold =>
+      'Halte eine freie Stelle auf deinem Home-Bildschirm gedrückt, bis die Apps wackeln.';
+
+  @override
+  String get addWidgetStepEdit =>
+      'Tippe oben auf „Bearbeiten“ und dann auf „Widget hinzufügen“. Bei älteren iOS-Versionen tippst du auf +.';
+
+  @override
+  String get addWidgetStepSearch =>
+      'Suche nach Medito und wähle Streak, Consistency oder Continue.';
+
+  @override
+  String get addWidgetStepAdd =>
+      'Tippe auf „Widget hinzufügen“ und dann auf „Fertig“.';
+
+  @override
+  String get addWidgetFootnote =>
+      'Dein Widget aktualisiert sich nach jeder Meditation. Für den Sperrbildschirm: Halte ihn gedrückt und tippe auf „Anpassen“ und dann auf „Widgets hinzufügen“.';
+
+  @override
   String get themeTitle => 'Erscheinungsbild';
 
   @override

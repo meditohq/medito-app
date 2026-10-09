@@ -23,6 +23,11 @@ struct WidgetData {
     let daysLabel: String
     let themePreference: String
     let dayBoundaryOffsetHours: Int
+    /// The in-app streak chip's choice ("currentStreak" / "consistencyScore"), which the Lock
+    /// Screen widget follows. Defaults to the consistency score, as the app does.
+    var statDisplay: String = "consistencyScore"
+
+    var showsStreak: Bool { statDisplay == "currentStreak" }
 
     var allActivityDates: Set<Date> { meditationDates.union(freezeDates) }
 
@@ -79,7 +84,8 @@ struct WidgetData {
             dayLabel: defaults?.string(forKey: "day_label") ?? "day",
             daysLabel: defaults?.string(forKey: "days_label") ?? "days",
             themePreference: defaults?.string(forKey: "theme_preference") ?? "system",
-            dayBoundaryOffsetHours: offsetHours
+            dayBoundaryOffsetHours: offsetHours,
+            statDisplay: defaults?.string(forKey: "stat_display") ?? "consistencyScore"
         )
     }
 
@@ -105,6 +111,8 @@ struct WidgetColors {
     let inactiveColor: Color
     let accent: Color
     let onAccent: Color
+    /// Punch glyphs out of the accent disc instead of painting them in `onAccent`.
+    var knockOutGlyphs = false
 
     static let dark = WidgetColors(
         backgroundColor: Color(hex: "1A1A1A"), // ebony
@@ -123,6 +131,88 @@ struct WidgetColors {
         accent: Color(hex: "171717"), // brandAccent (light)
         onAccent: Color(hex: "FAFAFA") // onAccentLight
     )
+
+    /// Clear / tinted home screen and StandBy at night: the system keeps only each pixel's
+    /// opacity, so every colour comes out the same and states must differ by alpha, with glyphs
+    /// cut out of their discs.
+    static let monochrome = WidgetColors(
+        backgroundColor: Color(hex: "1A1A1A"),
+        textColor: .white,
+        secondaryTextColor: .white.opacity(0.6),
+        inactiveColor: .white.opacity(0.25),
+        accent: .white,
+        onAccent: .black,
+        knockOutGlyphs: true
+    )
+
+    /// The palette for the in-app theme choice ("dark" / "light" / "system").
+    static func forTheme(_ themePreference: String, _ colorScheme: ColorScheme) -> WidgetColors {
+        switch themePreference {
+        case "dark": return .dark
+        case "light": return .light
+        default: return colorScheme == .dark ? .dark : .light
+        }
+    }
+}
+
+/// Resolves the palette and placement from the widget's environment and hands them to `content`.
+///
+/// Where the system strips the container background (StandBy) the content sits on black, so the
+/// light palette's near-black text would vanish: the dark palette is used whatever the in-app
+/// theme says. Where it doesn't render in full colour (clear / tinted home screen, StandBy at
+/// night) the monochrome palette is used.
+struct WidgetContextReader<Content: View>: View {
+    let themePreference: String
+    let content: (WidgetColors, _ standBy: Bool) -> Content
+
+    init(themePreference: String, @ViewBuilder content: @escaping (WidgetColors, Bool) -> Content) {
+        self.themePreference = themePreference
+        self.content = content
+    }
+
+    var body: some View {
+        if #available(iOSApplicationExtension 17.0, *) {
+            BackgroundAwareReader(themePreference: themePreference, content: content)
+        } else {
+            ThemeReader(themePreference: themePreference, content: content)
+        }
+    }
+
+    private struct ThemeReader: View {
+        @Environment(\.colorScheme) var colorScheme
+        let themePreference: String
+        let content: (WidgetColors, Bool) -> Content
+
+        var body: some View {
+            content(WidgetColors.forTheme(themePreference, colorScheme), false)
+        }
+    }
+
+    @available(iOSApplicationExtension 17.0, *)
+    private struct BackgroundAwareReader: View {
+        @Environment(\.colorScheme) var colorScheme
+        @Environment(\.showsWidgetContainerBackground) var showsBackground
+        @Environment(\.widgetRenderingMode) var renderingMode
+        let themePreference: String
+        let content: (WidgetColors, Bool) -> Content
+
+        var body: some View {
+            let colors: WidgetColors = renderingMode != .fullColor
+                ? .monochrome
+                : !showsBackground ? .dark : .forTheme(themePreference, colorScheme)
+            content(
+                colors,
+                // A home-screen-size widget without its background is in StandBy (or, rarely, on
+                // an iPad Lock Screen).
+                !showsBackground
+            )
+        }
+    }
+}
+
+/// A widget's tap deep link. `placement` lets DeepLinkService split taps by where the widget sits.
+func widgetTapURL(_ widget: String, path: String = "medito/", placement: String = "home_screen") -> URL? {
+    URL(string: "org.meditofoundation://\(path)?source=home_widget&widget=\(widget)&placement=\(placement)")
 }
 
 /// Google Sans, registered from the containing app's Flutter bundle so the extension shares the
@@ -188,9 +278,10 @@ struct CalendarStrip: View {
                         if active {
                             Image(systemName: "checkmark")
                                 .font(.system(size: circleSize * 0.4, weight: .bold))
-                                .foregroundStyle(colors.onAccent)
+                                .onAccentGlyph(colors)
                         }
                     }
+                    .compositingGroup()
                     .frame(width: circleSize, height: circleSize)
                 }
                 .frame(maxWidth: .infinity)
@@ -413,6 +504,17 @@ struct StatWidgetBody: View {
 }
 
 extension View {
+    /// A glyph on an accent disc: painted in `onAccent`, or punched out of the disc for the
+    /// monochrome palette (the disc needs `.compositingGroup()` so only it is cut).
+    @ViewBuilder
+    func onAccentGlyph(_ colors: WidgetColors) -> some View {
+        if colors.knockOutGlyphs {
+            foregroundStyle(.black).blendMode(.destinationOut)
+        } else {
+            foregroundStyle(colors.onAccent)
+        }
+    }
+
     @ViewBuilder
     func widgetBackground(color: Color) -> some View {
         if #available(iOSApplicationExtension 17.0, *) {

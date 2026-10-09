@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/services/home_widget_service.dart';
 
 enum StreakCircleDisplayType { consistencyScore, currentStreak }
 
@@ -25,6 +26,7 @@ class StreakCircleDisplayNotifier
       type.name,
     );
     state = AsyncValue.data(type);
+    await HomeWidgetService.saveStatDisplay(type.name);
   }
 }
 

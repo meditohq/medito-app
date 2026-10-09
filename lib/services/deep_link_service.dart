@@ -177,6 +177,10 @@ class DeepLinkService {
         AnalyticsEventConstants.paramWidgetType: widgetType,
         'platform': Platform.isIOS ? 'ios' : 'android',
       };
+      final placement = uri.queryParameters['placement'];
+      if (placement != null) {
+        params[AnalyticsEventConstants.paramWidgetPlacement] = placement;
+      }
 
       // Include the track id when present so we can correlate widget taps
       // with content (Up Next widget only). Normalise across the two URI

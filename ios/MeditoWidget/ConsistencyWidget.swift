@@ -25,34 +25,28 @@ struct ConsistencyProvider: TimelineProvider {
 }
 
 struct ConsistencyWidgetView: View {
-    @Environment(\.colorScheme) var colorScheme
     @Environment(\.widgetFamily) var family
     let entry: ConsistencyEntry
 
-    private var effectiveDark: Bool {
-        switch entry.data.themePreference {
-        case "dark": return true
-        case "light": return false
-        default: return colorScheme == .dark
-        }
-    }
-
-    private var colors: WidgetColors { effectiveDark ? .dark : .light }
     private var isMedium: Bool { family == .systemMedium }
 
     private var today: Date { entry.data.today(at: entry.date) }
 
     var body: some View {
         let score = entry.data.consistencyScore(at: entry.date)
-        StatWidgetBody(
-            value: "\(score)%",
-            ringScore: score,
-            doneToday: entry.data.allActivityDates.contains(today),
-            allActivityDates: entry.data.allActivityDates,
-            today: today,
-            colors: colors,
-            isMedium: isMedium
-        )
+        WidgetContextReader(themePreference: entry.data.themePreference) { colors, standBy in
+            StatWidgetBody(
+                value: "\(score)%",
+                ringScore: score,
+                doneToday: entry.data.allActivityDates.contains(today),
+                allActivityDates: entry.data.allActivityDates,
+                today: today,
+                colors: colors,
+                isMedium: isMedium
+            )
+            // Source params let DeepLinkService attribute the tap for analytics.
+            .widgetURL(widgetTapURL("consistency", placement: standBy ? "standby" : "home_screen"))
+        }
     }
 }
 
@@ -62,8 +56,6 @@ struct ConsistencyWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: ConsistencyProvider()) { entry in
             ConsistencyWidgetView(entry: entry)
-                // Source params let DeepLinkService attribute the tap for analytics.
-                .widgetURL(URL(string: "org.meditofoundation://medito/?source=home_widget&widget=consistency"))
         }
         .configurationDisplayName("Consistency")
         .description("See your meditation consistency percentage.")

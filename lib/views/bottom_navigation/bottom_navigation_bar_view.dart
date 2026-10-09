@@ -11,6 +11,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/services/installed_widgets_service.dart';
 import 'package:medito/services/watch_presence_service.dart';
 import 'package:medito/views/bottom_navigation/widgets/medito_nav_bar.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
@@ -56,7 +57,10 @@ class _BottomNavigationBarViewState
     ];
 
     _initializeStats();
-    if (_currentPageIndex == _homeIndex) unawaited(reportWatchPresence());
+    if (_currentPageIndex == _homeIndex) {
+      unawaited(reportWatchPresence());
+      unawaited(reportInstalledHomeWidgets());
+    }
   }
 
   Future<void> _initializeStats() async {
@@ -184,8 +188,12 @@ class _BottomNavigationBarViewState
           .setInt(SharedPreferenceConstants.lastMainTabIndex, index);
     }
 
-    // Refresh watch presence each time Home is shown (pairing may change).
-    if (index == _homeIndex && entering) unawaited(reportWatchPresence());
+    // Refresh watch presence and installed widgets each time Home is shown
+    // (pairing and the home screen may have changed).
+    if (index == _homeIndex && entering) {
+      unawaited(reportWatchPresence());
+      unawaited(reportInstalledHomeWidgets());
+    }
 
     // Load explore data only on the first visit to the explore tab.
     if (index == _exploreIndex) {

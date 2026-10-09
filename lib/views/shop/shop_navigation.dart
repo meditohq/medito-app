@@ -52,7 +52,9 @@ Future<void> startShopCheckout(WidgetRef ref) async {
   if (bag.isEmpty) return;
 
   final currency = ref.read(shopCurrencyProvider);
-  final uri = FourthwallService.checkoutUri(bag.items, currency: currency);
+  final uri = await ref
+      .read(fourthwallServiceProvider)
+      .resolveCheckoutUri(bag.items, currency: currency);
 
   ref
       .read(analyticsServiceProvider)

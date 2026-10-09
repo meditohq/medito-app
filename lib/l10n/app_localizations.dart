@@ -3262,6 +3262,42 @@ abstract class AppLocalizations {
   /// **'Add Home Screen Widget'**
   String get addHomeScreenWidget;
 
+  /// Title of the iOS sheet explaining how to add a home screen widget
+  ///
+  /// In en, this message translates to:
+  /// **'Add a Medito widget'**
+  String get addWidgetSheetTitle;
+
+  /// Step 1 of adding an iOS home screen widget
+  ///
+  /// In en, this message translates to:
+  /// **'Touch and hold an empty spot on your Home Screen until the apps jiggle.'**
+  String get addWidgetStepHold;
+
+  /// Step 2 of adding an iOS home screen widget; Edit / Add Widget are iOS button labels
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Edit in the top corner, then Add Widget. On older iOS versions, tap +.'**
+  String get addWidgetStepEdit;
+
+  /// Step 3; Streak, Consistency and Continue are the iOS widget gallery names (English-only in the widget extension), keep them untranslated
+  ///
+  /// In en, this message translates to:
+  /// **'Search for Medito and choose Streak, Consistency or Continue.'**
+  String get addWidgetStepSearch;
+
+  /// Step 4; Add Widget / Done are iOS button labels
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Add Widget, then Done.'**
+  String get addWidgetStepAdd;
+
+  /// Footnote under the add-widget steps
+  ///
+  /// In en, this message translates to:
+  /// **'Your widget updates after every meditation. For your Lock Screen, touch and hold it, then tap Customise and Add Widgets.'**
+  String get addWidgetFootnote;
+
   /// Title for theme selection setting in customization section
   ///
   /// In en, this message translates to:

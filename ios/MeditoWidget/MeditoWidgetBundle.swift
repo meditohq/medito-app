@@ -11,5 +11,6 @@ struct MeditoWidgetBundle: WidgetBundle {
         StreakWidget()
         ConsistencyWidget()
         UpNextWidget()
+        PracticeWidget()
     }
 }
