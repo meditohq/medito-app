@@ -105,12 +105,16 @@ class PackPathButton extends StatelessWidget {
 
   Widget _progressEdge(BuildContext context, int completed, int total) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
+    // The play button's label already says "3 of 7"; a bare "43%" here added
+    // nothing.
     return SizedBox(
       height: _progressHeight,
-      child: LinearProgressIndicator(
-        value: total == 0 ? 0 : completed / total,
-        backgroundColor: onSurface.withValues(alpha: 0.08),
-        color: context.brandAccent,
+      child: ExcludeSemantics(
+        child: LinearProgressIndicator(
+          value: total == 0 ? 0 : completed / total,
+          backgroundColor: onSurface.withValues(alpha: 0.08),
+          color: context.brandAccent,
+        ),
       ),
     );
   }

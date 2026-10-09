@@ -2129,5 +2129,55 @@
   "clearEmail": "Clear email",
   "@clearEmail": {
     "description": "Tooltip / screen-reader label of the button that clears the email field on the sign-in screen"
+  },
+  "previousMonth": "Previous month",
+  "@previousMonth": {
+    "description": "Screen-reader label of the stats calendar's previous-month arrow"
+  },
+  "nextMonth": "Next month",
+  "@nextMonth": {
+    "description": "Screen-reader label of the stats calendar's next-month arrow"
+  },
+  "searchResultsCount": "{count, plural, =1{1 result} other{{count} results}}",
+  "@searchResultsCount": {
+    "description": "Screen-reader count on a search filter tab, read after the tab name",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearField": "Clear",
+  "@clearField": {
+    "description": "Tooltip / screen-reader label of an icon button that clears a text field"
+  },
+  "shopPriceWas": "{price}, was {compareAt}",
+  "@shopPriceWas": {
+    "description": "Screen-reader reading of a sale price with the struck-through original price, e.g. '£25, was £30'",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "compareAt": {
+        "type": "String"
+      }
+    }
+  },
+  "shopQuantity": "Quantity: {count}",
+  "@shopQuantity": {
+    "description": "Screen-reader reading of the quantity number between the bag's minus and plus buttons",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "externalLink": "External link",
+  "@externalLink": {
+    "description": "Screen-reader label of the link icon on pack rows that open a web page"
+  },
+  "meditatedToday": "Meditated today",
+  "@meditatedToday": {
+    "description": "Screen-reader suffix on the Home streak circle once today's meditation is done"
   }
 }

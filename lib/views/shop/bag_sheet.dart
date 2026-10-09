@@ -46,11 +46,15 @@ class ShopBagButton extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return IconButton(
-      tooltip: l10n.shopViewBag,
+      // The count goes in the label: the badge's bare number read as
+      // "3, View bag".
+      tooltip: count > 0
+          ? '${l10n.shopViewBag}, ${l10n.shopBagItemCount(count)}'
+          : l10n.shopViewBag,
       onPressed: () => showShopBag(context, source: source, onBrowse: onBrowse),
       icon: Badge(
         isLabelVisible: count > 0,
-        label: Text('$count'),
+        label: ExcludeSemantics(child: Text('$count')),
         backgroundColor: theme.colorScheme.primary,
         textColor: theme.colorScheme.onPrimary,
         child: MeditoIcon(
@@ -305,6 +309,8 @@ class _QuantityStepper extends StatelessWidget {
             width: 20,
             child: Text(
               '$quantity',
+              // Read as "Quantity: 2", not a bare "2" between two buttons.
+              semanticsLabel: l10n.shopQuantity(quantity),
               textAlign: TextAlign.center,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: onSurface,
@@ -609,9 +615,16 @@ class _AddOns extends ConsumerWidget {
               spacing: 10,
               children: [
                 for (final product in addOns)
+                  // One label: the name was read, then the name and price
+                  // texts again.
                   Semantics(
                     button: true,
-                    label: product.name,
+                    label: [
+                      product.name,
+                      if (product.fromPrice case final price?) price.format(),
+                    ].join(', '),
+                    excludeSemantics: true,
+                    onTap: () => open(product),
                     child: GestureDetector(
                       onTap: () => open(product),
                       child: SizedBox(

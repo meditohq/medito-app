@@ -413,8 +413,11 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
       ),
     );
 
+    // Grouped, not labelled: a label on top of the visible title and subtitle
+    // read both twice. The content (eyebrow, title, subtitle, then the
+    // button) already reads in order.
     return Semantics(
-      label: '$title. $subtitle',
+      container: true,
       child: isHero
           ? body
           : Padding(
@@ -613,10 +616,17 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                   ),
               ],
             ),
+            // One stop for the whole card: without excludeSemantics its texts,
+            // the progress bar ("43%") and "3 of 7" were read again after the
+            // label. The tap moves here because excluding drops the
+            // GestureDetector's.
             child: Semantics(
               label:
-                  '$eyebrow: ${widget.data.pack.title} — ${nextSession.title}',
+                  '$eyebrow: ${widget.data.pack.title} — ${nextSession.title}'
+                  '${widget.data.totalCount > 0 ? ', ${l10n.upNextProgress(widget.data.completedCount, widget.data.totalCount)}' : ''}',
               button: true,
+              excludeSemantics: true,
+              onTap: () => _onTap(context),
               customSemanticsActions: {
                 CustomSemanticsAction(label: l10n.skip): () => _onSkip(context),
                 CustomSemanticsAction(label: l10n.openPack): () =>

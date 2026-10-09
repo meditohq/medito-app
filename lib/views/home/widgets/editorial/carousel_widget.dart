@@ -93,13 +93,17 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: padding16),
-          child: Text(
-            AppLocalizations.of(context)!.carouselTitle,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              height: 28 / 24,
-              color: Theme.of(context).colorScheme.onSurface,
+          // A heading, so screen-reader users can jump between Home sections.
+          child: Semantics(
+            header: true,
+            child: Text(
+              AppLocalizations.of(context)!.carouselTitle,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                height: 28 / 24,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
         ),
@@ -119,11 +123,16 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(_kCardBorderRadius),
                 ),
-                onTap: (index) => _onItemTap(index),
+                // The carousel's own tap layer sits beside each child, not
+                // around it: every card was two screen-reader stops (a label
+                // with no action, then an unlabelled tap target), and the two
+                // spacers below were focusable tap targets whose index
+                // overran carouselItems. Cards handle their own tap instead.
+                enableSplash: false,
                 children: [
-                  ...widget.carouselItems.map((item) {
-                    return _buildCarouselItem(context, item);
-                  }),
+                  for (final (index, item) in widget.carouselItems.indexed)
+                    _buildTappableItem(context, item, index),
+                  // Spacers so the last card can scroll fully into view.
                   const SizedBox.shrink(),
                   const SizedBox.shrink(),
                 ],
@@ -190,6 +199,7 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   }
 
   void _onItemTap(int index) {
+    if (index >= widget.carouselItems.length) return;
     final item = widget.carouselItems[index];
     unawaited(
       ref
@@ -204,63 +214,82 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     );
   }
 
+  Widget _buildTappableItem(
+    BuildContext context,
+    HomeCarouselModel item,
+    int index,
+  ) {
+    return Semantics(
+      label: item.title,
+      button: true,
+      excludeSemantics: true,
+      onTap: () => _onItemTap(index),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          _buildCarouselItem(context, item),
+          Material(
+            type: MaterialType.transparency,
+            child: InkWell(onTap: () => _onItemTap(index)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCarouselItem(BuildContext context, HomeCarouselModel item) {
     final cardColor = Theme.of(context).cardColor;
     final screenWidth = MediaQuery.of(context).size.width;
     final imageWidth = screenWidth * 0.55;
 
-    return Semantics(
-      label: item.title,
-      button: true,
-      child: _buildBanner(
-        item,
-        HomeGradientBorder(
-          backgroundColor: cardColor,
-          borderRadius: _kCardBorderRadius,
-          borderWidth: 0.5,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              OverflowBox(
-                maxWidth: imageWidth,
-                minWidth: imageWidth,
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
-                  width: imageWidth,
-                  child: NetworkImageWidget(
-                    url: item.coverUrl,
-                    shouldCache: true,
-                  ),
+    return _buildBanner(
+      item,
+      HomeGradientBorder(
+        backgroundColor: cardColor,
+        borderRadius: _kCardBorderRadius,
+        borderWidth: 0.5,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            OverflowBox(
+              maxWidth: imageWidth,
+              minWidth: imageWidth,
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                width: imageWidth,
+                child: NetworkImageWidget(
+                  url: item.coverUrl,
+                  shouldCache: true,
                 ),
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(10, 36, 10, 12),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [Color(0xCC000000), Colors.transparent],
-                    ),
-                  ),
-                  child: Text(
-                    item.title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      height: 1.2,
-                      color: Colors.white,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 36, 10, 12),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [Color(0xCC000000), Colors.transparent],
                   ),
                 ),
+                child: Text(
+                  item.title,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 1.2,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

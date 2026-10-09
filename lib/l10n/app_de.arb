@@ -1762,5 +1762,13 @@
   "playbackPositionValue": "{position} von {duration}",
   "dayMeditated": "Meditiert",
   "dayNotMeditated": "Nicht meditiert",
-  "clearEmail": "E-Mail löschen"
+  "clearEmail": "E-Mail löschen",
+  "previousMonth": "Vorheriger Monat",
+  "nextMonth": "Nächster Monat",
+  "searchResultsCount": "{count, plural, =1{1 Ergebnis} other{{count} Ergebnisse}}",
+  "clearField": "Löschen",
+  "shopPriceWas": "{price}, vorher {compareAt}",
+  "shopQuantity": "Menge: {count}",
+  "externalLink": "Externer Link",
+  "meditatedToday": "Heute meditiert"
 }

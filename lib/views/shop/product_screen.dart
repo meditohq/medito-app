@@ -495,34 +495,43 @@ class _Price extends StatelessWidget {
     final price = needsSize ? cheapest : display?.price;
     if (price == null) return const SizedBox.shrink();
     final compareAt = needsSize ? null : display?.compareAtPrice;
+    final shownPrice = needsSize && varied
+        ? l10n.shopFromPrice(price.format())
+        : price.format();
+    final onSale = compareAt != null && compareAt.value > price.value;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.baseline,
-      textBaseline: TextBaseline.alphabetic,
-      children: [
-        Text(
-          needsSize && varied
-              ? l10n.shopFromPrice(price.format())
-              : price.format(),
-          style: style,
-        ),
-        if (compareAt != null && compareAt.value > price.value) ...[
-          const SizedBox(width: 8),
-          Text(
-            compareAt.format(),
-            style: style?.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: onSurface.withValues(alpha: 0.5),
-              decoration: TextDecoration.lineThrough,
+    // Two bare prices ("$30 $40") gave no hint which was the old one.
+    final priceSemantics = onSale
+        ? l10n.shopPriceWas(shownPrice, compareAt.format())
+        : shownPrice;
+    return Semantics(
+      label: product.isAvailable
+          ? priceSemantics
+          : '$priceSemantics, ${l10n.shopSoldOut}',
+      excludeSemantics: true,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          Text(shownPrice, style: style),
+          if (onSale) ...[
+            const SizedBox(width: 8),
+            Text(
+              compareAt.format(),
+              style: style?.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: onSurface.withValues(alpha: 0.5),
+                decoration: TextDecoration.lineThrough,
+              ),
             ),
-          ),
+          ],
+          if (!product.isAvailable) ...[
+            const SizedBox(width: 12),
+            ShopPill(label: l10n.shopSoldOut),
+          ],
         ],
-        if (!product.isAvailable) ...[
-          const SizedBox(width: 12),
-          ShopPill(label: l10n.shopSoldOut),
-        ],
-      ],
+      ),
     );
   }
 }
@@ -594,6 +603,8 @@ class _ColorSwatches extends StatelessWidget {
                 button: true,
                 child: Tooltip(
                   message: c.name,
+                  // The Semantics above already names it ("Black, Black").
+                  excludeFromSemantics: true,
                   child: GestureDetector(
                     onTap: () => onSelected(c.name),
                     child: AnimatedContainer(

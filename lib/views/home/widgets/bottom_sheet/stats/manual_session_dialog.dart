@@ -224,6 +224,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           prefixIcon: Icon(Icons.timer, color: theme.colorScheme.onSurface),
           suffixIcon: _durationController.text.isNotEmpty
               ? IconButton(
+                  tooltip: l10n.clearField,
                   icon: Icon(
                     Icons.clear,
                     size: 20,

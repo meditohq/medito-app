@@ -63,20 +63,26 @@ class ProductsWidget extends ConsumerWidget {
           child: Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: openAll,
-                  behavior: HitTestBehavior.opaque,
-                  child: Text(
-                    showBlackFridayStyle
-                        ? l10n.blackFridayTitle
-                        : l10n.meditationProducts,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      height: 28 / 24,
-                      color: onSurface,
+                // A heading, so screen-reader users can jump between Home
+                // sections; still opens the shop.
+                child: Semantics(
+                  header: true,
+                  button: true,
+                  child: GestureDetector(
+                    onTap: openAll,
+                    behavior: HitTestBehavior.opaque,
+                    child: Text(
+                      showBlackFridayStyle
+                          ? l10n.blackFridayTitle
+                          : l10n.meditationProducts,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                        height: 28 / 24,
+                        color: onSurface,
+                      ),
                     ),
                   ),
                 ),
@@ -210,7 +216,10 @@ class _ProductTile extends ConsumerWidget {
 
     return Semantics(
       button: true,
-      label: '${product.name}, $priceLabel',
+      // The label hides the photo's "New" pill, so carry it here.
+      label:
+          '${product.name}, $priceLabel'
+          '${product.isNewAt(DateTime.now()) ? ', ${l10n.newProductLabel}' : ''}',
       excludeSemantics: true,
       // excludeSemantics drops the child's tap action, so give it here.
       onTap: () => _open(context, ref),

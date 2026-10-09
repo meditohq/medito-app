@@ -2880,4 +2880,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearEmail => 'Clear email';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
+
+  @override
+  String searchResultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count results',
+      one: '1 result',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get clearField => 'Clear';
+
+  @override
+  String shopPriceWas(String price, String compareAt) {
+    return '$price, was $compareAt';
+  }
+
+  @override
+  String shopQuantity(int count) {
+    return 'Quantity: $count';
+  }
+
+  @override
+  String get externalLink => 'External link';
+
+  @override
+  String get meditatedToday => 'Meditated today';
 }

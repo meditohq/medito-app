@@ -1362,5 +1362,13 @@
   "playbackPositionValue": "{position} de {duration}",
   "dayMeditated": "Meditaste",
   "dayNotMeditated": "Sin meditar",
-  "clearEmail": "Borrar correo electrónico"
+  "clearEmail": "Borrar correo electrónico",
+  "previousMonth": "Mes anterior",
+  "nextMonth": "Mes siguiente",
+  "searchResultsCount": "{count, plural, =1{1 resultado} other{{count} resultados}}",
+  "clearField": "Borrar",
+  "shopPriceWas": "{price}, antes {compareAt}",
+  "shopQuantity": "Cantidad: {count}",
+  "externalLink": "Enlace externo",
+  "meditatedToday": "Has meditado hoy"
 }

@@ -44,6 +44,7 @@ class _TagViewState extends ConsumerState<TagView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
+            tooltip: AppLocalizations.of(context)!.close,
             onPressed: () => Navigator.pop(context),
           ),
         ],

@@ -249,17 +249,22 @@ class _PackViewState extends ConsumerState<PackView>
   Widget _buildListTile(PackItemsModel item, bool isLast) {
     return Column(
       children: [
-        InkWell(
-          onTap: () {
-            _onListItemTap(item.id, item.type, context);
-          },
-          splashColor: ColorConstants.charcoal,
-          child: item.type == TypeConstants.pack
-              ? PackItemWidget(item: item)
-              : PackItemWidget(
-                  item: item,
-                  onSetComplete: (complete) => _setComplete(item, complete),
-                ),
+        // Rows open a session, pack or link; without the role they read as
+        // plain text.
+        Semantics(
+          button: true,
+          child: InkWell(
+            onTap: () {
+              _onListItemTap(item.id, item.type, context);
+            },
+            splashColor: ColorConstants.charcoal,
+            child: item.type == TypeConstants.pack
+                ? PackItemWidget(item: item)
+                : PackItemWidget(
+                    item: item,
+                    onSetComplete: (complete) => _setComplete(item, complete),
+                  ),
+          ),
         ),
         if (!isLast)
           const Divider(

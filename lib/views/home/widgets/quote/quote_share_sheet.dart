@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -232,11 +233,14 @@ class _QuoteShareScreenState extends ConsumerState<QuoteShareScreen> {
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               color: context.onBrandAccent,
+                              semanticsLabel: AppLocalizations.of(
+                                context,
+                              )!.loading,
                             ),
                           )
-                        : const Text(
-                            'Share',
-                            style: TextStyle(
+                        : Text(
+                            AppLocalizations.of(context)!.share,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),

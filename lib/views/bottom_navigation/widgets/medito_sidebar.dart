@@ -39,6 +39,7 @@ class MeditoSidebar extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Semantics(
+                      button: true,
                       selected: selectedIndex == i,
                       child: Material(
                         color: selectedIndex == i

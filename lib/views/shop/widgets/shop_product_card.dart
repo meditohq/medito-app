@@ -34,9 +34,17 @@ class ShopProductCard extends StatelessWidget {
         ? l10n.shopFromPrice(price.format())
         : price.format();
 
+    // The label hides the photo's pill, so carry its state here: a sold-out
+    // product sounded the same as an available one.
+    final status = !available
+        ? ', ${l10n.shopSoldOut}'
+        : product.isNewAt(DateTime.now())
+        ? ', ${l10n.newProductLabel}'
+        : '';
+
     return Semantics(
       button: true,
-      label: '${product.name}, $priceLabel',
+      label: '${product.name}, $priceLabel$status',
       excludeSemantics: true,
       // excludeSemantics drops the child's tap action, so give it here.
       onTap: onTap,

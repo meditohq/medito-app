@@ -15,18 +15,23 @@ class TagChip extends StatelessWidget {
     return Material(
       color: theme.cardColor,
       shape: StadiumBorder(
-        side: BorderSide(color: theme.colorScheme.outline.withOpacityValue(0.3)),
+        side: BorderSide(
+          color: theme.colorScheme.outline.withOpacityValue(0.3),
+        ),
       ),
-      child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: onSurface,
-              fontWeight: FontWeight.w500,
+      child: Semantics(
+        button: true,
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: onSurface,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),

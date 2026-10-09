@@ -5277,6 +5277,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear email'**
   String get clearEmail;
+
+  /// Screen-reader label of the stats calendar's previous-month arrow
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get previousMonth;
+
+  /// Screen-reader label of the stats calendar's next-month arrow
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get nextMonth;
+
+  /// Screen-reader count on a search filter tab, read after the tab name
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 result} other{{count} results}}'**
+  String searchResultsCount(int count);
+
+  /// Tooltip / screen-reader label of an icon button that clears a text field
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearField;
+
+  /// Screen-reader reading of a sale price with the struck-through original price, e.g. '£25, was £30'
+  ///
+  /// In en, this message translates to:
+  /// **'{price}, was {compareAt}'**
+  String shopPriceWas(String price, String compareAt);
+
+  /// Screen-reader reading of the quantity number between the bag's minus and plus buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity: {count}'**
+  String shopQuantity(int count);
+
+  /// Screen-reader label of the link icon on pack rows that open a web page
+  ///
+  /// In en, this message translates to:
+  /// **'External link'**
+  String get externalLink;
+
+  /// Screen-reader suffix on the Home streak circle once today's meditation is done
+  ///
+  /// In en, this message translates to:
+  /// **'Meditated today'**
+  String get meditatedToday;
 }
 
 class _AppLocalizationsDelegate

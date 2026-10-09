@@ -2917,4 +2917,40 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get clearEmail => 'Borrar correo electrónico';
+
+  @override
+  String get previousMonth => 'Mes anterior';
+
+  @override
+  String get nextMonth => 'Mes siguiente';
+
+  @override
+  String searchResultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count resultados',
+      one: '1 resultado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get clearField => 'Borrar';
+
+  @override
+  String shopPriceWas(String price, String compareAt) {
+    return '$price, antes $compareAt';
+  }
+
+  @override
+  String shopQuantity(int count) {
+    return 'Cantidad: $count';
+  }
+
+  @override
+  String get externalLink => 'Enlace externo';
+
+  @override
+  String get meditatedToday => 'Has meditado hoy';
 }
