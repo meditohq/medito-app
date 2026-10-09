@@ -74,7 +74,8 @@ fun HomeScreen(
             contentPadding = PaddingValues(bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            val upNext = state.upNext
+            // Not synced: one open session, so the watch works on its own.
+            val upNext = if (state.synced) state.upNext else SampleSession
             if (upNext != null) {
                 item { UpNextHero(upNext = upNext, stat = stat, onPlay = { onPlay(upNext.track) }) }
             } else {
@@ -289,7 +290,7 @@ private fun ShortcutTile(title: String, @DrawableRes icon: Int, modifier: Modifi
 @Composable
 private fun EmptyState() {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(top = 48.dp, start = 24.dp, end = 24.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, start = 24.dp, end = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -300,7 +301,7 @@ private fun EmptyState() {
             modifier = Modifier.size(26.dp),
         )
         Text(
-            "Open Medito on your phone to get started.",
+            "Open Medito on your phone to see all your sessions.",
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             color = Color.White.copy(alpha = 0.6f),

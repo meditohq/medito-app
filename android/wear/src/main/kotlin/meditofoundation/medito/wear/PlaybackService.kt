@@ -82,6 +82,7 @@ class PlaybackService : MediaSessionService() {
     private fun reportCompleted(item: MediaItem?) {
         item ?: return
         val extras = item.mediaMetadata.extras ?: Bundle.EMPTY
+        if (extras.getBoolean(EXTRA_SAMPLE)) return
         WatchRepository.reportCompleted(
             trackId = item.mediaId,
             fileId = extras.getString(EXTRA_FILE_ID).orEmpty(),
@@ -94,6 +95,7 @@ class PlaybackService : MediaSessionService() {
         const val EXTRA_FILE_ID = "fileId"
         const val EXTRA_GUIDE = "guide"
         const val EXTRA_DURATION_MS = "durationMs"
+        const val EXTRA_SAMPLE = "sample"
 
         fun mediaItem(track: WatchTrack): MediaItem = MediaItem.Builder()
             .setMediaId(track.id)
@@ -111,6 +113,7 @@ class PlaybackService : MediaSessionService() {
                             putString(EXTRA_FILE_ID, track.fileId)
                             putString(EXTRA_GUIDE, track.guide)
                             putLong(EXTRA_DURATION_MS, track.durationMs)
+                            putBoolean(EXTRA_SAMPLE, track.isSample)
                         }
                     )
                     .build()

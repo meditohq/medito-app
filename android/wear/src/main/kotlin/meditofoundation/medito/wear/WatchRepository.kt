@@ -137,6 +137,8 @@ object WatchRepository {
         durationMs: Long,
         endedAt: Long = System.currentTimeMillis(),
     ) {
+        // No account to credit (never synced, or signed out on the phone).
+        if (!_state.value.synced) return
         val payload = JSONObject()
             .put("type", "sessionCompleted")
             .put("accountId", snapshot.optString("accountId"))

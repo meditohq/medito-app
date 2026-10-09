@@ -17,6 +17,8 @@ data class WatchTrack(
     val guide: String,
     /** Set when this is a favourited pack's next session. */
     val packTitle: String,
+    /** The session offered before the phone has synced: never recorded. */
+    val isSample: Boolean = false,
 ) {
     val minutes: Int get() = maxOf(1, (durationMs / 60000.0).roundToInt())
 
@@ -42,6 +44,29 @@ data class WatchTrack(
         }
     }
 }
+
+/**
+ * One open session for a watch the phone hasn't synced yet (no Medito on the
+ * phone, or signed out), so the app does something on its own. Plays from the
+ * public CDN and saves nothing.
+ */
+val SampleSession = UpNext(
+    track = WatchTrack(
+        id = "sample",
+        title = "Daily meditation",
+        subtitle = "3 min",
+        audioUrl = "https://cdn.medito.app/mp3/tracks/NqCePW2Opibif6Nd-will-180816.mp3",
+        fileId = "NqCePW2Opibif6Nd-will-180816",
+        durationMs = 180816,
+        guide = "Will",
+        packTitle = "",
+        isSample = true,
+    ),
+    packTitle = "",
+    coverUrl = "https://cdn.medito.app/cdn-cgi/image/width=400,quality=70,format=jpeg/png/packs/getting_started.png",
+    completed = 0,
+    total = 0,
+)
 
 data class UpNext(
     val track: WatchTrack,
