@@ -3295,7 +3295,7 @@ abstract class AppLocalizations {
   /// Footnote under the add-widget steps
   ///
   /// In en, this message translates to:
-  /// **'Your widget updates after every meditation.'**
+  /// **'Your widget updates after every meditation. For your Lock Screen, touch and hold it, then tap Customise and Add Widgets.'**
   String get addWidgetFootnote;
 
   /// Title for theme selection setting in customization section

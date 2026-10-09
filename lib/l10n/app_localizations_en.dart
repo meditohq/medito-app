@@ -1788,7 +1788,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addWidgetStepAdd => 'Tap Add Widget, then Done.';
 
   @override
-  String get addWidgetFootnote => 'Your widget updates after every meditation.';
+  String get addWidgetFootnote =>
+      'Your widget updates after every meditation. For your Lock Screen, touch and hold it, then tap Customise and Add Widgets.';
 
   @override
   String get themeTitle => 'Theme';

@@ -35,6 +35,17 @@ void main() {
       expect(homeWidgetsPropertyValue(widgets), 'consistency,streak,up_next');
     });
 
+    test('the Lock Screen widget reports lock', () {
+      final widgets = [
+        HomeWidgetInfo(
+          iOSKind: 'PracticeWidget',
+          iOSFamily: 'accessoryCircular',
+        ),
+        HomeWidgetInfo(iOSKind: 'ConsistencyWidget', iOSFamily: 'systemSmall'),
+      ];
+      expect(homeWidgetsPropertyValue(widgets), 'consistency,lock');
+    });
+
     test('unknown widgets report other', () {
       final widgets = [HomeWidgetInfo(iOSKind: 'SomethingNew')];
       expect(homeWidgetsPropertyValue(widgets), 'other');

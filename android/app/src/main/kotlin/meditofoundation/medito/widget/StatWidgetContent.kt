@@ -92,7 +92,14 @@ internal fun StatWidgetContent(
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
                 Column(modifier = GlanceModifier.defaultWeight().fillMaxHeight()) {
-                    stat.Icon(28.dp)
+                    Row(
+                        modifier = GlanceModifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Vertical.CenterVertically,
+                    ) {
+                        stat.Icon(28.dp)
+                        Spacer(modifier = GlanceModifier.defaultWeight())
+                        MeditoLogo(palette)
+                    }
                     Spacer(modifier = GlanceModifier.defaultWeight())
                     stat.Figure(if (size.height >= STAT_WIDE_TALL.height) 56f else 48f)
                     stat.Unit(16f)
@@ -108,7 +115,10 @@ internal fun StatWidgetContent(
             }
 
             size.height >= STAT_TALL.height -> Column(modifier = GlanceModifier.fillMaxSize().padding(14.dp)) {
-                Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
+                Row(
+                    modifier = GlanceModifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Vertical.CenterVertically,
+                ) {
                     stat.Icon(24.dp)
                     Spacer(modifier = GlanceModifier.width(6.dp))
                     stat.Figure(32f)
@@ -116,6 +126,8 @@ internal fun StatWidgetContent(
                         Spacer(modifier = GlanceModifier.width(4.dp))
                         stat.Unit(14f)
                     }
+                    Spacer(modifier = GlanceModifier.defaultWeight())
+                    MeditoLogo(palette)
                 }
                 Spacer(modifier = GlanceModifier.defaultWeight())
                 ActivityGrid(today, activityDays, weeks = 4, dot = 14.dp, gap = null, palette = palette)
@@ -179,6 +191,20 @@ private class StatParts(
         fontSize = fontSize,
         weight = WidgetWeight.Medium,
         color = palette.muted,
+    )
+}
+
+/**
+ * The Medito "m", quiet in the corner. Android launchers don't label widgets with the app name
+ * the way iOS does, so this is the only thing saying the widget is Medito's.
+ */
+@Composable
+private fun MeditoLogo(palette: WidgetPalette) {
+    Image(
+        provider = ImageProvider(R.drawable.widget_logo),
+        contentDescription = null,
+        colorFilter = ColorFilter.tint(ColorProvider(palette.muted)),
+        modifier = GlanceModifier.width(24.dp).height(12.dp),
     )
 }
 

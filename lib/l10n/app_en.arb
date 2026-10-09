@@ -849,7 +849,7 @@
   "@addWidgetStepAdd": {
     "description": "Step 4; Add Widget / Done are iOS button labels"
   },
-  "addWidgetFootnote": "Your widget updates after every meditation.",
+  "addWidgetFootnote": "Your widget updates after every meditation. For your Lock Screen, touch and hold it, then tap Customise and Add Widgets.",
   "@addWidgetFootnote": {
     "description": "Footnote under the add-widget steps"
   },

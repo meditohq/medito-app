@@ -30,7 +30,7 @@ Future<void> reportInstalledHomeWidgets({
 }
 
 /// Sorted, de-duplicated widget types joined by ',' ('consistency,streak'),
-/// or 'none'. At most 26 chars, inside GA4's 36-char user property limit.
+/// or 'none'. At most 31 chars, inside GA4's 36-char user property limit.
 @visibleForTesting
 String homeWidgetsPropertyValue(List<HomeWidgetInfo> widgets) {
   final types = widgets.map(_widgetType).toSet().toList()..sort();
@@ -41,6 +41,8 @@ String homeWidgetsPropertyValue(List<HomeWidgetInfo> widgets) {
 /// widgets' tap deep links use (`widget=` param on home_widget_tapped).
 String _widgetType(HomeWidgetInfo info) {
   final id = info.iOSKind ?? info.androidClassName ?? '';
+  // iOS Lock Screen widget (streak or consistency, following the app setting).
+  if (id == 'PracticeWidget') return 'lock';
   if (id.contains('UpNext')) return 'up_next';
   if (id.contains('Consistency')) return 'consistency';
   // iOS StreakWidget; Android's streak widget is MeditationWidgetReceiver.

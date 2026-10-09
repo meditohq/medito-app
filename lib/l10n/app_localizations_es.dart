@@ -1820,7 +1820,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get addWidgetFootnote =>
-      'Tu widget se actualiza después de cada meditación.';
+      'Tu widget se actualiza después de cada meditación. Para la pantalla bloqueada, mantenla pulsada y toca Personalizar y luego Añadir widgets.';
 
   @override
   String get themeTitle => 'Tema';

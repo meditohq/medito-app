@@ -524,8 +524,13 @@ class AnalyticsEventConstants {
   static const String homeWidgetInstructionsShown =
       'home_widget_instructions_shown';
 
-  /// Parameter naming the widget kind: `up_next`, `streak`, `consistency`.
+  /// Parameter naming the widget kind: `up_next`, `streak`, `consistency`,
+  /// or the Lock Screen's `lock_streak` / `lock_consistency`.
   static const String paramWidgetType = 'widget_type';
+
+  /// Parameter for where the tapped widget sits (iOS): `home_screen`,
+  /// `standby` or `lock_screen`. Absent on Android and older builds.
+  static const String paramWidgetPlacement = 'placement';
 
   /// Sentinel value for the `source` deep-link query param that identifies
   /// the link as coming from a home-screen widget tap.
@@ -558,6 +563,7 @@ class AnalyticsEventConstants {
 
   /// GA4 user property listing the home-screen widget kinds the user has
   /// placed, sorted and comma-joined ('consistency,up_next'), or 'none'.
+  /// 'lock' is the iOS Lock Screen widget.
   /// Set on every Home launch so passive (never-tapped) widgets are visible.
   static const String userPropHomeWidgets = 'home_widgets';
 

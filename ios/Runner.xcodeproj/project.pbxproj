@@ -57,6 +57,7 @@
 		EDFD4D0B2C9359BF0066E874 /* MeditoWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0A2C9359BF0066E874 /* MeditoWidgetBundle.swift */; };
 		EDFD4D0D2C9359BF0066E874 /* WidgetShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */; };
 		A1B2C3D42F1A000100000002 /* StatCalculators.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F1A000100000001 /* StatCalculators.swift */; };
+		A1B2C3D42F1A000100000004 /* PracticeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F1A000100000003 /* PracticeWidget.swift */; };
 		EDFD4D0F2C9359BF0066E874 /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */; };
 		EDFD4D112C9359BF0066E874 /* ConsistencyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */; };
 		EDFD4D122C9359BF0066E874 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDFD4D072C9359BF0066E874 /* Assets.xcassets */; };
@@ -172,6 +173,7 @@
 		EDFD4D0A2C9359BF0066E874 /* MeditoWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeditoWidgetBundle.swift; sourceTree = "<group>"; };
 		EDFD4D0C2C9359BF0066E874 /* WidgetShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetShared.swift; sourceTree = "<group>"; };
 		A1B2C3D42F1A000100000001 /* StatCalculators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatCalculators.swift; sourceTree = "<group>"; };
+		A1B2C3D42F1A000100000003 /* PracticeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeWidget.swift; sourceTree = "<group>"; };
 		EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidget.swift; sourceTree = "<group>"; };
 		EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsistencyWidget.swift; sourceTree = "<group>"; };
 		EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpNextWidget.swift; sourceTree = "<group>"; };
@@ -459,6 +461,7 @@
 				EDFD4D0E2C9359BF0066E874 /* StreakWidget.swift */,
 				EDFD4D102C9359BF0066E874 /* ConsistencyWidget.swift */,
 				EDFD4D2A2C9359BF0066E874 /* UpNextWidget.swift */,
+				A1B2C3D42F1A000100000003 /* PracticeWidget.swift */,
 				ED8A5BE12CCCE11E0043D20A /* Resources */,
 				ED8A5B812CCCDB480043D20A /* Design */,
 				ED8A5B3B2CCCCB800043D20A /* Modifier */,
@@ -876,6 +879,7 @@
 				EDFD4D0F2C9359BF0066E874 /* StreakWidget.swift in Sources */,
 				EDFD4D112C9359BF0066E874 /* ConsistencyWidget.swift in Sources */,
 				EDFD4D2B2C9359BF0066E874 /* UpNextWidget.swift in Sources */,
+				A1B2C3D42F1A000100000004 /* PracticeWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

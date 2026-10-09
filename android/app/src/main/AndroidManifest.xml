@@ -345,7 +345,8 @@
 
         <receiver
             android:name=".widget.MeditationWidgetReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/widget_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="es.antonborri.home_widget.UPDATE_WIDGET" />
@@ -357,7 +358,8 @@
 
         <receiver
             android:name=".widget.ConsistencyWidgetReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/consistency_widget_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="es.antonborri.home_widget.UPDATE_WIDGET" />
@@ -369,7 +371,8 @@
 
         <receiver
             android:name=".widget.UpNextWidgetReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/up_next_widget_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="es.antonborri.home_widget.UPDATE_WIDGET" />

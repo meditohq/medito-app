@@ -734,7 +734,7 @@
   "addWidgetStepEdit": "Tippe oben auf „Bearbeiten“ und dann auf „Widget hinzufügen“. Bei älteren iOS-Versionen tippst du auf +.",
   "addWidgetStepSearch": "Suche nach Medito und wähle Streak, Consistency oder Continue.",
   "addWidgetStepAdd": "Tippe auf „Widget hinzufügen“ und dann auf „Fertig“.",
-  "addWidgetFootnote": "Dein Widget aktualisiert sich nach jeder Meditation.",
+  "addWidgetFootnote": "Dein Widget aktualisiert sich nach jeder Meditation. Für den Sperrbildschirm: Halte ihn gedrückt und tippe auf „Anpassen“ und dann auf „Widgets hinzufügen“.",
   "themeTitle": "Erscheinungsbild",
   "@themeTitle": {
     "description": "Title for theme selection setting in customization section"

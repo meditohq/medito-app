@@ -664,7 +664,7 @@
   "addWidgetStepEdit": "Toca Editar en la esquina superior y luego Añadir widget. En versiones anteriores de iOS, toca +.",
   "addWidgetStepSearch": "Busca Medito y elige Streak, Consistency o Continue.",
   "addWidgetStepAdd": "Toca Añadir widget y luego OK.",
-  "addWidgetFootnote": "Tu widget se actualiza después de cada meditación.",
+  "addWidgetFootnote": "Tu widget se actualiza después de cada meditación. Para la pantalla bloqueada, mantenla pulsada y toca Personalizar y luego Añadir widgets.",
   "themeTitle": "Tema",
   "@themeTitle": {
     "description": "Title for theme selection setting in customization section"

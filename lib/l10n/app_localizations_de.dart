@@ -1834,7 +1834,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get addWidgetFootnote =>
-      'Dein Widget aktualisiert sich nach jeder Meditation.';
+      'Dein Widget aktualisiert sich nach jeder Meditation. Für den Sperrbildschirm: Halte ihn gedrückt und tippe auf „Anpassen“ und dann auf „Widgets hinzufügen“.';
 
   @override
   String get themeTitle => 'Erscheinungsbild';

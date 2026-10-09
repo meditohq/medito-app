@@ -35,6 +35,7 @@ class HomeWidgetService {
   static const String _upNextTotalKey = 'up_next_total';
   static const String _upNextTrackIdKey = 'up_next_track_id';
   static const String _dayBoundaryOffsetHoursKey = 'day_boundary_offset_hours';
+  static const String _statDisplayKey = 'stat_display';
 
   static Future<void> _configure() async {
     if (Platform.isIOS) {
@@ -62,6 +63,20 @@ class HomeWidgetService {
       }
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to save theme preference', e);
+    }
+  }
+
+  /// Saves which stat the in-app streak chip shows ('currentStreak' /
+  /// 'consistencyScore') so the iOS Lock Screen widget can follow it.
+  static Future<void> saveStatDisplay(String statDisplay) async {
+    if (!Platform.isIOS) return;
+
+    try {
+      await _configure();
+      await HomeWidget.saveWidgetData<String>(_statDisplayKey, statDisplay);
+      await HomeWidget.updateWidget(iOSName: 'PracticeWidget');
+    } catch (e) {
+      AppLogger.e('WIDGET', 'Failed to save stat display', e);
     }
   }
 
@@ -141,6 +156,7 @@ class HomeWidgetService {
           .round()
           .clamp(0, 100);
       final dayBoundaryOffsetHours = await _readDayBoundaryOffsetHours();
+      final statDisplay = await _readStatDisplay();
 
       await Future.wait([
         _saveWithTimeout(_streakCurrentKey, stats.streakCurrent),
@@ -155,6 +171,7 @@ class HomeWidgetService {
         _saveWithTimeout(_totalTracksCompletedKey, stats.totalTracksCompleted),
         _saveWithTimeout(_consistencyScoreKey, consistencyPercentage),
         _saveWithTimeout(_dayBoundaryOffsetHoursKey, dayBoundaryOffsetHours),
+        _saveWithTimeout(_statDisplayKey, statDisplay),
       ]);
 
       await _triggerWidgetRefresh();
@@ -171,6 +188,21 @@ class HomeWidgetService {
     } catch (e) {
       AppLogger.w('WIDGET', 'Failed to read day boundary offset: $e');
       return 0;
+    }
+  }
+
+  // Pushed with every stats update (not only when the choice changes) so users
+  // who picked a stat before the Lock Screen widget existed are covered.
+  static Future<String> _readStatDisplay() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(
+            SharedPreferenceConstants.streakCircleDisplayPreference,
+          ) ??
+          'consistencyScore';
+    } catch (e) {
+      AppLogger.w('WIDGET', 'Failed to read stat display: $e');
+      return 'consistencyScore';
     }
   }
 
@@ -210,6 +242,7 @@ class HomeWidgetService {
     try {
       await HomeWidget.updateWidget(iOSName: 'StreakWidget');
       await HomeWidget.updateWidget(iOSName: 'ConsistencyWidget');
+      await HomeWidget.updateWidget(iOSName: 'PracticeWidget');
       AppLogger.d('WIDGET', 'iOS widget reload triggered');
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to trigger iOS widget reload', e);

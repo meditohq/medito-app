@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Medito</string>
+    <!-- Widget picker names, matching the iOS gallery (Streak / Consistency / Continue). -->
+    <string name="widget_label">Streak</string>
+    <string name="consistency_widget_label">Consistency</string>
+    <string name="up_next_widget_label">Continue</string>
     <string name="widget_description">Meditation streak and calendar</string>
     <string name="consistency_widget_description">Meditation consistency score and calendar</string>
     <string name="up_next_widget_description">Pick up your pack where you left off</string>
