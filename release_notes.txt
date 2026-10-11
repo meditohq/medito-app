@@ -1,6 +1,13 @@
 Unreleased
 -
 
+2610.11.0
+- [ios] New Lock Screen widget: see your streak or consistency score at a glance
+- Better screen reader support across the app
+- [ios] Settings now shows how to add a Medito widget to your Home Screen
+- [ios] Home screen widgets now look right in StandBy and tinted mode
+- [android] The widget picker now names each widget (Streak, Consistency, Continue)
+
 2610.9.0
 - [android] Wear OS: try a meditation on your watch before Medito on your phone is set up
 
