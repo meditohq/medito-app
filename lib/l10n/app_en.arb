@@ -62,6 +62,15 @@
   "thanksForSharingNeutral": "Neutral face",
   "thanksForSharingHappy": "Happy face",
   "thanksForSharingSad": "Sad face",
+  "ratingAskTitle": "Could you leave Medito a rating?",
+  "@ratingAskTitle": {
+    "description": "Title of the one-time ask for a store rating, shown on the end screen after the user taps the happy face"
+  },
+  "ratingAskBody": "It only takes a moment, and it helps more people find free meditation.",
+  "ratingAskCta": "Rate Medito",
+  "@ratingAskCta": {
+    "description": "Button that opens the App Store / Play Store review page"
+  },
   "min": "min",
   "hey": "👋 Hey",
   "someThingWentWrong": "Something went wrong",

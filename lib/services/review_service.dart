@@ -1,93 +1,94 @@
 import 'package:in_app_review/in_app_review.dart';
+import 'package:intl/intl.dart';
 import 'package:medito/utils/logger.dart';
-import 'package:medito/utils/stats_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Decides when to ask for a store rating: once, right after the user has
+/// told us they feel good (a 😊 tap on the end screen).
+///
+/// A single happy tap is not enough — first sessions (onboarding) and one-off
+/// good days are excluded by requiring 😊 on [minHappyDays] separate days.
+/// Once the ask has been shown it never comes back on this install, whatever
+/// the user picked.
+///
+/// The ask's button opens the store's review page rather than the in-app
+/// review dialog: both stores forbid triggering that dialog from a button,
+/// because the OS may silently not show it and the button would do nothing.
 class ReviewService {
-  static const _reviewRequestKey = 'last_review_request_timestamp';
-  static const _minimumDaysBetweenRequests = 90; // 3 months
-  static const _minimumStreakForReview = 10;
+  static const _happyDaysKey = 'review_happy_feedback_days';
+  static const _shownKey = 'review_prompt_shown';
 
-  final InAppReview _inAppReview = InAppReview.instance;
-  final StatsManager _statsManager;
+  /// Set by the old streak-based prompt. Anyone it already asked counts as
+  /// asked, so they are not prompted a second time.
+  static const _legacyRequestKey = 'last_review_request_timestamp';
 
-  ReviewService({required StatsManager statsManager})
-    : _statsManager = statsManager;
+  static const _appStoreId = '1500780518';
 
-  Future<void> checkAndRequestReview() async {
+  static const minHappyDays = 3;
+
+  final SharedPreferences _prefs;
+  final Future<void> Function() _openStore;
+  final DateTime Function() _now;
+
+  ReviewService({
+    required SharedPreferences prefs,
+    Future<void> Function()? openStore,
+    DateTime Function()? now,
+  }) : _prefs = prefs,
+       _openStore =
+           openStore ??
+           (() =>
+               InAppReview.instance.openStoreListing(appStoreId: _appStoreId)),
+       _now = now ?? DateTime.now;
+
+  bool get _alreadyShown =>
+      (_prefs.getBool(_shownKey) ?? false) ||
+      _prefs.containsKey(_legacyRequestKey);
+
+  /// Records a 😊 tap and returns whether the rating ask should be shown now.
+  /// The tap is recorded even when [suppress] is set (another ask already
+  /// happened on this screen, e.g. a donate tap), so it still counts later.
+  Future<bool> onHappyFeedback({bool suppress = false}) async {
     try {
-      final stats = await _statsManager.localAllStats;
-
-      // 2. Check if streak is at least 2
-      if (stats.streakCurrent < _minimumStreakForReview) {
-        return;
-      }
-
-      // 3. Check if we can request a review
-      if (!await _canRequestReview()) {
-        return;
-      }
-
-      // 4. Request the review
-      await _requestReview();
-
-      // 5. Save the timestamp of this request
-      await _saveReviewRequestTimestamp();
+      if (_alreadyShown) return false;
+      final days = await _recordHappyDay();
+      return days >= minHappyDays && !suppress;
     } catch (e) {
-      AppLogger.e('REVIEW', 'Error checking for app review: $e');
-    }
-  }
-
-  Future<bool> _canRequestReview() async {
-    try {
-      // Check if in-app review is available on this device
-      if (!await _inAppReview.isAvailable()) {
-        return false;
-      }
-
-      // Check if enough time has passed since last request
-      final prefs = await SharedPreferences.getInstance();
-      final lastRequestTimestamp = prefs.getInt(_reviewRequestKey) ?? 0;
-
-      if (lastRequestTimestamp == 0) {
-        // First time, can request
-        return true;
-      }
-
-      final lastRequestDate = DateTime.fromMillisecondsSinceEpoch(
-        lastRequestTimestamp,
-      );
-      final now = DateTime.now();
-      final difference = now.difference(lastRequestDate).inDays;
-
-      return difference >= _minimumDaysBetweenRequests;
-    } catch (e) {
+      AppLogger.e('REVIEW', 'Error checking review eligibility: $e');
       return false;
     }
   }
 
-  Future<void> _requestReview() async {
+  /// Called when the ask is rendered, so it is never shown again.
+  Future<void> markShown() async {
     try {
-      await _inAppReview.requestReview();
+      await _prefs.setBool(_shownKey, true);
     } catch (e) {
-      // Fallback to store listing if requesting review fails
-      try {
-        await _inAppReview.openStoreListing(appStoreId: '1500780518');
-      } catch (storeError) {
-        AppLogger.e('REVIEW', 'Error opening store listing: $storeError');
-      }
+      AppLogger.e('REVIEW', 'Error saving review prompt state: $e');
     }
   }
 
-  Future<void> _saveReviewRequestTimestamp() async {
+  /// Opens the store's write-a-review page (iOS) / listing (Android).
+  Future<void> openStore() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(
-        _reviewRequestKey,
-        DateTime.now().millisecondsSinceEpoch,
-      );
+      await _openStore();
     } catch (e) {
-      AppLogger.e('REVIEW', 'Error saving review request timestamp: $e');
+      AppLogger.e('REVIEW', 'Error opening store listing: $e');
     }
+  }
+
+  /// Adds today to the days with a 😊 tap and returns how many are stored.
+  Future<int> _recordHappyDay() async {
+    final today = DateFormat('yyyy-MM-dd').format(_now());
+    final days = _prefs.getStringList(_happyDaysKey) ?? const <String>[];
+    if (days.contains(today)) return days.length;
+
+    // Only the count up to minHappyDays matters; keep the list bounded.
+    final updated = [...days, today];
+    final trimmed = updated.length > minHappyDays
+        ? updated.sublist(updated.length - minHappyDays)
+        : updated;
+    await _prefs.setStringList(_happyDaysKey, trimmed);
+    return trimmed.length;
   }
 }

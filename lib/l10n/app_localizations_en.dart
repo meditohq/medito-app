@@ -164,6 +164,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get thanksForSharingSad => 'Sad face';
 
   @override
+  String get ratingAskTitle => 'Could you leave Medito a rating?';
+
+  @override
+  String get ratingAskBody =>
+      'It only takes a moment, and it helps more people find free meditation.';
+
+  @override
+  String get ratingAskCta => 'Rate Medito';
+
+  @override
   String get min => 'min';
 
   @override

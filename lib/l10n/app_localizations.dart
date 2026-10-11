@@ -400,6 +400,24 @@ abstract class AppLocalizations {
   /// **'Sad face'**
   String get thanksForSharingSad;
 
+  /// Title of the one-time ask for a store rating, shown on the end screen after the user taps the happy face
+  ///
+  /// In en, this message translates to:
+  /// **'Could you leave Medito a rating?'**
+  String get ratingAskTitle;
+
+  /// No description provided for @ratingAskBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It only takes a moment, and it helps more people find free meditation.'**
+  String get ratingAskBody;
+
+  /// Button that opens the App Store / Play Store review page
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Medito'**
+  String get ratingAskCta;
+
   /// No description provided for @min.
   ///
   /// In en, this message translates to:

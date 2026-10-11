@@ -166,6 +166,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get thanksForSharingSad => 'Trauriges Gesicht';
 
   @override
+  String get ratingAskTitle => 'Würdest du Medito bewerten?';
+
+  @override
+  String get ratingAskBody =>
+      'Es dauert nur einen Moment und hilft mehr Menschen, kostenlose Meditation zu finden.';
+
+  @override
+  String get ratingAskCta => 'Medito bewerten';
+
+  @override
   String get min => 'Min.';
 
   @override
