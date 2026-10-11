@@ -14,7 +14,6 @@ import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
-import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/providers/settings/account_prompt_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -99,7 +98,6 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   @override
   void initState() {
     super.initState();
-    _loadStats();
     _logScreenView();
     _checkNotificationPermission();
 
@@ -200,15 +198,6 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
   Future<void> _logScreenView() async {
     await _analytics.logScreenView(screenName: 'EndScreenView');
-  }
-
-  void _loadStats() {
-    // handleStats already wrote this session's completion to local stats
-    // and pushed it through statsProvider before we got here, so there's
-    // no refresh() needed. Just gate the review prompt on the current
-    // stats being available.
-    final reviewService = ref.read(reviewServiceProvider);
-    reviewService.checkAndRequestReview();
   }
 
   void _navigateToHome() {

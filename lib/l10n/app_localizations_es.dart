@@ -165,6 +165,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get thanksForSharingSad => 'Cara triste';
 
   @override
+  String get ratingAskTitle => '¿Podrías valorar Medito?';
+
+  @override
+  String get ratingAskBody =>
+      'Solo te llevará un momento y ayudará a que más personas descubran la meditación gratuita.';
+
+  @override
+  String get ratingAskCta => 'Valorar Medito';
+
+  @override
   String get min => 'min';
 
   @override

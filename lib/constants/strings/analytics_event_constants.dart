@@ -211,6 +211,21 @@ class AnalyticsEventConstants {
   /// Event logged when user submits post-meditation feedback
   static const String postMeditationFeedback = 'post_meditation_feedback';
 
+  /// Impression of the inline "Could you leave Medito a rating?" ask that
+  /// replaces the thank-you line after a 😊 post-meditation feedback tap, once
+  /// the user has tapped 😊 on several separate days (see ReviewService).
+  /// Shown at most once per install. Params: [paramSource] ('end_screen').
+  static const String reviewPromptShown = 'review_prompt_shown';
+
+  /// User tapped "Rate Medito" on the rating ask; the store's review page
+  /// opens. Neither store reports whether a rating was then left.
+  /// Params: [paramSource] ('end_screen').
+  static const String reviewPromptRateTap = 'review_prompt_rate_tap';
+
+  /// User tapped "Not now" on the rating ask. Params: [paramSource]
+  /// ('end_screen').
+  static const String reviewPromptNotNowTap = 'review_prompt_not_now_tap';
+
   // Audio session events
   /// Event logged when an audio session is completed and stats are updated
   static const String audioSessionCompleted = 'audio_session_completed';
