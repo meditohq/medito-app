@@ -2963,4 +2963,55 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get meditatedToday => 'Has meditado hoy';
+
+  @override
+  String get endScreenDone => 'Listo';
+
+  @override
+  String endScreenRestoredLastNight(String title) {
+    return 'Hola de nuevo. Terminaste «$title» anoche.';
+  }
+
+  @override
+  String endScreenRestoredEarlierToday(String title) {
+    return 'Hola de nuevo. Terminaste «$title» hoy más temprano.';
+  }
+
+  @override
+  String endScreenRestoredYesterday(String title) {
+    return 'Hola de nuevo. Terminaste «$title» ayer.';
+  }
+
+  @override
+  String endScreenRestoredTimerLastNight(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+    );
+    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 anoche.';
+  }
+
+  @override
+  String endScreenRestoredTimerEarlierToday(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+    );
+    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 hoy más temprano.';
+  }
+
+  @override
+  String endScreenRestoredTimerYesterday(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+    );
+    return 'Hola de nuevo. Terminaste un temporizador de $_temp0 ayer.';
+  }
 }

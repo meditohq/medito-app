@@ -13,6 +13,10 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/installed_widgets_service.dart';
 import 'package:medito/services/watch_presence_service.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/pending_end_screen.dart';
+import 'package:medito/views/end_screen/end_screen_view.dart';
 import 'package:medito/views/bottom_navigation/widgets/medito_nav_bar.dart';
 import 'package:medito/views/explore/widgets/explore_view.dart';
 import 'package:medito/views/home/home_view.dart';
@@ -40,6 +44,7 @@ class _BottomNavigationBarViewState
   final _exploreViewKey = GlobalKey<ExploreViewState>();
   final _searchViewKey = GlobalKey<SearchViewState>();
   late final List<Widget> _pages;
+  bool _restoringEndScreen = false;
 
   @override
   void initState() {
@@ -57,9 +62,59 @@ class _BottomNavigationBarViewState
     ];
 
     _initializeStats();
+    // Completions replayed by the platform after launch arrive late (Android
+    // pushes them from onResume), so listen as well as check now.
+    PendingEndScreen.completions.addListener(_restorePendingEndScreen);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _restorePendingEndScreen(),
+    );
     if (_currentPageIndex == _homeIndex) {
       unawaited(reportWatchPresence());
       unawaited(reportInstalledHomeWidgets());
+    }
+  }
+
+  @override
+  void dispose() {
+    PendingEndScreen.completions.removeListener(_restorePendingEndScreen);
+    super.dispose();
+  }
+
+  /// Shows the end screen of a session that finished while the app was in the
+  /// background and was killed before that end screen could open. Rebuilt in
+  /// place, without a route transition, as if it had been there all along.
+  Future<void> _restorePendingEndScreen() async {
+    if (_restoringEndScreen || PendingEndScreen.hasLivePlayer) return;
+    _restoringEndScreen = true;
+    try {
+      final pending = await PendingEndScreen.takeCompleted(
+        ref.read(sharedPreferencesProvider),
+      );
+      if (pending == null || !mounted) return;
+      AppLogger.d(
+        'END_SCREEN',
+        'Restoring end screen: ${pending.request.fileId}',
+      );
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(name: AnalyticsEventConstants.endScreenRestored),
+      );
+      unawaited(
+        Navigator.of(context).push(
+          PageRouteBuilder<void>(
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+            pageBuilder: (_, _, _) => EndScreenView(
+              request: pending.request,
+              priorStats: pending.priorStats,
+              restoredFrom: pending.completedAt,
+            ),
+          ),
+        ),
+      );
+    } finally {
+      _restoringEndScreen = false;
     }
   }
 

@@ -19,6 +19,7 @@ import 'health_kit_manager.dart';
 import 'stats_manager.dart';
 import '../models/local_audio_completed.dart';
 import 'logger.dart';
+import 'pending_end_screen.dart';
 import '../services/home_widget_service.dart';
 import '../services/analytics/firebase_analytics_service.dart';
 import '../constants/strings/analytics_event_constants.dart';
@@ -194,6 +195,18 @@ Future<bool> handleStats(
 
     // Refresh stats from local; upNextProvider rebuilds reactively.
     await _refreshStatsAndUpNext();
+
+    // After the refresh, so an end screen rebuilt from this completion (the
+    // app was killed before it could show) animates to the new stats.
+    try {
+      await PendingEndScreen.markCompleted(
+        await SharedPreferences.getInstance(),
+        fileId: payload[TypeConstants.fileIdKey] as String?,
+        timestampMs: payload[TypeConstants.timestampIdKey] as int,
+      );
+    } catch (e) {
+      AppLogger.w('STATS', 'Could not mark pending end screen: $e');
+    }
 
     // Update home widget with latest stats (fire-and-forget to avoid blocking)
     try {

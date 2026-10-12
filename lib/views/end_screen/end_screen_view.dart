@@ -12,6 +12,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/settings/account_prompt_provider.dart';
@@ -41,6 +42,7 @@ import 'widgets/animated_end_screen_section.dart';
 import 'widgets/donation_widget.dart';
 import 'widgets/soft_ask_card.dart';
 import 'widgets/zen_mode_animation.dart';
+import 'restored_when.dart';
 
 /// Tags every end-screen prompt event with where it came from, so they can be
 /// swept with `source = 'end_screen'` alongside the events shared with other
@@ -57,7 +59,17 @@ class EndScreenView extends ConsumerStatefulWidget {
   /// once the entrance slide completes. Null on first-ever session.
   final LocalAllStats? priorStats;
 
-  const EndScreenView({super.key, required this.request, this.priorStats});
+  /// Set when this end screen is rebuilt on a later launch (the app was killed
+  /// before it could open): when the session finished. The screen then says
+  /// which session it is about and offers one plain way back to Home.
+  final DateTime? restoredFrom;
+
+  const EndScreenView({
+    super.key,
+    required this.request,
+    this.priorStats,
+    this.restoredFrom,
+  });
 
   @override
   ConsumerState<EndScreenView> createState() => _EndScreenViewState();
@@ -213,39 +225,46 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomActionBar(
-        leftItem: BottomActionBarItem(
-          child: MeditoIcon(
-            assetName: MeditoIcons.xmark,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          onTap: () => Navigator.pop(context),
-          semanticLabel: AppLocalizations.of(context)!.close,
-        ),
-        leftCenterItem: BottomActionBarItem(
-          child: const SizedBox.shrink(),
-          onTap: null,
-        ),
-        rightCenterItem: BottomActionBarItem(
-          child: const SizedBox.shrink(),
-          onTap: null,
-        ),
-        rightItem: BottomActionBarItem(
-          child: MeditoIcon(
-            assetName: MeditoIcons.home,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          onTap: _navigateToHome,
-          semanticLabel: AppLocalizations.of(context)!.home,
-        ),
-        layout: BottomActionBarLayout.edgeAligned,
-      ),
+      bottomNavigationBar: widget.restoredFrom != null
+          ? _buildRestoredDoneBar()
+          : BottomActionBar(
+              leftItem: BottomActionBarItem(
+                child: MeditoIcon(
+                  assetName: MeditoIcons.xmark,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onTap: () => Navigator.pop(context),
+                semanticLabel: AppLocalizations.of(context)!.close,
+              ),
+              leftCenterItem: BottomActionBarItem(
+                child: const SizedBox.shrink(),
+                onTap: null,
+              ),
+              rightCenterItem: BottomActionBarItem(
+                child: const SizedBox.shrink(),
+                onTap: null,
+              ),
+              rightItem: BottomActionBarItem(
+                child: MeditoIcon(
+                  assetName: MeditoIcons.home,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onTap: _navigateToHome,
+                semanticLabel: AppLocalizations.of(context)!.home,
+              ),
+              layout: BottomActionBarLayout.edgeAligned,
+            ),
       body: AdaptivePageBody(
         maxWidth: 640,
         child: SingleChildScrollView(
           child: SafeArea(
             child: Column(
               children: [
+                if (widget.restoredFrom != null)
+                  FadeTransition(
+                    opacity: _statsFadeAnimation,
+                    child: _buildRestoredContext(widget.restoredFrom!),
+                  ),
                 SlideTransition(
                   position: _statsSlideAnimation,
                   child: FadeTransition(
@@ -280,6 +299,99 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 ),
                 // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// "Welcome back. You finished “Body scan” last night.": without it, an end
+  /// screen that appears on opening the app the next morning makes no sense.
+  Widget _buildRestoredContext(DateTime completedAt) {
+    final l10n = AppLocalizations.of(context)!;
+    final when = restoredWhen(
+      completedAt,
+      DateTime.now(),
+      dayBoundary: Duration(
+        hours:
+            ref
+                .read(sharedPreferencesProvider)
+                .getInt(SharedPreferenceConstants.dayBoundaryOffsetHours) ??
+            0,
+      ),
+    );
+    final request = widget.request;
+    final String text;
+    if (request.isTimer) {
+      final minutes = (request.duration / 60000).round().clamp(1, 1 << 20);
+      text = switch (when) {
+        RestoredWhen.lastNight => l10n.endScreenRestoredTimerLastNight(minutes),
+        RestoredWhen.earlierToday => l10n.endScreenRestoredTimerEarlierToday(
+          minutes,
+        ),
+        RestoredWhen.yesterday => l10n.endScreenRestoredTimerYesterday(minutes),
+      };
+    } else {
+      text = switch (when) {
+        RestoredWhen.lastNight => l10n.endScreenRestoredLastNight(
+          request.title,
+        ),
+        RestoredWhen.earlierToday => l10n.endScreenRestoredEarlierToday(
+          request.title,
+        ),
+        RestoredWhen.yesterday => l10n.endScreenRestoredYesterday(
+          request.title,
+        ),
+      };
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(padding24, padding16, padding24, 0),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          fontFamily: googleSans,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+        ),
+      ),
+    );
+  }
+
+  /// Home is underneath a restored end screen, so close and home are the same
+  /// action; one labelled button reads more clearly than two icons. Outlined so
+  /// it doesn't compete with the filled asks on the screen.
+  Widget _buildRestoredDoneBar() {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    // Not AdaptivePageBody: its Align fills the height it's given, which in the
+    // bottomNavigationBar slot is the whole screen. heightFactor keeps the bar
+    // as tall as the button.
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.all(padding16),
+      child: Center(
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640 - 2 * padding16),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => Navigator.pop(context),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: BorderSide(color: onSurface.withValues(alpha: 0.5)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                AppLocalizations.of(context)!.endScreenDone,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontFamily: googleSans,
+                  fontWeight: FontWeight.w500,
+                  color: onSurface,
+                ),
+              ),
             ),
           ),
         ),

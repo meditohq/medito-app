@@ -2926,4 +2926,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get meditatedToday => 'Meditated today';
+
+  @override
+  String get endScreenDone => 'Done';
+
+  @override
+  String endScreenRestoredLastNight(String title) {
+    return 'Welcome back. You finished “$title” last night.';
+  }
+
+  @override
+  String endScreenRestoredEarlierToday(String title) {
+    return 'Welcome back. You finished “$title” earlier today.';
+  }
+
+  @override
+  String endScreenRestoredYesterday(String title) {
+    return 'Welcome back. You finished “$title” yesterday.';
+  }
+
+  @override
+  String endScreenRestoredTimerLastNight(int minutes) {
+    return 'Welcome back. You finished a $minutes-minute timer last night.';
+  }
+
+  @override
+  String endScreenRestoredTimerEarlierToday(int minutes) {
+    return 'Welcome back. You finished a $minutes-minute timer earlier today.';
+  }
+
+  @override
+  String endScreenRestoredTimerYesterday(int minutes) {
+    return 'Welcome back. You finished a $minutes-minute timer yesterday.';
+  }
 }

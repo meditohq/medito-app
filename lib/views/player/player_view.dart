@@ -14,6 +14,7 @@ import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:medito/utils/stats_updater.dart' show handleStats;
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/pending_end_screen.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/providers/donation/donation_page_provider.dart';
@@ -35,6 +36,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/report_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import '../../widgets/errors/medito_error_widget.dart';
@@ -70,6 +72,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   // affect them. EndScreenView uses this as the "before" value so its
   // AnimatedSwitcher actually animates from old streak -> new streak.
   LocalAllStats? _statsAtSessionStart;
+  // Read once: dispose() clears the pending end screen and may not use ref.
+  late final SharedPreferences _prefs;
 
   // Holds the end-screen donation ask alive while the player is open so the
   // fetch happens NOW, while the network is known to be up. When a session
@@ -86,6 +90,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
   @override
   void initState() {
     super.initState();
+    PendingEndScreen.playerMounted();
+    _prefs = ref.read(sharedPreferencesProvider);
     _statsAtSessionStart = ref.read(statsProvider).value;
     // Bells are remembered per scope (on by default for a timer, off under
     // tracks); set before _initializePlayer restores them.
@@ -137,6 +143,15 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     final request = ref.read(playerProvider);
     if (request == null) return;
     _completionGate.reset();
+    // So the end screen can be rebuilt if the app is killed before this
+    // session's completion gets to open it.
+    unawaited(
+      PendingEndScreen.start(
+        _prefs,
+        request,
+        _statsAtSessionStart,
+      ),
+    );
     try {
       await ref.read(playerProvider.notifier).play(request);
       if (!mounted) return;
@@ -179,6 +194,10 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     // paused session. No-op if it's still playing (continues in background) or
     // already completed/stopped.
     unawaited(AudioSessionTracker.instance.onPlayerClosed());
+    // Gone with this screen either way: the end screen opened, or the
+    // session was closed before it finished.
+    PendingEndScreen.playerUnmounted();
+    unawaited(PendingEndScreen.clear(_prefs));
     _playbackStartFallback?.cancel();
     _donationAskWarmup?.close();
     _endScreenConfigWarmup?.close();
