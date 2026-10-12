@@ -2285,7 +2285,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get defaultsNote =>
-      'These defaults are set from your last selection on any track. Home uses them to skip the selection screen when you continue a pack.';
+      'Set from what you play on any track. Home and your watch use them to start sessions without the selection screen.';
 
   @override
   String get streakFreezeUsed => 'Streak freeze used';
@@ -3013,4 +3013,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get meditatedToday => 'Meditated today';
+
+  @override
+  String upNextVariant(String guide, int minutes) {
+    return '$guide · $minutes min';
+  }
+
+  @override
+  String upNextVariantMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get upNextVariantEdit => 'Change voice or length';
+
+  @override
+  String get variantSheetTitle => 'Voice and length';
+
+  @override
+  String get variantSheetNote =>
+      'Saved as your default for sessions you start from Home.';
+
+  @override
+  String get variantVoice => 'Voice';
+
+  @override
+  String get variantLength => 'Length';
+
+  @override
+  String get clearDefaults => 'Clear defaults';
+
+  @override
+  String get defaultsCleared => 'Defaults cleared';
 }

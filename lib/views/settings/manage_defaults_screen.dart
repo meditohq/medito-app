@@ -1,12 +1,16 @@
 import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/duration_preference_provider.dart';
 import 'package:medito/providers/guide_name_preference_provider.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
+import 'package:medito/models/track/track.dart';
+import 'package:medito/providers/home/up_next_provider.dart';
+import 'package:medito/providers/meditation/track_provider.dart';
+import 'package:medito/utils/utils.dart';
+import 'package:medito/widgets/inputs/option_pills.dart';
 import 'package:medito/widgets/snackbar_widget.dart' show showSnackBar;
 
 class ManageDefaultsScreen extends ConsumerWidget {
@@ -55,198 +59,112 @@ class ManageDefaultsScreen extends ConsumerWidget {
     int? duration,
     AppLocalizations l10n,
   ) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+    final guides = _guideOptions(ref, guideName);
+    final savedMinutes = duration == null
+        ? null
+        : convertDurationToMinutes(milliseconds: duration);
+    // A saved length off the presets (e.g. an 8-minute track) gets its own
+    // pill rather than lighting up the nearest preset.
+    final minutes = {..._presetMinutes, ?savedMinutes}.toList()..sort();
+
     return SliverPadding(
-      padding: const EdgeInsets.only(top: padding16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       sliver: SliverList(
         delegate: SliverChildListDelegate([
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(width: 0.7, color: ColorConstants.onyx),
+          Text(
+            l10n.defaultsNote,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontSize: 15,
+              color: onSurface.withValues(alpha: 0.7),
+            ),
+          ),
+          const SizedBox(height: 24),
+          OptionPillGroup(
+            label: l10n.variantVoice,
+            options: [
+              for (final guide in guides)
+                PillOption(
+                  text: guide,
+                  selected: guide == guideName,
+                  onTap: () => ref
+                      .read(guideNamePreferenceProvider.notifier)
+                      .setGuideName(guide),
+                ),
+            ],
+          ),
+          // No Up Next and nothing saved: nothing to offer yet.
+          if (guides.isEmpty)
+            Text(
+              l10n.notSet,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 15,
+                color: onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          const SizedBox(height: 24),
+          OptionPillGroup(
+            label: l10n.variantLength,
+            options: [
+              for (final m in minutes)
+                PillOption(
+                  text: l10n.upNextVariantMinutes(m),
+                  selected: m == savedMinutes,
+                  onTap: () => ref
+                      .read(durationPreferenceProvider.notifier)
+                      .setDuration(m * 60000),
+                ),
+            ],
+          ),
+          if (guideName != null || duration != null) ...[
+            const SizedBox(height: 32),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: onSurface,
+                  padding: EdgeInsets.zero,
+                ),
+                onPressed: () {
+                  ref
+                      .read(guideNamePreferenceProvider.notifier)
+                      .clearGuideName();
+                  ref.read(durationPreferenceProvider.notifier).clearDuration();
+                  showSnackBar(context, l10n.defaultsCleared);
+                },
+                child: Text(
+                  l10n.clearDefaults,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.face_outlined,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    size: 24,
-                  ),
-                  width16,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.defaultGuideName,
-                          style: Theme.of(context).textTheme.labelMedium
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                        ),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          guideName ?? l10n.notSet,
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.7),
-                                letterSpacing: 0,
-                                height: 1.7,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (guideName != null)
-                    IconButton(
-                      tooltip: l10n.clearDefault,
-                      icon: const Icon(Icons.delete_outline),
-                      color: Theme.of(context).colorScheme.onSurface,
-                      onPressed: () {
-                        ref
-                            .read(guideNamePreferenceProvider.notifier)
-                            .clearGuideName();
-                        showSnackBar(context, l10n.defaultGuideNameCleared);
-                      },
-                    ),
-                ],
-              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(width: 0.7, color: ColorConstants.onyx),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time_outlined,
-                        color: Theme.of(context).colorScheme.onSurface,
-                        size: 24,
-                      ),
-                      width16,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.defaultDuration,
-                              style: Theme.of(context).textTheme.labelMedium
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                            ),
-                            const SizedBox(height: 4.0),
-                            Text(
-                              duration != null
-                                  ? '${duration ~/ 60000} ${l10n.min}'
-                                  : l10n.notSet,
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.7),
-                                    letterSpacing: 0,
-                                    height: 1.7,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (duration != null) ...[
-                    const SizedBox(height: 16.0),
-                    SliderTheme(
-                      data: SliderThemeData(
-                        trackHeight: 4,
-                        thumbShape: const RoundSliderThumbShape(
-                          enabledThumbRadius: 8.0,
-                        ),
-                      ),
-                      child: Slider(
-                        value: (duration / 60000).clamp(1, 60).toDouble(),
-                        min: 1,
-                        max: 60,
-                        divisions: 59,
-                        // Otherwise read as a percentage of the range
-                        // (10 minutes was "15%").
-                        semanticFormatterCallback: (value) =>
-                            AppLocalizations.of(
-                              context,
-                            )!.timerPresetSemantics(value.round()),
-                        activeColor: context.brandAccent,
-                        inactiveColor: ColorConstants.greyIsTheNewGrey,
-                        onChanged: (double newValue) {
-                          ref
-                              .read(durationPreferenceProvider.notifier)
-                              .setDuration((newValue * 60000).round());
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '1 ${l10n.min}',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
-                                ),
-                          ),
-                          Text(
-                            '60 ${l10n.min}',
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.6),
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 16.0,
-            ),
-            child: Text(
-              l10n.defaultsNote,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.6),
-                height: 1.5,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16.0),
+          ],
         ]),
       ),
     );
+  }
+
+  /// Lengths most sessions come in; each track plays its closest.
+  static const _presetMinutes = [3, 5, 10, 15, 20, 30, 60];
+
+  /// There is no catalogue of guides, so offer the voices of the Up Next
+  /// session (Getting started has the main four) plus the saved one.
+  List<String> _guideOptions(WidgetRef ref, String? saved) {
+    final nextId = ref.watch(upNextProvider).value?.nextSession?.id;
+    final track = nextId == null
+        ? null
+        : ref.watch(tracksProvider(trackId: nextId)).value;
+    final guides = <String>[
+      for (final voice in track?.voices ?? const <TrackVoice>[])
+        if (voice.guideName != null && voice.guideName!.isNotEmpty)
+          voice.guideName!,
+    ];
+    if (saved != null && !guides.contains(saved)) guides.add(saved);
+    return guides;
   }
 }

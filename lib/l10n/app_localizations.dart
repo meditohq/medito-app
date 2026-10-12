@@ -4177,7 +4177,7 @@ abstract class AppLocalizations {
   /// Note explaining how defaults work in Up Next
   ///
   /// In en, this message translates to:
-  /// **'These defaults are set from your last selection on any track. Home uses them to skip the selection screen when you continue a pack.'**
+  /// **'Set from what you play on any track. Home and your watch use them to start sessions without the selection screen.'**
   String get defaultsNote;
 
   /// Text shown when a streak freeze was used on a particular day
@@ -5505,6 +5505,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Meditated today'**
   String get meditatedToday;
+
+  /// Voice and length the Home hero will play, under the session title, e.g. Will · 10 min
+  ///
+  /// In en, this message translates to:
+  /// **'{guide} · {minutes} min'**
+  String upNextVariant(String guide, int minutes);
+
+  /// Length the Home hero will play when the session has a single voice, e.g. 10 min
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String upNextVariantMinutes(int minutes);
+
+  /// Screen-reader hint on the Home hero's voice · length line, which opens a picker
+  ///
+  /// In en, this message translates to:
+  /// **'Change voice or length'**
+  String get upNextVariantEdit;
+
+  /// Title of the sheet for picking the voice and length opened from the Home hero
+  ///
+  /// In en, this message translates to:
+  /// **'Voice and length'**
+  String get variantSheetTitle;
+
+  /// Note under the voice and length sheet title: the choice becomes the default
+  ///
+  /// In en, this message translates to:
+  /// **'Saved as your default for sessions you start from Home.'**
+  String get variantSheetNote;
+
+  /// Section label for the guide voice options
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get variantVoice;
+
+  /// Section label for the session length options
+  ///
+  /// In en, this message translates to:
+  /// **'Length'**
+  String get variantLength;
+
+  /// Button on Manage defaults that clears the saved voice and length
+  ///
+  /// In en, this message translates to:
+  /// **'Clear defaults'**
+  String get clearDefaults;
+
+  /// Snackbar after the saved voice and length are cleared
+  ///
+  /// In en, this message translates to:
+  /// **'Defaults cleared'**
+  String get defaultsCleared;
 }
 
 class _AppLocalizationsDelegate
