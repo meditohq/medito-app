@@ -304,21 +304,12 @@ class _TrackViewState extends ConsumerState<TrackView>
   void _handleOnGuideNameChange(TrackVoice? newVoice) {
     if (newVoice == null) return;
 
+    // The duration preference is left as is: the length shown is the closest
+    // the new voice offers, and snapping the saved value to it would lose a
+    // length this voice doesn't have for every other track.
     ref
         .read(guideNamePreferenceProvider.notifier)
         .setGuideName(newVoice.guideName);
-
-    // Keep the duration preference in step with what the new voice offers
-    final currentDuration = ref.read(durationPreferenceProvider);
-    if (currentDuration != null) {
-      final bestFile = TrackVariantSelector.closestDuration(
-        newVoice.audioFiles,
-        currentDuration,
-      );
-      ref
-          .read(durationPreferenceProvider.notifier)
-          .setDuration(bestFile.duration);
-    }
   }
 
   void _handleOnDurationChange(TrackAudioFile? value) {
@@ -335,6 +326,7 @@ class _TrackViewState extends ConsumerState<TrackView>
   ) {
     if (_isStarting) return;
     setState(() => _isStarting = true);
+    _rememberDefaults(track, voice, file);
 
     // Prepare the request (sets player state synchronously) then open the
     // player immediately. PlayerView starts playback and shows its own loading
@@ -348,6 +340,28 @@ class _TrackViewState extends ConsumerState<TrackView>
     ).whenComplete(() {
       if (mounted) setState(() => _isStarting = false);
     });
+  }
+
+  /// Saves what was played as the default voice / length if none is set yet,
+  /// so Up Next and the watch play it instead of each track's first option.
+  void _rememberDefaults(Track track, TrackVoice voice, TrackAudioFile file) {
+    final defaults = TrackVariantSelector.defaultsFromPlay(
+      track,
+      voice,
+      file,
+      savedGuideName: ref.read(guideNamePreferenceProvider),
+      savedDurationMs: ref.read(durationPreferenceProvider),
+    );
+    if (defaults.guideName != null) {
+      ref
+          .read(guideNamePreferenceProvider.notifier)
+          .setGuideName(defaults.guideName);
+    }
+    if (defaults.durationMs != null) {
+      ref
+          .read(durationPreferenceProvider.notifier)
+          .setDuration(defaults.durationMs);
+    }
   }
 
   Widget _durationDropdown(
