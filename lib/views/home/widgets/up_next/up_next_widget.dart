@@ -12,6 +12,12 @@ import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/models/track/track.dart';
+import 'package:medito/providers/duration_preference_provider.dart';
+import 'package:medito/providers/guide_name_preference_provider.dart';
+import 'package:medito/providers/meditation/track_provider.dart';
+import 'package:medito/utils/track_variant_selector.dart';
+import 'package:medito/views/home/widgets/up_next/variant_sheet.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/views/player/start_session.dart';
 import 'package:medito/routes/routes.dart';
@@ -577,6 +583,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
     final canRemove =
         widget.data.pack.id != ConfigConstants.basicsPackId &&
         !PackSequence.contains(widget.data.pack.id);
+    final variantTrack = _variantTrack(ref, nextSession.id);
 
     return Opacity(
       opacity: _skipping ? 0.0 : 1.0,
@@ -634,6 +641,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                 if (canRemove)
                   CustomSemanticsAction(label: l10n.removeFromHome): () =>
                       _onRemove(context),
+                if (variantTrack != null)
+                  CustomSemanticsAction(label: l10n.upNextVariantEdit): () =>
+                      showVariantSheet(context, variantTrack),
               },
               child: GestureDetector(
                 // The hero style has no card surface behind the content, so
@@ -716,6 +726,10 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                                           height: 1.2,
                                           color: palette.foreground,
                                         ),
+                                  ),
+                                  _VariantLine(
+                                    trackId: nextSession.id,
+                                    palette: palette,
                                   ),
                                   if (widget.data.totalCount > 0) ...[
                                     const SizedBox(height: 10),
@@ -925,6 +939,78 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
     } finally {
       if (mounted) setState(() => _isStarting = false);
     }
+  }
+}
+
+/// The track behind [trackId] when the Home hero should show which voice and
+/// length it will play: only once both defaults are saved (otherwise a tap
+/// opens the track screen, which shows the pickers itself) and only when the
+/// track offers a choice.
+Track? _variantTrack(WidgetRef ref, String trackId) {
+  if (ref.watch(guideNamePreferenceProvider) == null ||
+      ref.watch(durationPreferenceProvider) == null) {
+    return null;
+  }
+  final track = ref.watch(tracksProvider(trackId: trackId)).value;
+  return track != null && trackHasVariants(track) ? track : null;
+}
+
+/// "Will · 10 min" under the session title, with a pencil: what a tap on the
+/// hero will play, since it skips the track screen. Opens [VariantSheet].
+class _VariantLine extends ConsumerWidget {
+  const _VariantLine({required this.trackId, required this.palette});
+
+  final String trackId;
+  final _UpNextPalette palette;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final track = _variantTrack(ref, trackId);
+    if (track == null) return const SizedBox.shrink();
+
+    final l10n = AppLocalizations.of(context)!;
+    final selection = TrackVariantSelector.resolve(
+      track,
+      guideName: ref.watch(guideNamePreferenceProvider),
+      durationMs: ref.watch(durationPreferenceProvider),
+    );
+    final minutes = convertDurationToMinutes(
+      milliseconds: selection.file.duration,
+    );
+    final guide = selection.voice.guideName;
+    final text = guide == null || guide.isEmpty
+        ? l10n.upNextVariantMinutes(minutes)
+        : l10n.upNextVariant(guide, minutes);
+    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      fontSize: 15,
+      fontWeight: FontWeight.w500,
+      color: palette.muted,
+    );
+
+    // Opaque so the gap between text and pencil opens the sheet too, not the
+    // player; the vertical padding makes the target thumb-sized.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => showVariantSheet(context, track),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 2, right: 12),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                text,
+                style: style,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.edit_outlined, size: 15, color: palette.muted),
+          ],
+        ),
+      ),
+    );
   }
 }
 

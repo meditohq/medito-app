@@ -1245,7 +1245,7 @@
   "defaultGuideNameCleared": "Guía predeterminado eliminado",
   "defaultDurationCleared": "Duración predeterminada eliminada",
   "notSet": "Sin configurar",
-  "defaultsNote": "Estos valores predeterminados se basan en tu última selección en cualquier pista. Inicio los usa para omitir la pantalla de selección cuando continúas un paquete.",
+  "defaultsNote": "Se basan en lo que reproduces en cualquier pista. Inicio y tu reloj los usan para empezar sesiones sin la pantalla de selección.",
   "streakFreezeUsed": "Congelación de racha usada",
   "session": "sesión",
   "sessions": "sesiones",
@@ -1380,5 +1380,14 @@
   "endScreenRestoredYesterday": "Hola de nuevo. Terminaste «{title}» ayer.",
   "endScreenRestoredTimerLastNight": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} anoche.",
   "endScreenRestoredTimerEarlierToday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} hoy más temprano.",
-  "endScreenRestoredTimerYesterday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} ayer."
+  "endScreenRestoredTimerYesterday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} ayer.",
+  "upNextVariant": "{guide} · {minutes} min",
+  "upNextVariantMinutes": "{minutes} min",
+  "upNextVariantEdit": "Cambiar voz o duración",
+  "variantSheetTitle": "Voz y duración",
+  "variantSheetNote": "Se guarda como predeterminado para las sesiones que empiezas desde Inicio.",
+  "variantVoice": "Voz",
+  "variantLength": "Duración",
+  "clearDefaults": "Borrar predeterminados",
+  "defaultsCleared": "Predeterminados borrados"
 }

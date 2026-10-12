@@ -1495,7 +1495,7 @@
   "@notSet": {
     "description": "Text shown when a default value is not set"
   },
-  "defaultsNote": "These defaults are set from your last selection on any track. Home uses them to skip the selection screen when you continue a pack.",
+  "defaultsNote": "Set from what you play on any track. Home and your watch use them to start sessions without the selection screen.",
   "@defaultsNote": {
     "description": "Note explaining how defaults work in Up Next"
   },
@@ -2202,5 +2202,35 @@
   "endScreenRestoredTimerEarlierToday": "Welcome back. You finished a {minutes}-minute timer earlier today.",
   "@endScreenRestoredTimerEarlierToday": {"description": "As endScreenRestoredEarlierToday, for a Timer session", "placeholders": {"minutes": {"type": "int"}}},
   "endScreenRestoredTimerYesterday": "Welcome back. You finished a {minutes}-minute timer yesterday.",
-  "@endScreenRestoredTimerYesterday": {"description": "As endScreenRestoredYesterday, for a Timer session", "placeholders": {"minutes": {"type": "int"}}}
+  "@endScreenRestoredTimerYesterday": {"description": "As endScreenRestoredYesterday, for a Timer session", "placeholders": {"minutes": {"type": "int"}}},
+  "upNextVariant": "{guide} · {minutes} min",
+  "@upNextVariant": {
+    "description": "Voice and length the Home hero will play, under the session title, e.g. Will · 10 min",
+    "placeholders": {"guide": {"type": "String"}, "minutes": {"type": "int"}}
+  },
+  "upNextVariantMinutes": "{minutes} min",
+  "@upNextVariantMinutes": {
+    "description": "Length the Home hero will play when the session has a single voice, e.g. 10 min",
+    "placeholders": {"minutes": {"type": "int"}}
+  },
+  "upNextVariantEdit": "Change voice or length",
+  "@upNextVariantEdit": {
+    "description": "Screen-reader hint on the Home hero's voice · length line, which opens a picker"
+  },
+  "variantSheetTitle": "Voice and length",
+  "@variantSheetTitle": {
+    "description": "Title of the sheet for picking the voice and length opened from the Home hero"
+  },
+  "variantSheetNote": "Saved as your default for sessions you start from Home.",
+  "@variantSheetNote": {
+    "description": "Note under the voice and length sheet title: the choice becomes the default"
+  },
+  "variantVoice": "Voice",
+  "@variantVoice": {"description": "Section label for the guide voice options"},
+  "variantLength": "Length",
+  "@variantLength": {"description": "Section label for the session length options"},
+  "clearDefaults": "Clear defaults",
+  "@clearDefaults": {"description": "Button on Manage defaults that clears the saved voice and length"},
+  "defaultsCleared": "Defaults cleared",
+  "@defaultsCleared": {"description": "Snackbar after the saved voice and length are cleared"}
 }

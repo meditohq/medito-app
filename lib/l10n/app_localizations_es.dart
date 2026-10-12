@@ -2321,7 +2321,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get defaultsNote =>
-      'Estos valores predeterminados se basan en tu última selección en cualquier pista. Inicio los usa para omitir la pantalla de selección cuando continúas un paquete.';
+      'Se basan en lo que reproduces en cualquier pista. Inicio y tu reloj los usan para empezar sesiones sin la pantalla de selección.';
 
   @override
   String get streakFreezeUsed => 'Congelación de racha usada';
@@ -3014,4 +3014,36 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return 'Hola de nuevo. Terminaste un temporizador de $_temp0 ayer.';
   }
+
+  @override
+  String upNextVariant(String guide, int minutes) {
+    return '$guide · $minutes min';
+  }
+
+  @override
+  String upNextVariantMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get upNextVariantEdit => 'Cambiar voz o duración';
+
+  @override
+  String get variantSheetTitle => 'Voz y duración';
+
+  @override
+  String get variantSheetNote =>
+      'Se guarda como predeterminado para las sesiones que empiezas desde Inicio.';
+
+  @override
+  String get variantVoice => 'Voz';
+
+  @override
+  String get variantLength => 'Duración';
+
+  @override
+  String get clearDefaults => 'Borrar predeterminados';
+
+  @override
+  String get defaultsCleared => 'Predeterminados borrados';
 }

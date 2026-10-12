@@ -1333,7 +1333,7 @@
   "@notSet": {
     "description": "Text shown when a default value is not set"
   },
-  "defaultsNote": "Diese Voreinstellungen entsprechen deiner letzten Auswahl bei einem Titel. Die Startseite verwendet sie, um den Auswahlbildschirm zu überspringen, wenn du ein Paket fortsetzt.",
+  "defaultsNote": "Wird aus dem übernommen, was du bei einem Titel abspielst. Die Startseite und deine Uhr starten damit Sitzungen ohne Auswahlbildschirm.",
   "@defaultsNote": {
     "description": "Note explaining how defaults work in Up Next"
   },
@@ -1780,5 +1780,14 @@
   "endScreenRestoredYesterday": "Willkommen zurück. Du hast „{title}“ gestern beendet.",
   "endScreenRestoredTimerLastNight": "Willkommen zurück. Du hast letzte Nacht einen {minutes}-Minuten-Timer beendet.",
   "endScreenRestoredTimerEarlierToday": "Willkommen zurück. Du hast heute einen {minutes}-Minuten-Timer beendet.",
-  "endScreenRestoredTimerYesterday": "Willkommen zurück. Du hast gestern einen {minutes}-Minuten-Timer beendet."
+  "endScreenRestoredTimerYesterday": "Willkommen zurück. Du hast gestern einen {minutes}-Minuten-Timer beendet.",
+  "upNextVariant": "{guide} · {minutes} Min.",
+  "upNextVariantMinutes": "{minutes} Min.",
+  "upNextVariantEdit": "Stimme oder Länge ändern",
+  "variantSheetTitle": "Stimme und Länge",
+  "variantSheetNote": "Wird als Standard für Sitzungen gespeichert, die du auf der Startseite beginnst.",
+  "variantVoice": "Stimme",
+  "variantLength": "Länge",
+  "clearDefaults": "Voreinstellungen zurücksetzen",
+  "defaultsCleared": "Voreinstellungen zurückgesetzt"
 }

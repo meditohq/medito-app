@@ -2338,7 +2338,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get defaultsNote =>
-      'Diese Voreinstellungen entsprechen deiner letzten Auswahl bei einem Titel. Die Startseite verwendet sie, um den Auswahlbildschirm zu überspringen, wenn du ein Paket fortsetzt.';
+      'Wird aus dem übernommen, was du bei einem Titel abspielst. Die Startseite und deine Uhr starten damit Sitzungen ohne Auswahlbildschirm.';
 
   @override
   String get streakFreezeUsed => 'Serienschutz eingesetzt';
@@ -3018,4 +3018,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String endScreenRestoredTimerYesterday(int minutes) {
     return 'Willkommen zurück. Du hast gestern einen $minutes-Minuten-Timer beendet.';
   }
+
+  @override
+  String upNextVariant(String guide, int minutes) {
+    return '$guide · $minutes Min.';
+  }
+
+  @override
+  String upNextVariantMinutes(int minutes) {
+    return '$minutes Min.';
+  }
+
+  @override
+  String get upNextVariantEdit => 'Stimme oder Länge ändern';
+
+  @override
+  String get variantSheetTitle => 'Stimme und Länge';
+
+  @override
+  String get variantSheetNote =>
+      'Wird als Standard für Sitzungen gespeichert, die du auf der Startseite beginnst.';
+
+  @override
+  String get variantVoice => 'Stimme';
+
+  @override
+  String get variantLength => 'Länge';
+
+  @override
+  String get clearDefaults => 'Voreinstellungen zurücksetzen';
+
+  @override
+  String get defaultsCleared => 'Voreinstellungen zurückgesetzt';
 }
