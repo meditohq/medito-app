@@ -13,7 +13,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
 import '../../../services/analytics/firebase_analytics_service.dart';
 import '../../../widgets/dialogs/dialogs.dart';
-import '../../../widgets/medito_icon.dart';
 import '../../../widgets/snackbar_widget.dart';
 
 import '../../../models/events/donation/donation_page_model.dart';
@@ -30,8 +29,8 @@ import '../../../routes/routes.dart';
 import '../../../utils/logger.dart';
 import '../../../utils/receipt_email.dart';
 import '../../../widgets/errors/medito_error_widget.dart';
-import '../../home/widgets/home_gradient_border.dart';
 import 'donation_thank_you_card.dart';
+import 'end_screen_card.dart';
 import 'feedback_widget.dart';
 import 'inline_donation_pay.dart';
 
@@ -366,87 +365,37 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     // colour is theme-driven now, so the foreground must follow the theme too.
     final footerColor = context.onBrandAccent.withValues(alpha: 0.85);
 
-    return HomeGradientBorder(
-      backgroundColor: context.brandAccent,
-      borderRadius: 14,
-      borderWidth: 0.5,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 12, 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Text(
-                      donationPageModel.title ?? 'Support Medito',
-                      textAlign: TextAlign.left,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            fontFamily: googleSans,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w400,
-                            height: 1.2,
-                            color: context.onBrandAccent,
-                          ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  tooltip: AppLocalizations.of(context)!.donationInfo,
-                  icon: MeditoIcon(
-                    assetName: MeditoIcons.help,
-                    size: 20,
-                    color: context.onBrandAccent,
-                  ),
-                  onPressed: () => _showDonationInfoDialog(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              donationPageModel.text ??
-                  AppLocalizations.of(
-                    context,
-                  )!.meditoReliesOnYourDonationsToSurvive,
-              textAlign: TextAlign.left,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                height: 1.4,
-                color: context.onBrandAccent.withValues(alpha: 0.9),
-              ),
-            ),
-            const SizedBox(height: 20),
+    return EndScreenCard(
+      inverted: true,
+      title: donationPageModel.title ?? 'Support Medito',
+      body:
+          donationPageModel.text ??
+          AppLocalizations.of(context)!.meditoReliesOnYourDonationsToSurvive,
+      corner: EndScreenCardCorner(
+        icon: MeditoIcons.help,
+        tooltip: AppLocalizations.of(context)!.donationInfo,
+        onPressed: () => _showDonationInfoDialog(context),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _isInlineVariant
+              ? _buildInlineOrFallback(donationPageModel, context)
+              : _buildButtonRow(donationPageModel.buttons, context),
+          if (donationPageModel.footerText != null)
             Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: _isInlineVariant
-                  ? _buildInlineOrFallback(donationPageModel, context)
-                  : _buildButtonRow(donationPageModel.buttons, context),
-            ),
-            if (donationPageModel.footerText != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 14.0, right: 8),
-                child: Text(
-                  donationPageModel.footerText!,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.4,
-                    color: footerColor,
-                  ),
+              padding: const EdgeInsets.only(top: 14.0),
+              child: Text(
+                donationPageModel.footerText!,
+                textAlign: TextAlign.center,
+                style: EndScreenCard.secondaryStyle(
+                  context,
+                  color: footerColor,
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -618,9 +567,8 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
               ),
               child: Text(
                 button.title ?? AppLocalizations.of(context)!.donateNow,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+                style: EndScreenCard.buttonStyle(
+                  context,
                   color: context.brandAccent,
                 ),
               ),
@@ -656,6 +604,10 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
               ),
               child: Text(
                 button.title ?? AppLocalizations.of(context)!.donateNow,
+                style: EndScreenCard.buttonStyle(
+                  context,
+                  color: context.brandAccent,
+                ),
               ),
             ),
           ),

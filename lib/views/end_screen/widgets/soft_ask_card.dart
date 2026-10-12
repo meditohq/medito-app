@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
-import 'package:medito/views/home/widgets/home_gradient_border.dart';
-import 'package:medito/widgets/medito_icon.dart';
 
-/// Shared layout for the end-screen soft-asks (reminders, account). Mirrors the
-/// donation card below it — left-aligned title with the ✕ in the corner, body,
-/// then a full-width CTA — so the stacked cards read as one family.
+import 'end_screen_card.dart';
+
+/// Shared layout for the end-screen soft-asks (reminders, account): an
+/// [EndScreenCard] with the ✕ in the corner, a full-width CTA and "Not now".
 class SoftAskCard extends StatelessWidget {
   const SoftAskCard({
     super.key,
@@ -34,8 +33,7 @@ class SoftAskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
 
     return Padding(
       padding: const EdgeInsets.only(
@@ -43,98 +41,44 @@ class SoftAskCard extends StatelessWidget {
         right: padding16,
         bottom: 16,
       ),
-      child: HomeGradientBorder(
-        backgroundColor: theme.cardColor,
-        borderRadius: 14,
-        borderWidth: 0.5,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 12, 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
-                        color: onSurface,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: AppLocalizations.of(context)!.dismiss,
-                    icon: MeditoIcon(
-                      assetName: MeditoIcons.xmark,
-                      size: 20,
-                      color: onSurface.withValues(alpha: 0.6),
-                    ),
-                    onPressed: onDismiss,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ],
+      child: EndScreenCard(
+        title: title,
+        body: body,
+        corner: EndScreenCardCorner(
+          icon: MeditoIcons.xmark,
+          tooltip: AppLocalizations.of(context)!.dismiss,
+          onPressed: onDismiss,
+        ),
+        bottomPadding: 8,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton(
+              onPressed: onCta,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 6),
-                    Text(
-                      body,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        height: 1.4,
-                        color: onSurface.withValues(alpha: 0.8),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: onCta,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: Text(
-                          ctaLabel,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: context.onBrandAccent,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: TextButton(
-                        onPressed: onSnooze,
-                        child: Text(
-                          AppLocalizations.of(context)!.notNow,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: onSurface.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+              child: Text(
+                ctaLabel,
+                textAlign: TextAlign.center,
+                style: EndScreenCard.buttonStyle(
+                  context,
+                  color: context.onBrandAccent,
                 ),
               ),
-            ],
-          ),
+            ),
+            TextButton(
+              onPressed: onSnooze,
+              child: Text(
+                AppLocalizations.of(context)!.notNow,
+                style: EndScreenCard.secondaryStyle(
+                  context,
+                  color: onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
