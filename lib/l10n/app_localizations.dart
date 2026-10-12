@@ -5559,6 +5559,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Defaults cleared'**
   String get defaultsCleared;
+
+  /// Button that closes an end screen shown on the next launch and returns to Home
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get endScreenDone;
+
+  /// Top line of an end screen shown on the next launch because the app was closed before it could appear (e.g. the user fell asleep). The session ended between 6pm yesterday and 5am today.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished “{title}” last night.'**
+  String endScreenRestoredLastNight(String title);
+
+  /// As endScreenRestoredLastNight, for a session that ended earlier today
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished “{title}” earlier today.'**
+  String endScreenRestoredEarlierToday(String title);
+
+  /// As endScreenRestoredLastNight, for a session that ended yesterday during the day
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished “{title}” yesterday.'**
+  String endScreenRestoredYesterday(String title);
+
+  /// As endScreenRestoredLastNight, for a Timer session of {minutes} minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished a {minutes}-minute timer last night.'**
+  String endScreenRestoredTimerLastNight(int minutes);
+
+  /// As endScreenRestoredEarlierToday, for a Timer session
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished a {minutes}-minute timer earlier today.'**
+  String endScreenRestoredTimerEarlierToday(int minutes);
+
+  /// As endScreenRestoredYesterday, for a Timer session
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back. You finished a {minutes}-minute timer yesterday.'**
+  String endScreenRestoredTimerYesterday(int minutes);
 }
 
 class _AppLocalizationsDelegate

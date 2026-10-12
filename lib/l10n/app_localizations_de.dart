@@ -3107,4 +3107,37 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get defaultsCleared => 'Voreinstellungen zurückgesetzt';
+
+  @override
+  String get endScreenDone => 'Fertig';
+
+  @override
+  String endScreenRestoredLastNight(String title) {
+    return 'Willkommen zurück. Du hast „$title“ letzte Nacht beendet.';
+  }
+
+  @override
+  String endScreenRestoredEarlierToday(String title) {
+    return 'Willkommen zurück. Du hast „$title“ heute beendet.';
+  }
+
+  @override
+  String endScreenRestoredYesterday(String title) {
+    return 'Willkommen zurück. Du hast „$title“ gestern beendet.';
+  }
+
+  @override
+  String endScreenRestoredTimerLastNight(int minutes) {
+    return 'Willkommen zurück. Du hast letzte Nacht einen $minutes-Minuten-Timer beendet.';
+  }
+
+  @override
+  String endScreenRestoredTimerEarlierToday(int minutes) {
+    return 'Willkommen zurück. Du hast heute einen $minutes-Minuten-Timer beendet.';
+  }
+
+  @override
+  String endScreenRestoredTimerYesterday(int minutes) {
+    return 'Willkommen zurück. Du hast gestern einen $minutes-Minuten-Timer beendet.';
+  }
 }

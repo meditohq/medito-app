@@ -1409,5 +1409,12 @@
   "variantVoice": "Voz",
   "variantLength": "Duración",
   "clearDefaults": "Borrar predeterminados",
-  "defaultsCleared": "Predeterminados borrados"
+  "defaultsCleared": "Predeterminados borrados",
+  "endScreenDone": "Listo",
+  "endScreenRestoredLastNight": "Hola de nuevo. Terminaste «{title}» anoche.",
+  "endScreenRestoredEarlierToday": "Hola de nuevo. Terminaste «{title}» hoy más temprano.",
+  "endScreenRestoredYesterday": "Hola de nuevo. Terminaste «{title}» ayer.",
+  "endScreenRestoredTimerLastNight": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} anoche.",
+  "endScreenRestoredTimerEarlierToday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} hoy más temprano.",
+  "endScreenRestoredTimerYesterday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} ayer."
 }

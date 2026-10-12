@@ -1809,5 +1809,12 @@
   "variantVoice": "Stimme",
   "variantLength": "Länge",
   "clearDefaults": "Voreinstellungen zurücksetzen",
-  "defaultsCleared": "Voreinstellungen zurückgesetzt"
+  "defaultsCleared": "Voreinstellungen zurückgesetzt",
+  "endScreenDone": "Fertig",
+  "endScreenRestoredLastNight": "Willkommen zurück. Du hast „{title}“ letzte Nacht beendet.",
+  "endScreenRestoredEarlierToday": "Willkommen zurück. Du hast „{title}“ heute beendet.",
+  "endScreenRestoredYesterday": "Willkommen zurück. Du hast „{title}“ gestern beendet.",
+  "endScreenRestoredTimerLastNight": "Willkommen zurück. Du hast letzte Nacht einen {minutes}-Minuten-Timer beendet.",
+  "endScreenRestoredTimerEarlierToday": "Willkommen zurück. Du hast heute einen {minutes}-Minuten-Timer beendet.",
+  "endScreenRestoredTimerYesterday": "Willkommen zurück. Du hast gestern einen {minutes}-Minuten-Timer beendet."
 }

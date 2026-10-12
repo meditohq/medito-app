@@ -663,6 +663,11 @@ class AnalyticsEventConstants {
   static const String endScreenDonationCardInfoOpened =
       'end_screen_donation_card_info_opened';
 
+  /// Event logged when a finished session's end screen is rebuilt on launch
+  /// because the app was killed before it could open (session ended with the
+  /// screen off). The end screen's own events follow as usual.
+  static const String endScreenRestored = 'end_screen_restored';
+
   /// Parameter naming which donate CTA was tapped when the CMS supplies more
   /// than one button (0-based).
   static const String paramButtonIndex = 'button_index';

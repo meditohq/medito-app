@@ -2248,5 +2248,19 @@
   "clearDefaults": "Clear defaults",
   "@clearDefaults": {"description": "Button on Manage defaults that clears the saved voice and length"},
   "defaultsCleared": "Defaults cleared",
-  "@defaultsCleared": {"description": "Snackbar after the saved voice and length are cleared"}
+  "@defaultsCleared": {"description": "Snackbar after the saved voice and length are cleared"},
+  "endScreenDone": "Done",
+  "@endScreenDone": {"description": "Button that closes an end screen shown on the next launch and returns to Home"},
+  "endScreenRestoredLastNight": "Welcome back. You finished “{title}” last night.",
+  "@endScreenRestoredLastNight": {"description": "Top line of an end screen shown on the next launch because the app was closed before it could appear (e.g. the user fell asleep). The session ended between 6pm yesterday and 5am today.", "placeholders": {"title": {"type": "String"}}},
+  "endScreenRestoredEarlierToday": "Welcome back. You finished “{title}” earlier today.",
+  "@endScreenRestoredEarlierToday": {"description": "As endScreenRestoredLastNight, for a session that ended earlier today", "placeholders": {"title": {"type": "String"}}},
+  "endScreenRestoredYesterday": "Welcome back. You finished “{title}” yesterday.",
+  "@endScreenRestoredYesterday": {"description": "As endScreenRestoredLastNight, for a session that ended yesterday during the day", "placeholders": {"title": {"type": "String"}}},
+  "endScreenRestoredTimerLastNight": "Welcome back. You finished a {minutes}-minute timer last night.",
+  "@endScreenRestoredTimerLastNight": {"description": "As endScreenRestoredLastNight, for a Timer session of {minutes} minutes", "placeholders": {"minutes": {"type": "int"}}},
+  "endScreenRestoredTimerEarlierToday": "Welcome back. You finished a {minutes}-minute timer earlier today.",
+  "@endScreenRestoredTimerEarlierToday": {"description": "As endScreenRestoredEarlierToday, for a Timer session", "placeholders": {"minutes": {"type": "int"}}},
+  "endScreenRestoredTimerYesterday": "Welcome back. You finished a {minutes}-minute timer yesterday.",
+  "@endScreenRestoredTimerYesterday": {"description": "As endScreenRestoredYesterday, for a Timer session", "placeholders": {"minutes": {"type": "int"}}}
 }
