@@ -1773,5 +1773,13 @@
   "shopPriceWas": "{price}, vorher {compareAt}",
   "shopQuantity": "Menge: {count}",
   "externalLink": "Externer Link",
-  "meditatedToday": "Heute meditiert"
+  "meditatedToday": "Heute meditiert",
+  "analyticsReconsentTitle": "Nutzungsstatistiken wieder einschalten?",
+  "analyticsReconsentBody": "Nur um zu sehen, was hilft und was nicht funktioniert. Nie für Werbung.",
+  "analyticsReconsentAccept": "Bin dabei",
+  "analyticsReconsentDecline": "Ausgeschaltet lassen",
+  "analyticsReconsentAcceptedMessage": "Danke. Nutzungsstatistiken sind eingeschaltet.",
+  "analyticsReconsentDeclinedMessage": "Kein Problem. Sie bleiben ausgeschaltet.",
+  "analyticsReconsentInfoTitle": "Über Nutzungsstatistiken",
+  "analyticsReconsentInfoBody": "Ältere Versionen von Medito haben Nutzungsstatistiken bei allen ausgeschaltet, die Tracking abgelehnt haben – das ging weiter als nötig.\n\nNutzungsstatistiken erfassen, wie du die App nutzt, verknüpft mit deiner Medito-Nutzer-ID, damit wir sehen, welche Sessions helfen, und beheben können, was nicht funktioniert. Sie werden nie für Werbung oder App-übergreifendes Tracking verwendet.\n\nDu kannst das jederzeit unter Einstellungen → Erweitert → Datenschutzerklärung ändern."
 }

@@ -70,6 +70,23 @@ class SharedPreferenceConstants {
   static const String analyticsFirebaseEnabled = 'analytics_firebase_enabled';
   static const String analyticsMetaEnabled = 'analytics_meta_enabled';
 
+  /// Set to [analyticsOptOutSourceSettings] when the user turns Firebase
+  /// analytics off on the Data Collection screen, and removed when they turn
+  /// it back on. Before Oct 2026 nothing recorded where a stored
+  /// `analyticsFirebaseEnabled=false` came from: iOS builds 3.4.16–2606.11
+  /// also wrote it when the user declined App Tracking Transparency.
+  static const String analyticsOptOutSource = 'analytics_opt_out_source';
+  static const String analyticsOptOutSourceSettings = 'settings';
+
+  /// One-time end-screen ask to turn usage stats back on for iOS users whose
+  /// opt-out was most likely written by the old ATT path. `accepted` or
+  /// `declined` once answered; absent until then.
+  static const String analyticsReconsentAnswer = 'analytics_reconsent_answer';
+
+  /// How many end screens have shown the re-consent ask without an answer.
+  static const String analyticsReconsentImpressions =
+      'analytics_reconsent_impressions';
+
   // Historical consistency score data
   static const String consistencyScoreHistory = 'consistency_score_history';
 

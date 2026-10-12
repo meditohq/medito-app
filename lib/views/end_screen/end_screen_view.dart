@@ -15,7 +15,9 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/providers/settings/account_prompt_provider.dart';
+import 'package:medito/providers/settings/analytics_reconsent_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:medito/utils/logger.dart';
@@ -37,6 +39,7 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 
 import 'widgets/account_prompt_card.dart';
+import 'widgets/analytics_reconsent_card.dart';
 import 'widgets/animated_end_screen_section.dart';
 import 'widgets/donation_widget.dart';
 import 'widgets/soft_ask_card.dart';
@@ -75,6 +78,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   bool _reminderPromptImpressionLogged = false;
   bool _accountPromptImpressionLogged = false;
 
+  /// Set the first time the re-consent card shows on this screen. Keeps it up
+  /// until answered even if this showing reaches the impression cap, and keeps
+  /// the other soft-asks out of the slot for the rest of this visit.
+  bool _reconsentShown = false;
+
   /// Whether the OS notification permission is already granted. When it is,
   /// tapping the CTA raises no system dialog, so the soft-ask is skipped.
   bool _notificationsGranted = false;
@@ -100,6 +108,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     super.initState();
     _logScreenView();
     _checkNotificationPermission();
+    // Start the ATT lookup now so the re-consent card is decided before the
+    // soft-ask slot animates in, instead of swapping cards under the user.
+    ref.read(attAuthorizedProvider);
 
     _statsAnimationController = AnimationController(
       vsync: this,
@@ -259,12 +270,16 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                   position: _reminderSlideAnimation,
                   child: FadeTransition(
                     opacity: _reminderFadeAnimation,
-                    // The reminder and account soft-asks are mutually exclusive
-                    // (see shouldShowAccountPromptProvider), so they share this
-                    // animation slot; only one ever renders.
+                    // The soft-asks are mutually exclusive (see
+                    // shouldShowAccountPromptProvider and _reconsentShown), so
+                    // they share this animation slot; only one ever renders.
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // First: it decides _reconsentShown for the two below.
+                        AnimatedEndScreenSection(
+                          child: _buildAnalyticsReconsent(),
+                        ),
                         AnimatedEndScreenSection(child: _buildReminderPrompt()),
                         AnimatedEndScreenSection(child: _buildAccountPrompt()),
                       ],
@@ -597,7 +612,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     // this card only ever renders in the "off" state and vanishes on success.
     final shouldShow = ref.watch(shouldShowReminderPromptProvider);
 
-    if (!shouldShow) {
+    if (!shouldShow || _reconsentShown) {
       return const SizedBox.shrink();
     }
 
@@ -635,7 +650,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   /// [shouldShowAccountPromptProvider]; shares the reminder animation slot.
   Widget _buildAccountPrompt() {
     final shouldShow = ref.watch(shouldShowAccountPromptProvider);
-    if (!shouldShow) {
+    if (!shouldShow || _reconsentShown) {
       return const SizedBox.shrink();
     }
 
@@ -660,6 +675,78 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       onSnooze: _snoozeAccountPrompt,
       onDismiss: _dismissAccountPromptForever,
     );
+  }
+
+  /// One-time ask to turn usage stats back on for iOS users whose opt-out was
+  /// most likely written by the old ATT path. Gated by
+  /// [shouldShowAnalyticsReconsentProvider]; takes the soft-ask slot.
+  ///
+  /// No impression or decline events: analytics is off for these users, and
+  /// a "no" keeps it off.
+  Widget _buildAnalyticsReconsent() {
+    final answered = ref.watch(analyticsReconsentProvider).answer != null;
+    if (!_reconsentShown) {
+      if (!ref.watch(shouldShowAnalyticsReconsentProvider)) {
+        return const SizedBox.shrink();
+      }
+      _reconsentShown = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          unawaited(
+            ref.read(analyticsReconsentProvider.notifier).recordImpression(),
+          );
+        }
+      });
+    }
+    if (answered) return const SizedBox.shrink();
+
+    return AnalyticsReconsentCard(
+      onAccept: _acceptAnalyticsReconsent,
+      onDecline: _declineAnalyticsReconsent,
+    );
+  }
+
+  Future<void> _acceptAnalyticsReconsent() async {
+    final impression = ref.read(analyticsReconsentProvider).impressions;
+    await ref.read(analyticsReconsentProvider.notifier).answer(accepted: true);
+
+    final analytics = ref.read(analyticsServiceProvider);
+    await analytics.enableProductAnalytics();
+    // main() never initialised Crashlytics for these users, so hook up its
+    // error handlers now rather than on the next launch.
+    final crashlytics = CrashlyticsService();
+    if (!crashlytics.isEnabled) await crashlytics.initialize();
+    // The splash skipped this while analytics was off.
+    final userId = ref.read(userIdProvider);
+    if (userId != null && userId.isNotEmpty) {
+      await analytics.setUserId(userId);
+    }
+    unawaited(
+      analytics.logEvent(
+        name: AnalyticsEventConstants.analyticsReconsentAccepted,
+        parameters: {
+          ..._endScreenSourceParams,
+          AnalyticsEventConstants.paramImpression: impression,
+        },
+      ),
+    );
+
+    if (mounted) {
+      showSnackBar(
+        context,
+        AppLocalizations.of(context)!.analyticsReconsentAcceptedMessage,
+      );
+    }
+  }
+
+  Future<void> _declineAnalyticsReconsent() async {
+    await ref.read(analyticsReconsentProvider.notifier).answer(accepted: false);
+    if (mounted) {
+      showSnackBar(
+        context,
+        AppLocalizations.of(context)!.analyticsReconsentDeclinedMessage,
+      );
+    }
   }
 
   /// Opens the existing sign-in sheet to link an email to the current

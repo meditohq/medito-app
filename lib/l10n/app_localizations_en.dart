@@ -2926,4 +2926,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get meditatedToday => 'Meditated today';
+
+  @override
+  String get analyticsReconsentTitle => 'Turn usage stats back on?';
+
+  @override
+  String get analyticsReconsentBody =>
+      'Only to see what helps and what breaks. Never used for ads.';
+
+  @override
+  String get analyticsReconsentAccept => 'I\'m in';
+
+  @override
+  String get analyticsReconsentDecline => 'Keep them off';
+
+  @override
+  String get analyticsReconsentAcceptedMessage =>
+      'Thank you. Usage stats are on.';
+
+  @override
+  String get analyticsReconsentDeclinedMessage =>
+      'No problem. They\'ll stay off.';
+
+  @override
+  String get analyticsReconsentInfoTitle => 'About usage stats';
+
+  @override
+  String get analyticsReconsentInfoBody =>
+      'Older versions of Medito switched usage stats off for anyone who declined tracking, which went further than it should have.\n\nUsage stats record how you use the app, linked to your Medito user ID, so we can see which sessions help and fix what breaks. They\'re never used for ads or to track you across other apps.\n\nYou can change this any time in Settings → Advanced → Privacy Policy.';
 }

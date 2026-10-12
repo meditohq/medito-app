@@ -302,6 +302,48 @@ class FirebaseAnalyticsService {
     }
   }
 
+  /// Turn product analytics back on after the user opts in, keeping the
+  /// cross-app ad signals gated by ATT exactly as [initialize] does.
+  /// [setCollectionEnabled] grants all four consents, which would hand ad
+  /// consent to an iOS user who declined tracking.
+  Future<void> enableProductAnalytics() async {
+    if (!_initialized) {
+      await initialize(requestAttPermissionImmediately: false);
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(
+        SharedPreferenceConstants.analyticsFirebaseEnabled,
+        true,
+      );
+
+      if (_analytics is FirebaseAnalytics) {
+        await (_analytics as FirebaseAnalytics).setAnalyticsCollectionEnabled(
+          true,
+        );
+      }
+
+      final attStatus = Platform.isIOS
+          ? await AppTrackingTransparencyService.instance.getTrackingStatus()
+          : TrackingStatus.notSupported;
+      final adConsent =
+          !Platform.isIOS || attStatus == TrackingStatus.authorized;
+      await setConsent(
+        analyticsStorageConsentGranted: true,
+        adStorageConsentGranted: adConsent,
+        adUserDataConsentGranted: adConsent,
+        adPersonalizationSignalsConsentGranted: adConsent,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        AppLogger.d(
+          'FIREBASE_ANALYTICS',
+          'Error enabling product analytics: $e',
+        );
+      }
+    }
+  }
+
   /// Set all consent flags to true using consent mode v2
   Future<void> setConsentToTrue() async {
     try {

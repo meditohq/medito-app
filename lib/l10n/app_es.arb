@@ -1373,5 +1373,13 @@
   "shopPriceWas": "{price}, antes {compareAt}",
   "shopQuantity": "Cantidad: {count}",
   "externalLink": "Enlace externo",
-  "meditatedToday": "Has meditado hoy"
+  "meditatedToday": "Has meditado hoy",
+  "analyticsReconsentTitle": "¿Volver a activar las estadísticas de uso?",
+  "analyticsReconsentBody": "Solo para ver qué ayuda y qué falla. Nunca para anuncios.",
+  "analyticsReconsentAccept": "Me apunto",
+  "analyticsReconsentDecline": "Mantenerlas desactivadas",
+  "analyticsReconsentAcceptedMessage": "Gracias. Las estadísticas de uso están activadas.",
+  "analyticsReconsentDeclinedMessage": "De acuerdo. Seguirán desactivadas.",
+  "analyticsReconsentInfoTitle": "Sobre las estadísticas de uso",
+  "analyticsReconsentInfoBody": "Las versiones anteriores de Medito desactivaban las estadísticas de uso a quien rechazaba el rastreo, y eso fue más allá de lo necesario.\n\nLas estadísticas de uso registran cómo usas la app, vinculadas a tu ID de usuario de Medito, para ver qué sesiones ayudan y arreglar lo que falla. Nunca se usan para anuncios ni para rastrearte en otras apps.\n\nPuedes cambiarlo cuando quieras en Ajustes → Avanzado → Política de Privacidad."
 }

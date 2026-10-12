@@ -2963,4 +2963,33 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get meditatedToday => 'Has meditado hoy';
+
+  @override
+  String get analyticsReconsentTitle =>
+      '¿Volver a activar las estadísticas de uso?';
+
+  @override
+  String get analyticsReconsentBody =>
+      'Solo para ver qué ayuda y qué falla. Nunca para anuncios.';
+
+  @override
+  String get analyticsReconsentAccept => 'Me apunto';
+
+  @override
+  String get analyticsReconsentDecline => 'Mantenerlas desactivadas';
+
+  @override
+  String get analyticsReconsentAcceptedMessage =>
+      'Gracias. Las estadísticas de uso están activadas.';
+
+  @override
+  String get analyticsReconsentDeclinedMessage =>
+      'De acuerdo. Seguirán desactivadas.';
+
+  @override
+  String get analyticsReconsentInfoTitle => 'Sobre las estadísticas de uso';
+
+  @override
+  String get analyticsReconsentInfoBody =>
+      'Las versiones anteriores de Medito desactivaban las estadísticas de uso a quien rechazaba el rastreo, y eso fue más allá de lo necesario.\n\nLas estadísticas de uso registran cómo usas la app, vinculadas a tu ID de usuario de Medito, para ver qué sesiones ayudan y arreglar lo que falla. Nunca se usan para anuncios ni para rastrearte en otras apps.\n\nPuedes cambiarlo cuando quieras en Ajustes → Avanzado → Política de Privacidad.';
 }
