@@ -32,6 +32,32 @@ class TrackVariantSelector {
     );
   }
 
+  /// The defaults to remember when the user plays [voice] / [file] from the
+  /// track screen. Playing what was preselected counts as a choice, so this
+  /// fills in whichever default is still unset — but only when the track
+  /// offered a choice, so a single-voice or single-length track never decides
+  /// it. Saved defaults are left alone; the pickers change those.
+  static ({String? guideName, int? durationMs}) defaultsFromPlay(
+    Track track,
+    TrackVoice voice,
+    TrackAudioFile file, {
+    String? savedGuideName,
+    int? savedDurationMs,
+  }) {
+    final guide = voice.guideName;
+    final pickedVoice =
+        savedGuideName == null &&
+        track.voices.length > 1 &&
+        guide != null &&
+        guide.isNotEmpty;
+    final pickedDuration =
+        savedDurationMs == null && voice.audioFiles.length > 1;
+    return (
+      guideName: pickedVoice ? guide : null,
+      durationMs: pickedDuration ? file.duration : null,
+    );
+  }
+
   /// Resolves both the voice and the audio file in one shot.
   static ({TrackVoice voice, TrackAudioFile file}) resolve(
     Track track, {
