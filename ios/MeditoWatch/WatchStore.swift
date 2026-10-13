@@ -1,6 +1,8 @@
 import Foundation
 import zlib
 import WatchConnectivity
+import AVFoundation
+import WatchKit
 
 /// One playable session, resolved on the iPhone (guide + duration already
 /// picked from the user's preferences) so the watch only has to stream it.
@@ -113,6 +115,38 @@ final class WatchStore: NSObject, ObservableObject, WCSessionDelegate {
         render()
         send(payload)
     }
+
+    /// Which audio path a playback start took, so we can see who listens on
+    /// the speaker vs headphones and who hits "no route", by watch model.
+    /// Fire-and-forget: the phone logs it to analytics when it arrives.
+    func reportAudio(_ outcome: String, track: WatchTrack, detail: String? = nil) {
+        let output = AVAudioSession.sharedInstance().currentRoute.outputs.first?
+            .portType.rawValue ?? "none"
+        var payload: [String: Any] = [
+            "type": "watchAudio",
+            "outcome": outcome,
+            "output": output,
+            "watchModel": Self.modelIdentifier,
+            "watchOS": WKInterfaceDevice.current().systemVersion,
+            "sessionMinutes": track.durationMs / 60_000,
+        ]
+        if let detail { payload["detail"] = String(detail.prefix(90)) }
+        let session = WCSession.default
+        guard session.activationState == .activated else { return }
+        session.transferUserInfo(payload)
+    }
+
+    /// e.g. "Watch7,1"; the simulator reports the model it simulates.
+    private static let modelIdentifier: String = {
+        if let simulated = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] {
+            return simulated
+        }
+        var size = 0
+        sysctlbyname("hw.machine", nil, &size, nil, 0)
+        var machine = [CChar](repeating: 0, count: size)
+        sysctlbyname("hw.machine", &machine, &size, nil, 0)
+        return String(cString: machine)
+    }()
 
     private func send(_ payload: [String: Any]) {
         let session = WCSession.default

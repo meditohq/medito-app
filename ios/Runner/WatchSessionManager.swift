@@ -1,3 +1,4 @@
+import FirebaseAnalytics
 import Flutter
 import Foundation
 import WatchConnectivity
@@ -94,6 +95,8 @@ final class WatchSessionManager: NSObject, WCSessionDelegate {
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         if userInfo["type"] as? String == "downloadStatus" {
             DispatchQueue.main.async { WatchPhoneDownloads.shared.receive(userInfo) }
+        } else if userInfo["type"] as? String == "watchAudio" {
+            logWatchAudio(userInfo)
         } else {
             enqueue(userInfo)
         }
@@ -117,6 +120,22 @@ final class WatchSessionManager: NSObject, WCSessionDelegate {
 
     func session(_ session: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
         DispatchQueue.main.async { WatchPhoneDownloads.shared.finished(fileTransfer, error: error) }
+    }
+
+    /// Which audio path a watch playback start took (headphones, speaker, or
+    /// no route), with the watch model and watchOS. Logged here rather than in
+    /// Dart because it's analytics only and may arrive with Flutter not running.
+    private func logWatchAudio(_ info: [String: Any]) {
+        var params: [String: Any] = [:]
+        let keys = [
+            ("outcome", "outcome"), ("output", "output"), ("watchModel", "watch_model"),
+            ("watchOS", "watch_os"), ("detail", "detail"),
+        ]
+        for (from, to) in keys {
+            if let value = info[from] as? String { params[to] = String(value.prefix(100)) }
+        }
+        if let minutes = info["sessionMinutes"] as? Int { params["session_minutes"] = minutes }
+        Analytics.logEvent("watch_audio", parameters: params)
     }
 
     private func enqueue(_ payload: [String: Any]) {

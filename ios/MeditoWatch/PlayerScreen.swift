@@ -56,6 +56,15 @@ struct PlayerScreen: View {
                     .font(.title.weight(.semibold))
             }
             .buttonStyle(.plain)
+        case .needsOutput:
+            Button(action: player.playOnWatch) {
+                Image(systemName: "applewatch.radiowaves.left.and.right")
+                    .font(.title2)
+            }
+            .buttonStyle(.plain)
+            .frame(width: 64, height: 64)
+            .contentShape(Circle())
+            .accessibilityLabel("Play on watch speaker")
         case .failed:
             Image(systemName: "headphones")
                 .font(.title2)
@@ -65,6 +74,7 @@ struct PlayerScreen: View {
     private var caption: String {
         switch player.phase {
         case .finished: return "Well done"
+        case .needsOutput: return "Tap to play on watch"
         case .failed(let message): return message
         case .idle, .connecting: return "\(track.minutes) min"
         case .playing, .paused: return "-" + format(player.remaining)
