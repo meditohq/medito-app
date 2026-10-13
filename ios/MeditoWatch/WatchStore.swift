@@ -137,7 +137,7 @@ final class WatchStore: NSObject, ObservableObject, WCSessionDelegate {
     }
 
     /// e.g. "Watch7,1"; the simulator reports the model it simulates.
-    private static let modelIdentifier: String = {
+    static let modelIdentifier: String = {
         if let simulated = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] {
             return simulated
         }

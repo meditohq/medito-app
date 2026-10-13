@@ -4,11 +4,13 @@ import WatchKit
 
 /// Streams one session on the watch itself.
 ///
-/// Headphones first: long-form audio keeps playing with the wrist down, but
-/// watchOS only routes it to Bluetooth (and, on Series 10 / Ultra 2 with
-/// watchOS 11+, to the speaker if the user picked it). When that gets no
-/// route, the player offers the watch speaker instead, kept alive with the
-/// screen off by a mindfulness extended runtime session (up to an hour).
+/// Newer watches (Series 10 / Ultra 2 and later) use long-form audio, which
+/// keeps playing with the wrist down and can route to their speaker. On older
+/// watches long-form only routes to Bluetooth, so activating it pops the
+/// Bluetooth picker; they play with the default route policy instead (speaker,
+/// or headphones if connected), kept alive with the screen off by a
+/// mindfulness extended runtime session (up to an hour). If long-form gets no
+/// route, the player offers the watch speaker the same way.
 @MainActor
 final class WatchPlayer: ObservableObject {
     enum Phase: Equatable {
@@ -18,6 +20,21 @@ final class WatchPlayer: ObservableObject {
     /// A mindfulness session ends after an hour; leave room for loading and
     /// pauses. Longer sessions (mostly sleep) still need headphones.
     static let speakerMaxMs = 55 * 60 * 1000
+
+    /// Whether this watch can play long-form audio through its own speaker:
+    /// Ultra 2 (Watch7,5), Series 10 (Watch7,8) and everything after. Unknown
+    /// models count as older, which only costs them the long-form route.
+    static let speakerSupportsLongForm: Bool = {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-forceOlderWatch") { return false }
+        #endif
+        let id = WatchStore.modelIdentifier
+        guard id.hasPrefix("Watch") else { return false }
+        let parts = id.dropFirst("Watch".count).split(separator: ",").compactMap { Int($0) }
+        guard parts.count == 2 else { return false }
+        let (major, minor) = (parts[0], parts[1])
+        return major > 7 || (major == 7 && (minor == 5 || minor >= 8))
+    }()
 
     @Published private(set) var phase: Phase = .idle
     @Published private(set) var elapsed: Double = 0
@@ -43,6 +60,13 @@ final class WatchPlayer: ObservableObject {
               let url = WatchStore.shared.localURL(track) ?? URL(string: track.audioUrl)
         else { return }
         phase = .connecting
+
+        // Older watches: skip long-form, whose activation would show the
+        // Bluetooth picker, unless the session outlasts a mindfulness session.
+        if !Self.speakerSupportsLongForm && track.durationMs <= Self.speakerMaxMs {
+            playWithoutLongForm(url)
+            return
+        }
 
         let session = AVAudioSession.sharedInstance()
         var activated = false
@@ -71,14 +95,19 @@ final class WatchPlayer: ObservableObject {
         play(url)
     }
 
-    /// No headphones: play through the watch speaker. The mindfulness session
-    /// is what keeps the app (and so the audio) running once the wrist drops.
+    /// No headphones: play through the watch speaker.
     func playOnWatch() {
         guard phase == .needsOutput,
               let url = WatchStore.shared.localURL(track) ?? URL(string: track.audioUrl)
         else { return }
         phase = .connecting
+        playWithoutLongForm(url)
+    }
 
+    /// Plays with the default route policy: the speaker, or headphones if
+    /// connected. The mindfulness session is what keeps the app (and so the
+    /// audio) running once the wrist drops; leaving the app stops it.
+    private func playWithoutLongForm(_ url: URL) {
         let keepAlive = MindfulnessKeepAlive { [weak self] reason in
             // e.g. Low Power Mode: playback continues while the screen is on.
             guard let self else { return }

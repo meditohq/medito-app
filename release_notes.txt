@@ -1,5 +1,5 @@
 Unreleased
--
+- [ios] Apple Watch: sessions play through the speaker on older watches without asking for Bluetooth headphones
 
 2610.13.1
 - See and change the voice and length of your next session right on Home
