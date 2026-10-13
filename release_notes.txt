@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2610.13.0
+- See and change the voice and length of your next session right on Home
+- Medito now remembers the voice and length you play, so your next session starts straight away
+- Fell asleep during a session? Your end screen and stats are waiting when you next open Medito
+- [ios] Apple Watch: listen through the watch speaker when no headphones are connected
+
 2610.11.0
 - [ios] New Lock Screen widget: see your streak or consistency score at a glance
 - Better screen reader support across the app
