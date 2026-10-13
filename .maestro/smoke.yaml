@@ -178,11 +178,14 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
     timeout: 15000
 - tapOn: "Play"
 
-# Player screen: verify playback started. Very short intro tracks can complete
+# Player screen: verify playback started. The elapsed/total labels are hidden
+# from accessibility (2ce300a6); the seek bar's value reads "00:12 of 00:48",
+# with the "Playback position" label in front on some platforms.
+# Very short intro tracks can complete
 # before Maestro observes the elapsed timer on iOS CI, so accept the end screen
 # as proof that tapping Play advanced the session.
 - extendedWaitUntil:
-    visible: "00:[0-5][1-9]|.*day streak.*"
+    visible: "(?s).*00:[0-5][1-9] of .*|.*day streak.*"
     timeout: 20000
 - takeScreenshot: player-playing
 
@@ -197,7 +200,7 @@ name: Smoke Test – Onboarding, Navigate, Verify Content
       notVisible: ".*day streak.*"
     commands:
       - extendedWaitUntil:
-          visible: "00:0[5-9]|00:[1-5][0-9]"
+          visible: "(?s).*(00:0[5-9]|00:[1-5][0-9]) of .*"
           timeout: 30000
 
 # Tap the skip-forward button (labelled "Skip forward 10 seconds", though it

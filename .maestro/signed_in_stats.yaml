@@ -44,7 +44,7 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
 - tapOn: "Play"
 
 - extendedWaitUntil:
-    visible: "00:0[5-9]|00:[1-5][0-9]"
+    visible: "(?s).*(00:0[5-9]|00:[1-5][0-9]) of .*"
     timeout: 30000
 
 - repeat:
