@@ -60,6 +60,6 @@ name: Upgrade Verification – Lands on Home After In-Place Update
       - tapOn: "Play"
 
 - extendedWaitUntil:
-    visible: "00:[0-5][1-9]"
+    visible: "(?s).*00:[0-5][1-9] of .*"
     timeout: 20000
 - takeScreenshot: post-upgrade-playing
