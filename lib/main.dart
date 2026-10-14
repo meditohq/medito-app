@@ -38,6 +38,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:medito/providers/player/ios_audio_handler.dart';
+import 'package:medito/utils/app_open_tracker.dart';
 import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
@@ -260,6 +261,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     _setUpSystemUi();
     WidgetsBinding.instance.addObserver(this);
     unawaited(_recoverPreviousSession());
+    unawaited(AppOpenTracker.instance.onColdStart());
     unawaited(ref.read(firebaseMessagingProvider).registerOpenTracking(ref));
     unawaited(FirebaseAnalyticsService.applyRemindersOnProperty());
   }
@@ -405,9 +407,13 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       _onAppForegrounded();
+      unawaited(AppOpenTracker.instance.onForegrounded());
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached) {
+      if (state != AppLifecycleState.inactive) {
+        AppOpenTracker.instance.onBackgrounded();
+      }
       // Analytics: leaving the app abandons a paused session. A session that is
       // actively playing keeps going in the background (screen-off mid-
       // meditation is normal), so the tracker only fires when not playing.

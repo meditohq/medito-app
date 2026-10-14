@@ -28,6 +28,14 @@ class AnalyticsEventConstants {
   /// Event logged once when the app is first opened
   static const String appFirstOpen = 'app_first_open';
 
+  /// Event logged on a cold start, or a resume after 30+ min in the
+  /// background (GA4's session timeout). Carries [paramLaunchType] and
+  /// [paramNetworkType]; the baseline for network_type on session starts.
+  static const String appOpen = 'app_open';
+
+  /// How the app was opened for [appOpen]: 'cold' | 'resume'.
+  static const String paramLaunchType = 'launch_type';
+
   // Payment and donation events
   /// Event logged when a one-time donation is successfully completed
   static const String donationOnetime = 'donation_onetime';
@@ -256,6 +264,11 @@ class AnalyticsEventConstants {
 
   /// Parameter for elapsed playback time in whole seconds when abandoning.
   static const String paramElapsedSeconds = 'elapsed_seconds';
+
+  /// Connection type when a session starts: wifi | mobile | ethernet | none |
+  /// other | unknown. A permission-free proxy for "at home" (we never read
+  /// the SSID, which would need location permission).
+  static const String paramNetworkType = 'network_type';
 
   // Error and token events
   /// Event logged when unexpected logout occurs due to missing refresh token

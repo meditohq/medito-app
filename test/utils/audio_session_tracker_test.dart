@@ -1,7 +1,9 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/utils/audio_session_tracker.dart';
+import 'package:medito/utils/network_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Captures what the tracker would have logged, in order.
@@ -23,6 +25,7 @@ void main() {
     AudioSessionTracker.logSink = (name, params) async {
       events.add(_LoggedEvent(name, params));
     };
+    NetworkType.source = () async => [ConnectivityResult.wifi];
     tracker.resetForTesting();
   });
 
@@ -62,6 +65,48 @@ void main() {
         of(
           AnalyticsEventConstants.audioSessionStarted,
         ).first.params[AnalyticsEventConstants.paramAudioFileGuide],
+        'unknown',
+      );
+    });
+
+    Future<Object?> networkTypeFor(
+      Future<List<ConnectivityResult>> Function() source,
+    ) async {
+      NetworkType.source = source;
+      events.clear();
+      tracker.resetForTesting();
+      await tracker.onStarted(fileId: 'f1', guide: 'g', durationMs: 1000);
+      return of(
+        AnalyticsEventConstants.audioSessionStarted,
+      ).first.params[AnalyticsEventConstants.paramNetworkType];
+    }
+
+    test('network_type: physical link wins over vpn', () async {
+      expect(
+        await networkTypeFor(
+          () async => [ConnectivityResult.vpn, ConnectivityResult.wifi],
+        ),
+        'wifi',
+      );
+      expect(
+        await networkTypeFor(
+          () async => [ConnectivityResult.vpn, ConnectivityResult.mobile],
+        ),
+        'mobile',
+      );
+      expect(
+        await networkTypeFor(() async => [ConnectivityResult.vpn]),
+        'other',
+      );
+      expect(
+        await networkTypeFor(() async => [ConnectivityResult.none]),
+        'none',
+      );
+    });
+
+    test('network_type: lookup failure still logs the event', () async {
+      expect(
+        await networkTypeFor(() async => throw Exception('no channel')),
         'unknown',
       );
     });
