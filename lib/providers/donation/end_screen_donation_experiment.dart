@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -19,11 +17,12 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 ///   Google Pay / card elsewhere), and an "Other amount" link that still
 ///   opens the webview.
 ///
-/// Assignment is sticky per install and lives here so the source can later
-/// be swapped for a server flag without touching the card or analytics.
-/// It is deliberately independent of the donate-api's single active
-/// experiment slot (currently `higher_floor_2`): both arms fetch the same
-/// server-resolved end_screen ladder, so pricing is identical across arms.
+/// CONCLUDED 2026-10-14: inline won (GA, 20 Sep – 10 Oct, ~12.7k viewers per
+/// arm: 7 vs 47 end-screen donors, p≈1e-8; same annualised value per donor,
+/// ~4× the total). Every install now gets [variantInline], including ones
+/// previously stored as control. The `variant_id`/Stripe tags keep reading
+/// "B" so existing dashboards and filters keep working — when comparing
+/// arms (e.g. churn), only use subscriptions created before this release.
 class EndScreenDonationExperiment {
   EndScreenDonationExperiment._();
 
@@ -32,27 +31,24 @@ class EndScreenDonationExperiment {
   static const String variantControl = 'A';
   static const String variantInline = 'B';
 
-  /// Returns the sticky variant for this install, assigning (50/50) and
-  /// persisting it on first call.
+  /// Returns the variant for this install. Since the rollout this is always
+  /// [variantInline]; it is persisted so payment metadata reflects it.
   static String resolveVariant(SharedPreferences prefs) {
-    final existing = prefs.getString(
-      SharedPreferenceConstants.endScreenDonationAskVariant,
-    );
-    if (existing == variantControl || existing == variantInline) {
-      return existing!;
+    if (prefs.getString(
+          SharedPreferenceConstants.endScreenDonationAskVariant,
+        ) !=
+        variantInline) {
+      prefs.setString(
+        SharedPreferenceConstants.endScreenDonationAskVariant,
+        variantInline,
+      );
     }
-    final assigned = Random().nextBool() ? variantInline : variantControl;
-    prefs.setString(
-      SharedPreferenceConstants.endScreenDonationAskVariant,
-      assigned,
-    );
-    return assigned;
+    return variantInline;
   }
 
-  /// Read-only peek used by warm-up paths that must not assign.
-  static bool isInlineVariant(SharedPreferences prefs) =>
-      prefs.getString(SharedPreferenceConstants.endScreenDonationAskVariant) ==
-      variantInline;
+  /// Read-only check used by warm-up paths that must not assign. Everyone
+  /// gets the inline card now, so warm its config for every install.
+  static bool isInlineVariant(SharedPreferences prefs) => true;
 
   /// Stripe metadata / paywall URL key. Separate from experiment_variant
   /// (which belongs to the donate-api's server experiment) so webview
