@@ -1,6 +1,21 @@
 Unreleased
 -
 
+2610.14.1
+- See and change your next session's voice and length right on Home
+- A new Timer, with a stopwatch. Timer sessions count towards your stats.
+- [ios] New Lock Screen widget: your streak or consistency score at a glance
+- Medito is now available in German
+- Fell asleep mid-session? Your end screen waits for you next time
+- [android] Support Medito in two taps from the end-of-session card
+- Better screen reader support
+- [ios] A fresh default app icon (you can still pick another in Settings)
+- [ios] Refreshed home screen widgets that follow the app's theme, look right in StandBy and tinted mode, and keep your streak up to date
+- [android] Home screen widgets now follow the app's theme
+- [ios] A tidier Downloads screen
+- [android] Fixed widgets showing "… days" for short streaks
+- Fixed the player clock for sessions over 100 minutes
+
 2610.6.3
 - [android] Fixed the app sometimes freezing when home screen widgets update
 - A fresh default app icon (you can still pick another in Settings)
