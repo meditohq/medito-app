@@ -1416,14 +1416,5 @@
   "endScreenRestoredYesterday": "Hola de nuevo. Terminaste «{title}» ayer.",
   "endScreenRestoredTimerLastNight": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} anoche.",
   "endScreenRestoredTimerEarlierToday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} hoy más temprano.",
-  "endScreenRestoredTimerYesterday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} ayer.",
-  "upNextVariant": "{guide} · {minutes} min",
-  "upNextVariantMinutes": "{minutes} min",
-  "upNextVariantEdit": "Cambiar voz o duración",
-  "variantSheetTitle": "Voz y duración",
-  "variantSheetNote": "Se guarda como predeterminado para las sesiones que empiezas desde Inicio.",
-  "variantVoice": "Voz",
-  "variantLength": "Duración",
-  "clearDefaults": "Borrar predeterminados",
-  "defaultsCleared": "Predeterminados borrados"
+  "endScreenRestoredTimerYesterday": "Hola de nuevo. Terminaste un temporizador de {minutes, plural, =1{1 minuto} other{{minutes} minutos}} ayer."
 }

@@ -3140,36 +3140,4 @@ class AppLocalizationsDe extends AppLocalizations {
   String endScreenRestoredTimerYesterday(int minutes) {
     return 'Willkommen zurück. Du hast gestern einen $minutes-Minuten-Timer beendet.';
   }
-
-  @override
-  String upNextVariant(String guide, int minutes) {
-    return '$guide · $minutes Min.';
-  }
-
-  @override
-  String upNextVariantMinutes(int minutes) {
-    return '$minutes Min.';
-  }
-
-  @override
-  String get upNextVariantEdit => 'Stimme oder Länge ändern';
-
-  @override
-  String get variantSheetTitle => 'Stimme und Länge';
-
-  @override
-  String get variantSheetNote =>
-      'Wird als Standard für Sitzungen gespeichert, die du auf der Startseite beginnst.';
-
-  @override
-  String get variantVoice => 'Stimme';
-
-  @override
-  String get variantLength => 'Länge';
-
-  @override
-  String get clearDefaults => 'Voreinstellungen zurücksetzen';
-
-  @override
-  String get defaultsCleared => 'Voreinstellungen zurückgesetzt';
 }
