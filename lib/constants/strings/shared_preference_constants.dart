@@ -74,7 +74,9 @@ class SharedPreferenceConstants {
   static const String consistencyScoreHistory = 'consistency_score_history';
 
   // Black Friday positioning
-  static const String blackFridayDismissed = 'black_friday_dismissed';
+  // Year the row was dismissed in. The old year-less 'black_friday_dismissed'
+  // bool is ignored, so 2025 dismissals don't carry over.
+  static const String blackFridayDismissedYear = 'black_friday_dismissed_year';
 
   // UTM parameters (stored from deep links, applied after user initialization)
   static const String utmSource = 'utm_source';

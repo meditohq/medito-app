@@ -26,9 +26,9 @@ void main() {
 
     group('Default order', () {
       test('returns default order when no custom order saved', () async {
-        await prefs.setBool(
-          SharedPreferenceConstants.blackFridayDismissed,
-          true,
+        await prefs.setInt(
+          SharedPreferenceConstants.blackFridayDismissedYear,
+          DateTime.now().year,
         );
         final order = container.read(homeWidgetOrderProvider);
         expect(order, [
@@ -69,9 +69,9 @@ void main() {
           SharedPreferenceConstants.homeWidgetOrder,
           customOrder.map((e) => e.name).toList(),
         );
-        await prefs.setBool(
-          SharedPreferenceConstants.blackFridayDismissed,
-          true,
+        await prefs.setInt(
+          SharedPreferenceConstants.blackFridayDismissedYear,
+          DateTime.now().year,
         );
 
         final order = container.read(homeWidgetOrderProvider);
@@ -92,9 +92,9 @@ void main() {
           SharedPreferenceConstants.homeWidgetOrder,
           customOrder.map((e) => e.name).toList(),
         );
-        await prefs.setBool(
-          SharedPreferenceConstants.blackFridayDismissed,
-          true,
+        await prefs.setInt(
+          SharedPreferenceConstants.blackFridayDismissedYear,
+          DateTime.now().year,
         );
 
         final order = container.read(homeWidgetOrderProvider);
@@ -113,9 +113,9 @@ void main() {
           SharedPreferenceConstants.homeWidgetOrder,
           customOrder.map((e) => e.name).toList(),
         );
-        await prefs.setBool(
-          SharedPreferenceConstants.blackFridayDismissed,
-          true,
+        await prefs.setInt(
+          SharedPreferenceConstants.blackFridayDismissedYear,
+          DateTime.now().year,
         );
 
         final notifier = container.read(homeWidgetOrderProvider.notifier);
@@ -170,9 +170,9 @@ void main() {
           SharedPreferenceConstants.homeWidgetOrder,
           customOrder.map((e) => e.name).toList(),
         );
-        await prefs.setBool(
-          SharedPreferenceConstants.blackFridayDismissed,
-          true,
+        await prefs.setInt(
+          SharedPreferenceConstants.blackFridayDismissedYear,
+          DateTime.now().year,
         );
 
         final notifier = container.read(homeWidgetOrderProvider.notifier);
@@ -214,9 +214,9 @@ void main() {
           SharedPreferenceConstants.homeWidgetOrder,
           customOrder.map((e) => e.name).toList(),
         );
-        await prefs.setBool(
-          SharedPreferenceConstants.blackFridayDismissed,
-          true,
+        await prefs.setInt(
+          SharedPreferenceConstants.blackFridayDismissedYear,
+          DateTime.now().year,
         );
 
         final order = container.read(homeWidgetOrderProvider);

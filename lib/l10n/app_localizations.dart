@@ -5601,6 +5601,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Welcome back. You finished a {minutes}-minute timer yesterday.'**
   String endScreenRestoredTimerYesterday(int minutes);
+
+  /// Voice and length the Home hero will play, under the session title, e.g. Will · 10 min
+  ///
+  /// In en, this message translates to:
+  /// **'{guide} · {minutes} min'**
+  String upNextVariant(String guide, int minutes);
+
+  /// Length the Home hero will play when the session has a single voice, e.g. 10 min
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String upNextVariantMinutes(int minutes);
+
+  /// Screen-reader hint on the Home hero's voice · length line, which opens a picker
+  ///
+  /// In en, this message translates to:
+  /// **'Change voice or length'**
+  String get upNextVariantEdit;
+
+  /// Title of the sheet for picking the voice and length opened from the Home hero
+  ///
+  /// In en, this message translates to:
+  /// **'Voice and length'**
+  String get variantSheetTitle;
+
+  /// Note under the voice and length sheet title: the choice becomes the default
+  ///
+  /// In en, this message translates to:
+  /// **'Saved as your default for sessions you start from Home.'**
+  String get variantSheetNote;
+
+  /// Section label for the guide voice options
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get variantVoice;
+
+  /// Section label for the session length options
+  ///
+  /// In en, this message translates to:
+  /// **'Length'**
+  String get variantLength;
+
+  /// Button on Manage defaults that clears the saved voice and length
+  ///
+  /// In en, this message translates to:
+  /// **'Clear defaults'**
+  String get clearDefaults;
+
+  /// Snackbar after the saved voice and length are cleared
+  ///
+  /// In en, this message translates to:
+  /// **'Defaults cleared'**
+  String get defaultsCleared;
 }
 
 class _AppLocalizationsDelegate

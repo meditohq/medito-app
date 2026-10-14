@@ -7,6 +7,7 @@ import '../constants/strings/analytics_event_constants.dart';
 import '../constants/strings/shared_preference_constants.dart';
 import '../services/analytics/firebase_analytics_service.dart';
 import 'logger.dart';
+import 'network_type.dart';
 
 /// Owns the lifecycle of a single in-flight meditation session for analytics,
 /// firing [AnalyticsEventConstants.audioSessionStarted] when playback begins and
@@ -76,6 +77,7 @@ class AudioSessionTracker {
       AnalyticsEventConstants.paramAudioFileId: session.fileId,
       AnalyticsEventConstants.paramAudioFileGuide: session.guide,
       AnalyticsEventConstants.paramAudioFileDuration: session.durationMs,
+      AnalyticsEventConstants.paramNetworkType: await NetworkType.current(),
     });
     AppLogger.d('SESSION', 'audio_session_started: ${session.fileId}');
   }

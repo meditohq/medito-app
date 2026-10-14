@@ -17,8 +17,15 @@ Fires **once** when playback of a track actually begins.
 | `audioFileId` | string | `PlaybackRequest.fileId` |
 | `audioFileGuide` | string | `PlaybackRequest.guideName` (falls back to `'unknown'`) |
 | `audioFileDuration` | int (ms) | `PlaybackRequest.duration` (the file's total length in ms) |
+| `network_type` | string | `connectivity_plus` at start: `wifi` / `mobile` / `ethernet` / `none` / `other` / `unknown` (lookup failed or >500 ms). A VPN reports alongside its transport; the physical link wins. Added on develop after 2610.13.1 (unreleased). |
 
-Same three params as `audio_session_completed` so the two join cleanly.
+The first three params match `audio_session_completed` so the two join cleanly.
+`network_type` is a permission-free "probably at home" proxy for AB_TEST_BACKLOG
+entry K. It never reads the SSID. Its baseline is `app_open` (same `network_type`
+plus `launch_type` = `cold` | `resume`), logged by `lib/utils/app_open_tracker.dart`
+on a cold start or a resume after 30+ min in the background (GA4's session
+timeout). Compare a user's wifi share of session starts against their wifi share
+of `app_open`.
 
 ### 2. `audio_session_abandoned`
 Fires **once** when a started session ends **without** completing.

@@ -3078,4 +3078,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String endScreenRestoredTimerYesterday(int minutes) {
     return 'Welcome back. You finished a $minutes-minute timer yesterday.';
   }
+
+  @override
+  String upNextVariant(String guide, int minutes) {
+    return '$guide · $minutes min';
+  }
+
+  @override
+  String upNextVariantMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get upNextVariantEdit => 'Change voice or length';
+
+  @override
+  String get variantSheetTitle => 'Voice and length';
+
+  @override
+  String get variantSheetNote =>
+      'Saved as your default for sessions you start from Home.';
+
+  @override
+  String get variantVoice => 'Voice';
+
+  @override
+  String get variantLength => 'Length';
+
+  @override
+  String get clearDefaults => 'Clear defaults';
+
+  @override
+  String get defaultsCleared => 'Defaults cleared';
 }
