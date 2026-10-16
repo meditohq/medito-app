@@ -1,3 +1,4 @@
+import '../../models/background_sounds/session_bell_pattern.dart';
 import '../../utils/logger.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -26,7 +27,7 @@ abstract class BackgroundSoundsRepository {
   /// The ambient sound, one choice shared by tracks and the Timer.
   void saveSelectedBgSoundToSharedPreferences(BackgroundSoundsModel sound);
 
-  /// The ambient sound (never session bells, which are a separate switch).
+  /// The ambient sound (session bells have their own settings).
   BackgroundSoundsModel? getSelectedBgSoundFromSharedPreferences();
 
   /// Bells default on for the Timer and off under tracks, except for users
@@ -34,6 +35,13 @@ abstract class BackgroundSoundsRepository {
   bool getSessionBellsEnabled({bool forTimer = false});
 
   void saveSessionBellsEnabled(bool enabled, {bool forTimer = false});
+
+  SessionBellPattern getSessionBellPattern({bool forTimer = false});
+
+  void saveSessionBellPattern(
+    SessionBellPattern pattern, {
+    bool forTimer = false,
+  });
 
   void removeSelectedBgSound();
 
@@ -226,6 +234,40 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
                 ? SharedPreferenceConstants.timerSessionBellsEnabled
                 : SharedPreferenceConstants.sessionBellsEnabled,
             enabled,
+          ),
+    );
+  }
+
+  @override
+  SessionBellPattern getSessionBellPattern({bool forTimer = false}) {
+    final saved = ref
+        .read(sharedPreferencesProvider)
+        .getString(
+          forTimer
+              ? SharedPreferenceConstants.timerSessionBellPattern
+              : SharedPreferenceConstants.sessionBellPattern,
+        );
+    return SessionBellPattern.values.firstWhere(
+      (pattern) => pattern.name == saved,
+      orElse: () => forTimer
+          ? SessionBellPattern.beginningEnd
+          : SessionBellPattern.beginningMiddleEnd,
+    );
+  }
+
+  @override
+  void saveSessionBellPattern(
+    SessionBellPattern pattern, {
+    bool forTimer = false,
+  }) {
+    unawaited(
+      ref
+          .read(sharedPreferencesProvider)
+          .setString(
+            forTimer
+                ? SharedPreferenceConstants.timerSessionBellPattern
+                : SharedPreferenceConstants.sessionBellPattern,
+            pattern.name,
           ),
     );
   }

@@ -3050,4 +3050,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get defaultsCleared => 'Voreinstellungen zurückgesetzt';
+
+  @override
+  String get sessionBellTiming => 'Glockenzeitpunkte';
+
+  @override
+  String get sessionBellBeginningMiddleEnd => 'Anfang, Mitte und Ende';
+
+  @override
+  String get sessionBellBeginningEnd => 'Anfang und Ende';
+
+  @override
+  String get sessionBellEveryMinute => 'Jede Minute';
+
+  @override
+  String get sessionBellEveryMinuteDescription =>
+      'Eine Glocke am Anfang, jede Minute und am Ende';
 }

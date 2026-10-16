@@ -1,3 +1,4 @@
+import 'package:medito/models/background_sounds/session_bell_pattern.dart';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,4 +47,46 @@ void main() {
     expect(repo.getSessionBellsEnabled(forTimer: true), isFalse);
     expect(repo.getSessionBellsEnabled(), isTrue);
   });
+
+  test(
+    'timer defaults to beginning/end, tracks retain the three cues',
+    () async {
+      final repo = await repoWith({});
+      expect(
+        repo.getSessionBellPattern(forTimer: true),
+        SessionBellPattern.beginningEnd,
+      );
+      expect(
+        repo.getSessionBellPattern(),
+        SessionBellPattern.beginningMiddleEnd,
+      );
+    },
+  );
+
+  test('bell timing is remembered separately for timer and tracks', () async {
+    final repo = await repoWith({});
+    repo.saveSessionBellPattern(SessionBellPattern.everyMinute, forTimer: true);
+    repo.saveSessionBellPattern(SessionBellPattern.beginningEnd);
+    await Future<void>.delayed(Duration.zero);
+    expect(
+      repo.getSessionBellPattern(forTimer: true),
+      SessionBellPattern.everyMinute,
+    );
+    expect(repo.getSessionBellPattern(), SessionBellPattern.beginningEnd);
+  });
+
+  test(
+    'invalid saved timing falls back without changing explicit silence',
+    () async {
+      final repo = await repoWith({
+        SharedPreferenceConstants.timerSessionBellsEnabled: false,
+        SharedPreferenceConstants.timerSessionBellPattern: 'unknown',
+      });
+      expect(repo.getSessionBellsEnabled(forTimer: true), isFalse);
+      expect(
+        repo.getSessionBellPattern(forTimer: true),
+        SessionBellPattern.beginningEnd,
+      );
+    },
+  );
 }

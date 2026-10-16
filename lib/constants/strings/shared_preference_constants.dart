@@ -176,6 +176,8 @@ class SharedPreferenceConstants {
   // Session bells on/off, separate from the ambient sound so both can play.
   // Tracks default off; the Timer defaults on.
   static const String sessionBellsEnabled = 'session_bells_enabled';
+  static const String sessionBellPattern = 'session_bell_pattern';
+  static const String timerSessionBellPattern = 'timer_session_bell_pattern';
   static const String timerSessionBellsEnabled = 'timer_session_bells_enabled';
   // Cover URL of the timer track, last fetched; shown behind the Timer
   // screen (offline from the image disk cache).

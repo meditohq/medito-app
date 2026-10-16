@@ -1389,5 +1389,10 @@
   "variantVoice": "Voz",
   "variantLength": "Duración",
   "clearDefaults": "Borrar predeterminados",
-  "defaultsCleared": "Predeterminados borrados"
+  "defaultsCleared": "Predeterminados borrados",
+  "sessionBellTiming": "Cuándo suenan las campanas",
+  "sessionBellBeginningMiddleEnd": "Principio, mitad y final",
+  "sessionBellBeginningEnd": "Principio y final",
+  "sessionBellEveryMinute": "Cada minuto",
+  "sessionBellEveryMinuteDescription": "Una campana al principio, cada minuto y al final"
 }

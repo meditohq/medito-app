@@ -37,8 +37,9 @@ internal class SessionBellPlayer(context: Context, private val primary: Player) 
 
     init { primary.addListener(this) }
 
-    fun enable(volume: Float) {
-        if (enabled) return
+    fun enable(volume: Float, pattern: String) {
+        if (enabled && schedule.pattern == pattern) return
+        schedule.pattern = pattern
         disable()
         enabled = true
         schedule.reset()

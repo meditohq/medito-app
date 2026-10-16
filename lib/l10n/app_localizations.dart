@@ -5439,6 +5439,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Defaults cleared'**
   String get defaultsCleared;
+
+  /// No description provided for @sessionBellTiming.
+  ///
+  /// In en, this message translates to:
+  /// **'Bell timing'**
+  String get sessionBellTiming;
+
+  /// No description provided for @sessionBellBeginningMiddleEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Beginning, middle and end'**
+  String get sessionBellBeginningMiddleEnd;
+
+  /// No description provided for @sessionBellBeginningEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Beginning and end'**
+  String get sessionBellBeginningEnd;
+
+  /// No description provided for @sessionBellEveryMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'Every minute'**
+  String get sessionBellEveryMinute;
+
+  /// No description provided for @sessionBellEveryMinuteDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A bell at the beginning, every minute and at the end'**
+  String get sessionBellEveryMinuteDescription;
 }
 
 class _AppLocalizationsDelegate

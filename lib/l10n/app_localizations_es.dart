@@ -3046,4 +3046,20 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get defaultsCleared => 'Predeterminados borrados';
+
+  @override
+  String get sessionBellTiming => 'Cuándo suenan las campanas';
+
+  @override
+  String get sessionBellBeginningMiddleEnd => 'Principio, mitad y final';
+
+  @override
+  String get sessionBellBeginningEnd => 'Principio y final';
+
+  @override
+  String get sessionBellEveryMinute => 'Cada minuto';
+
+  @override
+  String get sessionBellEveryMinuteDescription =>
+      'Una campana al principio, cada minuto y al final';
 }

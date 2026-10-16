@@ -1789,5 +1789,10 @@
   "variantVoice": "Stimme",
   "variantLength": "Länge",
   "clearDefaults": "Voreinstellungen zurücksetzen",
-  "defaultsCleared": "Voreinstellungen zurückgesetzt"
+  "defaultsCleared": "Voreinstellungen zurückgesetzt",
+  "sessionBellTiming": "Glockenzeitpunkte",
+  "sessionBellBeginningMiddleEnd": "Anfang, Mitte und Ende",
+  "sessionBellBeginningEnd": "Anfang und Ende",
+  "sessionBellEveryMinute": "Jede Minute",
+  "sessionBellEveryMinuteDescription": "Eine Glocke am Anfang, jede Minute und am Ende"
 }

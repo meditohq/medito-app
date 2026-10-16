@@ -2232,5 +2232,10 @@
   "clearDefaults": "Clear defaults",
   "@clearDefaults": {"description": "Button on Manage defaults that clears the saved voice and length"},
   "defaultsCleared": "Defaults cleared",
-  "@defaultsCleared": {"description": "Snackbar after the saved voice and length are cleared"}
+  "@defaultsCleared": {"description": "Snackbar after the saved voice and length are cleared"},
+  "sessionBellTiming": "Bell timing",
+  "sessionBellBeginningMiddleEnd": "Beginning, middle and end",
+  "sessionBellBeginningEnd": "Beginning and end",
+  "sessionBellEveryMinute": "Every minute",
+  "sessionBellEveryMinuteDescription": "A bell at the beginning, every minute and at the end"
 }

@@ -1085,12 +1085,12 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     }
 
     // Bells are independent of the ambient sound: both can play at once.
-    override fun setSessionBells(enabled: Boolean) {
+    override fun setSessionBells(enabled: Boolean, pattern: String) {
         if (!::sessionBells.isInitialized) {
             Log.w(TAG, "setSessionBells($enabled) before the service was ready")
             return
         }
-        if (enabled) sessionBells.enable(backgroundMusicVolume) else sessionBells.disable()
+        if (enabled) sessionBells.enable(backgroundMusicVolume, pattern) else sessionBells.disable()
     }
 
     override fun setBackgroundSoundVolume(volume: Double) {

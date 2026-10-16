@@ -90,8 +90,8 @@ abstract class MeditoAudioServiceApi {
 
   void stopBackgroundSound();
 
-  /// Start/middle/end bells, independent of the ambient background sound.
-  void setSessionBells(bool enabled);
+  /// Scheduled bells, independent of the ambient background sound.
+  void setSessionBells(bool enabled, String pattern);
 
   void playBackgroundSound();
 

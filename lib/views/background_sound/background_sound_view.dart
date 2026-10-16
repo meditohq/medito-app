@@ -1,3 +1,4 @@
+import '../../models/background_sounds/session_bell_pattern.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -95,6 +96,7 @@ class BackgroundSoundView extends ConsumerWidget {
             children: [
               // Bells are a switch: they play alongside any sound below.
               const _SessionBellsSwitch(),
+              const _SessionBellPatternPicker(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                 child: Text(
@@ -141,9 +143,8 @@ class _SessionBellsSwitch extends ConsumerWidget {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
     final l10n = AppLocalizations.of(context)!;
-    final enabled = ref.watch(
-      backgroundSoundsNotifierProvider.select((s) => s.bellsEnabled),
-    );
+    final state = ref.watch(backgroundSoundsNotifierProvider);
+    final enabled = state.bellsEnabled;
 
     void toggle(bool value) {
       FirebaseAnalyticsService().logEvent(
@@ -183,7 +184,14 @@ class _SessionBellsSwitch extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      l10n.sessionBellsDescription,
+                      switch (state.bellPattern) {
+                        SessionBellPattern.beginningMiddleEnd =>
+                          l10n.sessionBellsDescription,
+                        SessionBellPattern.beginningEnd =>
+                          l10n.sessionBellBeginningEnd,
+                        SessionBellPattern.everyMinute =>
+                          l10n.sessionBellEveryMinuteDescription,
+                      },
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontSize: 14,
                         color: onSurface.withValues(alpha: 0.7),
@@ -198,6 +206,44 @@ class _SessionBellsSwitch extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SessionBellPatternPicker extends ConsumerWidget {
+  const _SessionBellPatternPicker();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(backgroundSoundsNotifierProvider);
+    if (!state.bellsEnabled) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: DropdownButtonFormField<SessionBellPattern>(
+        initialValue: state.bellPattern,
+        isExpanded: true,
+        decoration: InputDecoration(labelText: l10n.sessionBellTiming),
+        items: [
+          for (final pattern in SessionBellPattern.values)
+            DropdownMenuItem(
+              value: pattern,
+              child: Text(switch (pattern) {
+                SessionBellPattern.beginningMiddleEnd =>
+                  l10n.sessionBellBeginningMiddleEnd,
+                SessionBellPattern.beginningEnd => l10n.sessionBellBeginningEnd,
+                SessionBellPattern.everyMinute => l10n.sessionBellEveryMinute,
+              }),
+            ),
+        ],
+        onChanged: (pattern) {
+          if (pattern != null) {
+            ref
+                .read(backgroundSoundsNotifierProvider.notifier)
+                .setSessionBellPattern(pattern);
+          }
+        },
       ),
     );
   }

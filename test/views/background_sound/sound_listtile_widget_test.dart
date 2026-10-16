@@ -1,3 +1,4 @@
+import 'package:medito/models/background_sounds/session_bell_pattern.dart';
 import 'package:flutter/material.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/views/background_sound/background_sound_view.dart';
@@ -31,6 +32,7 @@ class _FakeNotifier extends BackgroundSoundsNotifier {
   final retried = <String>[];
   final changed = <String?>[];
   final bells = <bool>[];
+  final patterns = <SessionBellPattern>[];
 
   @override
   BackgroundSoundsState build() => _initialState;
@@ -43,6 +45,12 @@ class _FakeNotifier extends BackgroundSoundsNotifier {
     BackgroundSoundsModel? sound, {
     bool preview = true,
   }) => changed.add(sound?.id);
+
+  @override
+  void setSessionBellPattern(SessionBellPattern pattern) {
+    patterns.add(pattern);
+    state = state.copyWith(bellPattern: pattern);
+  }
 
   @override
   void setSessionBells(bool enabled, {bool preview = true}) {
@@ -200,6 +208,50 @@ void main() {
     expect(notifier.changed, isEmpty);
     expect(notifier.bells, [true]);
     expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('bell timing can change to every minute while offline', (
+    tester,
+  ) async {
+    final notifier = _FakeNotifier(
+      const BackgroundSoundsState(
+        bellsEnabled: true,
+        bellPattern: SessionBellPattern.beginningEnd,
+      ),
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          backgroundSoundsNotifierProvider.overrideWith(() => notifier),
+          backgroundSoundCatalogProvider.overrideWithValue(
+            const BackgroundSoundCatalog(
+              sounds: [],
+              downloadedIds: {},
+              offline: true,
+              loading: false,
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: BackgroundSoundView()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(DropdownButtonFormField<SessionBellPattern>));
+    await tester.pumpAndSettle();
+    expect(find.text('Beginning, middle and end'), findsOneWidget);
+    await tester.tap(find.text('Every minute').last);
+    await tester.pumpAndSettle();
+    expect(notifier.patterns, [SessionBellPattern.everyMinute]);
+    expect(
+      find.text('A bell at the beginning, every minute and at the end'),
+      findsOneWidget,
+    );
+    expect(notifier.changed, isEmpty);
     expect(tester.takeException(), isNull);
   });
 }

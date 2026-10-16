@@ -1,3 +1,4 @@
+import 'package:medito/models/background_sounds/session_bell_pattern.dart';
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:just_audio/just_audio.dart';
@@ -121,5 +122,46 @@ void main() {
     positions.add(position);
     await flush();
     verifyNever(() => bell.play());
+  });
+
+  test('preloading while paused keeps the opening cue ready', () async {
+    final loading = Completer<Duration?>();
+    when(
+      () => bell.setAsset(kSessionBellAsset),
+    ).thenAnswer((_) => loading.future);
+    final preparing = controller.enable(
+      .5,
+      pattern: SessionBellPattern.beginningEnd,
+    );
+    positions.add(Duration.zero);
+    await flush();
+    verifyNever(() => bell.play());
+    loading.complete(const Duration(seconds: 6));
+    await preparing;
+    playing = true;
+    positions.add(Duration.zero);
+    await flush();
+    verify(() => bell.play()).called(1);
+    position = const Duration(minutes: 5);
+    positions.add(position);
+    await flush();
+    verifyNever(() => bell.play());
+    position = const Duration(seconds: 594);
+    positions.add(position);
+    await flush();
+    verify(() => bell.play()).called(1);
+  });
+
+  test('changing to minute bells during playback skips elapsed cues', () async {
+    await controller.enable(.5);
+    playing = true;
+    position = const Duration(seconds: 130);
+    await controller.enable(.5, pattern: SessionBellPattern.everyMinute);
+    await flush();
+    verifyNever(() => bell.play());
+    position = const Duration(minutes: 3);
+    positions.add(position);
+    await flush();
+    verify(() => bell.play()).called(1);
   });
 }

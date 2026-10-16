@@ -1,3 +1,4 @@
+import 'package:medito/models/background_sounds/session_bell_pattern.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/services/audio/session_bell_schedule.dart';
 
@@ -83,6 +84,52 @@ void main() {
     expect(cues.update(Duration.zero, short), isTrue);
     expect(cues.update(const Duration(seconds: 5), short), isTrue);
     expect(cues.update(const Duration(seconds: 6), short), isFalse);
+    expect(cues.update(short, short), isFalse);
+  });
+
+  test('beginning and end omits the midpoint', () {
+    cues = SessionBellSchedule(pattern: SessionBellPattern.beginningEnd);
+    expect(cues.update(Duration.zero, duration), isTrue);
+    expect(cues.update(const Duration(minutes: 5), duration), isFalse);
+    expect(cues.update(const Duration(seconds: 594), duration), isTrue);
+    expect(cues.update(const Duration(seconds: 595), duration), isFalse);
+  });
+
+  test('every minute rings once per boundary and includes the final cue', () {
+    cues = SessionBellSchedule(pattern: SessionBellPattern.everyMinute);
+    expect(cues.update(Duration.zero, duration), isTrue);
+    for (var minute = 1; minute < 10; minute++) {
+      expect(
+        cues.update(Duration(seconds: minute * 60 - 1), duration),
+        isFalse,
+      );
+      expect(cues.update(Duration(minutes: minute), duration), isTrue);
+      expect(cues.update(Duration(minutes: minute), duration), isFalse);
+    }
+    expect(cues.update(const Duration(seconds: 594), duration), isTrue);
+    expect(cues.update(duration, duration), isFalse);
+  });
+
+  test('minute bells skip seeks, rearm on rewind and reset on restart', () {
+    cues = SessionBellSchedule(pattern: SessionBellPattern.everyMinute);
+    cues.update(Duration.zero, duration);
+    cues.seek(const Duration(seconds: 195), duration);
+    expect(cues.update(const Duration(seconds: 195), duration), isFalse);
+    expect(cues.update(const Duration(minutes: 4), duration), isTrue);
+    cues.seek(const Duration(seconds: 65), duration);
+    expect(cues.update(const Duration(seconds: 65), duration), isFalse);
+    expect(cues.update(const Duration(minutes: 2), duration), isTrue);
+    cues.seek(Duration.zero, duration);
+    expect(cues.update(Duration.zero, duration), isTrue);
+    expect(cues.update(const Duration(minutes: 1), duration), isTrue);
+  });
+
+  test('short minute timers do not add a cue after the closing bell', () {
+    cues = SessionBellSchedule(pattern: SessionBellPattern.everyMinute);
+    const short = Duration(seconds: 63);
+    expect(cues.update(Duration.zero, short), isTrue);
+    expect(cues.update(const Duration(seconds: 57), short), isTrue);
+    expect(cues.update(const Duration(minutes: 1), short), isFalse);
     expect(cues.update(short, short), isFalse);
   });
 }

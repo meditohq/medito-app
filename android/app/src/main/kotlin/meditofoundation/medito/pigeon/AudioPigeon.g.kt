@@ -861,8 +861,8 @@ interface MeditoAudioServiceApi {
   fun setBackgroundSound(uri: String?)
   fun setBackgroundSoundVolume(volume: Double)
   fun stopBackgroundSound()
-  /** Start/middle/end bells, independent of the ambient background sound. */
-  fun setSessionBells(enabled: Boolean)
+  /** Scheduled bells, independent of the ambient background sound. */
+  fun setSessionBells(enabled: Boolean, pattern: String)
   fun playBackgroundSound()
   fun pauseBackgroundSound()
 
@@ -1068,8 +1068,9 @@ interface MeditoAudioServiceApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val enabledArg = args[0] as Boolean
+            val patternArg = args[1] as String
             val wrapped: List<Any?> = try {
-              api.setSessionBells(enabledArg)
+              api.setSessionBells(enabledArg, patternArg)
               listOf(null)
             } catch (exception: Throwable) {
               AudioPigeonPigeonUtils.wrapError(exception)

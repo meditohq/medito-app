@@ -48,4 +48,45 @@ class SessionBellScheduleTest {
         assertTrue(cues.update(594000, 600000))
     }
 
+
+    @Test fun beginningAndEndOmitsMidpoint() {
+        val cues = SessionBellSchedule("beginningEnd")
+        assertTrue(cues.update(0, 600000))
+        assertFalse(cues.update(300000, 600000))
+        assertTrue(cues.update(594000, 600000))
+        assertFalse(cues.update(595000, 600000))
+    }
+
+    @Test fun minuteBellsRingOncePerMinuteAndAtEnd() {
+        val cues = SessionBellSchedule("everyMinute")
+        assertTrue(cues.update(0, 600000))
+        for (minute in 1L..9L) {
+            assertFalse(cues.update(minute * 60000 - 1, 600000))
+            assertTrue(cues.update(minute * 60000, 600000))
+            assertFalse(cues.update(minute * 60000, 600000))
+        }
+        assertTrue(cues.update(594000, 600000))
+        assertFalse(cues.update(600000, 600000))
+    }
+
+    @Test fun minuteBellsHandleSeeksAndRestart() {
+        val cues = SessionBellSchedule("everyMinute")
+        cues.update(0, 600000)
+        cues.seek(195000, 600000)
+        assertFalse(cues.update(195000, 600000))
+        assertTrue(cues.update(240000, 600000))
+        cues.seek(65000, 600000)
+        assertFalse(cues.update(65000, 600000))
+        assertTrue(cues.update(120000, 600000))
+        cues.seek(0, 600000)
+        assertTrue(cues.update(0, 600000))
+        assertTrue(cues.update(60000, 600000))
+    }
+
+    @Test fun shortMinuteTimersDoNotRingAfterClosingCue() {
+        val cues = SessionBellSchedule("everyMinute")
+        assertTrue(cues.update(0, 63000))
+        assertTrue(cues.update(57000, 63000))
+        assertFalse(cues.update(60000, 63000))
+    }
 }

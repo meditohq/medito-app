@@ -1,3 +1,4 @@
+import '../background_sounds/background_sounds_notifier.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'dart:async';
 import 'dart:io';
@@ -140,6 +141,13 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
       setRepeatMode(repeatMode);
       setSpeed(1.0);
       await _playAudioWithRetry(url, trackData);
+      if (request.hasBackgroundSound) {
+        await ref
+            .read(backgroundSoundsNotifierProvider.notifier)
+            .prepareSessionBells(forTimer: request.isTimer);
+      } else {
+        await _api.setSessionBells(false, 'beginningMiddleEnd');
+      }
     } else {
       AppLogger.d('PLAYER', 'On iOS - setting up audio');
       // NOTE: errors here intentionally propagate (see comment above for the
@@ -150,6 +158,13 @@ class PlayerProvider extends Notifier<PlaybackRequest?> {
       setSpeed(1.0);
       await iosAudioHandler.setUrl(downloadPath, request, trackData);
       AppLogger.d('PLAYER', 'iOS setUrl succeeded');
+      if (request.hasBackgroundSound) {
+        await ref
+            .read(backgroundSoundsNotifierProvider.notifier)
+            .prepareSessionBells(forTimer: request.isTimer);
+      } else {
+        await iosAudioHandler.sessionBells.disable();
+      }
       await iosAudioHandler.play();
       AppLogger.d('PLAYER', 'iOS play() called');
     }

@@ -1,3 +1,4 @@
+import '../../models/background_sounds/session_bell_pattern.dart';
 import 'dart:async';
 
 import 'package:just_audio/just_audio.dart';
@@ -36,8 +37,15 @@ class IosSessionBells {
 
   bool get enabled => _enabled;
 
-  Future<void> enable(double volume) async {
-    if (_enabled && _ready) return;
+  Future<void> enable(
+    double volume, {
+    SessionBellPattern pattern = SessionBellPattern.beginningMiddleEnd,
+  }) async {
+    if (_enabled && _ready && _schedule.pattern == pattern) {
+      await _bell.setVolume(volume);
+      return;
+    }
+    _schedule.pattern = pattern;
     final generation = ++_generation;
     _enabled = true;
     _ready = false;
