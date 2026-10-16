@@ -1,6 +1,11 @@
 Unreleased
 -
 
+2610.16.0
+- Timer bells now play by default, even without a background sound
+- Choose bells at the beginning and end, every minute, or at the beginning, middle and end
+- [ios] Home announcements now show for new installs
+
 2610.14.1
 - See and change your next session's voice and length right on Home
 - A new Timer, with a stopwatch. Timer sessions count towards your stats.
