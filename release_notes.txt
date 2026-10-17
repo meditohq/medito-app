@@ -1,6 +1,13 @@
 Unreleased
 -
 
+2610.17.1
+- Choose beginning, middle and end bells independently with simple checkboxes
+- A clearer sound picker with consistent headings and aligned controls
+- Smoother app startup
+- A one-time tip helps you find the sound controls
+- [android] Improved handling of duplicate app icons
+
 2610.17.0
 - Choose beginning, middle and end bells independently with simple checkboxes
 - A clearer sound picker with consistent headings and aligned controls
