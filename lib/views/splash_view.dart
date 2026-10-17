@@ -4,8 +4,8 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
@@ -32,6 +32,7 @@ import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/views/root/root_page_view.dart';
 import 'package:medito/views/settings/sign_up_log_in_screen.dart';
 import 'package:medito/widgets/widgets.dart';
+import 'package:medito/widgets/launch_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashView extends ConsumerStatefulWidget {
@@ -329,11 +330,8 @@ class SplashViewState extends ConsumerState<SplashView>
 
           AppLogger.i('SPLASH', 'Navigation to main app...');
           if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
-          await Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) =>
-                  const RootPageView(firstChild: BottomNavigationBarView()),
-            ),
+          await _openApp(
+            const RootPageView(firstChild: BottomNavigationBarView()),
           );
         } catch (e) {
           // If services initialization fails (likely due to network issues),
@@ -347,11 +345,7 @@ class SplashViewState extends ConsumerState<SplashView>
           showSnackBar(context, AppLocalizations.of(context)!.offlineMode);
 
           if (!appReadyCompleter.isCompleted) appReadyCompleter.complete();
-          await Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const DownloadsView(isRoot: true),
-            ),
-          );
+          await _openApp(const DownloadsView(isRoot: true));
         }
       } else {
         AppLogger.i('SPLASH', 'No verified user, showing auth buttons');
@@ -567,52 +561,66 @@ class SplashViewState extends ConsumerState<SplashView>
           _checkAuthAndInitialize();
         }
       },
-      child: Scaffold(
-        extendBody: true,
-        backgroundColor: _isLoading
-            ? Theme.of(context).scaffoldBackgroundColor
-            : Colors.transparent,
-        body: _isLoading
-            ? Center(
-                child: SvgPicture.asset(
-                  AssetConstants.icLogo,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: LaunchSplash.systemUiStyle,
+        child: Scaffold(
+          extendBody: true,
+          backgroundColor: Colors.black,
+          body: AnimatedSwitcher(
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 250),
+            child: _isLoading
+                ? const LaunchSplash()
+                : SplashWelcomeLayout(
+                    showAccountButtons: _showAccountButtons,
+                    isSigningIn: _isSigningIn,
+                    onGetStarted: () async {
+                      await FirebaseAnalyticsService().logEvent(
+                        name: FirebaseAnalyticsService
+                            .eventOnboardingSplashscreenContinueTap,
+                      );
+                      await _handleAnonymousSignIn();
+                    },
+                    onSignIn: () async {
+                      await FirebaseAnalyticsService().logEvent(
+                        name: FirebaseAnalyticsService
+                            .eventOnboardingSplashscreenSignupTap,
+                      );
+                      await Navigator.of(context)
+                          .push(
+                            MaterialPageRoute(
+                              builder: (context) => const SignUpLogInPage(
+                                source: AnalyticsEventConstants.sourceSplash,
+                              ),
+                            ),
+                          )
+                          .then((value) {
+                            if (value == true) {
+                              _checkAuthAndInitialize();
+                            }
+                          });
+                    },
                   ),
-                  width: 168,
-                ),
-              )
-            : SplashWelcomeLayout(
-                showAccountButtons: _showAccountButtons,
-                isSigningIn: _isSigningIn,
-                onGetStarted: () async {
-                  await FirebaseAnalyticsService().logEvent(
-                    name: FirebaseAnalyticsService
-                        .eventOnboardingSplashscreenContinueTap,
-                  );
-                  await _handleAnonymousSignIn();
-                },
-                onSignIn: () async {
-                  await FirebaseAnalyticsService().logEvent(
-                    name: FirebaseAnalyticsService
-                        .eventOnboardingSplashscreenSignupTap,
-                  );
-                  await Navigator.of(context)
-                      .push(
-                        MaterialPageRoute(
-                          builder: (context) => const SignUpLogInPage(
-                            source: AnalyticsEventConstants.sourceSplash,
-                          ),
-                        ),
-                      )
-                      .then((value) {
-                        if (value == true) {
-                          _checkAuthAndInitialize();
-                        }
-                      });
-                },
-              ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openApp(Widget page) {
+    return Navigator.of(context).pushReplacement<void, void>(
+      PageRouteBuilder<void>(
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionDuration: MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : const Duration(milliseconds: 300),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation.drive(CurveTween(curve: Curves.easeInOut)),
+            child: child,
+          );
+        },
       ),
     );
   }

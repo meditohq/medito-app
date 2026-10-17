@@ -43,6 +43,7 @@ import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/stats_updater.dart';
 import 'package:medito/views/splash_view.dart';
+import 'package:medito/widgets/launch_splash.dart';
 import 'package:medito/services/network/http_api_service.dart';
 import 'package:medito/services/deep_link_service.dart';
 // ignore: depend_on_referenced_packages
@@ -332,7 +333,8 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
 
     return authRepo.when(
       loading: () => const MaterialApp(
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+        debugShowCheckedModeBanner: false,
+        home: LaunchSplash(),
       ),
       error: (error, stack) => MaterialApp(
         home: Scaffold(body: Center(child: Text('Error initializing: $error'))),
