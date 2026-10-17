@@ -1,8 +1,4 @@
 import '../../models/background_sounds/session_bell_pattern.dart';
-import 'package:medito/providers/providers.dart';
-import 'package:medito/models/timer/timer_session.dart';
-import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
@@ -76,9 +72,6 @@ class BackgroundSoundView extends ConsumerWidget {
     BackgroundSoundCatalog catalog, {
     Widget? footer,
   }) {
-    final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface;
-
     // Volume stays pinned above the scrolling list. No pull-to-refresh: in a
     // sheet, pulling down at the top should collapse the sheet, and the error
     // footer already offers a retry.
@@ -94,22 +87,12 @@ class BackgroundSoundView extends ConsumerWidget {
               bottom: MediaQuery.paddingOf(context).bottom + 16,
             ),
             children: [
-              // Bells are a switch: they play alongside any sound below.
-              const _SessionBellsSwitch(),
-              const _SessionBellPatternPicker(),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                child: Text(
-                  AppLocalizations.of(
-                    context,
-                  )!.backgroundSoundsSection.toUpperCase(),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.8,
-                    color: onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
+              _SoundSectionHeading(
+                label: AppLocalizations.of(context)!.sessionBells,
+              ),
+              const _SessionBellCheckboxes(),
+              _SoundSectionHeading(
+                label: AppLocalizations.of(context)!.backgroundSoundsSection,
               ),
               // None first, so it reads as turning the sound off.
               const SoundListTileWidget(
@@ -135,115 +118,63 @@ class BackgroundSoundView extends ConsumerWidget {
   }
 }
 
-class _SessionBellsSwitch extends ConsumerWidget {
-  const _SessionBellsSwitch();
+class _SoundSectionHeading extends StatelessWidget {
+  const _SoundSectionHeading({required this.label});
+
+  final String label;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface;
-    final l10n = AppLocalizations.of(context)!;
-    final state = ref.watch(backgroundSoundsNotifierProvider);
-    final enabled = state.bellsEnabled;
-
-    void toggle(bool value) {
-      FirebaseAnalyticsService().logEvent(
-        name: AnalyticsEventConstants.sessionBellsToggled,
-        parameters: {
-          'enabled': value ? 1 : 0,
-          'is_timer': (ref.read(playerProvider)?.isTimer ?? false) ? 1 : 0,
-        },
-      );
-      ref
-          .read(backgroundSoundsNotifierProvider.notifier)
-          .setSessionBells(value);
-    }
-
-    // Same type and margins as the sound rows below.
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: InkWell(
-        onTap: () => toggle(!enabled),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.sessionBells,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      switch (state.bellPattern) {
-                        SessionBellPattern.beginningMiddleEnd =>
-                          l10n.sessionBellsDescription,
-                        SessionBellPattern.beginningEnd =>
-                          l10n.sessionBellBeginningEnd,
-                        SessionBellPattern.everyMinute =>
-                          l10n.sessionBellEveryMinuteDescription,
-                      },
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontSize: 14,
-                        color: onSurface.withValues(alpha: 0.7),
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Switch(value: enabled, onChanged: toggle),
-            ],
-          ),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Text(
+        label,
+        style: theme.textTheme.bodySmall?.copyWith(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         ),
       ),
     );
   }
 }
 
-class _SessionBellPatternPicker extends ConsumerWidget {
-  const _SessionBellPatternPicker();
+class _SessionBellCheckboxes extends ConsumerWidget {
+  const _SessionBellCheckboxes();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(backgroundSoundsNotifierProvider);
-    if (!state.bellsEnabled) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
+    final pattern = ref
+        .watch(backgroundSoundsNotifierProvider)
+        .selectedBellPattern;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: DropdownButtonFormField<SessionBellPattern>(
-        initialValue: state.bellPattern,
-        isExpanded: true,
-        decoration: InputDecoration(labelText: l10n.sessionBellTiming),
-        items: [
-          for (final pattern in SessionBellPattern.values)
-            DropdownMenuItem(
-              value: pattern,
-              child: Text(switch (pattern) {
-                SessionBellPattern.beginningMiddleEnd =>
-                  l10n.sessionBellBeginningMiddleEnd,
-                SessionBellPattern.beginningEnd => l10n.sessionBellBeginningEnd,
-                SessionBellPattern.everyMinute => l10n.sessionBellEveryMinute,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final cue in SessionBellCue.values)
+            CheckboxListTile(
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              visualDensity: VisualDensity.compact,
+              title: Text(switch (cue) {
+                SessionBellCue.beginning => l10n.sessionBellBeginning,
+                SessionBellCue.middle => l10n.sessionBellMiddle,
+                SessionBellCue.end => l10n.sessionBellEnd,
               }),
+              value: pattern.includes(cue),
+              onChanged: (selected) {
+                if (selected != null) {
+                  ref
+                      .read(backgroundSoundsNotifierProvider.notifier)
+                      .setSessionBellCue(cue, selected);
+                }
+              },
             ),
         ],
-        onChanged: (pattern) {
-          if (pattern != null) {
-            ref
-                .read(backgroundSoundsNotifierProvider.notifier)
-                .setSessionBellPattern(pattern);
-          }
-        },
       ),
     );
   }

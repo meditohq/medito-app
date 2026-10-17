@@ -1795,5 +1795,8 @@
   "sessionBellBeginningMiddleEnd": "Anfang, Mitte und Ende",
   "sessionBellBeginningEnd": "Anfang und Ende",
   "sessionBellEveryMinute": "Jede Minute",
-  "sessionBellEveryMinuteDescription": "Eine Glocke am Anfang, jede Minute und am Ende"
+  "sessionBellEveryMinuteDescription": "Eine Glocke am Anfang, jede Minute und am Ende",
+  "sessionBellBeginning": "Anfang",
+  "sessionBellMiddle": "Mitte",
+  "sessionBellEnd": "Ende"
 }

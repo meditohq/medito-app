@@ -213,6 +213,9 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
   @override
   bool getSessionBellsEnabled({bool forTimer = false}) {
     final prefs = ref.read(sharedPreferencesProvider);
+    if (getSessionBellPattern(forTimer: forTimer) == SessionBellPattern.none) {
+      return false;
+    }
     final saved = prefs.getBool(
       forTimer
           ? SharedPreferenceConstants.timerSessionBellsEnabled
@@ -247,6 +250,8 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
               ? SharedPreferenceConstants.timerSessionBellPattern
               : SharedPreferenceConstants.sessionBellPattern,
         );
+    // The old recurring preset becomes the three visible cue checkboxes.
+    if (saved == 'everyMinute') return SessionBellPattern.beginningMiddleEnd;
     return SessionBellPattern.values.firstWhere(
       (pattern) => pattern.name == saved,
       orElse: () => forTimer

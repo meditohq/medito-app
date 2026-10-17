@@ -152,16 +152,19 @@ void main() {
     verify(() => bell.play()).called(1);
   });
 
-  test('changing to minute bells during playback skips elapsed cues', () async {
-    await controller.enable(.5);
-    playing = true;
-    position = const Duration(seconds: 130);
-    await controller.enable(.5, pattern: SessionBellPattern.everyMinute);
-    await flush();
-    verifyNever(() => bell.play());
-    position = const Duration(minutes: 3);
-    positions.add(position);
-    await flush();
-    verify(() => bell.play()).called(1);
-  });
+  test(
+    'changing to middle only during playback skips the opening cue',
+    () async {
+      await controller.enable(.5);
+      playing = true;
+      position = const Duration(seconds: 130);
+      await controller.enable(.5, pattern: SessionBellPattern.middle);
+      await flush();
+      verifyNever(() => bell.play());
+      position = const Duration(minutes: 5);
+      positions.add(position);
+      await flush();
+      verify(() => bell.play()).called(1);
+    },
+  );
 }

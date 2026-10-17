@@ -57,36 +57,46 @@ class SessionBellScheduleTest {
         assertFalse(cues.update(595000, 600000))
     }
 
-    @Test fun minuteBellsRingOncePerMinuteAndAtEnd() {
-        val cues = SessionBellSchedule("everyMinute")
-        assertTrue(cues.update(0, 600000))
-        for (minute in 1L..9L) {
-            assertFalse(cues.update(minute * 60000 - 1, 600000))
-            assertTrue(cues.update(minute * 60000, 600000))
-            assertFalse(cues.update(minute * 60000, 600000))
+
+    @Test fun eachCombinationRingsOnlySelectedCues() {
+        val patterns = mapOf(
+            "none" to listOf(false, false, false),
+            "beginning" to listOf(true, false, false),
+            "middle" to listOf(false, true, false),
+            "end" to listOf(false, false, true),
+            "beginningMiddle" to listOf(true, true, false),
+            "beginningEnd" to listOf(true, false, true),
+            "middleEnd" to listOf(false, true, true),
+            "beginningMiddleEnd" to listOf(true, true, true)
+        )
+        for ((pattern, selected) in patterns) {
+            val cues = SessionBellSchedule(pattern)
+            assertEquals(pattern, selected[0], cues.update(0, 600000))
+            assertFalse(cues.update(60000, 600000))
+            assertEquals(pattern, selected[1], cues.update(300000, 600000))
+            assertFalse(cues.update(300000, 600000))
+            assertEquals(pattern, selected[2], cues.update(594000, 600000))
+            assertFalse(cues.update(595000, 600000))
         }
-        assertTrue(cues.update(594000, 600000))
-        assertFalse(cues.update(600000, 600000))
     }
 
-    @Test fun minuteBellsHandleSeeksAndRestart() {
-        val cues = SessionBellSchedule("everyMinute")
-        cues.update(0, 600000)
-        cues.seek(195000, 600000)
-        assertFalse(cues.update(195000, 600000))
-        assertTrue(cues.update(240000, 600000))
-        cues.seek(65000, 600000)
-        assertFalse(cues.update(65000, 600000))
-        assertTrue(cues.update(120000, 600000))
+    @Test fun middleOnlyRearmsWithoutOpeningBell() {
+        val cues = SessionBellSchedule("middle")
+        assertFalse(cues.update(0, 600000))
+        cues.seek(360000, 600000)
+        assertFalse(cues.update(360000, 600000))
+        cues.seek(240000, 600000)
+        assertTrue(cues.update(300000, 600000))
         cues.seek(0, 600000)
-        assertTrue(cues.update(0, 600000))
-        assertTrue(cues.update(60000, 600000))
+        assertFalse(cues.update(0, 600000))
+        assertTrue(cues.update(300000, 600000))
+        assertFalse(cues.update(594000, 600000))
     }
 
-    @Test fun shortMinuteTimersDoNotRingAfterClosingCue() {
-        val cues = SessionBellSchedule("everyMinute")
-        assertTrue(cues.update(0, 63000))
-        assertTrue(cues.update(57000, 63000))
-        assertFalse(cues.update(60000, 63000))
+    @Test fun shortMiddleOnlyTimerStillRingsWithoutEndBell() {
+        val cues = SessionBellSchedule("middle")
+        assertFalse(cues.update(0, 10000))
+        assertTrue(cues.update(5000, 10000))
+        assertFalse(cues.update(6000, 10000))
     }
 }

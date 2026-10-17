@@ -65,12 +65,15 @@ void main() {
 
   test('bell timing is remembered separately for timer and tracks', () async {
     final repo = await repoWith({});
-    repo.saveSessionBellPattern(SessionBellPattern.everyMinute, forTimer: true);
+    repo.saveSessionBellPattern(
+      SessionBellPattern.beginningMiddle,
+      forTimer: true,
+    );
     repo.saveSessionBellPattern(SessionBellPattern.beginningEnd);
     await Future<void>.delayed(Duration.zero);
     expect(
       repo.getSessionBellPattern(forTimer: true),
-      SessionBellPattern.everyMinute,
+      SessionBellPattern.beginningMiddle,
     );
     expect(repo.getSessionBellPattern(), SessionBellPattern.beginningEnd);
   });
@@ -89,4 +92,23 @@ void main() {
       );
     },
   );
+
+  test('old every-minute preference becomes the three visible cues', () async {
+    final repo = await repoWith({
+      SharedPreferenceConstants.timerSessionBellPattern: 'everyMinute',
+    });
+    expect(
+      repo.getSessionBellPattern(forTimer: true),
+      SessionBellPattern.beginningMiddleEnd,
+    );
+  });
+
+  test('clearing all checkboxes persists silence', () async {
+    final repo = await repoWith({});
+    repo.saveSessionBellPattern(SessionBellPattern.none, forTimer: true);
+    repo.saveSessionBellsEnabled(false, forTimer: true);
+    await Future<void>.delayed(Duration.zero);
+    expect(repo.getSessionBellsEnabled(forTimer: true), isFalse);
+    expect(repo.getSessionBellPattern(forTimer: true), SessionBellPattern.none);
+  });
 }

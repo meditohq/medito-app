@@ -3011,4 +3011,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get sessionBellEveryMinuteDescription =>
       'A bell at the beginning, every minute and at the end';
+
+  @override
+  String get sessionBellBeginning => 'Beginning';
+
+  @override
+  String get sessionBellMiddle => 'Middle';
+
+  @override
+  String get sessionBellEnd => 'End';
 }

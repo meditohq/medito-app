@@ -151,6 +151,9 @@ class BackgroundSoundsState {
       (selectedBgSound != null &&
           selectedBgSound!.id != kNoneBackgroundSoundId);
 
+  SessionBellPattern get selectedBellPattern =>
+      bellsEnabled ? bellPattern : SessionBellPattern.none;
+
   BackgroundSoundsState copyWith({
     bool? bellsEnabled,
     SessionBellPattern? bellPattern,
@@ -285,12 +288,26 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
     unawaited(_applySessionBells(enabled, preview: preview));
   }
 
-  void setSessionBellPattern(SessionBellPattern pattern) {
-    ref
-        .read(backgroundSoundsRepositoryProvider)
-        .saveSessionBellPattern(pattern, forTimer: _timerScope);
-    state = state.copyWith(bellPattern: pattern);
-    unawaited(_applySessionBells(state.bellsEnabled, preview: true));
+  void setSessionBellCue(SessionBellCue cue, bool selected) {
+    _setSessionBellPattern(
+      state.selectedBellPattern.withCue(cue, selected),
+      preview: selected,
+    );
+  }
+
+  void setSessionBellPattern(SessionBellPattern pattern) =>
+      _setSessionBellPattern(pattern, preview: true);
+
+  void _setSessionBellPattern(
+    SessionBellPattern pattern, {
+    required bool preview,
+  }) {
+    final enabled = pattern != SessionBellPattern.none;
+    final repo = ref.read(backgroundSoundsRepositoryProvider);
+    repo.saveSessionBellPattern(pattern, forTimer: _timerScope);
+    repo.saveSessionBellsEnabled(enabled, forTimer: _timerScope);
+    state = state.copyWith(bellPattern: pattern, bellsEnabled: enabled);
+    unawaited(_applySessionBells(enabled, preview: preview));
   }
 
   /// Restore bells before iOS starts playback, so loading the bundled asset

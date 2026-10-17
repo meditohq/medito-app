@@ -2241,5 +2241,8 @@
   "sessionBellBeginningMiddleEnd": "Beginning, middle and end",
   "sessionBellBeginningEnd": "Beginning and end",
   "sessionBellEveryMinute": "Every minute",
-  "sessionBellEveryMinuteDescription": "A bell at the beginning, every minute and at the end"
+  "sessionBellEveryMinuteDescription": "A bell at the beginning, every minute and at the end",
+  "sessionBellBeginning": "Beginning",
+  "sessionBellMiddle": "Middle",
+  "sessionBellEnd": "End"
 }

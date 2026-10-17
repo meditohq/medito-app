@@ -53,7 +53,16 @@ class SoundListTileWidget extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
               child: Row(
                 children: [
-                  RadioDot(selected: isSelected, accent: context.brandAccent),
+                  // Match CheckboxListTile's leading column in the bell rows.
+                  SizedBox(
+                    width: 40,
+                    child: Center(
+                      child: RadioDot(
+                        selected: isSelected,
+                        accent: context.brandAccent,
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: padding12),
                   Expanded(
                     child: Column(

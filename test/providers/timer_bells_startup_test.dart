@@ -11,6 +11,7 @@ import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/services/audio/ios_session_bells.dart';
+import 'package:medito/services/audio/session_bell_preview.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
 import 'package:medito/utils/audio_session_tracker.dart';
 import 'package:mocktail/mocktail.dart';
@@ -20,11 +21,14 @@ class _Handler extends Mock implements IosAudioHandler {}
 
 class _Bells extends Mock implements IosSessionBells {}
 
+class _Preview extends Mock implements SessionBellPreview {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late _Handler handler;
   late _Bells bells;
   late ProviderContainer container;
+  late _Preview preview;
   final request = timerPlaybackRequest(
     mode: TimerMode.countdown,
     duration: const Duration(minutes: 10),
@@ -52,10 +56,13 @@ void main() {
   Future<void> setup(Map<String, Object> saved) async {
     SharedPreferences.setMockInitialValues(saved);
     final prefs = await SharedPreferences.getInstance();
+    preview = _Preview();
+    when(() => preview.play(any())).thenAnswer((_) async {});
     container = ProviderContainer(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         audioStateProvider.overrideWith(AudioStateNotifier.new),
+        sessionBellPreviewProvider.overrideWithValue(preview),
       ],
     );
     addTearDown(container.dispose);
@@ -100,15 +107,15 @@ void main() {
   );
 
   test(
-    'startup restores saved volume and minute bells without an ambient sound',
+    'startup restores saved volume and selected cues without an ambient sound',
     () async {
       await setup({
         SharedPreferenceConstants.bgSoundVolume: 80.0,
-        SharedPreferenceConstants.timerSessionBellPattern: 'everyMinute',
+        SharedPreferenceConstants.timerSessionBellPattern: 'middleEnd',
       });
       await container.read(playerProvider.notifier).play(request);
       verify(
-        () => bells.enable(.4, pattern: SessionBellPattern.everyMinute),
+        () => bells.enable(.4, pattern: SessionBellPattern.middleEnd),
       ).called(1);
       expect(container.read(backgroundSoundsNotifierProvider).volume, 80);
     },
@@ -121,4 +128,53 @@ void main() {
     verifyNever(() => bells.enable(any(), pattern: any(named: 'pattern')));
     verify(() => handler.play()).called(1);
   });
+
+  test(
+    'independent checkbox changes persist and clearing all disables playback',
+    () async {
+      await setup({});
+      final notifier = container.read(
+        backgroundSoundsNotifierProvider.notifier,
+      );
+      await notifier.prepareSessionBells(forTimer: true);
+      notifier.setSessionBellCue(SessionBellCue.beginning, false);
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        container.read(backgroundSoundsNotifierProvider).selectedBellPattern,
+        SessionBellPattern.end,
+      );
+      verifyNever(() => preview.play(any()));
+      notifier.setSessionBellCue(SessionBellCue.end, false);
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        container.read(backgroundSoundsNotifierProvider).selectedBellPattern,
+        SessionBellPattern.none,
+      );
+      verify(() => bells.disable()).called(1);
+      notifier.setSessionBellCue(SessionBellCue.middle, true);
+      await Future<void>.delayed(Duration.zero);
+      verify(() => preview.play(any())).called(1);
+      final prefs = container.read(sharedPreferencesProvider);
+      expect(
+        prefs.getString(SharedPreferenceConstants.timerSessionBellPattern),
+        'middle',
+      );
+      expect(
+        prefs.getBool(SharedPreferenceConstants.timerSessionBellsEnabled),
+        isTrue,
+      );
+      await notifier.prepareSessionBells(forTimer: true);
+      expect(
+        container.read(backgroundSoundsNotifierProvider).selectedBellPattern,
+        SessionBellPattern.middle,
+      );
+      expect(
+        container
+            .read(backgroundSoundsNotifierProvider)
+            .selectedBellPattern
+            .hasEnd,
+        isFalse,
+      );
+    },
+  );
 }

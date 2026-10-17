@@ -3066,4 +3066,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get sessionBellEveryMinuteDescription =>
       'Una campana al principio, cada minuto y al final';
+
+  @override
+  String get sessionBellBeginning => 'Principio';
+
+  @override
+  String get sessionBellMiddle => 'Mitad';
+
+  @override
+  String get sessionBellEnd => 'Final';
 }

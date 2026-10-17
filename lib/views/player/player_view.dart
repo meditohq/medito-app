@@ -411,7 +411,10 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
     // A countdown that runs out rings its closing bell before the end; ending
     // early (or finishing a stopwatch) rings it as the end screen opens.
     final bgSounds = ref.read(backgroundSoundsNotifierProvider.notifier);
-    final bellsOn = ref.read(backgroundSoundsNotifierProvider).bellsEnabled;
+    final bellsOn = ref
+        .read(backgroundSoundsNotifierProvider)
+        .selectedBellPattern
+        .hasEnd;
     final volume = bgSounds.scaledVolume(
       ref.read(backgroundSoundsNotifierProvider).volume,
     );

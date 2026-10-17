@@ -1395,5 +1395,8 @@
   "sessionBellBeginningMiddleEnd": "Principio, mitad y final",
   "sessionBellBeginningEnd": "Principio y final",
   "sessionBellEveryMinute": "Cada minuto",
-  "sessionBellEveryMinuteDescription": "Una campana al principio, cada minuto y al final"
+  "sessionBellEveryMinuteDescription": "Una campana al principio, cada minuto y al final",
+  "sessionBellBeginning": "Principio",
+  "sessionBellMiddle": "Mitad",
+  "sessionBellEnd": "Final"
 }

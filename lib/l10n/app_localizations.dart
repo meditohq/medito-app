@@ -5475,6 +5475,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A bell at the beginning, every minute and at the end'**
   String get sessionBellEveryMinuteDescription;
+
+  /// No description provided for @sessionBellBeginning.
+  ///
+  /// In en, this message translates to:
+  /// **'Beginning'**
+  String get sessionBellBeginning;
+
+  /// No description provided for @sessionBellMiddle.
+  ///
+  /// In en, this message translates to:
+  /// **'Middle'**
+  String get sessionBellMiddle;
+
+  /// No description provided for @sessionBellEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get sessionBellEnd;
 }
 
 class _AppLocalizationsDelegate
