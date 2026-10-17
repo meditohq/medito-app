@@ -88,6 +88,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backgroundSounds => 'Background Sound';
 
   @override
+  String get changeBackgroundSoundsHint =>
+      'Tap here to change background sounds or bells.';
+
+  @override
   String get x06 => 'x0.6';
 
   @override

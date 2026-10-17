@@ -8,7 +8,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_download_widget.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/audio_speed_widget.dart';
-import 'package:medito/views/player/widgets/bottom_actions/widgets/bg_sound_widget.dart';
+import 'package:medito/views/player/widgets/bottom_actions/widgets/background_sound_button.dart';
 import 'package:medito/views/player/widgets/bottom_actions/widgets/speed_sheet.dart';
 
 import 'package:medito/views/background_sound/background_sound_view.dart';
@@ -42,16 +42,7 @@ class PlayerActionBar extends StatelessWidget {
           onTap: onClosePressed,
           semanticLabel: l10n.close,
         ),
-        rightItem: BottomActionBarItem(
-          child: _buildBackgroundSoundWidget(),
-          onTap: () {
-            FirebaseAnalyticsService().logEvent(
-              name: AnalyticsEventConstants.playerBackgroundSoundsOpened,
-            );
-            showBackgroundSoundSheet(context);
-          },
-          semanticLabel: l10n.backgroundSounds,
-        ),
+        rightItem: _backgroundSoundItem(context),
       );
     }
 
@@ -65,18 +56,7 @@ class PlayerActionBar extends StatelessWidget {
       leftCenterItem: BottomActionBarItem.custom(
         child: AudioDownloadWidget(request: request),
       ),
-      rightCenterItem: BottomActionBarItem(
-        child: _buildBackgroundSoundWidget(),
-        onTap: request.hasBackgroundSound
-            ? () {
-                FirebaseAnalyticsService().logEvent(
-                  name: AnalyticsEventConstants.playerBackgroundSoundsOpened,
-                );
-                showBackgroundSoundSheet(context);
-              }
-            : () => _showBackgroundSoundDisabledMessage(context),
-        semanticLabel: l10n.backgroundSounds,
-      ),
+      rightCenterItem: _backgroundSoundItem(context),
       rightItem: BottomActionBarItem(
         child: const AudioSpeedWidget(),
         onTap: () => showSpeedSheet(
@@ -94,10 +74,25 @@ class PlayerActionBar extends StatelessWidget {
     );
   }
 
-  Widget _buildBackgroundSoundWidget() {
-    return request.hasBackgroundSound
-        ? BgSoundWidget(isBackgroundSoundSelected: isBackgroundSoundSelected)
-        : const Icon(Icons.music_off, color: ColorConstants.white);
+  BottomActionBarItem _backgroundSoundItem(BuildContext context) {
+    if (!request.hasBackgroundSound) {
+      return BottomActionBarItem(
+        child: const Icon(Icons.music_off, color: ColorConstants.white),
+        onTap: () => _showBackgroundSoundDisabledMessage(context),
+        semanticLabel: AppLocalizations.of(context)!.backgroundSounds,
+      );
+    }
+    return BottomActionBarItem.custom(
+      child: BackgroundSoundButton(
+        isBackgroundSoundSelected: isBackgroundSoundSelected,
+        onPressed: () {
+          FirebaseAnalyticsService().logEvent(
+            name: AnalyticsEventConstants.playerBackgroundSoundsOpened,
+          );
+          showBackgroundSoundSheet(context);
+        },
+      ),
+    );
   }
 
   void _showBackgroundSoundDisabledMessage(BuildContext context) {

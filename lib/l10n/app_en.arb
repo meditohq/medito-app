@@ -31,6 +31,10 @@
   "statsSuccess": "Stats updated",
   "shareStatsText": "Discover calmness for FREE with #Medito I've found my inner peace; now it's your turn! Join me on this mindful journey and start exploring today 💜 Download https://medito.app #Calm #Meditation #Headspace",
   "backgroundSounds": "Background Sound",
+  "changeBackgroundSoundsHint": "Tap here to change background sounds or bells.",
+  "@changeBackgroundSoundsHint": {
+    "description": "One-time tooltip above the player's background sound button on the second visit with a background sound or session bells enabled."
+  },
   "x06": "x0.6",
   "x07": "x0.7",
   "x08": "x0.8",

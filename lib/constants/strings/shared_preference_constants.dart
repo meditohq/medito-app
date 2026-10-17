@@ -2,6 +2,9 @@ class SharedPreferenceConstants {
   static const String user = 'user';
   static const String bgSoundVolume = 'bgSoundVolume';
   static const String bgSound = 'bgSound';
+  // Count player visits with a background sound or bells, capped at two.
+  static const String bgSoundPlayerVisits = 'bg_sound_player_visits';
+  static const String bgSoundChangeHintShown = 'bg_sound_change_hint_shown';
   static const String listBgSound = 'listBgSound';
   // The full background sound list as last fetched (JSON list), so the
   // pickers can list sounds offline and grey out the ones not downloaded.

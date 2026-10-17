@@ -250,6 +250,12 @@ abstract class AppLocalizations {
   /// **'Background Sound'**
   String get backgroundSounds;
 
+  /// One-time tooltip above the player's background sound button on the second visit with a background sound or session bells enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to change background sounds or bells.'**
+  String get changeBackgroundSoundsHint;
+
   /// No description provided for @x06.
   ///
   /// In en, this message translates to:

@@ -90,6 +90,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get backgroundSounds => 'Hintergrundklang';
 
   @override
+  String get changeBackgroundSoundsHint =>
+      'Tippe hier, um Hintergrundklänge oder Glockentöne zu ändern.';
+
+  @override
   String get x06 => 'x0.6';
 
   @override
