@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2610.17.0
+- Choose beginning, middle and end bells independently with simple checkboxes
+- A clearer sound picker with consistent headings and aligned controls
+- Smoother app startup
+- A one-time tip helps you find the sound controls
+
 2610.16.0
 - Timer bells now play by default, even without a background sound
 - Choose bells at the beginning and end, every minute, or at the beginning, middle and end
