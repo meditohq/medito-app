@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/analytics/crashlytics_service.dart';
 import 'package:medito/services/notifications/local_notifications.dart';
+import 'package:medito/services/notifications/notification_timing.dart';
 
 final reminderProvider = Provider<ReminderProvider>((ref) {
   return ReminderProvider();
@@ -103,6 +105,7 @@ class ReminderProvider {
             // null-guard skipped navigation and analytics alike.
             payload: payload,
           );
+          unawaited(NotificationTiming.log('notification_scheduled', payload));
           AppLogger.d(
             'XXXX',
             'Successfully scheduled reminder ID=${item.id} at ${item.scheduledDate}',
@@ -155,12 +158,15 @@ class ReminderProvider {
 
   Future<void> cancelReminderSeries() async {
     await _initFuture;
+    final pending = await getPendingNotifications();
+    final payloads = {for (final item in pending) item.id: item.payload};
     try {
       var cancelledCount = 0;
       for (var i = 0; i < reminderSeriesCount; i++) {
         try {
-          await _flutterLocalNotificationsPlugin.cancel(
-            id: reminderSeriesBaseId + i,
+          await LocalNotifications.cancelTracked(
+            reminderSeriesBaseId + i,
+            payload: payloads[reminderSeriesBaseId + i],
           );
           cancelledCount++;
         } catch (e, s) {
@@ -178,8 +184,9 @@ class ReminderProvider {
         }
       }
       try {
-        await _flutterLocalNotificationsPlugin.cancel(
-          id: reminderSeriesBaseId + 15,
+        await LocalNotifications.cancelTracked(
+          reminderSeriesBaseId + 15,
+          payload: payloads[reminderSeriesBaseId + 15],
         );
         cancelledCount++;
       } catch (e, s) {

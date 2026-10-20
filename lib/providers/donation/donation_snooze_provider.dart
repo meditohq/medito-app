@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'package:medito/services/notifications/supporter_campaign_api.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../services/notifications/local_notifications.dart';
+import 'supporter_appeal_experiment.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../shared_preference/shared_preference_provider.dart';
@@ -71,6 +75,7 @@ class DonationSnooze extends _$DonationSnooze {
     );
 
     ref.invalidateSelf();
+    unawaited(SupporterCampaignApi.updatePreferences(prefs));
   }
 
   Future<void> recordDonationSuccess(String frequency) async {
@@ -98,5 +103,9 @@ class DonationSnooze extends _$DonationSnooze {
     );
 
     ref.invalidateSelf();
+    unawaited(SupporterCampaignApi.updatePreferences(prefs));
+    await LocalNotifications.cancelSafely(
+      SupporterAppealExperiment.notificationId,
+    );
   }
 }

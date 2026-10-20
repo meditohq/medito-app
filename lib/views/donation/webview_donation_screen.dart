@@ -14,6 +14,7 @@ import 'package:medito/models/stripe/payment_intent_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
 import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
+import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:medito/providers/locale_provider.dart';
 import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
@@ -31,9 +32,14 @@ import 'package:webview_flutter/webview_flutter.dart';
 /// frequency / success / close button); Flutter just bridges the JS channel
 /// to the native Stripe sheet.
 class WebViewDonationScreen extends ConsumerStatefulWidget {
-  const WebViewDonationScreen({super.key, this.source});
+  const WebViewDonationScreen({
+    super.key,
+    this.source,
+    this.campaignMetadata = const {},
+  });
 
   final String? source;
+  final Map<String, String> campaignMetadata;
 
   @override
   ConsumerState<WebViewDonationScreen> createState() =>
@@ -262,7 +268,12 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     final prefs = ref.read(sharedPreferencesProvider);
     query
       ..addAll(EndScreenDonationExperiment.paymentMetadata(prefs))
-      ..addAll(OnboardingDonationTimingExperiment.paymentMetadata(prefs));
+      ..addAll(OnboardingDonationTimingExperiment.paymentMetadata(prefs))
+      ..addAll(SupporterAppealExperiment(prefs).paymentMetadata())
+      ..addAll(widget.campaignMetadata);
+    if (widget.campaignMetadata.isNotEmpty) {
+      query.addAll(SupporterAppealExperiment(prefs).acquisitionMetadata());
+    }
 
     try {
       final config = await ref.read(paymentConfigProvider.future);
@@ -457,6 +468,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userId: userId,
           userEmail: userEmail,
           paywallSource: widget.source,
+          campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
           onSuccess: () {},
@@ -471,6 +483,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userId: userId,
           userEmail: userEmail,
           paywallSource: widget.source,
+          campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
           onSuccess: () {},
@@ -486,6 +499,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           userId: userId,
           userEmail: userEmail,
           paywallSource: widget.source,
+          campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
           onSuccess: () {},

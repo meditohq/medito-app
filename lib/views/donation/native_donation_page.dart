@@ -60,21 +60,25 @@ const _disclosureCopy =
     'Stichting Medito · Non-profit registered in the Netherlands · KvK 75284251';
 const _stripeTrustCopy = 'Secure payment powered by Stripe';
 
-/// Native (Dart) rendering of the onboarding donation paywall — an inline
-/// pager-tab body, not a pushed route. Renders the same server-resolved
-/// `/paywall` config the webview page consumes; the caller is responsible for
-/// loading [config] and falling back to the webview flow when it can't.
+/// Native rendering of the server-resolved donation configuration. The caller
+/// provides a page or pager shell, loads [config], and handles load failures.
 class NativeDonationPage extends ConsumerStatefulWidget {
   const NativeDonationPage({
     super.key,
     required this.config,
     required this.onNext,
     required this.source,
+    this.campaignMetadata = const {},
+    this.showCloseButton = true,
   });
 
   final PaywallConfigModel config;
   final VoidCallback onNext;
   final String source;
+  final Map<String, String> campaignMetadata;
+
+  /// Disable when the enclosing screen supplies its own header close button.
+  final bool showCloseButton;
 
   @override
   ConsumerState<NativeDonationPage> createState() => _NativeDonationPageState();
@@ -179,9 +183,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               : _Frequency.monthly);
     _selectedAmount = _suggestedAmountFor(_selectedFrequency);
 
-    _closeTimer = Timer(_closeDelay, () {
-      if (mounted) setState(() => _showClose = true);
-    });
+    if (widget.showCloseButton) {
+      _closeTimer = Timer(_closeDelay, () {
+        if (mounted) setState(() => _showClose = true);
+      });
+    }
 
     _logPageShown();
   }
@@ -326,8 +332,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
 
   void _handleSkip(String method) {
     FirebaseAnalyticsService().logEvent(
-      name: FirebaseAnalyticsService.eventOnboardingDonationSkipTap,
-      parameters: {'method': method},
+      name: widget.source == 'onboarding'
+          ? FirebaseAnalyticsService.eventOnboardingDonationSkipTap
+          : 'donation_close_tapped',
+      parameters: {'method': method, 'paywall_source': widget.source},
     );
     if (!_didDonate) _logPaywallDismissedNoPayment();
     widget.onNext();
@@ -364,7 +372,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       _donateTapLogged = true;
       unawaited(
         FirebaseAnalyticsService().logEvent(
-          name: FirebaseAnalyticsService.eventOnboardingDonateNowTap,
+          name: widget.source == 'onboarding'
+              ? FirebaseAnalyticsService.eventOnboardingDonateNowTap
+              : 'donation_pay_tapped',
+          parameters: {'paywall_source': widget.source},
         ),
       );
     }
@@ -397,6 +408,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             paywallSource: widget.source,
             variantId: _variantId,
             experimentId: _experimentId,
+            campaignMetadata: widget.campaignMetadata,
             onSuccess: onSuccess,
           );
         case _Frequency.yearly:
@@ -411,6 +423,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             paywallSource: widget.source,
             variantId: _variantId,
             experimentId: _experimentId,
+            campaignMetadata: widget.campaignMetadata,
             onSuccess: onSuccess,
           );
         case _Frequency.oneTime:
@@ -425,6 +438,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             paywallSource: widget.source,
             variantId: _variantId,
             experimentId: _experimentId,
+            campaignMetadata: widget.campaignMetadata,
             onSuccess: onSuccess,
           );
       }
@@ -506,7 +520,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           // X on the webview paywall. Only inserted once active so its
           // semantics don't exist while it can't be tapped (keeps UI tests
           // honest too).
-          if (_showClose)
+          if (widget.showCloseButton && _showClose)
             Positioned(
               top: 4,
               right: 4,

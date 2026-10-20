@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:medito/utils/logger.dart';
+import 'notification_timing.dart';
 
 /// The one initialisation of flutter_local_notifications, shared by reminders
 /// and push.
@@ -24,6 +26,30 @@ class LocalNotifications {
   static void Function(NotificationResponse response)? tapHandler;
 
   static Future<void> ensureInitialized() => _initFuture ??= _initialize();
+
+  /// Cancelling an optional campaign must never turn a successful donation
+  /// or a settings change into an error if the OS notification service fails.
+  static Future<void> cancelSafely(int id) async {
+    try {
+      String? payload;
+      try {
+        final pending = await plugin.pendingNotificationRequests();
+        for (final item in pending) {
+          if (item.id == id) payload = item.payload;
+        }
+      } catch (_) {
+        // An unavailable timing snapshot must never block cancellation.
+      }
+      await cancelTracked(id, payload: payload);
+    } catch (e) {
+      AppLogger.w('NOTIFICATIONS', 'Could not cancel notification $id: $e');
+    }
+  }
+
+  static Future<void> cancelTracked(int id, {String? payload}) async {
+    await plugin.cancel(id: id);
+    await NotificationTiming.log('notification_cancelled', payload);
+  }
 
   static Future<void> _initialize() async {
     tz.initializeTimeZones();
