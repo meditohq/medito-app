@@ -67,11 +67,13 @@ final supporterAppealProvider = FutureProvider<AppealAssignment?>((ref) async {
           : '50_plus',
     );
     await prefs.setBool('supporter_campaign_registered', true);
+    // Accepted-message opens can still reconcile after a campaign is paused,
+    // even though sync correctly withholds its announcement card.
+    await SupporterAppealRuntime.retryPendingOpen(prefs, api);
     if (data == null) return null;
     final experiment = SupporterAppealExperiment(prefs);
     final previousId = experiment.assignment?.id;
     if (!await experiment.applyServerAssignment(data)) return null;
-    await SupporterAppealRuntime.retryPendingOpen(prefs, api);
     if (previousId != experiment.assignment?.id) {
       await SupporterAppealRuntime.log('appeal_assignment_observed', prefs);
     }
