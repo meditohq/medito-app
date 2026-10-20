@@ -1,4 +1,3 @@
-import '../../models/background_sounds/session_bell_pattern.dart';
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
@@ -8,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/background_sounds/background_sounds_notifier.dart';
 import 'widgets/sound_listtile_widget.dart';
+import 'widgets/session_bell_checkboxes.dart';
 import 'widgets/volume_slider_widget.dart';
 
 /// Opens the background-sound picker as a draggable bottom sheet over the
@@ -90,7 +90,14 @@ class BackgroundSoundView extends ConsumerWidget {
               _SoundSectionHeading(
                 label: AppLocalizations.of(context)!.sessionBells,
               ),
-              const _SessionBellCheckboxes(),
+              SessionBellCheckboxes(
+                pattern: ref
+                    .watch(backgroundSoundsNotifierProvider)
+                    .selectedBellPattern,
+                onChanged: ref
+                    .read(backgroundSoundsNotifierProvider.notifier)
+                    .setSessionBellCue,
+              ),
               _SoundSectionHeading(
                 label: AppLocalizations.of(context)!.backgroundSoundsSection,
               ),
@@ -136,45 +143,6 @@ class _SoundSectionHeading extends StatelessWidget {
           letterSpacing: 0,
           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         ),
-      ),
-    );
-  }
-}
-
-class _SessionBellCheckboxes extends ConsumerWidget {
-  const _SessionBellCheckboxes();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final pattern = ref
-        .watch(backgroundSoundsNotifierProvider)
-        .selectedBellPattern;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final cue in SessionBellCue.values)
-            CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              controlAffinity: ListTileControlAffinity.leading,
-              visualDensity: VisualDensity.compact,
-              title: Text(switch (cue) {
-                SessionBellCue.beginning => l10n.sessionBellBeginning,
-                SessionBellCue.middle => l10n.sessionBellMiddle,
-                SessionBellCue.end => l10n.sessionBellEnd,
-              }),
-              value: pattern.includes(cue),
-              onChanged: (selected) {
-                if (selected != null) {
-                  ref
-                      .read(backgroundSoundsNotifierProvider.notifier)
-                      .setSessionBellCue(cue, selected);
-                }
-              },
-            ),
-        ],
       ),
     );
   }

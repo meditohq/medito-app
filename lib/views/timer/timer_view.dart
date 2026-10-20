@@ -23,6 +23,7 @@ import 'package:medito/widgets/inputs/medito_segmented_tabs.dart';
 import 'package:medito/views/player/widgets/bottom_actions/single_back_action_bar.dart';
 
 import 'widgets/timer_duration_wheels.dart';
+import 'widgets/timer_bells_tile.dart';
 
 /// The home Timer: pick a length (or an open-ended stopwatch) and a sound,
 /// then sit with the regular player. Works fully offline — the session is a
@@ -128,7 +129,7 @@ class _TimerViewState extends ConsumerState<TimerView> {
                 settings.mode == TimerMode.stopwatch ? 0 : settings.minutes,
             if (settings.mode == TimerMode.countdown)
               AnalyticsEventConstants.paramLengthSource: _lengthSource,
-            // Ambient sound and bells, as last left in the player.
+            // Ambient sound is shared; bells use the timer setup selection.
             AnalyticsEventConstants.paramSoundId:
                 _soundRepo.getSelectedBgSoundFromSharedPreferences()?.id ??
                 kNoneBackgroundSoundId,
@@ -253,6 +254,8 @@ class _TimerViewState extends ConsumerState<TimerView> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 24),
+                      const TimerBellsTile(),
                     ],
                   ),
                 ),
@@ -327,7 +330,7 @@ class _StopwatchInfo extends StatelessWidget {
 class _PresetChips extends StatelessWidget {
   const _PresetChips({required this.selectedMinutes, required this.onSelected});
 
-  static const height = 58.0;
+  static const _diameter = 58.0;
 
   final int selectedMinutes;
   final ValueChanged<int> onSelected;
@@ -336,28 +339,31 @@ class _PresetChips extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      height: height,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          for (final minutes in kTimerPresetMinutes)
-            _PresetChip(
-              minutes: minutes,
-              selected: minutes == selectedMinutes,
-              label: l10n.min,
-              semanticLabel: l10n.timerPresetSemantics(minutes),
-              onTap: () => onSelected(minutes),
-              theme: theme,
-            ),
-        ],
-      ),
+    final scaledDiameter = MediaQuery.textScalerOf(context).scale(_diameter);
+    final diameter = scaledDiameter < _diameter ? _diameter : scaledDiameter;
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      spacing: 12,
+      runSpacing: 12,
+      children: [
+        for (final minutes in kTimerPresetMinutes)
+          _PresetChip(
+            diameter: diameter,
+            minutes: minutes,
+            selected: minutes == selectedMinutes,
+            label: l10n.min,
+            semanticLabel: l10n.timerPresetSemantics(minutes),
+            onTap: () => onSelected(minutes),
+            theme: theme,
+          ),
+      ],
     );
   }
 }
 
 class _PresetChip extends StatelessWidget {
   const _PresetChip({
+    required this.diameter,
     required this.minutes,
     required this.selected,
     required this.label,
@@ -366,6 +372,7 @@ class _PresetChip extends StatelessWidget {
     required this.theme,
   });
 
+  final double diameter;
   final int minutes;
   final bool selected;
   final String label;
@@ -389,8 +396,8 @@ class _PresetChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: _PresetChips.height,
-        height: _PresetChips.height,
+        width: diameter,
+        height: diameter,
         decoration: BoxDecoration(color: background, shape: BoxShape.circle),
         child: Material(
           type: MaterialType.transparency,

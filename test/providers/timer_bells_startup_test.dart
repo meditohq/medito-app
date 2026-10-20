@@ -10,6 +10,7 @@ import 'package:medito/providers/player/ios_audio_handler.dart';
 import 'package:medito/providers/player/audio_state_provider.dart';
 import 'package:medito/providers/player/player_provider.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/providers/timer/timer_bell_settings_provider.dart';
 import 'package:medito/services/audio/ios_session_bells.dart';
 import 'package:medito/services/audio/session_bell_preview.dart';
 import 'package:medito/src/audio_pigeon.g.dart';
@@ -174,6 +175,69 @@ void main() {
             .selectedBellPattern
             .hasEnd,
         isFalse,
+      );
+    },
+  );
+
+  test(
+    'timer setup selection reaches playback and the sound sheet stays in sync',
+    () async {
+      await setup({});
+      container.listen(timerBellSettingsProvider, (_, _) {});
+      final settings = container.read(timerBellSettingsProvider.notifier);
+      settings.setCue(SessionBellCue.beginning, false);
+      expect(container.read(timerBellSettingsProvider), SessionBellPattern.end);
+      // Editing setup must not touch the active audio engine.
+      verifyNever(() => bells.enable(any(), pattern: any(named: 'pattern')));
+      verifyNever(() => bells.disable());
+      await container.read(playerProvider.notifier).play(request);
+      verify(
+        () => bells.enable(.25, pattern: SessionBellPattern.end),
+      ).called(1);
+      expect(
+        container.read(backgroundSoundsNotifierProvider).selectedBellPattern,
+        SessionBellPattern.end,
+      );
+      final sounds = container.read(backgroundSoundsNotifierProvider.notifier);
+      sounds.setSessionBellCue(SessionBellCue.middle, true);
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        container.read(timerBellSettingsProvider),
+        SessionBellPattern.middleEnd,
+      );
+      expect(
+        container.read(backgroundSoundsNotifierProvider).selectedBellPattern,
+        SessionBellPattern.middleEnd,
+      );
+      // A regular session's sheet still edits its own choices.
+      await sounds.prepareSessionBells(forTimer: false);
+      sounds.setSessionBellCue(SessionBellCue.beginning, true);
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        container.read(backgroundSoundsNotifierProvider).selectedBellPattern,
+        SessionBellPattern.beginning,
+      );
+      expect(
+        container.read(timerBellSettingsProvider),
+        SessionBellPattern.middleEnd,
+      );
+    },
+  );
+
+  test(
+    'all bells unchecked in setup disables bells when the timer starts',
+    () async {
+      await setup({});
+      container.listen(timerBellSettingsProvider, (_, _) {});
+      container
+          .read(timerBellSettingsProvider.notifier)
+          .setPattern(SessionBellPattern.none);
+      await container.read(playerProvider.notifier).play(request);
+      verify(() => bells.disable()).called(1);
+      verifyNever(() => bells.enable(any(), pattern: any(named: 'pattern')));
+      expect(
+        container.read(backgroundSoundsNotifierProvider).selectedBellPattern,
+        SessionBellPattern.none,
       );
     },
   );

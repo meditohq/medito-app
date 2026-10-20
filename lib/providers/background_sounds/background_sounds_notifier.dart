@@ -13,6 +13,7 @@ import '../../repositories/downloader/downloader_repository.dart';
 import '../../src/audio_pigeon.g.dart';
 import '../../utils/logger.dart';
 import '../player/player_provider.dart';
+import '../timer/timer_bell_settings_provider.dart';
 
 part 'background_sounds_notifier.g.dart';
 
@@ -197,7 +198,7 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   StreamSubscription<Duration>? _fadeSubscription;
 
   /// True while a home Timer session owns the player. The ambient sound is
-  /// one shared choice; only the bells switch is remembered per scope (on by
+  /// one shared choice; bell choices are remembered per scope (on by
   /// default for the Timer, off under tracks).
   bool _timerScope = false;
 
@@ -281,6 +282,17 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   /// sound is playing, and remembers it for this scope (tracks or timer).
   /// [preview] rings a bell when switching on, so the user hears it.
   void setSessionBells(bool enabled, {bool preview = true}) {
+    if (_timerScope) {
+      _setSessionBellPattern(
+        enabled
+            ? (state.bellPattern == SessionBellPattern.none
+                  ? SessionBellPattern.beginningEnd
+                  : state.bellPattern)
+            : SessionBellPattern.none,
+        preview: preview,
+      );
+      return;
+    }
     ref
         .read(backgroundSoundsRepositoryProvider)
         .saveSessionBellsEnabled(enabled, forTimer: _timerScope);
@@ -304,8 +316,12 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   }) {
     final enabled = pattern != SessionBellPattern.none;
     final repo = ref.read(backgroundSoundsRepositoryProvider);
-    repo.saveSessionBellPattern(pattern, forTimer: _timerScope);
-    repo.saveSessionBellsEnabled(enabled, forTimer: _timerScope);
+    if (_timerScope) {
+      ref.read(timerBellSettingsProvider.notifier).setPattern(pattern);
+    } else {
+      repo.saveSessionBellPattern(pattern);
+      repo.saveSessionBellsEnabled(enabled);
+    }
     state = state.copyWith(bellPattern: pattern, bellsEnabled: enabled);
     unawaited(_applySessionBells(enabled, preview: preview));
   }
@@ -315,10 +331,15 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   Future<void> prepareSessionBells({required bool forTimer}) async {
     _timerScope = forTimer;
     final repo = ref.read(backgroundSoundsRepositoryProvider);
+    final pattern = forTimer
+        ? ref.read(timerBellSettingsProvider)
+        : repo.getSessionBellPattern();
     state = state.copyWith(
       volume: repo.getBgSoundVolume() ?? 50,
-      bellsEnabled: repo.getSessionBellsEnabled(forTimer: forTimer),
-      bellPattern: repo.getSessionBellPattern(forTimer: forTimer),
+      bellsEnabled: forTimer
+          ? pattern != SessionBellPattern.none
+          : repo.getSessionBellsEnabled(),
+      bellPattern: pattern,
     );
     // Android starts with a native volume of zero. Previously this was only
     // restored when an ambient sound played, so bells alone stayed silent.
