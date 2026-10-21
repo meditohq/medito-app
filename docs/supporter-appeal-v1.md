@@ -16,12 +16,13 @@ The app backend owns campaign definitions, sticky assignments and FCM HTTP v1
 sending. The donation API continues to own prices, currencies, frequency options
 and payment-ladder assignments; no Stripe integration or donation settings change.
 The app renders the server announcement and prefers its native donation page.
-The fallback below is exclusive to source `announcement`; onboarding, end-screen
-and settings webviews retain their previous method detection with no eight-second
-setup timeout, and report native errors to the page without switching checkout.
-If native rendering is disabled, configuration is missing/invalid, SDK setup or
-payment methods are unavailable, or setup takes more than eight seconds, the
-same screen switches to the web donation page with an immediate Close button.
+The shared webview prefers the native payment sheet for every source, including
+onboarding, end-screen, settings and campaigns. It uses browser checkout after a
+native SDK setup/availability failure or when no usable payment methods exist.
+Slow setup alone does not force browser checkout; the eight-second native setup
+cutoff has been removed. Existing network/page error handling and Close remain.
+For campaigns, disabled/invalid native page configuration opens the web donation
+page with an immediate Close button.
 The web page still uses the native payment sheet when SDK setup and payment
 methods are available (`isInAppPaymentAvailable=true`). Only an unavailable native
 payment integration uses Stripe.js browser checkout instead. A native sheet

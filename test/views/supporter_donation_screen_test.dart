@@ -13,6 +13,7 @@ import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/views/donation/supporter_donation_screen.dart';
+import 'package:medito/views/donation/native_donation_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/views/donation/webview_donation_screen.dart';
@@ -20,7 +21,6 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 import '../helpers/fake_webview_platform.dart';
 import 'dart:convert';
-import 'dart:async';
 
 class _Auth implements AuthRepository {
   @override
@@ -194,9 +194,10 @@ void main() {
     required PaywallConfigModel value,
     required _CapturePaymentUI payments,
     bool setupFailure = false,
+    bool Function()? setupFailureWhen,
     bool configFailure = false,
     bool noMethods = false,
-    bool configTimeout = false,
+    bool methodsUnavailable = false,
     String? webSource,
     Duration paymentConfigDelay = Duration.zero,
   }) async {
@@ -207,14 +208,15 @@ void main() {
         overrides: [
           supporterPaywallConfigProvider.overrideWith((ref) async {
             if (configFailure) throw StateError('Config unavailable');
-            if (configTimeout) return Completer<PaywallConfigModel>().future;
             return value;
           }),
           paymentConfigProvider.overrideWith((ref) async {
             if (paymentConfigDelay != Duration.zero) {
               await Future<void>.delayed(paymentConfigDelay);
             }
-            if (setupFailure) throw UnsupportedError('Native SDK unavailable');
+            if (setupFailure || (setupFailureWhen?.call() ?? false)) {
+              throw UnsupportedError('Native SDK unavailable');
+            }
             return MockPaymentServiceImpl().getPaymentConfig();
           }),
           deviceAndAppInfoProvider.overrideWith(
@@ -236,12 +238,12 @@ void main() {
           availablePaymentMethodsProvider.overrideWith(
             (ref) async => noMethods
                 ? []
-                : const [
+                : [
                     PaymentMethod(
                       id: 'card',
                       type: PaymentMethodType.card,
                       displayName: 'Card',
-                      isAvailable: true,
+                      isAvailable: !methodsUnavailable,
                     ),
                   ],
           ),
@@ -267,81 +269,183 @@ void main() {
   }
 
   testWidgets(
-    'onboarding waits beyond eight seconds and keeps the native sheet',
+    'slow native setup keeps the sheet across every donation entry point',
     (tester) async {
-      final payments = _CapturePaymentUI();
-      await pump(
-        tester,
-        value: config(),
-        payments: payments,
-        webSource: 'onboarding',
-        paymentConfigDelay: const Duration(seconds: 12),
-      );
-      await tester.pump(const Duration(seconds: 9));
-      expect(web.controller.loaded, isNull);
-      await tester.pump(const Duration(seconds: 3));
-      await tester.pumpAndSettle();
-      expect(
-        web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
-        'true',
-      );
-      await tester.pumpWidget(const SizedBox());
-    },
-  );
-
-  testWidgets(
-    'non-campaign webviews report native availability failures without browser fallback',
-    (tester) async {
-      for (final source in ['onboarding', 'end_screen', 'settings']) {
-        final payments = _CapturePaymentUI()
-          ..result = PaymentResult.failure(
-            errorMessage: 'Native unavailable',
-            error: PaymentError(
-              type: PaymentErrorType.paymentMethodNotSupported,
-              message: 'Test',
-              userFriendlyMessage: 'Test',
-            ),
-          );
+      for (final source in [
+        'onboarding',
+        'end_screen',
+        'settings',
+        'announcement',
+        null,
+      ]) {
         await pump(
           tester,
           value: config(),
-          payments: payments,
+          payments: _CapturePaymentUI(),
           webSource: source,
+          paymentConfigDelay: const Duration(seconds: 12),
         );
-        final loaded = web.controller.loaded;
-        web.controller.channel!.onMessageReceived(
-          const JavaScriptMessage(
-            message:
-                '{"type":"paywall_payment_request","amount":700,"frequency":"monthly"}',
-          ),
-        );
+        await tester.pump(const Duration(seconds: 9));
+        if (source == null) {
+          expect(find.byType(WebViewDonationScreen), findsNothing);
+        } else {
+          expect(web.controller.loaded, isNull);
+        }
+        await tester.pump(const Duration(seconds: 3));
         await tester.pumpAndSettle();
-        expect(payments.requests.length, 1);
-        expect(web.controller.loaded, loaded);
-        expect(web.controller.scripts.join(), contains('"status":"error"'));
-        expect(
-          web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
-          'true',
-        );
+        if (source == null) {
+          expect(find.byType(NativeDonationPage), findsOneWidget);
+        } else {
+          expect(
+            web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
+            'true',
+          );
+        }
         await tester.pumpWidget(const SizedBox());
       }
     },
   );
 
-  testWidgets('legacy webviews still detect methods when config fails', (
+  testWidgets(
+    'all webview sources offer browser checkout only for native availability failures',
+    (tester) async {
+      for (final source in [
+        'onboarding',
+        'end_screen',
+        'settings',
+        'announcement',
+      ]) {
+        for (final type in [
+          null,
+          PaymentErrorType.cardDeclined,
+          PaymentErrorType.networkError,
+          PaymentErrorType.genericError,
+          PaymentErrorType.paymentMethodNotSupported,
+          PaymentErrorType.applePayNotAvailable,
+          PaymentErrorType.googlePayNotAvailable,
+        ]) {
+          final payments = _CapturePaymentUI();
+          if (type != null) {
+            payments.result = PaymentResult.failure(
+              errorMessage: 'Test error',
+              error: PaymentError(
+                type: type,
+                message: 'Test',
+                userFriendlyMessage: 'Test',
+              ),
+            );
+          }
+          await pump(
+            tester,
+            value: config(),
+            payments: payments,
+            webSource: source,
+          );
+          final loaded = web.controller.loaded;
+          web.controller.channel!.onMessageReceived(
+            const JavaScriptMessage(
+              message:
+                  '{"type":"paywall_payment_request","amount":700,"frequency":"monthly"}',
+            ),
+          );
+          await tester.pumpAndSettle();
+          expect(payments.requests.length, 1);
+          final fallback = [
+            PaymentErrorType.paymentMethodNotSupported,
+            PaymentErrorType.applePayNotAvailable,
+            PaymentErrorType.googlePayNotAvailable,
+          ].contains(type);
+          expect(
+            web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
+            fallback ? 'false' : 'true',
+          );
+          expect(web.controller.loaded!.queryParameters['source'], source);
+          if (!fallback) {
+            expect(web.controller.loaded, loaded);
+            expect(
+              web.controller.scripts.join(),
+              contains(
+                type == null ? '"status":"cancelled"' : '"status":"error"',
+              ),
+            );
+          }
+          await tester.pumpWidget(const SizedBox());
+        }
+      }
+    },
+  );
+
+  testWidgets(
+    'every source falls back when SDK setup fails or no usable methods exist',
+    (tester) async {
+      for (final source in [
+        'onboarding',
+        'end_screen',
+        'settings',
+        'announcement',
+      ]) {
+        for (final reason in ['setup', 'empty', 'unavailable']) {
+          final payments = _CapturePaymentUI();
+          await pump(
+            tester,
+            value: config(),
+            payments: payments,
+            webSource: source,
+            setupFailure: reason == 'setup',
+            noMethods: reason == 'empty',
+            methodsUnavailable: reason == 'unavailable',
+          );
+          expect(
+            web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
+            'false',
+          );
+          expect(web.controller.loaded!.queryParameters['source'], source);
+          web.controller.channel!.onMessageReceived(
+            const JavaScriptMessage(
+              message:
+                  '{"type":"paywall_payment_request","amount":700,"frequency":"monthly"}',
+            ),
+          );
+          await tester.pumpAndSettle();
+          expect(payments.requests, isEmpty);
+          await tester.pumpWidget(const SizedBox());
+        }
+      }
+    },
+  );
+
+  testWidgets('setup lost after loading falls back before any payment attempt', (
     tester,
   ) async {
+    var unavailable = false;
+    final payments = _CapturePaymentUI();
     await pump(
       tester,
       value: config(),
-      payments: _CapturePaymentUI(),
-      webSource: 'onboarding',
-      setupFailure: true,
+      payments: payments,
+      webSource: 'settings',
+      setupFailureWhen: () => unavailable,
     );
     expect(
       web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
       'true',
     );
+    unavailable = true;
+    ProviderScope.containerOf(
+      tester.element(find.byType(WebViewDonationScreen)),
+    ).invalidate(paymentConfigProvider);
+    web.controller.channel!.onMessageReceived(
+      const JavaScriptMessage(
+        message:
+            '{"type":"paywall_payment_request","amount":700,"frequency":"monthly"}',
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
+      'false',
+    );
+    expect(payments.requests, isEmpty);
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -401,7 +505,6 @@ void main() {
     (tester) async {
       for (final reason in [
         'config',
-        'timeout',
         'setup',
         'disabled',
         'methods',
@@ -431,7 +534,6 @@ void main() {
           value: value,
           payments: payments,
           configFailure: reason == 'config',
-          configTimeout: reason == 'timeout',
           setupFailure: reason == 'setup',
           noMethods: reason == 'methods',
         );

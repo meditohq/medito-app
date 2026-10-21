@@ -11,6 +11,7 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
+import 'package:medito/models/stripe/payment_config_model.dart';
 import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
@@ -69,7 +70,6 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   bool _didDonate = false;
   bool _nativeSheetAvailable = false;
   bool _nativeSheetFailed = false;
-  bool get _campaignCheckout => widget.source == 'announcement';
   bool _presentedLogged = false;
   bool _dismissLogged = false;
   bool _loadOutcomeLogged = false;
@@ -291,44 +291,19 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     }
 
     _nativeSheetAvailable = false;
-    if (!_campaignCheckout) {
-      // Preserve the shared webview's established behaviour outside campaigns.
-      // Config failure must not stop method detection, and slow setup has no
-      // campaign-specific eight-second deadline.
+    if (widget.useNativePaymentSheet && !_nativeSheetFailed) {
       try {
         final config = await ref.read(paymentConfigProvider.future);
         query['currency'] = config.pricing.currency;
         query['country'] = config.pricing.country;
-      } catch (e) {
-        AppLogger.w(_logTag, 'Could not load payment config: $e');
-      }
-      try {
         final methods = await ref.read(availablePaymentMethodsProvider.future);
-        _nativeSheetAvailable = methods.isNotEmpty;
-      } catch (e) {
-        AppLogger.w(_logTag, 'Could not load payment methods: $e');
-      }
-    } else if (widget.useNativePaymentSheet && !_nativeSheetFailed) {
-      try {
-        Future<bool> resolveNativeSheet() async {
-          final config = await ref.read(paymentConfigProvider.future);
-          query['currency'] = config.pricing.currency;
-          query['country'] = config.pricing.country;
-          final methods = await ref.read(
-            availablePaymentMethodsProvider.future,
-          );
-          return methods.any((method) => method.isAvailable);
-        }
-
-        _nativeSheetAvailable = await resolveNativeSheet().timeout(
-          const Duration(seconds: 8),
-        );
+        _nativeSheetAvailable = methods.any((method) => method.isAvailable);
       } catch (e) {
         AppLogger.w(_logTag, 'Native payment sheet unavailable: $e');
       }
     }
     query['isInAppPaymentAvailable'] = _nativeSheetAvailable ? 'true' : 'false';
-    if (_campaignCheckout && !_nativeSheetAvailable) {
+    if (!_nativeSheetAvailable) {
       try {
         final device = await ref.read(deviceAndAppInfoProvider.future);
         if (device.currency case final String currency) {
@@ -514,18 +489,21 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         ? emailFromPage
         : authRepository.currentUser?.email;
 
-    final paymentConfig = await ref.read(paymentConfigProvider.future);
-    final methods = await ref.read(availablePaymentMethodsProvider.future);
-    final availableMethods = _campaignCheckout
-        ? methods.where((method) => method.isAvailable).toList()
-        : methods;
-
+    late final PaymentConfigModel paymentConfig;
+    late final List<payment_models.PaymentMethod> availableMethods;
+    try {
+      paymentConfig = await ref.read(paymentConfigProvider.future);
+      final methods = await ref.read(availablePaymentMethodsProvider.future);
+      availableMethods = methods.where((method) => method.isAvailable).toList();
+    } catch (e) {
+      // No payment has been attempted yet. Configuration may have expired or
+      // become unavailable since the page's initial capability check.
+      AppLogger.w(_logTag, 'Native payment setup unavailable: $e');
+      _offerBrowserCheckout();
+      return;
+    }
     if (availableMethods.isEmpty) {
-      AppLogger.w(_logTag, 'no native payment methods available');
-      _notifyJsResult(
-        status: 'error',
-        message: 'No payment methods available on this device.',
-      );
+      _offerBrowserCheckout();
       return;
     }
 
@@ -597,22 +575,26 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         _didDonate = true;
         _notifyJsResult(status: 'success');
       case PaymentFailure(:final errorMessage, :final error):
-        if (_campaignCheckout &&
-            mounted &&
+        if (mounted &&
             [
               PaymentErrorType.paymentMethodNotSupported,
               PaymentErrorType.applePayNotAvailable,
               PaymentErrorType.googlePayNotAvailable,
             ].contains(error?.type)) {
-          _nativeSheetFailed = true;
-          _nativeSheetAvailable = false;
-          _startLoad();
+          _offerBrowserCheckout();
         } else {
           _notifyJsResult(status: 'error', message: errorMessage);
         }
       case PaymentCancelled():
         _notifyJsResult(status: 'cancelled');
     }
+  }
+
+  void _offerBrowserCheckout() {
+    if (!mounted) return;
+    _nativeSheetFailed = true;
+    _nativeSheetAvailable = false;
+    _startLoad();
   }
 
   Widget _buildErrorOverlay() {

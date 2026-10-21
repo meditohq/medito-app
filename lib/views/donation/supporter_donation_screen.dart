@@ -47,7 +47,7 @@ final supporterNativeCheckoutProvider =
       }
 
       try {
-        return await resolve().timeout(const Duration(seconds: 8));
+        return await resolve();
       } catch (_) {
         return null;
       }
