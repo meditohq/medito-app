@@ -16,6 +16,9 @@ The app backend owns campaign definitions, sticky assignments and FCM HTTP v1
 sending. The donation API continues to own prices, currencies, frequency options
 and payment-ladder assignments; no Stripe integration or donation settings change.
 The app renders the server announcement and prefers its native donation page.
+The fallback below is exclusive to source `announcement`; onboarding, end-screen
+and settings webviews retain their previous method detection with no eight-second
+setup timeout, and report native errors to the page without switching checkout.
 If native rendering is disabled, configuration is missing/invalid, SDK setup or
 payment methods are unavailable, or setup takes more than eight seconds, the
 same screen switches to the web donation page with an immediate Close button.
@@ -66,16 +69,13 @@ signout cannot reach the sender or recall already accepted pushes. Preferences
 sync at Home/resume, donation/snooze and reminder changes. Dismissal retries
 through ordinary sync.
 
-Known local donations and the legacy `has_active_subscription` profile flag
-suppress; positive donor suppression is sticky. This is **not a complete donor
-identity feed**: an unlinked website gift or a donation made on another identity
-may be missed. Validate linked donor coverage before a broad campaign; the
-prototype does not claim all historical/external supporters are identified.
-Cached assignments and queued notification opens are scoped to their authenticated
-account. Sign-out/account deletion clears them, and responses from an earlier
-account cannot restore attribution after an identity change. Older unowned caches
-require an authenticated refresh before use.
-
+Local donations, legacy subscription flags and the internal donation-API donor
+feed suppress asks. Matching uses account ID or case-insensitive profile email;
+suppression stays sticky across registration/sync. The app API imports donors
+before allocation and fails closed for new participants when the feed is missing,
+failed or still catching up. Linked web/reinstalled donors are covered by that
+mirror; unlinked donations or history missing from the payments database still
+need coverage validation. See the backend docs for the private feed and retention.
 Reinstalls without a shared identity can still re-enroll. A token hash avoids
 duplicate campaign allocation/cooldowns for multiple identities sharing a device.
 
@@ -125,7 +125,7 @@ be attributed. The source click tags are associations, not causal proof.
 
 ## API
 
-- Public `GET /supporter-campaigns/status`: `{version:3}`; no credentials.
+- Public `GET /supporter-campaigns/status`: `{version:4}`; no credentials.
 - App JWT `POST /supporter-campaigns/sync`: push/supporter/snooze/reminder
   preferences (`push_allowed` reflects OS permission only) and consistency band; returns active assignment or null.
 - App JWT `POST /supporter-campaigns/events`: owned `assignment_id`, kind
@@ -143,8 +143,12 @@ and local development. Tokens stay in tab memory and do not enter public JS.
 
 ## Release order
 
-1. Review/merge the companion backend PR. Apply `0015_supporter_campaigns.sql` using the
-   existing users D1 migration process in each intended environment.
+1. Release the donation API donor feed first, with its additive migration
+   `0001_supporter_donor_feed.sql` and dedicated server-only
+   `SUPPORTER_DONOR_FEED_TOKEN`. Then apply app API migrations
+   `0015_supporter_campaigns.sql` (if absent) and `0016_supporter_donor_sync.sql`.
+   Configure its matching `SUPPORTER_DONOR_FEED_URL`/token. Keep sending OFF
+   while the historical import completes. Follow the backend release guide.
 2. Set secret `CAMPAIGN_ADMIN_TOKEN` and secret `FCM_SERVICE_ACCOUNT` (JSON
    service-account identity with only the needed Firebase messaging permission
    in the correct Medito Firebase project). Do not paste either into chat, code
@@ -195,7 +199,8 @@ full twice-run sender with fake OAuth/FCM including an ambiguous result.
 eight synthetic users, temporary in-memory DB, fixed clearly fake token, sender
 disabled. Pair with the website dev server. It is not imported by the Worker.
 
-The campaign admin requires backend status version 3, which uses OS notification
-permission independently of daily reminders and retains local quiet hours. Only
-migration 0015 is required. Deploy the reconciled website and this API release
-before testing activation. Refresh an older admin page after deployment.
+The campaign admin requires backend status version 4, which uses OS notification
+permission independently of daily reminders, local quiet hours, donor-sync gating
+and participant export. Apply app API migrations 0015/0016 and the donation API
+feed migration before using this release. Deploy the matching website/API before
+testing activation. Refresh an older admin page after deployment.

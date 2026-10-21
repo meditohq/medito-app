@@ -40,6 +40,7 @@ class _View extends PlatformWebViewWidget {
 class FakeCheckoutWebViewController extends PlatformWebViewController {
   FakeCheckoutWebViewController(super.params) : super.implementation();
   Uri? loaded;
+  final scripts = <String>[];
   JavaScriptChannelParams? channel;
   _Navigation? _navigation;
   @override
@@ -67,5 +68,7 @@ class FakeCheckoutWebViewController extends PlatformWebViewController {
   @override
   Future<String?> currentUrl() async => loaded?.toString();
   @override
-  Future<void> runJavaScript(String javaScript) async {}
+  Future<void> runJavaScript(String javaScript) async {
+    scripts.add(javaScript);
+  }
 }

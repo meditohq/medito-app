@@ -69,6 +69,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   bool _didDonate = false;
   bool _nativeSheetAvailable = false;
   bool _nativeSheetFailed = false;
+  bool get _campaignCheckout => widget.source == 'announcement';
   bool _presentedLogged = false;
   bool _dismissLogged = false;
   bool _loadOutcomeLogged = false;
@@ -290,7 +291,24 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     }
 
     _nativeSheetAvailable = false;
-    if (widget.useNativePaymentSheet && !_nativeSheetFailed) {
+    if (!_campaignCheckout) {
+      // Preserve the shared webview's established behaviour outside campaigns.
+      // Config failure must not stop method detection, and slow setup has no
+      // campaign-specific eight-second deadline.
+      try {
+        final config = await ref.read(paymentConfigProvider.future);
+        query['currency'] = config.pricing.currency;
+        query['country'] = config.pricing.country;
+      } catch (e) {
+        AppLogger.w(_logTag, 'Could not load payment config: $e');
+      }
+      try {
+        final methods = await ref.read(availablePaymentMethodsProvider.future);
+        _nativeSheetAvailable = methods.isNotEmpty;
+      } catch (e) {
+        AppLogger.w(_logTag, 'Could not load payment methods: $e');
+      }
+    } else if (widget.useNativePaymentSheet && !_nativeSheetFailed) {
       try {
         Future<bool> resolveNativeSheet() async {
           final config = await ref.read(paymentConfigProvider.future);
@@ -310,7 +328,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       }
     }
     query['isInAppPaymentAvailable'] = _nativeSheetAvailable ? 'true' : 'false';
-    if (!_nativeSheetAvailable) {
+    if (_campaignCheckout && !_nativeSheetAvailable) {
       try {
         final device = await ref.read(deviceAndAppInfoProvider.future);
         if (device.currency case final String currency) {
@@ -497,9 +515,10 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         : authRepository.currentUser?.email;
 
     final paymentConfig = await ref.read(paymentConfigProvider.future);
-    final availableMethods = (await ref.read(
-      availablePaymentMethodsProvider.future,
-    )).where((method) => method.isAvailable).toList();
+    final methods = await ref.read(availablePaymentMethodsProvider.future);
+    final availableMethods = _campaignCheckout
+        ? methods.where((method) => method.isAvailable).toList()
+        : methods;
 
     if (availableMethods.isEmpty) {
       AppLogger.w(_logTag, 'no native payment methods available');
@@ -578,7 +597,8 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         _didDonate = true;
         _notifyJsResult(status: 'success');
       case PaymentFailure(:final errorMessage, :final error):
-        if (mounted &&
+        if (_campaignCheckout &&
+            mounted &&
             [
               PaymentErrorType.paymentMethodNotSupported,
               PaymentErrorType.applePayNotAvailable,
