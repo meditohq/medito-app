@@ -716,6 +716,10 @@ void main() {
 
         // Verify
         verify(() => mockAuthApiService.refreshToken(refreshToken)).called(1);
+        // Same account signs back in: keep its campaign arm for attribution.
+        verifyNever(
+          () => mockPreferences.remove(SupporterAppealExperiment.assignmentKey),
+        );
         verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
         verify(() => mockSecureStorageService.clearUserEmail()).called(1);
         verify(() => mockHttpApiService.clearLocalAuth()).called(1);
@@ -840,6 +844,10 @@ void main() {
       verifyNever(() => mockHttpApiService.setAuthHeader(any()));
       verifyNever(() => mockSecureStorageService.storeUserEmail(any()));
       verify(() => mockHttpApiService.clearLocalAuth()).called(1);
+      // Account deletion: the deleted account's campaign arm goes with it.
+      verify(
+        () => mockPreferences.remove(SupporterAppealExperiment.assignmentKey),
+      ).called(1);
     });
   });
 

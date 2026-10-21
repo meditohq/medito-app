@@ -723,6 +723,10 @@ class AuthRepositoryImpl extends AuthRepository {
         (_tokens != null && !_tokens!.isExpired ? _tokens!.accessToken : null);
 
     await _resetAuth();
+    // Deliberate sign-outs only. An involuntary reset (dead refresh token)
+    // signs back in as the same account, whose campaign arm must survive for
+    // donation attribution; the cache is user-scoped against real switches.
+    await SupporterAppealExperiment.clearAccountState(_preferences);
     dev.log('[AUTH_REPO] Local auth state reset', level: 500);
 
     if (accessToken == null) {
@@ -759,6 +763,7 @@ class AuthRepositoryImpl extends AuthRepository {
     // before its first await, so nothing can hand a deleted account's
     // still-valid access token to the next request and recreate its profile.
     await _resetAuth();
+    await SupporterAppealExperiment.clearAccountState(_preferences);
     await _authService.clearAuthTokens();
     dev.log('[AUTH_REPO] Local sign out complete', level: 500);
   }
@@ -836,7 +841,6 @@ class AuthRepositoryImpl extends AuthRepository {
 
     // Mark user as logged out
     await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, false);
-    await SupporterAppealExperiment.clearAccountState(_preferences);
 
     // Clear tokens
     await _secureStorage.clearRefreshToken();

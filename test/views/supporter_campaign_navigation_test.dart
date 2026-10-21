@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/services/notifications/supporter_campaign_navigation.dart';
+import 'package:medito/utils/pending_end_screen.dart';
 
 void main() {
   testWidgets('warm tap reveals the main route below a screen and a dialog', (
@@ -49,4 +50,45 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Home'), findsOneWidget);
   });
+
+  for (final (label, mount, unmount) in [
+    (
+      'player',
+      PendingEndScreen.playerMounted,
+      PendingEndScreen.playerUnmounted,
+    ),
+    (
+      'end screen',
+      PendingEndScreen.endScreenMounted,
+      PendingEndScreen.endScreenUnmounted,
+    ),
+  ]) {
+    testWidgets('warm tap leaves an open $label in place', (tester) async {
+      final navigator = GlobalKey<NavigatorState>();
+      late BuildContext mainContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: navigator,
+          home: Builder(
+            builder: (context) {
+              mainContext = context;
+              return const Scaffold(body: Text('Home'));
+            },
+          ),
+        ),
+      );
+      navigator.currentState!.push(
+        MaterialPageRoute<void>(
+          builder: (_) => const Scaffold(body: Text('Session')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      mount();
+      addTearDown(unmount);
+
+      revealSupporterCampaignHome(mainContext);
+      await tester.pumpAndSettle();
+      expect(find.text('Session'), findsOneWidget);
+    });
+  }
 }
