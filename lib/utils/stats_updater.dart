@@ -372,8 +372,12 @@ Future<void> rescheduleRemindersAfterSession({
 /// Writes a session recorded elsewhere (the Apple Watch) to Health, exactly
 /// as [handleStats] does for sessions played on the phone. Takes the same
 /// payload shape (timestamp = end, duration in ms).
-Future<void> syncSessionToHealth(Map<String, dynamic> payload) =>
-    _syncHealthKit(payload);
+Future<bool> syncSessionToHealth(Map<String, dynamic> payload) async {
+  await _syncHealthKit(payload);
+  return HealthKitManager().isSessionSynced(
+    payload[TypeConstants.timestampIdKey],
+  );
+}
 
 Future<void> _syncHealthKit(Map<String, dynamic> payload) async {
   var healthKitManager = HealthKitManager();

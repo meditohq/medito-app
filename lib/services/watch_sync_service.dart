@@ -343,6 +343,12 @@ final watchCompletionSyncProvider = Provider<WatchCompletionSync>((ref) {
   return sync;
 });
 
+// Exposed separately so completion retries can be tested without HealthKit.
+final watchHealthWriterProvider =
+    Provider<Future<bool> Function(Map<String, dynamic>)>(
+      (ref) => syncSessionToHealth,
+    );
+
 class WatchCompletionSync {
   WatchCompletionSync(this._ref, this._prefs);
   static const _channel = MethodChannel('medito.app/watch');
@@ -352,6 +358,64 @@ class WatchCompletionSync {
   bool _disposed = false;
   bool _draining = false;
   bool _drainAgain = false;
+  static const healthPendingKey = 'watch_health_pending_v1';
+
+  List<Map<String, dynamic>> _pendingHealth() =>
+      (_prefs.getStringList(healthPendingKey) ?? [])
+          .map((entry) => Map<String, dynamic>.from(jsonDecode(entry) as Map))
+          .toList();
+
+  Future<void> _savePendingHealth(List<Map<String, dynamic>> sessions) async {
+    if (!await _prefs.setStringList(
+      healthPendingKey,
+      sessions.map((entry) => jsonEncode(entry)).toList(),
+    )) {
+      // SharedPreferences updates its cache even when the platform save fails.
+      // Reload so a native replay cannot mistake that cache for a durable queue.
+      await _prefs.reload();
+      throw StateError('Could not persist pending watch Health sessions');
+    }
+  }
+
+  Future<void> _queueHealth(Map session) async {
+    final pending = _pendingHealth();
+    final account = _prefs.getString(SharedPreferenceConstants.userId) ?? '';
+    if (pending.any(
+      (entry) =>
+          entry['accountId'] == account &&
+          entry['timestamp'] == session['timestamp'],
+    )) {
+      return;
+    }
+    pending.add({
+      'accountId': account,
+      TypeConstants.timestampIdKey: session['timestamp'],
+      TypeConstants.durationIdKey: session['duration'] as int? ?? 0,
+    });
+    await _savePendingHealth(pending);
+  }
+
+  Future<void> _retryHealth() async {
+    final pending = _pendingHealth();
+    for (final session in pending.toList()) {
+      if (_disposed ||
+          !(_prefs.getBool(SharedPreferenceConstants.isLoggedIn) ?? false)) {
+        return;
+      }
+      if (session['accountId'] !=
+          (_prefs.getString(SharedPreferenceConstants.userId) ?? '')) {
+        continue;
+      }
+      try {
+        if (await _ref.read(watchHealthWriterProvider)(session)) {
+          pending.remove(session);
+          await _savePendingHealth(pending);
+        }
+      } catch (e) {
+        AppLogger.e('WATCH', 'Health sync deferred for retry', e);
+      }
+    }
+  }
 
   void start() {
     _channel.setMethodCallHandler((call) async {
@@ -387,7 +451,10 @@ class WatchCompletionSync {
     try {
       final pending =
           await _channel.invokeListMethod<Map>('takePendingSessions') ?? [];
-      if (pending.isEmpty) return;
+      if (pending.isEmpty) {
+        await _retryHealth();
+        return;
+      }
 
       final statsManager = _ref.read(statsManagerProvider);
       final accepted = <Map>[];
@@ -421,6 +488,9 @@ class WatchCompletionSync {
           timestampIsNormalized: session['statsTimestamp'] is int,
         );
         savedAny = true;
+        // Preserve a separate Health retry before acknowledging native delivery.
+        // Stats and reminders can finish even if Health is unavailable.
+        await _queueHealth(session);
         accepted.add(session);
         await _channel.invokeMethod('acknowledgeSessions', {
           'keys': ['$trackId|$timestamp'],
@@ -465,17 +535,8 @@ class WatchCompletionSync {
         );
       }
 
-      // Last, as on the phone: this can show the Health permission sheet.
-      for (final session in accepted) {
-        final timestamp = session['timestamp'] as int?;
-        if (session['trackId'] == null || timestamp == null) continue;
-        await syncSessionToHealth({
-          TypeConstants.timestampIdKey: timestamp,
-          TypeConstants.durationIdKey: session['duration'] as int? ?? 0,
-        }).catchError((e) {
-          AppLogger.e('WATCH', 'HealthKit sync error', e);
-        });
-      }
+      // Also retry earlier writes when no new watch sessions arrived.
+      await _retryHealth();
     } catch (e, st) {
       AppLogger.e('WATCH', 'Failed to record watch sessions', e, st);
     } finally {

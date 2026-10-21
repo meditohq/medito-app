@@ -21,10 +21,15 @@ class _LocalStats extends StatsNotifier {
 class _FailingStore extends InMemorySharedPreferencesStore {
   _FailingStore() : super.empty();
   bool failWrites = true;
+  bool failHealthWrites = false;
   @override
   Future<bool> setValue(String type, String key, Object value) {
     if (failWrites &&
         key.endsWith(SharedPreferenceConstants.localAllStatsKey)) {
+      return Future.value(false);
+    }
+    if (failHealthWrites &&
+        key.endsWith(WatchCompletionSync.healthPendingKey)) {
       return Future.value(false);
     }
     return super.setValue(type, key, value);
@@ -40,6 +45,8 @@ void main() {
   late List<Map<String, Object>> pending;
   late SharedPreferences prefs;
   bool failAck = false;
+  bool healthAvailable = true;
+  final healthWrites = <Map<String, dynamic>>[];
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({
@@ -53,6 +60,8 @@ void main() {
     await manager.initializeForTesting(statsService: service);
     manager.setStatsForTesting(LocalAllStats.empty());
     failAck = false;
+    healthAvailable = true;
+    healthWrites.clear();
     pending = [
       {
         'trackId': 'watch-track',
@@ -83,6 +92,10 @@ void main() {
         sharedPreferencesProvider.overrideWithValue(prefs),
         statsManagerProvider.overrideWithValue(manager),
         statsProvider.overrideWith(_LocalStats.new),
+        watchHealthWriterProvider.overrideWithValue((payload) async {
+          healthWrites.add(Map.of(payload));
+          return healthAvailable;
+        }),
       ],
     );
   });
@@ -145,6 +158,98 @@ void main() {
       expect(manager.currentStats!.totalTimeListened, 600000);
     },
   );
+
+  test(
+    'failed Health write survives restart and retries without new sessions',
+    () async {
+      healthAvailable = false;
+      await container.read(watchCompletionSyncProvider).drainPendingSessions();
+      expect(pending, isEmpty);
+      expect(
+        prefs.getStringList(WatchCompletionSync.healthPendingKey),
+        hasLength(1),
+      );
+      expect(healthWrites, hasLength(1));
+
+      // Recreate the service after native delivery has already been acknowledged.
+      final sync = WatchCompletionSync(
+        container.read(Provider<Ref>((ref) => ref)),
+        prefs,
+      );
+      healthAvailable = true;
+      await sync.drainPendingSessions();
+      expect(healthWrites, hasLength(2));
+      expect(healthWrites.last['duration'], 600000);
+      expect(
+        prefs.getStringList(WatchCompletionSync.healthPendingKey),
+        isEmpty,
+      );
+      expect(manager.currentStats!.totalTracksCompleted, 1);
+      await sync.drainPendingSessions();
+      expect(healthWrites, hasLength(2));
+      sync.dispose();
+    },
+  );
+
+  test('interruption before acknowledgement retains Health retry', () async {
+    // A later stats refresh failure used to lose the Health write. Persisting
+    // before acknowledgement also covers process death at that boundary.
+    failAck = true;
+    await container.read(watchCompletionSyncProvider).drainPendingSessions();
+    expect(
+      prefs.getStringList(WatchCompletionSync.healthPendingKey),
+      hasLength(1),
+    );
+    expect(healthWrites, isEmpty);
+    failAck = false;
+    await container.read(watchCompletionSyncProvider).drainPendingSessions();
+    expect(healthWrites, hasLength(1));
+    expect(prefs.getStringList(WatchCompletionSync.healthPendingKey), isEmpty);
+    expect(manager.currentStats!.totalTracksCompleted, 1);
+  });
+
+  test('failed Health queue persistence prevents acknowledgement', () async {
+    final store = _FailingStore()..failWrites = false;
+    // Seed the replacement platform store so reload reflects the signed-in app.
+    for (final key in prefs.getKeys()) {
+      final value = prefs.get(key)!;
+      await store.setValue(
+        value is bool ? 'Bool' : 'String',
+        'flutter.$key',
+        value,
+      );
+    }
+    store.failHealthWrites = true;
+    SharedPreferencesStorePlatform.instance = store;
+    final sync = container.read(watchCompletionSyncProvider);
+    await sync.drainPendingSessions();
+    expect(pending, hasLength(1));
+    expect(healthWrites, isEmpty);
+    expect(prefs.getStringList(WatchCompletionSync.healthPendingKey), isNull);
+    store.failHealthWrites = false;
+    await sync.drainPendingSessions();
+    expect(pending, isEmpty);
+    expect(healthWrites, hasLength(1));
+    expect(manager.currentStats!.totalTracksCompleted, 1);
+  });
+
+  test('pending Health writes wait for their account', () async {
+    healthAvailable = false;
+    final sync = container.read(watchCompletionSyncProvider);
+    await sync.drainPendingSessions();
+    await prefs.setString(SharedPreferenceConstants.userId, 'other-account');
+    healthAvailable = true;
+    await sync.drainPendingSessions();
+    expect(healthWrites, hasLength(1));
+    expect(
+      prefs.getStringList(WatchCompletionSync.healthPendingKey),
+      hasLength(1),
+    );
+    await prefs.setString(SharedPreferenceConstants.userId, 'account');
+    await sync.drainPendingSessions();
+    expect(healthWrites, hasLength(2));
+    expect(prefs.getStringList(WatchCompletionSync.healthPendingKey), isEmpty);
+  });
 
   test('signed-out app leaves sessions queued', () async {
     await prefs.setBool(SharedPreferenceConstants.isLoggedIn, false);
