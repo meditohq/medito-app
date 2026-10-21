@@ -39,7 +39,7 @@ class FirebaseMessagingHandler {
   // Track if notifications are initialized
   static bool _isFlutterLocalNotificationsInitialized = false;
 
-  static bool _openTrackingRegistered = false;
+  static Future<void>? _openTrackingRegistration;
 
   // Create a channel for Android notifications
   static AndroidNotificationChannel? _channel;
@@ -111,6 +111,14 @@ class FirebaseMessagingHandler {
 
     // Channel creation is idempotent and preserves the user's channel settings.
     await androidImplementation?.createNotificationChannel(_channel!);
+    await androidImplementation?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'medito_supporter_appeal',
+        'Support Medito',
+        description: 'Occasional messages about Medito and supporting its work',
+        importance: Importance.defaultImportance,
+      ),
+    );
 
     _isFlutterLocalNotificationsInitialized = true;
   }
@@ -127,10 +135,12 @@ class FirebaseMessagingHandler {
   /// app start: it used to run only from the onboarding reminder screen, so
   /// reminder and push opens from returning users were never seen.
   /// Idempotent; onboarding calls it again harmlessly.
-  Future<void> registerOpenTracking(WidgetRef ref) async {
-    if (isMockMode || _openTrackingRegistered) return;
-    _openTrackingRegistered = true;
+  Future<void> registerOpenTracking(WidgetRef ref) {
+    if (isMockMode) return Future.value();
+    return _openTrackingRegistration ??= _registerOpenTracking(ref);
+  }
 
+  Future<void> _registerOpenTracking(WidgetRef ref) async {
     try {
       LocalNotifications.tapHandler = (response) =>
           _onLocalNotificationTap(response, ref);
@@ -138,13 +148,18 @@ class FirebaseMessagingHandler {
       // Returning users do not revisit onboarding. Receiving messages must be
       // registered at startup too, without requesting notification permission.
       await _setupFlutterNotifications();
-      _configureFirebaseMessaging(ref);
       await FirebaseMessaging.instance
           .setForegroundNotificationPresentationOptions(
             alert: true,
             badge: false,
             sound: true,
           );
+
+      // Finish fallible async setup before attaching listeners. A failed
+      // attempt can then retry without leaving duplicate message handlers.
+      final initialMessage = await FirebaseMessaging.instance
+          .getInitialMessage();
+      _configureFirebaseMessaging(ref);
 
       // A reminder fires while the app is terminated, which is the normal case
       // for a 7am notification. That tap never reaches the tap handler — it
@@ -159,8 +174,6 @@ class FirebaseMessagingHandler {
       // Same gap for push: a tap that launches the app from terminated never
       // reaches onMessageOpenedApp. Logged only — routing here would race the
       // splash screen.
-      final initialMessage = await FirebaseMessaging.instance
-          .getInitialMessage();
       if (initialMessage != null) {
         unawaited(
           _logNotificationOpen(
@@ -170,6 +183,7 @@ class FirebaseMessagingHandler {
         );
       }
     } catch (e, st) {
+      _openTrackingRegistration = null;
       AppLogger.e(
         'FIREBASE_NOTIFICATIONS',
         'Error registering notification open tracking: $e',

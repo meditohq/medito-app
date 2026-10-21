@@ -25,7 +25,13 @@ class LocalNotifications {
   /// `plugin.getNotificationAppLaunchDetails()` instead.
   static void Function(NotificationResponse response)? tapHandler;
 
-  static Future<void> ensureInitialized() => _initFuture ??= _initialize();
+  static Future<void> ensureInitialized() => _initFuture ??= _initialize()
+      .catchError((Object error, StackTrace stack) {
+        // Share an in-flight attempt, but allow the next caller to retry a
+        // transient platform failure rather than caching it for the session.
+        _initFuture = null;
+        Error.throwWithStackTrace(error, stack);
+      });
 
   /// Cancelling an optional campaign must never turn a successful donation
   /// or a settings change into an error if the OS notification service fails.
