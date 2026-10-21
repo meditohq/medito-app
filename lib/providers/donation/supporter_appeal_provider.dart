@@ -50,8 +50,9 @@ final supporterAppealProvider = FutureProvider<AppealAssignment?>((ref) async {
           ?.createNotificationChannel(
             const AndroidNotificationChannel(
               'medito_supporter_appeal',
-              'Medito notifications',
-              description: 'Occasional messages from Medito',
+              'Support Medito',
+              description:
+                  'Occasional messages about Medito and supporting its work',
               importance: Importance.defaultImportance,
             ),
           );

@@ -15,7 +15,22 @@ lifecycle, delivery guarantees and release/setup steps.
 The app backend owns campaign definitions, sticky assignments and FCM HTTP v1
 sending. The donation API continues to own prices, currencies, frequency options
 and payment-ladder assignments; no Stripe integration or donation settings change.
-The app renders the server announcement and its existing native donation page.
+The app renders the server announcement and prefers its native donation page.
+If native rendering is disabled, configuration is missing/invalid, SDK setup or
+payment methods are unavailable, or setup takes more than eight seconds, the
+same screen switches to web checkout with an immediate Close button. A native
+sheet initialization/availability failure also opens web checkout; cancellation,
+card declines and ambiguous payment errors do not trigger another checkout.
+The fallback sets `isInAppPaymentAvailable=false`, so Stripe.js handles payment
+inside the webview instead of handing it back to the unavailable native SDK.
+Campaign/source/account metadata is preserved. Bank redirects return to the
+checkout and retrieve Stripe's actual status; only succeeded payments mark the
+install as a donor. Processing payments remain pending. Publish the companion
+website changes before testing this path.
+
+Android campaign notifications use the existing `medito_supporter_appeal`
+channel (Support Medito), including foreground presentation. Creating it adds no
+new permission prompt; OS channel settings still control its visibility.
 
 The admin is `/admin/campaigns` on `paywall.meditofoundation.org` (production) or
 `test.meditofoundation.org` (preview app API). It supports drafts, audience/copy

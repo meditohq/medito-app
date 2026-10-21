@@ -149,6 +149,9 @@ class _SupporterAppealPreviewState extends State<SupporterAppealPreview> {
         }),
       },
       overrides: [
+        supporterNativeCheckoutProvider.overrideWith(
+          (ref) async => supporterPreviewConfig,
+        ),
         supporterPaywallConfigProvider.overrideWith(
           (ref) async => supporterPreviewConfig,
         ),

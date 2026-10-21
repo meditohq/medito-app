@@ -236,20 +236,39 @@ class CardPaymentService implements PaymentMethodService {
     try {
       AppLogger.d('PAYMENT', 'Presenting PaymentSheet for ${paymentIntent.id}');
 
-      await Stripe.instance.initPaymentSheet(
-        paymentSheetParameters: SetupPaymentSheetParameters(
-          paymentIntentClientSecret: paymentIntent.clientSecret,
-          merchantDisplayName: 'Medito Foundation',
-          applePay: PaymentSheetApplePay(
-            merchantCountryCode:
-                StripeConstants.applePayConfig['countryCode'] as String,
+      try {
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: paymentIntent.clientSecret,
+            merchantDisplayName: 'Medito Foundation',
+            applePay: PaymentSheetApplePay(
+              merchantCountryCode:
+                  StripeConstants.applePayConfig['countryCode'] as String,
+            ),
+            googlePay: PaymentSheetGooglePay(
+              merchantCountryCode: 'NL',
+              testEnv: kDebugMode,
+            ),
           ),
-          googlePay: PaymentSheetGooglePay(
-            merchantCountryCode: 'NL',
-            testEnv: kDebugMode,
-          ),
-        ),
-      );
+        );
+      } catch (e) {
+        if (_isCancellation(e)) rethrow;
+        // Initialization failed before the donor could submit a payment.
+        // The campaign may safely offer browser checkout instead of retrying
+        // the same unavailable native sheet.
+        final error = PaymentError(
+          type: PaymentErrorType.paymentMethodNotSupported,
+          message: 'Native payment sheet could not initialize',
+          userFriendlyMessage: 'Native checkout is unavailable on this device.',
+          technicalDetails: e.toString(),
+        );
+        paymentState.setError(error);
+        return PaymentResult.failure(
+          paymentIntentId: paymentIntent.id,
+          errorMessage: error.userFriendlyMessage,
+          error: error,
+        );
+      }
 
       AppLogger.d('PAYMENT', 'Presenting PaymentSheet');
       await Stripe.instance.presentPaymentSheet();

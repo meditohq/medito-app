@@ -23,6 +23,9 @@ import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/utils/receipt_email.dart';
+import 'package:medito/providers/donation/donation_snooze_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -36,10 +39,14 @@ class WebViewDonationScreen extends ConsumerStatefulWidget {
     super.key,
     this.source,
     this.campaignMetadata = const {},
+    this.useNativePaymentSheet = true,
+    this.showImmediateCloseButton = false,
   });
 
   final String? source;
   final Map<String, String> campaignMetadata;
+  final bool useNativePaymentSheet;
+  final bool showImmediateCloseButton;
 
   @override
   ConsumerState<WebViewDonationScreen> createState() =>
@@ -253,7 +260,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
   Future<void> _loadPaywall() async {
     final authRepository = ref.read(authRepositorySyncProvider);
-    final email = authRepository.currentUser?.email;
+    final email =
+        authRepository.currentUser?.email ??
+        ReceiptEmail.read(ref.read(sharedPreferencesProvider));
     final userId = authRepository.currentUser?.id;
     final locale = ref.read(localeProvider)?.languageCode ?? 'en';
 
@@ -275,20 +284,38 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       query.addAll(SupporterAppealExperiment(prefs).acquisitionMetadata());
     }
 
-    try {
-      final config = await ref.read(paymentConfigProvider.future);
-      query['currency'] = config.pricing.currency;
-      query['country'] = config.pricing.country;
-    } catch (e) {
-      AppLogger.w(_logTag, 'Could not load payment config: $e');
-    }
+    if (widget.useNativePaymentSheet) {
+      try {
+        final config = await ref.read(paymentConfigProvider.future);
+        query['currency'] = config.pricing.currency;
+        query['country'] = config.pricing.country;
+      } catch (e) {
+        AppLogger.w(_logTag, 'Could not load payment config: $e');
+      }
 
-    try {
-      final methods = await ref.read(availablePaymentMethodsProvider.future);
-      query['isInAppPaymentAvailable'] = methods.isNotEmpty ? 'true' : 'false';
-    } catch (e) {
-      AppLogger.w(_logTag, 'Could not load payment methods: $e');
+      try {
+        final methods = await ref.read(availablePaymentMethodsProvider.future);
+        query['isInAppPaymentAvailable'] = methods.isNotEmpty
+            ? 'true'
+            : 'false';
+      } catch (e) {
+        AppLogger.w(_logTag, 'Could not load payment methods: $e');
+        query['isInAppPaymentAvailable'] = 'false';
+      }
+    } else {
+      // Browser checkout must not initialize or call the unavailable native SDK.
       query['isInAppPaymentAvailable'] = 'false';
+      try {
+        final device = await ref.read(deviceAndAppInfoProvider.future);
+        if (device.currency case final String currency) {
+          query['currency'] = currency;
+        }
+        if (device.country case final String country) {
+          query['country'] = country;
+        }
+      } catch (_) {
+        // The web page resolves its own pricing and payment availability.
+      }
     }
 
     if (kDebugMode) query['debug'] = 'true';
@@ -316,7 +343,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     final type = data['type'] as String? ?? '';
     switch (type) {
       case 'paywall_payment_request':
-        _handlePaymentRequest(data);
+        if (widget.useNativePaymentSheet) _handlePaymentRequest(data);
+      case 'web_payment_succeeded':
+        unawaited(_handleWebPaymentSucceeded(data));
       case 'page_view':
         _handlePageView(data);
       case 'close':
@@ -381,6 +410,40 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   void _closePaywall() {
     if (!_didDonate) _logPaywallDismissedNoPayment();
     if (mounted) Navigator.of(context).pop(_didDonate);
+  }
+
+  Future<void> _handleWebPaymentSucceeded(Map<String, dynamic> data) async {
+    if (widget.useNativePaymentSheet ||
+        _didDonate ||
+        data['status'] != 'succeeded') {
+      return;
+    }
+    final id = data['payment_intent_id'];
+    final frequency = data['frequency'];
+    if (id is! String ||
+        !RegExp(r'^pi_[A-Za-z0-9]+$').hasMatch(id) ||
+        !['one_time', 'monthly', 'yearly'].contains(frequency)) {
+      return;
+    }
+    final current = Uri.tryParse(await _controller.currentUrl() ?? '');
+    final expected = Uri.parse(paywallFormUrl);
+    if (!mounted ||
+        _didDonate ||
+        current == null ||
+        current.scheme != expected.scheme ||
+        current.authority != expected.authority ||
+        !(current.path.replaceFirst(RegExp(r'/$'), '') ==
+                expected.path.replaceFirst(RegExp(r'/$'), '') ||
+            expected.path == '/' &&
+                current.path.replaceFirst(RegExp(r'/$'), '') == '/paywall')) {
+      return;
+    }
+    _didDonate = true;
+    await ref
+        .read(donationSnoozeProvider.notifier)
+        .recordDonationSuccess(
+          frequency == 'one_time' ? 'onetime' : frequency as String,
+        );
   }
 
   Future<void> _handlePaymentRequest(Map<String, dynamic> data) async {
@@ -621,11 +684,24 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
                     opacity: _isLoading ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 220),
                     curve: Curves.easeOut,
-                    child: const _PaywallSkeleton(),
+                    child: TickerMode(
+                      enabled: _isLoading,
+                      child: const _PaywallSkeleton(),
+                    ),
                   ),
                 ),
                 if (_hasLoadError) _buildErrorOverlay(),
-                if (isSmokeTestMode) _buildSmokeTestCloseButton(),
+                if (widget.showImmediateCloseButton)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: CloseButton(
+                      color: const Color(0xFF1A1A17),
+                      onPressed: _closePaywall,
+                    ),
+                  ),
+                if (isSmokeTestMode && !widget.showImmediateCloseButton)
+                  _buildSmokeTestCloseButton(),
                 // Close affordance lives in the webpage itself (delayed fade-in
                 // so users don't dismiss before they've read the page). The JS
                 // bridge posts a `close` message which _handleClose() pops.

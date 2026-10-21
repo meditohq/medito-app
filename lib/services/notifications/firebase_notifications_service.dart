@@ -316,9 +316,16 @@ class FirebaseMessagingHandler {
         body: notification.body,
         notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
-            _channel!.id,
-            _channel!.name,
-            channelDescription: _channel!.description,
+            message.data['source'] == SupporterAppealExperiment.name
+                ? 'medito_supporter_appeal'
+                : _channel!.id,
+            message.data['source'] == SupporterAppealExperiment.name
+                ? 'Support Medito'
+                : _channel!.name,
+            channelDescription:
+                message.data['source'] == SupporterAppealExperiment.name
+                ? 'Occasional messages about Medito and supporting its work'
+                : _channel!.description,
             icon: 'logo',
             channelShowBadge: false,
           ),
