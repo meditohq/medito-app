@@ -66,6 +66,7 @@ class SupporterDonationScreen extends ConsumerStatefulWidget {
 class _SupporterDonationScreenState
     extends ConsumerState<SupporterDonationScreen> {
   bool _useWeb = false;
+  bool _nativeSheetFailed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +76,7 @@ class _SupporterDonationScreenState
       return WebViewDonationScreen(
         source: 'announcement',
         campaignMetadata: widget.campaignMetadata,
-        useNativePaymentSheet: false,
+        useNativePaymentSheet: !_nativeSheetFailed,
         showImmediateCloseButton: true,
       );
     }
@@ -110,7 +111,10 @@ class _SupporterDonationScreenState
                   source: 'announcement',
                   campaignMetadata: widget.campaignMetadata,
                   showCloseButton: false,
-                  onNativeUnavailable: () => setState(() => _useWeb = true),
+                  onNativeUnavailable: () => setState(() {
+                    _nativeSheetFailed = true;
+                    _useWeb = true;
+                  }),
                   onNext: () => Navigator.of(context).pop(),
                 ),
         ),

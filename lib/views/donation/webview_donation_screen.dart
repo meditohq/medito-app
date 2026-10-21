@@ -11,6 +11,7 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
+import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
 import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
@@ -45,6 +46,8 @@ class WebViewDonationScreen extends ConsumerStatefulWidget {
 
   final String? source;
   final Map<String, String> campaignMetadata;
+
+  /// Prefer the native sheet when available; false forces browser checkout.
   final bool useNativePaymentSheet;
   final bool showImmediateCloseButton;
 
@@ -64,6 +67,8 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   bool _hasLoadError = false;
   bool _isProcessingPayment = false;
   bool _didDonate = false;
+  bool _nativeSheetAvailable = false;
+  bool _nativeSheetFailed = false;
   bool _presentedLogged = false;
   bool _dismissLogged = false;
   bool _loadOutcomeLogged = false;
@@ -284,27 +289,28 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       query.addAll(SupporterAppealExperiment(prefs).acquisitionMetadata());
     }
 
-    if (widget.useNativePaymentSheet) {
+    _nativeSheetAvailable = false;
+    if (widget.useNativePaymentSheet && !_nativeSheetFailed) {
       try {
-        final config = await ref.read(paymentConfigProvider.future);
-        query['currency'] = config.pricing.currency;
-        query['country'] = config.pricing.country;
-      } catch (e) {
-        AppLogger.w(_logTag, 'Could not load payment config: $e');
-      }
+        Future<bool> resolveNativeSheet() async {
+          final config = await ref.read(paymentConfigProvider.future);
+          query['currency'] = config.pricing.currency;
+          query['country'] = config.pricing.country;
+          final methods = await ref.read(
+            availablePaymentMethodsProvider.future,
+          );
+          return methods.any((method) => method.isAvailable);
+        }
 
-      try {
-        final methods = await ref.read(availablePaymentMethodsProvider.future);
-        query['isInAppPaymentAvailable'] = methods.isNotEmpty
-            ? 'true'
-            : 'false';
+        _nativeSheetAvailable = await resolveNativeSheet().timeout(
+          const Duration(seconds: 8),
+        );
       } catch (e) {
-        AppLogger.w(_logTag, 'Could not load payment methods: $e');
-        query['isInAppPaymentAvailable'] = 'false';
+        AppLogger.w(_logTag, 'Native payment sheet unavailable: $e');
       }
-    } else {
-      // Browser checkout must not initialize or call the unavailable native SDK.
-      query['isInAppPaymentAvailable'] = 'false';
+    }
+    query['isInAppPaymentAvailable'] = _nativeSheetAvailable ? 'true' : 'false';
+    if (!_nativeSheetAvailable) {
       try {
         final device = await ref.read(deviceAndAppInfoProvider.future);
         if (device.currency case final String currency) {
@@ -343,7 +349,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     final type = data['type'] as String? ?? '';
     switch (type) {
       case 'paywall_payment_request':
-        if (widget.useNativePaymentSheet) _handlePaymentRequest(data);
+        if (_nativeSheetAvailable) _handlePaymentRequest(data);
       case 'web_payment_succeeded':
         unawaited(_handleWebPaymentSucceeded(data));
       case 'page_view':
@@ -413,9 +419,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   }
 
   Future<void> _handleWebPaymentSucceeded(Map<String, dynamic> data) async {
-    if (widget.useNativePaymentSheet ||
-        _didDonate ||
-        data['status'] != 'succeeded') {
+    if (_nativeSheetAvailable || _didDonate || data['status'] != 'succeeded') {
       return;
     }
     final id = data['payment_intent_id'];
@@ -493,9 +497,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         : authRepository.currentUser?.email;
 
     final paymentConfig = await ref.read(paymentConfigProvider.future);
-    final availableMethods = await ref.read(
+    final availableMethods = (await ref.read(
       availablePaymentMethodsProvider.future,
-    );
+    )).where((method) => method.isAvailable).toList();
 
     if (availableMethods.isEmpty) {
       AppLogger.w(_logTag, 'no native payment methods available');
@@ -573,8 +577,19 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       case PaymentSuccess():
         _didDonate = true;
         _notifyJsResult(status: 'success');
-      case PaymentFailure(:final errorMessage):
-        _notifyJsResult(status: 'error', message: errorMessage);
+      case PaymentFailure(:final errorMessage, :final error):
+        if (mounted &&
+            [
+              PaymentErrorType.paymentMethodNotSupported,
+              PaymentErrorType.applePayNotAvailable,
+              PaymentErrorType.googlePayNotAvailable,
+            ].contains(error?.type)) {
+          _nativeSheetFailed = true;
+          _nativeSheetAvailable = false;
+          _startLoad();
+        } else {
+          _notifyJsResult(status: 'error', message: errorMessage);
+        }
       case PaymentCancelled():
         _notifyJsResult(status: 'cancelled');
     }

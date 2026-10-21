@@ -305,7 +305,7 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
   testWidgets(
-    'config/SDK failures, disabled native and missing methods open real browser checkout',
+    'web page keeps native sheet unless SDK setup or payment methods are unavailable',
     (tester) async {
       for (final reason in [
         'config',
@@ -346,11 +346,11 @@ void main() {
         final screen = tester.widget<WebViewDonationScreen>(
           find.byType(WebViewDonationScreen),
         );
-        expect(screen.useNativePaymentSheet, isFalse);
+        expect(screen.useNativePaymentSheet, isTrue);
         expect(screen.showImmediateCloseButton, isTrue);
         expect(
           web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
-          'false',
+          ['setup', 'methods'].contains(reason) ? 'false' : 'true',
         );
         expect(
           web.controller.loaded!.queryParameters['source'],
@@ -361,14 +361,18 @@ void main() {
           'support_medito_june_copy_v1',
         );
         expect(payments.requests, isEmpty);
-        // A stale/erroneous native request cannot re-enter the failed SDK.
+        // The web page can still use the native sheet when it is available.
         web.controller.channel!.onMessageReceived(
           const JavaScriptMessage(
-            message: '{"type":"paywall_payment_request","amount":700}',
+            message:
+                '{"type":"paywall_payment_request","amount":700,"frequency":"monthly"}',
           ),
         );
         await tester.pumpAndSettle();
-        expect(payments.requests, isEmpty);
+        expect(
+          payments.requests.length,
+          ['setup', 'methods'].contains(reason) ? 0 : 1,
+        );
         await tester.pumpWidget(const SizedBox());
       }
     },
@@ -403,6 +407,66 @@ void main() {
           type == PaymentErrorType.paymentMethodNotSupported
               ? findsOneWidget
               : findsNothing,
+        );
+        if (type == PaymentErrorType.paymentMethodNotSupported) {
+          expect(
+            tester
+                .widget<WebViewDonationScreen>(
+                  find.byType(WebViewDonationScreen),
+                )
+                .useNativePaymentSheet,
+            isFalse,
+          );
+          expect(
+            web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
+            'false',
+          );
+        }
+        await tester.pumpWidget(const SizedBox());
+      }
+    },
+  );
+
+  testWidgets(
+    'web page switches to browser only after a native availability failure',
+    (tester) async {
+      for (final type in [
+        null,
+        PaymentErrorType.cardDeclined,
+        PaymentErrorType.paymentMethodNotSupported,
+      ]) {
+        final payments = _CapturePaymentUI();
+        if (type != null) {
+          payments.result = PaymentResult.failure(
+            errorMessage: 'Test error',
+            error: PaymentError(
+              type: type,
+              message: 'Test',
+              userFriendlyMessage: 'Test',
+            ),
+          );
+        }
+        await pump(
+          tester,
+          value: config(),
+          payments: payments,
+          configFailure: true,
+        );
+        expect(
+          web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
+          'true',
+        );
+        web.controller.channel!.onMessageReceived(
+          const JavaScriptMessage(
+            message:
+                '{"type":"paywall_payment_request","amount":700,"frequency":"monthly"}',
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(payments.requests.length, 1);
+        expect(
+          web.controller.loaded!.queryParameters['isInAppPaymentAvailable'],
+          type == PaymentErrorType.paymentMethodNotSupported ? 'false' : 'true',
         );
         await tester.pumpWidget(const SizedBox());
       }
