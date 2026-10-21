@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
@@ -449,7 +450,19 @@ class FirebaseAnalyticsService {
           true;
 
       if (analyticsEnabled && _analytics != null) {
-        await _analytics.logEvent(name: name, parameters: parameters);
+        final isDonation = {
+          AnalyticsEventConstants.donationMonthly,
+          AnalyticsEventConstants.donationYearly,
+          AnalyticsEventConstants.donationOnetime,
+        }.contains(name);
+        await _analytics.logEvent(
+          name: name,
+          parameters: {
+            if (isDonation)
+              ...SupporterAppealExperiment(prefs).paymentMetadata(),
+            ...?parameters,
+          },
+        );
       } else if (kDebugMode && !analyticsEnabled) {
         AppLogger.d(
           'FIREBASE_ANALYTICS',

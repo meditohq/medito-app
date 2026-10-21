@@ -9,6 +9,7 @@ import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
+import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:medito/providers/onboarding/onboarding_donation_timing_experiment.dart';
 import 'package:medito/utils/currency.dart';
 import 'package:medito/utils/logger.dart';
@@ -235,20 +236,39 @@ class CardPaymentService implements PaymentMethodService {
     try {
       AppLogger.d('PAYMENT', 'Presenting PaymentSheet for ${paymentIntent.id}');
 
-      await Stripe.instance.initPaymentSheet(
-        paymentSheetParameters: SetupPaymentSheetParameters(
-          paymentIntentClientSecret: paymentIntent.clientSecret,
-          merchantDisplayName: 'Medito Foundation',
-          applePay: PaymentSheetApplePay(
-            merchantCountryCode:
-                StripeConstants.applePayConfig['countryCode'] as String,
+      try {
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: paymentIntent.clientSecret,
+            merchantDisplayName: 'Medito Foundation',
+            applePay: PaymentSheetApplePay(
+              merchantCountryCode:
+                  StripeConstants.applePayConfig['countryCode'] as String,
+            ),
+            googlePay: PaymentSheetGooglePay(
+              merchantCountryCode: 'NL',
+              testEnv: kDebugMode,
+            ),
           ),
-          googlePay: PaymentSheetGooglePay(
-            merchantCountryCode: 'NL',
-            testEnv: kDebugMode,
-          ),
-        ),
-      );
+        );
+      } catch (e) {
+        if (_isCancellation(e)) rethrow;
+        // Initialization failed before the donor could submit a payment.
+        // The campaign may safely offer browser checkout instead of retrying
+        // the same unavailable native sheet.
+        final error = PaymentError(
+          type: PaymentErrorType.paymentMethodNotSupported,
+          message: 'Native payment sheet could not initialize',
+          userFriendlyMessage: 'Native checkout is unavailable on this device.',
+          technicalDetails: e.toString(),
+        );
+        paymentState.setError(error);
+        return PaymentResult.failure(
+          paymentIntentId: paymentIntent.id,
+          errorMessage: error.userFriendlyMessage,
+          error: error,
+        );
+      }
 
       AppLogger.d('PAYMENT', 'Presenting PaymentSheet');
       await Stripe.instance.presentPaymentSheet();
@@ -484,6 +504,7 @@ class OneTimePaymentController extends _$OneTimePaymentController {
     String? experimentVariant,
     String? paywallSource,
     String? paywallId,
+    Map<String, String> campaignMetadata = const {},
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -510,6 +531,14 @@ class OneTimePaymentController extends _$OneTimePaymentController {
         ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
+        ...SupporterAppealExperiment(
+          ref.read(sharedPreferencesProvider),
+        ).paymentMetadata(),
+        if (campaignMetadata.isNotEmpty)
+          ...SupporterAppealExperiment(
+            ref.read(sharedPreferencesProvider),
+          ).acquisitionMetadata(),
+        ...campaignMetadata,
       };
 
       final request = PaymentIntentRequest(
@@ -582,6 +611,7 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
     String? experimentVariant,
     String? paywallSource,
     String? paywallId,
+    Map<String, String> campaignMetadata = const {},
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -608,6 +638,14 @@ class MonthlySubscriptionController extends _$MonthlySubscriptionController {
         ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
+        ...SupporterAppealExperiment(
+          ref.read(sharedPreferencesProvider),
+        ).paymentMetadata(),
+        if (campaignMetadata.isNotEmpty)
+          ...SupporterAppealExperiment(
+            ref.read(sharedPreferencesProvider),
+          ).acquisitionMetadata(),
+        ...campaignMetadata,
       };
 
       final request = PaymentIntentRequest(
@@ -682,6 +720,7 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
     String? experimentVariant,
     String? paywallSource,
     String? paywallId,
+    Map<String, String> campaignMetadata = const {},
   }) async {
     final paymentState = ref.read(paymentStateProvider.notifier);
     paymentState.reset();
@@ -708,6 +747,14 @@ class YearlySubscriptionController extends _$YearlySubscriptionController {
         ...EndScreenDonationExperiment.paymentMetadata(
           ref.read(sharedPreferencesProvider),
         ),
+        ...SupporterAppealExperiment(
+          ref.read(sharedPreferencesProvider),
+        ).paymentMetadata(),
+        if (campaignMetadata.isNotEmpty)
+          ...SupporterAppealExperiment(
+            ref.read(sharedPreferencesProvider),
+          ).acquisitionMetadata(),
+        ...campaignMetadata,
       };
 
       final request = PaymentIntentRequest(

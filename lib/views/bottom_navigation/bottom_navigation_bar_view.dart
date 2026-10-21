@@ -1,6 +1,8 @@
 import 'package:medito/widgets/adaptive/adaptive_content.dart';
 import 'package:medito/views/bottom_navigation/widgets/medito_sidebar.dart';
 import 'dart:async';
+import 'package:medito/services/notifications/supporter_campaign_navigation.dart';
+import 'package:medito/providers/donation/supporter_appeal_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,7 +55,12 @@ class _BottomNavigationBarViewState
     final saved = prefs.getInt(SharedPreferenceConstants.lastMainTabIndex) ?? 0;
     // Only Home/Explore are restored on launch; never open straight into
     // Search or Settings.
-    _currentPageIndex = saved <= _exploreIndex ? saved : _homeIndex;
+    _currentPageIndex = SupporterAppealRuntime.consumeHomeRequest()
+        ? _homeIndex
+        : saved <= _exploreIndex
+        ? saved
+        : _homeIndex;
+    SupporterAppealRuntime.homeRequested.addListener(_openAppealHome);
     _pages = [
       const HomeView(),
       ExploreView(key: _exploreViewKey),
@@ -74,8 +81,16 @@ class _BottomNavigationBarViewState
     }
   }
 
+  void _openAppealHome() {
+    if (!mounted || !SupporterAppealRuntime.consumeHomeRequest()) return;
+    ref.invalidate(supporterAppealProvider);
+    _onDestinationSelected(_homeIndex);
+    revealSupporterCampaignHome(context);
+  }
+
   @override
   void dispose() {
+    SupporterAppealRuntime.homeRequested.removeListener(_openAppealHome);
     PendingEndScreen.completions.removeListener(_restorePendingEndScreen);
     super.dispose();
   }

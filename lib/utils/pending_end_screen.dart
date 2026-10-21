@@ -61,6 +61,20 @@ class PendingEndScreen {
     if (_livePlayers > 0) _livePlayers--;
   }
 
+  static int _liveEndScreens = 0;
+
+  /// The player or its end screen is open. Closing either from outside (e.g.
+  /// a notification tap returning to Home) would stop the meditation or lose
+  /// its summary, so callers must leave them in place.
+  static bool get hasLiveSessionScreen =>
+      _livePlayers > 0 || _liveEndScreens > 0;
+
+  static void endScreenMounted() => _liveEndScreens++;
+
+  static void endScreenUnmounted() {
+    if (_liveEndScreens > 0) _liveEndScreens--;
+  }
+
   static Future<void> start(
     SharedPreferences prefs,
     PlaybackRequest request,

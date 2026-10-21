@@ -40,6 +40,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? variantId,
     String? experimentId,
     VoidCallback? onSuccess,
+    Map<String, String> campaignMetadata = const {},
   }) async {
     try {
       final me = await ref.read(meProvider.future);
@@ -57,6 +58,7 @@ class PaymentUIController extends _$PaymentUIController {
         experimentVariant: variantId,
         paywallSource: paywallSource,
         paywallId: paywallId,
+        campaignMetadata: campaignMetadata,
       );
 
       if (context.mounted) {
@@ -98,6 +100,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? variantId,
     String? experimentId,
     VoidCallback? onSuccess,
+    Map<String, String> campaignMetadata = const {},
   }) async {
     try {
       final me = await ref.read(meProvider.future);
@@ -115,6 +118,7 @@ class PaymentUIController extends _$PaymentUIController {
         experimentVariant: variantId,
         paywallSource: paywallSource,
         paywallId: paywallId,
+        campaignMetadata: campaignMetadata,
       );
 
       if (context.mounted) {
@@ -160,6 +164,7 @@ class PaymentUIController extends _$PaymentUIController {
     String? variantId,
     String? experimentId,
     VoidCallback? onSuccess,
+    Map<String, String> campaignMetadata = const {},
   }) async {
     try {
       final me = await ref.read(meProvider.future);
@@ -177,6 +182,7 @@ class PaymentUIController extends _$PaymentUIController {
         experimentVariant: variantId,
         paywallSource: paywallSource,
         paywallId: paywallId,
+        campaignMetadata: campaignMetadata,
       );
 
       if (context.mounted) {
