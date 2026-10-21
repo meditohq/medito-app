@@ -3020,4 +3020,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sessionBellEnd => 'End';
+
+  @override
+  String get downloadAll => 'Download all';
+
+  @override
+  String downloadingPack(int completed, int total) {
+    return 'Downloading $completed of $total';
+  }
+
+  @override
+  String get stopDownloading => 'Stop downloading';
+
+  @override
+  String get deletePackDownloads => 'Delete downloads';
+
+  @override
+  String get packDownloadsDeleted => 'Downloads removed';
+
+  @override
+  String get allDownloaded => 'All sessions downloaded';
+
+  @override
+  String get overflowMenu => 'More options';
 }

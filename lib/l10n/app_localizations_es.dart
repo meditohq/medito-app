@@ -3075,4 +3075,27 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get sessionBellEnd => 'Final';
+
+  @override
+  String get downloadAll => 'Descargar todo';
+
+  @override
+  String downloadingPack(int completed, int total) {
+    return 'Descargando $completed de $total';
+  }
+
+  @override
+  String get stopDownloading => 'Detener descarga';
+
+  @override
+  String get deletePackDownloads => 'Eliminar descargas';
+
+  @override
+  String get packDownloadsDeleted => 'Descargas eliminadas';
+
+  @override
+  String get allDownloaded => 'Todas las sesiones descargadas';
+
+  @override
+  String get overflowMenu => 'Más opciones';
 }

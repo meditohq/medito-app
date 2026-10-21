@@ -2244,5 +2244,41 @@
   "sessionBellEveryMinuteDescription": "A bell at the beginning, every minute and at the end",
   "sessionBellBeginning": "Beginning",
   "sessionBellMiddle": "Middle",
-  "sessionBellEnd": "End"
+  "sessionBellEnd": "End",
+  "downloadAll": "Download all",
+  "@downloadAll": {
+    "description": "Option to download all sessions in a pack"
+  },
+  "downloadingPack": "Downloading {completed} of {total}",
+  "@downloadingPack": {
+    "description": "Status text while batch downloading tracks in a pack",
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "stopDownloading": "Stop downloading",
+  "@stopDownloading": {
+    "description": "Action to cancel ongoing pack downloads"
+  },
+  "deletePackDownloads": "Delete downloads",
+  "@deletePackDownloads": {
+    "description": "Action to remove downloaded files for a pack"
+  },
+  "packDownloadsDeleted": "Downloads removed",
+  "@packDownloadsDeleted": {
+    "description": "Snackbar confirming downloaded files for the pack were removed"
+  },
+  "allDownloaded": "All sessions downloaded",
+  "@allDownloaded": {
+    "description": "Status text when all tracks in a pack are downloaded"
+  },
+  "overflowMenu": "More options",
+  "@overflowMenu": {
+    "description": "Accessibility label for the overflow menu button on the pack screen"
+  }
 }

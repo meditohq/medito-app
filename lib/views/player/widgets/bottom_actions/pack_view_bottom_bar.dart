@@ -1,22 +1,22 @@
-import 'package:medito/constants/colors/color_constants.dart';
+import 'dart:async';
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:io' show Platform;
+import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/icons/medito_icons.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
+import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/models/favorites/favorite_item.dart';
+import 'package:medito/models/pack/pack_model.dart';
+import 'package:medito/providers/favorites/favorites_provider.dart';
+import 'package:medito/providers/providers.dart';
+import 'package:medito/scaffold_messenger_key.dart';
+import 'package:medito/widgets/add_to_siri_util.dart';
+import 'package:medito/widgets/medito_icon.dart';
+import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:medito/constants/icons/medito_icons.dart';
-import 'dart:async';
-import 'package:medito/constants/strings/analytics_event_constants.dart';
-import 'package:medito/providers/providers.dart';
-
-import '../../../../l10n/app_localizations.dart';
-import '../../../../models/favorites/favorite_item.dart';
-import '../../../../models/pack/pack_model.dart';
-import '../../../../providers/favorites/favorites_provider.dart';
-import '../../../../widgets/add_to_siri_util.dart';
-import '../../../../widgets/medito_icon.dart';
-import '../../../../scaffold_messenger_key.dart';
-import '../../../../widgets/snackbar_widget.dart';
 import 'animated_favourite_icon.dart';
 import 'bottom_action_bar.dart';
 
@@ -53,63 +53,172 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
     SharePlus.instance.share(ShareParams(text: shareText));
   }
 
-  void _showBottomSheet(BuildContext context) {
+  void _showOverflowMenu(BuildContext context, PackModel pack) {
     showModalBottomSheet(
       showDragHandle: true,
       context: context,
       backgroundColor: Theme.of(context).bottomSheetTheme.backgroundColor,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (Platform.isIOS)
-              _buildBottomSheetTile(
-                context,
-                iconAsset: MeditoIcons.siri,
-                title: AppLocalizations.of(context)!.addToSiri,
-                onTap: () {
-                  addToSiri(
-                    title:
-                        '${AppLocalizations.of(context)!.open} ${widget.packName}',
-                    id: widget.packId,
-                    url: 'org.meditofoundation://packs/${widget.packId}',
-                  );
-                  Navigator.pop(context);
-                },
+      builder: (bottomSheetContext) {
+        return Consumer(
+          builder: (consumerContext, ref, _) {
+            final batchState = ref.watch(batchDownloadProvider);
+            final downloadedTracks =
+                ref.watch(downloadedTracksProvider).asData?.value ?? [];
+            final isFullyDownloaded = pack.isFullyDownloaded(downloadedTracks);
+            final isDownloading = batchState.isPackDownloading(widget.packId);
+            final l10n = AppLocalizations.of(consumerContext)!;
+
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isDownloading) ...[
+                    ListTile(
+                      leading: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          value: batchState.total > 0
+                              ? batchState.completed / batchState.total
+                              : null,
+                          color: consumerContext.brandAccent,
+                        ),
+                      ),
+                      title: Text(
+                        l10n.downloadingPack(
+                          batchState.completed,
+                          batchState.total,
+                        ),
+                        style: TextStyle(
+                          color:
+                              Theme.of(consumerContext).colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    _buildBottomSheetTile(
+                      consumerContext,
+                      iconWidget: Icon(
+                        Icons.stop_circle_outlined,
+                        color: Theme.of(consumerContext).colorScheme.error,
+                        size: 20,
+                      ),
+                      title: l10n.stopDownloading,
+                      textColor: Theme.of(consumerContext).colorScheme.error,
+                      onTap: () {
+                        ref
+                            .read(batchDownloadProvider.notifier)
+                            .cancelDownload();
+                        Navigator.pop(bottomSheetContext);
+                      },
+                    ),
+                  ] else if (isFullyDownloaded) ...[
+                    ListTile(
+                      leading: MeditoIcon(
+                        assetName: MeditoIcons.checkCircleSolid,
+                        color: consumerContext.brandAccent,
+                        size: 20,
+                      ),
+                      title: Text(
+                        l10n.allDownloaded,
+                        style: TextStyle(
+                          color:
+                              Theme.of(consumerContext).colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    _buildBottomSheetTile(
+                      consumerContext,
+                      iconWidget: Icon(
+                        Icons.delete_outline,
+                        color: Theme.of(consumerContext).colorScheme.error,
+                        size: 20,
+                      ),
+                      title: l10n.deletePackDownloads,
+                      textColor: Theme.of(consumerContext).colorScheme.error,
+                      onTap: () async {
+                        Navigator.pop(bottomSheetContext);
+                        await ref
+                            .read(batchDownloadProvider.notifier)
+                            .deletePackDownloads(pack);
+                        if (context.mounted) {
+                          scaffoldMessengerKey.currentState
+                              ?.hideCurrentSnackBar();
+                          showSnackBar(context, l10n.packDownloadsDeleted);
+                        }
+                      },
+                    ),
+                  ] else ...[
+                    _buildBottomSheetTile(
+                      consumerContext,
+                      iconAsset: MeditoIcons.downloadCircleNew,
+                      title: l10n.downloadAll,
+                      onTap: () {
+                        Navigator.pop(bottomSheetContext);
+                        ref
+                            .read(batchDownloadProvider.notifier)
+                            .startPackDownload(pack);
+                      },
+                    ),
+                  ],
+                  if (Platform.isIOS)
+                    _buildBottomSheetTile(
+                      consumerContext,
+                      iconAsset: MeditoIcons.siri,
+                      title: l10n.addToSiri,
+                      onTap: () {
+                        addToSiri(
+                          title: '${l10n.open} ${widget.packName}',
+                          id: widget.packId,
+                          url: 'org.meditofoundation://packs/${widget.packId}',
+                        );
+                        Navigator.pop(bottomSheetContext);
+                      },
+                    ),
+                  _buildBottomSheetTile(
+                    consumerContext,
+                    iconAsset: Platform.isIOS
+                        ? MeditoIcons.shareIos
+                        : MeditoIcons.shareAndroid,
+                    title: l10n.share,
+                    onTap: () {
+                      Navigator.pop(bottomSheetContext);
+                      _sharePack(context);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
-            _buildBottomSheetTile(
-              context,
-              iconAsset: Platform.isIOS
-                  ? MeditoIcons.shareIos
-                  : MeditoIcons.shareAndroid,
-              title: AppLocalizations.of(context)!.share,
-              onTap: () {
-                _sharePack(context);
-                Navigator.pop(context);
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 
   ListTile _buildBottomSheetTile(
     BuildContext context, {
-    required String iconAsset,
+    String? iconAsset,
+    Widget? iconWidget,
     required String title,
+    Color? textColor,
     required VoidCallback onTap,
   }) {
+    final defaultColor = Theme.of(context).colorScheme.onSurface;
     return ListTile(
-      leading: MeditoIcon(
-        assetName: iconAsset,
-        color: Theme.of(context).colorScheme.onSurface,
-        size: 20,
-      ),
+      leading: iconWidget ??
+          (iconAsset != null
+              ? MeditoIcon(
+                  assetName: iconAsset,
+                  color: textColor ?? defaultColor,
+                  size: 20,
+                )
+              : null),
       title: Text(
         title,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+        style: TextStyle(color: textColor ?? defaultColor),
       ),
       onTap: onTap,
     );
@@ -162,6 +271,7 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
   Widget build(BuildContext context) {
     final packData = ref.watch(packProvider(packId: widget.packId));
     final favoritesState = ref.watch(favoritesNotifierProvider);
+    final batchState = ref.watch(batchDownloadProvider);
 
     return packData.when(
       data: (pack) {
@@ -170,7 +280,7 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
               favorites.any((item) => item.id == widget.packId),
           orElse: () => false,
         );
-        return _buildBottomBar(context, pack, isFavorite);
+        return _buildBottomBar(context, pack, isFavorite, batchState);
       },
       loading: () => const SizedBox.shrink(),
       error: (_, _) => const SizedBox.shrink(),
@@ -181,12 +291,14 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
     BuildContext context,
     PackModel pack,
     bool isFavorite,
+    BatchDownloadState batchState,
   ) {
     final favouriteColour = isFavorite
         ? context.brandAccent
         : Theme.of(context).colorScheme.onSurface;
 
     final l10n = AppLocalizations.of(context)!;
+    final isDownloading = batchState.isPackDownloading(widget.packId);
 
     return BottomActionBar(
       layout: BottomActionBarLayout.compactRight,
@@ -205,12 +317,10 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
               : MeditoIcons.shareAndroid,
           color: Theme.of(context).colorScheme.onSurface,
         ),
-        onTap: Platform.isIOS
-            ? () => _showBottomSheet(context)
-            : () => _sharePack(context),
+        onTap: () => _sharePack(context),
         semanticLabel: l10n.share,
       ),
-      rightItem: BottomActionBarItem(
+      leftCenterItem: BottomActionBarItem(
         child: AnimatedFavouriteIcon(
           isFavorite: isFavorite,
           color: favouriteColour,
@@ -220,6 +330,26 @@ class _PackViewBottomBarState extends ConsumerState<PackViewBottomBar> {
             ? l10n.removeFromFavorites
             : l10n.addToFavorites,
         onTap: () => _toggleFavorite(isFavorite, pack),
+      ),
+      rightItem: BottomActionBarItem(
+        child: isDownloading
+            ? SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  value: batchState.total > 0
+                      ? batchState.completed / batchState.total
+                      : null,
+                  color: context.brandAccent,
+                ),
+              )
+            : Icon(
+                Icons.more_vert,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+        onTap: () => _showOverflowMenu(context, pack),
+        semanticLabel: l10n.overflowMenu,
       ),
     );
   }
