@@ -102,6 +102,7 @@ class _CapturePaymentUI extends PaymentUIController {
     String? variantId,
     String? experimentId,
     VoidCallback? onSuccess,
+    bool showSuccessFeedback = true,
     Map<String, String> campaignMetadata = const {},
   }) async {
     requests.add({
@@ -129,6 +130,7 @@ class _CapturePaymentUI extends PaymentUIController {
     String? variantId,
     String? experimentId,
     VoidCallback? onSuccess,
+    bool showSuccessFeedback = true,
     Map<String, String> campaignMetadata = const {},
   }) async {
     requests.add({

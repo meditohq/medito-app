@@ -535,7 +535,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
-          onSuccess: () {},
+          showSuccessFeedback: false,
         );
       case 'yearly':
         result = await uiController.initiateYearlySubscription(
@@ -550,7 +550,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
-          onSuccess: () {},
+          showSuccessFeedback: false,
         );
       case 'one_time':
       default:
@@ -566,7 +566,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
-          onSuccess: () {},
+          showSuccessFeedback: false,
         );
     }
 

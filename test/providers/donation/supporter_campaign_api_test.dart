@@ -14,10 +14,12 @@ class _Client extends HttpApiService {
   final calls = <Map<String, dynamic>>[];
   Map<String, dynamic>? assignment;
   Completer<void>? responseGate;
+  Completer<void>? eventGate;
   @override
   Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async {
     calls.add({'path': path, 'body': body});
     await responseGate?.future;
+    if (path.endsWith('/events')) await eventGate?.future;
     return {'assignment': assignment};
   }
 }
@@ -37,6 +39,41 @@ void main() {
     'announcement': 'Server copy',
     'cta_title': 'Donate now',
   };
+  test('a slow open event does not delay a freshly validated card', () async {
+    SharedPreferences.setMockInitialValues({
+      SharedPreferenceConstants.userId: 'test-user',
+      SharedPreferenceConstants.analyticsFirebaseEnabled: true,
+    });
+    final prefs = await SharedPreferences.getInstance(), client = _Client();
+    final now = DateTime.now();
+    final assignment = serverAssignment(now);
+    client.assignment = assignment;
+    client.eventGate = Completer<void>();
+    await prefs.setString(
+      SupporterAppealExperiment.pendingOpenKey,
+      jsonEncode({
+        'user_id': 'test-user',
+        'at': now.millisecondsSinceEpoch,
+        'payload': {
+          'source': SupporterAppealExperiment.name,
+          'appeal_id': assignment['id'],
+          'campaign_id': assignment['campaign_id'],
+          'variant_id': 'B',
+        },
+      }),
+    );
+    final card = await loadSupporterAppeal(
+      prefs: prefs,
+      api: SupporterCampaignApi(client),
+      permissionGranted: true,
+    ).timeout(const Duration(seconds: 1));
+    expect(card?.id, assignment['id']);
+    expect(client.eventGate!.isCompleted, isFalse);
+    expect(client.calls.any((c) => c['path'].endsWith('/events')), isTrue);
+    client.eventGate!.complete();
+    await Future<void>.delayed(Duration.zero);
+  });
+
   test(
     'sync sends preferences and reminder snapshot, never admin credentials or local history',
     () async {
