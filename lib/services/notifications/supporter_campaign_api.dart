@@ -23,6 +23,11 @@ class SupporterCampaignApi {
             permissionGranted &&
             prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ==
                 true,
+        'campaign_push_opt_in':
+            prefs.getBool(
+              SharedPreferenceConstants.supporterCampaignPushOptIn,
+            ) ==
+            true,
         'donor_suppressed':
             prefs.getInt(
               SharedPreferenceConstants.lastSuccessfulDonationAtMs,

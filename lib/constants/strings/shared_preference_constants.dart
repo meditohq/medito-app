@@ -46,6 +46,9 @@ class SharedPreferenceConstants {
 
   // Daily reminders
   static const String dailyReminderEnabled = 'daily_reminder_enabled';
+  // Separate, explicit consent; never inferred from reminder/OS permission.
+  static const String supporterCampaignPushOptIn =
+      'supporter_campaign_push_opt_in_v1';
   static const String reminderPromptDismissedForever =
       'reminder_prompt_dismissed_forever';
   static const String notifPermissionFixNeeded = 'notif_permission_fix_needed';

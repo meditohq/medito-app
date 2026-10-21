@@ -2244,5 +2244,7 @@
   "sessionBellEveryMinuteDescription": "A bell at the beginning, every minute and at the end",
   "sessionBellBeginning": "Beginning",
   "sessionBellMiddle": "Middle",
-  "sessionBellEnd": "End"
+  "sessionBellEnd": "End",
+  "supporterNotificationsTitle": "Supporter notifications",
+  "supporterNotificationsDescription": "Allow occasional Medito updates and donation requests. You can turn these off here at any time. Daily reminders and notification permission must also be enabled."
 }

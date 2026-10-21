@@ -5493,6 +5493,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End'**
   String get sessionBellEnd;
+
+  /// No description provided for @supporterNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Supporter notifications'**
+  String get supporterNotificationsTitle;
+
+  /// No description provided for @supporterNotificationsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow occasional Medito updates and donation requests. You can turn these off here at any time. Daily reminders and notification permission must also be enabled.'**
+  String get supporterNotificationsDescription;
 }
 
 class _AppLocalizationsDelegate

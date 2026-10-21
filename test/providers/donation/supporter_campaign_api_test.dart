@@ -55,6 +55,7 @@ void main() {
       );
       final body = client.calls.single['body'] as Map;
       expect(body['push_allowed'], isTrue);
+      expect(body['campaign_push_opt_in'], isFalse);
       expect(body['donor_suppressed'], isTrue);
       expect(body['reminder_hour'], 18);
       expect(body['reminder_minute'], 30);
@@ -218,6 +219,27 @@ void main() {
         prefs.getString(SupporterAppealExperiment.pendingOpenKey),
         replacement,
       );
+    },
+  );
+  test(
+    'explicit supporter consent is synced independently and can be withdrawn',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        SharedPreferenceConstants.dailyReminderEnabled: true,
+        SharedPreferenceConstants.supporterCampaignPushOptIn: true,
+      });
+      final prefs = await SharedPreferences.getInstance(), client = _Client();
+      final api = SupporterCampaignApi(client);
+      await api.sync(prefs, permissionGranted: true);
+      expect(client.calls.last['body']['campaign_push_opt_in'], isTrue);
+      expect(client.calls.last['body']['push_allowed'], isTrue);
+      await prefs.setBool(
+        SharedPreferenceConstants.supporterCampaignPushOptIn,
+        false,
+      );
+      await api.sync(prefs, permissionGranted: true);
+      expect(client.calls.last['body']['campaign_push_opt_in'], isFalse);
+      expect(client.calls.last['body']['push_allowed'], isTrue);
     },
   );
 }

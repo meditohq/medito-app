@@ -41,9 +41,13 @@ subgroup reporting; unknown stays unknown.
 All eligible users, including notification-denied users, are randomized once.
 Notification eligibility is saved at assignment; denied users remain in their
 assigned group and can see the B/C card. New push attempts require registered
-OS/reminder preference, a token and no donor/snooze/dismissal suppression.
-The phone's current enabled-reminder preference is the conservative push opt-in.
-New permission prompts are not triggered. Preferences sync at Home/resume,
+OS/reminder preference, explicit supporter-notification consent, a token and no
+donor/snooze/dismissal suppression. The separate Settings switch starts off and
+clearly covers donation requests, with an off switch on the same screen. Existing
+reminder or OS permission never implies consent. Sign-out/deletion clears the
+local opt-in. Authenticated server signout also revokes campaign consent for that
+account; offline signout cannot recall already accepted pushes or reach the server.
+New OS permission prompts are not triggered. Preferences sync at Home/resume,
 donation/snooze and reminder changes. Dismissal retries through ordinary sync.
 
 Known local donations and the legacy `has_active_subscription` profile flag
@@ -70,9 +74,15 @@ Minute cron: enroll <=100 users per run up to the campaign participant cap,
 then attempt <=50 queued B/C sends. This is a rollout over time, not a single
 instant simultaneous blast. The campaign window is at most seven days; a later
 campaign respects a global >=30-day assignment cooldown (including controls).
-UTC send windows are configured from the admin's local-time inputs. There is no
-time-of-day experiment or collision avoidance with local daily reminders.
-Reminder hour/minute/offset are last-sync snapshots for later observational work.
+UTC campaign windows are configured from the admin's local-time inputs. Within
+that window, new push attempts run only from 09:00 to 21:00 using each device's
+latest synced UTC offset. Quiet recipients remain pending and are filtered before
+the 50-recipient batch limit; they cannot block daytime recipients. Provider TTL
+is capped at the local closing time with a 15-second request margin, and new
+claims stop 16 seconds before closing. Offset changes are rechecked at claim.
+Offsets are snapshots: travel or daylight-saving changes after the latest sync
+can make them stale until the next Home/resume/settings sync. This does not
+randomize time of day or avoid collisions with daily reminders.
 
 Each outbound call is preceded by an atomic D1 `pending -> sending` claim with
 live campaign, recipient and dismissal checks. Captured token hashes must still
@@ -99,9 +109,9 @@ be attributed. The source click tags are associations, not causal proof.
 
 ## API
 
-- Public `GET /supporter-campaigns/status`: `{version:1}`; no credentials.
+- Public `GET /supporter-campaigns/status`: `{version:2}`; no credentials.
 - App JWT `POST /supporter-campaigns/sync`: push/supporter/snooze/reminder
-  preferences and consistency band; returns active assignment or null.
+  preferences (including `campaign_push_opt_in`, omitted means false) and consistency band; returns active assignment or null.
 - App JWT `POST /supporter-campaigns/events`: owned `assignment_id`, kind
   `opened`, `viewed`, `dismissed`; duplicate events keep the first timestamp.
 - Dedicated admin `GET/POST /admin/campaigns`; PATCH `/:id` includes the last
@@ -117,7 +127,7 @@ and local development. Tokens stay in tab memory and do not enter public JS.
 
 ## Release order
 
-1. Review/merge the companion backend PR. Apply `0015_supporter_campaigns.sql` using the
+1. Review/merge the companion backend PR. Apply `0015_supporter_campaigns.sql` and `0016_campaign_push_consent.sql` using the
    existing users D1 migration process in each intended environment.
 2. Set secret `CAMPAIGN_ADMIN_TOKEN` and secret `FCM_SERVICE_ACCOUNT` (JSON
    service-account identity with only the needed Firebase messaging permission
@@ -168,3 +178,8 @@ full twice-run sender with fake OAuth/FCM including an ambiguous result.
 `node --import tsx test/local-admin-demo.ts`: loopback-only UI fixture on 9989,
 eight synthetic users, temporary in-memory DB, fixed clearly fake token, sender
 disabled. Pair with the website dev server. It is not imported by the Worker.
+
+The campaign admin requires backend status version 2, which enforces explicit
+supporter consent and local quiet hours. Deploy the reconciled website and apply
+both migrations with this API release before testing activation. An older admin
+page must be refreshed after deployment.

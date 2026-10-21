@@ -3020,4 +3020,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sessionBellEnd => 'End';
+
+  @override
+  String get supporterNotificationsTitle => 'Supporter notifications';
+
+  @override
+  String get supporterNotificationsDescription =>
+      'Allow occasional Medito updates and donation requests. You can turn these off here at any time. Daily reminders and notification permission must also be enabled.';
 }

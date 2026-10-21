@@ -1798,5 +1798,7 @@
   "sessionBellEveryMinuteDescription": "Eine Glocke am Anfang, jede Minute und am Ende",
   "sessionBellBeginning": "Anfang",
   "sessionBellMiddle": "Mitte",
-  "sessionBellEnd": "Ende"
+  "sessionBellEnd": "Ende",
+  "supporterNotificationsTitle": "Mitteilungen zur Unterstützung",
+  "supporterNotificationsDescription": "Erlaube gelegentliche Neuigkeiten von Medito und Spendenaufrufe. Du kannst sie hier jederzeit ausschalten. Tägliche Erinnerungen und die Berechtigung für Mitteilungen müssen ebenfalls aktiviert sein."
 }
