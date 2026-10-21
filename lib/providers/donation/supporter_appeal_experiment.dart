@@ -5,6 +5,18 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class _CampaignAccountWrites {
+  int generation = 0;
+  Future<void> _pending = Future<void>.value();
+
+  Future<T> run<T>(Future<T> Function() operation) {
+    final next = _pending.then((_) => operation());
+    // A failed persistence operation must not block later account cleanup.
+    _pending = next.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+    return next;
+  }
+}
+
 /// Caches authenticated server assignments and keeps campaign attribution
 /// separate from acquisition and pricing experiments. Local enrollment exists
 /// only for the isolated preview and tests; production pushes come from the server.
@@ -33,20 +45,30 @@ class SupporterAppealExperiment {
   static const shownKey = '${name}_shown';
   static const tapKey = '${name}_notification_tap';
   static const pendingOpenKey = 'supporter_campaign_pending_open';
+  static final _accountWrites = Expando<_CampaignAccountWrites>();
+
+  static _CampaignAccountWrites _writesFor(SharedPreferences prefs) =>
+      _accountWrites[prefs] ??= _CampaignAccountWrites();
 
   /// Campaign identity and queued events belong to the signed-in account.
-  static Future<void> clearAccountState(SharedPreferences prefs) async {
-    for (final key in [
-      assignmentKey,
-      dismissedKey,
-      scheduledKey,
-      shownKey,
-      tapKey,
-      pendingOpenKey,
-      'supporter_campaign_registered',
-    ]) {
-      await prefs.remove(key);
-    }
+  static Future<void> clearAccountState(SharedPreferences prefs) {
+    final writes = _writesFor(prefs);
+    // Invalidate responses immediately, even while an earlier preference write
+    // is still awaiting persistence. Clear after that write has finished.
+    writes.generation++;
+    return writes.run(() async {
+      for (final key in [
+        assignmentKey,
+        dismissedKey,
+        scheduledKey,
+        shownKey,
+        tapKey,
+        pendingOpenKey,
+        'supporter_campaign_registered',
+      ]) {
+        await prefs.remove(key);
+      }
+    });
   }
 
   static const cardWindow = Duration(days: 7);
@@ -103,49 +125,58 @@ class SupporterAppealExperiment {
   Future<bool> applyServerAssignment(
     Map<String, dynamic> data, {
     required String userId,
-  }) async {
-    // Capture this ID before the request, not when its response arrives.
-    if (userId.isEmpty ||
-        userId != prefs.getString(SharedPreferenceConstants.userId) ||
-        prefs.getBool(SharedPreferenceConstants.isLoggedIn) == false) {
-      return false;
-    }
-    final id = data['id'], arm = data['arm'], at = data['assigned_at'];
-    final end = data['expires_at'], campaignId = data['campaign_id'];
-    if (id is! String ||
-        !_serverIdPattern.hasMatch(id) ||
-        !['A', 'B', 'C'].contains(arm) ||
-        at is! int ||
-        end is! int ||
-        end <= at ||
-        end - at > cardWindow.inMilliseconds ||
-        campaignId is! String ||
-        !RegExp(r'^[a-z0-9][a-z0-9_-]{2,79}$').hasMatch(campaignId) ||
-        data['announcement'] is! String ||
-        data['cta_title'] is! String) {
-      return false;
-    }
-    if (assignment?.id != id) {
-      for (final key in [dismissedKey, shownKey, scheduledKey, tapKey]) {
-        await prefs.remove(key);
+  }) {
+    final writes = _writesFor(prefs);
+    final generation = writes.generation;
+    bool currentAccount() =>
+        generation == writes.generation &&
+        userId.isNotEmpty &&
+        userId == prefs.getString(SharedPreferenceConstants.userId) &&
+        prefs.getBool(SharedPreferenceConstants.isLoggedIn) != false;
+    return writes.run(() async {
+      // Capture this ID before the request, not when its response arrives.
+      if (!currentAccount()) {
+        return false;
       }
-    }
-    await prefs.setString(
-      assignmentKey,
-      jsonEncode({
-        'server_id': id,
-        'user_id': userId,
-        'campaign_id': campaignId,
-        'arm': arm,
-        'at': at,
-        'expires_at': end,
-        'consistency': data['consistency_band'] as String? ?? 'unknown',
-        'notifications_allowed': data['notification_eligible'] == true,
-        'announcement': data['announcement'],
-        'cta_title': data['cta_title'],
-      }),
-    );
-    return true;
+      final id = data['id'], arm = data['arm'], at = data['assigned_at'];
+      final end = data['expires_at'], campaignId = data['campaign_id'];
+      if (id is! String ||
+          !_serverIdPattern.hasMatch(id) ||
+          !['A', 'B', 'C'].contains(arm) ||
+          at is! int ||
+          end is! int ||
+          end <= at ||
+          end - at > cardWindow.inMilliseconds ||
+          campaignId is! String ||
+          !RegExp(r'^[a-z0-9][a-z0-9_-]{2,79}$').hasMatch(campaignId) ||
+          data['announcement'] is! String ||
+          data['cta_title'] is! String) {
+        return false;
+      }
+      if (assignment?.id != id) {
+        for (final key in [dismissedKey, shownKey, scheduledKey, tapKey]) {
+          if (!currentAccount()) return false;
+          await prefs.remove(key);
+        }
+      }
+      if (!currentAccount()) return false;
+      await prefs.setString(
+        assignmentKey,
+        jsonEncode({
+          'server_id': id,
+          'user_id': userId,
+          'campaign_id': campaignId,
+          'arm': arm,
+          'at': at,
+          'expires_at': end,
+          'consistency': data['consistency_band'] as String? ?? 'unknown',
+          'notifications_allowed': data['notification_eligible'] == true,
+          'announcement': data['announcement'],
+          'cta_title': data['cta_title'],
+        }),
+      );
+      return currentAccount();
+    });
   }
 
   bool get suppressed =>

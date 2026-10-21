@@ -31,6 +31,9 @@ class LocalNotifications {
   /// or a settings change into an error if the OS notification service fails.
   static Future<void> cancelSafely(int id) async {
     try {
+      // Returning users may cancel the prototype before reminders or push have
+      // initialized the shared plugin. Initialization requests no permission.
+      await ensureInitialized();
       String? payload;
       try {
         final pending = await plugin.pendingNotificationRequests();
