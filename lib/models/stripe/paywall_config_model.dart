@@ -82,6 +82,9 @@ abstract class PaywallConfigModel with _$PaywallConfigModel {
   /// API fills in default pricing. A frequency with an empty effective ladder
   /// is always hidden.
   bool isFrequencyOffered(String freqKey, {String? source}) {
+    // Supporter campaigns ask for ongoing support, even when the general
+    // donation configuration includes a one-time ladder.
+    if (source == 'announcement' && freqKey == 'oneTime') return false;
     const keys = ['oneTime', 'monthly', 'yearly'];
     final config = effectiveConfig;
     final override = sourceOverride(source);

@@ -268,6 +268,19 @@ void main() {
     }
   }
 
+  testWidgets('campaign hides one-time when general pricing includes it', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      value: config().copyWith(experiment: null),
+      payments: _CapturePaymentUI(),
+    );
+    expect(find.text('Monthly'), findsOneWidget);
+    expect(find.text('Yearly'), findsOneWidget);
+    expect(find.text('One-time'), findsNothing);
+  });
+
   testWidgets(
     'slow native setup keeps the sheet across every donation entry point',
     (tester) async {
