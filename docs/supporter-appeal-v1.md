@@ -128,7 +128,7 @@ be attributed. The source click tags are associations, not causal proof.
 
 ## API
 
-- Public `GET /supporter-campaigns/status`: `{version:4}`; no credentials.
+- Public `GET /supporter-campaigns/status`: `{version:5}`; no credentials.
 - App JWT `POST /supporter-campaigns/sync`: push/supporter/snooze/reminder
   preferences (`push_allowed` reflects OS permission only) and consistency band; returns active assignment or null.
 - App JWT `POST /supporter-campaigns/events`: owned `assignment_id`, kind
@@ -149,8 +149,8 @@ and local development. Tokens stay in tab memory and do not enter public JS.
 1. Release the donation API donor feed first, with its additive migration
    `0001_supporter_donor_feed.sql` and dedicated server-only
    `SUPPORTER_DONOR_FEED_TOKEN`. Then apply app API migrations
-   `0015_supporter_campaigns.sql` (if absent), `0016_supporter_donor_sync.sql`
-   and `0017_supporter_suppression_events.sql`.
+   `0015_supporter_campaigns.sql` (if absent), `0016_supporter_donor_sync.sql`,
+   `0017_supporter_suppression_events.sql` and `0018_supporter_assignment_totals.sql`.
    Configure its matching `SUPPORTER_DONOR_FEED_URL`/token. Keep sending OFF
    while the historical import completes. Follow the backend release guide.
 2. Set secret `CAMPAIGN_ADMIN_TOKEN` and secret `FCM_SERVICE_ACCOUNT` (JSON
@@ -203,8 +203,17 @@ full twice-run sender with fake OAuth/FCM including an ambiguous result.
 eight synthetic users, temporary in-memory DB, fixed clearly fake token, sender
 disabled. Pair with the website dev server. It is not imported by the Worker.
 
-The campaign admin requires backend status version 4, which uses OS notification
+The campaign admin requires backend status version 5, which uses OS notification
 permission independently of daily reminders, local quiet hours, donor-sync gating
-and participant export. Apply app API migrations 0015–0017 and the donation API
+and participant export. Apply app API migrations 0015–0018 and the donation API
 feed migration before using this release. Deploy the matching website/API before
 testing activation. Refresh an older admin page after deployment.
+
+
+For experiment outcomes, use the protocol-5 **Download analysis (CSV)** export
+and the API's canonical `docs/supporter-campaign-readout.sql`. Aggregate assignment
+and deletion counts survive account erasure without retaining deleted identities.
+The readout requires the full per-person outcome window and a verified daily
+Stripe sync watermark; it flags missing/deleted outcomes and does not assume
+anonymous gifts are equally missing in each arm. GA4 is supporting funnel data,
+not the authoritative assignment or revenue denominator.
