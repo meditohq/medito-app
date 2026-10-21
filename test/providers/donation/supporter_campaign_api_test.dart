@@ -55,7 +55,7 @@ void main() {
       );
       final body = client.calls.single['body'] as Map;
       expect(body['push_allowed'], isTrue);
-      expect(body['campaign_push_opt_in'], isFalse);
+      expect(body.containsKey('campaign_push_opt_in'), isFalse);
       expect(body['donor_suppressed'], isTrue);
       expect(body['reminder_hour'], 18);
       expect(body['reminder_minute'], 30);
@@ -221,25 +221,29 @@ void main() {
       );
     },
   );
+
   test(
-    'explicit supporter consent is synced independently and can be withdrawn',
+    'campaign pushes depend only on OS permission, regardless of daily reminders',
     () async {
-      SharedPreferences.setMockInitialValues({
-        SharedPreferenceConstants.dailyReminderEnabled: true,
-        SharedPreferenceConstants.supporterCampaignPushOptIn: true,
-      });
-      final prefs = await SharedPreferences.getInstance(), client = _Client();
-      final api = SupporterCampaignApi(client);
-      await api.sync(prefs, permissionGranted: true);
-      expect(client.calls.last['body']['campaign_push_opt_in'], isTrue);
-      expect(client.calls.last['body']['push_allowed'], isTrue);
-      await prefs.setBool(
-        SharedPreferenceConstants.supporterCampaignPushOptIn,
-        false,
-      );
-      await api.sync(prefs, permissionGranted: true);
-      expect(client.calls.last['body']['campaign_push_opt_in'], isFalse);
-      expect(client.calls.last['body']['push_allowed'], isTrue);
+      for (final reminders in [null, false, true]) {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance(), client = _Client();
+        if (reminders != null) {
+          await prefs.setBool(
+            SharedPreferenceConstants.dailyReminderEnabled,
+            reminders,
+          );
+        }
+        final api = SupporterCampaignApi(client);
+        await api.sync(prefs, permissionGranted: true);
+        expect(client.calls.last['body']['push_allowed'], isTrue);
+        expect(
+          client.calls.last['body'].containsKey('campaign_push_opt_in'),
+          isFalse,
+        );
+        await api.sync(prefs, permissionGranted: false);
+        expect(client.calls.last['body']['push_allowed'], isFalse);
+      }
     },
   );
 }

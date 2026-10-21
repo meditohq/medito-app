@@ -22,7 +22,6 @@ import 'package:medito/views/settings/health_sync_tile.dart';
 import 'package:medito/views/settings/widgets/account_section_widget.dart';
 import 'package:medito/views/settings/widgets/dnd_setting_tile.dart';
 import 'package:medito/views/settings/widgets/reminder_tile.dart';
-import 'package:medito/views/settings/widgets/supporter_notifications_tile.dart';
 import 'package:medito/views/settings/widgets/app_icon_tile.dart';
 import 'package:medito/views/settings/widgets/theme_tile.dart';
 import 'package:medito/views/settings/widgets/add_widget_sheet.dart';
@@ -476,7 +475,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       sliver: SliverList(
         delegate: SliverChildListDelegate([
           const ReminderTile(),
-          const SupporterNotificationsTile(),
           if (!isEffectivelySignedIn) ...[
             _buildSectionTitle(context, AppLocalizations.of(context)!.account),
             _buildSectionCard([const AccountSectionWidget(inCard: true)]),

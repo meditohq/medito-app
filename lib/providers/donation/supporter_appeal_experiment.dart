@@ -44,7 +44,6 @@ class SupporterAppealExperiment {
       tapKey,
       pendingOpenKey,
       'supporter_campaign_registered',
-      SharedPreferenceConstants.supporterCampaignPushOptIn,
     ]) {
       await prefs.remove(key);
     }

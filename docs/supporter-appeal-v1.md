@@ -40,15 +40,15 @@ subgroup reporting; unknown stays unknown.
 
 All eligible users, including notification-denied users, are randomized once.
 Notification eligibility is saved at assignment; denied users remain in their
-assigned group and can see the B/C card. New push attempts require registered
-OS/reminder preference, explicit supporter-notification consent, a token and no
-donor/snooze/dismissal suppression. The separate Settings switch starts off and
-clearly covers donation requests, with an off switch on the same screen. Existing
-reminder or OS permission never implies consent. Sign-out/deletion clears the
-local opt-in. Authenticated server signout also revokes campaign consent for that
-account; offline signout cannot recall already accepted pushes or reach the server.
-New OS permission prompts are not triggered. Preferences sync at Home/resume,
-donation/snooze and reminder changes. Dismissal retries through ordinary sync.
+assigned group and can see the B/C card. New push attempts require granted OS
+notification permission, a token and no donor/snooze/dismissal suppression.
+Daily reminders can be off; their saved time is optional observational metadata
+and never a campaign eligibility gate. There is no separate supporter toggle or
+permission prompt. Authenticated server signout disables campaign pushes for the
+departing account until it next syncs its notification permission. Offline
+signout cannot reach the sender or recall already accepted pushes. Preferences
+sync at Home/resume, donation/snooze and reminder changes. Dismissal retries
+through ordinary sync.
 
 Known local donations and the legacy `has_active_subscription` profile flag
 suppress; positive donor suppression is sticky. This is **not a complete donor
@@ -109,9 +109,9 @@ be attributed. The source click tags are associations, not causal proof.
 
 ## API
 
-- Public `GET /supporter-campaigns/status`: `{version:2}`; no credentials.
+- Public `GET /supporter-campaigns/status`: `{version:3}`; no credentials.
 - App JWT `POST /supporter-campaigns/sync`: push/supporter/snooze/reminder
-  preferences (including `campaign_push_opt_in`, omitted means false) and consistency band; returns active assignment or null.
+  preferences (`push_allowed` reflects OS permission only) and consistency band; returns active assignment or null.
 - App JWT `POST /supporter-campaigns/events`: owned `assignment_id`, kind
   `opened`, `viewed`, `dismissed`; duplicate events keep the first timestamp.
 - Dedicated admin `GET/POST /admin/campaigns`; PATCH `/:id` includes the last
@@ -127,7 +127,7 @@ and local development. Tokens stay in tab memory and do not enter public JS.
 
 ## Release order
 
-1. Review/merge the companion backend PR. Apply `0015_supporter_campaigns.sql` and `0016_campaign_push_consent.sql` using the
+1. Review/merge the companion backend PR. Apply `0015_supporter_campaigns.sql` using the
    existing users D1 migration process in each intended environment.
 2. Set secret `CAMPAIGN_ADMIN_TOKEN` and secret `FCM_SERVICE_ACCOUNT` (JSON
    service-account identity with only the needed Firebase messaging permission
@@ -179,7 +179,7 @@ full twice-run sender with fake OAuth/FCM including an ambiguous result.
 eight synthetic users, temporary in-memory DB, fixed clearly fake token, sender
 disabled. Pair with the website dev server. It is not imported by the Worker.
 
-The campaign admin requires backend status version 2, which enforces explicit
-supporter consent and local quiet hours. Deploy the reconciled website and apply
-both migrations with this API release before testing activation. An older admin
-page must be refreshed after deployment.
+The campaign admin requires backend status version 3, which uses OS notification
+permission independently of daily reminders and retains local quiet hours. Only
+migration 0015 is required. Deploy the reconciled website and this API release
+before testing activation. Refresh an older admin page after deployment.

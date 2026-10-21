@@ -19,15 +19,7 @@ class SupporterCampaignApi {
     final response = await client.postRequest(
       'supporter-campaigns/sync',
       body: {
-        'push_allowed':
-            permissionGranted &&
-            prefs.getBool(SharedPreferenceConstants.dailyReminderEnabled) ==
-                true,
-        'campaign_push_opt_in':
-            prefs.getBool(
-              SharedPreferenceConstants.supporterCampaignPushOptIn,
-            ) ==
-            true,
+        'push_allowed': permissionGranted,
         'donor_suppressed':
             prefs.getInt(
               SharedPreferenceConstants.lastSuccessfulDonationAtMs,

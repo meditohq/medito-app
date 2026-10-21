@@ -83,10 +83,6 @@ void main() {
       );
       await prefs.setString(SupporterAppealExperiment.pendingOpenKey, '{}');
       await prefs.setBool('supporter_campaign_registered', true);
-      await prefs.setBool(
-        SharedPreferenceConstants.supporterCampaignPushOptIn,
-        true,
-      );
       await prefs.setBool(SupporterAppealExperiment.dismissedKey, true);
       await SupporterAppealExperiment.clearAccountState(prefs);
       expect(
@@ -98,10 +94,6 @@ void main() {
         isFalse,
       );
       expect(prefs.containsKey('supporter_campaign_registered'), isFalse);
-      expect(
-        prefs.containsKey(SharedPreferenceConstants.supporterCampaignPushOptIn),
-        isFalse,
-      );
       expect(
         prefs.containsKey(SupporterAppealExperiment.dismissedKey),
         isFalse,

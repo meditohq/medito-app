@@ -1398,7 +1398,5 @@
   "sessionBellEveryMinuteDescription": "Una campana al principio, cada minuto y al final",
   "sessionBellBeginning": "Principio",
   "sessionBellMiddle": "Mitad",
-  "sessionBellEnd": "Final",
-  "supporterNotificationsTitle": "Notificaciones para apoyar a Medito",
-  "supporterNotificationsDescription": "Permite recibir novedades ocasionales de Medito y solicitudes de donaciones. Puedes desactivarlas aquí en cualquier momento. También deben estar activados los recordatorios diarios y el permiso de notificaciones."
+  "sessionBellEnd": "Final"
 }
