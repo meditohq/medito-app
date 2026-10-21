@@ -72,7 +72,9 @@ through ordinary sync.
 
 Local donations, legacy subscription flags and the internal donation-API donor
 feed suppress asks. Matching uses account ID or case-insensitive profile email;
-suppression stays sticky across registration/sync. The app API imports donors
+suppression stays sticky across registration/sync. Indexed database triggers
+update suppression on new donor imports, registration and profile email changes;
+unchanged donor polls do not scan subscribers. The app API imports donors
 before allocation and fails closed for new participants when the feed is missing,
 failed or still catching up. Linked web/reinstalled donors are covered by that
 mirror; unlinked donations or history missing from the payments database still
@@ -147,7 +149,8 @@ and local development. Tokens stay in tab memory and do not enter public JS.
 1. Release the donation API donor feed first, with its additive migration
    `0001_supporter_donor_feed.sql` and dedicated server-only
    `SUPPORTER_DONOR_FEED_TOKEN`. Then apply app API migrations
-   `0015_supporter_campaigns.sql` (if absent) and `0016_supporter_donor_sync.sql`.
+   `0015_supporter_campaigns.sql` (if absent), `0016_supporter_donor_sync.sql`
+   and `0017_supporter_suppression_events.sql`.
    Configure its matching `SUPPORTER_DONOR_FEED_URL`/token. Keep sending OFF
    while the historical import completes. Follow the backend release guide.
 2. Set secret `CAMPAIGN_ADMIN_TOKEN` and secret `FCM_SERVICE_ACCOUNT` (JSON
@@ -202,6 +205,6 @@ disabled. Pair with the website dev server. It is not imported by the Worker.
 
 The campaign admin requires backend status version 4, which uses OS notification
 permission independently of daily reminders, local quiet hours, donor-sync gating
-and participant export. Apply app API migrations 0015/0016 and the donation API
+and participant export. Apply app API migrations 0015–0017 and the donation API
 feed migration before using this release. Deploy the matching website/API before
 testing activation. Refresh an older admin page after deployment.
