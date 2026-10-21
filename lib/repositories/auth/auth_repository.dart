@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
@@ -835,6 +836,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
     // Mark user as logged out
     await _preferences.setBool(SharedPreferenceConstants.isLoggedIn, false);
+    await SupporterAppealExperiment.clearAccountState(_preferences);
 
     // Clear tokens
     await _secureStorage.clearRefreshToken();

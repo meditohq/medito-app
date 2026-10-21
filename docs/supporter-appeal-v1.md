@@ -51,6 +51,11 @@ suppress; positive donor suppression is sticky. This is **not a complete donor
 identity feed**: an unlinked website gift or a donation made on another identity
 may be missed. Validate linked donor coverage before a broad campaign; the
 prototype does not claim all historical/external supporters are identified.
+Cached assignments and queued notification opens are scoped to their authenticated
+account. Sign-out/account deletion clears them, and responses from an earlier
+account cannot restore attribution after an identity change. Older unowned caches
+require an authenticated refresh before use.
+
 Reinstalls without a shared identity can still re-enroll. A token hash avoids
 duplicate campaign allocation/cooldowns for multiple identities sharing a device.
 

@@ -32,6 +32,23 @@ class SupporterAppealExperiment {
   static const scheduledKey = '${name}_scheduled';
   static const shownKey = '${name}_shown';
   static const tapKey = '${name}_notification_tap';
+  static const pendingOpenKey = 'supporter_campaign_pending_open';
+
+  /// Campaign identity and queued events belong to the signed-in account.
+  static Future<void> clearAccountState(SharedPreferences prefs) async {
+    for (final key in [
+      assignmentKey,
+      dismissedKey,
+      scheduledKey,
+      shownKey,
+      tapKey,
+      pendingOpenKey,
+      'supporter_campaign_registered',
+    ]) {
+      await prefs.remove(key);
+    }
+  }
+
   static const cardWindow = Duration(days: 7);
   static const attributionWindow = Duration(days: 7);
   static const measurementWindow = Duration(days: 90);
@@ -50,7 +67,12 @@ class SupporterAppealExperiment {
       final nonce = data['nonce'];
       final serverId = data['server_id'];
       final isServer = serverId is String;
-      if (isServer && !_serverIdPattern.hasMatch(serverId)) {
+      if (isServer &&
+          (!_serverIdPattern.hasMatch(serverId) ||
+              data['user_id'] is! String ||
+              data['user_id'] !=
+                  prefs.getString(SharedPreferenceConstants.userId) ||
+              prefs.getBool(SharedPreferenceConstants.isLoggedIn) == false)) {
         return null;
       }
       if (!isServer &&
@@ -78,7 +100,16 @@ class SupporterAppealExperiment {
 
   /// Accept only the authenticated app backend's assignment. Device preview
   /// enrollment remains separate; normal builds never randomize locally.
-  Future<bool> applyServerAssignment(Map<String, dynamic> data) async {
+  Future<bool> applyServerAssignment(
+    Map<String, dynamic> data, {
+    required String userId,
+  }) async {
+    // Capture this ID before the request, not when its response arrives.
+    if (userId.isEmpty ||
+        userId != prefs.getString(SharedPreferenceConstants.userId) ||
+        prefs.getBool(SharedPreferenceConstants.isLoggedIn) == false) {
+      return false;
+    }
     final id = data['id'], arm = data['arm'], at = data['assigned_at'];
     final end = data['expires_at'], campaignId = data['campaign_id'];
     if (id is! String ||
@@ -103,6 +134,7 @@ class SupporterAppealExperiment {
       assignmentKey,
       jsonEncode({
         'server_id': id,
+        'user_id': userId,
         'campaign_id': campaignId,
         'arm': arm,
         'at': at,

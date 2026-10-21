@@ -45,6 +45,7 @@ void main() {
         () async {
           SharedPreferences.setMockInitialValues({
             SharedPreferenceConstants.utmSource: 'google',
+            SharedPreferenceConstants.userId: 'test-user',
           });
           final prefs = await SharedPreferences.getInstance();
           final experiment = SupporterAppealExperiment(prefs);
@@ -83,7 +84,7 @@ void main() {
               'consistency_band': 'under_25',
               'announcement': 'Support Medito',
               'cta_title': 'Donate now',
-            });
+            }, userId: 'test-user');
           }
           final a = experiment.assignment!;
           await experiment.recordNotificationTap(

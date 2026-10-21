@@ -49,7 +49,9 @@ void main() {
   }
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({
+      SharedPreferenceConstants.userId: 'test-user',
+    });
     prefs = await SharedPreferences.getInstance();
     experiment = SupporterAppealExperiment(prefs);
   });
@@ -260,7 +262,10 @@ void main() {
         'announcement': 'Server announcement',
         'cta_title': 'Support Medito',
       };
-      expect(await experiment.applyServerAssignment(data), isTrue);
+      expect(
+        await experiment.applyServerAssignment(data, userId: 'test-user'),
+        isTrue,
+      );
       final a = experiment.assignment!;
       expect(a.isServer, isTrue);
       expect(a.id, data['id']);
@@ -281,11 +286,14 @@ void main() {
         isNotNull,
       );
       await prefs.setBool(SupporterAppealExperiment.dismissedKey, true);
-      await experiment.applyServerAssignment(data);
+      await experiment.applyServerAssignment(data, userId: 'test-user');
       expect(prefs.getBool(SupporterAppealExperiment.dismissedKey), isTrue);
       expect(prefs.containsKey(SupporterAppealExperiment.tapKey), isTrue);
       expect(
-        await experiment.applyServerAssignment({...data, 'id': 'bad-id'}),
+        await experiment.applyServerAssignment({
+          ...data,
+          'id': 'bad-id',
+        }, userId: 'test-user'),
         isFalse,
       );
       expect(experiment.assignment!.id, a.id);

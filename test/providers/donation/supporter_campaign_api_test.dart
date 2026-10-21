@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -12,9 +13,11 @@ class _Client extends HttpApiService {
   _Client() : super.internal();
   final calls = <Map<String, dynamic>>[];
   Map<String, dynamic>? assignment;
+  Completer<void>? responseGate;
   @override
   Future<Map<String, dynamic>> postRequest(String path, {dynamic body}) async {
     calls.add({'path': path, 'body': body});
+    await responseGate?.future;
     return {'assignment': assignment};
   }
 }
@@ -65,7 +68,9 @@ void main() {
   test(
     'an offline tap is reconciled once with the authenticated assignment and original tap time',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({
+        SharedPreferenceConstants.userId: 'test-user',
+      });
       final prefs = await SharedPreferences.getInstance(), client = _Client();
       final now = DateTime.now(), at = now.subtract(const Duration(minutes: 5));
       client.assignment = serverAssignment(now);
@@ -79,7 +84,11 @@ void main() {
       };
       await prefs.setString(
         'supporter_campaign_pending_open',
-        jsonEncode({'payload': payload, 'at': at.millisecondsSinceEpoch}),
+        jsonEncode({
+          'payload': payload,
+          'at': at.millisecondsSinceEpoch,
+          'user_id': 'test-user',
+        }),
       );
       final api = SupporterCampaignApi(client);
       await SupporterAppealRuntime.retryPendingOpen(prefs, api);
@@ -121,12 +130,15 @@ void main() {
   test(
     'a backend response for a different assignment cannot claim the notification click',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({
+        SharedPreferenceConstants.userId: 'test-user',
+      });
       final prefs = await SharedPreferences.getInstance(), client = _Client();
       client.assignment = serverAssignment(DateTime.now());
       await prefs.setString(
         'supporter_campaign_pending_open',
         jsonEncode({
+          'user_id': 'test-user',
           'payload': {'appeal_id': 'another-id'},
           'at': DateTime.now().millisecondsSinceEpoch,
         }),
@@ -139,6 +151,72 @@ void main() {
       expect(
         prefs.containsKey(SupporterAppealExperiment.assignmentKey),
         isFalse,
+      );
+    },
+  );
+  test('queued opens are dropped when their owning account changes', () async {
+    SharedPreferences.setMockInitialValues({
+      SharedPreferenceConstants.userId: 'new-user',
+    });
+    final prefs = await SharedPreferences.getInstance(), client = _Client();
+    await prefs.setString(
+      SupporterAppealExperiment.pendingOpenKey,
+      jsonEncode({
+        'user_id': 'old-user',
+        'at': DateTime.now().millisecondsSinceEpoch,
+        'payload': {'appeal_id': '11111111-2222-4333-8444-555555555555'},
+      }),
+    );
+    await SupporterAppealRuntime.retryPendingOpen(
+      prefs,
+      SupporterCampaignApi(client),
+    );
+    expect(client.calls, isEmpty);
+    expect(
+      prefs.containsKey(SupporterAppealExperiment.pendingOpenKey),
+      isFalse,
+    );
+  });
+
+  test(
+    'an account change while an open is in flight cannot restore old attribution',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        SharedPreferenceConstants.userId: 'old-user',
+      });
+      final prefs = await SharedPreferences.getInstance(), client = _Client();
+      client.assignment = serverAssignment(DateTime.now());
+      client.responseGate = Completer<void>();
+      await prefs.setString(
+        SupporterAppealExperiment.pendingOpenKey,
+        jsonEncode({
+          'user_id': 'old-user',
+          'at': DateTime.now().millisecondsSinceEpoch,
+          'payload': {'appeal_id': client.assignment!['id']},
+        }),
+      );
+      final retry = SupporterAppealRuntime.retryPendingOpen(
+        prefs,
+        SupporterCampaignApi(client),
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(client.calls, hasLength(1));
+      await prefs.setString(SharedPreferenceConstants.userId, 'new-user');
+      const replacement = 'new-account-pending-open';
+      await prefs.setString(
+        SupporterAppealExperiment.pendingOpenKey,
+        replacement,
+      );
+      client.responseGate!.complete();
+      await retry;
+      expect(SupporterAppealExperiment(prefs).paymentMetadata(), isEmpty);
+      expect(
+        prefs.containsKey(SupporterAppealExperiment.assignmentKey),
+        isFalse,
+      );
+      expect(
+        prefs.getString(SupporterAppealExperiment.pendingOpenKey),
+        replacement,
       );
     },
   );

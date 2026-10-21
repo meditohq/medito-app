@@ -56,6 +56,8 @@ final supporterAppealProvider = FutureProvider<AppealAssignment?>((ref) async {
             ),
           );
     }
+    final userId = prefs.getString(SharedPreferenceConstants.userId);
+    if (userId == null) return null;
     final api = ref.read(supporterCampaignApiProvider);
     final data = await api.sync(
       prefs,
@@ -66,6 +68,11 @@ final supporterAppealProvider = FutureProvider<AppealAssignment?>((ref) async {
           ? '25_to_50'
           : '50_plus',
     );
+    if (!ref.mounted ||
+        prefs.getString(SharedPreferenceConstants.userId) != userId ||
+        prefs.getBool(SharedPreferenceConstants.isLoggedIn) == false) {
+      return null;
+    }
     await prefs.setBool('supporter_campaign_registered', true);
     // Accepted-message opens can still reconcile after a campaign is paused,
     // even though sync correctly withholds its announcement card.
@@ -73,7 +80,9 @@ final supporterAppealProvider = FutureProvider<AppealAssignment?>((ref) async {
     if (data == null) return null;
     final experiment = SupporterAppealExperiment(prefs);
     final previousId = experiment.assignment?.id;
-    if (!await experiment.applyServerAssignment(data)) return null;
+    if (!await experiment.applyServerAssignment(data, userId: userId)) {
+      return null;
+    }
     if (previousId != experiment.assignment?.id) {
       await SupporterAppealRuntime.log('appeal_assignment_observed', prefs);
     }
@@ -92,7 +101,7 @@ class SupporterAppealRuntime {
   static final homeRequested = ValueNotifier<int>(0);
   static bool _pendingHome = false;
   static final _opening = <String>{};
-  static const _pendingOpenKey = 'supporter_campaign_pending_open';
+  static const _pendingOpenKey = SupporterAppealExperiment.pendingOpenKey;
 
   static bool consumeHomeRequest() {
     final pending = _pendingHome;
@@ -139,17 +148,31 @@ class SupporterAppealRuntime {
   ) async {
     final raw = prefs.getString(_pendingOpenKey);
     if (raw == null) return;
+    Future<void> discard() async {
+      // A different account/tap may have replaced this entry during the request.
+      if (prefs.getString(_pendingOpenKey) == raw) {
+        await prefs.remove(_pendingOpenKey);
+      }
+    }
+
     if (prefs.getBool(SharedPreferenceConstants.analyticsFirebaseEnabled) ==
         false) {
-      await prefs.remove(_pendingOpenKey);
+      await discard();
       return;
     }
     try {
       final saved = jsonDecode(raw) as Map<String, dynamic>;
+      final userId = prefs.getString(SharedPreferenceConstants.userId);
+      if (userId == null ||
+          saved['user_id'] != userId ||
+          prefs.getBool(SharedPreferenceConstants.isLoggedIn) == false) {
+        await discard();
+        return;
+      }
       final at = DateTime.fromMillisecondsSinceEpoch(saved['at'] as int);
       if (DateTime.now().difference(at) >
           SupporterAppealExperiment.cardWindow) {
-        await prefs.remove(_pendingOpenKey);
+        await discard();
         return;
       }
       final payload = saved['payload'] as Map<String, dynamic>;
@@ -157,7 +180,7 @@ class SupporterAppealRuntime {
       final experiment = SupporterAppealExperiment(prefs);
       if (data != null &&
           data['id'] == payload['appeal_id'] &&
-          await experiment.applyServerAssignment(data)) {
+          await experiment.applyServerAssignment(data, userId: userId)) {
         if (await experiment.recordNotificationTap(payload, at) != null) {
           await log(
             'appeal_notification_opened',
@@ -166,7 +189,7 @@ class SupporterAppealRuntime {
           );
         }
       }
-      await prefs.remove(_pendingOpenKey);
+      await discard();
     } catch (_) {
       /* Retry this same event at the next app sync. */
     }
@@ -211,7 +234,11 @@ class SupporterAppealRuntime {
       }
       await prefs.setString(
         _pendingOpenKey,
-        jsonEncode({'payload': payload, 'at': at.millisecondsSinceEpoch}),
+        jsonEncode({
+          'payload': payload,
+          'at': at.millisecondsSinceEpoch,
+          'user_id': prefs.getString(SharedPreferenceConstants.userId),
+        }),
       );
       await retryPendingOpen(prefs, SupporterCampaignApi(HttpApiService()));
     } finally {

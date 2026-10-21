@@ -1,6 +1,7 @@
 import 'package:medito/widgets/adaptive/adaptive_content.dart';
 import 'package:medito/views/bottom_navigation/widgets/medito_sidebar.dart';
 import 'dart:async';
+import 'package:medito/services/notifications/supporter_campaign_navigation.dart';
 import 'package:medito/providers/donation/supporter_appeal_provider.dart';
 
 import 'package:flutter/material.dart';
@@ -84,6 +85,7 @@ class _BottomNavigationBarViewState
     if (!mounted || !SupporterAppealRuntime.consumeHomeRequest()) return;
     ref.invalidate(supporterAppealProvider);
     _onDestinationSelected(_homeIndex);
+    revealSupporterCampaignHome(context);
   }
 
   @override
