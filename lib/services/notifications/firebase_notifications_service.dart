@@ -55,17 +55,7 @@ class FirebaseMessagingHandler {
       return;
     }
     try {
-      await _setupFlutterNotifications();
-      _configureFirebaseMessaging(context, ref);
       await registerOpenTracking(ref);
-
-      // Enable headless notification presentation for all platforms, but disable badges
-      await FirebaseMessaging.instance
-          .setForegroundNotificationPresentationOptions(
-            alert: true,
-            badge: false, // Never show badges
-            sound: true,
-          );
 
       if (kDebugMode) {
         AppLogger.d(
@@ -114,26 +104,22 @@ class FirebaseMessagingHandler {
       importance: Importance.high,
     );
 
-    // Check if the channel already exists (it might have been created in the native code)
     final androidImplementation = _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
 
-    final channelExists =
-        await androidImplementation?.areNotificationsEnabled() ?? false;
-    if (!channelExists) {
-      // Only create the channel if needed
-      await androidImplementation?.createNotificationChannel(_channel!);
-    }
+    // Channel creation is idempotent and preserves the user's channel settings.
+    await androidImplementation?.createNotificationChannel(_channel!);
 
     _isFlutterLocalNotificationsInitialized = true;
   }
 
-  void _configureFirebaseMessaging(BuildContext context, WidgetRef ref) {
+  void _configureFirebaseMessaging(WidgetRef ref) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage.listen(
-      (message) => _handleForegroundMessage(message, context, ref),
+      (message) =>
+          _handleForegroundMessage(message, navigatorKey.currentContext, ref),
     );
   }
 
@@ -149,6 +135,16 @@ class FirebaseMessagingHandler {
       LocalNotifications.tapHandler = (response) =>
           _onLocalNotificationTap(response, ref);
       await LocalNotifications.ensureInitialized();
+      // Returning users do not revisit onboarding. Receiving messages must be
+      // registered at startup too, without requesting notification permission.
+      await _setupFlutterNotifications();
+      _configureFirebaseMessaging(ref);
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
+            alert: true,
+            badge: false,
+            sound: true,
+          );
 
       // A reminder fires while the app is terminated, which is the normal case
       // for a 7am notification. That tap never reaches the tap handler — it
@@ -261,7 +257,7 @@ class FirebaseMessagingHandler {
 
   Future<void> _handleForegroundMessage(
     RemoteMessage message,
-    BuildContext context,
+    BuildContext? context,
     WidgetRef ref,
   ) async {
     // Debug log
@@ -282,7 +278,7 @@ class FirebaseMessagingHandler {
     }
 
     // Still show snackbar for in-app UX, but make sure the context is valid
-    if (context.mounted) {
+    if (context != null && context.mounted) {
       final localizations = AppLocalizations.of(context)!;
       final snackBar = SnackBar(
         content: Text(
