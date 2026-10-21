@@ -1,14 +1,14 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/types/type_constants.dart';
 import 'package:medito/models/pack/pack_model.dart';
 import 'package:medito/models/track/track.dart';
+import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/downloader/downloader_repository.dart';
 import 'package:medito/repositories/track/track_repository.dart';
-import 'package:medito/providers/providers.dart';
-import 'package:medito/services/downloads/batch_download_service.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
@@ -48,20 +48,15 @@ class BatchDownloadState {
     int? completed,
     int? total,
     String? errorMessage,
-  }) {
-    return BatchDownloadState(
-      status: status ?? this.status,
-      packId: packId ?? this.packId,
-      completed: completed ?? this.completed,
-      total: total ?? this.total,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
+  }) =>
+      BatchDownloadState(
+        status: status ?? this.status,
+        packId: packId ?? this.packId,
+        completed: completed ?? this.completed,
+        total: total ?? this.total,
+        errorMessage: errorMessage ?? this.errorMessage,
+      );
 }
-
-final batchDownloadServiceProvider = Provider<BatchDownloadService>((ref) {
-  return BatchDownloadService();
-});
 
 final batchDownloadProvider =
     NotifierProvider<BatchDownloadNotifier, BatchDownloadState>(
@@ -69,11 +64,14 @@ final batchDownloadProvider =
 );
 
 class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
+  bool _cancelled = false;
+
   @override
   BatchDownloadState build() => const BatchDownloadState();
 
   Future<void> startPackDownload(PackModel pack) async {
     if (state.isDownloading) return;
+    _cancelled = false;
 
     state = BatchDownloadState(
       status: BatchDownloadStatus.fetchingTracks,
@@ -82,12 +80,10 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
       total: 0,
     );
 
-    unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.packBatchDownloadStarted,
-        parameters: {AnalyticsEventConstants.paramPackId: pack.id},
-      ),
-    );
+    unawaited(ref.read(analyticsServiceProvider).logEvent(
+      name: AnalyticsEventConstants.packBatchDownloadStarted,
+      parameters: {AnalyticsEventConstants.paramPackId: pack.id},
+    ));
 
     final trackItems = pack.items
         .where((item) => item.type == TypeConstants.track)
@@ -105,12 +101,13 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
       final fetchedTracks = <Track>[];
       for (final item in trackItems) {
         try {
-          final track = await trackRepo.fetchTrack(item.id);
-          fetchedTracks.add(track);
+          fetchedTracks.add(await trackRepo.fetchTrack(item.id));
         } catch (e) {
           AppLogger.e('BATCH_DOWNLOAD', 'Failed to fetch track ${item.id}: $e');
         }
       }
+
+      if (_cancelled) return;
 
       if (fetchedTracks.isEmpty) {
         state = state.copyWith(
@@ -120,20 +117,17 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
         return;
       }
 
-      final itemsToDownload = <BatchDownloadItem>[];
+      final itemsToDownload = <({String url, String fileName})>[];
       final tracksForPreference = <Track>[];
 
       for (final track in fetchedTracks) {
         if (track.voices.isEmpty) continue;
-        final resolved = TrackVariantSelector.resolve(track);
-        final voice = resolved.voice;
-        final file = resolved.file;
-
+        final (:voice, :file) = TrackVariantSelector.resolve(track);
         final fileName =
             '${track.id}-${file.id}${getAudioFileExtension(file.path)}';
         final isDownloaded = await downloaderRepo.isFileDownloaded(fileName);
 
-        final trackForPref = Track(
+        tracksForPreference.add(Track(
           id: track.id,
           title: track.title,
           description: track.description,
@@ -141,32 +135,15 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
           isPublished: true,
           hasBackgroundSound: track.hasBackgroundSound,
           artist: track.artist,
-          voices: [
-            TrackVoice(
-              guideName: voice.guideName,
-              audioFiles: [
-                TrackAudioFile(
-                  id: file.id,
-                  path: file.path,
-                  duration: file.duration,
-                ),
-              ],
-            ),
-          ],
-        );
-        tracksForPreference.add(trackForPref);
+          voices: [TrackVoice(guideName: voice.guideName, audioFiles: [file])],
+        ));
 
         if (!isDownloaded) {
-          itemsToDownload.add(
-            BatchDownloadItem(
-              url: file.path,
-              fileName: fileName,
-              trackId: track.id,
-              fileId: file.id,
-            ),
-          );
+          itemsToDownload.add((url: file.path, fileName: fileName));
         }
       }
+
+      if (_cancelled) return;
 
       final totalItems = tracksForPreference.length;
       final alreadyDownloadedCount = totalItems - itemsToDownload.length;
@@ -187,28 +164,28 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
         total: totalItems,
       );
 
-      final service = ref.read(batchDownloadServiceProvider);
-      await service.downloadBatch(
-        itemsToDownload,
-        onProgress: (progress) {
-          if (!ref.mounted) return;
-          state = state.copyWith(
-            completed: alreadyDownloadedCount + progress.completed,
-            total: totalItems,
-          );
-        },
-      );
+      var nextIndex = 0;
+      Future<void> worker() async {
+        while (nextIndex < itemsToDownload.length) {
+          if (_cancelled) return;
+          final item = itemsToDownload[nextIndex++];
+          await downloaderRepo.downloadFile(item.url, fileName: item.fileName);
+          if (_cancelled || !ref.mounted) return;
+          state = state.copyWith(completed: state.completed + 1);
+        }
+      }
 
-      if (!ref.mounted) return;
+      final poolSize = min(4, itemsToDownload.length);
+      await Future.wait(List.generate(poolSize, (_) => worker()));
+
+      if (_cancelled || !ref.mounted) return;
 
       await _saveDownloadedTracksToPreference(tracksForPreference);
 
-      unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.packBatchDownloadCompleted,
-          parameters: {AnalyticsEventConstants.paramPackId: pack.id},
-        ),
-      );
+      unawaited(ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.packBatchDownloadCompleted,
+        parameters: {AnalyticsEventConstants.paramPackId: pack.id},
+      ));
 
       state = state.copyWith(
         status: BatchDownloadStatus.completed,
@@ -226,24 +203,14 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
     }
   }
 
-  Future<void> _saveDownloadedTracksToPreference(
-      List<Track> newTracks) async {
+  Future<void> _saveDownloadedTracksToPreference(List<Track> newTracks) async {
     try {
-      final currentDownloaded =
-          await ref.read(downloadedTracksProvider.future);
-      final updatedList = List<Track>.from(currentDownloaded);
-
-      for (final newTrack in newTracks) {
-        final alreadySaved = updatedList.any((t) =>
-            t.id == newTrack.id &&
-            t.voices.any((v) => v.audioFiles.any((f) => newTrack.voices
-                .any((nv) => nv.audioFiles.any((nf) => nf.id == f.id)))));
-        if (!alreadySaved) {
-          updatedList.add(newTrack);
-        }
+      final current = await ref.read(downloadedTracksProvider.future);
+      final trackMap = {for (final t in current) t.id: t};
+      for (final t in newTracks) {
+        trackMap.putIfAbsent(t.id, () => t);
       }
-
-      await ref.read(trackRepositoryProvider).addTrackInPreference(updatedList);
+      await ref.read(trackRepositoryProvider).addTrackInPreference(trackMap.values.toList());
       ref.invalidate(downloadedTracksProvider);
     } catch (e) {
       AppLogger.e('BATCH_DOWNLOAD', 'Failed saving tracks to preference: $e');
@@ -252,18 +219,14 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
 
   Future<void> cancelDownload() async {
     if (!state.isDownloading) return;
+    _cancelled = true;
 
     final packId = state.packId;
-    final service = ref.read(batchDownloadServiceProvider);
-    await service.stopBatch();
-
     if (packId != null) {
-      unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.packBatchDownloadCancelled,
-          parameters: {AnalyticsEventConstants.paramPackId: packId},
-        ),
-      );
+      unawaited(ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.packBatchDownloadCancelled,
+        parameters: {AnalyticsEventConstants.paramPackId: packId},
+      ));
     }
 
     state = const BatchDownloadState(status: BatchDownloadStatus.idle);
@@ -278,34 +241,28 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
     if (trackIds.isEmpty) return;
 
     try {
-      final currentDownloaded =
-          await ref.read(downloadedTracksProvider.future);
-      final remaining = <Track>[];
+      final current = await ref.read(downloadedTracksProvider.future);
       final downloaderRepo = ref.read(downloaderRepositoryProvider);
 
-      for (final track in currentDownloaded) {
-        if (trackIds.contains(track.id)) {
-          for (final voice in track.voices) {
-            for (final file in voice.audioFiles) {
-              final fileName =
-                  '${track.id}-${file.id}${getAudioFileExtension(file.path)}';
-              await downloaderRepo.deleteDownloadedFile(fileName);
-            }
+      for (final track in current.where((t) => trackIds.contains(t.id))) {
+        for (final voice in track.voices) {
+          for (final file in voice.audioFiles) {
+            final fileName =
+                '${track.id}-${file.id}${getAudioFileExtension(file.path)}';
+            await downloaderRepo.deleteDownloadedFile(fileName);
           }
-        } else {
-          remaining.add(track);
         }
       }
 
+      final remaining =
+          current.where((t) => !trackIds.contains(t.id)).toList();
       await ref.read(trackRepositoryProvider).addTrackInPreference(remaining);
       ref.invalidate(downloadedTracksProvider);
 
-      unawaited(
-        ref.read(analyticsServiceProvider).logEvent(
-          name: AnalyticsEventConstants.packBatchDownloadsDeleted,
-          parameters: {AnalyticsEventConstants.paramPackId: pack.id},
-        ),
-      );
+      unawaited(ref.read(analyticsServiceProvider).logEvent(
+        name: AnalyticsEventConstants.packBatchDownloadsDeleted,
+        parameters: {AnalyticsEventConstants.paramPackId: pack.id},
+      ));
     } catch (e) {
       AppLogger.e('BATCH_DOWNLOAD', 'Failed deleting pack downloads: $e');
     }

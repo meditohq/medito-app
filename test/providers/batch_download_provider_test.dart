@@ -7,7 +7,6 @@ import 'package:medito/providers/providers.dart';
 import 'package:medito/repositories/downloader/downloader_repository.dart';
 import 'package:medito/repositories/track/track_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
-import 'package:medito/services/downloads/batch_download_service.dart';
 
 class FakeTrackRepository implements TrackRepository {
   final Map<String, Track> tracksById = {};
@@ -68,40 +67,6 @@ class FakeDownloaderRepository implements DownloaderRepository {
   }
 }
 
-class FakeBatchDownloadService extends BatchDownloadService {
-  final FakeDownloaderRepository downloader;
-  bool isBatchRunning = false;
-
-  FakeBatchDownloadService(this.downloader);
-
-  @override
-  Future<void> downloadBatch(
-    List<BatchDownloadItem> items, {
-    void Function(BatchDownloadProgress progress)? onProgress,
-  }) async {
-    isBatchRunning = true;
-    var completed = 0;
-    for (final item in items) {
-      if (!isBatchRunning) break;
-      await downloader.downloadFile(item.url, fileName: item.fileName);
-      completed++;
-      onProgress?.call(
-        BatchDownloadProgress(
-          completed: completed,
-          total: items.length,
-          isRunning: true,
-        ),
-      );
-    }
-    isBatchRunning = false;
-  }
-
-  @override
-  Future<void> stopBatch() async {
-    isBatchRunning = false;
-  }
-}
-
 class FakeAnalyticsService implements FirebaseAnalyticsService {
   final List<String> loggedEvents = [];
 
@@ -120,7 +85,6 @@ class FakeAnalyticsService implements FirebaseAnalyticsService {
 void main() {
   late FakeTrackRepository trackRepo;
   late FakeDownloaderRepository downloaderRepo;
-  late FakeBatchDownloadService batchService;
   late FakeAnalyticsService analyticsService;
   late ProviderContainer container;
 
@@ -191,14 +155,12 @@ void main() {
     trackRepo.tracksById['t2'] = testTrack2;
 
     downloaderRepo = FakeDownloaderRepository();
-    batchService = FakeBatchDownloadService(downloaderRepo);
     analyticsService = FakeAnalyticsService();
 
     container = ProviderContainer(
       overrides: [
         trackRepositoryProvider.overrideWithValue(trackRepo),
         downloaderRepositoryProvider.overrideWithValue(downloaderRepo),
-        batchDownloadServiceProvider.overrideWithValue(batchService),
         analyticsServiceProvider.overrideWithValue(analyticsService),
       ],
     );
@@ -235,6 +197,13 @@ void main() {
     expect(savedTracks.length, 2);
     expect(savedTracks.any((t) => t.id == 't1'), isTrue);
     expect(savedTracks.any((t) => t.id == 't2'), isTrue);
+  });
+
+  test('cancelDownload stops batch and resets to idle', () async {
+    final notifier = container.read(batchDownloadProvider.notifier);
+    await notifier.cancelDownload();
+    expect(
+        container.read(batchDownloadProvider).status, BatchDownloadStatus.idle);
   });
 
   test('deletePackDownloads deletes files and removes from preferences',
