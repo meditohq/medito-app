@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/types/type_constants.dart';
@@ -11,6 +13,8 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 class FakeTrackRepository implements TrackRepository {
   final Map<String, Track> tracksById = {};
   List<Track> downloadedTracks = [];
+  Duration writeDelay = Duration.zero;
+  final savedSnapshots = <List<Track>>[];
 
   @override
   Future<Track> fetchTrack(String trackId) async {
@@ -26,7 +30,9 @@ class FakeTrackRepository implements TrackRepository {
 
   @override
   Future<void> addTrackInPreference(List<Track> trackList) async {
+    if (writeDelay != Duration.zero) await Future<void>.delayed(writeDelay);
     downloadedTracks = List<Track>.from(trackList);
+    savedSnapshots.add(List<Track>.from(trackList));
   }
 
   @override
@@ -65,6 +71,36 @@ class FakeDownloaderRepository implements DownloaderRepository {
   Future<bool> isFileDownloaded(String name) async {
     return files.contains(name);
   }
+}
+
+class ControlledDownloaderRepository extends FakeDownloaderRepository {
+  final pending = <String, Completer<void>>{};
+  final calls = <String>[];
+
+  @override
+  Future<void> downloadFile(
+    String url, {
+    required String fileName,
+    void Function(int, int)? onReceiveProgress,
+  }) async {
+    calls.add(fileName);
+    final completion = Completer<void>();
+    pending[fileName] = completion;
+    await completion.future;
+    files.add(fileName);
+  }
+
+  void finish(String fileName) => pending.remove(fileName)!.complete();
+  void fail(String fileName) =>
+      pending.remove(fileName)!.completeError(Exception('Network lost'));
+}
+
+Future<void> waitUntil(bool Function() condition) async {
+  for (var i = 0; i < 200; i++) {
+    if (condition()) return;
+    await Future<void>.delayed(const Duration(milliseconds: 1));
+  }
+  fail('Timed out waiting for download state');
 }
 
 class FakeAnalyticsService implements FirebaseAnalyticsService {
@@ -243,6 +279,121 @@ void main() {
       expect(savedTracks.any((t) => t.id == 't2'), isTrue);
     },
   );
+
+  ProviderContainer controlledContainer(ControlledDownloaderRepository files) =>
+      ProviderContainer(
+        overrides: [
+          trackRepositoryProvider.overrideWithValue(trackRepo),
+          downloaderRepositoryProvider.overrideWithValue(files),
+          analyticsServiceProvider.overrideWithValue(analyticsService),
+        ],
+      );
+
+  test(
+    'completed tracks are saved before the batch finishes and survive restart',
+    () async {
+      final files = ControlledDownloaderRepository();
+      final first = controlledContainer(files);
+      final batch = first
+          .read(batchDownloadProvider.notifier)
+          .startPackDownload(testPack);
+      await waitUntil(() => files.pending.length == 2);
+      files.finish('t1-f1.mp3');
+      await waitUntil(() => trackRepo.downloadedTracks.length == 1);
+      expect(
+        first.read(batchDownloadProvider).status,
+        BatchDownloadStatus.downloading,
+      );
+      expect(trackRepo.downloadedTracks.single.id, 't1');
+      first.dispose();
+      // Finishing the old fake network request after disposal must not mark it saved.
+      files.finish('t2-f2.mp3');
+      await batch;
+      files.files.remove('t2-f2.mp3');
+      final restarted = controlledContainer(files);
+      addTearDown(restarted.dispose);
+      final saved = await restarted.read(downloadedTracksProvider.future);
+      expect(testPack.downloadedTrackCount(saved), 1);
+      final retry = restarted
+          .read(batchDownloadProvider.notifier)
+          .startPackDownload(testPack);
+      await waitUntil(() => files.pending.containsKey('t2-f2.mp3'));
+      expect(files.calls.where((name) => name == 't1-f1.mp3').length, 1);
+      files.finish('t2-f2.mp3');
+      await retry;
+      expect(trackRepo.downloadedTracks.map((track) => track.id).toSet(), {
+        't1',
+        't2',
+      });
+    },
+  );
+
+  test('concurrent completions do not overwrite saved tracks', () async {
+    trackRepo.writeDelay = const Duration(milliseconds: 10);
+    final files = ControlledDownloaderRepository();
+    final active = controlledContainer(files);
+    addTearDown(active.dispose);
+    final batch = active
+        .read(batchDownloadProvider.notifier)
+        .startPackDownload(testPack);
+    await waitUntil(() => files.pending.length == 2);
+    files.finish('t1-f1.mp3');
+    files.finish('t2-f2.mp3');
+    await batch;
+    expect(trackRepo.savedSnapshots.first.length, 1);
+    expect(trackRepo.downloadedTracks.map((track) => track.id).toSet(), {
+      't1',
+      't2',
+    });
+  });
+
+  test(
+    'network failure retains completed tracks without saving failed tracks',
+    () async {
+      final files = ControlledDownloaderRepository();
+      final active = controlledContainer(files);
+      addTearDown(active.dispose);
+      final batch = active
+          .read(batchDownloadProvider.notifier)
+          .startPackDownload(testPack);
+      await waitUntil(() => files.pending.length == 2);
+      files.finish('t1-f1.mp3');
+      files.fail('t2-f2.mp3');
+      await batch;
+      expect(
+        active.read(batchDownloadProvider).status,
+        BatchDownloadStatus.error,
+      );
+      expect(trackRepo.downloadedTracks.map((track) => track.id), ['t1']);
+    },
+  );
+
+  test('cancellation retains downloads that finish in flight', () async {
+    final files = ControlledDownloaderRepository();
+    final active = controlledContainer(files);
+    addTearDown(active.dispose);
+    final notifier = active.read(batchDownloadProvider.notifier);
+    final batch = notifier.startPackDownload(testPack);
+    await waitUntil(() => files.pending.length == 2);
+    await notifier.cancelDownload();
+    files.finish('t1-f1.mp3');
+    files.finish('t2-f2.mp3');
+    await batch;
+    expect(active.read(batchDownloadProvider).status, BatchDownloadStatus.idle);
+    expect(trackRepo.downloadedTracks.length, 2);
+  });
+
+  test('existing files are registered without downloading again', () async {
+    downloaderRepo.files.addAll(['t1-f1.mp3', 't2-f2.mp3']);
+    await container
+        .read(batchDownloadProvider.notifier)
+        .startPackDownload(testPack);
+    expect(trackRepo.downloadedTracks.length, 2);
+    expect(
+      container.read(batchDownloadProvider).status,
+      BatchDownloadStatus.completed,
+    );
+  });
 
   test('cancelDownload stops batch and resets to idle', () async {
     final notifier = container.read(batchDownloadProvider.notifier);
