@@ -334,7 +334,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     return authRepo.when(
       loading: () => const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LaunchSplash(),
+        home: LaunchSplashFrame(child: LaunchSplash()),
       ),
       error: (error, stack) => MaterialApp(
         home: Scaffold(body: Center(child: Text('Error initializing: $error'))),
