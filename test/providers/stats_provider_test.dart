@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:mocktail/mocktail.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/local_all_stats.dart';
@@ -5,11 +7,17 @@ import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/utils/stats_manager.dart';
+import 'package:medito/services/stats_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class _Manager extends Mock implements StatsManager {}
+
+class _Service extends Mock implements StatsService {}
+
 class _FakeAuthRepository implements AuthRepository {
+  User? user;
   @override
-  User? get currentUser => null;
+  User? get currentUser => user;
   @override
   Future<String> getToken() async => '';
   @override
@@ -54,6 +62,63 @@ void main() {
   tearDown(() {
     container.dispose();
   });
+
+  test('empty local snapshot never starts a network request', () async {
+    final service = _Service();
+    statsManager.resetForTesting();
+    await statsManager.initializeForTesting(statsService: service);
+    final local = await statsManager.readLocalSnapshot();
+    expect(local.totalTracksCompleted, 0);
+    verifyNever(() => service.fetchAllStats());
+    statsManager.resetForTesting();
+  });
+
+  for (final outcome in ['success', 'offline', 'account-switch']) {
+    test(
+      'local stats appear before slow sync ($outcome), with one shared refresh',
+      () async {
+        container.dispose();
+        final manager = _Manager();
+        final auth = _FakeAuthRepository()..user = User(id: 'test-user');
+        final gate = Completer<void>();
+        final local = LocalAllStats.empty().copyWith(totalTracksCompleted: 4);
+        final remote = local.copyWith(totalTracksCompleted: 6);
+        when(() => manager.readLocalSnapshot()).thenAnswer((_) async => local);
+        when(() => manager.initialize()).thenAnswer((_) async {});
+        when(() => manager.sync(force: true)).thenAnswer((_) => gate.future);
+        when(() => manager.localAllStats).thenAnswer((_) async => remote);
+        container = ProviderContainer(
+          overrides: [
+            authRepositorySyncProvider.overrideWithValue(auth),
+            statsManagerProvider.overrideWithValue(manager),
+          ],
+        );
+        expect(
+          (await container.read(statsProvider.future)).totalTracksCompleted,
+          4,
+        );
+        expect(gate.isCompleted, isFalse);
+        final notifier = container.read(statsProvider.notifier);
+        final refresh = notifier.refresh();
+        expect(identical(refresh, notifier.refresh()), isTrue);
+        await container.pump();
+        if (outcome == 'account-switch') {
+          auth.user = User(id: 'another-test-user');
+        }
+        if (outcome == 'offline') {
+          gate.completeError(Exception('offline'));
+        } else {
+          gate.complete();
+        }
+        await refresh;
+        expect(
+          container.read(statsProvider).requireValue.totalTracksCompleted,
+          outcome == 'success' ? 6 : 4,
+        );
+        verify(() => manager.sync(force: true)).called(1);
+      },
+    );
+  }
 
   group('StatsNotifier - refreshFromLocal', () {
     test('refreshFromLocal - reads from local stats without syncing', () async {

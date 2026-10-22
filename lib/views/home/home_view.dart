@@ -6,6 +6,7 @@ import 'package:medito/widgets/adaptive/adaptive_home_sections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/stats_provider.dart';
+import 'package:medito/providers/donation/supporter_appeal_provider.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
 import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -49,6 +50,10 @@ class _HomeViewState extends ConsumerState<HomeView>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).invalidate(homeCacheScopeProvider);
     _logScreenView();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fixBrokenNotificationPermission();
@@ -102,7 +107,12 @@ class _HomeViewState extends ConsumerState<HomeView>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final home = ref.watch(fetchHomeProvider);
+    // Begin independent requests while the base feed is loading, rather than
+    // waiting for the data branch below to build the dependent widgets.
+    ref.watch(homeHeroCoverProvider);
+    ref.watch(fetchLatestAnnouncementProvider);
+    ref.watch(supporterAppealProvider);
+    final home = ref.watch(homeContentProvider);
 
     return home.when(
       loading: () => const _HomeLoadingView(),
@@ -230,6 +240,7 @@ class _HomeViewState extends ConsumerState<HomeView>
     }
     // Refetch all pack data; upNext is derived and will re-derive automatically.
     ref.invalidate(packDataProvider);
+    ref.invalidate(spanishFeaturedPackProvider);
     await Future.wait([
       ref.read(statsProvider.notifier).refresh(),
       ref.read(fetchLatestAnnouncementProvider.future),
