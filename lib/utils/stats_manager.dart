@@ -242,6 +242,17 @@ class StatsManager {
     //dev.log'StatsManager: Sync completed');
   }
 
+  /// Current local history for first paint. Unlike localAllStats, this never
+  /// starts a network request, even for an empty/new account.
+  Future<LocalAllStats> readLocalSnapshot() async {
+    await initialize();
+    final generation = _clearGeneration;
+    final snapshot = _allStats ?? await _loadLocalAllStats();
+    if (generation != _clearGeneration) return LocalAllStats.empty();
+    final local = calculateStreak(snapshot);
+    return local.copyWith(consistencyScore: calculateConsistencyScore(local));
+  }
+
   Future<LocalAllStats> get localAllStats async {
     if (_allStats == null) {
       _allStats = await _loadLocalAllStats();

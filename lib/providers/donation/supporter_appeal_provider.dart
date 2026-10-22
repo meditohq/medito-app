@@ -33,13 +33,14 @@ final supporterAppealProvider = FutureProvider<AppealAssignment?>((ref) async {
   final prefs = ref.read(sharedPreferencesProvider);
   // Migration only: cancel the old prototype's local appeal. No local campaign
   // notifications are scheduled anywhere in this provider.
-  await LocalNotifications.cancelSafely(
-    SupporterAppealExperiment.notificationId,
+  unawaited(
+    LocalNotifications.cancelSafely(SupporterAppealExperiment.notificationId),
   );
   if (!SupporterAppealExperiment.enabled) return null;
   try {
-    final stats = await ref.watch(statsProvider.future);
-    if (!ref.mounted) return null;
+    // Consistency is only a reporting band. Loading/reconciling stats must not
+    // hold up the server-authorized announcement after a notification tap.
+    final stats = ref.read(statsProvider).value;
     final granted = (await Permission.notification.status).isGranted;
     if (granted && Platform.isAndroid) {
       await LocalNotifications.ensureInitialized();
@@ -57,37 +58,18 @@ final supporterAppealProvider = FutureProvider<AppealAssignment?>((ref) async {
             ),
           );
     }
-    final userId = prefs.getString(SharedPreferenceConstants.userId);
-    if (userId == null) return null;
-    final api = ref.read(supporterCampaignApiProvider);
-    final data = await api.sync(
-      prefs,
+    return await loadSupporterAppeal(
+      prefs: prefs,
+      api: ref.read(supporterCampaignApiProvider),
       permissionGranted: granted,
-      consistencyBand: stats.consistencyScore < .25
+      consistencyBand: stats == null
+          ? 'unknown'
+          : stats.consistencyScore < .25
           ? 'under_25'
           : stats.consistencyScore < .5
           ? '25_to_50'
           : '50_plus',
     );
-    if (!ref.mounted ||
-        prefs.getString(SharedPreferenceConstants.userId) != userId ||
-        prefs.getBool(SharedPreferenceConstants.isLoggedIn) == false) {
-      return null;
-    }
-    await prefs.setBool('supporter_campaign_registered', true);
-    // Accepted-message opens can still reconcile after a campaign is paused,
-    // even though sync correctly withholds its announcement card.
-    await SupporterAppealRuntime.retryPendingOpen(prefs, api);
-    if (data == null) return null;
-    final experiment = SupporterAppealExperiment(prefs);
-    final previousId = experiment.assignment?.id;
-    if (!await experiment.applyServerAssignment(data, userId: userId)) {
-      return null;
-    }
-    if (previousId != experiment.assignment?.id) {
-      await SupporterAppealRuntime.log('appeal_assignment_observed', prefs);
-    }
-    return experiment.assignment;
   } catch (e) {
     AppLogger.w(
       'SUPPORTER_APPEAL',
@@ -96,6 +78,40 @@ final supporterAppealProvider = FutureProvider<AppealAssignment?>((ref) async {
     return null;
   }
 });
+
+/// Fetch and validate the card without waiting for analytics reconciliation.
+Future<AppealAssignment?> loadSupporterAppeal({
+  required SharedPreferences prefs,
+  required SupporterCampaignApi api,
+  required bool permissionGranted,
+  String consistencyBand = 'unknown',
+}) async {
+  final userId = prefs.getString(SharedPreferenceConstants.userId);
+  if (userId == null) return null;
+  final data = await api.sync(
+    prefs,
+    permissionGranted: permissionGranted,
+    consistencyBand: consistencyBand,
+  );
+  if (prefs.getString(SharedPreferenceConstants.userId) != userId ||
+      prefs.getBool(SharedPreferenceConstants.isLoggedIn) == false) {
+    return null;
+  }
+  await prefs.setBool('supporter_campaign_registered', true);
+  // Accepted-message opens can still reconcile after a campaign is paused,
+  // even though sync correctly withholds its announcement card.
+  unawaited(SupporterAppealRuntime.retryPendingOpen(prefs, api));
+  if (data == null) return null;
+  final experiment = SupporterAppealExperiment(prefs);
+  final previousId = experiment.assignment?.id;
+  if (!await experiment.applyServerAssignment(data, userId: userId)) {
+    return null;
+  }
+  if (previousId != experiment.assignment?.id) {
+    unawaited(SupporterAppealRuntime.log('appeal_assignment_observed', prefs));
+  }
+  return experiment.assignment;
+}
 
 class SupporterAppealRuntime {
   SupporterAppealRuntime._();

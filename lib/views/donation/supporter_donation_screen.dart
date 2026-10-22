@@ -35,7 +35,7 @@ final supporterNativeCheckoutProvider =
       Future<PaywallConfigModel?> resolve() async {
         final config = await ref.watch(supporterPaywallConfigProvider.future);
         if (config.effectiveConfig?['nativePaywall'] == false ||
-            !['monthly', 'yearly', 'oneTime'].any(
+            !['monthly', 'yearly'].any(
               (frequency) =>
                   config.isFrequencyOffered(frequency, source: 'announcement'),
             )) {

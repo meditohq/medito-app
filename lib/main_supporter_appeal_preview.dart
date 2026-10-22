@@ -84,6 +84,7 @@ class PreviewPaymentUIController extends PaymentUIController {
     String? variantId,
     String? experimentId,
     VoidCallback? onSuccess,
+    bool showSuccessFeedback = true,
     Map<String, String> campaignMetadata = const {},
   }) async => _preview(context, amount, currency, 'monthly');
 
@@ -100,6 +101,7 @@ class PreviewPaymentUIController extends PaymentUIController {
     String? variantId,
     String? experimentId,
     VoidCallback? onSuccess,
+    bool showSuccessFeedback = true,
     Map<String, String> campaignMetadata = const {},
   }) async => _preview(context, amount, currency, 'yearly');
 
@@ -116,6 +118,7 @@ class PreviewPaymentUIController extends PaymentUIController {
     String? variantId,
     String? experimentId,
     VoidCallback? onSuccess,
+    bool showSuccessFeedback = true,
     Map<String, String> campaignMetadata = const {},
   }) async => _preview(context, amount, currency, 'one-time');
 }

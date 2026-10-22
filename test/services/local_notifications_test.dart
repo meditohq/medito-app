@@ -8,7 +8,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test(
-    'legacy cancellation initializes first without requesting iOS permission',
+    'legacy cancellation retries failed initialization without requesting iOS permission',
     () async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       IOSFlutterLocalNotificationsPlugin.registerWith();
@@ -19,7 +19,14 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (call) async {
             calls.add(call);
-            if (call.method == 'initialize') return true;
+            if (call.method == 'initialize') {
+              if (calls.length == 1) {
+                throw PlatformException(
+                  code: 'transient_initialization_failure',
+                );
+              }
+              return true;
+            }
             if (call.method == 'pendingNotificationRequests') return <Object>[];
             return null;
           });
@@ -29,7 +36,9 @@ void main() {
             .setMockMethodCallHandler(channel, null);
       });
       await LocalNotifications.cancelSafely(10103000);
+      await LocalNotifications.cancelSafely(10103000);
       expect(calls.map((c) => c.method), [
+        'initialize',
         'initialize',
         'pendingNotificationRequests',
         'cancel',
