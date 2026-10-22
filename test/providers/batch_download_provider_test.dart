@@ -176,49 +176,98 @@ void main() {
     expect(testPack.isFullyDownloaded([testTrack1, testTrack2]), isTrue);
   });
 
-  test('startPackDownload downloads all sessions and updates preferences',
-      () async {
-    final notifier = container.read(batchDownloadProvider.notifier);
+  test(
+    'bulk downloads require a nonempty pack containing only tracks',
+    () async {
+      final folders = testPack.copyWith(
+        items: [testPack.items.first.copyWith(type: TypeConstants.pack)],
+      );
+      final mixed = testPack.copyWith(
+        items: [
+          ...testPack.items,
+          testPack.items.first.copyWith(type: TypeConstants.link),
+        ],
+      );
+      expect(testPack.canDownloadAll, isTrue);
+      for (final pack in [folders, mixed, testPack.copyWith(items: [])]) {
+        expect(pack.canDownloadAll, isFalse);
+        await container
+            .read(batchDownloadProvider.notifier)
+            .startPackDownload(pack);
+        expect(
+          container.read(batchDownloadProvider).status,
+          BatchDownloadStatus.idle,
+        );
+      }
+      expect(downloaderRepo.files, isEmpty);
+      expect(analyticsService.loggedEvents, isEmpty);
+    },
+  );
 
-    expect(container.read(batchDownloadProvider).status,
-        BatchDownloadStatus.idle);
-
-    await notifier.startPackDownload(testPack);
-
-    final finalState = container.read(batchDownloadProvider);
-    expect(finalState.status, BatchDownloadStatus.completed);
-    expect(finalState.completed, 2);
-    expect(finalState.total, 2);
-
-    expect(downloaderRepo.files.contains('t1-f1.mp3'), isTrue);
-    expect(downloaderRepo.files.contains('t2-f2.mp3'), isTrue);
-
-    final savedTracks = await trackRepo.fetchTrackFromPreference();
-    expect(savedTracks.length, 2);
-    expect(savedTracks.any((t) => t.id == 't1'), isTrue);
-    expect(savedTracks.any((t) => t.id == 't2'), isTrue);
+  test('download count ignores duplicates and tracks outside this pack', () {
+    expect(testPack.downloadedTrackCount([]), 0);
+    expect(testPack.downloadedTrackCount([testTrack1, testTrack1]), 1);
+    expect(
+      testPack.downloadedTrackCount([
+        testTrack1,
+        testTrack2,
+        testTrack1.copyWith(id: 'other'),
+      ]),
+      2,
+    );
   });
+
+  test(
+    'startPackDownload downloads all sessions and updates preferences',
+    () async {
+      final notifier = container.read(batchDownloadProvider.notifier);
+
+      expect(
+        container.read(batchDownloadProvider).status,
+        BatchDownloadStatus.idle,
+      );
+
+      await notifier.startPackDownload(testPack);
+
+      final finalState = container.read(batchDownloadProvider);
+      expect(finalState.status, BatchDownloadStatus.completed);
+      expect(finalState.completed, 2);
+      expect(finalState.total, 2);
+
+      expect(downloaderRepo.files.contains('t1-f1.mp3'), isTrue);
+      expect(downloaderRepo.files.contains('t2-f2.mp3'), isTrue);
+
+      final savedTracks = await trackRepo.fetchTrackFromPreference();
+      expect(savedTracks.length, 2);
+      expect(savedTracks.any((t) => t.id == 't1'), isTrue);
+      expect(savedTracks.any((t) => t.id == 't2'), isTrue);
+    },
+  );
 
   test('cancelDownload stops batch and resets to idle', () async {
     final notifier = container.read(batchDownloadProvider.notifier);
     await notifier.cancelDownload();
     expect(
-        container.read(batchDownloadProvider).status, BatchDownloadStatus.idle);
+      container.read(batchDownloadProvider).status,
+      BatchDownloadStatus.idle,
+    );
   });
 
-  test('deletePackDownloads deletes files and removes from preferences',
-      () async {
-    final notifier = container.read(batchDownloadProvider.notifier);
+  test(
+    'deletePackDownloads deletes files and removes from preferences',
+    () async {
+      final notifier = container.read(batchDownloadProvider.notifier);
 
-    // Download first
-    await notifier.startPackDownload(testPack);
-    expect(downloaderRepo.files.length, 2);
-    expect(trackRepo.downloadedTracks.length, 2);
+      // Download first
+      await notifier.startPackDownload(testPack);
+      expect(downloaderRepo.files.length, 2);
+      expect(trackRepo.downloadedTracks.length, 2);
 
-    // Now delete
-    await notifier.deletePackDownloads(testPack);
+      // Now delete
+      await notifier.deletePackDownloads(testPack);
 
-    expect(downloaderRepo.files.isEmpty, isTrue);
-    expect(trackRepo.downloadedTracks.isEmpty, isTrue);
-  });
+      expect(downloaderRepo.files.isEmpty, isTrue);
+      expect(trackRepo.downloadedTracks.isEmpty, isTrue);
+    },
+  );
 }

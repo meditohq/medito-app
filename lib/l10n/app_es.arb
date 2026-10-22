@@ -1405,5 +1405,8 @@
   "deletePackDownloads": "Eliminar descargas",
   "packDownloadsDeleted": "Descargas eliminadas",
   "allDownloaded": "Todas las sesiones descargadas",
-  "overflowMenu": "Más opciones"
+  "overflowMenu": "Más opciones",
+  "downloadRemaining": "Descargar pistas restantes",
+  "packDownloadedCount": "{count} de {total} pistas descargadas",
+  "trackDownloaded": "Descargada"
 }

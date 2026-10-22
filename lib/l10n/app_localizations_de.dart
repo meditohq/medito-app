@@ -3102,4 +3102,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get overflowMenu => 'Weitere Optionen';
+
+  @override
+  String get downloadRemaining => 'Verbleibende Titel herunterladen';
+
+  @override
+  String packDownloadedCount(int count, int total) {
+    return '$count von $total Titeln heruntergeladen';
+  }
+
+  @override
+  String get trackDownloaded => 'Heruntergeladen';
 }

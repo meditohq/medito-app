@@ -5535,6 +5535,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More options'**
   String get overflowMenu;
+
+  /// Action to download tracks in this pack that are not already saved offline
+  ///
+  /// In en, this message translates to:
+  /// **'Download remaining tracks'**
+  String get downloadRemaining;
+
+  /// Offline download status in the pack menu
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {total} tracks downloaded'**
+  String packDownloadedCount(int count, int total);
+
+  /// Label beneath a pack track available offline
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get trackDownloaded;
 }
 
 class _AppLocalizationsDelegate

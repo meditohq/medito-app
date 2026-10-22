@@ -13,13 +13,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
 
-enum BatchDownloadStatus {
-  idle,
-  fetchingTracks,
-  downloading,
-  completed,
-  error,
-}
+enum BatchDownloadStatus { idle, fetchingTracks, downloading, completed, error }
 
 class BatchDownloadState {
   final BatchDownloadStatus status;
@@ -48,20 +42,19 @@ class BatchDownloadState {
     int? completed,
     int? total,
     String? errorMessage,
-  }) =>
-      BatchDownloadState(
-        status: status ?? this.status,
-        packId: packId ?? this.packId,
-        completed: completed ?? this.completed,
-        total: total ?? this.total,
-        errorMessage: errorMessage ?? this.errorMessage,
-      );
+  }) => BatchDownloadState(
+    status: status ?? this.status,
+    packId: packId ?? this.packId,
+    completed: completed ?? this.completed,
+    total: total ?? this.total,
+    errorMessage: errorMessage ?? this.errorMessage,
+  );
 }
 
 final batchDownloadProvider =
     NotifierProvider<BatchDownloadNotifier, BatchDownloadState>(
-  BatchDownloadNotifier.new,
-);
+      BatchDownloadNotifier.new,
+    );
 
 class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
   bool _cancelled = false;
@@ -70,7 +63,7 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
   BatchDownloadState build() => const BatchDownloadState();
 
   Future<void> startPackDownload(PackModel pack) async {
-    if (state.isDownloading) return;
+    if (state.isDownloading || !pack.canDownloadAll) return;
     _cancelled = false;
 
     state = BatchDownloadState(
@@ -80,10 +73,14 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
       total: 0,
     );
 
-    unawaited(ref.read(analyticsServiceProvider).logEvent(
-      name: AnalyticsEventConstants.packBatchDownloadStarted,
-      parameters: {AnalyticsEventConstants.paramPackId: pack.id},
-    ));
+    unawaited(
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: AnalyticsEventConstants.packBatchDownloadStarted,
+            parameters: {AnalyticsEventConstants.paramPackId: pack.id},
+          ),
+    );
 
     final trackItems = pack.items
         .where((item) => item.type == TypeConstants.track)
@@ -127,16 +124,20 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
             '${track.id}-${file.id}${getAudioFileExtension(file.path)}';
         final isDownloaded = await downloaderRepo.isFileDownloaded(fileName);
 
-        tracksForPreference.add(Track(
-          id: track.id,
-          title: track.title,
-          description: track.description,
-          coverUrl: track.coverUrl,
-          isPublished: true,
-          hasBackgroundSound: track.hasBackgroundSound,
-          artist: track.artist,
-          voices: [TrackVoice(guideName: voice.guideName, audioFiles: [file])],
-        ));
+        tracksForPreference.add(
+          Track(
+            id: track.id,
+            title: track.title,
+            description: track.description,
+            coverUrl: track.coverUrl,
+            isPublished: true,
+            hasBackgroundSound: track.hasBackgroundSound,
+            artist: track.artist,
+            voices: [
+              TrackVoice(guideName: voice.guideName, audioFiles: [file]),
+            ],
+          ),
+        );
 
         if (!isDownloaded) {
           itemsToDownload.add((url: file.path, fileName: fileName));
@@ -182,10 +183,14 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
 
       await _saveDownloadedTracksToPreference(tracksForPreference);
 
-      unawaited(ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.packBatchDownloadCompleted,
-        parameters: {AnalyticsEventConstants.paramPackId: pack.id},
-      ));
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.packBatchDownloadCompleted,
+              parameters: {AnalyticsEventConstants.paramPackId: pack.id},
+            ),
+      );
 
       state = state.copyWith(
         status: BatchDownloadStatus.completed,
@@ -210,7 +215,9 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
       for (final t in newTracks) {
         trackMap.putIfAbsent(t.id, () => t);
       }
-      await ref.read(trackRepositoryProvider).addTrackInPreference(trackMap.values.toList());
+      await ref
+          .read(trackRepositoryProvider)
+          .addTrackInPreference(trackMap.values.toList());
       ref.invalidate(downloadedTracksProvider);
     } catch (e) {
       AppLogger.e('BATCH_DOWNLOAD', 'Failed saving tracks to preference: $e');
@@ -223,10 +230,14 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
 
     final packId = state.packId;
     if (packId != null) {
-      unawaited(ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.packBatchDownloadCancelled,
-        parameters: {AnalyticsEventConstants.paramPackId: packId},
-      ));
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.packBatchDownloadCancelled,
+              parameters: {AnalyticsEventConstants.paramPackId: packId},
+            ),
+      );
     }
 
     state = const BatchDownloadState(status: BatchDownloadStatus.idle);
@@ -254,15 +265,18 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
         }
       }
 
-      final remaining =
-          current.where((t) => !trackIds.contains(t.id)).toList();
+      final remaining = current.where((t) => !trackIds.contains(t.id)).toList();
       await ref.read(trackRepositoryProvider).addTrackInPreference(remaining);
       ref.invalidate(downloadedTracksProvider);
 
-      unawaited(ref.read(analyticsServiceProvider).logEvent(
-        name: AnalyticsEventConstants.packBatchDownloadsDeleted,
-        parameters: {AnalyticsEventConstants.paramPackId: pack.id},
-      ));
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.packBatchDownloadsDeleted,
+              parameters: {AnalyticsEventConstants.paramPackId: pack.id},
+            ),
+      );
     } catch (e) {
       AppLogger.e('BATCH_DOWNLOAD', 'Failed deleting pack downloads: $e');
     }
@@ -271,9 +285,24 @@ class BatchDownloadNotifier extends Notifier<BatchDownloadState> {
 
 /// Helper extension on PackModel to test whether all of its sessions are downloaded.
 extension PackDownloadExtension on PackModel {
+  bool get canDownloadAll =>
+      items.isNotEmpty &&
+      items.every((item) => item.type == TypeConstants.track);
+
+  int downloadedTrackCount(List<Track> downloadedTracks) {
+    final downloadedIds = downloadedTracks.map((track) => track.id).toSet();
+    return items
+        .where((item) => item.type == TypeConstants.track)
+        .map((item) => item.id)
+        .toSet()
+        .intersection(downloadedIds)
+        .length;
+  }
+
   bool isFullyDownloaded(List<Track> downloadedTracks) {
-    final trackItems =
-        items.where((i) => i.type == TypeConstants.track).toList();
+    final trackItems = items
+        .where((i) => i.type == TypeConstants.track)
+        .toList();
     if (trackItems.isEmpty) return false;
     return trackItems.every(
       (item) => downloadedTracks.any((d) => d.id == item.id),

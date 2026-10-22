@@ -2280,5 +2280,11 @@
   "overflowMenu": "More options",
   "@overflowMenu": {
     "description": "Accessibility label for the overflow menu button on the pack screen"
-  }
+  },
+  "downloadRemaining": "Download remaining tracks",
+  "@downloadRemaining": {"description": "Action to download tracks in this pack that are not already saved offline"},
+  "packDownloadedCount": "{count} of {total} tracks downloaded",
+  "@packDownloadedCount": {"description": "Offline download status in the pack menu", "placeholders": {"count": {"type": "int"}, "total": {"type": "int"}}},
+  "trackDownloaded": "Downloaded",
+  "@trackDownloaded": {"description": "Label beneath a pack track available offline"}
 }

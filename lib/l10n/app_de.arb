@@ -1805,5 +1805,8 @@
   "deletePackDownloads": "Downloads löschen",
   "packDownloadsDeleted": "Downloads entfernt",
   "allDownloaded": "Alle Sitzungen heruntergeladen",
-  "overflowMenu": "Weitere Optionen"
+  "overflowMenu": "Weitere Optionen",
+  "downloadRemaining": "Verbleibende Titel herunterladen",
+  "packDownloadedCount": "{count} von {total} Titeln heruntergeladen",
+  "trackDownloaded": "Heruntergeladen"
 }
