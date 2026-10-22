@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/currency.dart';
+import 'package:medito/widgets/dialogs/medito_dialog_buttons.dart';
 
 /// A persistent acknowledgement shared by every native donation entry point.
 /// Web checkout keeps its own confirmation page instead of showing both.
@@ -17,6 +18,7 @@ Future<void> showDonationSuccessSheet(
     builder: (context) {
       final l10n = AppLocalizations.of(context)!;
       final theme = Theme.of(context);
+      final onSurface = theme.colorScheme.onSurface;
       return SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
@@ -40,7 +42,9 @@ Future<void> showDonationSuccessSheet(
                 child: Text(
                   l10n.thankYouForYourSupport,
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -50,20 +54,25 @@ Future<void> showDonationSuccessSheet(
                   currency.toUpperCase(),
                 ),
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: onSurface,
+                  height: 1.5,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
                 l10n.donorSupportMessage,
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: onSurface.withValues(alpha: 0.7),
+                ),
               ),
               const SizedBox(height: 28),
               SizedBox(
                 width: double.infinity,
-                child: FilledButton(
+                child: MeditoDialogPrimaryButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l10n.continueText),
+                  label: l10n.continueText,
                 ),
               ),
             ],
