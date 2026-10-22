@@ -21,6 +21,8 @@ import '../../constants/strings/analytics_event_constants.dart';
 import '../../models/notification/notification_payload_model.dart';
 import '../analytics/firebase_analytics_service.dart';
 import 'local_notifications.dart';
+import 'notification_timing.dart';
+import '../../providers/donation/supporter_appeal_provider.dart';
 import '../../routes/routes.dart';
 import '../../views/bottom_navigation/bottom_navigation_bar_view.dart';
 
@@ -217,6 +219,11 @@ class FirebaseMessagingHandler {
     Map<String, dynamic>? data, {
     String? sourceOverride,
   }) async {
+    try {
+      await SupporterAppealRuntime.recordOpen(data);
+    } catch (e) {
+      AppLogger.w('SUPPORTER_APPEAL', 'Could not record appeal open: $e');
+    }
     final source =
         sourceOverride ??
         (data?['source'] as String?) ??
@@ -228,6 +235,7 @@ class FirebaseMessagingHandler {
       parameters: {
         AnalyticsEventConstants.paramSource: source,
         if (day is int) AnalyticsEventConstants.paramNotificationDay: day,
+        ...NotificationTiming.opened(data, DateTime.now()),
       },
     );
   }

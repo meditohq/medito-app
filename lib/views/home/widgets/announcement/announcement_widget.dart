@@ -16,10 +16,12 @@ class AnnouncementWidget extends ConsumerStatefulWidget {
     super.key,
     required this.announcement,
     this.onPressedDismiss,
+    this.onCtaPressed,
   });
 
   final AnnouncementModel announcement;
   final void Function()? onPressedDismiss;
+  final VoidCallback? onCtaPressed;
 
   @override
   ConsumerState<AnnouncementWidget> createState() => _AnnouncementWidgetState();
@@ -151,7 +153,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       // Themed ElevatedButton: accent fill with the accent's own foreground.
       actionWidgets.add(
         ElevatedButton(
-          onPressed: () => _handleCtaTitlePress(context),
+          onPressed: widget.onCtaPressed ?? () => _handleCtaTitlePress(context),
           style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(8)),
           child: Text(widget.announcement.ctaTitle ?? ''),
         ),

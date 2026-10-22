@@ -1,4 +1,7 @@
 import 'dart:convert';
+import '../../providers/donation/supporter_appeal_experiment.dart';
+import '../notifications/local_notifications.dart';
+import '../notifications/notification_timing.dart';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,11 +20,14 @@ import '../../utils/stats_manager.dart';
 /// attribution, not routing. Must stay valid JSON: the handler decodes it, and
 /// a bare string (what the series used to build, and then never attached)
 /// decodes to nothing.
-String reminderPayload(int day) => json.encode({
-  AnalyticsEventConstants.paramSource:
-      AnalyticsEventConstants.sourceLocalReminder,
-  AnalyticsEventConstants.paramNotificationDay: day,
-});
+String reminderPayload(int day, {DateTime? scheduledAt, int? notificationId}) =>
+    json.encode({
+      AnalyticsEventConstants.paramSource:
+          AnalyticsEventConstants.sourceLocalReminder,
+      AnalyticsEventConstants.paramNotificationDay: day,
+      if (scheduledAt != null && notificationId != null)
+        ...NotificationTiming.planned(scheduledAt, notificationId),
+    });
 
 /// The series re-anchors after every session so the streak and consistency
 /// numbers baked into each day's copy stay current. That part is deliberate.
@@ -103,6 +109,9 @@ class DailyRemindersService {
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, false);
     await reminders.cancelDailyNotification();
     await reminders.cancelReminderSeries();
+    await LocalNotifications.cancelSafely(
+      SupporterAppealExperiment.notificationId,
+    );
   }
 
   TimeOfDay _computeDefaultTimeFromNow() {
@@ -160,7 +169,11 @@ class DailyRemindersScheduler {
           when: tzWhen,
           title: copy.$1,
           body: copy.$2,
-          payload: reminderPayload(i + 1),
+          payload: reminderPayload(
+            i + 1,
+            scheduledAt: when,
+            notificationId: reminderSeriesBaseId + i,
+          ),
         ),
       );
     }
@@ -179,7 +192,11 @@ class DailyRemindersScheduler {
         when: day30TzWhen,
         title: day30Copy.$1,
         body: day30Copy.$2,
-        payload: reminderPayload(30),
+        payload: reminderPayload(
+          30,
+          scheduledAt: day30When,
+          notificationId: reminderSeriesBaseId + 15,
+        ),
       ),
     );
 

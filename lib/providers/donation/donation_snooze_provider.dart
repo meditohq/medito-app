@@ -1,4 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../services/notifications/local_notifications.dart';
+import 'supporter_appeal_experiment.dart';
 
 import '../../constants/strings/shared_preference_constants.dart';
 import '../shared_preference/shared_preference_provider.dart';
@@ -98,5 +100,8 @@ class DonationSnooze extends _$DonationSnooze {
     );
 
     ref.invalidateSelf();
+    await LocalNotifications.cancelSafely(
+      SupporterAppealExperiment.notificationId,
+    );
   }
 }
