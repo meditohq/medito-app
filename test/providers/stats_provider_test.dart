@@ -1,3 +1,11 @@
+import 'dart:convert';
+
+import 'package:medito/constants/strings/shared_preference_constants.dart';
+import 'package:medito/exceptions/app_error.dart';
+import 'package:medito/views/previews/preview_support.dart'
+    show FakeAuthRepository;
+import 'package:mockito/mockito.dart';
+import '../stats_manager_test.mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/models/local_all_stats.dart';
@@ -53,6 +61,51 @@ void main() {
 
   tearDown(() {
     container.dispose();
+    statsManager.resetForTesting();
+  });
+
+  test('failed sync preserves saved stats on a cold offline load', () async {
+    container.dispose();
+    statsManager.resetForTesting();
+    final saved = LocalAllStats.empty().copyWith(
+      streakCurrent: 4,
+      totalTracksCompleted: 7,
+      audioCompleted: [
+        LocalAudioCompleted(id: 'offline-session', timestamp: 1234),
+      ],
+    );
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      SharedPreferenceConstants.localAllStatsKey,
+      jsonEncode(saved.toJson()),
+    );
+    final service = MockStatsService();
+    when(service.fetchAllStats()).thenThrow(const NetworkConnectionError());
+    await statsManager.initializeForTesting(statsService: service);
+    container = ProviderContainer(
+      overrides: [
+        authRepositorySyncProvider.overrideWithValue(FakeAuthRepository()),
+      ],
+    );
+
+    final result = await container.read(statsProvider.future);
+
+    expect(result.streakCurrent, 4);
+    expect(result.totalTracksCompleted, 7);
+    expect(result.audioCompleted?.single.id, 'offline-session');
+    expect(container.read(statsProvider).hasError, false);
+    verify(service.fetchAllStats()).called(1);
+  });
+
+  test('reading empty local stats never tries the network', () async {
+    statsManager.resetForTesting();
+    final service = MockStatsService();
+    await statsManager.initializeForTesting(statsService: service);
+
+    final result = await statsManager.readLocalStats();
+
+    expect(result.totalTracksCompleted, 0);
+    verifyNever(service.fetchAllStats());
   });
 
   group('StatsNotifier - refreshFromLocal', () {

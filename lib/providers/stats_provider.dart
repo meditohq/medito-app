@@ -130,7 +130,12 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
         );
         await statsManager.initialize();
         // Force sync when refreshing to get latest data from server across devices
-        await statsManager.sync(force: force);
+        try {
+          await statsManager.sync(force: force);
+        } catch (error) {
+          // Sync is best-effort: saved progress remains available offline.
+          AppLogger.w('STATS_PROVIDER', 'Stats sync failed: $error');
+        }
       } else {
         AppLogger.d(
           'STATS_PROVIDER',
@@ -138,7 +143,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
         );
       }
 
-      return await statsManager.localAllStats;
+      return await statsManager.readLocalStats();
     } catch (error) {
       AppLogger.e('STATS_PROVIDER', 'StatsNotifier: Error during fetch', error);
 
@@ -186,7 +191,7 @@ class StatsNotifier extends AsyncNotifier<LocalAllStats> {
 
     try {
       await statsManager.initialize();
-      var localStats = await statsManager.localAllStats;
+      var localStats = await statsManager.readLocalStats();
       state = AsyncValue.data(localStats);
       AppLogger.d(
         'STATS_PROVIDER',

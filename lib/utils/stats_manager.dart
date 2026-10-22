@@ -242,6 +242,13 @@ class StatsManager {
     //dev.log'StatsManager: Sync completed');
   }
 
+  /// Reads saved progress without attempting a network sync, even when empty.
+  Future<LocalAllStats> readLocalStats() async {
+    await initialize();
+    _allStats ??= await _loadLocalAllStats();
+    return _allStats!;
+  }
+
   Future<LocalAllStats> get localAllStats async {
     if (_allStats == null) {
       _allStats = await _loadLocalAllStats();

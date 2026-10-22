@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'animated_end_screen_section.dart';
+
 import 'dart:io';
 
 import 'package:medito/constants/constants.dart';
@@ -11,6 +12,7 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
+
 import '../../../services/analytics/firebase_analytics_service.dart';
 import '../../../widgets/dialogs/dialogs.dart';
 import '../../../widgets/medito_icon.dart';
@@ -29,7 +31,6 @@ import '../../../repositories/auth/auth_repository.dart';
 import '../../../routes/routes.dart';
 import '../../../utils/logger.dart';
 import '../../../utils/receipt_email.dart';
-import '../../../widgets/errors/medito_error_widget.dart';
 import '../../home/widgets/home_gradient_border.dart';
 import 'donation_thank_you_card.dart';
 import 'feedback_widget.dart';
@@ -287,73 +288,56 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     final donationPage = ref.watch(fetchDonationPageProvider);
     final snoozeState = ref.watch(donationSnoozeProvider);
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: donationPage.when(
-        loading: () => _buildLoadingWidget(),
-        error: (err, _) {
-          // An impression that could never convert — counted separately so the
-          // ask denominator stays honest instead of silently shrinking. Logged
-          // only once Riverpod's own retries have given up, so a blip that
-          // recovers on its own is not counted as a lost ask.
-          if (!_loadFailureLogged && !donationPage.retrying) {
-            _loadFailureLogged = true;
-            _logOnce(
-              AnalyticsEventConstants.endScreenDonationCardLoadFailed,
-              parameters: {
-                AnalyticsEventConstants.paramPaywallSource:
-                    FirebaseAnalyticsService.paywallSourceEndScreen,
-                AnalyticsEventConstants.paramErrorKind: _errorKind(err),
-              },
-            );
-          }
-          final error = err is AppError ? err : const UnknownError();
-          return MeditoErrorWidget(
-            error: error,
-            onTap: _retryLoad,
-            isScaffold: false,
-          );
+    // Feedback and locally stored donor/snooze state do not depend on the
+    // remote donation copy. Keep them usable while that request is unavailable.
+    if (donationPage.hasError &&
+        !_loadFailureLogged &&
+        !donationPage.retrying) {
+      _loadFailureLogged = true;
+      _logOnce(
+        AnalyticsEventConstants.endScreenDonationCardLoadFailed,
+        parameters: {
+          AnalyticsEventConstants.paramPaywallSource:
+              FirebaseAnalyticsService.paywallSourceEndScreen,
+          AnalyticsEventConstants.paramErrorKind: _errorKind(
+            donationPage.error!,
+          ),
         },
-        data: (DonationPageModel donationPageModel) {
-          if (!snoozeState.isSnoozed && _isInlineVariant) {
-            // Impression is logged from inside the B builder once it knows
-            // whether the inline body or the fallback CTA rendered.
-          } else {
-            _logImpression(isSnoozed: snoozeState.isSnoozed);
-          }
-          // Someone who tapped "Hide for now" asked for silence: no card at
-          // all for the snooze window (the suppressed impression above still
-          // keeps the denominator honest). Donors get a thank-you instead.
-          return Column(
-            children: [
-              AnimatedEndScreenSection(
-                child: snoozeState.isSnoozed && !snoozeState.isDonor
-                    ? const SizedBox.shrink()
-                    : Column(
-                        children: [
-                          snoozeState.isSnoozed
-                              ? const DonationThankYouCard()
-                              : _buildDonationWidget(
-                                  context,
-                                  donationPageModel,
-                                  isSnoozed: false,
-                                ),
-                          height20,
-                        ],
-                      ),
-              ),
-              FeedbackWidget(suppressRatingAsk: () => _donateTapped),
-            ],
-          );
-        },
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildLoadingWidget() {
-    return const SizedBox(
-      height: 200,
-      child: Center(child: CircularProgressIndicator()),
+    final page = donationPage.value;
+    final showLocalState = snoozeState.isSnoozed;
+    final canShowAsk = page != null || donationPage.hasError;
+    if (showLocalState || (canShowAsk && !_isInlineVariant)) {
+      _logImpression(isSnoozed: snoozeState.isSnoozed);
+    }
+
+    return Column(
+      children: [
+        AnimatedEndScreenSection(
+          child: showLocalState && !snoozeState.isDonor
+              ? const SizedBox.shrink()
+              : showLocalState || canShowAsk
+              ? Column(
+                  children: [
+                    showLocalState
+                        ? const DonationThankYouCard()
+                        : _buildDonationWidget(
+                            context,
+                            page ??
+                                const DonationPageModel(
+                                  buttons: [ButtonModel()],
+                                ),
+                            isSnoozed: false,
+                          ),
+                    height20,
+                  ],
+                )
+              : const SizedBox.shrink(),
+        ),
+        FeedbackWidget(suppressRatingAsk: () => _donateTapped),
+      ],
     );
   }
 
@@ -413,9 +397,8 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
             const SizedBox(height: 10),
             Text(
               donationPageModel.text ??
-                  AppLocalizations.of(
-                    context,
-                  )!.meditoReliesOnYourDonationsToSurvive,
+                  AppLocalizations.of(context)!
+                      .meditoReliesOnYourDonationsToSurvive,
               textAlign: TextAlign.left,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontSize: 16,
