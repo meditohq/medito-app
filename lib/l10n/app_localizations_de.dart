@@ -3079,4 +3079,38 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get sessionBellEnd => 'Ende';
+
+  @override
+  String get downloadAll => 'Alle herunterladen';
+
+  @override
+  String downloadingPack(int completed, int total) {
+    return 'Lade $completed von $total herunter';
+  }
+
+  @override
+  String get stopDownloading => 'Download anhalten';
+
+  @override
+  String get deletePackDownloads => 'Downloads löschen';
+
+  @override
+  String get packDownloadsDeleted => 'Downloads entfernt';
+
+  @override
+  String get allDownloaded => 'Alle Sitzungen heruntergeladen';
+
+  @override
+  String get overflowMenu => 'Weitere Optionen';
+
+  @override
+  String get downloadRemaining => 'Verbleibende Titel herunterladen';
+
+  @override
+  String packDownloadedCount(int count, int total) {
+    return '$count von $total Titeln heruntergeladen';
+  }
+
+  @override
+  String get trackDownloaded => 'Heruntergeladen';
 }

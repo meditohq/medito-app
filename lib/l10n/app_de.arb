@@ -1798,5 +1798,15 @@
   "sessionBellEveryMinuteDescription": "Eine Glocke am Anfang, jede Minute und am Ende",
   "sessionBellBeginning": "Anfang",
   "sessionBellMiddle": "Mitte",
-  "sessionBellEnd": "Ende"
+  "sessionBellEnd": "Ende",
+  "downloadAll": "Alle herunterladen",
+  "downloadingPack": "Lade {completed} von {total} herunter",
+  "stopDownloading": "Download anhalten",
+  "deletePackDownloads": "Downloads löschen",
+  "packDownloadsDeleted": "Downloads entfernt",
+  "allDownloaded": "Alle Sitzungen heruntergeladen",
+  "overflowMenu": "Weitere Optionen",
+  "downloadRemaining": "Verbleibende Titel herunterladen",
+  "packDownloadedCount": "{count} von {total} Titeln heruntergeladen",
+  "trackDownloaded": "Heruntergeladen"
 }

@@ -73,13 +73,42 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
         audioDownloadState: finalDownloadState,
       );
 
-      await ref.read(
-        deleteDownloadedTrackByIdProvider(fileId: request.fileId).future,
+      final repository = ref.read(trackRepositoryProvider);
+      final tracks = await repository.fetchTrackFromPreference();
+      final updated = tracks
+          .where(
+            (track) => !track.voices.any(
+              (voice) =>
+                  voice.audioFiles.any((file) => file.id == request.fileId),
+            ),
+          )
+          .toList();
+      updated.add(
+        Track(
+          id: request.trackId,
+          title: request.title,
+          description: request.description,
+          coverUrl: request.coverUrl,
+          isPublished: true,
+          hasBackgroundSound: request.hasBackgroundSound,
+          artist: request.artist,
+          voices: [
+            TrackVoice(
+              guideName: request.guideName,
+              audioFiles: [
+                TrackAudioFile(
+                  id: request.fileId,
+                  path: request.remoteUrl,
+                  duration: request.duration,
+                ),
+              ],
+            ),
+          ],
+        ),
       );
-
+      await repository.addTrackInPreference(updated);
       if (!ref.mounted) return;
-
-      await ref.read(addDownloadedTrackProvider(request: request).future);
+      ref.invalidate(downloadedTracksProvider);
     } catch (e) {
       if (ref.mounted) {
         var errorDownloadState = Map<String, AudioDownloadState>.from(
@@ -90,6 +119,29 @@ class AudioDownloaderProvider extends Notifier<AudioDownloaderState> {
       }
       rethrow;
     }
+  }
+
+  /// Keep file removal and saved-download state in the same long-lived action,
+  /// so navigating away from the player cannot dispose the preference update.
+  Future<void> removeTrackDownload({
+    required String fileName,
+    required String fileId,
+  }) async {
+    await deleteTrackAudio(fileName);
+    if (!ref.mounted) return;
+
+    final repository = ref.read(trackRepositoryProvider);
+    final tracks = await repository.fetchTrackFromPreference();
+    final remaining = tracks
+        .where(
+          (track) => !track.voices.any(
+            (voice) => voice.audioFiles.any((file) => file.id == fileId),
+          ),
+        )
+        .toList();
+    await repository.addTrackInPreference(remaining);
+    if (!ref.mounted) return;
+    ref.invalidate(downloadedTracksProvider);
   }
 
   Future<void> deleteTrackAudio(String fileName) async {

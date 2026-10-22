@@ -3,10 +3,12 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/meditation/download_track_provider.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:medito/views/pack/widgets/pack_complete_badge.dart';
 
-class PackItemWidget extends StatelessWidget {
+class PackItemWidget extends ConsumerWidget {
   const PackItemWidget({super.key, required this.item, this.onSetComplete});
 
   final PackItemsModel item;
@@ -17,8 +19,16 @@ class PackItemWidget extends StatelessWidget {
   final Future<bool> Function(bool complete)? onSetComplete;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var hasSubtitle = item.subtitle.isNotNullAndNotEmpty();
+    final isDownloaded =
+        item.type == TypeConstants.track &&
+        (ref
+                .watch(downloadedTracksProvider)
+                .asData
+                ?.value
+                .any((track) => track.id == item.id) ??
+            false);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -41,14 +51,39 @@ class PackItemWidget extends StatelessWidget {
                           item.title,
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
-                      if (hasSubtitle)
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              item.subtitle ?? '',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
+                      if (hasSubtitle || isDownloaded)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Row(
+                            children: [
+                              if (hasSubtitle)
+                                Flexible(
+                                  child: Text(
+                                    item.subtitle!,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
+                                  ),
+                                ),
+                              if (hasSubtitle && isDownloaded)
+                                const SizedBox(width: 6),
+                              if (isDownloaded)
+                                Tooltip(
+                                  message: AppLocalizations.of(
+                                    context,
+                                  )!.trackDownloaded,
+                                  child: Icon(
+                                    Icons.download_done,
+                                    size: 14,
+                                    color: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium?.color,
+                                    semanticLabel: AppLocalizations.of(
+                                      context,
+                                    )!.trackDownloaded,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                     ],
