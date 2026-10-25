@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/tags/tags_provider.dart';
 
 import 'widgets/box_shimmer_widget.dart';
@@ -26,68 +27,75 @@ class TrackShimmerWidget extends ConsumerWidget {
     // their row then.
     final showTags = !ref.watch(tagCatalogProvider).isEmpty;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const AspectRatio(
-          aspectRatio: 16 / 9,
-          child: BoxShimmerWidget(
-            width: double.infinity,
-            height: double.infinity,
-            borderRadius: 20,
-          ),
-        ),
-        const SizedBox(height: 24),
-        const _LineShimmer(lineHeight: _titleLineHeight, widthFactor: 0.6),
-        const SizedBox(height: 8),
-        const _LineShimmer(lineHeight: _descriptionLineHeight),
-        const _LineShimmer(lineHeight: _descriptionLineHeight),
-        const _LineShimmer(
-          lineHeight: _descriptionLineHeight,
-          widthFactor: 0.6,
-        ),
-        if (showTags)
-          const Padding(
-            padding: EdgeInsets.only(top: 12),
-            child: Row(
-              children: [
-                BoxShimmerWidget(
-                  height: _chipHeight,
-                  width: 96,
-                  borderRadius: _chipHeight / 2,
-                ),
-                SizedBox(width: 8),
-                BoxShimmerWidget(
-                  height: _chipHeight,
-                  width: 72,
-                  borderRadius: _chipHeight / 2,
-                ),
-              ],
+    // One "Loading" stop instead of silence while the track loads.
+    return Semantics(
+      container: true,
+      label: AppLocalizations.of(context)!.loading,
+      child: ExcludeSemantics(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const AspectRatio(
+              aspectRatio: 16 / 9,
+              child: BoxShimmerWidget(
+                width: double.infinity,
+                height: double.infinity,
+                borderRadius: 20,
+              ),
             ),
-          ),
-        const SizedBox(height: 24),
-        // Guide + duration pickers
-        if (useCompactLayout)
-          const Row(
-            children: [
-              Expanded(child: _PickerShimmer()),
-              SizedBox(width: 12),
-              Expanded(child: _PickerShimmer()),
+            const SizedBox(height: 24),
+            const _LineShimmer(lineHeight: _titleLineHeight, widthFactor: 0.6),
+            const SizedBox(height: 8),
+            const _LineShimmer(lineHeight: _descriptionLineHeight),
+            const _LineShimmer(lineHeight: _descriptionLineHeight),
+            const _LineShimmer(
+              lineHeight: _descriptionLineHeight,
+              widthFactor: 0.6,
+            ),
+            if (showTags)
+              const Padding(
+                padding: EdgeInsets.only(top: 12),
+                child: Row(
+                  children: [
+                    BoxShimmerWidget(
+                      height: _chipHeight,
+                      width: 96,
+                      borderRadius: _chipHeight / 2,
+                    ),
+                    SizedBox(width: 8),
+                    BoxShimmerWidget(
+                      height: _chipHeight,
+                      width: 72,
+                      borderRadius: _chipHeight / 2,
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 24),
+            // Guide + duration pickers
+            if (useCompactLayout)
+              const Row(
+                children: [
+                  Expanded(child: _PickerShimmer()),
+                  SizedBox(width: 12),
+                  Expanded(child: _PickerShimmer()),
+                ],
+              )
+            else ...const [
+              _PickerShimmer(),
+              SizedBox(height: 12),
+              _PickerShimmer(),
             ],
-          )
-        else ...const [
-          _PickerShimmer(),
-          SizedBox(height: 12),
-          _PickerShimmer(),
-        ],
-        const SizedBox(height: 12),
-        // Play button
-        const BoxShimmerWidget(
-          height: 56,
-          width: double.infinity,
-          borderRadius: 28,
+            const SizedBox(height: 12),
+            // Play button
+            const BoxShimmerWidget(
+              height: 56,
+              width: double.infinity,
+              borderRadius: 28,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

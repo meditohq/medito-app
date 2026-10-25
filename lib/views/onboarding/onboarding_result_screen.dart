@@ -18,6 +18,7 @@ import 'package:medito/utils/track_variant_selector.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
+import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 
 /// The three possible outcome states for the onboarding result screen.
 enum OnboardingResultState {
@@ -265,7 +266,7 @@ class _OnboardingResultScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  OnboardingStepTitle(
                     heading,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -392,12 +393,16 @@ class _OnboardingResultScreenState
         ),
         if (_started) ...[
           const SizedBox(height: 18),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 5,
-              backgroundColor: onSurface.withOpacityValue(0.12),
+          // A bare, ever-changing percentage ("4") is noise next to the
+          // play/pause button.
+          ExcludeSemantics(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 5,
+                backgroundColor: onSurface.withOpacityValue(0.12),
+              ),
             ),
           ),
         ],
@@ -451,12 +456,19 @@ class _OnboardingResultScreenState
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: context.onBrandAccent,
+                        semanticsLabel: l10n.loading,
                       ),
                     )
                   : Icon(
                       isPlaying ? Icons.pause : Icons.play_arrow,
                       color: context.onBrandAccent,
                       size: 32,
+                      // Icon-only button: this is its only name.
+                      semanticLabel: !_started
+                          ? l10n.onboardingFirstMeditationBegin
+                          : isPlaying
+                          ? l10n.pause
+                          : l10n.play,
                     ),
             ),
           ),
@@ -470,47 +482,61 @@ class _OnboardingResultScreenState
         ref.watch(statsProvider).value?.streakCurrent ?? (_priorStreak + 1);
     return Column(
       children: [
-        Text(
-          l10n.onboardingFirstMeditationDone,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: onSurface,
+        // The player swaps for this in place; the live region reads it out.
+        Semantics(
+          liveRegion: true,
+          child: Text(
+            l10n.onboardingFirstMeditationDone,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: onSurface,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
-        TweenAnimationBuilder<double>(
-          tween: Tween(
-            begin: _priorStreak.toDouble(),
-            end: currentStreak.toDouble(),
-          ),
-          duration: const Duration(milliseconds: 900),
-          curve: Curves.easeOutCubic,
-          builder: (context, value, _) => Row(
+        // One "1 day streak", not the counting-up number then "day streak".
+        Semantics(
+          label: l10n.streakDays(currentStreak),
+          excludeSemantics: true,
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              MeditoIcon(
-                assetName: MeditoIcons.fire,
-                size: 44,
-                color: context.brandAccent,
+              TweenAnimationBuilder<double>(
+                tween: Tween(
+                  begin: _priorStreak.toDouble(),
+                  end: currentStreak.toDouble(),
+                ),
+                duration: const Duration(milliseconds: 900),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, _) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    MeditoIcon(
+                      assetName: MeditoIcons.fire,
+                      size: 44,
+                      color: context.brandAccent,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      '${value.round()}',
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        fontSize: 48,
+                        fontWeight: FontWeight.w700,
+                        color: onSurface,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(height: 4),
               Text(
-                '${value.round()}',
-                style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                  fontSize: 48,
-                  fontWeight: FontWeight.w700,
-                  color: onSurface,
+                l10n.dayStreak,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: onSurface.withOpacityValue(0.9),
                 ),
               ),
             ],
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          l10n.dayStreak,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: onSurface.withOpacityValue(0.9),
           ),
         ),
       ],
@@ -533,7 +559,7 @@ class _GetStartedButtonState extends State<_GetStartedButton>
   late final AnimationController _breathe = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 2400),
-  )..repeat(reverse: true);
+  );
 
   late final AnimationController _press = AnimationController(
     vsync: this,
@@ -543,6 +569,17 @@ class _GetStartedButtonState extends State<_GetStartedButton>
   );
 
   bool _dispatched = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The highlight sweep loops forever, so reduce motion turns it off.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _breathe.stop();
+    } else if (!_breathe.isAnimating) {
+      _breathe.repeat(reverse: true);
+    }
+  }
 
   @override
   void dispose() {
@@ -566,6 +603,7 @@ class _GetStartedButtonState extends State<_GetStartedButton>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final bg = isDark ? ColorConstants.onyx : ColorConstants.lightOnSurface;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
     return AnimatedBuilder(
       animation: Listenable.merge([_breathe, _press]),
       builder: (context, _) {
@@ -591,31 +629,32 @@ class _GetStartedButtonState extends State<_GetStartedButton>
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
                   children: [
-                    Positioned.fill(
-                      child: Align(
-                        alignment: Alignment(
-                          -1.4 + (_breathe.value * 2.8),
-                          -1.0,
-                        ),
-                        child: FractionallySizedBox(
-                          widthFactor: 0.4,
-                          heightFactor: 1,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Colors.white.withValues(alpha: 0.0),
-                                  Colors.white.withValues(alpha: 0.14),
-                                  Colors.white.withValues(alpha: 0.0),
-                                ],
+                    if (!reduceMotion)
+                      Positioned.fill(
+                        child: Align(
+                          alignment: Alignment(
+                            -1.4 + (_breathe.value * 2.8),
+                            -1.0,
+                          ),
+                          child: FractionallySizedBox(
+                            widthFactor: 0.4,
+                            heightFactor: 1,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Colors.white.withValues(alpha: 0.0),
+                                    Colors.white.withValues(alpha: 0.14),
+                                    Colors.white.withValues(alpha: 0.0),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
                     Center(
                       child: Text(
                         widget.label,

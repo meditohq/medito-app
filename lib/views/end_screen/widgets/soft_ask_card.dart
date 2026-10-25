@@ -57,18 +57,25 @@ class SoftAskCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
-                        color: onSurface,
+                    child: Semantics(
+                      container: true,
+                      header: true,
+                      child: Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                          color: onSurface,
+                        ),
                       ),
                     ),
                   ),
+                  // Hides the card for good ("Not now" below only snoozes),
+                  // so it says so rather than just "Dismiss". Standard
+                  // density keeps the padded tap target at 48pt.
                   IconButton(
-                    tooltip: AppLocalizations.of(context)!.dismiss,
+                    tooltip: AppLocalizations.of(context)!.dontShowAgain,
                     icon: MeditoIcon(
                       assetName: MeditoIcons.xmark,
                       size: 20,
@@ -77,7 +84,6 @@ class SoftAskCard extends StatelessWidget {
                     onPressed: onDismiss,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    visualDensity: VisualDensity.compact,
                   ),
                 ],
               ),

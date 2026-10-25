@@ -45,7 +45,9 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final dateFmt = DateFormat('MMM d, y');
+    final dateFmt = DateFormat.yMMMd(
+      Localizations.localeOf(context).toString(),
+    );
     final alreadyFilled = widget.dayCount - widget.newSessionsCount;
     final streakChanged = widget.projectedStreak != widget.currentStreak;
 
@@ -81,14 +83,12 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
               children: [
                 _StreakRow(
                   label: l10n.currentStreak,
-                  value:
-                      '${widget.currentStreak} ${widget.currentStreak == 1 ? l10n.day.toLowerCase() : l10n.days}',
+                  value: l10n.dayCount(widget.currentStreak),
                 ),
                 const SizedBox(height: 6),
                 _StreakRow(
                   label: l10n.newStreak,
-                  value:
-                      '${widget.projectedStreak} ${widget.projectedStreak == 1 ? l10n.day.toLowerCase() : l10n.days}',
+                  value: l10n.dayCount(widget.projectedStreak),
                   emphasize: streakChanged,
                 ),
                 const SizedBox(height: 6),
@@ -121,7 +121,7 @@ class _BulkAddSessionsDialogState extends State<BulkAddSessionsDialog> {
               const SizedBox(width: 12),
               Expanded(
                 child: MeditoDialogPrimaryButton(
-                  label: '${l10n.add} ${widget.newSessionsCount}',
+                  label: l10n.addSessionsTitle(widget.newSessionsCount),
                   onPressed: widget.newSessionsCount == 0
                       ? null
                       : () {
@@ -155,27 +155,33 @@ class _StreakRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: googleSans,
-            color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+    // One stop per row ("Current streak, 3 days"); the label wraps rather
+    // than pushing the value off the edge at large text.
+    return MergeSemantics(
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontFamily: googleSans,
+                color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+              ),
+            ),
           ),
-        ),
-        Text(
-          value,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: googleSans,
-            fontWeight: FontWeight.w700,
-            color: emphasize
-                ? context.brandAccent
-                : theme.colorScheme.onSurface,
+          const SizedBox(width: 12),
+          Text(
+            value,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontFamily: googleSans,
+              fontWeight: FontWeight.w700,
+              color: emphasize
+                  ? context.brandAccent
+                  : theme.colorScheme.onSurface,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

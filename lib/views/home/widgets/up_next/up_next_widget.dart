@@ -392,13 +392,16 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            title,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontSize: isHero ? 28 : 22,
-              fontWeight: FontWeight.w700,
-              height: 1.2,
-              color: onSurface,
+          Semantics(
+            header: true,
+            child: Text(
+              title,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontSize: isHero ? 28 : 22,
+                fontWeight: FontWeight.w700,
+                height: 1.2,
+                color: onSurface,
+              ),
             ),
           ),
           const SizedBox(height: 6),
@@ -464,28 +467,36 @@ class _CompletedCta extends StatelessWidget {
           backgroundColor: palette.buttonBackground,
           borderRadius: 14,
           borderWidth: 0.5,
-          child: SizedBox(
-            height: 48,
-            child: Center(
-              child: busy
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: palette.buttonForeground,
-                      ),
-                    )
-                  : ExcludeSemantics(
-                      child: Text(
-                        label,
-                        style: TextStyle(
+          // A floor, not a fixed height: a long pack name wraps at large text.
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: padding16,
+                vertical: 12,
+              ),
+              child: Center(
+                child: busy
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
                           color: palette.buttonForeground,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    : ExcludeSemantics(
+                        child: Text(
+                          label,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: palette.buttonForeground,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
+              ),
             ),
           ),
         ),
@@ -583,7 +594,8 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
     final canRemove =
         widget.data.pack.id != ConfigConstants.basicsPackId &&
         !PackSequence.contains(widget.data.pack.id);
-    final variantTrack = _variantTrack(ref, nextSession.id);
+    final variant = _variantInfo(ref, l10n, nextSession.id);
+    final variantTrack = variant?.track;
 
     return Opacity(
       opacity: _skipping ? 0.0 : 1.0,
@@ -628,9 +640,12 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
             // label. The tap moves here because excluding drops the
             // GestureDetector's.
             child: Semantics(
+              // A tap plays the voice and length on the variant line, so it is
+              // part of what the card says.
               label:
                   '$eyebrow: ${widget.data.pack.title} — ${nextSession.title}'
-                  '${widget.data.totalCount > 0 ? ', ${l10n.upNextProgress(widget.data.completedCount, widget.data.totalCount)}' : ''}',
+                  '${variant != null ? ', ${variant.spoken}' : ''}'
+                  '${widget.data.totalCount > 0 ? ', ${l10n.upNextProgressSemantics(widget.data.completedCount, widget.data.totalCount)}' : ''}',
               button: true,
               excludeSemantics: true,
               onTap: () => _onTap(context),
@@ -680,15 +695,19 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                                 children: [
                                   Row(
                                     children: [
-                                      Text(
-                                        eyebrow.toUpperCase(),
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 1.2,
-                                              color: palette.muted,
-                                            ),
+                                      Flexible(
+                                        child: Text(
+                                          eyebrow.toUpperCase(),
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                letterSpacing: 1.2,
+                                                color: palette.muted,
+                                              ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
@@ -872,6 +891,7 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
     if (nextSession == null || _skipping) return;
 
     setState(() => _skipping = true);
+    _announceAfterSkip(context, skippedId: nextSession.id);
 
     unawaited(
       ref
@@ -902,6 +922,41 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
     // upNextProvider rebuilds reactively via packProvider <- statsProvider.
   }
 
+  /// The card fades out and the next session (or the completed state) fades
+  /// in under a new key, which a screen reader doesn't notice: say what
+  /// replaced it. Listens on the container because this widget is disposed
+  /// as soon as the next session arrives.
+  void _announceAfterSkip(BuildContext context, {required String skippedId}) {
+    final container = ProviderScope.containerOf(context, listen: false);
+    final view = View.of(context);
+    final direction = Directionality.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    ProviderSubscription<AsyncValue<UpNextData>>? sub;
+    void close() {
+      sub?.close();
+      sub = null;
+    }
+
+    sub = container.listen<AsyncValue<UpNextData>>(upNextProvider, (_, next) {
+      final data = next.value;
+      if (data == null) return;
+      final upcoming = data.nextSession;
+      if (upcoming != null && upcoming.id == skippedId) return;
+      close();
+      final message = data.isCompleted
+          ? (data.isEndOfPath
+                ? l10n.upNextPathCompletedTitle
+                : l10n.upNextPackCompletedTitle(data.pack.title))
+          : upcoming == null
+          ? null
+          : l10n.upNextSkippedAnnouncement(upcoming.title);
+      if (message == null) return;
+      unawaited(SemanticsService.sendAnnouncement(view, message, direction));
+    });
+    // Skipping failed or changed nothing: stop listening.
+    Future.delayed(const Duration(seconds: 10), close);
+  }
+
   Future<void> _onTap(BuildContext context) async {
     final nextSession = widget.data.nextSession;
     if (nextSession == null) return;
@@ -929,6 +984,16 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
     );
 
     setState(() => _isStarting = true);
+    // The card is one node, so the play button's spinner isn't reachable.
+    // Say it once if the track takes a moment to load.
+    final view = View.of(context);
+    final direction = Directionality.of(context);
+    final loading = AppLocalizations.of(context)!.loading;
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted && _isStarting) {
+        unawaited(SemanticsService.sendAnnouncement(view, loading, direction));
+      }
+    });
     try {
       await startSession(
         context,
@@ -955,6 +1020,40 @@ Track? _variantTrack(WidgetRef ref, String trackId) {
   return track != null && trackHasVariants(track) ? track : null;
 }
 
+/// What a tap on the hero will play for [trackId]: the visible "Will · 10 min"
+/// and its spoken form "Will, 10 minutes". Null when [_variantTrack] is.
+({Track track, String text, String spoken})? _variantInfo(
+  WidgetRef ref,
+  AppLocalizations l10n,
+  String trackId,
+) {
+  final track = _variantTrack(ref, trackId);
+  if (track == null) return null;
+
+  final selection = TrackVariantSelector.resolve(
+    track,
+    guideName: ref.watch(guideNamePreferenceProvider),
+    durationMs: ref.watch(durationPreferenceProvider),
+  );
+  final minutes = convertDurationToMinutes(
+    milliseconds: selection.file.duration,
+  );
+  final guide = selection.voice.guideName;
+  final spokenMinutes = l10n.timerPresetSemantics(minutes);
+  if (guide == null || guide.isEmpty) {
+    return (
+      track: track,
+      text: l10n.upNextVariantMinutes(minutes),
+      spoken: spokenMinutes,
+    );
+  }
+  return (
+    track: track,
+    text: l10n.upNextVariant(guide, minutes),
+    spoken: '$guide, $spokenMinutes',
+  );
+}
+
 /// "Will · 10 min" under the session title, with a pencil: what a tap on the
 /// hero will play, since it skips the track screen. Opens [VariantSheet].
 class _VariantLine extends ConsumerWidget {
@@ -965,22 +1064,10 @@ class _VariantLine extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final track = _variantTrack(ref, trackId);
-    if (track == null) return const SizedBox.shrink();
-
-    final l10n = AppLocalizations.of(context)!;
-    final selection = TrackVariantSelector.resolve(
-      track,
-      guideName: ref.watch(guideNamePreferenceProvider),
-      durationMs: ref.watch(durationPreferenceProvider),
-    );
-    final minutes = convertDurationToMinutes(
-      milliseconds: selection.file.duration,
-    );
-    final guide = selection.voice.guideName;
-    final text = guide == null || guide.isEmpty
-        ? l10n.upNextVariantMinutes(minutes)
-        : l10n.upNextVariant(guide, minutes);
+    final variant = _variantInfo(ref, AppLocalizations.of(context)!, trackId);
+    if (variant == null) return const SizedBox.shrink();
+    final track = variant.track;
+    final text = variant.text;
     final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
       fontSize: 15,
       fontWeight: FontWeight.w500,

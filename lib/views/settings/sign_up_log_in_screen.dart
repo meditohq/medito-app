@@ -4,6 +4,7 @@ import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
@@ -246,6 +247,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       setState(() {
         _hasRequestedOtp = true;
       });
+      _announceCodeSent();
     } on RateLimitError catch (e) {
       showSnackBar(context, e.message);
       setState(() {
@@ -315,6 +317,17 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
         _isLoading = false;
       });
     }
+  }
+
+  /// The form swaps to code entry with no other cue for a screen reader.
+  void _announceCodeSent() {
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      '${l10n.otpInstructions} ${_emailController.text.trim()}',
+      Directionality.of(context),
+    );
   }
 
   void _startRetryTimer() {
@@ -591,6 +604,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                   width: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
+                    semanticsLabel: AppLocalizations.of(context)!.loading,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       context.onBrandAccent,
                     ),
@@ -601,6 +615,9 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                   AppLocalizations.of(
                     context,
                   )!.retryInSeconds(_retryAfterSeconds.toString()),
+                  semanticsLabel: AppLocalizations.of(
+                    context,
+                  )!.retryInSecondsSpoken(_retryAfterSeconds),
                 )
               : Text(AppLocalizations.of(context)!.sendMeMyPasswordText),
         ),
@@ -652,6 +669,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
                   width: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
+                    semanticsLabel: AppLocalizations.of(context)!.loading,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       context.onBrandAccent,
                     ),
@@ -660,25 +678,31 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               : Text(AppLocalizations.of(context)!.verifyOtpButtonText),
         ),
         height16,
+        // onSurface + underline: the old light-blue link was ~1.2:1 on the
+        // light theme's white page. Default min size keeps a 48px target.
         TextButton(
           onPressed: _isLoading || _isRateLimited ? null : _requestOtp,
-          style: TextButton.styleFrom(
-            padding: EdgeInsets.zero,
-            minimumSize: const Size(0, 32),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
+          style: TextButton.styleFrom(padding: EdgeInsets.zero),
           child: Text(
             _isRateLimited
                 ? AppLocalizations.of(
                     context,
                   )!.resendCodeInSeconds(_retryAfterSeconds.toString())
                 : AppLocalizations.of(context)!.resendCode,
+            semanticsLabel: _isRateLimited
+                ? AppLocalizations.of(
+                    context,
+                  )!.resendCodeInSecondsSpoken(_retryAfterSeconds)
+                : null,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: _isLoading || _isRateLimited
                   ? Theme.of(
                       context,
                     ).textTheme.bodySmall?.color?.withOpacityValue(0.38)
-                  : ColorConstants.brightSky,
+                  : Theme.of(context).colorScheme.onSurface,
+              decoration: _isLoading || _isRateLimited
+                  ? null
+                  : TextDecoration.underline,
               fontSize: 14,
             ),
           ),
@@ -700,6 +724,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
       hintText: l10n.emailLabel,
       errorText: showError ? l10n.invalidEmailError : null,
       keyboardType: TextInputType.emailAddress,
+      autofillHints: const [AutofillHints.email],
       onChanged: (_) => setState(() {}),
       inputFormatters: [
         TextInputFormatter.withFunction(
@@ -739,12 +764,15 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
   Widget _buildOtpField(TextStyle inputTextStyle) {
     final l10n = AppLocalizations.of(context)!;
     final showError = !_isOtpValid && _otpController.text.isNotEmpty;
+    // Focus the code field on every path (it only appears after the user
+    // asked for a code), so the keyboard and screen reader land on it.
     return MeditoTextField(
       controller: _otpController,
-      autofocus: widget.source == AnalyticsEventConstants.sourceSplash,
+      autofocus: true,
       hintText: l10n.otpLabel,
       errorText: showError ? l10n.invalidOtpError : null,
       keyboardType: TextInputType.number,
+      autofillHints: const [AutofillHints.oneTimeCode],
       maxLength: 6,
     );
   }
@@ -764,7 +792,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
             ),
             children: [
               TextSpan(
-                text: 'Terms of Service',
+                text: AppLocalizations.of(context)!.termsOfService,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   decoration: TextDecoration.underline,
@@ -779,7 +807,7 @@ class SignUpLogInFormState extends ConsumerState<SignUpLogInForm> {
               ),
               TextSpan(text: AppLocalizations.of(context)!.andText),
               TextSpan(
-                text: 'Privacy Policy',
+                text: AppLocalizations.of(context)!.privacyPolicy,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   decoration: TextDecoration.underline,

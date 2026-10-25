@@ -67,11 +67,14 @@ class ConsistencyWidget : GlanceAppWidget() {
         val activityDays = (meditationRaw + freezeRaw).map(::bucketDay).toSet()
 
         val themePreference = prefs.getString("theme_preference", "system") ?: "system"
+        val strings = WidgetStrings.from(prefs)
 
         StatWidgetContent(
             context = context,
             value = "$consistencyScore%",
             unit = "",
+            stat = strings.consistencySummary.fill("value" to "$consistencyScore%"),
+            strings = strings,
             ringScore = consistencyScore,
             doneToday = activityDays.contains(consistencyToday),
             today = consistencyToday,

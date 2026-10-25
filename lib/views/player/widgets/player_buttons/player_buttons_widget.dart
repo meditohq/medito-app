@@ -98,7 +98,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
   IconButton _rewindButton(AppLocalizations l10n) {
     return IconButton(
       onPressed: onSkip10SecondsBackward,
-      tooltip: l10n.skipBackward10Seconds,
+      tooltip: l10n.skipBackward15Seconds,
       icon: const MeditoIcon(
         assetName: MeditoIcons.backward15,
         size: 40,
@@ -110,7 +110,7 @@ class PlayerButtonsWidget extends ConsumerWidget {
   IconButton _forwardButton(AppLocalizations l10n) {
     return IconButton(
       onPressed: onSkip10SecondsForward,
-      tooltip: l10n.skipForward10Seconds,
+      tooltip: l10n.skipForward15Seconds,
       icon: const MeditoIcon(
         assetName: MeditoIcons.forward15,
         size: 40,
@@ -161,16 +161,26 @@ class _RepeatButton extends ConsumerWidget {
     // Always full white: the icon opens a sheet, so dimming it for "off"
     // read as disabled. An active mode gets the same rounded highlight as the
     // speed and download buttons in the action bar.
-    return IconButton(
-      onPressed: () => showRepeatModeSheet(context),
-      tooltip: tooltip,
-      style: IconButton.styleFrom(
-        backgroundColor: repeatMode == medito_repeat.RepeatMode.none
-            ? Colors.transparent
-            : ColorConstants.graphite.withAlpha(200),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+    // "Repeat" alone didn't say it's off; the other modes name themselves.
+    return Semantics(
+      button: true,
+      // One label: Android reads a separate value before the label.
+      label: repeatMode == medito_repeat.RepeatMode.none
+          ? '$tooltip: ${l10n.repeatModeOff}'
+          : tooltip,
+      onTap: () => showRepeatModeSheet(context),
+      excludeSemantics: true,
+      child: IconButton(
+        onPressed: () => showRepeatModeSheet(context),
+        tooltip: tooltip,
+        style: IconButton.styleFrom(
+          backgroundColor: repeatMode == medito_repeat.RepeatMode.none
+              ? Colors.transparent
+              : ColorConstants.graphite.withAlpha(200),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        ),
+        icon: MeditoIcon(assetName: iconAsset, size: 32, color: Colors.white),
       ),
-      icon: MeditoIcon(assetName: iconAsset, size: 32, color: Colors.white),
     );
   }
 }

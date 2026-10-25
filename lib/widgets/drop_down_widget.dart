@@ -15,6 +15,7 @@ class DropdownWidget<T> extends StatelessWidget {
     this.bottomRight = 14,
     this.disabledLabelText = '',
     required this.isLandscape,
+    this.semanticLabel,
   });
 
   final List<DropdownMenuItem<T>>? items;
@@ -27,6 +28,9 @@ class DropdownWidget<T> extends StatelessWidget {
   final double bottomRight;
   final String disabledLabelText;
   final bool isLandscape;
+
+  /// What the picker chooses ("Voice"), read before its current value.
+  final String? semanticLabel;
 
   bool get _isClickable => items != null && items!.length > 1;
 
@@ -65,25 +69,35 @@ class DropdownWidget<T> extends StatelessWidget {
     BorderRadius radius,
     TextStyle? textStyle,
   ) {
-    return Material(
-      color: ColorConstants.transparent,
-      child: InkWell(
-        onTap: _isClickable ? () => _showDropdown(context) : null,
-        borderRadius: radius,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            children: [
-              if (iconData != null)
-                Icon(iconData, color: Theme.of(context).iconTheme.color),
-              if (iconData != null) const SizedBox(width: 12),
-              Expanded(child: Text(_getDisplayValue(), style: textStyle)),
-              if (_isClickable)
-                Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Theme.of(context).iconTheme.color,
-                ),
-            ],
+    // Read as "Voice: Will, button" rather than a bare "Will": the icon and
+    // chevron say what it is to sighted users only. One label, not label +
+    // value, because Android reads the value first.
+    final display = _getDisplayValue();
+    return Semantics(
+      button: _isClickable,
+      label: semanticLabel == null ? display : '$semanticLabel: $display',
+      onTap: _isClickable ? () => _showDropdown(context) : null,
+      excludeSemantics: true,
+      child: Material(
+        color: ColorConstants.transparent,
+        child: InkWell(
+          onTap: _isClickable ? () => _showDropdown(context) : null,
+          borderRadius: radius,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                if (iconData != null)
+                  Icon(iconData, color: Theme.of(context).iconTheme.color),
+                if (iconData != null) const SizedBox(width: 12),
+                Expanded(child: Text(_getDisplayValue(), style: textStyle)),
+                if (_isClickable)
+                  Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -119,11 +133,14 @@ class DropdownWidget<T> extends StatelessWidget {
             .map(
               (item) => PopupMenuItem<T>(
                 value: item.value,
-                child: Container(
-                  width: size.width - 24, // Subtract horizontal padding
-                  height: isLandscape ? 56 : 48,
-                  alignment: AlignmentDirectional.centerStart,
-                  child: item.child,
+                child: Semantics(
+                  selected: item.value == value,
+                  child: Container(
+                    width: size.width - 24, // Subtract horizontal padding
+                    height: isLandscape ? 56 : 48,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: item.child,
+                  ),
                 ),
               ),
             )

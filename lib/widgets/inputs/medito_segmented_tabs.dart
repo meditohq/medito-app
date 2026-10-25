@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:medito/constants/constants.dart';
 
 /// The app's tab switcher: a card-coloured track with the selected segment
@@ -33,6 +34,7 @@ class MeditoSegmentedTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final localizations = MaterialLocalizations.of(context);
     final count = labels.length;
 
     Alignment alignmentFor(double index) =>
@@ -73,39 +75,53 @@ class MeditoSegmentedTabs extends StatelessWidget {
               alignment: alignmentFor(selectedIndex.toDouble()),
               child: indicator,
             ),
-          Row(
-            children: [
-              for (var i = 0; i < count; i++)
-                Expanded(
-                  child: Semantics(
-                    button: true,
-                    selected: i == selectedIndex,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
+          // Tab semantics like Material's TabBar: "Timer, selected, Tab 1
+          // of 2" rather than a row of unrelated buttons.
+          Semantics(
+            role: SemanticsRole.tabBar,
+            container: true,
+            explicitChildNodes: true,
+            child: Row(
+              children: [
+                for (var i = 0; i < count; i++)
+                  Expanded(
+                    child: Semantics(
+                      container: true,
+                      role: SemanticsRole.tab,
+                      selected: i == selectedIndex,
+                      hint: localizations.tabLabel(
+                        tabIndex: i + 1,
+                        tabCount: count,
+                      ),
                       onTap: () => onChanged(i),
-                      child: Center(
-                        child: AnimatedDefaultTextStyle(
-                          duration: _duration,
-                          style: theme.textTheme.titleSmall!.copyWith(
-                            fontFamily: googleSans,
-                            fontWeight: FontWeight.w600,
-                            color: i == selectedIndex
-                                ? context.onBrandAccent
-                                : theme.colorScheme.onSurface.withValues(
-                                    alpha: 0.7,
-                                  ),
-                          ),
-                          child: Text(
-                            labels[i],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        excludeFromSemantics: true,
+                        onTap: () => onChanged(i),
+                        child: Center(
+                          child: AnimatedDefaultTextStyle(
+                            duration: _duration,
+                            style: theme.textTheme.titleSmall!.copyWith(
+                              fontFamily: googleSans,
+                              fontWeight: FontWeight.w600,
+                              color: i == selectedIndex
+                                  ? context.onBrandAccent
+                                  : theme.colorScheme.onSurface.withValues(
+                                      alpha: 0.7,
+                                    ),
+                            ),
+                            child: Text(
+                              labels[i],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

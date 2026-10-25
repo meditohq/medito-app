@@ -14,13 +14,19 @@ class StopwatchElapsedWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final positionMs = ref.watch(audioStateProvider.select((s) => s.position));
     final textTheme = Theme.of(context).textTheme;
-    // One announcement ("12:34 elapsed"), not the time and caption apart.
-    return MergeSemantics(
+    final l10n = AppLocalizations.of(context)!;
+    final elapsed = Duration(milliseconds: positionMs);
+    // One label ("12 minutes 34 seconds elapsed"), not the clock and caption
+    // apart; a clock like "12:34" can be read as a time of day. Not a live
+    // region: it changes every second.
+    return Semantics(
+      label: '${spokenDuration(elapsed, l10n)} ${l10n.timerElapsed}',
+      excludeSemantics: true,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            formatTimerClock(Duration(milliseconds: positionMs)),
+            formatTimerClock(elapsed),
             style: textTheme.displayMedium?.copyWith(
               color: ColorConstants.white,
               fontFamily: googleSans,
@@ -32,7 +38,7 @@ class StopwatchElapsedWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            AppLocalizations.of(context)!.timerElapsed,
+            l10n.timerElapsed,
             style: textTheme.titleSmall?.copyWith(
               color: ColorConstants.white.withValues(alpha: 0.7),
               fontFamily: googleSans,

@@ -12,6 +12,7 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
+import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 
 class TrackingPermissionScreen extends ConsumerWidget {
   const TrackingPermissionScreen({super.key, this.headerImage, this.onNext});
@@ -98,7 +99,7 @@ class TrackingPermissionScreen extends ConsumerWidget {
                                   color: onSurface,
                                 ),
                                 const SizedBox(height: 20),
-                                Text(
+                                OnboardingStepTitle(
                                   l10n.trackingPermissionTitle,
                                   style: Theme.of(context)
                                       .textTheme

@@ -224,6 +224,11 @@ class _AnimatedFavouriteIconState extends State<AnimatedFavouriteIcon>
         ? MeditoIcons.starSolid
         : MeditoIcons.star;
 
+    // Reduced motion: no entrance, spin or pop, just the current star.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return MeditoIcon(assetName: assetName, color: widget.color);
+    }
+
     final animatedIcon = AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
       reverseDuration: const Duration(milliseconds: 180),

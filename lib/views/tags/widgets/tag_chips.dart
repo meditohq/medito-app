@@ -47,26 +47,24 @@ class ExploreTagChips extends ConsumerWidget {
           ..sort((a, b) => (counts[b.id] ?? 0).compareTo(counts[a.id] ?? 0));
     if (tags.isEmpty) return const SizedBox.shrink();
 
+    // Sized by its chips rather than a fixed height, so larger text isn't
+    // clipped. Eager is fine: the catalog has a few dozen tags at most.
     return Padding(
       padding: padding,
-      child: SizedBox(
-        height: 52,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(
-            horizontal: padding16,
-            vertical: padding8,
-          ),
-          itemCount: tags.length,
-          separatorBuilder: (_, _) => const SizedBox(width: padding8),
-          itemBuilder: (context, index) {
-            final tag = tags[index];
-            return TagChip(
-              key: ValueKey('tag_chip_${tag.id}'),
-              label: tagLabel(context, tag.id),
-              onTap: () => openTag(context, tag),
-            );
-          },
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: padding16, vertical: 2),
+        child: Row(
+          children: [
+            for (final tag in tags) ...[
+              if (tag != tags.first) const SizedBox(width: padding8),
+              TagChip(
+                key: ValueKey('tag_chip_${tag.id}'),
+                label: tagLabel(context, tag.id),
+                onTap: () => openTag(context, tag),
+              ),
+            ],
+          ],
         ),
       ),
     );
@@ -100,7 +98,8 @@ class TagChipsWrap extends StatelessWidget {
       padding: padding,
       child: Wrap(
         spacing: padding8,
-        runSpacing: padding8,
+        // Each chip's 48px touch target already leaves a gap between rows.
+        runSpacing: 0,
         children: [
           for (final tag in visible)
             TagChip(

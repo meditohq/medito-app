@@ -280,7 +280,11 @@ class _HomeLoadingViewState extends State<_HomeLoadingView> {
     return Scaffold(
       body: Stack(
         children: [
-          const Center(child: CircularProgressIndicator()),
+          Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: AppLocalizations.of(context)!.loading,
+            ),
+          ),
           Positioned(
             left: 0,
             right: 0,

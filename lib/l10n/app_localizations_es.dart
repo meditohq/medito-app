@@ -93,6 +93,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Toca aquí para cambiar los sonidos de fondo o las campanas.';
 
   @override
+  String get dismissTip => 'Cerrar consejo';
+
+  @override
   String get x06 => 'x0.6';
 
   @override
@@ -122,6 +125,35 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tapToShare => 'Toca para compartir';
+
+  @override
+  String quoteBackgroundOption(String name) {
+    return 'Fondo $name';
+  }
+
+  @override
+  String get quotePaletteMidnight => 'Medianoche';
+
+  @override
+  String get quotePaletteIndigo => 'Índigo';
+
+  @override
+  String get quotePaletteOcean => 'Océano';
+
+  @override
+  String get quotePaletteForest => 'Bosque';
+
+  @override
+  String get quotePaletteSunset => 'Atardecer';
+
+  @override
+  String get quotePaletteRose => 'Rosa';
+
+  @override
+  String get quotePaletteCream => 'Crema';
+
+  @override
+  String get quotePaletteSlate => 'Pizarra';
 
   @override
   String get id => 'id';
@@ -154,6 +186,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get explore => 'Explorar';
 
   @override
+  String get explorePacksEmpty => 'No hay packs disponibles';
+
+  @override
   String get welcome => '👋 Bienvenido';
 
   @override
@@ -167,6 +202,48 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get thanksForSharingSad => 'Cara triste';
+
+  @override
+  String get thanksForSharingSpoken => 'Gracias por compartir';
+
+  @override
+  String get zenModeEndMessage1 => 'Bien hecho por estar aquí.';
+
+  @override
+  String get zenModeEndMessage2 => 'Gracias por practicar.';
+
+  @override
+  String get zenModeEndMessage3 => 'Tiempo bien invertido.';
+
+  @override
+  String get zenModeEndMessage4 => 'Un momento solo para ti.';
+
+  @override
+  String get zenModeEndMessage5 => 'Gratitud por esta pausa.';
+
+  @override
+  String get zenModeEndMessage6 => 'Disfruta el resto de tu día.';
+
+  @override
+  String get zenModeEndMessage7 => 'Llévate esta sensación contigo.';
+
+  @override
+  String get zenModeEndMessage8 => 'Lleva esta calma contigo.';
+
+  @override
+  String get zenModeEndMessage9 => 'Hasta la próxima.';
+
+  @override
+  String get zenModeEndMessage10 => 'Hasta mañana.';
+
+  @override
+  String get zenModeEndMessage11 => 'Sesión completada.';
+
+  @override
+  String get zenModeEndMessage12 => 'Práctica completada.';
+
+  @override
+  String get zenModeEndMessage13 => 'Aquí y ahora.';
 
   @override
   String get ratingAskTitle => '¿Podrías valorar Medito?';
@@ -183,6 +260,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get hey => '👋 Hola';
+
+  @override
+  String get heyLabel => 'Hola';
 
   @override
   String get someThingWentWrong => 'Algo salió mal';
@@ -471,6 +551,28 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String retryInSecondsSpoken(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: '$seconds segundos',
+      one: '1 segundo',
+    );
+    return 'Reintentar en $_temp0';
+  }
+
+  @override
+  String resendCodeInSecondsSpoken(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: '$seconds segundos',
+      one: '1 segundo',
+    );
+    return 'Reenviar código en $_temp0';
+  }
+
+  @override
   String get byContinuingAgreeTo => 'Al continuar, aceptas nuestros ';
 
   @override
@@ -735,6 +837,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dayStreak => 'días de racha';
 
   @override
+  String streakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días de racha',
+      one: '1 día de racha',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get dailyQuote => 'Cita Diaria';
 
   @override
@@ -845,6 +958,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get customiseHomeLayout => 'Organizar Diseño de Inicio';
 
   @override
+  String get customiseHomeLayoutHint =>
+      'Mantén pulsado un elemento y arrástralo para cambiar el orden. Con un lector de pantalla, usa el menú de acciones para mover los elementos.';
+
+  @override
   String get featuresIntegrations => 'Características e Integraciones';
 
   @override
@@ -861,6 +978,26 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get restorePreviousStats => 'Restaurar estadísticas anteriores';
+
+  @override
+  String get dayStartsTitle => 'Cuándo empieza mi día';
+
+  @override
+  String get dayStartsMidnightDefault => 'Medianoche (predeterminado)';
+
+  @override
+  String get dayStartsDialogTitle => '¿Cuándo empieza tu día?';
+
+  @override
+  String get dayStartsDialogBody =>
+      'Elige cuándo empieza un nuevo día para tu racha. Es útil si sueles meditar tarde por la noche y quieres que las sesiones después de medianoche sigan contando para el día anterior.';
+
+  @override
+  String get dayStartsExperimentalNote =>
+      'Experimental. Al cambiar esto se actualiza cómo se agrupan en días todas tus sesiones anteriores, así que tu racha actual y tu racha más larga pueden cambiar.';
+
+  @override
+  String get save => 'Guardar';
 
   @override
   String get restorePreviousStatsExplainer =>
@@ -910,6 +1047,31 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String dayCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días',
+      one: '1 día',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String sessionCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sesiones',
+      one: '1 sesión',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historySessionFallback => 'Sesión de meditación';
+
+  @override
   String get newStreak => 'Nueva racha';
 
   @override
@@ -943,6 +1105,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get minutesPerDayOptional => 'Minutos por día (opcional)';
+
+  @override
+  String get durationMinutesOptional => 'Duración (en minutos, opcional)';
 
   @override
   String get onboarding => 'Incorporación';
@@ -1069,6 +1234,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingBatteryOptimize => 'Desactivar Optimización de Batería';
+
+  @override
+  String get onboardingBatteryAutoStartTitle => 'Activar inicio automático';
+
+  @override
+  String get onboardingBatteryAutoStartBody =>
+      'Sigue los pasos para activar el inicio automático de Medito.';
+
+  @override
+  String get onboardingBatteryOemTitle =>
+      'Tu dispositivo tiene una optimización de batería adicional';
+
+  @override
+  String get onboardingBatteryOemBody =>
+      'Sigue los pasos para desactivar estas optimizaciones y que Medito funcione sin problemas.';
 
   @override
   String get skipForNow => 'Omitir por Ahora';
@@ -1958,6 +2138,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Puedes activar o desactivar los recordatorios en Configuración';
 
   @override
+  String reminderSetFor(String time) {
+    return 'Recordatorio diario a las $time';
+  }
+
+  @override
+  String get dontShowAgain => 'No volver a mostrar';
+
+  @override
   String get reminderDay1TitleVar1 => 'Mantén tu racha 🌱';
 
   @override
@@ -2261,6 +2449,22 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String upNextProgressSemantics(int completed, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: '$completed de $total sesiones completadas',
+      one: '$completed de 1 sesión completada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String upNextSkippedAnnouncement(String title) {
+    return 'Omitida. A continuación: $title';
+  }
+
+  @override
   String upNextPackCompletedTitle(String packTitle) {
     return 'You finished $packTitle';
   }
@@ -2343,10 +2547,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pause => 'Pausar';
 
   @override
-  String get skipBackward10Seconds => 'Retroceder 10 segundos';
+  String get skipBackward15Seconds => 'Retroceder 15 segundos';
 
   @override
-  String get skipForward10Seconds => 'Avanzar 10 segundos';
+  String get skipForward15Seconds => 'Avanzar 15 segundos';
 
   @override
   String get repeat => 'Repetir';
@@ -2361,7 +2565,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteDownload => 'Eliminar descarga';
 
   @override
+  String downloadRemoved(String title) {
+    return '“$title” eliminado';
+  }
+
+  @override
   String get playbackSpeed => 'Velocidad de reproducción';
+
+  @override
+  String playbackSpeedValue(String speed) {
+    return '$speed veces';
+  }
 
   @override
   String get speedReset => 'Restablecer';
@@ -2577,6 +2791,48 @@ class AppLocalizationsEs extends AppLocalizations {
       'Mensual, cancela cuando quieras. Pago seguro con Stripe.';
 
   @override
+  String donateAmountPerMonthSpoken(String amount) {
+    return 'Donar $amount al mes';
+  }
+
+  @override
+  String donateAmountPerMonthWithApplePay(String amount) {
+    return 'Donar $amount al mes con Apple Pay';
+  }
+
+  @override
+  String get donateWithApplePay => 'Donar con Apple Pay';
+
+  @override
+  String get donateWithCard => 'Donar con tarjeta';
+
+  @override
+  String get yearlyDonation => 'Anual';
+
+  @override
+  String get donateNotNow => 'Ahora no';
+
+  @override
+  String donationMinimumAmount(String amount) {
+    return 'La cantidad mínima es $amount';
+  }
+
+  @override
+  String donationOtherAmountHint(String amount) {
+    return 'Otra cantidad (mín. $amount)';
+  }
+
+  @override
+  String get donationDisclosure =>
+      'Tu donación ayuda a que Medito siga siendo gratis para todos, sin anuncios ni muros de pago. Recibirás un correo de confirmación en breve.';
+
+  @override
+  String get donationStripeTrust => 'Pago seguro con Stripe';
+
+  @override
+  String get supportMedito => 'Apoya a Medito';
+
+  @override
   String get tagSleep => 'Sueño';
 
   @override
@@ -2713,6 +2969,35 @@ class AppLocalizationsEs extends AppLocalizations {
   String get upNextStartHere => 'Empieza aquí';
 
   @override
+  String widgetStreakSummary(String value) {
+    return 'Racha de meditación: $value';
+  }
+
+  @override
+  String widgetConsistencySummary(String value) {
+    return 'Puntuación de consistencia: $value';
+  }
+
+  @override
+  String get widgetNotMeditatedToday => 'Aún no has meditado hoy';
+
+  @override
+  String widgetRecentDays(String done, String total) {
+    return 'Has meditado $done de los últimos $total días';
+  }
+
+  @override
+  String widgetUpNextProgress(String completed, String total) {
+    return '$completed de $total';
+  }
+
+  @override
+  String get widgetPackComplete => 'Paquete completado';
+
+  @override
+  String get widgetChooseWhatsNext => 'Elige qué sigue';
+
+  @override
   String get removeFromHomeShort => 'Quitar';
 
   @override
@@ -2788,6 +3073,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get shopCheckout => 'Pagar';
 
   @override
+  String get shopCheckoutHint => 'Abre el pago seguro en tu navegador';
+
+  @override
   String get shopCheckoutPrompt => '¿Ya hiciste tu pedido?';
 
   @override
@@ -2858,6 +3146,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get shopCentimetres => 'cm';
 
   @override
+  String get shopUnitInches => 'pulgadas';
+
+  @override
+  String get shopUnitCentimetres => 'centímetros';
+
+  @override
+  String shopPhotoPosition(int index, int count) {
+    return 'Foto $index de $count';
+  }
+
+  @override
   String get timerTitle => 'Temporizador';
 
   @override
@@ -2916,11 +3215,47 @@ class AppLocalizationsEs extends AppLocalizations {
   String get downloadingAudio => 'Descargando';
 
   @override
+  String get audioDownloaded => 'Descargado';
+
+  @override
   String get playbackPosition => 'Posición de reproducción';
 
   @override
   String playbackPositionValue(String position, String duration) {
     return '$position de $duration';
+  }
+
+  @override
+  String spokenHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count horas',
+      one: '1 hora',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String spokenMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutos',
+      one: '1 minuto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String spokenSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count segundos',
+      one: '1 segundo',
+    );
+    return '$_temp0';
   }
 
   @override

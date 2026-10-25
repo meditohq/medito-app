@@ -87,7 +87,12 @@ class AppIconPreview extends StatelessWidget {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(size * 0.22),
-        child: Image.asset(option.previewAsset, width: size, height: size),
+        child: Image.asset(
+          option.previewAsset,
+          width: size,
+          height: size,
+          excludeFromSemantics: true,
+        ),
       );
     }
 
@@ -105,6 +110,7 @@ class AppIconPreview extends StatelessWidget {
       child: Center(
         child: SvgPicture.asset(
           AssetConstants.icLogo,
+          excludeFromSemantics: true,
           width: size * 0.75,
           height: size * 0.75,
           colorFilter: ColorFilter.mode(

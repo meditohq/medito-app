@@ -22,6 +22,7 @@ class MeditoTextField extends StatefulWidget {
     this.controller,
     this.focusNode,
     this.labelText,
+    this.semanticLabel,
     this.hintText,
     this.helperText,
     this.helperMaxLines,
@@ -51,6 +52,11 @@ class MeditoTextField extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final String? labelText;
+
+  /// Screen-reader name for the field when there is no [labelText]. Falls
+  /// back to [labelText], then [hintText]: the hint alone disappears from the
+  /// semantics tree once the field has text.
+  final String? semanticLabel;
   final String? hintText;
   final String? helperText;
   final int? helperMaxLines;
@@ -180,7 +186,18 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
       decoration: InputDecoration(
         // No floating label — the label is rendered statically above the box
         // (see below). Only the hint lives in the decoration.
-        hintText: widget.hintText,
+        // The hint is excluded because it's already the field's semantic
+        // label below; leaving it in would read it twice while empty.
+        hint: widget.hintText == null
+            ? null
+            : ExcludeSemantics(
+                child: Text(
+                  widget.hintText!,
+                  style: hintLabelStyle,
+                  maxLines: widget.maxLines,
+                  overflow: widget.maxLines == 1 ? TextOverflow.ellipsis : null,
+                ),
+              ),
         counterText: maxLength != null ? '' : widget.counterText,
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.suffixIcon,
@@ -200,10 +217,19 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
     // [Stack], so it adds no layout size — siblings stay put whether or not the
     // field is focused.
     const ringWidth = MeditoTextField._focusRingWidth;
+    // The label, hint and error live outside the InputDecoration, so attach
+    // them to the field's semantics node by hand: the field keeps a name once
+    // it has text, and an error is read as the field's hint.
+    final semanticField = Semantics(
+      container: true,
+      label: widget.semanticLabel ?? widget.labelText ?? widget.hintText,
+      hint: widget.errorText,
+      child: field,
+    );
     final ringedBox = Stack(
       clipBehavior: Clip.none,
       children: [
-        field,
+        semanticField,
         Positioned(
           left: -ringWidth,
           top: -ringWidth,
@@ -253,13 +279,16 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
         if (label != null)
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 8),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: googleSans,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: onSurface.withOpacityValue(0.7),
+            // Read as the field's own label (see semanticField).
+            child: ExcludeSemantics(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontFamily: googleSans,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: onSurface.withOpacityValue(0.7),
+                ),
               ),
             ),
           ),
@@ -273,24 +302,33 @@ class _MeditoTextFieldState extends State<MeditoTextField> {
                 Expanded(
                   child: subText == null
                       ? const SizedBox.shrink()
-                      : Text(
-                          subText,
-                          maxLines: widget.helperMaxLines,
-                          overflow: widget.helperMaxLines != null
-                              ? TextOverflow.ellipsis
-                              : null,
-                          style: supportingStyle,
+                      // An error is announced when it appears; it's also the
+                      // field's semantic hint for when focus returns to it.
+                      : Semantics(
+                          container: true,
+                          liveRegion: hasError,
+                          child: Text(
+                            subText,
+                            maxLines: widget.helperMaxLines,
+                            overflow: widget.helperMaxLines != null
+                                ? TextOverflow.ellipsis
+                                : null,
+                            style: supportingStyle,
+                          ),
                         ),
                 ),
                 if (showCounter)
                   Padding(
                     padding: const EdgeInsets.only(left: 12),
-                    child: ValueListenableBuilder<TextEditingValue>(
-                      valueListenable: _controller,
-                      builder: (context, value, _) => Text(
-                        '${value.text.characters.length}/$maxLength',
-                        style: supportingStyle.copyWith(
-                          color: widget.supportingTextColor ?? muted,
+                    // TextField reports the remaining length itself.
+                    child: ExcludeSemantics(
+                      child: ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _controller,
+                        builder: (context, value, _) => Text(
+                          '${value.text.characters.length}/$maxLength',
+                          style: supportingStyle.copyWith(
+                            color: widget.supportingTextColor ?? muted,
+                          ),
                         ),
                       ),
                     ),

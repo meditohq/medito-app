@@ -37,6 +37,7 @@ class SplashWelcomeLayout extends StatelessWidget {
                 alignment: constraints.maxWidth >= 700
                     ? Alignment.topCenter
                     : Alignment.bottomCenter,
+                excludeFromSemantics: true,
               ),
             ),
           ),
@@ -82,9 +83,11 @@ class SplashWelcomeLayout extends StatelessWidget {
                                     ),
                                     shape: BoxShape.circle,
                                   ),
+                                  // The app name sits right beside it.
                                   child: SvgPicture.asset(
                                     AssetConstants.icLogo,
                                     width: 40,
+                                    excludeFromSemantics: true,
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -106,20 +109,25 @@ class SplashWelcomeLayout extends StatelessWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Text(
-                                  AppLocalizations.of(context)!.splashHeadline,
-                                  textAlign: constraints.maxWidth >= 700
-                                      ? TextAlign.center
-                                      : TextAlign.start,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .displayLarge
-                                      ?.copyWith(
-                                        fontSize: 40,
-                                        fontWeight: FontWeight.bold,
-                                        height: 1.2,
-                                        color: Colors.white,
-                                      ),
+                                Semantics(
+                                  header: true,
+                                  child: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.splashHeadline,
+                                    textAlign: constraints.maxWidth >= 700
+                                        ? TextAlign.center
+                                        : TextAlign.start,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayLarge
+                                        ?.copyWith(
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.2,
+                                          color: Colors.white,
+                                        ),
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                                 Align(
@@ -185,11 +193,15 @@ class SplashWelcomeLayout extends StatelessWidget {
                                           ? null
                                           : onGetStarted,
                                       child: isSigningIn
-                                          ? const SizedBox(
+                                          ? SizedBox(
                                               width: 20,
                                               height: 20,
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2,
+                                                semanticsLabel:
+                                                    AppLocalizations.of(
+                                                      context,
+                                                    )!.loading,
                                               ),
                                             )
                                           : Text(

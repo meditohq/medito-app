@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -75,6 +76,12 @@ class TimerDurationWheelsState extends State<TimerDurationWheels> {
     var delta = (minutes % 60 - current % 60) % 60;
     if (delta > 30) delta -= 60;
     _animating = true;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _hours.jumpToItem(minutes ~/ 60);
+      _minutes.jumpToItem(current + delta);
+      _animating = false;
+      return;
+    }
     try {
       await Future.wait([
         _hours.animateToItem(minutes ~/ 60, duration: duration, curve: curve),
@@ -158,8 +165,12 @@ class _Wheel extends StatelessWidget {
   bool get _canIncrease => maxValue == null || _item < maxValue!;
   bool get _canDecrease => loopLength != null || _item > 0;
 
-  void _step(int by) {
+  void _step(int by, {required bool reduceMotion}) {
     if (!controller.hasClients) return;
+    if (reduceMotion) {
+      controller.jumpToItem(_item + by);
+      return;
+    }
     controller.animateToItem(
       _item + by,
       duration: const Duration(milliseconds: 200),
@@ -172,15 +183,21 @@ class _Wheel extends StatelessWidget {
     // The wheel's own semantics are a run of loose numbers ("04", "05",
     // "06") with nothing saying which is chosen or what they count. Expose it
     // as one adjustable control instead: "Minutes, 10", swipe up/down to step.
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
     return ListenableBuilder(
       listenable: controller,
       builder: (context, child) => Semantics(
+        slider: true,
         label: label,
         value: '${_display(_item)}',
         increasedValue: _canIncrease ? '${_display(_item + 1)}' : null,
         decreasedValue: _canDecrease ? '${_display(_item - 1)}' : null,
-        onIncrease: _canIncrease ? () => _step(1) : null,
-        onDecrease: _canDecrease ? () => _step(-1) : null,
+        onIncrease: _canIncrease
+            ? () => _step(1, reduceMotion: reduceMotion)
+            : null,
+        onDecrease: _canDecrease
+            ? () => _step(-1, reduceMotion: reduceMotion)
+            : null,
         child: ExcludeSemantics(child: child),
       ),
       child: _buildWheel(context),
@@ -189,6 +206,14 @@ class _Wheel extends StatelessWidget {
 
   Widget _buildWheel(BuildContext context) {
     final theme = Theme.of(context);
+    // The 64pt digits outgrow an 80pt row above 1.25× text size and were
+    // clipped; grow the rows with them.
+    final itemExtent = math.max(
+      TimerDurationWheels._itemExtent,
+      MediaQuery.textScalerOf(
+        context,
+      ).scale(TimerDurationWheels.digitStyle(context).fontSize!),
+    );
     return Column(
       children: [
         HomeGradientBorder(
@@ -213,7 +238,7 @@ class _Wheel extends StatelessWidget {
               ).createShader(rect),
               child: ListWheelScrollView.useDelegate(
                 controller: controller,
-                itemExtent: TimerDurationWheels._itemExtent,
+                itemExtent: itemExtent,
                 physics: const FixedExtentScrollPhysics(),
                 diameterRatio: 1.8,
                 overAndUnderCenterOpacity: 0.35,

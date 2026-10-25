@@ -46,12 +46,19 @@ class _MaintenanceViewState extends ConsumerState<MaintenanceView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 24),
-                        Text(
-                          AppLocalizations.of(context)!.hey,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
+                        // Heading without the 👋, which screen readers read
+                        // out as "waving hand".
+                        Semantics(
+                          header: true,
+                          label: AppLocalizations.of(context)!.heyLabel,
+                          excludeSemantics: true,
+                          child: Text(
+                            AppLocalizations.of(context)!.hey,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 12),

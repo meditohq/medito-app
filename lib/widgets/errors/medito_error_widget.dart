@@ -79,7 +79,9 @@ class MeditoErrorWidget extends ConsumerWidget {
     );
 
     if (isScaffold) {
-      return Scaffold(backgroundColor: ColorConstants.ebony, body: mainBody);
+      // Themed background: the text and buttons below use theme colours, so a
+      // hard-coded dark background made them near-invisible in light mode.
+      return Scaffold(body: mainBody);
     }
 
     return mainBody;
@@ -106,35 +108,40 @@ class MeditoErrorWidget extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            RichText(
-              text: TextSpan(
-                text: '$message. ',
-                style: textStyle,
-                children: <TextSpan>[
-                  if (isShowCheckDownload)
-                    TextSpan(
-                      text: '${AppLocalizations.of(context)!.meanWhileListen} ',
-                      style: textStyle,
-                    ),
-                  if (isShowCheckDownload)
-                    TextSpan(
-                      text: AppLocalizations.of(
-                        context,
-                      )!.downloads.toLowerCase(),
-                      style: textStyle?.copyWith(
-                        decoration: TextDecoration.underline,
-                        color: ColorConstants.accentDark,
+            // Announced when it appears (e.g. after a failed retry).
+            Semantics(
+              liveRegion: true,
+              child: RichText(
+                text: TextSpan(
+                  text: '$message. ',
+                  style: textStyle,
+                  children: <TextSpan>[
+                    if (isShowCheckDownload)
+                      TextSpan(
+                        text:
+                            '${AppLocalizations.of(context)!.meanWhileListen} ',
+                        style: textStyle,
                       ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const DownloadsView(),
-                          ),
+                    if (isShowCheckDownload)
+                      TextSpan(
+                        text: AppLocalizations.of(
+                          context,
+                        )!.downloads.toLowerCase(),
+                        style: textStyle?.copyWith(
+                          decoration: TextDecoration.underline,
+                          color: context.brandAccent,
                         ),
-                    ),
-                ],
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const DownloadsView(),
+                            ),
+                          ),
+                      ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
             height16,
             if (error is UnauthorizedError || error is RefreshTokenError)
@@ -184,8 +191,8 @@ class MeditoErrorWidget extends ConsumerWidget {
                         }
                       },
                       isLoading: isLoading,
-                      bgColor: ColorConstants.accentDark,
-                      textColor: ColorConstants.onyx,
+                      bgColor: context.brandAccent,
+                      textColor: context.onBrandAccent,
                     ),
                   ),
                 ],
@@ -270,8 +277,8 @@ class MeditoErrorWidget extends ConsumerWidget {
                   AppLocalizations.of(context)!.reportError,
                   style: TextStyle(
                     color: isCoolingDown
-                        ? ColorConstants.accentDark.withOpacityValue(0.5)
-                        : ColorConstants.accentDark,
+                        ? context.brandAccent.withOpacityValue(0.5)
+                        : context.brandAccent,
                   ),
                 ),
               ),

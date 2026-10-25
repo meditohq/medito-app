@@ -45,8 +45,8 @@ class AnalyticsSettingsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(AppLocalizations.of(context)!.analyticsTrackingTitle),
-                  const SizedBox(height: 12),
+                  // The title is the app bar's heading; repeating it here
+                  // only made screen readers read it twice.
                   Text(AppLocalizations.of(context)!.analyticsTrackingContent),
                   const SizedBox(height: 24),
                   _SwitchTile(

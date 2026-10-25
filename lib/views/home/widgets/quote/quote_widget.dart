@@ -32,12 +32,17 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
       padding: const EdgeInsets.symmetric(horizontal: padding24),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          onTap: widget.data == null ? null : _shareQuote,
-          borderRadius: BorderRadius.circular(kHomeCardRadius),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-            child: _buildQuoteContent(),
+        // Reads as "quote, — author, Share, button": the share glyph's label
+        // says what the tap does.
+        child: Semantics(
+          button: widget.data != null,
+          child: InkWell(
+            onTap: widget.data == null ? null : _shareQuote,
+            borderRadius: BorderRadius.circular(kHomeCardRadius),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              child: _buildQuoteContent(),
+            ),
           ),
         ),
       ),
@@ -112,7 +117,7 @@ class QuoteWidgetState extends ConsumerState<QuoteWidget> {
                 color: Theme.of(
                   context,
                 ).colorScheme.onSurface.withValues(alpha: 0.45),
-                semanticLabel: AppLocalizations.of(context)!.tapToShare,
+                semanticLabel: AppLocalizations.of(context)!.share,
               ),
             ],
           ),

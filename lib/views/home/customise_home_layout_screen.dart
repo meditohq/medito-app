@@ -52,6 +52,8 @@ class CustomiseHomeLayoutScreenState
           automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
+          // Names the screen for screen readers too.
+          title: Text(AppLocalizations.of(context)!.customiseHomeLayout),
         ),
         bottomNavigationBar: SingleBackButtonActionBar(
           onBackPressed: _logOrderAndPop,
@@ -66,7 +68,7 @@ class CustomiseHomeLayoutScreenState
                   vertical: 8,
                 ),
                 child: Text(
-                  'Tap and hold to drag items into your preferred order',
+                  AppLocalizations.of(context)!.customiseHomeLayoutHint,
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),

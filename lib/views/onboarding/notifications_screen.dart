@@ -15,6 +15,7 @@ import 'package:medito/providers/onboarding/onboarding_picker_mode_experiment.da
 import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
+import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 import 'package:medito/services/notifications/firebase_notifications_service.dart';
 import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
@@ -423,7 +424,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
+                                OnboardingStepTitle(
                                   _notificationsTitle(
                                     AppLocalizations.of(context)!,
                                   ),
@@ -738,8 +739,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     final onSurface = theme.colorScheme.onSurface;
 
     // Custom card: without the button role it's announced as plain text.
+    // Disabled and selected mirror the chip's state for screen readers.
     return Semantics(
       button: true,
+      enabled: !_isProcessing,
+      selected: ReminderSlot.forTime(ref.watch(reminderTimeProvider)) == slot,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: _isProcessing

@@ -86,8 +86,17 @@ class _AppIconTileState extends State<AppIconTile> {
           showSnackBar(context, AppLocalizations.of(context)!.appIconChanged);
         }
         // Android swaps launcher aliases, which kills the process; leave
-        // cleanly after the snackbar has been seen.
-        await Future.delayed(const Duration(seconds: 1));
+        // cleanly after the snackbar has been seen (and, with a screen
+        // reader, heard).
+        await Future.delayed(
+          WidgetsBinding
+                  .instance
+                  .platformDispatcher
+                  .accessibilityFeatures
+                  .accessibleNavigation
+              ? const Duration(seconds: 3)
+              : const Duration(seconds: 1),
+        );
         await SystemNavigator.pop();
       } else if (!kIsWeb) {
         await DynamicAppIconFlutterPlus.setAlternateIconName(name);
@@ -141,11 +150,14 @@ class AppIconSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.appIconTitle,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w600,
+            Semantics(
+              header: true,
+              child: Text(
+                l10n.appIconTitle,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(height: 16),

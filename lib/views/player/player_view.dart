@@ -605,8 +605,10 @@ class PlayerScreenLayout extends StatelessWidget {
                         imageFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: _FadingNetworkImage(imageUrl: imageUrl),
                       ),
+                    // Dark enough for the white title and controls to reach
+                    // 3:1 over a white cover (0.3 managed about 2:1).
                     Container(
-                      color: ColorConstants.black.withOpacityValue(0.3),
+                      color: ColorConstants.black.withOpacityValue(0.45),
                     ),
                   ],
                 ),

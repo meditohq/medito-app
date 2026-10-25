@@ -35,13 +35,15 @@ class ColorConstants {
   static const lightCard = Color(0xFFF5F5F5);
   static const lightOnSurface = Color(0xFF0A0A0A);
   static const lightOnBackground = Color(0xFF0A0A0A);
-  // Darkened from #6B7280 (which was 4.31:1 on lightCard — sub-AA) to slate-600.
-  // 7.56:1 on white, 6.74:1 on lightCard — AAA for body copy.
-  static const lightSecondary = Color(0xFF737373); // 4.7:1 on white — AA
+  // 4.74:1 on white (AA), but only 4.35:1 on lightCard — keep it off cards
+  // for body-size text.
+  static const lightSecondary = Color(0xFF737373);
   static const lightOnSecondary = Color(0xFFFFFFFF);
   static const lightGrey = Color(0xFFE5E5E5);
   static const lightSoftGrey = Color(0xFFD4D4D4);
-  static const lightGraphite = Color(0xFF737373);
+  // Secondary text colour in the light text theme, often on lightCard:
+  // #737373 was 4.35:1 there (sub-AA); #6B6B6B is 4.89:1 (5.33:1 on white).
+  static const lightGraphite = Color(0xFF6B6B6B);
   // Light-mode accent: primary / text / buttons. Near-black: ~17.9:1 on
   // white, ~17.2:1 under onAccentLight text → AAA.
   static const lightPrimary = Color(0xFF171717);

@@ -113,11 +113,13 @@ class _PackViewState extends ConsumerState<PackView>
                 // One button, drawn above the app bar: it rides with the
                 // content, then sticks straddling the collapsed bar's edge
                 // (Spotify-style). No swap between copies, so no jump.
+                // Screen readers use the hidden inline copy instead, which
+                // reads in place rather than after the whole list.
                 if (playable && slotTop != null)
                   Positioned(
                     top: math.max(slotTop - offset, _dockedPlayTop),
                     right: PackPathButton.rightInset,
-                    child: PackPlayButton(pack: data),
+                    child: ExcludeSemantics(child: PackPlayButton(pack: data)),
                   ),
               ],
             );
@@ -235,13 +237,11 @@ class _PackViewState extends ConsumerState<PackView>
   }
 
   List<Widget> _listItems(PackModel pack, WidgetRef ref) {
+    // The row's InkWell handles the tap; an outer GestureDetector here added
+    // a second tap target over the same row.
     return pack.items
         .map(
-          (packItem) => GestureDetector(
-            onTap: () =>
-                _onListItemTap(packItem.id, packItem.type, ref.context),
-            child: _buildListTile(packItem, pack.items.last == packItem),
-          ),
+          (packItem) => _buildListTile(packItem, pack.items.last == packItem),
         )
         .toList();
   }

@@ -27,19 +27,29 @@ class _BgSoundWidgetState extends ConsumerState<BgSoundWidget>
       duration: const Duration(milliseconds: 1800),
       vsync: this,
     );
-    if (widget.isBackgroundSoundSelected) {
-      _animationController.repeat();
-    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncSpin();
   }
 
   @override
   void didUpdateWidget(BgSoundWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.isBackgroundSoundSelected &&
-        !oldWidget.isBackgroundSoundSelected) {
+    _syncSpin();
+  }
+
+  /// Spins while a sound is selected, unless the system asks for reduced
+  /// motion: then the record stays still (its highlight still shows it's on).
+  void _syncSpin() {
+    final spin =
+        widget.isBackgroundSoundSelected &&
+        !MediaQuery.disableAnimationsOf(context);
+    if (spin && !_animationController.isAnimating) {
       _animationController.repeat();
-    } else if (!widget.isBackgroundSoundSelected &&
-        oldWidget.isBackgroundSoundSelected) {
+    } else if (!spin) {
       _animationController.stop();
     }
   }

@@ -34,7 +34,8 @@ ThemeData appTheme(BuildContext context, [ThemeMode? themeMode]) {
             surface: ColorConstants.ebony,
             onSurface: ColorConstants.white,
             error: ColorConstants.amber,
-            onError: ColorConstants.white,
+            // White on amber (#FF6568) is 2.87:1; near-black is ~6.2:1.
+            onError: ColorConstants.greyIsTheNewBlack,
           )
         : const ColorScheme.light(
             primary: ColorConstants.lightPrimary,

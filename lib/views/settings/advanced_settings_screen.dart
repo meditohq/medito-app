@@ -61,8 +61,8 @@ class AdvancedSettingsScreen extends ConsumerWidget {
       ),
       RowItemWidget(
         icon: Icon(Icons.bedtime_outlined, color: onSurface),
-        title: 'When my day starts',
-        subTitle: dayOffset == 0 ? 'Midnight (default)' : '$dayOffset:00 AM',
+        title: l10n.dayStartsTitle,
+        subTitle: dayBoundaryLabel(context, dayOffset),
         onTap: () => _showDayBoundaryOffsetDialog(context, ref),
       ),
       RowItemWidget(
@@ -81,14 +81,22 @@ class AdvancedSettingsScreen extends ConsumerWidget {
           title: l10n.onboarding,
           onTap: () => _push(context, const OnboardingPagerScreen()),
         ),
-      RowItemWidget(
-        icon: MeditoIcon(assetName: MeditoIcons.document, color: onSurface),
-        title: l10n.termsOfService,
-        onTap: () => handleNavigation(
-          'url',
-          ['https://meditofoundation.org/terms-of-service'],
-          context,
-          ref: ref,
+      // Opens a web page: say so. The outer MergeSemantics folds this into
+      // the row's own merged node.
+      MergeSemantics(
+        child: Semantics(
+          link: true,
+          hint: l10n.externalLink,
+          child: RowItemWidget(
+            icon: MeditoIcon(assetName: MeditoIcons.document, color: onSurface),
+            title: l10n.termsOfService,
+            onTap: () => handleNavigation(
+              'url',
+              ['https://meditofoundation.org/terms-of-service'],
+              context,
+              ref: ref,
+            ),
+          ),
         ),
       ),
       RowItemWidget(
@@ -103,7 +111,7 @@ class AdvancedSettingsScreen extends ConsumerWidget {
       ),
       RowItemWidget(
         icon: Icon(Icons.description_outlined, color: onSurface),
-        title: 'Licenses',
+        title: MaterialLocalizations.of(context).licensesPageTitle,
         hasUnderline: false,
         onTap: () =>
             showLicensePage(context: context, applicationName: 'Medito'),

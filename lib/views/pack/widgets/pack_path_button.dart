@@ -90,6 +90,11 @@ class PackPathButton extends StatelessWidget {
         Positioned(
           right: rightInset,
           bottom: 0,
+          // Hidden, this stays the screen-reader button: it sits in reading
+          // order after the description, where the floating copy (excluded
+          // from semantics) would come after the whole list. The floating
+          // copy covers it whenever it's on screen, so touches still land
+          // there.
           child: Visibility.maintain(
             visible: !hideButton,
             child: PackPlayButton(
@@ -182,12 +187,18 @@ class _PackPlayButtonState extends ConsumerState<PackPlayButton> {
         : l10n.packContinue;
     final label = done
         ? action
-        : '$action: ${next.title}. ${l10n.upNextProgress(completed, total)}';
+        : '$action: ${next.title}, '
+              '${l10n.upNextProgressSemantics(completed, total)}';
 
     return Semantics(
+      // Its own node: otherwise it merges into the header around it and
+      // covers the description.
+      container: true,
       button: !done,
       label: label,
       excludeSemantics: true,
+      // excludeSemantics drops the InkWell's tap, so it's repeated here.
+      onTap: done ? null : () => _start(context, next),
       child: Tooltip(
         message: done ? action : '$action: ${next.title}',
         excludeFromSemantics: true,

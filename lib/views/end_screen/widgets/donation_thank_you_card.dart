@@ -28,14 +28,18 @@ class DonationThankYouCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              l10n.thankYouForYourSupport,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontFamily: googleSans,
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
-                color: context.onBrandAccent,
+            Semantics(
+              container: true,
+              header: true,
+              child: Text(
+                l10n.thankYouForYourSupport,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontFamily: googleSans,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  color: context.onBrandAccent,
+                ),
               ),
             ),
             const SizedBox(height: 6),

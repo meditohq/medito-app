@@ -218,8 +218,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           onChanged: (_) => setState(() {}),
-          labelText:
-              '${l10n.duration} (in ${l10n.minutes.toLowerCase()}, ${l10n.optional.toLowerCase()})',
+          labelText: l10n.durationMinutesOptional,
           hintText: l10n.minutes,
           prefixIcon: Icon(Icons.timer, color: theme.colorScheme.onSurface),
           suffixIcon: _durationController.text.isNotEmpty
@@ -239,11 +238,16 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
         ),
         if (_isFutureSession()) ...[
           const SizedBox(height: 12),
-          Text(
-            l10n.cannotAddFutureSession,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontFamily: googleSans,
-              color: theme.colorScheme.error,
+          // Appears as the time changes; the disabled Add button alone
+          // doesn't say why.
+          Semantics(
+            liveRegion: true,
+            child: Text(
+              l10n.cannotAddFutureSession,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontFamily: googleSans,
+                color: theme.colorScheme.error,
+              ),
             ),
           ),
         ],
@@ -304,11 +308,14 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
         ),
         if (!_rangeOrderValid) ...[
           const SizedBox(height: 12),
-          Text(
-            l10n.endDateBeforeStartError,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontFamily: googleSans,
-              color: theme.colorScheme.error,
+          Semantics(
+            liveRegion: true,
+            child: Text(
+              l10n.endDateBeforeStartError,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontFamily: googleSans,
+                color: theme.colorScheme.error,
+              ),
             ),
           ),
         ],
@@ -325,14 +332,12 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
               children: [
                 _PreviewRow(
                   label: l10n.currentStreak,
-                  value:
-                      '${preview.currentStreak} ${preview.currentStreak == 1 ? l10n.day.toLowerCase() : l10n.days}',
+                  value: l10n.dayCount(preview.currentStreak),
                 ),
                 const SizedBox(height: 6),
                 _PreviewRow(
                   label: l10n.newStreak,
-                  value:
-                      '${preview.projectedStreak} ${preview.projectedStreak == 1 ? l10n.day.toLowerCase() : l10n.days}',
+                  value: l10n.dayCount(preview.projectedStreak),
                   emphasize: streakChanged,
                 ),
                 const SizedBox(height: 6),
@@ -367,7 +372,7 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
             Expanded(
               child: MeditoDialogPrimaryButton(
                 label: preview != null && preview.newSessionsCount > 0
-                    ? '${l10n.add} ${preview.newSessionsCount}'
+                    ? l10n.addSessionsTitle(preview.newSessionsCount)
                     : l10n.add,
                 onPressed: (preview == null || preview.newSessionsCount == 0)
                     ? null
@@ -412,57 +417,62 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
 
   Widget _buildTimePickerTile(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
-    return InkWell(
-      onTap: () => _selectTime(context),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.colorScheme.outline.withOpacityValue(0.3),
-            width: 0.5,
+    return Semantics(
+      button: true,
+      child: InkWell(
+        onTap: () => _selectTime(context),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: theme.colorScheme.outline.withOpacityValue(0.3),
+              width: 0.5,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.access_time,
-              size: 20,
-              color: theme.colorScheme.onSurface,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.time,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontFamily: googleSans,
-                      color: theme.colorScheme.onSurface.withOpacityValue(0.75),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _selectedTime != null
-                        ? _selectedTime!.format(context)
-                        : l10n.selectTime,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontFamily: googleSans,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ],
+          child: Row(
+            children: [
+              Icon(
+                Icons.access_time,
+                size: 20,
+                color: theme.colorScheme.onSurface,
               ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              color: theme.colorScheme.onSurface.withOpacityValue(0.6),
-              size: 20,
-            ),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.time,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontFamily: googleSans,
+                        color: theme.colorScheme.onSurface.withOpacityValue(
+                          0.75,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _selectedTime != null
+                          ? _selectedTime!.format(context)
+                          : l10n.selectTime,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontFamily: googleSans,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurface.withOpacityValue(0.6),
+                size: 20,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -475,40 +485,43 @@ class _ManualSessionDialogState extends State<ManualSessionDialog>
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    final fmt = DateFormat('MMM d, y');
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.colorScheme.outline.withOpacityValue(0.3),
-            width: 0.5,
+    final fmt = DateFormat.yMMMd(Localizations.localeOf(context).toString());
+    return Semantics(
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: theme.colorScheme.outline.withOpacityValue(0.3),
+              width: 0.5,
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontFamily: googleSans,
-                color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontFamily: googleSans,
+                  color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              fmt.format(value),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
-                color: theme.colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 4),
+              Text(
+                fmt.format(value),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontFamily: googleSans,
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -529,27 +542,33 @@ class _PreviewRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: googleSans,
-            color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+    // One stop per row ("Current streak, 3 days"); the label wraps rather
+    // than pushing the value off the edge at large text.
+    return MergeSemantics(
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontFamily: googleSans,
+                color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+              ),
+            ),
           ),
-        ),
-        Text(
-          value,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: googleSans,
-            fontWeight: FontWeight.w700,
-            color: emphasize
-                ? context.brandAccent
-                : theme.colorScheme.onSurface,
+          const SizedBox(width: 12),
+          Text(
+            value,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontFamily: googleSans,
+              fontWeight: FontWeight.w700,
+              color: emphasize
+                  ? context.brandAccent
+                  : theme.colorScheme.onSurface,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

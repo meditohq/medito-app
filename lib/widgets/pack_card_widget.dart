@@ -69,17 +69,26 @@ class _PackCardWidgetState extends State<PackCardWidget> {
       ),
     );
 
-    if (!widget.isCompleted) return card;
-    return Stack(
-      children: [
-        card,
-        // Decorative: let taps on the badge reach the card's InkWell.
-        const Positioned(
-          top: 10,
-          right: 10,
-          child: IgnorePointer(child: PackCompleteBadge()),
-        ),
-      ],
+    // One button reading title, subtitle and (when done) "Completed": the
+    // badge sits outside the InkWell, so without the merge it was a separate
+    // stop.
+    return MergeSemantics(
+      child: Semantics(
+        button: true,
+        child: !widget.isCompleted
+            ? card
+            : Stack(
+                children: [
+                  card,
+                  // Decorative: let taps on the badge reach the card's InkWell.
+                  const Positioned(
+                    top: 10,
+                    right: 10,
+                    child: IgnorePointer(child: PackCompleteBadge()),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 

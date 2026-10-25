@@ -8,8 +8,11 @@ import 'package:medito/views/shop/widgets/shop_photo.dart';
 /// Product photos are all shot 3:4.
 const kShopPhotoAspect = 3 / 4;
 
-/// Height of the name + price block under a grid card's photo.
-const kShopCardCaptionHeight = 74.0;
+/// Height of the name + price block under a grid card's photo. The 12px of
+/// padding is fixed; the two name lines and the price line grow with the
+/// text scale, so a fixed height overflowed from about 1.15×.
+double shopCardCaptionHeight(TextScaler textScaler) =>
+    12 + textScaler.scale(62);
 
 class ShopProductCard extends StatelessWidget {
   const ShopProductCard({
@@ -90,7 +93,7 @@ class ShopProductCard extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: kShopCardCaptionHeight,
+              height: shopCardCaptionHeight(MediaQuery.textScalerOf(context)),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(2, 10, 2, 0),
                 child: Column(

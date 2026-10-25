@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -41,7 +42,9 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: AnimatedSize(
-        duration: const Duration(milliseconds: 300),
+        duration: MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : const Duration(milliseconds: 300),
         curve: Curves.easeOutCubic,
         alignment: Alignment.topCenter,
         child: Padding(
@@ -57,13 +60,17 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
       spacing: 16,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          AppLocalizations.of(context)!.howDoYouFeel,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontFamily: googleSans,
-            fontSize: 22,
-            fontWeight: FontWeight.normal,
+        Semantics(
+          container: true,
+          header: true,
+          child: Text(
+            AppLocalizations.of(context)!.howDoYouFeel,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontFamily: googleSans,
+              fontSize: 22,
+              fontWeight: FontWeight.normal,
+            ),
           ),
         ),
         _showThankYouMessage
@@ -117,13 +124,17 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          l10n.ratingAskTitle,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontFamily: googleSans,
-            fontSize: 22,
-            fontWeight: FontWeight.normal,
+        Semantics(
+          container: true,
+          header: true,
+          child: Text(
+            l10n.ratingAskTitle,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontFamily: googleSans,
+              fontSize: 22,
+              fontWeight: FontWeight.normal,
+            ),
           ),
         ),
         const SizedBox(height: 8),
@@ -196,14 +207,22 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
   }
 
   Widget _buildThanksMessage() {
+    final l10n = AppLocalizations.of(context)!;
+    // Replaces the button that was just tapped, so it's announced; spoken
+    // without the emoji ("Thanks for sharing, purple heart").
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        AppLocalizations.of(context)!.thanksForSharing,
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
+      child: Semantics(
+        container: true,
+        liveRegion: true,
+        child: Text(
+          l10n.thanksForSharing,
+          semanticsLabel: l10n.thanksForSharingSpoken,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
@@ -233,6 +252,14 @@ class FeedbackWidgetState extends ConsumerState<FeedbackWidget> {
     await reviewService.markShown();
     if (!mounted) return;
     setState(() => _showRatingAsk = true);
+    // It replaces the thank-you line with no focus change; say it appeared.
+    unawaited(
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        AppLocalizations.of(context)!.ratingAskTitle,
+        Directionality.of(context),
+      ),
+    );
     unawaited(
       FirebaseAnalyticsService().logEvent(
         name: AnalyticsEventConstants.reviewPromptShown,

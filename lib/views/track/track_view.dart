@@ -255,14 +255,17 @@ class _TrackViewState extends ConsumerState<TrackView>
     );
   }
 
-  Text _title(BuildContext context, String title) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        letterSpacing: 0.2,
-        fontSize: 22,
-        color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.w700,
+  Widget _title(BuildContext context, String title) {
+    return Semantics(
+      header: true,
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          letterSpacing: 0.2,
+          fontSize: 22,
+          color: Theme.of(context).colorScheme.onSurface,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -390,6 +393,7 @@ class _TrackViewState extends ConsumerState<TrackView>
       }).toList(),
       onChanged: _handleOnDurationChange,
       isLandscape: isLandscape,
+      semanticLabel: AppLocalizations.of(context)!.variantLength,
     );
   }
 
@@ -418,6 +422,7 @@ class _TrackViewState extends ConsumerState<TrackView>
         }).toList(),
         onChanged: _handleOnGuideNameChange,
         isLandscape: isLandscape,
+        semanticLabel: AppLocalizations.of(context)!.variantVoice,
       );
     }
 

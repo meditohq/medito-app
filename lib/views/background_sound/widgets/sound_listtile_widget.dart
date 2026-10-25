@@ -38,87 +38,97 @@ class SoundListTileWidget extends ConsumerWidget {
     // Styled like the settings sheets (same radio dot, type and 16pt margins)
     // but as plain rows rather than bordered cards: the list is long and
     // cards would push most of it below the fold.
-    return Opacity(
-      opacity: available ? 1 : 0.4,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: InkWell(
-          onTap: available
-              ? () => _handleItemTap(ref, context, hasFailed: hasFailed)
-              : null,
-          borderRadius: BorderRadius.circular(12),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 56),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-              child: Row(
-                children: [
-                  // Match CheckboxListTile's leading column in the bell rows.
-                  SizedBox(
-                    width: 40,
-                    child: Center(
-                      child: RadioDot(
-                        selected: isSelected,
-                        accent: context.brandAccent,
+    // A radio group to screen readers, like [RadioOptionCard]: the dot alone
+    // never said which sound was chosen.
+    return Semantics(
+      inMutuallyExclusiveGroup: true,
+      checked: isSelected,
+      enabled: available,
+      child: Opacity(
+        opacity: available ? 1 : 0.4,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: InkWell(
+            onTap: available
+                ? () => _handleItemTap(ref, context, hasFailed: hasFailed)
+                : null,
+            borderRadius: BorderRadius.circular(12),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 56),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    // Match CheckboxListTile's leading column in the bell rows.
+                    SizedBox(
+                      width: 40,
+                      child: Center(
+                        child: RadioDot(
+                          selected: isSelected,
+                          accent: context.brandAccent,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: padding12),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          // The repository builds the "None" row with a
-                          // hardcoded English title, to be localised here.
-                          sound.id == kNoneBackgroundSoundId
-                              ? AppLocalizations.of(context)!.none
-                              : sound.id == kSessionBellsId
-                              ? AppLocalizations.of(context)!.sessionBells
-                              : sound.title,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: onSurface,
-                          ),
-                        ),
-                        if (sound.id == kSessionBellsId) ...[
-                          const SizedBox(height: 4),
+                    const SizedBox(width: padding12),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            AppLocalizations.of(
-                              context,
-                            )!.sessionBellsDescription,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 14,
-                              color: onSurface.withValues(alpha: 0.7),
-                              height: 1.4,
+                            // The repository builds the "None" row with a
+                            // hardcoded English title, to be localised here.
+                            sound.id == kNoneBackgroundSoundId
+                                ? AppLocalizations.of(context)!.none
+                                : sound.id == kSessionBellsId
+                                ? AppLocalizations.of(context)!.sessionBells
+                                : sound.title,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: onSurface,
                             ),
                           ),
-                        ],
-                        if (!available)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Text(
+                          if (sound.id == kSessionBellsId) ...[
+                            const SizedBox(height: 4),
+                            Text(
                               AppLocalizations.of(
                                 context,
-                              )!.soundNeedsConnection,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontFamily: googleSans,
+                              )!.sessionBellsDescription,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontSize: 14,
                                 color: onSurface.withValues(alpha: 0.7),
+                                height: 1.4,
                               ),
                             ),
-                          )
-                        else if (hasFailed)
-                          _failureMessage(context),
-                      ],
+                          ],
+                          if (!available)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.soundNeedsConnection,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontFamily: googleSans,
+                                  color: onSurface.withValues(alpha: 0.7),
+                                ),
+                              ),
+                            )
+                          else if (hasFailed)
+                            _failureMessage(context),
+                        ],
+                      ),
                     ),
-                  ),
-                  if (isDownloading)
-                    _loadingSpinner(context)
-                  else if (hasFailed)
-                    _retryIcon(context),
-                ],
+                    if (isDownloading)
+                      _loadingSpinner(context)
+                    else if (hasFailed)
+                      _retryIcon(context),
+                  ],
+                ),
               ),
             ),
           ),
@@ -131,13 +141,17 @@ class SoundListTileWidget extends ConsumerWidget {
   /// — previously a failure was completely silent, leaving the row looking
   /// selected with nothing playing and no way to recover.
   Widget _failureMessage(BuildContext context) {
+    // Announced when it appears: the tap that failed gave no other feedback.
     return Padding(
       padding: const EdgeInsets.only(top: 2.0),
-      child: Text(
-        AppLocalizations.of(context)!.backgroundSoundDownloadFailed,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          fontFamily: googleSans,
-          color: Theme.of(context).colorScheme.error,
+      child: Semantics(
+        liveRegion: true,
+        child: Text(
+          AppLocalizations.of(context)!.backgroundSoundDownloadFailed,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontFamily: googleSans,
+            color: Theme.of(context).colorScheme.error,
+          ),
         ),
       ),
     );
@@ -163,6 +177,7 @@ class SoundListTileWidget extends ConsumerWidget {
         height: 16,
         width: 16,
         child: CircularProgressIndicator(
+          semanticsLabel: AppLocalizations.of(context)!.downloadingAudio,
           strokeWidth: 2,
           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),

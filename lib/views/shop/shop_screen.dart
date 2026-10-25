@@ -199,7 +199,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 }
 
 /// Picks a column count for the width and sizes tiles to photo + caption.
-SliverGridDelegate _gridDelegate(double width) {
+SliverGridDelegate _gridDelegate(double width, TextScaler textScaler) {
   final columns =
       ((width + _ShopScreenState._gridSpacing) /
               (_ShopScreenState._minTileWidth + _ShopScreenState._gridSpacing))
@@ -211,7 +211,8 @@ SliverGridDelegate _gridDelegate(double width) {
     crossAxisCount: columns,
     crossAxisSpacing: _ShopScreenState._gridSpacing,
     mainAxisSpacing: 8,
-    mainAxisExtent: tileWidth / kShopPhotoAspect + kShopCardCaptionHeight,
+    mainAxisExtent:
+        tileWidth / kShopPhotoAspect + shopCardCaptionHeight(textScaler),
   );
 }
 
@@ -227,7 +228,10 @@ class _ProductGrid extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       sliver: SliverLayoutBuilder(
         builder: (context, constraints) => SliverGrid(
-          gridDelegate: _gridDelegate(constraints.crossAxisExtent),
+          gridDelegate: _gridDelegate(
+            constraints.crossAxisExtent,
+            MediaQuery.textScalerOf(context),
+          ),
           delegate: SliverChildBuilderDelegate(
             (context, index) => ShopProductCard(
               product: products[index],
@@ -246,37 +250,46 @@ class _GridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      sliver: SliverLayoutBuilder(
-        builder: (context, constraints) => SliverGrid(
-          gridDelegate: _gridDelegate(constraints.crossAxisExtent),
-          delegate: SliverChildBuilderDelegate(
-            (context, _) => LayoutBuilder(
-              builder: (context, box) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BoxShimmerWidget(
-                    width: box.maxWidth,
-                    height: box.maxWidth / kShopPhotoAspect,
-                    borderRadius: 16,
-                  ),
-                  const SizedBox(height: 12),
-                  BoxShimmerWidget(
-                    width: box.maxWidth * 0.8,
-                    height: 12,
-                    borderRadius: 6,
-                  ),
-                  const SizedBox(height: 8),
-                  BoxShimmerWidget(
-                    width: box.maxWidth * 0.35,
-                    height: 12,
-                    borderRadius: 6,
-                  ),
-                ],
-              ),
+    // One "Loading" stop instead of a silent grid of placeholders.
+    return SliverSemantics(
+      container: true,
+      label: AppLocalizations.of(context)!.loading,
+      excludeSemantics: true,
+      sliver: SliverPadding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+        sliver: SliverLayoutBuilder(
+          builder: (context, constraints) => SliverGrid(
+            gridDelegate: _gridDelegate(
+              constraints.crossAxisExtent,
+              MediaQuery.textScalerOf(context),
             ),
-            childCount: 6,
+            delegate: SliverChildBuilderDelegate(
+              (context, _) => LayoutBuilder(
+                builder: (context, box) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BoxShimmerWidget(
+                      width: box.maxWidth,
+                      height: box.maxWidth / kShopPhotoAspect,
+                      borderRadius: 16,
+                    ),
+                    const SizedBox(height: 12),
+                    BoxShimmerWidget(
+                      width: box.maxWidth * 0.8,
+                      height: 12,
+                      borderRadius: 6,
+                    ),
+                    const SizedBox(height: 8),
+                    BoxShimmerWidget(
+                      width: box.maxWidth * 0.35,
+                      height: 12,
+                      borderRadius: 6,
+                    ),
+                  ],
+                ),
+              ),
+              childCount: 6,
+            ),
           ),
         ),
       ),
@@ -337,7 +350,7 @@ class _CollectionChips extends ConsumerWidget {
       height: 60,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         itemCount: chips.length,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
@@ -370,6 +383,8 @@ class ShopChoicePill extends StatelessWidget {
   final double minWidth;
   final VoidCallback onTap;
 
+  static const _pillHeight = 36.0;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -378,35 +393,60 @@ class ShopChoicePill extends StatelessWidget {
         ? scheme.onPrimary
         : scheme.onSurface.withValues(alpha: enabled ? 1 : 0.35);
 
+    // Disabled pills are sold-out sizes/options: say so rather than only
+    // "dimmed", which doesn't tell the user why.
     return Semantics(
       selected: selected,
       enabled: enabled,
       button: true,
-      child: Material(
-        color: selected ? scheme.primary : theme.cardColor,
-        shape: StadiumBorder(
-          side: BorderSide(
-            color: selected
-                ? scheme.primary
-                : scheme.outline.withValues(alpha: 0.3),
+      label: enabled
+          ? label
+          : '$label, ${AppLocalizations.of(context)!.shopSoldOut}',
+      excludeSemantics: true,
+      // excludeSemantics drops the InkWell's tap, so give it here.
+      onTap: onTap,
+      // The pill stays 36 tall; the padding around it takes the tap target
+      // to 48.
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: (kMinInteractiveDimension - _pillHeight) / 2,
           ),
-        ),
-        child: InkWell(
-          customBorder: const StadiumBorder(),
-          onTap: onTap,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: minWidth, minHeight: 36),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Center(
-                widthFactor: 1,
-                child: Text(
-                  label,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: foreground,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                    decoration: enabled ? null : TextDecoration.lineThrough,
-                    decorationColor: foreground,
+          child: Material(
+            color: selected ? scheme.primary : theme.cardColor,
+            shape: StadiumBorder(
+              side: BorderSide(
+                color: selected
+                    ? scheme.primary
+                    : scheme.outline.withValues(alpha: 0.3),
+              ),
+            ),
+            child: InkWell(
+              customBorder: const StadiumBorder(),
+              onTap: onTap,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: minWidth,
+                  minHeight: _pillHeight,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Center(
+                    widthFactor: 1,
+                    child: Text(
+                      label,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: foreground,
+                        fontWeight: selected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                        decoration: enabled ? null : TextDecoration.lineThrough,
+                        decorationColor: foreground,
+                      ),
+                    ),
                   ),
                 ),
               ),

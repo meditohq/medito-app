@@ -8,5 +8,8 @@ class StreakCircleConstants {
   static const fontSize = 16.0;
   static const lineHeight = 1.4;
   static const padding = EdgeInsets.fromLTRB(11, 9, 13, 9);
+
+  /// Minimum touch target; the padding alone gives ~40pt.
+  static const minHeight = 48.0;
   static const animationDuration = Duration(seconds: 4);
 }

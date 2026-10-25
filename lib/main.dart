@@ -336,8 +336,40 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
         debugShowCheckedModeBanner: false,
         home: LaunchSplash(),
       ),
+      // Same delegates as the main app, so the message is localized; the raw
+      // error stays underneath for support screenshots.
       error: (error, stack) => MaterialApp(
-        home: Scaffold(body: Center(child: Text('Error initializing: $error'))),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.errorUnknownMessage,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '$error',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
       data: (_) {
         // Initialize deep link service once we have context

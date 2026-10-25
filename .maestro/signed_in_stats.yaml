@@ -44,7 +44,7 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
 - tapOn: "Play"
 
 - extendedWaitUntil:
-    visible: "(?s).*(00:0[5-9]|00:[1-5][0-9]) of .*"
+    visible: "(?s)(.*\\D)?([5-9]|[1-5][0-9]) seconds? of .*"
     timeout: 30000
 
 - repeat:
@@ -53,7 +53,7 @@ name: Signed-in Stats – Pull, Complete a Session, Server Round-trip
       notVisible: ".*day streak.*"
     commands:
       - tapOn:
-          text: "Skip forward 10 seconds"
+          text: "Skip forward 15 seconds"
           optional: true
       - runFlow: dismiss_end_screen_reminder.yaml
 - runFlow: dismiss_end_screen_reminder.yaml

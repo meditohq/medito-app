@@ -1,5 +1,4 @@
 import 'package:medito/constants/icons/medito_icons.dart';
-import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:medito/widgets/widgets.dart';
@@ -89,11 +88,12 @@ class DownloadListItemWidget extends StatelessWidget {
             ),
           ),
           // Explicit handle: the default long-press-to-drag on phones gave no
-          // hint that the list could be reordered at all.
+          // hint that the list could be reordered at all. Hidden from screen
+          // readers: its label merged a "Reorder" that did nothing into every
+          // row, and ReorderableListView already offers the move actions.
           ReorderableDragStartListener(
             index: index,
-            child: Semantics(
-              label: AppLocalizations.of(context)!.reorder,
+            child: ExcludeSemantics(
               child: SizedBox(
                 width: 48,
                 height: 48,

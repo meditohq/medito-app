@@ -73,6 +73,51 @@ void main() {
     expect(labels, ['Sleep', 'Stress']); // guided_meditation hidden, unused has no tracks
   });
 
+  testWidgets('explore chips fit and stay 48px tappable at 1.5x text', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          tagsRepositoryProvider.overrideWithValue(
+            _FakeTagsRepository(catalog: catalog),
+          ),
+        ],
+        retry: (_, _) => null,
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          // The app's bodyMedium; 1.5x is the app-wide text scale cap.
+          theme: ThemeData(
+            textTheme: const TextTheme(
+              bodyMedium: TextStyle(fontSize: 16, height: 1.3),
+            ),
+          ),
+          home: const MediaQuery(
+            data: MediaQueryData(textScaler: TextScaler.linear(1.5)),
+            child: Scaffold(body: Column(children: [ExploreTagChips()])),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final strip = tester.getRect(find.byType(ExploreTagChips));
+    for (final chip in tester.widgetList(find.byType(TagChip))) {
+      final pill = find.descendant(
+        of: find.byWidget(chip),
+        matching: find.byType(Material),
+      );
+      final pillRect = tester.getRect(pill);
+      expect(pillRect.top, greaterThanOrEqualTo(strip.top));
+      expect(pillRect.bottom, lessThanOrEqualTo(strip.bottom));
+      expect(
+        tester.getSize(find.byWidget(chip)).height,
+        greaterThanOrEqualTo(TagChip.minTapHeight),
+      );
+    }
+  });
+
   testWidgets('track chips show that track\'s tags and open the tag page', (
     tester,
   ) async {

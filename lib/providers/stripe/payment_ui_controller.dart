@@ -321,11 +321,13 @@ class PaymentUIController extends _$PaymentUIController {
           'PAYMENT_UI',
           '✅ Showing success message: $amountString $currency (Intent: $paymentIntentId)',
         );
+        // Upper-case ISO code: "5.00 usd" was spelled out or misread by
+        // screen readers.
         _showSuccessSnackbar(
           context,
           AppLocalizations.of(
             context,
-          )!.paymentSuccessMessage(amountString, currency),
+          )!.paymentSuccessMessage(amountString, currency.toUpperCase()),
         );
       },
       failure: (errorMessage, paymentIntentId, error) {

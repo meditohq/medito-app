@@ -84,6 +84,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   // the entrance slide finishes — that frame change is what triggers the
   // AnimatedSwitcher transition from old streak -> new streak.
   bool _showPriorStats = true;
+  bool _animationsStarted = false;
   bool _reminderPromptImpressionLogged = false;
   bool _accountPromptImpressionLogged = false;
 
@@ -166,11 +167,28 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     _cardFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _cardAnimationController, curve: Curves.easeOut),
     );
+  }
 
-    _startAnimations();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Here rather than initState: reduce motion is read from MediaQuery.
+    if (!_animationsStarted) {
+      _animationsStarted = true;
+      _startAnimations();
+    }
   }
 
   void _startAnimations() {
+    // Reduce motion: show everything in place, with the current stats.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _statsAnimationController.value = 1;
+      _reminderAnimationController.value = 1;
+      _cardAnimationController.value = 1;
+      _showPriorStats = false;
+      return;
+    }
+
     _statsAnimationController.forward();
     Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
@@ -236,14 +254,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                 onTap: () => Navigator.pop(context),
                 semanticLabel: AppLocalizations.of(context)!.close,
               ),
-              leftCenterItem: BottomActionBarItem(
-                child: const SizedBox.shrink(),
-                onTap: null,
-              ),
-              rightCenterItem: BottomActionBarItem(
-                child: const SizedBox.shrink(),
-                onTap: null,
-              ),
+              // No centre items: null leaves the same 48pt spacers, where
+              // empty items were read as two unlabelled disabled buttons.
               rightItem: BottomActionBarItem(
                 child: MeditoIcon(
                   assetName: MeditoIcons.home,
@@ -414,15 +426,33 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         ? AsyncValue<LocalAllStats>.data(widget.priorStats!)
         : statsAsyncValue;
 
+    final l10n = AppLocalizations.of(context)!;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+
     return displayedStats.when(
-      loading: () => const SizedBox(
+      loading: () => SizedBox(
         height: 200,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(semanticsLabel: l10n.loading),
+        ),
       ),
-      error: (err, _) =>
-          SizedBox(height: 200, child: Center(child: Text('Error: $err'))),
+      error: (err, _) {
+        AppLogger.e('END_SCREEN', 'Failed to load stats: $err');
+        return SizedBox(
+          height: 200,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: padding24),
+              child: Text(l10n.anErrorOccurred, textAlign: TextAlign.center),
+            ),
+          ),
+        );
+      },
       data: (localAllStats) {
         var streak = localAllStats.streakCurrent;
+        // The number animates from the prior streak; say the current one
+        // straight away rather than the old value for the first 700 ms.
+        final spokenStreak = statsAsyncValue.value?.streakCurrent ?? streak;
         var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
         var lastFiveDays = List.generate(
           5,
@@ -435,7 +465,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
           children: [
             AnimatedSwitcher(
               key: _animatedSwitcherKey,
-              duration: const Duration(milliseconds: 500),
+              duration: reduceMotion
+                  ? Duration.zero
+                  : const Duration(milliseconds: 500),
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return FadeTransition(
                   opacity: animation,
@@ -465,9 +497,8 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               ),
             ),
             Text(
-              AppLocalizations.of(context)!.dayStreak,
-              semanticsLabel:
-                  '$streak ${AppLocalizations.of(context)!.dayStreak}',
+              l10n.dayStreak,
+              semanticsLabel: l10n.streakDays(spokenStreak),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontFamily: googleSans,
                 fontSize: 40,
@@ -479,7 +510,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
             ),
             const SizedBox(height: 24),
             AnimatedSwitcher(
-              duration: const Duration(seconds: 1),
+              duration: reduceMotion
+                  ? Duration.zero
+                  : const Duration(seconds: 1),
               child: _buildDayLettersAndIcons(
                 lastFiveDays,
                 daysMeditated,
@@ -1013,6 +1046,14 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
       await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
       await ref.read(reminderTimeProvider.notifier).setTime(time);
 
+      // The card vanishes on success; say what was set so it isn't silent.
+      if (mounted) {
+        showSnackBar(
+          context,
+          AppLocalizations.of(context)!.reminderSetFor(time.format(context)),
+        );
+      }
+
       unawaited(
         ref
             .read(analyticsServiceProvider)
@@ -1044,6 +1085,9 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
               parameters: _endScreenSourceParams,
             ),
       );
+      if (mounted) {
+        showSnackBar(context, AppLocalizations.of(context)!.anErrorOccurred);
+      }
     }
   }
 }

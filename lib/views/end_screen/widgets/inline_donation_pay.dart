@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:medito/constants/colors/color_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/inputs/medito_text_field.dart';
@@ -97,6 +100,20 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
         !widget.ladder.contains(_selectedAmount)) {
       _selectedAmount = _initialAmount();
     }
+    // The pay button swaps its label for a spinner; say why, once.
+    if (widget.isProcessing && !oldWidget.isProcessing) {
+      _announce(AppLocalizations.of(context)!.processingDonation);
+    }
+  }
+
+  void _announce(String message) {
+    unawaited(
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        message,
+        Directionality.of(context),
+      ),
+    );
   }
 
   @override
@@ -133,6 +150,9 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
 
     if (_asksForEmail && !_emailRevealed) {
       setState(() => _emailRevealed = true);
+      // Otherwise the tap seems to do nothing: the field appears silently
+      // and the button only changes its label.
+      _announce(AppLocalizations.of(context)!.donationEmailRequired);
       return;
     }
 
@@ -199,20 +219,29 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
             const SizedBox(width: 8),
             Semantics(
               button: true,
+              enabled: !widget.isProcessing,
               child: GestureDetector(
                 key: inlineDonationOtherAmountKey,
                 onTap: widget.isProcessing ? null : widget.onOtherAmount,
                 behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Text(
-                    l10n.donateOtherAmount,
-                    style: TextStyle(
-                      color: fg,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      decoration: TextDecoration.underline,
-                      decorationColor: fg,
+                // 44pt tall touch target around the small link text.
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  child: Align(
+                    widthFactor: 1,
+                    heightFactor: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        l10n.donateOtherAmount,
+                        style: TextStyle(
+                          color: fg,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                          decorationColor: fg,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -260,6 +289,8 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
   }) {
     final isSelected = amount == _selectedAmount;
     final label = formatCurrencyAmount(amount, widget.currencyCode);
+    // "COP 20,000", not "$20,000" read as dollars.
+    final spokenLabel = spokenCurrencyAmount(amount, widget.currencyCode);
 
     void select() => setState(() => _selectedAmount = amount);
 
@@ -268,8 +299,9 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
     // GestureDetector's tap, so it's given here.
     return Semantics(
       button: true,
+      enabled: !widget.isProcessing,
       selected: isSelected,
-      label: isSuggested ? '$label, $badge' : label,
+      label: isSuggested ? '$spokenLabel, $badge' : spokenLabel,
       excludeSemantics: true,
       onTap: widget.isProcessing ? null : select,
       child: GestureDetector(
@@ -373,6 +405,22 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
   String get _amountLabel =>
       formatCurrencyAmount(_selectedAmount, widget.currencyCode);
 
+  String get _spokenAmountLabel =>
+      spokenCurrencyAmount(_selectedAmount, widget.currencyCode);
+
+  Widget _buildProcessingIndicator(Color color, AppLocalizations l10n) {
+    return SizedBox(
+      width: 20,
+      height: 20,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: color,
+        // Otherwise the disabled button has no name while it spins.
+        semanticsLabel: l10n.processingDonation,
+      ),
+    );
+  }
+
   Widget _buildApplePayButton(BuildContext context, AppLocalizations l10n) {
     // White button per Apple Pay HIG on a coloured background; "Donate with
     //  Pay" is Apple's official nonprofit variant. U+F8FF is the Apple logo
@@ -389,44 +437,45 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: widget.isProcessing
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.black,
-                ),
-              )
+            ? _buildProcessingIndicator(Colors.black, l10n)
             // Long localized amounts (R$ 1.000, ₹2,000) must never wrap or
             // overflow the wallet button — shrink the whole label instead.
-            : FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${l10n.donateWithApplePayPrefix} ',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+            // Spoken as one phrase: the U+F8FF glyph is unspeakable (it read
+            // "Donate with Pay") and the visible label never says monthly.
+            : Semantics(
+                label: l10n.donateAmountPerMonthWithApplePay(
+                  _spokenAmountLabel,
+                ),
+                excludeSemantics: true,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${l10n.donateWithApplePayPrefix} ',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    const Text(
-                      '',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+                      const Text(
+                        '',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      'Pay · $_amountLabel',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                      const SizedBox(width: 2),
+                      Text(
+                        'Pay · $_amountLabel',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
       ),
@@ -434,8 +483,10 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
   }
 
   Widget _buildCardButton(BuildContext context, AppLocalizations l10n) {
-    return SizedBox(
-      height: 46,
+    // A minimum, not a fixed height: a long localized label wraps at large
+    // text sizes and was clipped by the old SizedBox(height: 46).
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 46),
       child: ElevatedButton(
         key: inlineDonationPayButtonKey,
         onPressed: widget.isProcessing ? null : _submit,
@@ -446,18 +497,15 @@ class _InlineDonationPayState extends State<InlineDonationPay> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: widget.isProcessing
-            ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: context.brandAccent,
-                ),
-              )
+            ? _buildProcessingIndicator(context.brandAccent, l10n)
             : Text(
                 _asksForEmail && _emailRevealed
                     ? l10n.donationContinueToPayment
                     : l10n.donateAmountPerMonth(_amountLabel),
+                // "/month" was read as "slash month".
+                semanticsLabel: _asksForEmail && _emailRevealed
+                    ? null
+                    : l10n.donateAmountPerMonthSpoken(_spokenAmountLabel),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

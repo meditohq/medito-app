@@ -37,6 +37,7 @@ class MarkdownWidget extends StatelessWidget {
       padding: const EdgeInsets.all(0),
       physics: const NeverScrollableScrollPhysics(),
       selectable: selectable,
+      sizedImageBuilder: _image,
       styleSheet: buildMarkdownStyleSheet(context).copyWith(
         p:
             p ??
@@ -56,6 +57,26 @@ class MarkdownWidget extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
       ),
+    );
+  }
+
+  /// Like the package's default for web images, but reads the alt text: the
+  /// default left images nameless to screen readers. Only http(s) images are
+  /// rendered; markdown here comes from the API, not local assets.
+  Widget _image(MarkdownImageConfig config) {
+    final uri = config.uri;
+    if (uri.scheme != 'http' && uri.scheme != 'https') {
+      return const SizedBox.shrink();
+    }
+    final alt = config.alt?.trim() ?? '';
+    return Image.network(
+      uri.toString(),
+      width: config.width,
+      height: config.height,
+      semanticLabel: alt.isEmpty ? null : alt,
+      // No alt text means decorative.
+      excludeFromSemantics: alt.isEmpty,
+      errorBuilder: (_, _, _) => const SizedBox.shrink(),
     );
   }
 

@@ -64,13 +64,17 @@ class _MeditoAppBarLargeState extends State<MeditoAppBarLarge> {
     );
   }
 
-  Text _topBarTitle(String title) {
-    return Text(
-      title,
-      style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
-        fontFamily: googleSans,
-        fontWeight: FontWeight.w700,
-        color: ColorConstants.white,
+  Widget _topBarTitle(String title) {
+    // FlexibleSpaceBar names the route but doesn't mark its title a heading.
+    return Semantics(
+      header: true,
+      child: Text(
+        title,
+        style: Theme.of(context).primaryTextTheme.titleLarge?.copyWith(
+          fontFamily: googleSans,
+          fontWeight: FontWeight.w700,
+          color: ColorConstants.white,
+        ),
       ),
     );
   }

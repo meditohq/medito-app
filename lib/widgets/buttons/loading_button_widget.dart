@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/utils.dart';
 
 class LoadingButtonWidget extends StatelessWidget {
@@ -43,27 +44,37 @@ class LoadingButtonWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Text(
-                btnText,
-                style: TextStyle(
-                  color: isLoading ? Colors.transparent : textColor,
-                  fontSize: fontSize,
-                  fontWeight: fontWeight,
-                ),
-              ),
-              if (isLoading)
-                SizedBox(
-                  height: 16,
-                  width: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: textColor,
+          // Flexible so a long label wraps instead of overflowing the button.
+          Flexible(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Kept (transparent) while loading so the button keeps its
+                // size, but hidden from screen readers, which read it anyway.
+                ExcludeSemantics(
+                  excluding: isLoading,
+                  child: Text(
+                    btnText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isLoading ? Colors.transparent : textColor,
+                      fontSize: fontSize,
+                      fontWeight: fontWeight,
+                    ),
                   ),
                 ),
-            ],
+                if (isLoading)
+                  SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: textColor,
+                      semanticsLabel: AppLocalizations.of(context)!.loading,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),

@@ -138,17 +138,11 @@ class ShortcutsItemsWidget extends ConsumerWidget {
               onTap: () => _handleChipPress(context, ref, e),
               child: Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    e.title ?? '',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: textColor.withOpacityValue(0.9),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
+                child: _ShortcutTitle(
+                  title: e.title ?? '',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: textColor.withOpacityValue(0.9),
                   ),
                 ),
               ),
@@ -156,6 +150,51 @@ class ShortcutsItemsWidget extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// A shortcut's caption. Wraps to two lines at large text sizes rather than
+/// shrinking back to the default size; only a word too wide for the tile on
+/// its own is scaled down, so it isn't split mid-word.
+class _ShortcutTitle extends StatelessWidget {
+  const _ShortcutTitle({required this.title, required this.style});
+
+  final String title;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textScaler = MediaQuery.textScalerOf(context);
+        final direction = Directionality.of(context);
+        final wordTooWide = title.split(RegExp(r'\s+')).any((word) {
+          final painter = TextPainter(
+            text: TextSpan(text: word, style: style),
+            textDirection: direction,
+            textScaler: textScaler,
+            maxLines: 1,
+          )..layout();
+          final width = painter.width;
+          painter.dispose();
+          return width > constraints.maxWidth;
+        });
+
+        if (wordTooWide) {
+          return FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(title, style: style, maxLines: 1),
+          );
+        }
+        return Text(
+          title,
+          style: style,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        );
+      },
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/medito_icon.dart';
@@ -24,16 +25,60 @@ class AudioDownloadWidget extends ConsumerWidget {
     final downloadAudioState = ref.watch(audioDownloaderProvider);
     final downloadFileKey =
         '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}';
+    final l10n = AppLocalizations.of(context)!;
+    final fileState = downloadAudioState.audioDownloadState[downloadFileKey];
 
-    return SizedBox(
-      width: 48,
-      height: 48,
-      child: Center(
-        child: _buildDownloadWidget(
-          context,
-          ref,
-          downloadAudioState,
-          downloadFileKey,
+    // The progress fill gives no other sign that the download finished.
+    ref.listen(
+      audioDownloaderProvider.select(
+        (s) => s.audioDownloadState[downloadFileKey],
+      ),
+      (previous, next) {
+        if (previous == AudioDownloadState.downloading &&
+            next == AudioDownloadState.downloaded) {
+          SemanticsService.sendAnnouncement(
+            View.of(context),
+            l10n.audioDownloaded,
+            Directionality.of(context),
+          );
+        }
+      },
+    );
+
+    // One semantics node across all three states: swapping the button for
+    // the progress box lost screen-reader focus as soon as Download was
+    // tapped.
+    final (label, value, onTap) = switch (fileState) {
+      AudioDownloadState.downloaded => (
+        l10n.deleteDownload,
+        null,
+        () => _handleRemoveDownload(ref, context),
+      ),
+      AudioDownloadState.downloading => (
+        l10n.downloadingAudio,
+        '${(_getDownloadProgress(downloadAudioState, downloadFileKey) * 100).round()}%',
+        null,
+      ),
+      _ => (l10n.downloadAudio, null, () => _handleDownload(ref, context)),
+    };
+
+    return Semantics(
+      container: true,
+      button: onTap != null,
+      label: label,
+      value: value,
+      onTap: onTap,
+      excludeSemantics: true,
+      child: SizedBox(
+        width: 48,
+        height: 48,
+        child: Center(
+          child: _buildDownloadWidget(
+            context,
+            ref,
+            downloadAudioState,
+            downloadFileKey,
+          ),
         ),
       ),
     );
@@ -108,42 +153,37 @@ class AudioDownloadWidget extends ConsumerWidget {
   ) {
     var progress = _getDownloadProgress(downloadAudioState, downloadFileKey);
 
-    return Semantics(
-      label: AppLocalizations.of(context)!.downloadingAudio,
-      value: '${(progress * 100).round()}%',
-      excludeSemantics: true,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            color: ColorConstants.graphite.withAlpha(100),
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          child: Container(
             width: 48,
-            height: 48,
+            height: 48 * progress,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
-              color: ColorConstants.graphite.withAlpha(100),
+              color: ColorConstants.graphite.withAlpha(200),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            child: Container(
-              width: 48,
-              height: 48 * progress,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                color: ColorConstants.graphite.withAlpha(200),
-              ),
-            ),
+        ),
+        const SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
           ),
-          const SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorConstants.white),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

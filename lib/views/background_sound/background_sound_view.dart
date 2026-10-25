@@ -135,13 +135,16 @@ class _SoundSectionHeading extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(
-        label,
-        style: theme.textTheme.bodySmall?.copyWith(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+      child: Semantics(
+        header: true,
+        child: Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ),
       ),
     );

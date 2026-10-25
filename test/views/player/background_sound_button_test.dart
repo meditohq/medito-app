@@ -252,7 +252,7 @@ void main() {
         onPressed: () => opened++,
       );
       await _waitForHint(tester);
-      final close = find.byTooltip('Close');
+      final close = find.byTooltip('Dismiss tip');
       expect(tester.getSize(close).shortestSide, greaterThanOrEqualTo(44));
       // A slower tap must still reach the close button instead of the overlay
       // disappearing on pointer-down and cancelling its gesture.

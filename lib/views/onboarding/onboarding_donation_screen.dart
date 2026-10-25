@@ -12,6 +12,7 @@ import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/views/donation/native_donation_page.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
+import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 
 class OnboardingDonationScreen extends ConsumerStatefulWidget {
   const OnboardingDonationScreen({super.key, this.headerImage, this.onNext});
@@ -179,7 +180,11 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
       // Still waiting (< timeout) on the paywall config.
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(
+            semanticsLabel: AppLocalizations.of(context)!.loading,
+          ),
+        ),
       );
     }
 
@@ -271,7 +276,7 @@ class _DonationScreenState extends ConsumerState<OnboardingDonationScreen> {
                           children: [
                             Column(
                               children: [
-                                Text(
+                                OnboardingStepTitle(
                                   AppLocalizations.of(context)!.donationTitle,
                                   style: TextStyle(
                                     color: Theme.of(

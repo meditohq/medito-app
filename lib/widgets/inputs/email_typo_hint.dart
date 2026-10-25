@@ -37,28 +37,43 @@ class EmailTypoHint extends StatelessWidget {
         final suggestion = suggestEmailCorrection(value.text);
         if (suggestion == null) return const SizedBox.shrink();
         final l10n = AppLocalizations.of(context)!;
+        // A button, announced as it appears while typing (the field keeps
+        // focus, so it would otherwise go unnoticed), with a 44pt target.
         return Align(
           alignment: AlignmentDirectional.centerStart,
-          child: InkWell(
-            key: emailTypoHintKey,
-            borderRadius: BorderRadius.circular(8),
-            onTap: () {
-              controller.value = TextEditingValue(
-                text: suggestion,
-                selection: TextSelection.collapsed(offset: suggestion.length),
-              );
-              onAccepted?.call();
-            },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-              child: Text.rich(
-                emailSuggestionSpan(l10n, value.text, suggestion),
-                style: TextStyle(
-                  fontFamily: googleSans,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                  decoration: TextDecoration.underline,
-                  color: color ?? Theme.of(context).colorScheme.primary,
+          child: Semantics(
+            container: true,
+            button: true,
+            liveRegion: true,
+            child: InkWell(
+              key: emailTypoHintKey,
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                controller.value = TextEditingValue(
+                  text: suggestion,
+                  selection: TextSelection.collapsed(offset: suggestion.length),
+                );
+                onAccepted?.call();
+              },
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    widthFactor: 1,
+                    heightFactor: 1,
+                    child: Text.rich(
+                      emailSuggestionSpan(l10n, value.text, suggestion),
+                      style: TextStyle(
+                        fontFamily: googleSans,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        decoration: TextDecoration.underline,
+                        color: color ?? Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

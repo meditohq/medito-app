@@ -40,7 +40,19 @@ struct PracticeWidgetView: View {
     private var doneToday: Bool { data.allActivityDates.contains(today) }
     private var streak: Int { data.streak(at: entry.date) }
     private var score: Int { data.consistencyScore(at: entry.date) }
-    private var unit: String { streak == 1 ? data.dayLabel : data.daysLabel }
+    private var unit: String { data.streakUnit(streak) }
+
+    /// One VoiceOver label for the whole widget: the stat by name, today's state and, where the
+    /// week is shown, how much of it was practised.
+    private var accessibilitySummary: String {
+        data.accessibilitySummary(
+            stat: data.showsStreak
+                ? data.streakDescription(at: entry.date)
+                : data.consistencyDescription(at: entry.date),
+            at: entry.date,
+            recentDays: family == .accessoryRectangular ? 7 : nil
+        )
+    }
 
     var body: some View {
         Group {
@@ -50,6 +62,8 @@ struct PracticeWidgetView: View {
             default: inline
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilitySummary)
         .widgetURL(widgetTapURL(
             data.showsStreak ? "lock_streak" : "lock_consistency",
             placement: "lock_screen"
@@ -77,7 +91,7 @@ struct PracticeWidgetView: View {
             }
         } else {
             Gauge(value: Double(min(max(score, 0), 100)), in: 0 ... 100) {
-                EmptyView()
+                Text(data.consistencyDescription(at: entry.date))
             } currentValueLabel: {
                 Text("\(score)%")
                     .font(.googleSans(15, .bold))
@@ -115,7 +129,7 @@ struct PracticeWidgetView: View {
                 }
                 Spacer(minLength: 4)
                 // Nothing else on the Lock Screen says which app this is.
-                Image("MeditoLogo")
+                Image(decorative: "MeditoLogo")
                     .resizable()
                     .scaledToFit()
                     .frame(height: 9)

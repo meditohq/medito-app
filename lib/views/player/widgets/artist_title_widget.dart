@@ -33,14 +33,17 @@ class ArtistTitleWidget extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Center(
-        child: Text(
-          trackTitle ?? '',
-          textAlign: TextAlign.center,
-          style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
-            fontFamily: googleSans,
-            color: ColorConstants.white,
-            fontSize: trackTitleFontSize,
-            letterSpacing: 0.2,
+        child: Semantics(
+          header: true,
+          child: Text(
+            trackTitle ?? '',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).primaryTextTheme.headlineMedium?.copyWith(
+              fontFamily: googleSans,
+              color: ColorConstants.white,
+              fontSize: trackTitleFontSize,
+              letterSpacing: 0.2,
+            ),
           ),
         ),
       ),
@@ -55,22 +58,23 @@ class ArtistTitleWidget extends ConsumerWidget {
       color: ColorConstants.white,
     );
 
+    final name = artistName ?? '';
+    final url = artistUrlPath ?? '';
+    final hasLink = isPlayerScreen && url.isNotEmpty;
+
+    // Timers have no narrator: keep the row's space but no empty focus stop.
+    // The name is a link only when there's somewhere to go.
     return SizedBox(
       height: 30, // Fixed height for subtitle
-      child: Semantics(
-        link: isPlayerScreen && artistUrlPath != null,
-        button: isPlayerScreen && artistUrlPath != null,
-        child: InkWell(
-          onTap: () => _handleArtistNameTap(),
-          child: Center(child: Text(artistName ?? '', style: style)),
-        ),
-      ),
+      child: name.isEmpty
+          ? null
+          : Semantics(
+              link: hasLink,
+              child: InkWell(
+                onTap: hasLink ? () => launchURLInBrowser(url) : null,
+                child: Center(child: Text(name, style: style)),
+              ),
+            ),
     );
-  }
-
-  void _handleArtistNameTap() async {
-    if (isPlayerScreen && artistUrlPath != null) {
-      await launchURLInBrowser(artistUrlPath!);
-    }
   }
 }

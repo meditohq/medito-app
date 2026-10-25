@@ -124,6 +124,43 @@ void main() {
     expect(find.text('Minimum amount is \$2'), findsOneWidget);
   });
 
+  testWidgets('disables Donate while no valid amount is chosen', (
+    tester,
+  ) async {
+    await pump(tester, _config(currency: 'usd', monthly: [200, 500, 1000]));
+
+    ElevatedButton donate() => tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Donate'),
+    );
+    expect(donate().onPressed, isNotNull);
+
+    // Below the minimum: the tap used to do nothing, silently.
+    await type(tester, '1');
+    expect(donate().onPressed, isNull);
+
+    await type(tester, '25');
+    expect(donate().onPressed, isNotNull);
+  });
+
+  testWidgets('names amounts and the skip link for screen readers', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await pump(tester, _config(currency: 'cad', monthly: [500, 1000, 2000]));
+
+    // Shown as "$5", which would be read as US dollars.
+    expect(find.text('\$5'), findsOneWidget);
+    expect(find.bySemanticsLabel('CAD\u00a05, Most popular'), findsOneWidget);
+    expect(find.bySemanticsLabel('CAD\u00a010'), findsOneWidget);
+    await tester.ensureVisible(find.text('Not now'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getSemantics(find.text('Not now')),
+      matchesSemantics(label: 'Not now', isButton: true, hasTapAction: true),
+    );
+    semantics.dispose();
+  });
+
   testWidgets('drops the echo when the field is cleared', (tester) async {
     await pump(tester, _config(currency: 'usd', monthly: [200, 500, 1000]));
 

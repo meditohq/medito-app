@@ -18,6 +18,7 @@ import 'package:medito/views/onboarding/onboarding_question_screen.dart';
 import 'package:medito/views/onboarding/onboarding_result_screen.dart';
 import 'package:medito/views/onboarding/battery_optimization_screen.dart';
 import 'package:medito/views/onboarding/tracking_permission_screen.dart';
+import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 import 'package:medito/widgets/onboarding/progress_indicator_widget.dart';
 
 // Keep the device decision injectable so previews exercise the real pager.
@@ -340,7 +341,22 @@ class OnboardingPagerScreenState extends ConsumerState<OnboardingPagerScreen> {
                 onPageChanged: (index) {
                   setState(() => _currentPage = index);
                 },
-                itemBuilder: (context, index) => pages[index],
+                // Pages past the first only build once paged to (no cache
+                // extent), so their title announces the new step.
+                itemBuilder: (context, index) => index == 0
+                    ? pages[index]
+                    : OnboardingStepAnnouncement(
+                        position: steps[index] == OnboardingStep.result
+                            ? null
+                            : l10n.onboardingStepIndicator(
+                                steps
+                                    .take(index + 1)
+                                    .where((s) => s != OnboardingStep.result)
+                                    .length,
+                                totalSteps,
+                              ),
+                        child: pages[index],
+                      ),
               ),
             ),
             if (steps[_currentPage] != OnboardingStep.result)

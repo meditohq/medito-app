@@ -44,43 +44,51 @@ class DeleteAccountConfirmationDialog extends StatelessWidget {
 
     return MeditoDialog(
       title: l10n.deleteAccountTitle,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MeditoDialogBody(l10n.deleteAccountConfirmation),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.onSurface.withOpacityValue(0.06),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MeditoDialogBody(l10n.deleteAccountDonationNotice),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(0, 40),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  onPressed: () =>
-                      launchURLInBrowser(ConfigConstants.donationPortalUrl),
-                  child: Text(
-                    l10n.deleteAccountManageDonations,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
-                      decoration: TextDecoration.underline,
+      // Scrolls so the text and buttons stay reachable at large text sizes or
+      // on short screens.
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            MeditoDialogBody(l10n.deleteAccountConfirmation),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurface.withOpacityValue(0.06),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  MeditoDialogBody(l10n.deleteAccountDonationNotice),
+                  // Opens the donation portal in the browser: a link, with
+                  // the default 48px tap target.
+                  MergeSemantics(
+                    child: Semantics(
+                      link: true,
+                      child: TextButton(
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        onPressed: () => launchURLInBrowser(
+                          ConfigConstants.donationPortalUrl,
+                        ),
+                        child: Text(
+                          l10n.deleteAccountManageDonations,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurface,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         MeditoDialogSecondaryButton(
@@ -152,7 +160,9 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
         e is AccountDeletionUnconfirmed
             ? l10n.deleteAccountUnconfirmed
             : l10n.deleteAccountFailed,
-        backgroundColor: Colors.red,
+        // White text on Colors.red is ~3.7:1; this red clears 4.5:1 in both
+        // themes (the dark theme's error red is too light for white text).
+        backgroundColor: ColorConstants.lightError,
       );
       return;
     }
@@ -168,6 +178,10 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
+    // White on the dark theme's light error red is ~2.9:1.
+    final onError = theme.brightness == Brightness.dark
+        ? ColorConstants.black
+        : theme.colorScheme.onError;
 
     // System back (Android back, iOS edge swipe) is blocked while the
     // request is in flight, like the bottom-bar back button.
@@ -197,11 +211,14 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   padding: const EdgeInsets.all(padding16),
                   sliver: SliverList.list(
                     children: [
-                      Text(
-                        l10n.deleteAccountReasonTitle,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: onSurface,
-                          fontWeight: FontWeight.w600,
+                      Semantics(
+                        header: true,
+                        child: Text(
+                          l10n.deleteAccountReasonTitle,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -269,12 +286,13 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                         maxLines: 5,
                       ),
                       const SizedBox(height: 16),
-                      SizedBox(
-                        height: 48,
+                      // Min height, not fixed: larger text grows the button.
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 48),
                         child: LoadingButtonWidget(
                           btnText: l10n.deleteAccountFinalButton,
                           bgColor: theme.colorScheme.error,
-                          textColor: theme.colorScheme.onError,
+                          textColor: onError,
                           borderRadius: 12,
                           isLoading: _isDeleting,
                           onPressed: _delete,
@@ -322,43 +340,68 @@ class AccountDeletedScreen extends ConsumerWidget {
         body: AdaptivePageBody(
           maxWidth: 560,
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  const Spacer(),
-                  Icon(Icons.check_circle_outline, size: 56, color: onSurface),
-                  const SizedBox(height: 24),
-                  Text(
-                    l10n.accountDeletedTitle,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: onSurface,
-                      fontWeight: FontWeight.w600,
+            // Scrolls when the content outgrows the screen (large text, short
+            // or landscape screens): back is blocked here, so Continue must
+            // always be reachable. Otherwise the Spacers centre it as before.
+            child: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: (constraints.maxHeight - 48).clamp(
+                      0,
+                      double.infinity,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n.accountDeletedBody,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: onSurface.withOpacityValue(0.75),
-                      height: 1.5,
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        const Spacer(),
+                        Icon(
+                          Icons.check_circle_outline,
+                          size: 56,
+                          color: onSurface,
+                        ),
+                        const SizedBox(height: 24),
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            l10n.accountDeletedTitle,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: onSurface,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          l10n.accountDeletedBody,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: onSurface.withOpacityValue(0.75),
+                            height: 1.5,
+                          ),
+                        ),
+                        const Spacer(),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 48),
+                            child: LoadingButtonWidget(
+                              btnText: l10n.continueText,
+                              bgColor: context.brandAccent,
+                              textColor: context.onBrandAccent,
+                              borderRadius: 12,
+                              onPressed: () => _done(context, ref),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: LoadingButtonWidget(
-                      btnText: l10n.continueText,
-                      bgColor: context.brandAccent,
-                      textColor: context.onBrandAccent,
-                      borderRadius: 12,
-                      onPressed: () => _done(context, ref),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

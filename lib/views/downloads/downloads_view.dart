@@ -35,8 +35,6 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   var scaffoldKey = GlobalKey<ScaffoldState>();
 
-  /// Matches the snackbar's display time, so Undo works while it's visible.
-  static const _undoWindow = Duration(seconds: 4);
   _PendingDelete? _pendingDelete;
 
   @override
@@ -89,7 +87,12 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
               onTap: () => ref.refresh(downloadedTracksProvider),
             );
           },
-          loading: () => const DownloadListShimmer(),
+          loading: () => Semantics(
+            container: true,
+            excludeSemantics: true,
+            label: AppLocalizations.of(context)!.loading,
+            child: const DownloadListShimmer(),
+          ),
         ),
       ),
     );
@@ -104,33 +107,42 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
 
     return ReorderableListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      // One heading stop, "Tracks 3", instead of the name and count apart.
       header: Padding(
         padding: const EdgeInsets.only(bottom: 20, top: 8),
-        child: Row(
-          children: [
-            Icon(
-              Icons.offline_pin_outlined,
-              size: 20,
-              color: Theme.of(context).textTheme.titleMedium?.color,
+        child: MergeSemantics(
+          child: Semantics(
+            header: true,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.offline_pin_outlined,
+                  size: 20,
+                  color: Theme.of(context).textTheme.titleMedium?.color,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  AppLocalizations.of(context)!.tracks,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${visible.length}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            Text(
-              AppLocalizations.of(context)!.tracks,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                '${visible.length}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
       buildDefaultDragHandles: false,
@@ -205,6 +217,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
           // Swipe-to-delete is unreachable with a screen reader; offer the
           // same delete (with undo) as an action on the row.
           child: Semantics(
+            button: true,
             customSemanticsActions: {
               CustomSemanticsAction(
                 label: AppLocalizations.of(context)!.deleteDownload,
@@ -280,7 +293,8 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     setState(() {
       _pendingDelete = _PendingDelete(
         track: item,
-        timer: Timer(_undoWindow, _commitPendingDelete),
+        // Matches the snackbar's display time, so Undo works while visible.
+        timer: Timer(snackBarDuration(hasAction: true), _commitPendingDelete),
         commit: () => _deleteDownload(container, item),
       );
     });
@@ -289,7 +303,7 @@ class _DownloadsViewState extends ConsumerState<DownloadsView>
     final l10n = AppLocalizations.of(context)!;
     showSnackBar(
       context,
-      '"${item.title}" ${l10n.removed.toLowerCase()}',
+      l10n.downloadRemoved(item.title),
       actionLabel: l10n.undo,
       onActionPressed: () {
         final pending = _pendingDelete;

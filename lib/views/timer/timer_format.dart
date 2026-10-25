@@ -12,6 +12,21 @@ String formatTimerClock(Duration duration) {
   return '$minutes:$seconds';
 }
 
+/// `3 minutes 12 seconds` or `1 hour 5 seconds`: a duration as a screen
+/// reader should say it, rather than a clock like `03:12`. Zero parts are
+/// left out; a zero duration is `0 seconds`.
+String spokenDuration(Duration duration, AppLocalizations l10n) {
+  final d = duration.isNegative ? Duration.zero : duration;
+  final hours = d.inHours;
+  final minutes = d.inMinutes.remainder(60);
+  final seconds = d.inSeconds.remainder(60);
+  return [
+    if (hours > 0) l10n.spokenHours(hours),
+    if (minutes > 0) l10n.spokenMinutes(minutes),
+    if (seconds > 0 || d.inSeconds == 0) l10n.spokenSeconds(seconds),
+  ].join(' ');
+}
+
 /// `20 min`, `1 h` or `1 h 30 min`: a session length, rounded down to the
 /// minute.
 String formatTimerLength(Duration duration, AppLocalizations l10n) {

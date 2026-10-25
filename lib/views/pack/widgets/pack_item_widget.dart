@@ -66,9 +66,14 @@ class PackItemWidget extends StatelessWidget {
   Widget _getTrailing(BuildContext context) {
     if (item.type == TypeConstants.link) {
       // Tells link rows apart from sessions, which otherwise sound the same.
-      return SvgPicture.asset(
-        AssetConstants.icLink,
-        semanticsLabel: AppLocalizations.of(context)!.externalLink,
+      // A plain label merges into the row; a labelled SvgPicture was its own
+      // stop.
+      return Semantics(
+        label: AppLocalizations.of(context)!.externalLink,
+        child: SvgPicture.asset(
+          AssetConstants.icLink,
+          excludeFromSemantics: true,
+        ),
       );
     }
 
@@ -172,10 +177,15 @@ class _CompletionToggleState extends State<_CompletionToggle> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // A checkbox reading its state ("Completed, checked"), with the action in
+    // the hint; the old action-as-label contradicted it ("Mark incomplete,
+    // checked").
     return Semantics(
-      button: true,
       checked: _shown,
-      label: _shown ? l10n.markTrackIncomplete : l10n.markTrackComplete,
+      label: l10n.completed,
+      onTap: _handleTap,
+      onTapHint: _shown ? l10n.markTrackIncomplete : l10n.markTrackComplete,
+      excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _handleTap,

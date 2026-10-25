@@ -34,37 +34,39 @@ class MeditoDialogPrimaryButton extends StatelessWidget {
     final bg = backgroundColor ?? context.brandAccent;
     final fg = foregroundColor ?? context.onBrandAccent;
 
-    return SizedBox(
-      height: _buttonHeight,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          foregroundColor: fg,
-          disabledBackgroundColor: bg.withOpacityValue(0.5),
-          disabledForegroundColor: fg.withOpacityValue(0.7),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_buttonRadius),
-          ),
-          textStyle: _buttonTextStyle,
+    // A minimum, not a fixed height: a two-line label at large text sizes
+    // was clipped by a 48px box.
+    return ElevatedButton(
+      onPressed: isLoading ? null : onPressed,
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(64, _buttonHeight),
+        backgroundColor: bg,
+        foregroundColor: fg,
+        disabledBackgroundColor: bg.withOpacityValue(0.5),
+        disabledForegroundColor: fg.withOpacityValue(0.7),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_buttonRadius),
         ),
-        child: isLoading
-            ? SizedBox(
-                height: 18,
-                width: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation(fg),
-                ),
-              )
-            : Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+        textStyle: _buttonTextStyle,
       ),
+      child: isLoading
+          ? SizedBox(
+              height: 18,
+              width: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(fg),
+                // The spinner replaces the label; keep the button named.
+                semanticsLabel: label,
+              ),
+            )
+          : Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
     );
   }
 }
@@ -84,24 +86,22 @@ class MeditoDialogSecondaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
-    return SizedBox(
-      height: _buttonHeight,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: onSurface,
-          side: BorderSide(color: onSurface.withOpacityValue(0.3), width: 0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_buttonRadius),
-          ),
-          textStyle: _buttonTextStyle,
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(64, _buttonHeight),
+        foregroundColor: onSurface,
+        side: BorderSide(color: onSurface.withOpacityValue(0.3), width: 0.5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_buttonRadius),
         ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
+        textStyle: _buttonTextStyle,
+      ),
+      child: Text(
+        label,
+        textAlign: TextAlign.center,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

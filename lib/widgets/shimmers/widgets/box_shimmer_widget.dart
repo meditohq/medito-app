@@ -33,6 +33,8 @@ class BoxShimmerWidget extends StatelessWidget {
       child: Shimmer.fromColors(
         baseColor: baseColor,
         highlightColor: highlightColor,
+        // A static placeholder when the user asked for reduced motion.
+        enabled: !MediaQuery.disableAnimationsOf(context),
         period: Duration(milliseconds: delayInMiliSeconds),
         child: Container(
           decoration: BoxDecoration(

@@ -37,7 +37,12 @@ struct StreakWidgetView: View {
         WidgetContextReader(themePreference: entry.data.themePreference) { colors, standBy in
             StatWidgetBody(
                 value: "\(streak)",
-                unit: streak == 1 ? entry.data.dayLabel : entry.data.daysLabel,
+                accessibilitySummary: entry.data.accessibilitySummary(
+                    stat: entry.data.streakDescription(at: entry.date),
+                    at: entry.date,
+                    recentDays: isMedium ? 35 : 5 // the five-week calendar, or the five-day strip
+                ),
+                unit: entry.data.streakUnit(streak),
                 doneToday: entry.data.allActivityDates.contains(today),
                 allActivityDates: entry.data.allActivityDates,
                 today: today,

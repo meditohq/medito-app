@@ -103,17 +103,26 @@ class _MaintenanceCheckerState extends ConsumerState<MaintenanceChecker> {
     }
 
     _maintenanceOverlay = OverlayEntry(
-      builder: (context) => PopScope(
-        canPop: false,
-        child: Material(
-          color: Colors.black,
-          child: MaintenanceView(
-            maintenanceModel: maintenanceModel,
-            onClose: () {
-              _dismissedMaintenanceModel = maintenanceModel;
-              _maintenanceOverlay?.remove();
-              _maintenanceOverlay = null;
-            },
+      // The entry isn't opaque, so the app underneath stays in the semantics
+      // tree; block it like a modal route does, or screen readers could
+      // wander into the screens behind the maintenance message.
+      builder: (context) => BlockSemantics(
+        child: Semantics(
+          scopesRoute: true,
+          explicitChildNodes: true,
+          child: PopScope(
+            canPop: false,
+            child: Material(
+              color: Colors.black,
+              child: MaintenanceView(
+                maintenanceModel: maintenanceModel,
+                onClose: () {
+                  _dismissedMaintenanceModel = maintenanceModel;
+                  _maintenanceOverlay?.remove();
+                  _maintenanceOverlay = null;
+                },
+              ),
+            ),
           ),
         ),
       ),

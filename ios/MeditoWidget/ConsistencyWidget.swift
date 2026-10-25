@@ -37,6 +37,11 @@ struct ConsistencyWidgetView: View {
         WidgetContextReader(themePreference: entry.data.themePreference) { colors, standBy in
             StatWidgetBody(
                 value: "\(score)%",
+                accessibilitySummary: entry.data.accessibilitySummary(
+                    stat: entry.data.consistencyDescription(at: entry.date),
+                    at: entry.date,
+                    recentDays: isMedium ? 35 : 5 // the five-week calendar, or the five-day strip
+                ),
                 ringScore: score,
                 doneToday: entry.data.allActivityDates.contains(today),
                 allActivityDates: entry.data.allActivityDates,

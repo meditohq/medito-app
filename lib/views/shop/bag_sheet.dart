@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
@@ -120,10 +121,13 @@ class _ShopBagSheetState extends ConsumerState<ShopBagSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.shopBagTitle,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: onSurface,
+                Semantics(
+                  header: true,
+                  child: Text(
+                    l10n.shopBagTitle,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: onSurface,
+                    ),
                   ),
                 ),
                 if (!bag.isEmpty) ...[
@@ -246,6 +250,14 @@ class _BagLine extends ConsumerWidget {
                           },
                         );
                     notifier.setQuantity(item.variantId, q);
+                    // The number between the buttons changed silently.
+                    if (q > 0) {
+                      SemanticsService.sendAnnouncement(
+                        View.of(context),
+                        AppLocalizations.of(context)!.shopQuantity(q),
+                        Directionality.of(context),
+                      );
+                    }
                   },
                 ),
               ],
@@ -280,7 +292,11 @@ class _QuantityStepper extends StatelessWidget {
       tooltip: label,
       iconSize: 18,
       visualDensity: VisualDensity.compact,
-      constraints: const BoxConstraints.tightFor(width: 40, height: 36),
+      // 48×48: the minimum touch target.
+      constraints: const BoxConstraints.tightFor(
+        width: kMinInteractiveDimension,
+        height: kMinInteractiveDimension,
+      ),
       padding: EdgeInsets.zero,
       color: onSurface,
       disabledColor: onSurface.withValues(alpha: 0.3),
@@ -481,19 +497,27 @@ class _BagFooterState extends ConsumerState<_BagFooter> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (_opening)
-                        const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      else
-                        const Icon(Icons.lock_outline_rounded, size: 18),
-                      const SizedBox(width: 8),
-                      Text(l10n.shopCheckout),
-                    ],
+                  // Inside the button so the hint merges into its node; a
+                  // Semantics around the button wouldn't reach it.
+                  child: Semantics(
+                    hint: l10n.shopCheckoutHint,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (_opening)
+                          SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              semanticsLabel: l10n.loading,
+                            ),
+                          )
+                        else
+                          const Icon(Icons.lock_outline_rounded, size: 18),
+                        const SizedBox(width: 8),
+                        Flexible(child: Text(l10n.shopCheckout)),
+                      ],
+                    ),
                   ),
                 ),
               ),

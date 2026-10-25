@@ -174,7 +174,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
     return Flexible(
       child: MarkdownWidget(
         body: widget.announcement.text ?? '',
-        selectable: true,
+        // Not selectable: TalkBack exposed the selectable text as a
+        // long-clickable read-only field instead of plain text.
+        selectable: false,
         textAlign: WrapAlignment.start,
         a: markDownTheme?.copyWith(
           decoration: TextDecoration.underline,

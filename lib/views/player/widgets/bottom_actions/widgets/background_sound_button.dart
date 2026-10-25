@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
@@ -85,8 +87,23 @@ class _BackgroundSoundButtonState extends ConsumerState<BackgroundSoundButton> {
               .read(sharedPreferencesProvider)
               .setBool(SharedPreferenceConstants.bgSoundChangeHintShown, true),
         );
-        // Manually shown Flutter tooltips need an explicit timeout.
-        _hideTimer = Timer(const Duration(seconds: 6), _dismissHint);
+        // RawTooltip announces itself through SemanticsService.tooltip,
+        // which only Android honours.
+        if (defaultTargetPlatform == TargetPlatform.iOS) {
+          unawaited(
+            SemanticsService.sendAnnouncement(
+              View.of(context),
+              AppLocalizations.of(context)!.changeBackgroundSoundsHint,
+              Directionality.of(context),
+            ),
+          );
+        }
+        // Manually shown Flutter tooltips need an explicit timeout. Not with
+        // a screen reader, which may still be finding its way to the bubble:
+        // it stays until closed or tapped outside.
+        if (!MediaQuery.accessibleNavigationOf(context)) {
+          _hideTimer = Timer(const Duration(seconds: 6), _dismissHint);
+        }
       }
     });
   }
@@ -124,78 +141,85 @@ class _BackgroundSoundButtonState extends ConsumerState<BackgroundSoundButton> {
     );
     if (!_showHint) return button;
 
-    return RawTooltip(
-      key: _tooltipKey,
-      semanticsTooltip: l10n.changeBackgroundSoundsHint,
-      triggerMode: TooltipTriggerMode.manual,
-      // Keep the close button alive until the tap finishes. Outside taps
-      // dismiss through TapRegion without interrupting the player's controls.
-      enableTapToDismiss: false,
-      positionDelegate: (position) {
-        final offset = positionDependentBox(
-          size: position.overlaySize,
-          childSize: position.tooltipSize,
-          target: position.target,
-          verticalOffset: 32,
-          preferBelow: false,
-        );
-        // Keep the bubble on screen, but let the arrow follow the button
-        // when the bubble has to move away from a screen edge.
-        final left = (position.target.dx - position.tooltipSize.width / 2)
-            .clamp(
-              0.0,
-              position.overlaySize.width - position.tooltipSize.width,
-            );
-        _arrowX.value = position.target.dx - left - 12;
-        return Offset(left, offset.dy);
-      },
-      tooltipBuilder: (context, animation) => FadeTransition(
-        opacity: animation,
-        child: TapRegion(
-          onTapOutside: (_) => RawTooltip.dismissAllToolTips(),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 252),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: DecoratedBox(
-                decoration: _SoundHintDecoration(_arrowX),
-                child: Padding(
-                  // Five extra pixels below the bubble reserve its arrow.
-                  padding: const EdgeInsets.fromLTRB(12, 2, 0, 7),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          l10n.changeBackgroundSoundsHint,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: const Color(0xFFF0F0F0),
-                                fontSize: 13,
-                                height: 1.35,
-                              ),
+    // The button's own tooltip is off while the hint shows, and a label
+    // around an IconButton doesn't name it: merge the name, the hint
+    // (RawTooltip's semantics tooltip) and the button into one node. The
+    // bubble itself lives in the overlay, outside this merge.
+    return MergeSemantics(
+      child: RawTooltip(
+        key: _tooltipKey,
+        semanticsTooltip: l10n.changeBackgroundSoundsHint,
+        triggerMode: TooltipTriggerMode.manual,
+        // Keep the close button alive until the tap finishes. Outside taps
+        // dismiss through TapRegion without interrupting the player's controls.
+        enableTapToDismiss: false,
+        positionDelegate: (position) {
+          final offset = positionDependentBox(
+            size: position.overlaySize,
+            childSize: position.tooltipSize,
+            target: position.target,
+            verticalOffset: 32,
+            preferBelow: false,
+          );
+          // Keep the bubble on screen, but let the arrow follow the button
+          // when the bubble has to move away from a screen edge.
+          final left = (position.target.dx - position.tooltipSize.width / 2)
+              .clamp(
+                0.0,
+                position.overlaySize.width - position.tooltipSize.width,
+              );
+          _arrowX.value = position.target.dx - left - 12;
+          return Offset(left, offset.dy);
+        },
+        tooltipBuilder: (context, animation) => FadeTransition(
+          opacity: animation,
+          child: TapRegion(
+            onTapOutside: (_) => RawTooltip.dismissAllToolTips(),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 252),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: DecoratedBox(
+                  decoration: _SoundHintDecoration(_arrowX),
+                  child: Padding(
+                    // Five extra pixels below the bubble reserve its arrow.
+                    padding: const EdgeInsets.fromLTRB(12, 2, 0, 7),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            l10n.changeBackgroundSoundsHint,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: const Color(0xFFF0F0F0),
+                                  fontSize: 13,
+                                  height: 1.35,
+                                ),
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: _dismissHint,
-                        tooltip: l10n.close,
-                        icon: const Icon(Icons.close, size: 16),
-                        color: ColorConstants.graphite,
-                        constraints: const BoxConstraints.tightFor(
-                          width: 44,
-                          height: 44,
+                        IconButton(
+                          onPressed: _dismissHint,
+                          // Not "Close": the player's own Close is nearby.
+                          tooltip: l10n.dismissTip,
+                          icon: const Icon(Icons.close, size: 16),
+                          color: ColorConstants.graphite,
+                          constraints: const BoxConstraints.tightFor(
+                            width: 44,
+                            height: 44,
+                          ),
+                          padding: EdgeInsets.zero,
                         ),
-                        padding: EdgeInsets.zero,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
+        child: Semantics(label: l10n.backgroundSounds, child: button),
       ),
-      child: Semantics(label: l10n.backgroundSounds, child: button),
     );
   }
 }

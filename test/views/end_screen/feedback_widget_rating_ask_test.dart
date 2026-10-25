@@ -76,6 +76,18 @@ void main() {
     expect(find.text('Could you leave Medito a rating?'), findsNothing);
   });
 
+  testWidgets('thanks are announced without the emoji', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await pump(tester, const {});
+    await tester.tap(find.text('😐'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getSemantics(find.textContaining('Thanks for sharing')),
+      matchesSemantics(label: 'Thanks for sharing', isLiveRegion: true),
+    );
+    semantics.dispose();
+  });
+
   testWidgets('neutral face never shows the ask', (tester) async {
     await pump(tester, eligible);
     await tester.tap(find.text('😐'));

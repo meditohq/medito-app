@@ -1,3 +1,4 @@
+import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/widgets/shimmers/widgets/box_shimmer_widget.dart';
 import 'package:flutter/material.dart';
@@ -9,15 +10,25 @@ class FolderShimmerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const BoxShimmerWidget(height: 380),
-          height8,
-          Column(
-            children: List.generate(5, (index) => _shimmerList(context, size)),
+    // One "Loading" stop instead of silence while the pack loads.
+    return Semantics(
+      container: true,
+      label: AppLocalizations.of(context)!.loading,
+      child: ExcludeSemantics(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const BoxShimmerWidget(height: 380),
+              height8,
+              Column(
+                children: List.generate(
+                  5,
+                  (index) => _shimmerList(context, size),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

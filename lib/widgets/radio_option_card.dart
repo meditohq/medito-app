@@ -125,7 +125,9 @@ class RadioDot extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: selected ? accent : onSurface.withValues(alpha: 0.35),
+          // 0.55, not 0.35: the empty ring was ~2.4:1, under the 3:1 a
+          // control's outline needs.
+          color: selected ? accent : onSurface.withValues(alpha: 0.55),
           width: selected ? 2 : 1.5,
         ),
       ),

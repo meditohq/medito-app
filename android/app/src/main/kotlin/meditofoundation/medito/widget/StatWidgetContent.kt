@@ -28,6 +28,8 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
+import androidx.glance.semantics.contentDescription
+import androidx.glance.semantics.semantics
 import androidx.glance.unit.ColorProvider
 import meditofoundation.medito.R
 import java.time.LocalDate
@@ -54,13 +56,16 @@ internal val statSizeMode = SizeMode.Responsive(setOf(STAT_COMPACT, STAT_TALL, S
  * - Tall (2×2): figure up top, the last four weeks as a calendar below.
  * - Wide (4×2+): figure on the left, the last five weeks on the right.
  *
- * [unit] may be empty (e.g. "62%").
+ * [unit] may be empty (e.g. "62%"). [stat] names it for TalkBack ("Consistency score: 62%"),
+ * which reads one description for the whole widget instead of the figure and calendar.
  */
 @Composable
 internal fun StatWidgetContent(
     context: Context,
     value: String,
     unit: String,
+    stat: String,
+    strings: WidgetStrings,
     ringScore: Int? = null,
     doneToday: Boolean,
     today: LocalDate,
@@ -77,17 +82,27 @@ internal fun StatWidgetContent(
         },
     )
     val size = LocalSize.current
-    val stat = StatParts(value, unit, ringScore, doneToday, palette)
+    val parts = StatParts(value, unit, ringScore, doneToday, palette)
+    val wide = size.width >= STAT_WIDE.width && size.height >= STAT_WIDE.height
+    val tall = size.height >= STAT_TALL.height
+    // The days the layout shows: five weeks, four weeks, or the five-day strip.
+    val shownDays = when {
+        wide -> 35
+        tall -> 28
+        else -> 5
+    }
+    val description = statAccessibilitySummary(stat, today, activityDays, shownDays, strings)
 
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(palette.background)
-            .clickable(onClick = tapAction),
+            .clickable(onClick = tapAction)
+            .semantics { contentDescription = description },
         contentAlignment = Alignment.Center,
     ) {
         when {
-            size.width >= STAT_WIDE.width && size.height >= STAT_WIDE.height -> Row(
+            wide -> Row(
                 modifier = GlanceModifier.fillMaxSize().padding(16.dp),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
             ) {
@@ -96,13 +111,13 @@ internal fun StatWidgetContent(
                         modifier = GlanceModifier.fillMaxWidth(),
                         verticalAlignment = Alignment.Vertical.CenterVertically,
                     ) {
-                        stat.Icon(28.dp)
+                        parts.Icon(28.dp)
                         Spacer(modifier = GlanceModifier.defaultWeight())
                         MeditoLogo(palette)
                     }
                     Spacer(modifier = GlanceModifier.defaultWeight())
-                    stat.Figure(if (size.height >= STAT_WIDE_TALL.height) 56f else 48f)
-                    stat.Unit(16f)
+                    parts.Figure(if (size.height >= STAT_WIDE_TALL.height) 56f else 48f)
+                    parts.Unit(16f)
                 }
                 Spacer(modifier = GlanceModifier.width(16.dp))
                 val roomy = size.height >= STAT_WIDE_TALL.height
@@ -114,17 +129,17 @@ internal fun StatWidgetContent(
                 )
             }
 
-            size.height >= STAT_TALL.height -> Column(modifier = GlanceModifier.fillMaxSize().padding(14.dp)) {
+            tall -> Column(modifier = GlanceModifier.fillMaxSize().padding(14.dp)) {
                 Row(
                     modifier = GlanceModifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Vertical.CenterVertically,
                 ) {
-                    stat.Icon(24.dp)
+                    parts.Icon(24.dp)
                     Spacer(modifier = GlanceModifier.width(6.dp))
-                    stat.Figure(32f)
+                    parts.Figure(32f)
                     if (unit.isNotEmpty()) {
                         Spacer(modifier = GlanceModifier.width(4.dp))
-                        stat.Unit(14f)
+                        parts.Unit(14f)
                     }
                     Spacer(modifier = GlanceModifier.defaultWeight())
                     MeditoLogo(palette)
@@ -138,12 +153,12 @@ internal fun StatWidgetContent(
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
             ) {
                 Row(verticalAlignment = Alignment.Vertical.CenterVertically) {
-                    stat.Icon(22.dp)
+                    parts.Icon(22.dp)
                     Spacer(modifier = GlanceModifier.width(4.dp))
-                    stat.Figure(24f)
+                    parts.Figure(24f)
                     if (unit.isNotEmpty()) {
                         Spacer(modifier = GlanceModifier.width(4.dp))
-                        stat.Unit(14f)
+                        parts.Unit(14f)
                     }
                 }
                 Spacer(modifier = GlanceModifier.height(4.dp))
@@ -151,6 +166,26 @@ internal fun StatWidgetContent(
             }
         }
     }
+}
+
+/**
+ * What TalkBack reads for a stat widget, which is otherwise a bare figure, unit and weekday
+ * letters: the [stat] by name, whether today is done, and how many of the last [shownDays] days
+ * were practised.
+ */
+internal fun statAccessibilitySummary(
+    stat: String,
+    today: LocalDate,
+    activityDays: Set<LocalDate>,
+    shownDays: Int,
+    strings: WidgetStrings,
+): String {
+    val done = (0 until shownDays).count { today.minusDays(it.toLong()) in activityDays }
+    return listOf(
+        stat,
+        if (today in activityDays) strings.doneToday else strings.notDoneToday,
+        strings.recentDays.fill("done" to done, "total" to shownDays),
+    ).joinToString(". ")
 }
 
 private class StatParts(
@@ -222,6 +257,7 @@ private fun FiveDayStrip(today: LocalDate, activityDays: Set<LocalDate>, palette
                     fontSize = 12f,
                     weight = WidgetWeight.SemiBold,
                     color = palette.muted,
+                    contentDescription = null,
                 )
                 Spacer(modifier = GlanceModifier.height(2.dp))
                 DayDot(active = day in activityDays, size = 20.dp, palette = palette)
@@ -258,6 +294,7 @@ private fun ActivityGrid(
                         fontSize = 11f,
                         weight = WidgetWeight.SemiBold,
                         color = palette.muted,
+                        contentDescription = null,
                     )
                 }
             }

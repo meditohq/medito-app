@@ -6,6 +6,7 @@ import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/providers.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
+import 'package:medito/views/settings/widgets/announce_setting.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/widgets/radio_option_card.dart';
 
@@ -87,7 +88,14 @@ class _DndSheetState extends ConsumerState<DndSheet> {
       );
     }
     await notifier.setEnabled(value);
-    if (mounted) Navigator.of(context).pop();
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    announceSettingChoice(
+      context,
+      widget.title,
+      value ? l10n.dndOn : l10n.dndOff,
+    );
+    Navigator.of(context).pop();
   }
 
   /// Explain the permission, offer the system page, and report whether access
@@ -167,11 +175,14 @@ class _DndSheetState extends ConsumerState<DndSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w600,
+            Semantics(
+              header: true,
+              child: Text(
+                widget.title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(height: 16),

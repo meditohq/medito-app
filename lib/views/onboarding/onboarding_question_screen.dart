@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
 import 'package:medito/widgets/onboarding/onboarding_option_button.dart';
+import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/widgets.dart';
 
@@ -147,7 +148,7 @@ class _OnboardingQuestionScreenState extends State<OnboardingQuestionScreen> {
                     ),
                     const SizedBox(height: padding16),
                   ],
-                  Text(
+                  OnboardingStepTitle(
                     widget.question,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w600,

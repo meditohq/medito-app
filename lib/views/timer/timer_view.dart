@@ -454,6 +454,7 @@ class _StartButton extends StatelessWidget {
             ? SizedBox.square(
                 dimension: 20,
                 child: CircularProgressIndicator(
+                  semanticsLabel: AppLocalizations.of(context)!.loading,
                   strokeWidth: 2.5,
                   color: context.onBrandAccent,
                 ),

@@ -25,6 +25,10 @@ import 'package:table_calendar/table_calendar.dart';
 import 'bulk_add_sessions_dialog.dart';
 import 'manual_session_dialog.dart';
 
+/// Streak-freeze blue for light mode: [ColorConstants.lightBlue] is only
+/// ~2.3:1 on the light card. This one is ~4.9:1 as text.
+const _kFreezeBlueLight = Color(0xFF1F6FA8);
+
 class MeditationCalendarWidget extends ConsumerStatefulWidget {
   final LocalAllStats stats;
 
@@ -525,6 +529,8 @@ class _MeditationCalendarWidgetState
       decoration: _cardDecoration(context),
       padding: const EdgeInsets.all(16),
       child: TableCalendar<dynamic>(
+        // Month title, weekday letters and each day's spoken label.
+        locale: Localizations.localeOf(context).toString(),
         firstDay: DateTime.utc(2020, 1, 1),
         lastDay: DateTime.now(),
         focusedDay: _focusedDay,
@@ -649,7 +655,7 @@ class _MeditationCalendarWidgetState
       return _buildDayCircle(
         context,
         date,
-        color: context.brandAccent.withOpacityValue(inRange ? 0.32 : 0.15),
+        color: _meditatedFill(context),
         fontWeight: FontWeight.w600,
       );
     }
@@ -658,8 +664,9 @@ class _MeditationCalendarWidgetState
       return _buildDayCircle(
         context,
         date,
-        color: ColorConstants.lightBlue.withOpacityValue(inRange ? 0.32 : 0.15),
+        color: _freezeFill(context),
         fontWeight: FontWeight.w600,
+        freeze: true,
       );
     }
 
@@ -676,9 +683,9 @@ class _MeditationCalendarWidgetState
     final hasMeditation = meditationDates.contains(dayStart);
     final hasFreeze = freezeDates.contains(dayStart);
     final backgroundColor = hasMeditation
-        ? context.brandAccent.withOpacityValue(0.25)
+        ? _meditatedFill(context)
         : hasFreeze
-        ? ColorConstants.lightBlue.withOpacityValue(0.25)
+        ? _freezeFill(context)
         : Theme.of(context).colorScheme.surface;
 
     return _buildDayCircle(
@@ -687,6 +694,7 @@ class _MeditationCalendarWidgetState
       color: backgroundColor,
       fontWeight: FontWeight.w600,
       border: Border.all(color: context.brandAccent, width: 2),
+      freeze: !hasMeditation && hasFreeze,
     );
   }
 
@@ -696,9 +704,8 @@ class _MeditationCalendarWidgetState
     required Set<DateTime> freezeDates,
   }) {
     final dayStart = startOfDay(date);
-    final fillColor = freezeDates.contains(dayStart)
-        ? ColorConstants.lightBlue
-        : context.brandAccent;
+    final isFreeze = freezeDates.contains(dayStart);
+    final fillColor = isFreeze ? _freezeColor(context) : context.brandAccent;
 
     if (_isRangeEndpoint(date)) {
       return Container(
@@ -714,6 +721,7 @@ class _MeditationCalendarWidgetState
           margin: const EdgeInsets.all(3),
           textColor: Theme.of(context).colorScheme.onPrimary,
           fontWeight: FontWeight.w700,
+          freeze: isFreeze,
         ),
       );
     }
@@ -724,8 +732,24 @@ class _MeditationCalendarWidgetState
       color: fillColor,
       textColor: Theme.of(context).colorScheme.onPrimary,
       fontWeight: FontWeight.w700,
+      freeze: isFreeze,
     );
   }
+
+  bool _isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  /// Meditated days: at least 3:1 against the card, so a done day doesn't
+  /// rest on a faint tint, while the digit on top keeps 4.5:1.
+  Color _meditatedFill(BuildContext context) =>
+      context.brandAccent.withOpacityValue(_isDark(context) ? 0.4 : 0.5);
+
+  Color _freezeColor(BuildContext context) =>
+      _isDark(context) ? ColorConstants.lightBlue : _kFreezeBlueLight;
+
+  /// Same 3:1 / 4.5:1 targets as [_meditatedFill].
+  Color _freezeFill(BuildContext context) =>
+      _freezeColor(context).withOpacityValue(_isDark(context) ? 0.6 : 0.75);
 
   Widget _buildDayCircle(
     BuildContext context,
@@ -735,7 +759,12 @@ class _MeditationCalendarWidgetState
     Color? textColor,
     FontWeight? fontWeight,
     BoxBorder? border,
+    bool freeze = false,
   }) {
+    final digit = Text(
+      '${date.day}',
+      style: _dayTextStyle(context, color: textColor, fontWeight: fontWeight),
+    );
     return Container(
       margin: margin,
       decoration: BoxDecoration(
@@ -743,16 +772,29 @@ class _MeditationCalendarWidgetState
         shape: BoxShape.circle,
         border: border,
       ),
-      child: Center(
-        child: Text(
-          '${date.day}',
-          style: _dayTextStyle(
-            context,
-            color: textColor,
-            fontWeight: fontWeight,
-          ),
-        ),
-      ),
+      child: freeze
+          // A snowflake under the digit, so a freeze day isn't told apart
+          // from a meditated day by hue alone.
+          ? Stack(
+              fit: StackFit.expand,
+              children: [
+                Center(child: digit),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 3,
+                  child: Center(
+                    child: MeditoIcon(
+                      assetName: MeditoIcons.snow,
+                      size: 8,
+                      color:
+                          textColor ?? Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : Center(child: digit),
     );
   }
 
@@ -819,14 +861,18 @@ class _MeditationCalendarWidgetState
   }
 
   Widget _buildDetailsTitle(BuildContext context, List<DateTime> rangeDays) {
-    return Text(
-      _hasCompleteRange
-          ? AppLocalizations.of(context)!.daysSelected(rangeDays.length)
-          : DateFormat('EEEE, MMMM d, y').format(_selectedDayForSessions),
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        fontFamily: googleSans,
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.onSurface,
+    final locale = Localizations.localeOf(context).toString();
+    return Semantics(
+      header: true,
+      child: Text(
+        _hasCompleteRange
+            ? AppLocalizations.of(context)!.daysSelected(rangeDays.length)
+            : DateFormat.yMMMMEEEEd(locale).format(_selectedDayForSessions),
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontFamily: googleSans,
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
     );
   }
@@ -838,8 +884,9 @@ class _MeditationCalendarWidgetState
     final l10n = AppLocalizations.of(context)!;
 
     if (_hasCompleteRange) {
+      final locale = Localizations.localeOf(context).toString();
       return Text(
-        '${DateFormat('MMM d').format(_rangeStart!)} – ${DateFormat('MMM d, y').format(_rangeEnd!)}',
+        '${DateFormat.MMMd(locale).format(_rangeStart!)} – ${DateFormat.yMMMd(locale).format(_rangeEnd!)}',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontFamily: googleSans,
           color: Theme.of(context).colorScheme.onSurface,
@@ -853,15 +900,17 @@ class _MeditationCalendarWidgetState
           MeditoIcon(
             assetName: MeditoIcons.snow,
             size: 16,
-            color: ColorConstants.lightBlue,
+            color: _freezeColor(context),
           ),
           const SizedBox(width: 6),
-          Text(
-            l10n.streakFreezeUsed,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontFamily: googleSans,
-              color: ColorConstants.lightBlue,
-              fontWeight: FontWeight.w500,
+          Flexible(
+            child: Text(
+              l10n.streakFreezeUsed,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontFamily: googleSans,
+                color: _freezeColor(context),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -869,7 +918,7 @@ class _MeditationCalendarWidgetState
     }
 
     return Text(
-      '${sessions.length} ${sessions.length == 1 ? l10n.session : l10n.sessions}',
+      l10n.sessionCount(sessions.length),
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
         fontFamily: googleSans,
         color: Theme.of(context).colorScheme.onSurface,
@@ -885,7 +934,10 @@ class _MeditationCalendarWidgetState
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
-          child: CircularProgressIndicator(color: context.brandAccent),
+          child: CircularProgressIndicator(
+            color: context.brandAccent,
+            semanticsLabel: AppLocalizations.of(context)!.loading,
+          ),
         ),
       );
     }
@@ -915,12 +967,6 @@ class _MeditationCalendarWidgetState
     required int rangeProjectedStreak,
   }) {
     final l10n = AppLocalizations.of(context)!;
-    final dayLabel = widget.stats.streakCurrent == 1
-        ? l10n.day.toLowerCase()
-        : l10n.days;
-    final projectedDayLabel = rangeProjectedStreak == 1
-        ? l10n.day.toLowerCase()
-        : l10n.days;
 
     return Column(
       children: [
@@ -936,12 +982,12 @@ class _MeditationCalendarWidgetState
             children: [
               _RangePreviewRow(
                 label: l10n.currentStreak,
-                value: '${widget.stats.streakCurrent} $dayLabel',
+                value: l10n.dayCount(widget.stats.streakCurrent),
               ),
               const SizedBox(height: 6),
               _RangePreviewRow(
                 label: l10n.newStreak,
-                value: '$rangeProjectedStreak $projectedDayLabel',
+                value: l10n.dayCount(rangeProjectedStreak),
                 emphasize: rangeProjectedStreak != widget.stats.streakCurrent,
               ),
               const SizedBox(height: 6),
@@ -1060,7 +1106,6 @@ class _SessionItemWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final date = DateTime.fromMillisecondsSinceEpoch(session.timestamp);
-    final timeFormat = DateFormat('h:mm a');
     final isManual = isManualSession(session);
     final timerLength = timerSessionDuration(session.id);
     final isTimer = timerLength != null;
@@ -1084,7 +1129,8 @@ class _SessionItemWidget extends ConsumerWidget {
           SizedBox(
             width: 60,
             child: Text(
-              timeFormat.format(date),
+              // The device's 12/24-hour setting and locale.
+              TimeOfDay.fromDateTime(date).format(context),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontFamily: googleSans,
                 fontWeight: FontWeight.w600,
@@ -1150,7 +1196,7 @@ class _SessionItemWidget extends ConsumerWidget {
                       ),
                     ),
                     error: (_, _) => Text(
-                      'Track ${session.id}',
+                      AppLocalizations.of(context)!.historySessionFallback,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontFamily: googleSans,
                         fontWeight: FontWeight.w600,
@@ -1195,22 +1241,25 @@ class _SessionItemWidget extends ConsumerWidget {
     }
 
     return withDeleteAction(
-      InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => isTimer
-                  ? const TimerView(
-                      source: AnalyticsEventConstants.sourceHistory,
-                    )
-                  : TrackView(trackId: session.id),
-            ),
-          );
-        },
-        onLongPress: onLongPress,
-        borderRadius: BorderRadius.circular(8),
-        child: content,
+      Semantics(
+        button: true,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => isTimer
+                    ? const TimerView(
+                        source: AnalyticsEventConstants.sourceHistory,
+                      )
+                    : TrackView(trackId: session.id),
+              ),
+            );
+          },
+          onLongPress: onLongPress,
+          borderRadius: BorderRadius.circular(8),
+          child: content,
+        ),
       ),
     );
   }
@@ -1230,27 +1279,33 @@ class _RangePreviewRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: googleSans,
-            color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+    // One stop per row ("Current streak, 3 days"); the label wraps rather
+    // than pushing the value off the edge at large text.
+    return MergeSemantics(
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontFamily: googleSans,
+                color: theme.colorScheme.onSurface.withOpacityValue(0.75),
+              ),
+            ),
           ),
-        ),
-        Text(
-          value,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontFamily: googleSans,
-            fontWeight: FontWeight.w700,
-            color: emphasize
-                ? context.brandAccent
-                : theme.colorScheme.onSurface,
+          const SizedBox(width: 12),
+          Text(
+            value,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontFamily: googleSans,
+              fontWeight: FontWeight.w700,
+              color: emphasize
+                  ? context.brandAccent
+                  : theme.colorScheme.onSurface,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

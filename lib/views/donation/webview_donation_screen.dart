@@ -51,6 +51,8 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   static const _channelName = 'MeditoPaywall';
   static const _loadTimeout = Duration(seconds: 15);
   static const _paywallId = 'paywall_webview';
+  // ~5:1 on the cream background; the old #A8A49B was ~2.3:1.
+  static const _mutedTextColor = Color(0xFF6E6A62);
 
   late final WebViewController _controller;
   bool _isLoading = true;
@@ -534,19 +536,25 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         children: [
           const Icon(Icons.wifi_off, size: 48, color: Color(0xFF6C5CE7)),
           const SizedBox(height: 16),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1A1A17),
+          // Announced when the overlay replaces the loading skeleton.
+          Semantics(
+            container: true,
+            header: true,
+            liveRegion: true,
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A17),
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
             body,
-            style: const TextStyle(fontSize: 14, color: Color(0xFFA8A49B)),
+            style: const TextStyle(fontSize: 14, color: _mutedTextColor),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -562,10 +570,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           const SizedBox(height: 8),
           TextButton(
             onPressed: _closePaywall,
-            child: Text(
-              close,
-              style: const TextStyle(color: Color(0xFFA8A49B)),
-            ),
+            child: Text(close, style: const TextStyle(color: _mutedTextColor)),
           ),
         ],
       ),
@@ -597,6 +602,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       systemNavigationBarColor: Color(0xFFFAF8F5),
       systemNavigationBarIconBrightness: Brightness.dark,
     );
+    final l10n = AppLocalizations.of(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayStyle,
       child: PopScope<Object?>(
@@ -606,33 +612,65 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         onPopInvokedWithResult: (didPop, _) {
           if (didPop && !_didDonate) _logPaywallDismissedNoPayment();
         },
-        child: Scaffold(
-          backgroundColor: const Color(0xFFFAF8F5),
-          body: SafeArea(
-            child: Stack(
-              children: [
-                WebViewWidget(controller: _controller),
-                // Flutter-rendered skeleton shown over the cream webview
-                // background until onPageFinished fires. Fades out once the
-                // real HTML is ready so users never see a blank screen.
-                IgnorePointer(
-                  ignoring: !_isLoading,
-                  child: AnimatedOpacity(
-                    opacity: _isLoading ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 220),
-                    curve: Curves.easeOut,
-                    child: const _PaywallSkeleton(),
+        // The page has no app bar, so name the route for screen readers.
+        child: Semantics(
+          scopesRoute: true,
+          namesRoute: true,
+          explicitChildNodes: true,
+          label: l10n?.donateTitle,
+          child: Scaffold(
+            backgroundColor: const Color(0xFFFAF8F5),
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  WebViewWidget(controller: _controller),
+                  // Flutter-rendered skeleton shown over the cream webview
+                  // background until onPageFinished fires. Fades out once the
+                  // real HTML is ready so users never see a blank screen.
+                  IgnorePointer(
+                    ignoring: !_isLoading,
+                    child: AnimatedOpacity(
+                      opacity: _isLoading ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOut,
+                      // Silent blocks otherwise, for up to the 15s timeout.
+                      child: Semantics(
+                        container: true,
+                        label: _isLoading ? l10n?.loading : null,
+                        child: const _PaywallSkeleton(),
+                      ),
+                    ),
                   ),
-                ),
-                if (_hasLoadError) _buildErrorOverlay(),
-                if (isSmokeTestMode) _buildSmokeTestCloseButton(),
-                // Close affordance lives in the webpage itself (delayed fade-in
-                // so users don't dismiss before they've read the page). The JS
-                // bridge posts a `close` message which _handleClose() pops.
-              ],
+                  if (_hasLoadError) _buildErrorOverlay(),
+                  if (isSmokeTestMode)
+                    _buildSmokeTestCloseButton()
+                  else if (MediaQuery.accessibleNavigationOf(context))
+                    _buildAccessibleCloseButton(),
+                  // Close affordance lives in the webpage itself (delayed
+                  // fade-in so users don't dismiss before they've read the
+                  // page). The JS bridge posts a `close` message which
+                  // _handleClose() pops.
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Screen readers only: the page's own close fades in after a delay inside
+  /// the web content, which is hard to find by touch or swipe. Top-left so it
+  /// never covers that X; sighted users (the experiment) see no change.
+  Widget _buildAccessibleCloseButton() {
+    final close = AppLocalizations.of(context)?.close ?? 'Close';
+    return Positioned(
+      top: 4,
+      left: 4,
+      child: IconButton(
+        onPressed: _closePaywall,
+        tooltip: close,
+        icon: const Icon(Icons.close, color: Color(0xFF1A1A17)),
       ),
     );
   }
@@ -689,7 +727,18 @@ class _PaywallSkeletonState extends State<_PaywallSkeleton>
     _shimmer = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
-    )..repeat();
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reduce motion: hold the blocks still instead of sweeping forever.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _shimmer.stop();
+    } else if (!_shimmer.isAnimating) {
+      _shimmer.repeat();
+    }
   }
 
   @override

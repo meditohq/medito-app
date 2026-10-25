@@ -30,12 +30,15 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
+import androidx.glance.semantics.contentDescription
+import androidx.glance.semantics.semantics
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.appwidget.action.actionStartActivity
 import es.antonborri.home_widget.HomeWidgetGlanceState
 import androidx.glance.unit.ColorProvider
 import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
 import meditofoundation.medito.R
+import java.util.Locale
 
 // Size thresholds — one per layout tier
 private val TINY      = DpSize(80.dp,  50.dp)   // 1×1 / cramped 2×1
@@ -66,14 +69,18 @@ class UpNextWidget : GlanceAppWidget() {
         val completed = prefs.getInt("up_next_completed", 0)
         val total = prefs.getInt("up_next_total", 0)
         val palette = WidgetPalette.resolve(context, prefs.getString("theme_preference", "system") ?: "system")
+        val strings = WidgetStrings.from(prefs)
+        val emptyTitle = strings.chooseWhatsNext
 
         // Matches the app's Home hero: "START HERE · Pack" before anything in the pack is
         // played, "CONTINUE · Pack" after. No eyebrow once the pack is finished.
+        val label = upNextLabel(completed, strings).uppercase(Locale.getDefault())
         val eyebrow = when {
             title.isEmpty() -> ""
-            packTitle.isEmpty() -> upNextLabel(completed)
-            else -> "${upNextLabel(completed)} · $packTitle"
+            packTitle.isEmpty() -> label
+            else -> "$label · $packTitle"
         }
+        val description = upNextAccessibilitySummary(title, packTitle, completed, total, strings)
         val progress = if (title.isNotEmpty() && total > 0) Progress(completed, total) else null
 
         val size = LocalSize.current
@@ -106,15 +113,18 @@ class UpNextWidget : GlanceAppWidget() {
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(palette.background)
-                .clickable(tapAction),
+                .clickable(tapAction)
+                // One description for the whole widget, as the app reads its Home hero,
+                // instead of the eyebrow, title and play button one by one.
+                .semantics { contentDescription = description },
             contentAlignment = Alignment.Center,
         ) {
             when (layout) {
                 Layout.TINY      -> TinyLayout(title, size, palette)
-                Layout.MEDIUM    -> MediumLayout(title, eyebrow, size, palette)
-                Layout.SQUARE    -> SquareLayout(title, upNextLabel(completed), progress, size, palette)
-                Layout.WIDE      -> WideLayout(title, eyebrow, size, palette)
-                Layout.WIDE_TALL -> WideTallLayout(title, subtitle, eyebrow, progress, size, palette)
+                Layout.MEDIUM    -> MediumLayout(title, emptyTitle, eyebrow, size, palette)
+                Layout.SQUARE    -> SquareLayout(title, emptyTitle, label, progress, size, palette)
+                Layout.WIDE      -> WideLayout(title, emptyTitle, eyebrow, size, palette)
+                Layout.WIDE_TALL -> WideTallLayout(title, emptyTitle, subtitle, eyebrow, progress, size, palette)
             }
         }
     }
@@ -141,7 +151,7 @@ class UpNextWidget : GlanceAppWidget() {
 
     // Comfortable 3×1 — eyebrow over title, play button alongside
     @Composable
-    private fun MediumLayout(title: String, eyebrow: String, size: DpSize, palette: WidgetPalette) {
+    private fun MediumLayout(title: String, emptyTitle: String, eyebrow: String, size: DpSize, palette: WidgetPalette) {
         val textWidth = size.width - 24.dp - 8.dp - 36.dp
         Column(
             modifier = GlanceModifier
@@ -156,7 +166,7 @@ class UpNextWidget : GlanceAppWidget() {
                 // A weighted image would centre the bitmap; keep the title flush left.
                 Box(modifier = GlanceModifier.defaultWeight(), contentAlignment = Alignment.CenterStart) {
                     WidgetText(
-                        text = title.ifEmpty { EMPTY_TITLE },
+                        text = title.ifEmpty { emptyTitle },
                         fontSize = 16f,
                         weight = WidgetWeight.Bold,
                         color = palette.foreground,
@@ -173,7 +183,7 @@ class UpNextWidget : GlanceAppWidget() {
 
     // 4×1 — text block on the left, play button on the right
     @Composable
-    private fun WideLayout(title: String, eyebrow: String, size: DpSize, palette: WidgetPalette) {
+    private fun WideLayout(title: String, emptyTitle: String, eyebrow: String, size: DpSize, palette: WidgetPalette) {
         val textWidth = size.width - 32.dp - 14.dp - 44.dp
         Row(
             modifier = GlanceModifier
@@ -184,7 +194,7 @@ class UpNextWidget : GlanceAppWidget() {
             Column(modifier = GlanceModifier.defaultWeight()) {
                 Eyebrow(eyebrow, textWidth, palette)
                 WidgetText(
-                    text = title.ifEmpty { EMPTY_TITLE },
+                    text = title.ifEmpty { emptyTitle },
                     fontSize = 18f,
                     weight = WidgetWeight.Bold,
                     color = palette.foreground,
@@ -199,13 +209,20 @@ class UpNextWidget : GlanceAppWidget() {
     // 2×2 / 3×2 — label and play button along the top, title and progress along the bottom
     // (mirrors iOS small)
     @Composable
-    private fun SquareLayout(title: String, label: String, progress: Progress?, size: DpSize, palette: WidgetPalette) {
+    private fun SquareLayout(
+        title: String,
+        emptyTitle: String,
+        label: String,
+        progress: Progress?,
+        size: DpSize,
+        palette: WidgetPalette,
+    ) {
         val contentWidth = size.width - 28.dp
         Column(modifier = GlanceModifier.fillMaxSize().padding(14.dp)) {
             TopRow(if (title.isEmpty()) "" else label, contentWidth - 40.dp - 8.dp, 40.dp, palette)
             Spacer(modifier = GlanceModifier.defaultWeight())
             WidgetText(
-                text = title.ifEmpty { EMPTY_TITLE },
+                text = title.ifEmpty { emptyTitle },
                 fontSize = 18f,
                 weight = WidgetWeight.Bold,
                 color = palette.foreground,
@@ -226,6 +243,7 @@ class UpNextWidget : GlanceAppWidget() {
     @Composable
     private fun WideTallLayout(
         title: String,
+        emptyTitle: String,
         subtitle: String,
         eyebrow: String,
         progress: Progress?,
@@ -237,7 +255,7 @@ class UpNextWidget : GlanceAppWidget() {
             TopRow(eyebrow, contentWidth - 44.dp - 12.dp, 44.dp, palette)
             Spacer(modifier = GlanceModifier.defaultWeight())
             WidgetText(
-                text = title.ifEmpty { EMPTY_TITLE },
+                text = title.ifEmpty { emptyTitle },
                 fontSize = 22f,
                 weight = WidgetWeight.Bold,
                 color = palette.foreground,
@@ -288,7 +306,7 @@ class UpNextWidget : GlanceAppWidget() {
                         )
                         Image(
                             provider = ImageProvider(R.drawable.widget_check),
-                            contentDescription = "Pack complete",
+                            contentDescription = null,
                             colorFilter = ColorFilter.tint(ColorProvider(palette.background)),
                             modifier = GlanceModifier.size(20.dp),
                         )
@@ -327,10 +345,33 @@ class UpNextWidget : GlanceAppWidget() {
         Spacer(modifier = GlanceModifier.height(4.dp))
     }
 
-    private fun upNextLabel(completed: Int) = if (completed == 0) "START HERE" else "CONTINUE"
-
     private enum class Layout { TINY, MEDIUM, SQUARE, WIDE, WIDE_TALL }
 }
 
-/** Shown when the pinned pack is finished (the app clears the session). */
-private const val EMPTY_TITLE = "Choose what's next"
+/**
+ * What TalkBack reads for the widget, as the app reads its Home hero: "Continue: Basics — Title,
+ * 2 of 10". Once the pack is finished (the app clears the session) it says so and invites a pick.
+ */
+internal fun upNextAccessibilitySummary(
+    title: String,
+    packTitle: String,
+    completed: Int,
+    total: Int,
+    strings: WidgetStrings,
+): String {
+    if (title.isEmpty()) {
+        // A fresh install has no total yet: nothing was finished.
+        return if (total > 0) "${strings.packComplete}. ${strings.chooseWhatsNext}" else strings.chooseWhatsNext
+    }
+    val label = upNextLabel(completed, strings)
+    val heading = if (packTitle.isEmpty()) "$label: $title" else "$label: $packTitle — $title"
+    return if (total > 0) {
+        "$heading, ${strings.upNextProgress.fill("completed" to completed, "total" to total)}"
+    } else {
+        heading
+    }
+}
+
+/** "Start here" before anything in the pack is played, "Continue" after. */
+private fun upNextLabel(completed: Int, strings: WidgetStrings) =
+    if (completed == 0) strings.startHere else strings.continueLabel

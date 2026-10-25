@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget picker names, matching the iOS gallery (Streak / Consistency / Continue). -->
+    <string name="widget_label">Serie</string>
+    <string name="consistency_widget_label">Beständigkeit</string>
+    <string name="up_next_widget_label">Weitermachen</string>
+    <string name="widget_description">Meditationsserie und Kalender</string>
+    <string name="consistency_widget_description">Beständigkeitswert und Meditationskalender</string>
+    <string name="up_next_widget_description">Mach mit deinem Paket dort weiter, wo du aufgehört hast</string>
+    <!-- Playback notification. -->
+    <string name="notification_preparing_playback">Wiedergabe wird vorbereitet…</string>
+    <string name="notification_action_play">Abspielen</string>
+    <string name="notification_action_pause">Pause</string>
+    <string name="notification_action_skip_back">15 Sekunden zurück</string>
+    <string name="notification_action_skip_forward">15 Sekunden vor</string>
+</resources>

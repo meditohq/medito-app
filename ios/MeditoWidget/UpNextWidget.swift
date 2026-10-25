@@ -12,6 +12,7 @@ struct UpNextEntry: TimelineEntry {
     let completed: Int
     let total: Int
     let themePreference: String
+    var strings = WidgetStrings()
 
     static var placeholder: UpNextEntry {
         UpNextEntry(
@@ -50,7 +51,8 @@ struct UpNextProvider: TimelineProvider {
             trackId: d?.string(forKey: "up_next_track_id") ?? "",
             completed: d?.integer(forKey: "up_next_completed") ?? 0,
             total: d?.integer(forKey: "up_next_total") ?? 0,
-            themePreference: d?.string(forKey: "theme_preference") ?? "system"
+            themePreference: d?.string(forKey: "theme_preference") ?? "system",
+            strings: .load(d)
         )
     }
 }
@@ -78,10 +80,33 @@ private struct PlayCircleView: View {
 /// Matches the app's Home hero: "Start here" before anything in the pack is
 /// played, "Continue" after.
 private func upNextLabel(_ entry: UpNextEntry) -> String {
-    entry.completed == 0 ? "START HERE" : "CONTINUE"
+    entry.completed == 0 ? entry.strings.startHere : entry.strings.continueLabel
 }
 
-private let emptyTitle = "Choose what's next"
+private func displayTitle(_ entry: UpNextEntry) -> String {
+    entry.title.isEmpty ? entry.strings.chooseWhatsNext : entry.title
+}
+
+/// One VoiceOver label for the whole widget, as the app reads its Home hero
+/// ("Continue: Basics — Title, 2 of 10"), in place of the eyebrow, play glyph and bar.
+private func accessibilitySummary(_ entry: UpNextEntry) -> String {
+    if entry.title.isEmpty {
+        // A finished pack (a fresh install has no total yet).
+        return entry.total > 0
+            ? "\(entry.strings.packComplete). \(entry.strings.chooseWhatsNext)"
+            : entry.strings.chooseWhatsNext
+    }
+    let label = upNextLabel(entry)
+    var summary = entry.packTitle.isEmpty
+        ? "\(label): \(entry.title)"
+        : "\(label): \(entry.packTitle) — \(entry.title)"
+    if entry.total > 0 {
+        summary += ", " + entry.strings.upNextProgress.filling(
+            ["completed": "\(entry.completed)", "total": "\(entry.total)"]
+        )
+    }
+    return summary
+}
 
 /// "CONTINUE · Pack" in the hero eyebrow's voice: small, semibold, tracked, muted. Hidden once
 /// the pack is finished.
@@ -98,8 +123,8 @@ private struct UpNextEyebrow: View {
                 .foregroundStyle(colors.secondaryTextColor)
         } else {
             Text(showPack && !entry.packTitle.isEmpty
-                 ? "\(upNextLabel(entry)) · \(entry.packTitle)"
-                 : upNextLabel(entry))
+                 ? "\(upNextLabel(entry).uppercased()) · \(entry.packTitle)"
+                 : upNextLabel(entry).uppercased())
                 .font(.googleSans(12, .semibold))
                 .tracking(1)
                 .foregroundStyle(colors.secondaryTextColor)
@@ -146,7 +171,6 @@ private func hasProgress(_ entry: UpNextEntry) -> Bool { !entry.title.isEmpty &&
 private struct UpNextSmallView: View {
     let entry: UpNextEntry
     let colors: WidgetColors
-    private var displayTitle: String { entry.title.isEmpty ? emptyTitle : entry.title }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -159,7 +183,7 @@ private struct UpNextSmallView: View {
 
             Spacer(minLength: 6)
 
-            Text(displayTitle)
+            Text(displayTitle(entry))
                 .font(.googleSans(17, .bold))
                 .foregroundStyle(colors.textColor)
                 .lineLimit(3)
@@ -172,6 +196,8 @@ private struct UpNextSmallView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilitySummary(entry))
         .widgetBackground(color: colors.backgroundColor)
     }
 }
@@ -182,7 +208,6 @@ private struct UpNextSmallView: View {
 private struct UpNextMediumView: View {
     let entry: UpNextEntry
     let colors: WidgetColors
-    private var displayTitle: String { entry.title.isEmpty ? emptyTitle : entry.title }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -195,7 +220,7 @@ private struct UpNextMediumView: View {
 
             Spacer(minLength: 4)
 
-            Text(displayTitle)
+            Text(displayTitle(entry))
                 .font(.googleSans(22, .bold))
                 .foregroundStyle(colors.textColor)
                 .lineLimit(2)
@@ -215,6 +240,8 @@ private struct UpNextMediumView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilitySummary(entry))
         .widgetBackground(color: colors.backgroundColor)
     }
 }

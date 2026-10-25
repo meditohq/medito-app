@@ -197,6 +197,8 @@
 	</dict>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Medito does not record audio. This entry is only required by the audio playback framework the app uses.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Medito saves the quote image you choose to share to your photo library.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

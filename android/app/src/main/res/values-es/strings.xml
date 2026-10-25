@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget picker names, matching the iOS gallery (Streak / Consistency / Continue). -->
+    <string name="widget_label">Racha</string>
+    <string name="consistency_widget_label">Consistencia</string>
+    <string name="up_next_widget_label">Continuar</string>
+    <string name="widget_description">Racha de meditación y calendario</string>
+    <string name="consistency_widget_description">Puntuación de consistencia y calendario de meditación</string>
+    <string name="up_next_widget_description">Retoma tu paquete donde lo dejaste</string>
+    <!-- Playback notification. -->
+    <string name="notification_preparing_playback">Preparando la reproducción…</string>
+    <string name="notification_action_play">Reproducir</string>
+    <string name="notification_action_pause">Pausar</string>
+    <string name="notification_action_skip_back">Retroceder 15 segundos</string>
+    <string name="notification_action_skip_forward">Avanzar 15 segundos</string>
+</resources>

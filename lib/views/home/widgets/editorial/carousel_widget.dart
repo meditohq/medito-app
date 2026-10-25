@@ -219,8 +219,12 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
     HomeCarouselModel item,
     int index,
   ) {
+    // The label hides the "New" (or custom) banner chip, so carry it here.
+    final banner = item.showBanner == true
+        ? item.bannerLabel ?? AppLocalizations.of(context)!.neww
+        : null;
     return Semantics(
-      label: item.title,
+      label: banner == null ? item.title : '${item.title}, $banner',
       button: true,
       excludeSemantics: true,
       onTap: () => _onItemTap(index),

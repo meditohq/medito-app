@@ -102,7 +102,7 @@ class ExploreViewState extends ConsumerState<ExploreView> {
             SliverFillRemaining(
               child: Center(
                 child: Text(
-                  'No packs available',
+                  AppLocalizations.of(context)!.explorePacksEmpty,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
@@ -123,8 +123,14 @@ class ExploreViewState extends ConsumerState<ExploreView> {
           ),
         ];
       },
-      loading: () => const [
-        SliverFillRemaining(child: Center(child: CircularProgressIndicator())),
+      loading: () => [
+        SliverFillRemaining(
+          child: Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: AppLocalizations.of(context)!.loading,
+            ),
+          ),
+        ),
       ],
     );
   }

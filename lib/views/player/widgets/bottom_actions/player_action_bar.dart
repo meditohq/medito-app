@@ -69,7 +69,8 @@ class PlayerActionBar extends StatelessWidget {
             onSpeedChanged(speed);
           },
         ),
-        semanticLabel: l10n.playbackSpeed,
+        // No tooltip: AudioSpeedWidget names itself ("Playback speed, 1.0
+        // times"), and the visible "1.0×" was all screen readers got.
       ),
     );
   }
@@ -79,7 +80,8 @@ class PlayerActionBar extends StatelessWidget {
       return BottomActionBarItem(
         child: const Icon(Icons.music_off, color: ColorConstants.white),
         onTap: () => _showBackgroundSoundDisabledMessage(context),
-        semanticLabel: AppLocalizations.of(context)!.backgroundSounds,
+        // Says why it's crossed out, as the snackbar it opens does.
+        semanticLabel: AppLocalizations.of(context)!.backgroundSoundsDisabled,
       );
     }
     return BottomActionBarItem.custom(

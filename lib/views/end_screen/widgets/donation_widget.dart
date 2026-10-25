@@ -366,20 +366,26 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 2),
-                    child: Text(
-                      donationPageModel.title ?? 'Support Medito',
-                      textAlign: TextAlign.left,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            fontFamily: googleSans,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w400,
-                            height: 1.2,
-                            color: context.onBrandAccent,
-                          ),
+                    child: Semantics(
+                      container: true,
+                      header: true,
+                      child: Text(
+                        donationPageModel.title ??
+                            AppLocalizations.of(context)!.supportMedito,
+                        textAlign: TextAlign.left,
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(
+                              fontFamily: googleSans,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w400,
+                              height: 1.2,
+                              color: context.onBrandAccent,
+                            ),
+                      ),
                     ),
                   ),
                 ),
+                // Standard density keeps the padded tap target at 48pt.
                 IconButton(
                   tooltip: AppLocalizations.of(context)!.donationInfo,
                   icon: MeditoIcon(
@@ -390,7 +396,6 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                   onPressed: () => _showDonationInfoDialog(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  visualDensity: VisualDensity.compact,
                 ),
               ],
             ),
@@ -487,13 +492,16 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     }
 
     // Still within the cap: hold the CTA slot at the fallback's height.
-    return const SizedBox(
+    return SizedBox(
       height: 44,
       child: Center(
         child: SizedBox(
           width: 18,
           height: 18,
-          child: CircularProgressIndicator(strokeWidth: 2),
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            semanticsLabel: AppLocalizations.of(context)!.loading,
+          ),
         ),
       ),
     );

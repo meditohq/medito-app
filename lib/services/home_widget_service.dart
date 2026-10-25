@@ -15,13 +15,38 @@ import '../utils/logger.dart';
 /// [locale]'s language. Falls back to English for a null or unsupported
 /// locale, matching the app's own fallback.
 ({String day, String days}) widgetStreakUnitLabels(Locale? locale) {
-  final l10n = lookupAppLocalizations(
-    locale != null && AppLocalizations.delegate.isSupported(locale)
-        ? locale
-        : const Locale('en'),
-  );
+  final l10n = _widgetLocalizations(locale);
   return (day: l10n.day, days: l10n.days);
 }
+
+/// The other words the native widgets show or speak, in [locale]'s language,
+/// keyed by the widget data key. The widgets recompute their figures between
+/// app opens, so the screen-reader templates keep `{value}`-style tokens for
+/// the widget to fill in. Each widget has the English text as its fallback.
+Map<String, String> widgetStrings(Locale? locale) {
+  final l10n = _widgetLocalizations(locale);
+  return {
+    'widget_streak_summary': l10n.widgetStreakSummary('{value}'),
+    'widget_consistency_summary': l10n.widgetConsistencySummary('{value}'),
+    'widget_done_today': l10n.meditatedToday,
+    'widget_not_done_today': l10n.widgetNotMeditatedToday,
+    'widget_recent_days': l10n.widgetRecentDays('{done}', '{total}'),
+    'widget_start_here': l10n.upNextStartHere,
+    'widget_continue': l10n.upNextTitle,
+    'widget_up_next_progress': l10n.widgetUpNextProgress(
+      '{completed}',
+      '{total}',
+    ),
+    'widget_pack_complete': l10n.widgetPackComplete,
+    'widget_choose_whats_next': l10n.widgetChooseWhatsNext,
+  };
+}
+
+AppLocalizations _widgetLocalizations(Locale? locale) => lookupAppLocalizations(
+  locale != null && AppLocalizations.delegate.isSupported(locale)
+      ? locale
+      : const Locale('en'),
+);
 
 class HomeWidgetService {
   static const String _appGroupId = 'group.org.medito.widget';
@@ -96,6 +121,22 @@ class HomeWidgetService {
   // Null until then, which resolves to English like the app itself.
   static Locale? _locale;
 
+  // [widgetStrings] only change with the language, so they're written once
+  // per process and language rather than with every stats update.
+  static Locale? _savedStringsLocale;
+  static bool _stringsSaved = false;
+
+  static Future<void> _saveWidgetStrings() async {
+    if (_stringsSaved && _savedStringsLocale == _locale) return;
+    final locale = _locale;
+    await Future.wait([
+      for (final entry in widgetStrings(locale).entries)
+        _saveWithTimeout(entry.key, entry.value),
+    ]);
+    _stringsSaved = true;
+    _savedStringsLocale = locale;
+  }
+
   /// Records the app's current language so the streak unit written to the
   /// widgets matches it, and rewrites the labels immediately if it changed.
   static Future<void> setLocale(Locale? locale) async {
@@ -109,8 +150,12 @@ class HomeWidgetService {
       await Future.wait([
         _saveWithTimeout(_dayLabelKey, labels.day),
         _saveWithTimeout(_daysLabelKey, labels.days),
+        _saveWidgetStrings(),
       ]);
       await _triggerWidgetRefresh();
+      if (Platform.isIOS) {
+        await HomeWidget.updateWidget(iOSName: 'UpNextWidget');
+      }
     } catch (e) {
       AppLogger.e('WIDGET', 'Failed to save widget day labels', e);
     }
@@ -148,6 +193,7 @@ class HomeWidgetService {
         _saveWithTimeout(_consistencyScoreKey, consistencyPercentage),
         _saveWithTimeout(_dayBoundaryOffsetHoursKey, dayBoundaryOffsetHours),
         _saveWithTimeout(_statDisplayKey, statDisplay),
+        _saveWidgetStrings(),
       ]);
 
       await _triggerWidgetRefresh();
@@ -272,6 +318,7 @@ class HomeWidgetService {
         HomeWidget.saveWidgetData<String>(_upNextTrackIdKey, trackId),
         HomeWidget.saveWidgetData<int>(_upNextCompletedKey, completed),
         HomeWidget.saveWidgetData<int>(_upNextTotalKey, total),
+        _saveWidgetStrings(),
       ]);
 
       await _triggerWidgetRefresh();

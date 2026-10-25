@@ -55,14 +55,17 @@ class VariantSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.variantSheetTitle,
-              // Explicit sizes: the theme's titleMedium (14) is smaller than
-              // its bodyMedium (16), which put the title under the note.
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontSize: 20,
-                color: onSurface,
-                fontWeight: FontWeight.w700,
+            Semantics(
+              header: true,
+              child: Text(
+                l10n.variantSheetTitle,
+                // Explicit sizes: the theme's titleMedium (14) is smaller than
+                // its bodyMedium (16), which put the title under the note.
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontSize: 20,
+                  color: onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             const SizedBox(height: 4),

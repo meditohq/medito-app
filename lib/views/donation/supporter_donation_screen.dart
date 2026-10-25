@@ -37,56 +37,81 @@ class SupporterDonationScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final config = ref.watch(supporterPaywallConfigProvider);
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          CloseButton(
-            onPressed: () {
-              unawaited(
-                FirebaseAnalyticsService().logEvent(
-                  name: 'donation_close_tapped',
-                  parameters: {
-                    'method': 'close',
-                    'paywall_source': 'announcement',
-                  },
-                ),
+    final l10n = AppLocalizations.of(context)!;
+    // The app bar has no title, so name the route for screen readers.
+    return Semantics(
+      scopesRoute: true,
+      namesRoute: true,
+      explicitChildNodes: true,
+      label: l10n.donateTitle,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          actions: [
+            CloseButton(
+              onPressed: () {
+                unawaited(
+                  FirebaseAnalyticsService().logEvent(
+                    name: 'donation_close_tapped',
+                    parameters: {
+                      'method': 'close',
+                      'paywall_source': 'announcement',
+                    },
+                  ),
+                );
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: config.when(
+            loading: () => Center(
+              child: CircularProgressIndicator(semanticsLabel: l10n.loading),
+            ),
+            error: (_, _) =>
+                _buildRetry(context, ref, l10n.connectionErrorMessage),
+            data: (value) {
+              if (!['monthly', 'yearly', 'oneTime'].any(
+                (frequency) =>
+                    value.isFrequencyOffered(frequency, source: 'announcement'),
+              )) {
+                return _buildRetry(context, ref, l10n.anErrorOccurred);
+              }
+              return NativeDonationPage(
+                config: value,
+                source: 'announcement',
+                campaignMetadata: campaignMetadata,
+                showCloseButton: false,
+                onNext: () => Navigator.of(context).pop(),
               );
-              Navigator.of(context).pop();
             },
           ),
-        ],
+        ),
       ),
-      body: SafeArea(
-        child: config.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, _) => Center(
-            child: TextButton(
+    );
+  }
+
+  /// A bare "Try again" said nothing about what went wrong; the message is
+  /// announced when it replaces the spinner.
+  Widget _buildRetry(BuildContext context, WidgetRef ref, String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Semantics(
+              container: true,
+              liveRegion: true,
+              child: Text(message, textAlign: TextAlign.center),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
               onPressed: () => ref.invalidate(supporterPaywallConfigProvider),
               child: Text(AppLocalizations.of(context)!.tryAgain),
             ),
-          ),
-          data: (value) {
-            if (!['monthly', 'yearly', 'oneTime'].any(
-              (frequency) =>
-                  value.isFrequencyOffered(frequency, source: 'announcement'),
-            )) {
-              return Center(
-                child: TextButton(
-                  onPressed: () =>
-                      ref.invalidate(supporterPaywallConfigProvider),
-                  child: Text(AppLocalizations.of(context)!.tryAgain),
-                ),
-              );
-            }
-            return NativeDonationPage(
-              config: value,
-              source: 'announcement',
-              campaignMetadata: campaignMetadata,
-              showCloseButton: false,
-              onNext: () => Navigator.of(context).pop(),
-            );
-          },
+          ],
         ),
       ),
     );

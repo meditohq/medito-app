@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:medito/utils/utils.dart';
 
 /// Small rounded pill naming a tag. Tapping opens the tag's track list.
+///
+/// The pill stays compact, but the touch target around it is at least 48px
+/// tall (the platform minimum).
 class TagChip extends StatelessWidget {
   const TagChip({super.key, required this.label, required this.onTap});
 
@@ -12,7 +15,7 @@ class TagChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    return Material(
+    final pill = Material(
       color: theme.cardColor,
       shape: StadiumBorder(
         side: BorderSide(
@@ -37,5 +40,18 @@ class TagChip extends StatelessWidget {
         ),
       ),
     );
+    // Taps in the slack above and below the pill count too; the pill's
+    // InkWell carries the semantics.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      excludeFromSemantics: true,
+      onTap: onTap,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: minTapHeight),
+        child: Center(widthFactor: 1, child: pill),
+      ),
+    );
   }
+
+  static const minTapHeight = 48.0;
 }

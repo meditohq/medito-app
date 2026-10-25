@@ -204,7 +204,7 @@ void main() {
                 )
                 .first;
             final button = tester.getRect(soundButton);
-            final close = find.byTooltip('Close').last;
+            final close = find.byTooltip('Dismiss tip');
             final closeRect = tester.getRect(close);
             expect(bubble.left, greaterThanOrEqualTo(12));
             expect(bubble.right, lessThanOrEqualTo(screen.value.width - 12));

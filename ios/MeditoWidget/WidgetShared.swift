@@ -26,6 +26,7 @@ struct WidgetData {
     /// The in-app streak chip's choice ("currentStreak" / "consistencyScore"), which the Lock
     /// Screen widget follows. Defaults to the consistency score, as the app does.
     var statDisplay: String = "consistencyScore"
+    var strings = WidgetStrings()
 
     var showsStreak: Bool { statDisplay == "currentStreak" }
 
@@ -44,6 +45,35 @@ struct WidgetData {
 
     func consistencyScore(at now: Date) -> Int {
         StatCalculator.consistencyScore(activityDays: allActivityDates, today: today(at: now))
+    }
+
+    func streakUnit(_ streak: Int) -> String { streak == 1 ? dayLabel : daysLabel }
+
+    /// "Meditation streak: 7 days", for VoiceOver.
+    func streakDescription(at now: Date) -> String {
+        let streak = streak(at: now)
+        return strings.streakSummary.filling(["value": "\(streak) \(streakUnit(streak))"])
+    }
+
+    /// "Consistency score: 67%", for VoiceOver.
+    func consistencyDescription(at now: Date) -> String {
+        strings.consistencySummary.filling(["value": "\(consistencyScore(at: now))%"])
+    }
+
+    /// What VoiceOver reads for a stat widget, which is otherwise a bare figure, unit and weekday
+    /// letters: [stat], whether today is done, and how many of the last [recentDays] days (the
+    /// ones the widget shows) were practised.
+    func accessibilitySummary(stat: String, at now: Date, recentDays: Int? = nil) -> String {
+        let today = today(at: now)
+        var parts = [stat, allActivityDates.contains(today) ? strings.doneToday : strings.notDoneToday]
+        if let recentDays {
+            let cal = Calendar.current
+            let done = (0 ..< recentDays).filter {
+                allActivityDates.contains(cal.date(byAdding: .day, value: -$0, to: today)!)
+            }.count
+            parts.append(strings.recentDays.filling(["done": "\(done)", "total": "\(recentDays)"]))
+        }
+        return parts.joined(separator: ". ")
     }
 
     /// Timeline entries for the stat widgets: now, and the moment the logical day rolls over, so
@@ -85,7 +115,8 @@ struct WidgetData {
             daysLabel: defaults?.string(forKey: "days_label") ?? "days",
             themePreference: defaults?.string(forKey: "theme_preference") ?? "system",
             dayBoundaryOffsetHours: offsetHours,
-            statDisplay: defaults?.string(forKey: "stat_display") ?? "consistencyScore"
+            statDisplay: defaults?.string(forKey: "stat_display") ?? "consistencyScore",
+            strings: .load(defaults)
         )
     }
 
@@ -98,6 +129,47 @@ struct WidgetData {
         return Set(timestamps.map {
             logicalDayStart(Date(timeIntervalSince1970: $0 / 1000), offsetHours: offsetHours)
         })
+    }
+}
+
+/// Words the widgets show or speak, written by the app in its language
+/// (HomeWidgetService.widgetStrings), with English until it has. The widgets recompute their
+/// figures between app opens, so the templates keep `{value}`-style tokens to fill in here.
+struct WidgetStrings {
+    var streakSummary = "Meditation streak: {value}"
+    var consistencySummary = "Consistency score: {value}"
+    var doneToday = "Meditated today"
+    var notDoneToday = "Not meditated yet today"
+    var recentDays = "Meditated on {done} of the last {total} days"
+    var startHere = "Start here"
+    var continueLabel = "Continue"
+    var upNextProgress = "{completed} of {total}"
+    var packComplete = "Pack complete"
+    var chooseWhatsNext = "Choose what's next"
+
+    static func load(_ defaults: UserDefaults?) -> WidgetStrings {
+        var strings = WidgetStrings()
+        func read(_ key: String, into value: inout String) {
+            if let saved = defaults?.string(forKey: key), !saved.isEmpty { value = saved }
+        }
+        read("widget_streak_summary", into: &strings.streakSummary)
+        read("widget_consistency_summary", into: &strings.consistencySummary)
+        read("widget_done_today", into: &strings.doneToday)
+        read("widget_not_done_today", into: &strings.notDoneToday)
+        read("widget_recent_days", into: &strings.recentDays)
+        read("widget_start_here", into: &strings.startHere)
+        read("widget_continue", into: &strings.continueLabel)
+        read("widget_up_next_progress", into: &strings.upNextProgress)
+        read("widget_pack_complete", into: &strings.packComplete)
+        read("widget_choose_whats_next", into: &strings.chooseWhatsNext)
+        return strings
+    }
+}
+
+extension String {
+    /// Replaces each `{key}` token with its value.
+    func filling(_ values: [String: String]) -> String {
+        values.reduce(self) { $0.replacingOccurrences(of: "{\($1.key)}", with: $1.value) }
     }
 }
 
@@ -432,6 +504,8 @@ struct ConsistencyRing: View {
 /// weeks as a calendar on the right.
 struct StatWidgetBody: View {
     let value: String
+    /// Read by VoiceOver in place of the figure, unit and calendar (`accessibilitySummary`).
+    let accessibilitySummary: String
     var unit: String = ""
     var ringScore: Int? = nil
     let doneToday: Bool
@@ -499,6 +573,8 @@ struct StatWidgetBody: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilitySummary)
         .widgetBackground(color: colors.backgroundColor)
     }
 }

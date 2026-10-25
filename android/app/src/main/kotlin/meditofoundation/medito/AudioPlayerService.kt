@@ -709,7 +709,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
     private fun createInitialNotification(): Notification {
         val initialNotification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Medito")
-            .setContentText("Preparing media playback...")
+            .setContentText(getString(R.string.notification_preparing_playback))
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setSilent(true)
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
@@ -955,14 +955,16 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         builder.addAction(
             NotificationCompat.Action(
                 R.drawable.ic_skip_backward,
-                "Skip Backward",
+                getString(R.string.notification_action_skip_back),
                 createMediaButtonPendingIntent(KeyEvent.KEYCODE_MEDIA_PREVIOUS, pendingIntentFlags)
             )
         )
 
         // Play/Pause action
         val playPauseIcon = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
-        val playPauseTitle = if (isPlaying) "Pause" else "Play"
+        val playPauseTitle = getString(
+            if (isPlaying) R.string.notification_action_pause else R.string.notification_action_play,
+        )
         builder.addAction(
             NotificationCompat.Action(
                 playPauseIcon,
@@ -975,7 +977,7 @@ class AudioPlayerService : MediaSessionService(), Player.Listener, MeditoAudioSe
         builder.addAction(
             NotificationCompat.Action(
                 R.drawable.ic_skip_forward,
-                "Skip Forward",
+                getString(R.string.notification_action_skip_forward),
                 createMediaButtonPendingIntent(KeyEvent.KEYCODE_MEDIA_NEXT, pendingIntentFlags)
             )
         )

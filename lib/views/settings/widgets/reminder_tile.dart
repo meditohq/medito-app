@@ -14,6 +14,7 @@ import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/row_item_widget.dart';
 import 'package:medito/views/home/widgets/home_gradient_border.dart';
+import 'package:medito/views/settings/widgets/announce_setting.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -187,6 +188,14 @@ class _ReminderTileState extends ConsumerState<ReminderTile> {
       );
       await ref.read(reminderEnabledProvider.notifier).setEnabled(true);
       await ref.read(reminderTimeProvider.notifier).setTime(time);
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        announceSettingChoice(
+          context,
+          l10n.reminderTitle,
+          _subtitle(l10n, true, time),
+        );
+      }
 
       unawaited(
         ref
@@ -212,6 +221,10 @@ class _ReminderTileState extends ConsumerState<ReminderTile> {
     try {
       await ref.read(reminderEnabledProvider.notifier).setEnabled(false);
       await _service().disable();
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        announceSettingChoice(context, l10n.reminderTitle, l10n.reminderOff);
+      }
 
       unawaited(
         ref
@@ -320,11 +333,14 @@ class ReminderOptionsSheet extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Text(
-                l10n.reminderChipsQuestion,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: onSurface,
-                  fontWeight: FontWeight.w600,
+              child: Semantics(
+                header: true,
+                child: Text(
+                  l10n.reminderChipsQuestion,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),

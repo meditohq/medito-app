@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
@@ -94,7 +95,8 @@ class AccountSectionWidget extends ConsumerWidget {
                   showSnackBar(
                     context,
                     AppLocalizations.of(context)!.signOutErrorMessage,
-                    backgroundColor: Colors.red,
+                    // White on Colors.red is ~3.7:1; this red clears 4.5:1.
+                    backgroundColor: ColorConstants.lightError,
                   );
                 }
               }

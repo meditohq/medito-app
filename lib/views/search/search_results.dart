@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
@@ -127,8 +130,12 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
   Widget _buildFilterTabs() {
     final query = widget.query;
     final packsCount = ref.watch(searchFilteredPacksProvider(query)).length;
-    final tracksCount =
-        ref.watch(searchTracksProvider(query)).value?.length ?? 0;
+    // Null until the tracks load, so the tab doesn't claim "0" meanwhile.
+    final loadedTracksCount = ref
+        .watch(searchTracksProvider(query))
+        .value
+        ?.length;
+    final tracksCount = loadedTracksCount ?? 0;
 
     if ((_previousPacksCount != packsCount ||
             _previousTracksCount != tracksCount) &&
@@ -163,7 +170,7 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
                   label: filter.label(context),
                   count: filter == SearchFilter.packs
                       ? packsCount
-                      : tracksCount,
+                      : loadedTracksCount,
                   selected: _filter == filter,
                   onTap: () => setState(() => _filter = filter),
                 ),
@@ -186,8 +193,21 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
         if (query.isNotEmpty && _reportedQuery != query) {
           _reportedQuery = query;
           final hasResults = packs.isNotEmpty || tracks.isNotEmpty;
+          final total = packs.length + tracks.length;
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) widget.onResults?.call(query, hasResults);
+            if (!mounted) return;
+            widget.onResults?.call(query, hasResults);
+            // The list swaps silently under the field; say what it found,
+            // once per settled (debounced) query.
+            unawaited(
+              SemanticsService.sendAnnouncement(
+                View.of(context),
+                hasResults
+                    ? l10n.searchResultsCount(total)
+                    : l10n.noResultsFound,
+                Directionality.of(context),
+              ),
+            );
           });
         }
 
@@ -248,8 +268,12 @@ class _SearchResultsState extends ConsumerState<SearchResults> {
           ),
         ];
       },
-      loading: () => const [
-        SliverFillRemaining(child: Center(child: CircularProgressIndicator())),
+      loading: () => [
+        SliverFillRemaining(
+          child: Center(
+            child: CircularProgressIndicator(semanticsLabel: l10n.loading),
+          ),
+        ),
       ],
     );
   }
@@ -264,7 +288,9 @@ class _FilterTab extends StatelessWidget {
   });
 
   final String label;
-  final int count;
+
+  /// Null while still loading: no count is shown or read.
+  final int? count;
   final bool selected;
   final VoidCallback onTap;
 
@@ -273,15 +299,18 @@ class _FilterTab extends StatelessWidget {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
     final primary = theme.colorScheme.primary;
-    final textColor = selected ? onSurface : onSurface.withOpacityValue(0.5);
+    // 0.65, not 0.5: the unselected tab must still pass contrast in light mode.
+    final textColor = selected ? onSurface : onSurface.withOpacityValue(0.65);
+    final count = this.count;
 
     // Was plain text read as "Packs", then a bare "12": no role, no
     // selection, no hint what the number counts.
     return Semantics(
       button: true,
       selected: selected,
-      label:
-          '$label, ${AppLocalizations.of(context)!.searchResultsCount(count)}',
+      label: count == null
+          ? label
+          : '$label, ${AppLocalizations.of(context)!.searchResultsCount(count)}',
       excludeSemantics: true,
       onTap: onTap,
       child: InkWell(
@@ -310,23 +339,28 @@ class _FilterTab extends StatelessWidget {
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: selected
-                      ? primary.withOpacityValue(0.15)
-                      : onSurface.withOpacityValue(0.08),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '$count',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: selected ? primary : textColor,
-                    fontWeight: FontWeight.w600,
+              if (count != null) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? primary.withOpacityValue(0.15)
+                        : onSurface.withOpacityValue(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '$count',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: selected ? primary : textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

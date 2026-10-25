@@ -42,6 +42,7 @@ class FavoritesView extends ConsumerStatefulWidget {
 class FavoritesViewState extends ConsumerState<FavoritesView> {
   FavoritesFilter _currentFilter = FavoritesFilter.all;
   final _scrollController = ScrollController();
+  final _refreshKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void dispose() {
@@ -62,6 +63,17 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
       appBar: MeditoAppBarSmall(
         title: AppLocalizations.of(context)!.favorites,
         hasBackButton: true,
+        // Pull-to-refresh can't be done with a screen reader; offer a button
+        // instead while one is running.
+        actions: MediaQuery.accessibleNavigationOf(context)
+            ? [
+                IconButton(
+                  tooltip: AppLocalizations.of(context)!.refresh,
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () => _refreshKey.currentState?.show(),
+                ),
+              ]
+            : null,
       ),
       bottomNavigationBar: SingleBackButtonActionBar(
         onBackPressed: () => Navigator.pop(context),
@@ -69,10 +81,15 @@ class FavoritesViewState extends ConsumerState<FavoritesView> {
       body: AdaptivePageBody(
         maxWidth: 760,
         child: RefreshIndicator(
+          key: _refreshKey,
           onRefresh: _onRefresh,
           child: favoritesState.when(
             data: (favorites) => _buildFavoritesContent(favorites, statsState),
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: AppLocalizations.of(context)!.loading,
+              ),
+            ),
             error: (error, stack) => _buildErrorState(),
           ),
         ),

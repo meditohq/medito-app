@@ -82,4 +82,33 @@ void main() {
       expect(formatCurrencyAmount(1000, 'usd'), r'$10');
     });
   });
+
+  group('spokenCurrencyAmount', () {
+    test('names the currency where its symbol is shared', () {
+      // All of these print as a bare "$", which screen readers say as dollars.
+      expect(spokenCurrencyAmount(2000000, 'cop'), 'COP\u00a020,000');
+      expect(spokenCurrencyAmount(500, 'cad'), 'CAD\u00a05');
+      expect(spokenCurrencyAmount(550, 'aud'), 'AUD\u00a05.50');
+      expect(spokenCurrencyAmount(5000, 'clp'), 'CLP\u00a05,000');
+      expect(spokenCurrencyAmount(10000, 'MXN'), 'MXN\u00a0100');
+      expect(spokenCurrencyAmount(20000, 'uyu'), 'UYU\u00a0200');
+      expect(spokenCurrencyAmount(1000, 'cny'), 'CNY\u00a010');
+    });
+
+    test('keeps the visible form where the symbol is unambiguous', () {
+      expect(spokenCurrencyAmount(500, 'usd'), r'$5');
+      expect(spokenCurrencyAmount(1000, 'jpy'), '¥1,000');
+      expect(spokenCurrencyAmount(500, 'eur'), '€5');
+      expect(spokenCurrencyAmount(500, 'gbp'), '£5');
+      expect(spokenCurrencyAmount(500, 'brl'), r'R$5');
+      expect(spokenCurrencyAmount(500, 'twd'), r'NT$5');
+    });
+
+    test('puts the code where the locale puts the symbol', () {
+      Intl.defaultLocale = 'de';
+      addTearDown(() => Intl.defaultLocale = 'en_US');
+      expect(formatCurrencyAmount(500, 'cad'), '5\u00a0\$');
+      expect(spokenCurrencyAmount(500, 'cad'), '5\u00a0CAD');
+    });
+  });
 }

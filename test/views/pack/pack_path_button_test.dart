@@ -65,6 +65,7 @@ void main() {
     WidgetTester tester,
     PackModel pack, {
     List<PackModel> others = const [],
+    bool hideButton = false,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -80,6 +81,7 @@ void main() {
           home: Scaffold(
             body: PackPathButton(
               pack: pack,
+              hideButton: hideButton,
               onStartSession: fakeStart,
               child: const SizedBox(height: 40),
             ),
@@ -109,7 +111,7 @@ void main() {
     final handle = tester.ensureSemantics();
     expect(
       find.bySemanticsLabel(
-        '${l10n.packContinue}: Session 3. ${l10n.upNextProgress(3, 7)}',
+        '${l10n.packContinue}: Session 3, ${l10n.upNextProgressSemantics(3, 7)}',
       ),
       findsOneWidget,
     );
@@ -121,6 +123,36 @@ void main() {
     expect(started, ['sleep-3']);
     expect(prefs.getString(SharedPreferenceConstants.upNextPackId), 'sleep');
     expect(find.text(l10n.packAddedToHome), findsOneWidget);
+  });
+
+  testWidgets('a screen reader double-tap starts the session', (tester) async {
+    await pump(tester, sleep);
+
+    final handle = tester.ensureSemantics();
+    tester.semantics.tap(
+      find.semantics.byLabel(RegExp('^${l10n.packContinue}: Session 3')),
+    );
+    await tester.pumpAndSettle();
+    handle.dispose();
+
+    expect(started, ['sleep-3']);
+  });
+
+  testWidgets('hidden, the inline copy is still the screen-reader button', (
+    tester,
+  ) async {
+    await pump(tester, sleep, hideButton: true);
+
+    // The pack screen draws a floating copy over it and excludes that one
+    // from semantics, so this one must still be readable and tappable.
+    final handle = tester.ensureSemantics();
+    tester.semantics.tap(
+      find.semantics.byLabel(RegExp('^${l10n.packContinue}: Session 3')),
+    );
+    await tester.pumpAndSettle();
+    handle.dispose();
+
+    expect(started, ['sleep-3']);
   });
 
   testWidgets('Undo after replacing the default restores the default', (

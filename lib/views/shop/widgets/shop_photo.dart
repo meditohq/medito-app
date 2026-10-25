@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 /// Product photos are signed imgproxy URLs at up to 2048px tall; the size is
 /// part of the signature, so we can't ask for a smaller one. Decode at the
 /// rendered size instead to keep a grid of them light in memory.
+///
+/// Decorative to screen readers, like NetworkImageWidget: a nameless
+/// "image" stop told them nothing. Callers carry the product name.
 class ShopPhoto extends StatelessWidget {
   const ShopPhoto({super.key, required this.url, this.fit = BoxFit.cover});
 
@@ -11,7 +14,10 @@ class ShopPhoto extends StatelessWidget {
   final BoxFit fit;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ExcludeSemantics(child: _photo(context));
+
+  Widget _photo(BuildContext context) {
     final placeholderColor = Theme.of(context).colorScheme.surface;
     final url = this.url;
     if (url == null || url.isEmpty) return _fallback(context);

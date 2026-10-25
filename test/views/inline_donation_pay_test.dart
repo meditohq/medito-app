@@ -262,6 +262,70 @@ void main() {
     expect(calls.single.method, PaymentMethodType.applePay);
   });
 
+  testWidgets('screen readers hear the currency and "per month"', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await pump(
+      tester,
+      currency: 'cop',
+      ladder: const [1000000, 2000000],
+      suggested: 2000000,
+      knownEmail: 'donor@example.com',
+    );
+    // "$20,000" alone would be read as US dollars.
+    expect(find.text('\$20,000'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('COP\u00a020,000, Most popular'),
+      findsOneWidget,
+    );
+    expect(find.bySemanticsLabel('COP\u00a010,000'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('Donate COP\u00a020,000 per month'),
+      findsOneWidget,
+    );
+    semantics.dispose();
+  });
+
+  testWidgets('Apple Pay button has a speakable name', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await pump(tester, knownEmail: 'donor@example.com', applePay: true);
+    expect(
+      find.bySemanticsLabel('Donate \$10 per month with Apple Pay'),
+      findsOneWidget,
+    );
+    semantics.dispose();
+  });
+
+  testWidgets('pay button keeps a name while processing', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: InlineDonationPay(
+            currencyCode: 'usd',
+            ladder: const [500],
+            suggestedAmount: 500,
+            knownEmail: 'donor@example.com',
+            applePayAvailable: false,
+            isProcessing: true,
+            onPay:
+                ({required amount, required email, required method}) async {},
+            onOtherAmount: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(
+      find.bySemanticsLabel('Processing your donation...'),
+      findsOneWidget,
+    );
+    semantics.dispose();
+  });
+
   testWidgets('"Other amount" hands off to the caller', (tester) async {
     var tapped = 0;
     await pump(tester, onOtherAmount: () => tapped++);

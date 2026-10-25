@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/colors/color_constants.dart';
@@ -25,15 +26,20 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/inputs/email_typo_hint.dart';
 
 enum _Frequency {
-  oneTime('oneTime', 'one_time', 'One-time'),
-  monthly('monthly', 'monthly', 'Monthly'),
-  yearly('yearly', 'yearly', 'Yearly');
+  oneTime('oneTime', 'one_time'),
+  monthly('monthly', 'monthly'),
+  yearly('yearly', 'yearly');
 
-  const _Frequency(this.configKey, this.analyticsKey, this.label);
+  const _Frequency(this.configKey, this.analyticsKey);
 
   final String configKey;
   final String analyticsKey;
-  final String label;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    oneTime => l10n.singleDonation,
+    monthly => l10n.monthlyDonation,
+    yearly => l10n.yearlyDonation,
+  };
 }
 
 // Stable handles for the page's two text inputs. Both fields render
@@ -51,14 +57,9 @@ const _defaultHeading = 'Keep meditation free\nfor the next million';
 const _defaultSubcopy =
     '4.1 million people meditate with Medito for free. '
     'No ads, no paywalls — funded entirely by donors like you.';
-const _mostPopularLabel = 'Most popular';
-const _supportCta = 'Donate';
-const _cardCta = 'Donate with card';
-const _disclosureCopy =
-    'Your donation helps keep Medito free for everyone — no ads, no paywalls. '
-    'You will receive an email confirmation shortly.\n'
+// Registration line under the localized disclosure (l10n.donationDisclosure).
+const _registrationCopy =
     'Stichting Medito · Non-profit registered in the Netherlands · KvK 75284251';
-const _stripeTrustCopy = 'Secure payment powered by Stripe';
 
 /// Native rendering of the server-resolved donation configuration. The caller
 /// provides a page or pager shell, loads [config], and handles load failures.
@@ -264,10 +265,11 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     final factor = _minorUnitFactor(widget.config.currencyCode);
     final minorAmount = majorUnits * factor;
     if (minorAmount < minimum) {
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _customAmountError =
-            'Minimum amount is '
-            '${formatCurrencyAmount(minimum, widget.config.currencyCode)}';
+        _customAmountError = l10n.donationMinimumAmount(
+          formatCurrencyAmount(minimum, widget.config.currencyCode),
+        );
         _selectedAmount = 0;
       });
       return;
@@ -381,6 +383,14 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
     }
 
     setState(() => _isProcessingPayment = true);
+    // The pay button swaps its label for a spinner; say why, once.
+    unawaited(
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        AppLocalizations.of(context)!.processingDonation,
+        Directionality.of(context),
+      ),
+    );
     try {
       final uiController = ref.read(paymentUIControllerProvider.notifier);
       final authRepository = ref.read(authRepositorySyncProvider);
@@ -526,7 +536,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               right: 4,
               child: TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: 1),
-                duration: const Duration(milliseconds: 400),
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : const Duration(milliseconds: 400),
                 builder: (context, opacity, child) =>
                     Opacity(opacity: opacity, child: child),
                 child: IconButton(
@@ -564,15 +576,19 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
-        Text(
-          heading,
-          style: TextStyle(
-            color: onSurface,
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            height: 1.2,
+        Semantics(
+          container: true,
+          header: true,
+          child: Text(
+            heading,
+            style: TextStyle(
+              color: onSurface,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              height: 1.2,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 12),
         Text(
@@ -589,6 +605,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }
 
   Widget _buildFrequencyToggle(BuildContext context, Color onSurface) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -602,9 +619,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             child: Semantics(
               button: true,
               selected: isSelected,
+              inMutuallyExclusiveGroup: true,
               child: GestureDetector(
                 onTap: () => _selectFrequency(frequency),
                 child: Container(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
                     color: isSelected
@@ -622,7 +642,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                         : null,
                   ),
                   child: Text(
-                    frequency.label,
+                    frequency.label(l10n),
                     style: TextStyle(
                       color: isSelected
                           ? onSurface
@@ -694,36 +714,56 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         amount == _selectedAmount && _customAmountController.text.isEmpty;
     final accent = context.brandAccent;
     final label = formatCurrencyAmount(amount, widget.config.currencyCode);
+    final mostPopular = AppLocalizations.of(context)!.donateMostPopular;
+    // "COP 20,000", not "$20,000" read as dollars. One label for the tile and
+    // its badge; excludeSemantics drops the GestureDetector's tap, so it's
+    // given here.
+    final spokenLabel = spokenCurrencyAmount(
+      amount,
+      widget.config.currencyCode,
+    );
+    void select() => _selectPresetAmount(amount);
 
-    // No explicit label: the child Text already provides it, and an explicit
-    // one would merge with it and be announced twice ("$5 $5").
     return Semantics(
       button: true,
       selected: isSelected,
+      inMutuallyExclusiveGroup: true,
+      label: isSuggested ? '$spokenLabel, $mostPopular' : spokenLabel,
+      excludeSemantics: true,
+      onTap: select,
       child: GestureDetector(
-        onTap: () => _selectPresetAmount(amount),
+        onTap: select,
         child: Stack(
           clipBehavior: Clip.none,
           children: [
             Container(
               height: 52,
               alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              // Selected is filled, like the end-screen chips: a faint tint
+              // and a slightly thicker border were near-invisible in the
+              // monochrome theme.
               decoration: BoxDecoration(
-                color: isSelected
-                    ? accent.withValues(alpha: 0.08)
-                    : Colors.transparent,
+                color: isSelected ? accent : Colors.transparent,
                 border: Border.all(
                   color: isSelected ? accent : onSurface.withValues(alpha: 0.2),
                   width: isSelected ? 1.5 : 1,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? accent : onSurface,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+              // Long amounts shrink rather than wrap and clip at large text
+              // sizes.
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  softWrap: false,
+                  style: TextStyle(
+                    color: isSelected ? context.onBrandAccent : onSurface,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -743,7 +783,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      _mostPopularLabel,
+                      mostPopular,
                       style: TextStyle(
                         color: accent,
                         fontSize: 12,
@@ -773,6 +813,8 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         _customAmountError == null &&
         _customAmountController.text.isNotEmpty &&
         _selectedAmount > 0;
+    final l10n = AppLocalizations.of(context)!;
+    final currency = widget.config.currencyCode;
     return MeditoTextField(
       fieldKey: customAmountFieldKey,
       controller: _customAmountController,
@@ -780,9 +822,12 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       textInputAction: TextInputAction.done,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       enabled: !_isProcessingPayment,
-      hintText:
-          'Other amount (min '
-          '${formatCurrencyAmount(minimum, widget.config.currencyCode)})',
+      hintText: l10n.donationOtherAmountHint(
+        formatCurrencyAmount(minimum, currency),
+      ),
+      semanticLabel: l10n.donationOtherAmountHint(
+        spokenCurrencyAmount(minimum, currency),
+      ),
       errorText: _customAmountError,
       helperText: showPreview
           ? '= ${formatCurrencyAmount(_selectedAmount, widget.config.currencyCode)}'
@@ -797,6 +842,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
       fieldKey: donationEmailFieldKey,
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
+      autofillHints: const [AutofillHints.email],
       textInputAction: TextInputAction.done,
       autocorrect: false,
       enabled: !_isProcessingPayment,
@@ -828,6 +874,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   static final _emailPattern = RegExp(r'^[^@\s]+@[^@\s.]+\.[^@\s]+$');
 
   Widget _buildPaymentButtons(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    // Disabled while no valid amount is chosen (a cleared or below-minimum
+    // custom amount), rather than a tap that silently does nothing.
+    final canPay = !_isProcessingPayment && _selectedAmount > 0;
     final methodsAsync = ref.watch(availablePaymentMethodsProvider);
     final methods = methodsAsync.value ?? const [];
     final hasApplePay =
@@ -842,9 +892,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: _isProcessingPayment
-                  ? null
-                  : () => _handlePay(payment_models.PaymentMethodType.applePay),
+              onPressed: canPay
+                  ? () => _handlePay(payment_models.PaymentMethodType.applePay)
+                  : null,
               // White button per Apple Pay HIG for dark backgrounds; the
               // "Donate with (apple) Pay" label is Apple's official variant
               // for nonprofits.
@@ -858,30 +908,30 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               // Screen readers can't speak the U+F8FF glyph below, which left
               // this announced as "Donate with Pay".
               child: Semantics(
-                label: 'Donate with Apple Pay',
+                label: l10n.donateWithApplePay,
                 excludeSemantics: true,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text(
-                      'Donate with',
-                      style: TextStyle(
+                      l10n.donateWithApplePayPrefix,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     // U+F8FF (Apple logo), drawn by the iOS system font — this
                     // button is iOS-only.
-                    Text(
+                    const Text(
                       '',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(width: 3),
-                    Text(
+                    const SizedBox(width: 3),
+                    const Text(
                       'Pay',
                       style: TextStyle(
                         fontSize: 16,
@@ -901,9 +951,9 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
           // With a wallet button present it is the primary action — card drops
           // to an outlined secondary. Without one, card stays the filled CTA.
           child: ElevatedButton(
-            onPressed: _isProcessingPayment
-                ? null
-                : () => _handlePay(payment_models.PaymentMethodType.card),
+            onPressed: canPay
+                ? () => _handlePay(payment_models.PaymentMethodType.card)
+                : null,
             style: hasApplePay
                 ? ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
@@ -932,10 +982,13 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
                       color: hasApplePay
                           ? context.brandAccent
                           : context.onBrandAccent,
+                      // Otherwise the disabled button has no name while it
+                      // spins.
+                      semanticsLabel: l10n.processingDonation,
                     ),
                   )
                 : Text(
-                    hasApplePay ? _cardCta : _supportCta,
+                    hasApplePay ? l10n.donateWithCard : l10n.donateTitle,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -948,11 +1001,13 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }
 
   Widget _buildDisclosure(BuildContext context, Color onSurface) {
-    final faint = onSurface.withValues(alpha: 0.5);
+    final l10n = AppLocalizations.of(context)!;
+    // 0.7, not 0.5: small print still needs to be legible.
+    final faint = onSurface.withValues(alpha: 0.7);
     return Column(
       children: [
         Text(
-          _disclosureCopy,
+          '${l10n.donationDisclosure}\n$_registrationCopy',
           style: TextStyle(color: faint, fontSize: 12, height: 1.5),
           textAlign: TextAlign.center,
         ),
@@ -966,7 +1021,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             const SizedBox(width: 4),
             Flexible(
               child: Text(
-                _stripeTrustCopy,
+                l10n.donationStripeTrust,
                 style: TextStyle(color: faint, fontSize: 12),
                 textAlign: TextAlign.center,
               ),
@@ -978,21 +1033,32 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   }
 
   /// Quiet skip: footnote-sized "Not now" under the disclosure, styled like
-  /// the surrounding small print rather than a button.
+  /// the surrounding small print rather than a button. Still announced as a
+  /// button, with a 48pt touch target around the small text.
   Widget _buildNotNow(BuildContext context, Color onSurface) {
-    final faint = onSurface.withValues(alpha: 0.5);
-    return GestureDetector(
-      onTap: () => _handleSkip('not_now'),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Text(
-          'Not now',
-          style: TextStyle(
-            color: faint,
-            fontSize: 12,
-            decoration: TextDecoration.underline,
-            decorationColor: faint,
+    final faint = onSurface.withValues(alpha: 0.7);
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: () => _handleSkip('not_now'),
+        behavior: HitTestBehavior.opaque,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Align(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: Text(
+                AppLocalizations.of(context)!.donateNotNow,
+                style: TextStyle(
+                  color: faint,
+                  fontSize: 12,
+                  decoration: TextDecoration.underline,
+                  decorationColor: faint,
+                ),
+              ),
+            ),
           ),
         ),
       ),

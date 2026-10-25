@@ -8,6 +8,7 @@ import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/medito_icon.dart';
 import 'package:medito/widgets/onboarding/onboarding_header_image.dart';
+import 'package:medito/widgets/onboarding/onboarding_step_title.dart';
 
 class BatteryOptimizationScreen extends StatefulWidget {
   const BatteryOptimizationScreen({super.key, this.headerImage, this.onNext});
@@ -49,14 +50,15 @@ class _BatteryOptimizationScreenState extends State<BatteryOptimizationScreen>
   Future<void> _handleOptimize() async {
     if (!mounted) return;
     setState(() => _isProcessing = true);
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       // This opens the system dialog; the observer above will fire on return.
       await DisableBatteryOptimization.showDisableAllOptimizationsSettings(
-        'Enable Auto Start',
-        'Follow the steps and enable the auto start of this app',
-        'Your device has additional battery optimization',
-        'Follow the steps and disable the optimizations to allow smooth functioning of this app',
+        l10n.onboardingBatteryAutoStartTitle,
+        l10n.onboardingBatteryAutoStartBody,
+        l10n.onboardingBatteryOemTitle,
+        l10n.onboardingBatteryOemBody,
       );
     } catch (_) {
       // If the system dialog isn't available, just move on.
@@ -107,7 +109,7 @@ class _BatteryOptimizationScreenState extends State<BatteryOptimizationScreen>
                                   ).colorScheme.onSurface,
                                 ),
                                 const SizedBox(height: 20),
-                                Text(
+                                OnboardingStepTitle(
                                   l10n.onboardingBatteryTitle,
                                   style: Theme.of(context)
                                       .textTheme

@@ -1,5 +1,6 @@
 import 'package:medito/widgets/inputs/medito_segmented_tabs.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
@@ -139,6 +140,13 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
           },
         );
     setState(() => _justAdded = true);
+    // The button's label swaps to "Added to bag", but VoiceOver doesn't
+    // re-read a focused button whose label changes.
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      AppLocalizations.of(context)!.shopAddedToBag,
+      Directionality.of(context),
+    );
     Future.delayed(const Duration(milliseconds: 1600), () {
       if (mounted) setState(() => _justAdded = false);
     });
@@ -170,12 +178,14 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
         ),
       );
     } else {
+      final name = product?.name ?? widget.preview?.name ?? '';
       final gallery = _Gallery(
         key: ValueKey(display?.color?.name ?? display?.id),
         urls: galleryUrls,
+        name: name,
       );
       final details = _Details(
-        name: product?.name ?? widget.preview?.name ?? '',
+        name: name,
         product: product,
         display: display,
         color: _color,
@@ -235,44 +245,86 @@ class _ProductScreenState extends ConsumerState<ProductScreen> {
 }
 
 class _Gallery extends StatefulWidget {
-  const _Gallery({super.key, required this.urls});
+  const _Gallery({super.key, required this.urls, required this.name});
 
   final List<String> urls;
+
+  /// The product name, so the gallery isn't a row of nameless photos.
+  final String name;
 
   @override
   State<_Gallery> createState() => _GalleryState();
 }
 
 class _GalleryState extends State<_Gallery> {
+  final _controller = PageController();
   int _page = 0;
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _goTo(int page) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.jumpToPage(page);
+    } else {
+      _controller.animateToPage(
+        page,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final urls = widget.urls;
+    final count = urls.length;
+    final canNext = _page < count - 1;
+    final canPrevious = _page > 0;
+    String position(int page) => l10n.shopPhotoPosition(page + 1, count);
 
-    return AspectRatio(
-      aspectRatio: kShopPhotoAspect,
-      child: ColoredBox(
-        color: theme.cardColor,
-        child: Stack(
-          children: [
-            if (urls.isEmpty)
-              const Positioned.fill(child: BoxShimmerWidget())
-            else
-              PageView.builder(
-                itemCount: urls.length,
-                onPageChanged: (i) => setState(() => _page = i),
-                itemBuilder: (context, i) => ShopPhoto(url: urls[i]),
-              ),
-            if (urls.length > 1)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 14,
-                child: _PageDots(count: urls.length, index: _page),
-              ),
-          ],
+    // One stop for the whole gallery: the photos were nameless "image"
+    // stops and paging was swipe-only. Screen readers page it with their
+    // adjust gestures (VoiceOver flick up/down, TalkBack volume keys).
+    return Semantics(
+      container: true,
+      image: true,
+      label: widget.name,
+      value: count > 1 ? position(_page) : null,
+      increasedValue: count > 1 && canNext ? position(_page + 1) : null,
+      decreasedValue: count > 1 && canPrevious ? position(_page - 1) : null,
+      onIncrease: canNext ? () => _goTo(_page + 1) : null,
+      onDecrease: canPrevious ? () => _goTo(_page - 1) : null,
+      excludeSemantics: true,
+      child: AspectRatio(
+        aspectRatio: kShopPhotoAspect,
+        child: ColoredBox(
+          color: theme.cardColor,
+          child: Stack(
+            children: [
+              if (urls.isEmpty)
+                const Positioned.fill(child: BoxShimmerWidget())
+              else
+                PageView.builder(
+                  controller: _controller,
+                  itemCount: urls.length,
+                  onPageChanged: (i) => setState(() => _page = i),
+                  itemBuilder: (context, i) => ShopPhoto(url: urls[i]),
+                ),
+              if (urls.length > 1)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 14,
+                  child: _PageDots(count: urls.length, index: _page),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -355,12 +407,17 @@ class _Details extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            name,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: onSurface,
-              fontSize: 24,
-              height: 1.25,
+          // The page has no app bar, so the name titles the route too.
+          Semantics(
+            header: true,
+            namesRoute: true,
+            child: Text(
+              name,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: onSurface,
+                fontSize: 24,
+                height: 1.25,
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -405,9 +462,9 @@ class _Details extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
+              // runSpacing 0: each pill pads itself to a 48px tap target.
               Wrap(
                 spacing: 8,
-                runSpacing: 8,
                 children: [
                   for (final s in product.sizes)
                     ShopChoicePill(
@@ -426,9 +483,9 @@ class _Details extends StatelessWidget {
               const SizedBox(height: 24),
               _SectionLabel(label: l10n.shopOption),
               const SizedBox(height: 12),
+              // runSpacing 0: each pill pads itself to a 48px tap target.
               Wrap(
                 spacing: 8,
-                runSpacing: 8,
                 children: [
                   for (final v in product.variants)
                     ShopChoicePill(
@@ -578,14 +635,17 @@ class _ColorSwatches extends StatelessWidget {
 
   static const _size = 36.0;
 
+  /// Swatch plus selection ring is 44; padding takes the tap target to 48.
+  static const _tapPadding = 2.0;
+
   @override
   Widget build(BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final scaffold = Theme.of(context).scaffoldBackgroundColor;
 
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 10 - _tapPadding * 2,
+      runSpacing: 10 - _tapPadding * 2,
       children: [
         for (final c in product.colors)
           Builder(
@@ -597,7 +657,10 @@ class _ColorSwatches extends StatelessWidget {
               final fill =
                   _parseHex(c.swatch) ?? onSurface.withValues(alpha: 0.2);
               return Semantics(
-                label: c.name,
+                // Out-of-stock colours were only "dimmed".
+                label: inStock
+                    ? c.name
+                    : '${c.name}, ${AppLocalizations.of(context)!.shopSoldOut}',
                 selected: isSelected,
                 enabled: inStock,
                 button: true,
@@ -606,35 +669,39 @@ class _ColorSwatches extends StatelessWidget {
                   // The Semantics above already names it ("Black, Black").
                   excludeFromSemantics: true,
                   child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () => onSelected(c.name),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      width: _size + 8,
-                      height: _size + 8,
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSelected ? onSurface : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      child: DecoratedBox(
+                    child: Padding(
+                      padding: const EdgeInsets.all(_tapPadding),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        width: _size + 8,
+                        height: _size + 8,
+                        padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: fill,
                           border: Border.all(
-                            color: Color.lerp(
-                              fill,
-                              onSurface,
-                              0.25,
-                            )!.withValues(alpha: 0.5),
-                            width: 0.5,
+                            color: isSelected ? onSurface : Colors.transparent,
+                            width: 2,
                           ),
                         ),
-                        child: inStock
-                            ? null
-                            : CustomPaint(painter: _StrikePainter(scaffold)),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: fill,
+                            border: Border.all(
+                              color: Color.lerp(
+                                fill,
+                                onSurface,
+                                0.25,
+                              )!.withValues(alpha: 0.5),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: inStock
+                              ? null
+                              : CustomPaint(painter: _StrikePainter(scaffold)),
+                        ),
                       ),
                     ),
                   ),
@@ -703,7 +770,8 @@ class _HtmlBlocks extends StatelessWidget {
                 ? Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('•  ', style: style),
+                      // Decorative: screen readers said "bullet" each line.
+                      ExcludeSemantics(child: Text('•  ', style: style)),
                       Expanded(child: Text(block.text, style: style)),
                     ],
                   )
@@ -972,9 +1040,14 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
 
     Widget body;
     if (chart.isLoading) {
-      body = const Padding(
-        padding: EdgeInsets.symmetric(vertical: 48),
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      body = Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            semanticsLabel: l10n.loading,
+          ),
+        ),
       );
     } else if (chart.value == null) {
       // No chart (or the page changed shape): the web page still has one.
@@ -1014,11 +1087,15 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
             columnWidths: const {0: FlexColumnWidth(0.8)},
             defaultVerticalAlignment: TableCellVerticalAlignment.middle,
             children: [
+              // Each row below reads as one label that names its columns,
+              // so the header row is visual only.
               TableRow(
                 children: [
-                  _cell(l10n.shopSize, headerStyle),
+                  ExcludeSemantics(child: _cell(l10n.shopSize, headerStyle)),
                   for (final m in data.measures)
-                    _cell(_measureLabel(l10n, m), headerStyle),
+                    ExcludeSemantics(
+                      child: _cell(_measureLabel(l10n, m), headerStyle),
+                    ),
                 ],
               ),
               for (final row in data.rows)
@@ -1032,20 +1109,37 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
                         )
                       : null,
                   children: [
-                    _cell(
-                      row.label,
-                      cellStyle?.copyWith(fontWeight: FontWeight.w600),
+                    // Cell by cell, a reader heard bare numbers and "in" as
+                    // a word: "M, 28, 20". Read the row as "M, Length 28
+                    // inches, Width 20 inches".
+                    Semantics(
+                      label: [
+                        row.label,
+                        for (final m in data.measures)
+                          if (row.values[m] case final v?)
+                            '${_measureLabel(l10n, m)} '
+                                '${_value(_inches ? v.inches : v.cm)} '
+                                '${_inches ? l10n.shopUnitInches : l10n.shopUnitCentimetres}',
+                      ].join(', '),
+                      selected: row.label == widget.selected ? true : null,
+                      excludeSemantics: true,
+                      child: _cell(
+                        row.label,
+                        cellStyle?.copyWith(fontWeight: FontWeight.w600),
+                      ),
                     ),
                     for (final m in data.measures)
-                      _cell(
-                        row.values[m] == null
-                            ? '–'
-                            : _value(
-                                _inches
-                                    ? row.values[m]!.inches
-                                    : row.values[m]!.cm,
-                              ),
-                        cellStyle,
+                      ExcludeSemantics(
+                        child: _cell(
+                          row.values[m] == null
+                              ? '–'
+                              : _value(
+                                  _inches
+                                      ? row.values[m]!.inches
+                                      : row.values[m]!.cm,
+                                ),
+                          cellStyle,
+                        ),
                       ),
                   ],
                 ),
@@ -1066,9 +1160,14 @@ class _SizeGuideSheetState extends ConsumerState<_SizeGuideSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.shopSizeGuide,
-              style: theme.textTheme.headlineSmall?.copyWith(color: onSurface),
+            Semantics(
+              header: true,
+              child: Text(
+                l10n.shopSizeGuide,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: onSurface,
+                ),
+              ),
             ),
             const SizedBox(height: 4),
             Text(

@@ -24,11 +24,18 @@ import '../home_gradient_border.dart';
 const _tileWidth = 148.0;
 const _tileGap = 12.0;
 const _photoHeight = _tileWidth / kShopPhotoAspect;
-const _captionHeight = 52.0;
+const _captionGap = 8.0;
+
+/// The name and price lines (titleSmall at height 1.3) at 1× text.
+const _captionTextHeight = 44.0;
 
 /// Height of the tile strip, shared with the loading placeholder so the
-/// section doesn't jump when products arrive.
-const kHomeShopStripHeight = _photoHeight + _captionHeight;
+/// section doesn't jump when products arrive. The caption grows with the
+/// text size; a fixed allowance clipped the price from ~1.2×.
+double homeShopStripHeight(BuildContext context) =>
+    _photoHeight +
+    _captionGap +
+    MediaQuery.textScalerOf(context).scale(_captionTextHeight);
 
 /// "Shop to Support" row on Home: a horizontal strip of shop products with
 /// local prices, ending in a "See all" tile. Tapping opens the native shop.
@@ -105,7 +112,6 @@ class ProductsWidget extends ConsumerWidget {
                 TextButton(
                   onPressed: openAll,
                   style: TextButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
                     padding: const EdgeInsets.only(left: 12, right: 8),
                     textStyle: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
@@ -135,26 +141,44 @@ class ProductsWidget extends ConsumerWidget {
             ),
           ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: kHomeShopStripHeight,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: products == null ? 4 : products.length + 1,
-            separatorBuilder: (_, _) => const SizedBox(width: _tileGap),
-            itemBuilder: (context, index) {
-              if (products == null) return const _SkeletonTile();
-              if (index == products.length) {
-                return _SeeAllTile(onTap: openAll);
-              }
-              return _ProductTile(
-                product: products[index],
-                // Stagger the colour cycling so tiles don't all flip at once.
-                cycleOffset: Duration(milliseconds: 1300 * index),
-              );
-            },
+        if (products == null)
+          // One "Loading" stop for the skeleton strip, not four silent tiles.
+          Semantics(
+            label: l10n.loading,
+            child: ExcludeSemantics(
+              child: SizedBox(
+                height: homeShopStripHeight(context),
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: 4,
+                  separatorBuilder: (_, _) => const SizedBox(width: _tileGap),
+                  itemBuilder: (_, _) => const _SkeletonTile(),
+                ),
+              ),
+            ),
+          )
+        else
+          SizedBox(
+            height: homeShopStripHeight(context),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: products.length + 1,
+              separatorBuilder: (_, _) => const SizedBox(width: _tileGap),
+              itemBuilder: (context, index) {
+                if (index == products.length) {
+                  return _SeeAllTile(onTap: openAll);
+                }
+                return _ProductTile(
+                  product: products[index],
+                  // Stagger the colour cycling so tiles don't all flip at once.
+                  cycleOffset: Duration(milliseconds: 1300 * index),
+                );
+              },
+            ),
           ),
-        ),
         if (showBlackFridayStyle)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -261,7 +285,7 @@ class _ProductTile extends ConsumerWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(2, 8, 2, 0),
+                padding: const EdgeInsets.fromLTRB(2, _captionGap, 2, 0),
                 child: Text(
                   product.name,
                   maxLines: 1,
@@ -311,15 +335,26 @@ class _CyclingPhotoState extends State<_CyclingPhoto> {
   Timer? _start;
   Timer? _timer;
 
+  // Started here rather than in initState: Reduce Motion holds the first
+  // photo instead of crossfading on a timer.
   @override
-  void initState() {
-    super.initState();
-    if (widget.urls.length > 1) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _stopCycling();
+    } else if (_start == null && widget.urls.length > 1) {
       _start = Timer(_interval + widget.offset, () {
         _advance();
         _timer = Timer.periodic(_interval, (_) => _advance());
       });
     }
+  }
+
+  void _stopCycling() {
+    _start?.cancel();
+    _timer?.cancel();
+    _start = null;
+    _timer = null;
   }
 
   void _advance() {
@@ -329,8 +364,7 @@ class _CyclingPhotoState extends State<_CyclingPhoto> {
 
   @override
   void dispose() {
-    _start?.cancel();
-    _timer?.cancel();
+    _stopCycling();
     super.dispose();
   }
 
@@ -369,38 +403,41 @@ class _SeeAllTile extends StatelessWidget {
             borderWidth: 0.5,
             child: Material(
               type: MaterialType.transparency,
-              child: InkWell(
-                onTap: onTap,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: onSurface.withValues(alpha: 0.2),
+              child: Semantics(
+                button: true,
+                child: InkWell(
+                  onTap: onTap,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: onSurface.withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Center(
+                            child: MeditoIcon(
+                              assetName: MeditoIcons.arrowRight,
+                              color: onSurface,
+                              size: 20,
+                            ),
                           ),
                         ),
-                        child: Center(
-                          child: MeditoIcon(
-                            assetName: MeditoIcons.arrowRight,
+                        const SizedBox(height: 12),
+                        Text(
+                          l10n.shopSeeAll,
+                          style: theme.textTheme.titleSmall?.copyWith(
                             color: onSurface,
-                            size: 20,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        l10n.shopSeeAll,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -476,25 +513,32 @@ class _BagPill extends ConsumerWidget {
               source: AnalyticsEventConstants.sourceHomeCard,
               onBrowse: onBrowse,
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  MeditoIcon(
-                    assetName: MeditoIcons.shop,
-                    color: onSurface,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '$count',
-                    style: theme.textTheme.titleSmall?.copyWith(
+            // At least 44pt tall: the padding alone gave ~32pt.
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 44),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    MeditoIcon(
+                      assetName: MeditoIcons.shop,
                       color: onSurface,
-                      fontWeight: FontWeight.w600,
+                      size: 18,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      '$count',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

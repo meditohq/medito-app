@@ -1,6 +1,7 @@
 package meditofoundation.medito.widget
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -77,6 +78,48 @@ internal data class WidgetPalette(
     }
 }
 
+/**
+ * Words the widgets show or speak, written by the app in its language
+ * (HomeWidgetService.widgetStrings), with English until it has. The widgets recompute their
+ * figures between app opens, so the templates keep `{value}`-style tokens to [fill] in here.
+ */
+internal data class WidgetStrings(
+    val streakSummary: String = "Meditation streak: {value}",
+    val consistencySummary: String = "Consistency score: {value}",
+    val doneToday: String = "Meditated today",
+    val notDoneToday: String = "Not meditated yet today",
+    val recentDays: String = "Meditated on {done} of the last {total} days",
+    val startHere: String = "Start here",
+    val continueLabel: String = "Continue",
+    val upNextProgress: String = "{completed} of {total}",
+    val packComplete: String = "Pack complete",
+    val chooseWhatsNext: String = "Choose what's next",
+) {
+    companion object {
+        fun from(prefs: SharedPreferences): WidgetStrings {
+            val fallback = WidgetStrings()
+            fun read(key: String, default: String) =
+                prefs.getString(key, null)?.takeIf { it.isNotEmpty() } ?: default
+            return WidgetStrings(
+                streakSummary = read("widget_streak_summary", fallback.streakSummary),
+                consistencySummary = read("widget_consistency_summary", fallback.consistencySummary),
+                doneToday = read("widget_done_today", fallback.doneToday),
+                notDoneToday = read("widget_not_done_today", fallback.notDoneToday),
+                recentDays = read("widget_recent_days", fallback.recentDays),
+                startHere = read("widget_start_here", fallback.startHere),
+                continueLabel = read("widget_continue", fallback.continueLabel),
+                upNextProgress = read("widget_up_next_progress", fallback.upNextProgress),
+                packComplete = read("widget_pack_complete", fallback.packComplete),
+                chooseWhatsNext = read("widget_choose_whats_next", fallback.chooseWhatsNext),
+            )
+        }
+    }
+}
+
+/** Replaces each `{key}` token with its value. */
+internal fun String.fill(vararg values: Pair<String, Any>): String =
+    values.fold(this) { text, (key, value) -> text.replace("{$key}", value.toString()) }
+
 internal enum class WidgetWeight(val fileSuffix: String, val value: Int) {
     Regular("Regular", 400),
     Medium("Medium", 500),
@@ -113,6 +156,7 @@ internal object WidgetFonts {
  * in sp, so the system font scale still applies.
  *
  * [maxWidth] bounds the line; longer text wraps up to [maxLines] and then ellipsizes.
+ * [contentDescription] is what TalkBack reads (the text itself unless given; null if decorative).
  */
 @Composable
 internal fun WidgetText(
@@ -126,6 +170,7 @@ internal fun WidgetText(
     letterSpacing: Float = 0f,
     lineHeight: Float = 1.2f,
     centered: Boolean = false,
+    contentDescription: String? = text,
 ) {
     if (text.isEmpty()) return
     val context = LocalContext.current
@@ -155,19 +200,22 @@ internal fun WidgetText(
     layout.draw(Canvas(bitmap))
     Image(
         provider = ImageProvider(bitmap),
-        contentDescription = text,
+        contentDescription = contentDescription,
         colorFilter = ColorFilter.tint(ColorProvider(color)),
         modifier = modifier,
     )
 }
 
-/** A day in the streak strip: an accent disc with a check when practised, a quiet disc if not. */
+/**
+ * A day in the streak strip: an accent disc with a check when practised, a quiet disc if not.
+ * Silent: the widget's own description says how many of the days were practised.
+ */
 @Composable
 internal fun DayDot(active: Boolean, size: Dp, palette: WidgetPalette) {
     Box(modifier = GlanceModifier.size(size), contentAlignment = Alignment.Center) {
         Image(
             provider = ImageProvider(R.drawable.widget_dot),
-            contentDescription = if (active) "Completed day" else "Empty day",
+            contentDescription = null,
             colorFilter = ColorFilter.tint(ColorProvider(if (active) palette.accent else palette.inactive)),
             modifier = GlanceModifier.size(size),
         )
@@ -182,13 +230,16 @@ internal fun DayDot(active: Boolean, size: Dp, palette: WidgetPalette) {
     }
 }
 
-/** The app's play button: accent disc, rounded play glyph in [WidgetPalette.onAccent]. */
+/**
+ * The app's play button: accent disc, rounded play glyph in [WidgetPalette.onAccent]. Silent:
+ * the whole widget is the tap target and its description says what it plays.
+ */
 @Composable
 internal fun PlayButton(size: Dp, palette: WidgetPalette) {
     Box(modifier = GlanceModifier.size(size), contentAlignment = Alignment.Center) {
         Image(
             provider = ImageProvider(R.drawable.widget_dot),
-            contentDescription = "Play",
+            contentDescription = null,
             colorFilter = ColorFilter.tint(ColorProvider(palette.accent)),
             modifier = GlanceModifier.size(size),
         )
@@ -223,7 +274,8 @@ internal fun ProgressBar(fraction: Float, width: Dp, palette: WidgetPalette, hei
 
 /**
  * The in-app consistency chip's ring: the score as an arc over a quiet track. Drawn as two
- * alpha masks so each can take its palette tint.
+ * alpha masks so each can take its palette tint. Silent: the figure beside it already says the
+ * score.
  */
 @Composable
 internal fun ConsistencyRing(score: Int, size: Dp, color: Color, palette: WidgetPalette) {
@@ -244,7 +296,7 @@ internal fun ConsistencyRing(score: Int, size: Dp, color: Color, palette: Widget
     Box(modifier = GlanceModifier.size(size), contentAlignment = Alignment.Center) {
         Image(
             provider = ImageProvider(arc(360f)),
-            contentDescription = "$score%",
+            contentDescription = null,
             colorFilter = ColorFilter.tint(ColorProvider(palette.inactive)),
         )
         if (score > 0) {

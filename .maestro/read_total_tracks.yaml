@@ -12,18 +12,24 @@ name: Read "Total Tracks Completed" from the stats screen into output[STATS_KEY]
     timeout: 30000
 - tapOn: ".*day streak.*|Consistency Score: .*"
 
-# Each stat row merges value and label into one node, "12\nTotal Tracks
-# Completed", so the regex needs (?s) to span the newline.
+# Each stat row is one node labelled name first, "Total Tracks Completed: 12"
+# (older builds: "12\nTotal Tracks Completed"), so match either and take the
+# only number in it.
 - scrollUntilVisible:
-    element: "(?s)\\d+\\s+Total Tracks Completed"
+    element: "(?s)(\\d+\\s+Total Tracks Completed|Total Tracks Completed: \\d+)"
     direction: DOWN
     timeout: 30000
-- copyTextFrom: "(?s)\\d+\\s+Total Tracks Completed"
-- evalScript: ${output[STATS_KEY] = parseInt(maestro.copiedText, 10)}
+- copyTextFrom: "(?s)(\\d+\\s+Total Tracks Completed|Total Tracks Completed: \\d+)"
+- evalScript: ${output[STATS_KEY] = parseInt(maestro.copiedText.match(/\d+/)[0], 10)}
 - evalScript: ${console.log('Total Tracks Completed [' + STATS_KEY + '] = ' + output[STATS_KEY])}
 - takeScreenshot: stats-${STATS_KEY}
 
 - tapOn: "Go Back"
+# The stats screen's Consistency Score row also reads "Consistency Score: N%",
+# so first wait for the stats screen to be gone.
+- extendedWaitUntil:
+    notVisible: "(?s)(\\d+\\s+Total Tracks Completed|Total Tracks Completed: \\d+)"
+    timeout: 15000
 - extendedWaitUntil:
     visible: ".*day streak.*|Consistency Score: .*"
     timeout: 15000

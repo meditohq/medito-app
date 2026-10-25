@@ -48,7 +48,7 @@ name: Upgrade Verification – Lands on Home After In-Place Update
 # the hero goes straight into the player. Fall back to the track view's Play
 # in case the old version never saved them.
 - extendedWaitUntil:
-    visible: "Share Track|Skip forward 10 seconds"
+    visible: "Share Track|Skip forward 15 seconds"
     timeout: 20000
 - runFlow:
     when:
@@ -60,6 +60,6 @@ name: Upgrade Verification – Lands on Home After In-Place Update
       - tapOn: "Play"
 
 - extendedWaitUntil:
-    visible: "(?s).*00:[0-5][1-9] of .*"
+    visible: "(?s)(.*\\D)?[1-9][0-9]? seconds? of .*"
     timeout: 20000
 - takeScreenshot: post-upgrade-playing

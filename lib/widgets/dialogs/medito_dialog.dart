@@ -38,7 +38,7 @@ class MeditoDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
+    final dialog = Dialog(
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -53,6 +53,13 @@ class MeditoDialog extends StatelessWidget {
             ? SingleChildScrollView(child: child)
             : _buildStructured(context),
       ),
+    );
+    // Like AlertDialog: a route scope, named by MeditoDialogTitle, so screen
+    // readers announce the title when the dialog opens.
+    return Semantics(
+      scopesRoute: true,
+      explicitChildNodes: true,
+      child: dialog,
     );
   }
 
@@ -99,14 +106,18 @@ class _MeditoDialogActions extends StatelessWidget {
       );
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        for (var i = 0; i < actions.length; i++) ...[
-          if (i > 0) const SizedBox(width: 12),
-          Expanded(child: actions[i]),
+    // Buttons grow with large text; keep side-by-side ones the same height.
+    return IntrinsicHeight(
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < actions.length; i++) ...[
+            if (i > 0) const SizedBox(width: 12),
+            Expanded(child: actions[i]),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -119,12 +130,17 @@ class MeditoDialogTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        fontFamily: googleSans,
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.onSurface,
+    return Semantics(
+      container: true,
+      header: true,
+      namesRoute: true,
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontFamily: googleSans,
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
     );
   }

@@ -35,6 +35,10 @@
   "@changeBackgroundSoundsHint": {
     "description": "One-time tooltip above the player's background sound button on the second visit with a background sound or session bells enabled."
   },
+  "dismissTip": "Dismiss tip",
+  "@dismissTip": {
+    "description": "Screen-reader label for the close button on the player's one-time background sound tip"
+  },
   "x06": "x0.6",
   "x07": "x0.7",
   "x08": "x0.8",
@@ -51,6 +55,43 @@
   },
   "share": "Share",
   "tapToShare": "Tap to share",
+  "quoteBackgroundOption": "{name} background",
+  "@quoteBackgroundOption": {
+    "description": "Screen-reader label of a background swatch on the quote share screen, e.g. Ocean background",
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "quotePaletteMidnight": "Midnight",
+  "@quotePaletteMidnight": {
+    "description": "Name of a quote share card background"
+  },
+  "quotePaletteIndigo": "Indigo",
+  "@quotePaletteIndigo": {
+    "description": "Name of a quote share card background"
+  },
+  "quotePaletteOcean": "Ocean",
+  "@quotePaletteOcean": {
+    "description": "Name of a quote share card background"
+  },
+  "quotePaletteForest": "Forest",
+  "@quotePaletteForest": {
+    "description": "Name of a quote share card background"
+  },
+  "quotePaletteSunset": "Sunset",
+  "@quotePaletteSunset": {
+    "description": "Name of a quote share card background"
+  },
+  "quotePaletteRose": "Rose",
+  "@quotePaletteRose": {
+    "description": "Name of a quote share card background"
+  },
+  "quotePaletteCream": "Cream",
+  "@quotePaletteCream": {
+    "description": "Name of a quote share card background"
+  },
+  "quotePaletteSlate": "Slate",
+  "@quotePaletteSlate": {
+    "description": "Name of a quote share card background"
+  },
   "id": "id",
   "env": "env",
   "email": "email",
@@ -61,11 +102,71 @@
   "buildNumber": "buildNumber",
   "debugInfo": "Debug info",
   "explore": "Explore",
+  "explorePacksEmpty": "No packs available",
+  "@explorePacksEmpty": {
+    "description": "Empty state on the Explore tab when no packs load"
+  },
   "welcome": "👋 Welcome",
   "thanksForSharing": "Thanks for sharing  💜",
   "thanksForSharingNeutral": "Neutral face",
   "thanksForSharingHappy": "Happy face",
   "thanksForSharingSad": "Sad face",
+  "thanksForSharingSpoken": "Thanks for sharing",
+  "@thanksForSharingSpoken": {
+    "description": "Screen-reader version of the end-screen feedback thank-you, without the emoji"
+  },
+  "zenModeEndMessage1": "Well done for showing up.",
+  "@zenModeEndMessage1": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage2": "Thank you for practicing.",
+  "@zenModeEndMessage2": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage3": "Time well spent.",
+  "@zenModeEndMessage3": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage4": "A moment just for you.",
+  "@zenModeEndMessage4": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage5": "Grateful for this pause.",
+  "@zenModeEndMessage5": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage6": "Enjoy the rest of your day.",
+  "@zenModeEndMessage6": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage7": "Take this feeling with you.",
+  "@zenModeEndMessage7": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage8": "Carry this calm forward.",
+  "@zenModeEndMessage8": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage9": "Until next time.",
+  "@zenModeEndMessage9": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage10": "See you tomorrow.",
+  "@zenModeEndMessage10": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage11": "Session complete.",
+  "@zenModeEndMessage11": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage12": "Practice complete.",
+  "@zenModeEndMessage12": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
+  "zenModeEndMessage13": "Here and now.",
+  "@zenModeEndMessage13": {
+    "description": "One of the random messages shown on the end screen in zen mode"
+  },
   "ratingAskTitle": "Could you leave Medito a rating?",
   "@ratingAskTitle": {
     "description": "Title of the one-time ask for a store rating, shown on the end screen after the user taps the happy face"
@@ -77,6 +178,10 @@
   },
   "min": "min",
   "hey": "👋 Hey",
+  "heyLabel": "Hey",
+  "@heyLabel": {
+    "description": "Screen-reader text for the maintenance screen heading (the visible heading `hey` starts with a waving-hand emoji)"
+  },
   "someThingWentWrong": "Something went wrong",
     "invalidEmail": "Invalid Email.",
     "emailForReceipt": "Email for Receipt",
@@ -170,6 +275,24 @@
   "errorPrefix": "Error: ",
   "retryInSeconds": "Retry in {seconds} s",
   "resendCodeInSeconds": "Resend code in {seconds} s",
+  "retryInSecondsSpoken": "Retry in {seconds, plural, =1{1 second} other{{seconds} seconds}}",
+  "@retryInSecondsSpoken": {
+    "description": "Screen-reader reading of the rate-limited sign-in button (retryInSeconds), with the unit spelled out",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "resendCodeInSecondsSpoken": "Resend code in {seconds, plural, =1{1 second} other{{seconds} seconds}}",
+  "@resendCodeInSecondsSpoken": {
+    "description": "Screen-reader reading of the rate-limited resend-code button (resendCodeInSeconds), with the unit spelled out",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "byContinuingAgreeTo": "By continuing, you agree to our ",
   "andText": " and ",
   "streakFreezeEarned": "Congratulations! You earned a streak freeze for reaching a 7-day milestone!",
@@ -253,6 +376,15 @@
   "sunday": "S",
   "dailyPracticeMessage": "Practicing daily grows your streak, but it also makes you more mindful and happier!",
   "dayStreak": "day streak",
+  "streakDays": "{count, plural, =1{1 day streak} other{{count} day streak}}",
+  "@streakDays": {
+    "description": "Screen-reader label for the current streak, e.g. '5 day streak'.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dailyQuote": "Daily Quote",
   "termsOfService": "Terms of Service",
   "privacyPolicy": "Privacy Policy",
@@ -286,12 +418,40 @@
   "quoteTitle": "Daily Quote",
   "customization": "Customisation",
   "customiseHomeLayout": "Organize Home Layout",
+  "customiseHomeLayoutHint": "Touch and hold an item, then drag it to reorder. With a screen reader, use the actions menu to move items.",
+  "@customiseHomeLayoutHint": {
+    "description": "Instruction at the top of the Organize Home Layout screen"
+  },
   "featuresIntegrations": "Features & Integrations",
   "account": "Account",
   "supportCommunity": "Support & Community",
   "helpLegal": "Help & Legal",
   "advanced": "Advanced",
   "restorePreviousStats": "Restore previous stats",
+  "dayStartsTitle": "When my day starts",
+  "@dayStartsTitle": {
+    "description": "Advanced settings row that opens the day-boundary picker (when a new day starts for streaks)"
+  },
+  "dayStartsMidnightDefault": "Midnight (default)",
+  "@dayStartsMidnightDefault": {
+    "description": "Day-boundary option: the day starts at midnight, the default"
+  },
+  "dayStartsDialogTitle": "When does your day start?",
+  "@dayStartsDialogTitle": {
+    "description": "Title of the day-boundary picker dialog"
+  },
+  "dayStartsDialogBody": "Pick when a new day begins for your streak. Useful if you usually meditate late at night and want sessions after midnight to still count for the previous day.",
+  "@dayStartsDialogBody": {
+    "description": "Explanation in the day-boundary picker dialog"
+  },
+  "dayStartsExperimentalNote": "Experimental. Changing this updates how every past session is grouped into days, so your current and longest streak may shift.",
+  "@dayStartsExperimentalNote": {
+    "description": "Warning note in the day-boundary picker dialog"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Generic Save button in a dialog"
+  },
   "restorePreviousStatsExplainer": "Pick a snapshot to restore. Snapshots are saved automatically when your stats sync, and the most recent 20 are kept on this device — including snapshots taken from other accounts you've signed into here.",
   "noBackupsAvailable": "No stats snapshots are stored on this device yet.",
   "backupSummary": "Streak {streak} · {sessions, plural, =1{1 session} other{{sessions} sessions}} · {minutes} min",
@@ -311,6 +471,20 @@
   "@daysSelected": {
     "placeholders": {"count": {"type": "int"}}
   },
+  "dayCount": "{count, plural, =1{1 day} other{{count} days}}",
+  "@dayCount": {
+    "description": "A number of days, e.g. a streak length in the add-sessions preview",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "sessionCount": "{count, plural, =1{1 session} other{{count} sessions}}",
+  "@sessionCount": {
+    "description": "Number of sessions on the selected calendar day",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "historySessionFallback": "Meditation session",
+  "@historySessionFallback": {
+    "description": "Title of a past session in the calendar when its track can no longer be loaded"
+  },
   "newStreak": "New streak",
   "newSessions": "New sessions",
   "addSessionsToSelectedDays": "Add sessions to selected days",
@@ -326,6 +500,10 @@
     }
   },
   "minutesPerDayOptional": "Minutes per day (optional)",
+  "durationMinutesOptional": "Duration (in minutes, optional)",
+  "@durationMinutesOptional": {
+    "description": "Label of the duration field in the Add session dialog"
+  },
   "onboarding": "Onboarding",
   "@onboarding": {
     "description": "Title for the onboarding section in settings"
@@ -459,6 +637,22 @@
   "onboardingBatteryTitle": "One Setting, Smoother Meditations",
   "onboardingBatteryBody": "Your phone can pause Medito mid-session. One quick change prevents this.",
   "onboardingBatteryOptimize": "Update Setting",
+  "onboardingBatteryAutoStartTitle": "Enable Auto Start",
+  "@onboardingBatteryAutoStartTitle": {
+    "description": "Title of the device-maker (OEM) auto-start dialog opened from the onboarding battery step"
+  },
+  "onboardingBatteryAutoStartBody": "Follow the steps to turn on auto start for Medito.",
+  "@onboardingBatteryAutoStartBody": {
+    "description": "Body of the device-maker (OEM) auto-start dialog opened from the onboarding battery step"
+  },
+  "onboardingBatteryOemTitle": "Your device has additional battery optimization",
+  "@onboardingBatteryOemTitle": {
+    "description": "Title of the device-maker (OEM) battery optimization dialog opened from the onboarding battery step"
+  },
+  "onboardingBatteryOemBody": "Follow the steps to turn off these optimizations so Medito runs smoothly.",
+  "@onboardingBatteryOemBody": {
+    "description": "Body of the device-maker (OEM) battery optimization dialog opened from the onboarding battery step"
+  },
   "skipForNow": "Skip for Now",
   "skip": "Skip",
   "donationTitle": "Millions find calm here for free. Help keep it that way.",
@@ -1030,6 +1224,20 @@
   "@reminderPromptDismissedMessage": {
     "description": "Message shown when user dismisses the reminder prompt on the end screen"
   },
+  "reminderSetFor": "Daily reminder set for {time}",
+  "@reminderSetFor": {
+    "description": "Confirmation after turning on a daily reminder from the end-screen card",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "7:00 AM"
+      }
+    }
+  },
+  "dontShowAgain": "Don't show again",
+  "@dontShowAgain": {
+    "description": "Screen-reader name of the ✕ that permanently hides an end-screen card"
+  },
   "reminderDay1TitleVar1": "Keep your streak going 🌱",
   "@reminderDay1TitleVar1": {
     "description": "Daily reminder day 1 title variant 1"
@@ -1410,6 +1618,16 @@
       "total": {"type": "int"}
     }
   },
+  "upNextProgressSemantics": "{total, plural, =1{{completed} of 1 session done} other{{completed} of {total} sessions done}}",
+  "@upNextProgressSemantics": {
+    "description": "Screen-reader form of the Up Next progress caption, e.g. 3 of 7 sessions done",
+    "placeholders": {"completed": {"type": "int"}, "total": {"type": "int"}}
+  },
+  "upNextSkippedAnnouncement": "Skipped. Up next: {title}",
+  "@upNextSkippedAnnouncement": {
+    "description": "Screen-reader announcement after skipping the Up Next session, naming the session that replaced it",
+    "placeholders": {"title": {"type": "String"}}
+  },
   "upNextPackCompletedTitle": "You finished {packTitle}",
   "@upNextPackCompletedTitle": {
     "description": "Headline on the Up Next card when every session in the pinned pack is complete",
@@ -1523,13 +1741,13 @@
   "@pause": {
     "description": "Accessibility label for the pause button in the player"
   },
-  "skipBackward10Seconds": "Skip back 10 seconds",
-  "@skipBackward10Seconds": {
-    "description": "Accessibility label for the skip-back button in the player"
+  "skipBackward15Seconds": "Skip back 15 seconds",
+  "@skipBackward15Seconds": {
+    "description": "Accessibility label for the skip-back button in the player (it seeks 15 seconds)"
   },
-  "skipForward10Seconds": "Skip forward 10 seconds",
-  "@skipForward10Seconds": {
-    "description": "Accessibility label for the skip-forward button in the player"
+  "skipForward15Seconds": "Skip forward 15 seconds",
+  "@skipForward15Seconds": {
+    "description": "Accessibility label for the skip-forward button in the player (it seeks 15 seconds)"
   },
   "repeat": "Repeat",
   "@repeat": {
@@ -1547,9 +1765,28 @@
   "@deleteDownload": {
     "description": "Accessibility label for the delete-download button in the player"
   },
+  "downloadRemoved": "“{title}” removed",
+  "@downloadRemoved": {
+    "description": "Snackbar after a download is removed from the Downloads list (with Undo)",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "playbackSpeed": "Playback speed",
   "@playbackSpeed": {
     "description": "Accessibility label for the playback speed control in the player"
+  },
+  "playbackSpeedValue": "{speed} times",
+  "@playbackSpeedValue": {
+    "description": "Screen-reader value for the playback speed, shown on screen as 0.8×",
+    "placeholders": {
+      "speed": {
+        "type": "String",
+        "example": "0.8"
+      }
+    }
   },
   "speedReset": "Reset",
   "@speedReset": {
@@ -1805,6 +2042,74 @@
   "@donateMostPopular": {"description": "Badge on the suggested amount chip"},
   "donateMonthlyDisclosure": "Monthly, cancel any time. Secure payment via Stripe.",
   "@donateMonthlyDisclosure": {"description": "Small print under the inline pay button"},
+  "donateAmountPerMonthSpoken": "Donate {amount} per month",
+  "@donateAmountPerMonthSpoken": {
+    "description": "Screen-reader version of donateAmountPerMonth, so \"/month\" is not read as \"slash month\"",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "$5"
+      }
+    }
+  },
+  "donateAmountPerMonthWithApplePay": "Donate {amount} per month with Apple Pay",
+  "@donateAmountPerMonthWithApplePay": {
+    "description": "Screen-reader name of the inline Apple Pay button (the Apple logo glyph cannot be spoken)",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "$5"
+      }
+    }
+  },
+  "donateWithApplePay": "Donate with Apple Pay",
+  "@donateWithApplePay": {
+    "description": "Screen-reader name of the Apple Pay button on the donation page (the Apple logo glyph cannot be spoken)"
+  },
+  "donateWithCard": "Donate with card",
+  "@donateWithCard": {
+    "description": "Card button on the donation page when Apple Pay is offered above it"
+  },
+  "yearlyDonation": "Yearly",
+  "@yearlyDonation": {
+    "description": "Yearly frequency option on the donation page"
+  },
+  "donateNotNow": "Not now",
+  "@donateNotNow": {
+    "description": "Small skip link at the bottom of the donation page"
+  },
+  "donationMinimumAmount": "Minimum amount is {amount}",
+  "@donationMinimumAmount": {
+    "description": "Error under the custom amount field on the donation page",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "$5"
+      }
+    }
+  },
+  "donationOtherAmountHint": "Other amount (min {amount})",
+  "@donationOtherAmountHint": {
+    "description": "Hint in the custom amount field on the donation page",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "$5"
+      }
+    }
+  },
+  "donationDisclosure": "Your donation helps keep Medito free for everyone — no ads, no paywalls. You will receive an email confirmation shortly.",
+  "@donationDisclosure": {
+    "description": "Small print under the pay buttons on the donation page"
+  },
+  "donationStripeTrust": "Secure payment powered by Stripe",
+  "@donationStripeTrust": {
+    "description": "Trust line under the donation page disclosure"
+  },
+  "supportMedito": "Support Medito",
+  "@supportMedito": {
+    "description": "Fallback title of the end-screen donation card"
+  },
   "tagSleep": "Sleep",
   "@tagSleep": {
     "description": "Content tag chip label (server tag id: sleep)"
@@ -1979,6 +2284,48 @@
   "@upNextStartHere": {
     "description": "Eyebrow on the home hero when nothing in the pack has been played yet, e.g. START HERE · Getting started"
   },
+  "widgetStreakSummary": "Meditation streak: {value}",
+  "@widgetStreakSummary": {
+    "description": "Screen-reader label start for the home-screen Streak widget. {value} is filled in by the widget, e.g. '7 days'.",
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "widgetConsistencySummary": "Consistency score: {value}",
+  "@widgetConsistencySummary": {
+    "description": "Screen-reader label start for the home-screen Consistency widget. {value} is filled in by the widget, e.g. '67%'.",
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "widgetNotMeditatedToday": "Not meditated yet today",
+  "@widgetNotMeditatedToday": {
+    "description": "Screen-reader part of the home-screen stat widgets before today's meditation is done"
+  },
+  "widgetRecentDays": "Meditated on {done} of the last {total} days",
+  "@widgetRecentDays": {
+    "description": "Screen-reader part of the home-screen stat widgets describing the visible calendar. Both numbers are filled in by the widget; {total} is always 5 or more.",
+    "placeholders": {
+      "done": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "widgetUpNextProgress": "{completed} of {total}",
+  "@widgetUpNextProgress": {
+    "description": "Pack progress spoken by the home-screen Continue widget, e.g. 3 of 7. Both numbers are filled in by the widget.",
+    "placeholders": {
+      "completed": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "widgetPackComplete": "Pack complete",
+  "@widgetPackComplete": {
+    "description": "Spoken by the home-screen Continue widget once every session in the pack is done"
+  },
+  "widgetChooseWhatsNext": "Choose what's next",
+  "@widgetChooseWhatsNext": {
+    "description": "Title on the home-screen Continue widget once the pack is finished; tapping opens the app"
+  },
   "removeFromHomeShort": "Remove",
   "@removeFromHomeShort": {
     "description": "Short label on the home hero swipe tile for Remove from Home (tiles are narrow)"
@@ -2037,6 +2384,8 @@
   "@shopShippingNote": {"description": "Bag sheet note under the subtotal"},
   "shopCheckout": "Checkout",
   "@shopCheckout": {"description": "Bag sheet button that opens the secure checkout page"},
+  "shopCheckoutHint": "Opens secure checkout in your browser",
+  "@shopCheckoutHint": {"description": "Screen-reader hint on the bag's Checkout button: checkout continues on the shop website"},
   "shopCheckoutPrompt": "Already placed your order?",
   "@shopCheckoutPrompt": {"description": "Bag sheet card shown after the user returned from checkout; offers to clear the bag"},
   "shopClearBag": "Clear bag",
@@ -2077,6 +2426,12 @@
   "@shopInches": {"description": "Size chart unit toggle: inches (abbreviation)"},
   "shopCentimetres": "cm",
   "@shopCentimetres": {"description": "Size chart unit toggle: centimetres (abbreviation)"},
+  "shopUnitInches": "inches",
+  "@shopUnitInches": {"description": "Size chart unit as spoken by a screen reader after a measurement, e.g. '28 inches' (the visible label is the abbreviation 'in')"},
+  "shopUnitCentimetres": "centimetres",
+  "@shopUnitCentimetres": {"description": "Size chart unit as spoken by a screen reader after a measurement, e.g. '71 centimetres'"},
+  "shopPhotoPosition": "Photo {index} of {count}",
+  "@shopPhotoPosition": {"description": "Screen-reader position in a product's swipeable photo gallery", "placeholders": {"index": {"type": "int"}, "count": {"type": "int"}}},
   "timerTitle": "Timer",
   "@timerTitle": {"description": "Title of the home Timer screen and of a timer session in the player"},
   "timerModeStopwatch": "Stopwatch",
@@ -2115,13 +2470,17 @@
   "@downloadingAudio": {
     "description": "Screen-reader label for the player's download button while a download is in progress (value is the percentage)"
   },
+  "audioDownloaded": "Downloaded",
+  "@audioDownloaded": {
+    "description": "Screen-reader announcement when the player's download finishes"
+  },
   "playbackPosition": "Playback position",
   "@playbackPosition": {
     "description": "Screen-reader label for the player's seek bar"
   },
   "playbackPositionValue": "{position} of {duration}",
   "@playbackPositionValue": {
-    "description": "Screen-reader value for the seek bar, e.g. 3:12 of 10:00",
+    "description": "Screen-reader value for the seek bar, e.g. '3 minutes 12 seconds of 10 minutes'. Both placeholders are spoken durations",
     "placeholders": {
       "position": {
         "type": "String"
@@ -2130,6 +2489,21 @@
         "type": "String"
       }
     }
+  },
+  "spokenHours": "{count, plural, =1{1 hour} other{{count} hours}}",
+  "@spokenHours": {
+    "description": "Hours part of a duration read by screen readers, e.g. '1 hour 5 minutes'",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "spokenMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+  "@spokenMinutes": {
+    "description": "Minutes part of a duration read by screen readers, e.g. '3 minutes 12 seconds'",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "spokenSeconds": "{count, plural, =1{1 second} other{{count} seconds}}",
+  "@spokenSeconds": {
+    "description": "Seconds part of a duration read by screen readers, e.g. '3 minutes 12 seconds'",
+    "placeholders": {"count": {"type": "int"}}
   },
   "dayMeditated": "Meditated",
   "@dayMeditated": {

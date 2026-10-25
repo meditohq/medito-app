@@ -72,20 +72,34 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
         hasBackButton: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(52),
-          child: AdaptivePageBody(
-            maxWidth: 640,
-            child: AnimatedBuilder(
-              animation: _tabController,
-              builder: (context, _) => Padding(
-                padding: const EdgeInsets.fromLTRB(padding16, 0, padding16, 4),
-                child: MeditoSegmentedTabs(
-                  labels: [
-                    AppLocalizations.of(context)!.stats,
-                    AppLocalizations.of(context)!.history,
-                  ],
-                  selectedIndex: _tabController.index,
-                  position: _tabController.animation,
-                  onChanged: _tabController.animateTo,
+          // The page has no visible title: name the route and give screen
+          // readers a heading to land on.
+          child: Semantics(
+            container: true,
+            explicitChildNodes: true,
+            header: true,
+            namesRoute: true,
+            label: AppLocalizations.of(context)!.stats,
+            child: AdaptivePageBody(
+              maxWidth: 640,
+              child: AnimatedBuilder(
+                animation: _tabController,
+                builder: (context, _) => Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    padding16,
+                    0,
+                    padding16,
+                    4,
+                  ),
+                  child: MeditoSegmentedTabs(
+                    labels: [
+                      AppLocalizations.of(context)!.stats,
+                      AppLocalizations.of(context)!.history,
+                    ],
+                    selectedIndex: _tabController.index,
+                    position: _tabController.animation,
+                    onChanged: _tabController.animateTo,
+                  ),
                 ),
               ),
             ),
@@ -118,13 +132,16 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             children: [
               const SizedBox(height: 16),
               statsAsync.when(
-                loading: () => const Center(
+                loading: () => Center(
                   child: Padding(
-                    padding: EdgeInsets.all(32.0),
+                    padding: const EdgeInsets.all(32.0),
                     child: SizedBox(
                       width: 16,
                       height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        semanticsLabel: AppLocalizations.of(context)!.loading,
+                      ),
                     ),
                   ),
                 ),
@@ -133,25 +150,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                     final stats = statsAsync.value!;
                     return _statsList(context, stats, ref);
                   } else {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Semantics(
-                          label: AppLocalizations.of(context)!.refresh,
-                          button: true,
-                          child: GestureDetector(
-                            onTap: () =>
-                                ref.read(statsProvider.notifier).refresh(),
-                            child: ExcludeSemantics(
-                              child: MeditoIcon(
-                                assetName: MeditoIcons.help,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
+                    return _buildLoadError(context);
                   }
                 },
                 data: (stats) {
@@ -179,17 +178,22 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
             children: [
               const SizedBox(height: 16),
               statsAsync.when(
-                loading: () => const Center(
+                loading: () => Center(
                   child: Padding(
-                    padding: EdgeInsets.all(32.0),
+                    padding: const EdgeInsets.all(32.0),
                     child: SizedBox(
                       width: 16,
                       height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        semanticsLabel: AppLocalizations.of(context)!.loading,
+                      ),
                     ),
                   ),
                 ),
-                error: (_, _) => const SizedBox.shrink(),
+                error: (_, _) => statsAsync.hasValue
+                    ? MeditationCalendarWidget(stats: statsAsync.value!)
+                    : _buildLoadError(context),
                 data: (stats) {
                   if (stats.updated == 0) return const SizedBox.shrink();
                   return MeditationCalendarWidget(stats: stats);
@@ -203,6 +207,32 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
     );
   }
 
+  /// Said and shown instead of a blank tab (or a lone icon) when stats
+  /// could not be loaded.
+  Widget _buildLoadError(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            l10n.statsLoadError,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () => ref.read(statsProvider.notifier).refresh(),
+            child: Text(l10n.statsErrorRetry),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStatRow(
     BuildContext context,
     String title,
@@ -210,20 +240,29 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
     bool hasUnderline = true,
     VoidCallback? onTap,
   }) {
-    return RowItemWidget(
-      icon: MeditoRemoteIcon(icon: title),
-      iconColor: Theme.of(context).colorScheme.onSurface,
-      trailingIconSize: 20,
-      title: value,
-      subTitle: title,
-      hasUnderline: hasUnderline,
-      isTrailingIcon: onTap != null,
-      trailingIcon: Icons.info_outline,
+    // Read name first ("Consistency Score: 85%"); the visual order puts the
+    // value first. Tappable rows keep their tap through the exclusion.
+    return Semantics(
+      container: true,
+      excludeSemantics: true,
+      label: '$title: $value',
+      button: onTap != null,
       onTap: onTap,
-      titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        fontFamily: googleSans,
+      child: RowItemWidget(
+        icon: MeditoRemoteIcon(icon: title),
+        iconColor: Theme.of(context).colorScheme.onSurface,
+        trailingIconSize: 20,
+        title: value,
+        subTitle: title,
+        hasUnderline: hasUnderline,
+        isTrailingIcon: onTap != null,
+        trailingIcon: Icons.info_outline,
+        onTap: onTap,
+        titleStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          fontFamily: googleSans,
+        ),
       ),
     );
   }
@@ -239,7 +278,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       var minuteText = minutes == 1
           ? AppLocalizations.of(context)!.minute
           : AppLocalizations.of(context)!.minutes;
-      return '$hours $hourText ${minutes.toString().padLeft(2, '0')} $minuteText';
+      return '$hours $hourText $minutes $minuteText';
     } else {
       var minuteText = minutes == 1
           ? AppLocalizations.of(context)!.minute
@@ -365,10 +404,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
           final displayTypeAsync = ref.watch(streakCircleDisplayProvider);
 
           return displayTypeAsync.when(
-            loading: () => const SizedBox(
+            loading: () => SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                semanticsLabel: AppLocalizations.of(context)!.loading,
+              ),
             ),
             error: (_, _) => const SizedBox.shrink(),
             data: (displayType) {
@@ -388,7 +430,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                 child: InkWell(
                   onTap: handleToggle,
                   borderRadius: BorderRadius.circular(8),
-                  child: Padding(
+                  child: Container(
+                    // 48px tall like other touch targets; the row was ~30px.
+                    constraints: const BoxConstraints(minHeight: 48),
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,

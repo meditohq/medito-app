@@ -172,6 +172,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           padding: const EdgeInsets.all(3),
           child: SvgPicture.asset(
             AssetConstants.icLogo,
+            excludeFromSemantics: true,
             colorFilter: ColorFilter.mode(
               Theme.of(context).colorScheme.onSurface,
               BlendMode.srcIn,
@@ -303,6 +304,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           elevation: 0.0,
           title: GestureDetector(
             behavior: HitTestBehavior.opaque,
+            // Hidden shortcut for support; not offered to screen readers as a
+            // long-press action on the page heading.
+            excludeFromSemantics: true,
             onLongPress: () => Navigator.of(context).push(
               MaterialPageRoute<void>(builder: (_) => const DebugInfoScreen()),
             ),
@@ -370,11 +374,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       );
     }
 
-    return RowItemWidget(
+    final row = RowItemWidget(
       icon: item.icon,
       title: item.title,
       hasUnderline: !isLast,
       onTap: () => handleItemPress(context, item),
+    );
+    if (item.type != TypeConstants.url) return row;
+    // Says the row leaves the app. The outer MergeSemantics folds this into
+    // the row's own merged node.
+    return MergeSemantics(
+      child: Semantics(
+        link: true,
+        hint: AppLocalizations.of(context)!.externalLink,
+        child: row,
+      ),
     );
   }
 
@@ -396,11 +410,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 24.0, bottom: 8.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: Theme.of(context).colorScheme.onSurface,
-          fontWeight: FontWeight.w600,
+      child: Semantics(
+        header: true,
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

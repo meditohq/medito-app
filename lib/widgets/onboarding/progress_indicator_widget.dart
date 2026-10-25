@@ -32,25 +32,29 @@ class OnboardingProgressIndicator extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: SizedBox(
-              width: 200,
-              height: 4,
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0, end: target),
-                duration: const Duration(milliseconds: 450),
-                curve: Curves.easeOutCubic,
-                builder: (context, value, _) {
-                  return LinearProgressIndicator(
-                    value: value,
-                    minHeight: 4,
-                    backgroundColor: trackColor,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      context.brandAccent,
-                    ),
-                  );
-                },
+          // The label below says "Step 1 of 3"; the bar read a bare "33"
+          // ahead of it.
+          ExcludeSemantics(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: SizedBox(
+                width: 200,
+                height: 4,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: target),
+                  duration: const Duration(milliseconds: 450),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, _) {
+                    return LinearProgressIndicator(
+                      value: value,
+                      minHeight: 4,
+                      backgroundColor: trackColor,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        context.brandAccent,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),

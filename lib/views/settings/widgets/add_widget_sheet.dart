@@ -35,11 +35,14 @@ class AddWidgetSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.addWidgetSheetTitle,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: onSurface,
-                fontWeight: FontWeight.w600,
+            Semantics(
+              header: true,
+              child: Text(
+                l10n.addWidgetSheetTitle,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -72,36 +75,39 @@ class _Step extends StatelessWidget {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 24,
-          height: 24,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: onSurface.withValues(alpha: 0.1),
-          ),
-          child: Text(
-            '$number',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: onSurface,
-              fontWeight: FontWeight.w600,
+    // One stop per step ("1 Touch and hold..."), and the circle grows with
+    // the number's text size instead of clipping it.
+    return MergeSemantics(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: onSurface.withValues(alpha: 0.1),
             ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 2),
             child: Text(
-              text,
-              style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
+              '$number',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: onSurface,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                text,
+                style: theme.textTheme.bodyMedium?.copyWith(color: onSurface),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

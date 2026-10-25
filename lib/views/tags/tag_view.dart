@@ -72,7 +72,11 @@ class _TagViewState extends ConsumerState<TagView> {
               ],
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: AppLocalizations.of(context)!.loading,
+            ),
+          ),
           error: (err, _) => MeditoErrorWidget(
             error: err is AppError ? err : const UnknownError(),
             isScaffold: false,

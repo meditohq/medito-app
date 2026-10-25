@@ -69,11 +69,14 @@ class MeditationWidget : GlanceAppWidget() {
         val today = bucketDay(System.currentTimeMillis())
 
         val themePreference = prefs.getString("theme_preference", "system") ?: "system"
+        val strings = WidgetStrings.from(prefs)
 
         StatWidgetContent(
             context = context,
             value = streakCurrent.toString(),
             unit = label,
+            stat = strings.streakSummary.fill("value" to "$streakCurrent $label"),
+            strings = strings,
             doneToday = activityDays.contains(today),
             today = today,
             activityDays = activityDays,

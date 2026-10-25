@@ -151,6 +151,8 @@ class NetworkImageWidget extends StatelessWidget {
             : ColorConstants.lightCard;
 
         return Shimmer.fromColors(
+          // A static placeholder when the user asked for reduced motion.
+          enabled: !MediaQuery.disableAnimationsOf(context),
           period: const Duration(seconds: 1),
           baseColor: baseColor,
           highlightColor: backgroundColor,

@@ -4,6 +4,7 @@ import 'package:medito/utils/duration_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/views/timer/timer_format.dart';
 
 class DurationIndicatorWidget extends ConsumerStatefulWidget {
   const DurationIndicatorWidget({
@@ -26,6 +27,10 @@ class DurationIndicatorWidget extends ConsumerStatefulWidget {
 
 class _DurationIndicatorWidgetState
     extends ConsumerState<DurationIndicatorWidget> {
+  /// What one screen-reader swipe on the seek bar moves, matching the skip
+  /// buttons.
+  static const _a11ySeekStepMs = 15000;
+
   bool _isSeekbarBeingDragged = false;
   double _dragSeekbarValue = 0;
 
@@ -66,6 +71,20 @@ class _DurationIndicatorWidgetState
     int rawTotalDuration,
     int rawCurrentPosition,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+    final sliderMax = totalDuration > 0.0 ? totalDuration : 1.0;
+    final sliderValue = _isSeekbarBeingDragged
+        ? _dragSeekbarValue
+        : currentDuration.clamp(0.0, sliderMax);
+    final positionMs = (sliderValue * 100).round();
+    final canSeek = rawTotalDuration > 0;
+    int stepped(int byMs) => (positionMs + byMs).clamp(0, rawTotalDuration);
+    // Spoken, not "03:12 of 48:00", which reads as clock times.
+    String spokenValue(int ms) => l10n.playbackPositionValue(
+      spokenDuration(Duration(milliseconds: ms), l10n),
+      spokenDuration(Duration(milliseconds: rawTotalDuration), l10n),
+    );
+
     return Padding(
       padding: const EdgeInsets.only(left: 32, right: 32, top: 0, bottom: 0),
       child: Column(
@@ -76,42 +95,48 @@ class _DurationIndicatorWidgetState
               trackShape: CustomTrackShape(addTopPadding: false),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
             ),
-            // Without a label and formatter the seek bar read as "Slider, 37%".
+            // The Slider is its own semantics node, so a label around it
+            // never named it, and its swipe step was a share of the track
+            // (6 minutes of a 60-minute one). One explicit node instead,
+            // stepping by the skip buttons' 15 seconds.
             child: Semantics(
-              label: AppLocalizations.of(context)!.playbackPosition,
-              child: Slider(
-                semanticFormatterCallback: (value) =>
-                    AppLocalizations.of(context)!.playbackPositionValue(
-                      Duration(
-                        milliseconds: (value * 100).round(),
-                      ).toMinutesSeconds(),
-                      Duration(
-                        milliseconds: rawTotalDuration.round(),
-                      ).toMinutesSeconds(),
-                    ),
-                min: 0.0,
-                max: totalDuration > 0.0 ? totalDuration : 1.0,
-                activeColor: ColorConstants.white,
-                inactiveColor: ColorConstants.onyx,
-                value: _isSeekbarBeingDragged
-                    ? _dragSeekbarValue
-                    : currentDuration.clamp(
-                        0.0,
-                        (totalDuration > 0.0 ? totalDuration : 1.0),
-                      ),
-                onChanged: (val) {
-                  if (!_isSeekbarBeingDragged) {
-                    _isSeekbarBeingDragged = true;
-                  }
-                  setState(() {
-                    _dragSeekbarValue = val;
-                  });
-                },
-                onChangeEnd: _onChangeEnd,
+              slider: true,
+              label: l10n.playbackPosition,
+              value: spokenValue(positionMs),
+              increasedValue: canSeek
+                  ? spokenValue(stepped(_a11ySeekStepMs))
+                  : null,
+              decreasedValue: canSeek
+                  ? spokenValue(stepped(-_a11ySeekStepMs))
+                  : null,
+              onIncrease: canSeek
+                  ? () => widget.onSeekEnd(stepped(_a11ySeekStepMs))
+                  : null,
+              onDecrease: canSeek
+                  ? () => widget.onSeekEnd(stepped(-_a11ySeekStepMs))
+                  : null,
+              child: ExcludeSemantics(
+                child: Slider(
+                  min: 0.0,
+                  max: sliderMax,
+                  activeColor: ColorConstants.white,
+                  inactiveColor: ColorConstants.onyx,
+                  value: sliderValue,
+                  onChanged: (val) {
+                    if (!_isSeekbarBeingDragged) {
+                      _isSeekbarBeingDragged = true;
+                    }
+                    setState(() {
+                      _dragSeekbarValue = val;
+                    });
+                  },
+                  onChangeEnd: _onChangeEnd,
+                ),
               ),
             ),
           ),
-          // The slider's value already says "3:12 of 10:00".
+          // The slider's value already says "3 minutes 12 seconds of 10
+          // minutes".
           ExcludeSemantics(
             child: Transform.translate(
               offset: const Offset(0, -14),

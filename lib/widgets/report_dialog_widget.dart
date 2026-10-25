@@ -51,14 +51,27 @@ class ReportDialogWidget extends ConsumerWidget {
                   color: theme.colorScheme.onSurface.withOpacityValue(0.8),
                 ),
               ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () => launchURLInBrowser('https://medito.support.site/'),
-                child: Text(
-                  l10n.reportDialogHelpLink,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: context.brandAccent,
-                    decoration: TextDecoration.underline,
+              // Announced as a link, with a 44px tall tap target (the text
+              // alone was ~20px); the min height absorbs the old 12px gap.
+              Semantics(
+                link: true,
+                child: InkWell(
+                  onTap: () =>
+                      launchURLInBrowser('https://medito.support.site/'),
+                  borderRadius: BorderRadius.circular(4),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 44),
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      widthFactor: 1,
+                      child: Text(
+                        l10n.reportDialogHelpLink,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: context.brandAccent,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
