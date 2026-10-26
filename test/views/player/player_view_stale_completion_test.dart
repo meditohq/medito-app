@@ -106,8 +106,6 @@ class _Stats extends StatsNotifier {
 }
 
 class _Review implements ReviewService {
-  @override
-  Future<bool> onHappyFeedback({bool suppress = false}) async => false;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

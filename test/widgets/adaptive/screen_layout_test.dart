@@ -157,8 +157,6 @@ class _JourneyFavorites extends FavoritesNotifier {
 
 class _JourneyReview implements ReviewService {
   @override
-  Future<bool> onHappyFeedback({bool suppress = false}) async => false;
-  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
@@ -814,6 +812,7 @@ void main() {
       await tester.pumpWidget(
         PreviewShell(
           prefs: prefsDark,
+          overrides: [statsProvider.overrideWith(_OnboardingStats.new)],
           child: Scaffold(
             body: Row(
               children: [

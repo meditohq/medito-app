@@ -51,10 +51,6 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
   bool _impressionLogged = false;
   bool _loadFailureLogged = false;
 
-  /// Set on any donate tap this visit; the feedback card's rating ask then
-  /// holds off so one end screen never carries two asks the user acted on.
-  bool _donateTapped = false;
-
   // `end_screen_inline_pay` A/B (see EndScreenDonationExperiment). Resolved
   // once per card visit; falls back to control if prefs are unavailable so a
   // storage hiccup can never blank the ask.
@@ -171,7 +167,6 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
     required int buttonIndex,
     Map<String, Object> extra = const {},
   }) {
-    _donateTapped = true;
     // Taps only exist in the 'ask' state now (the thank-you card has no CTA
     // and snoozers see no card); card_state is kept for query continuity.
     unawaited(
@@ -336,7 +331,7 @@ class DonationWidgetState extends ConsumerState<DonationWidget>
                 )
               : const SizedBox.shrink(),
         ),
-        FeedbackWidget(suppressRatingAsk: () => _donateTapped),
+        const FeedbackWidget(),
       ],
     );
   }

@@ -1,5 +1,4 @@
-// Widget previews for the one-time rating ask the end-screen feedback card
-// turns into after a 😊 tap (see ReviewService).
+// Widget previews for post-meditation mood feedback.
 //
 //   flutter widget-preview start --web-server
 
@@ -10,10 +9,8 @@ import 'package:medito/views/previews/preview_support.dart';
 
 const ratingAskSize = Size(390, 300);
 
-Widget _ask() => const Padding(
-  padding: EdgeInsets.all(16),
-  child: FeedbackWidget(initiallyShowRatingAsk: true),
-);
+Widget _ask() =>
+    const Padding(padding: EdgeInsets.all(16), child: FeedbackWidget());
 
 Widget wrapDark(Widget child) => PreviewShell(prefs: prefsDark, child: child);
 
@@ -24,7 +21,7 @@ Widget wrapEs(Widget child) =>
     PreviewShell(prefs: prefsDark, locale: const Locale('es'), child: child);
 
 @Preview(
-  group: 'Rating ask',
+  group: 'Mood feedback',
   name: 'dark',
   size: ratingAskSize,
   wrapper: wrapDark,
@@ -32,7 +29,7 @@ Widget wrapEs(Widget child) =>
 Widget ratingAskDark() => _ask();
 
 @Preview(
-  group: 'Rating ask',
+  group: 'Mood feedback',
   name: 'light',
   size: ratingAskSize,
   wrapper: wrapLight,
@@ -40,7 +37,7 @@ Widget ratingAskDark() => _ask();
 Widget ratingAskLight() => _ask();
 
 @Preview(
-  group: 'Rating ask',
+  group: 'Mood feedback',
   name: 'Spanish · dark',
   size: ratingAskSize,
   wrapper: wrapEs,
@@ -48,7 +45,7 @@ Widget ratingAskLight() => _ask();
 Widget ratingAskEs() => _ask();
 
 @Preview(
-  group: 'Rating ask',
+  group: 'Mood feedback',
   name: 'before the 😊 tap · dark',
   size: ratingAskSize,
   wrapper: wrapDark,

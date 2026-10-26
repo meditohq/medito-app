@@ -11,6 +11,7 @@ import 'package:medito/constants/constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/review_service_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -71,6 +72,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       !kIsWeb && (Platform.isIOS || Platform.isAndroid);
   static final _isDndSupported = !kIsWeb && Platform.isAndroid;
   final _analytics = FirebaseAnalyticsService();
+  bool _rateAvailabilityLogged = false;
+  static const _ratePath = 'rate_medito';
 
   @override
   void initState() {
@@ -84,7 +87,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final canRate = ref.watch(canRateMeditoProvider);
+    if (canRate && !_rateAvailabilityLogged) {
+      _rateAvailabilityLogged = true;
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.settingsRateAvailable,
+              parameters: {
+                AnalyticsEventConstants.paramSource:
+                    AnalyticsEventConstants.sourceSettings,
+              },
+            ),
+      );
+    }
     final List<SettingsItem> settingsItems = [
+      if (canRate)
+        SettingsItem(
+          section: AppLocalizations.of(context)!.supportCommunitySection,
+          type: TypeConstants.url,
+          title: AppLocalizations.of(context)!.ratingAskCta,
+          icon: MeditoIcon(
+            assetName: MeditoIcons.star,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          path: _ratePath,
+        ),
       SettingsItem(
         section: AppLocalizations.of(context)!.helpLegalSection,
         type: TypeConstants.url,
@@ -241,6 +270,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void handleItemPress(BuildContext context, SettingsItem item) async {
+    if (item.path == _ratePath) {
+      unawaited(
+        ref
+            .read(analyticsServiceProvider)
+            .logEvent(
+              name: AnalyticsEventConstants.settingsRateTap,
+              parameters: {
+                AnalyticsEventConstants.paramSource:
+                    AnalyticsEventConstants.sourceSettings,
+              },
+            ),
+      );
+      await ref.read(reviewServiceProvider).openStore();
+      return;
+    }
     if (item.path == TypeConstants.addWidget) {
       if (Platform.isIOS) {
         unawaited(
