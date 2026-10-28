@@ -78,9 +78,11 @@ class ShopBagSheet extends ConsumerStatefulWidget {
 }
 
 /// The bag's contents as event params, shared by the bag-level events.
+/// Line count is `line_items`, not `items`: GA4 reserves `items` for an
+/// array of item bundles, and Android drops any event where it's a number.
 Map<String, Object> _bagParams(ShopBag bag, {Map<String, Object>? extra}) => {
   ...?extra,
-  'items': bag.items.length,
+  'line_items': bag.items.length,
   'quantity': bag.quantity,
   'value': bag.subtotal?.value ?? 0,
   'currency': bag.subtotal?.currency ?? '',

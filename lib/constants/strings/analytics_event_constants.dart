@@ -1008,13 +1008,13 @@ class AnalyticsEventConstants {
   static const String shopAddToBag = 'shop_add_to_bag';
 
   /// "Checkout" tapped in the bag; opens Fourthwall's hosted checkout.
-  /// Params: items (lines), quantity (units), value, currency.
+  /// Params: line_items (lines), quantity (units), value, currency.
   static const String shopCheckoutStarted = 'shop_checkout_started';
 
   /// The bag sheet opened. Without it "added but never opened the bag" was
   /// indistinguishable from "opened the bag and left".
   /// Params: source (where the bag button was tapped: shop_grid, product_page,
-  /// home_card), items (lines), quantity (units), value, currency.
+  /// home_card), line_items (lines), quantity (units), value, currency.
   static const String shopBagViewed = 'shop_bag_viewed';
 
   /// A line was taken out of the bag (minus at quantity 1).
@@ -1029,11 +1029,11 @@ class AnalyticsEventConstants {
   /// the app after a checkout trip. Fires once per time the bag is opened in
   /// that state, so it can repeat until the bag is cleared. Hosted checkout
   /// gives no completion signal; this and [shopBagCleared] are the proxy.
-  /// Params: items, quantity, value, currency.
+  /// Params: line_items, quantity, value, currency.
   static const String shopCheckoutReturned = 'shop_checkout_returned';
 
-  /// The bag was emptied in one go. Params: reason ('checkout_return'), items,
-  /// quantity, value, currency.
+  /// The bag was emptied in one go. Params: reason ('checkout_return'),
+  /// line_items, quantity, value, currency.
   static const String shopBagCleared = 'shop_bag_cleared';
 
   /// A shop screen showed its load-failure view (an impression that could never
