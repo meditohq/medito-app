@@ -438,6 +438,12 @@ class FirebaseAnalyticsService {
     required String name,
     Map<String, Object>? parameters,
   }) async {
+    // GA4 reserves `items` for a list of item maps; on Android any other
+    // value makes Play services drop the whole event (iOS accepts it).
+    assert(
+      parameters?['items'] == null || parameters!['items'] is List,
+      '"items" must be a list of item maps; use another key for a count',
+    );
     if (_runningInTest) return;
     if (!_initialized) await initialize();
 

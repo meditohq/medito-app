@@ -61,7 +61,7 @@ Future<void> startShopCheckout(WidgetRef ref) async {
       .logEvent(
         name: AnalyticsEventConstants.shopCheckoutStarted,
         parameters: {
-          'items': bag.items.length,
+          'line_items': bag.items.length,
           'quantity': bag.quantity,
           'value': bag.subtotal?.value ?? 0,
           'currency': bag.subtotal?.currency ?? currency,
