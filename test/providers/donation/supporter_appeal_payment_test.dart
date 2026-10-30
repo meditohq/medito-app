@@ -38,113 +38,144 @@ class _CaptureCardService extends CardPaymentService {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  for (final isAppealCta in [true, false]) {
-    test(
-      'all native payment requests preserve assignment and preceding tap (CTA=$isAppealCta)',
-      () async {
-        SharedPreferences.setMockInitialValues({
-          SharedPreferenceConstants.utmSource: 'google',
-        });
-        final prefs = await SharedPreferences.getInstance();
-        final experiment = SupporterAppealExperiment(prefs);
-        final now = DateTime.now();
-        final stats = LocalAllStats.empty().copyWith(
-          audioCompleted: [
-            for (final days in [60, 10, 1])
-              LocalAudioCompleted(
-                timestamp: now
-                    .subtract(Duration(days: days))
-                    .millisecondsSinceEpoch,
-                id: '$days',
-              ),
-          ],
-        );
-        final seed = List.generate(
-          100,
-          (i) => i,
-        ).firstWhere((i) => Random(i).nextInt(3) == 2);
-        final a = await experiment.enroll(
-          stats: stats,
-          now: now,
-          notificationsAllowed: true,
-          random: Random(seed),
-        );
-        await experiment.recordNotificationTap(
-          jsonDecode(experiment.notificationPayload(a!))
-              as Map<String, dynamic>,
-          DateTime.now(),
-        );
-        final requests = <PaymentIntentRequest>[];
-        final container = ProviderContainer(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(prefs),
-            cardPaymentServiceProvider.overrideWith(
-              (ref) => _CaptureCardService(ref, requests),
-            ),
-          ],
-        );
-        addTearDown(container.dispose);
-        final tags = isAppealCta
-            ? experiment.ctaMetadata()
-            : <String, String>{};
-        await container
-            .read(oneTimePaymentControllerProvider.notifier)
-            .processOneTimePayment(
-              amount: 500,
-              currency: 'usd',
-              paymentMethod: PaymentMethodType.card,
-              userId: 'test-user',
-              paywallSource: isAppealCta ? 'announcement' : 'settings',
-              experimentId: 'existing_price_test',
-              experimentVariant: 'B',
-              campaignMetadata: tags,
-            );
-        await container
-            .read(monthlySubscriptionControllerProvider.notifier)
-            .processMonthlySubscription(
-              amount: 500,
-              currency: 'usd',
-              paymentMethod: PaymentMethodType.card,
-              userId: 'test-user',
-              paywallSource: isAppealCta ? 'announcement' : 'settings',
-              experimentId: 'existing_price_test',
-              experimentVariant: 'B',
-              campaignMetadata: tags,
-            );
-        await container
-            .read(yearlySubscriptionControllerProvider.notifier)
-            .processYearlySubscription(
-              amount: 500,
-              currency: 'usd',
-              paymentMethod: PaymentMethodType.card,
-              userId: 'test-user',
-              paywallSource: isAppealCta ? 'announcement' : 'settings',
-              experimentId: 'existing_price_test',
-              experimentVariant: 'B',
-              campaignMetadata: tags,
-            );
-        expect(requests, hasLength(3));
-        expect(requests.map((r) => r.subscriptionInterval), [
-          null,
-          SubscriptionInterval.month,
-          SubscriptionInterval.year,
-        ]);
-        for (final request in requests) {
-          expect(request.metadata![SupporterAppealExperiment.name], 'C');
-          expect(request.metadata!['appeal_notification_click_id'], a.id);
-          expect(request.metadata!['user_id'], 'test-user');
-          expect(request.metadata!['experiment_id'], 'existing_price_test');
-          expect(request.metadata!['experiment_variant'], 'B');
-          expect(
-            request.metadata!['utm_source'],
-            isAppealCta ? 'medito_app' : 'google',
+  for (final remote in [false, true]) {
+    for (final isAppealCta in [true, false]) {
+      test(
+        'all native payment requests preserve assignment and preceding tap (CTA=$isAppealCta, server=$remote)',
+        () async {
+          SharedPreferences.setMockInitialValues({
+            SharedPreferenceConstants.utmSource: 'google',
+            SharedPreferenceConstants.userId: 'test-user',
+          });
+          final prefs = await SharedPreferences.getInstance();
+          final experiment = SupporterAppealExperiment(prefs);
+          final now = DateTime.now();
+          final stats = LocalAllStats.empty().copyWith(
+            audioCompleted: [
+              for (final days in [60, 10, 1])
+                LocalAudioCompleted(
+                  timestamp: now
+                      .subtract(Duration(days: days))
+                      .millisecondsSinceEpoch,
+                  id: '$days',
+                ),
+            ],
           );
-          if (isAppealCta) {
-            expect(request.metadata!['acquisition_utm_source'], 'google');
+          final seed = List.generate(
+            100,
+            (i) => i,
+          ).firstWhere((i) => Random(i).nextInt(3) == 2);
+          await experiment.enroll(
+            stats: stats,
+            now: now,
+            notificationsAllowed: true,
+            random: Random(seed),
+          );
+          if (remote) {
+            await experiment.applyServerAssignment({
+              'id': '11111111-2222-4333-8444-555555555555',
+              'campaign_id': 'server-payment-campaign',
+              'arm': 'B',
+              'assigned_at': now.millisecondsSinceEpoch,
+              'expires_at': now
+                  .add(const Duration(days: 2))
+                  .millisecondsSinceEpoch,
+              'notification_eligible': true,
+              'consistency_band': 'under_25',
+              'announcement': 'Support Medito',
+              'cta_title': 'Donate now',
+            }, userId: 'test-user');
           }
-        }
-        expect(prefs.getString(SharedPreferenceConstants.utmSource), 'google');
-      },
-    );
+          final a = experiment.assignment!;
+          await experiment.recordNotificationTap(
+            jsonDecode(experiment.notificationPayload(a))
+                as Map<String, dynamic>,
+            DateTime.now(),
+          );
+          final requests = <PaymentIntentRequest>[];
+          final container = ProviderContainer(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              cardPaymentServiceProvider.overrideWith(
+                (ref) => _CaptureCardService(ref, requests),
+              ),
+            ],
+          );
+          addTearDown(container.dispose);
+          final tags = isAppealCta
+              ? experiment.ctaMetadata()
+              : <String, String>{};
+          await container
+              .read(oneTimePaymentControllerProvider.notifier)
+              .processOneTimePayment(
+                amount: 500,
+                currency: 'usd',
+                paymentMethod: PaymentMethodType.card,
+                userId: 'test-user',
+                paywallSource: isAppealCta ? 'announcement' : 'settings',
+                experimentId: 'existing_price_test',
+                experimentVariant: 'B',
+                campaignMetadata: tags,
+              );
+          await container
+              .read(monthlySubscriptionControllerProvider.notifier)
+              .processMonthlySubscription(
+                amount: 500,
+                currency: 'usd',
+                paymentMethod: PaymentMethodType.card,
+                userId: 'test-user',
+                paywallSource: isAppealCta ? 'announcement' : 'settings',
+                experimentId: 'existing_price_test',
+                experimentVariant: 'B',
+                campaignMetadata: tags,
+              );
+          await container
+              .read(yearlySubscriptionControllerProvider.notifier)
+              .processYearlySubscription(
+                amount: 500,
+                currency: 'usd',
+                paymentMethod: PaymentMethodType.card,
+                userId: 'test-user',
+                paywallSource: isAppealCta ? 'announcement' : 'settings',
+                experimentId: 'existing_price_test',
+                experimentVariant: 'B',
+                campaignMetadata: tags,
+              );
+          expect(requests, hasLength(3));
+          expect(requests.map((r) => r.subscriptionInterval), [
+            null,
+            SubscriptionInterval.month,
+            SubscriptionInterval.year,
+          ]);
+          for (final request in requests) {
+            expect(
+              request.metadata![SupporterAppealExperiment.name],
+              remote ? 'B' : 'C',
+            );
+            expect(request.metadata!['appeal_notification_click_id'], a.id);
+            if (remote) {
+              expect(
+                request.metadata!['appeal_campaign_id'],
+                'server-payment-campaign',
+              );
+            }
+            expect(request.metadata!['user_id'], 'test-user');
+            expect(request.metadata!['experiment_id'], 'existing_price_test');
+            expect(request.metadata!['experiment_variant'], 'B');
+            expect(
+              request.metadata!['utm_source'],
+              isAppealCta ? 'medito_app' : 'google',
+            );
+            if (isAppealCta) {
+              expect(request.metadata!['acquisition_utm_source'], 'google');
+            }
+          }
+          expect(
+            prefs.getString(SharedPreferenceConstants.utmSource),
+            'google',
+          );
+        },
+      );
+    }
   }
 }

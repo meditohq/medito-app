@@ -1,202 +1,219 @@
-# Supporter appeal v1
+# Supporter appeal — current server integration
 
-Status: local implementation, not released or sent. The app and checkout website
-changes must both ship before the fallback path can be counted end to end. No
-new server targeting, warehouse queries, cloud schedules or payment configuration.
-Publish the checkout metadata support before releasing the app experiment.
+Status: local implementation/PR, not released. No live campaign has been sent.
 
-The appeal Donate CTA now opens a dedicated native donation screen reusing
-`NativeDonationPage`, with an immediate top-right Close button in the header
-and no second close button in the donation content. It fetches `/paywall` with
-`source=announcement` and the existing user/currency/country. Localized prices,
-suggested amounts, available frequencies and the server's pricing experiment
-ID/variant are preserved. Yearly is supported when that assigned configuration
-offers it; this change does not enable yearly or one-time in server settings.
-Failures/empty configuration show Retry rather than inventing prices. The
-onboarding native/webview choice and end-screen test are unchanged. This
-announcement source deliberately renders natively; its `paywall_id` records that
-renderer separately from the server ladder assignment.
+This app now registers preferences with the app backend and reads its sticky
+campaign assignment. Campaign pushes are sent only by the server. The former
+local scheduling method has been removed; its old pending notification ID is
+cancelled on migration. The preview entrypoint still uses sample in-memory data
+and simulated checkout.
 
-This remains the original local A/B/C prototype described below. The later
-server-controlled targeting and supportive-versus-fundraising copy comparison
-are proposals, not implemented or launched by this change.
+See [the companion backend PR](https://github.com/meditohq/medito-api/pull/16)
+and its `docs/supporter-campaigns.md` for the shared API contract, campaign
+lifecycle, delivery guarantees and release/setup steps.
 
-## Copy
+The app backend owns campaign definitions, sticky assignments and FCM HTTP v1
+sending. The donation API continues to own prices, currencies, frequency options
+and payment-ladder assignments; no Stripe integration or donation settings change.
+The app renders the server announcement and prefers its native donation page.
+The shared webview prefers the native payment sheet for every source, including
+onboarding, end-screen, settings and campaigns. It uses browser checkout after a
+native SDK setup/availability failure or when no usable payment methods exist.
+Slow setup alone does not force browser checkout; the eight-second native setup
+cutoff has been removed. Existing network/page error handling and Close remain.
+For campaigns, disabled/invalid native page configuration opens the web donation
+page with an immediate Close button.
+The web page still uses the native payment sheet when SDK setup and payment
+methods are available (`isInAppPaymentAvailable=true`). Only an unavailable native
+payment integration uses Stripe.js browser checkout instead. A native sheet
+initialization/availability failure forces browser checkout; cancellation, card
+declines and ambiguous payment errors do not trigger another checkout.
+Campaign/source/account metadata is preserved. Bank redirects return to the
+checkout and retrieve Stripe's actual status; only succeeded payments mark the
+install as a donor. Processing payments remain pending. Publish the companion
+website changes before testing this path.
 
-Verified in Firebase Messaging on 20 October 2026, completed campaign dated
-8 June 2026 at 19:52:54: https://console.firebase.google.com/project/medito-9165c/messaging
+Android campaign notifications use the existing `medito_supporter_appeal`
+channel (Support Medito), including foreground presentation. Creating it adds no
+new permission prompt; OS channel settings still control its visibility.
 
-Title: **🫶 Your practice misses you 🫶**
+The admin is `/admin/campaigns` on `paywall.meditofoundation.org` (production) or
+`test.meditofoundation.org` (preview app API). It supports drafts, audience/copy
+editing, scheduling, bounded audience previews, FCM validation-only, activation,
+pause and permanent completion. Definitions freeze after first activation.
+Only one campaign may be active. There is no automatic monthly recurrence.
 
-Body: **Just a few minutes of stillness can change your whole day. Ready to breathe?**
+Default UI proposal: A 20% usual app (no new push/card), B 40% supportive push,
+C 40% fundraising push, with the same announcement and checkout for B/C. Existing
+app asks remain in all groups. Thus A is usual app, not a guaranteed absence of
+all fundraising. Actual weights/copy are saved explicitly in a draft.
 
-Announcement (adapted from medito-api commit 95c15f90):
+## Audience and identity
 
-> We need your help to keep Medito free for everyone.
->
-> Medito is a nonprofit; no ads, no paywalls. If it's been part of your life,
-> a small monthly or yearly donation helps keep this space open for all.
+Only clients that registered through the new authenticated sync endpoint enter
+the pool. Existing `profiles.fcmt` alone never enrolls an old app version.
+The server summarizes the stored, validated `stats.audio_completed`: distinct
+id/timestamp completions, first practice >=30 days ago, >=3 completions, practice
+and preference sync within <=30 days. Account/server creation is not install age.
+No consistency-score cutoff. A band captured before assignment is stored for
+subgroup reporting; unknown stays unknown.
 
-CTA: Donate now. Dismiss suppresses this campaign permanently on that install
-and records `appeal_dismissed`. There is no support-status button or reason dialog.
-Dismissal is not evidence of a person's willingness to donate. No historical shortfall is asserted as current.
-Copy is English, matching the original campaign.
+All eligible users, including notification-denied users, are randomized once.
+Notification eligibility is saved at assignment; denied users remain in their
+assigned group and can see the B/C card. New push attempts require granted OS
+notification permission, a token and no donor/snooze/dismissal suppression.
+Daily reminders can be off; their saved time is optional observational metadata
+and never a campaign eligibility gate. There is no separate supporter toggle or
+permission prompt. Authenticated server signout disables campaign pushes for the
+departing account until it next syncs its notification permission. Offline
+signout cannot reach the sender or recall already accepted pushes. Preferences
+sync at Home/resume, donation/snooze and reminder changes. Dismissal retries
+through ordinary sync.
 
-## Experiment and audience
+Local donations, legacy subscription flags and the internal donation-API donor
+feed suppress asks. Matching uses account ID or case-insensitive profile email;
+suppression stays sticky across registration/sync. Indexed database triggers
+update suppression on new donor imports, registration and profile email changes;
+unchanged donor polls do not scan subscribers. The app API imports donors
+before allocation and fails closed for new participants when the feed is missing,
+failed or still catching up. Linked web/reinstalled donors are covered by that
+mirror; unlinked donations or history missing from the payments database still
+need coverage validation. See the backend docs for the private feed and retention.
+Reinstalls without a shared identity can still re-enroll. A token hash avoids
+duplicate campaign allocation/cooldowns for multiple identities sharing a device.
 
-Sticky equal random assignment per install: A usual app; B local announcement;
-C same announcement plus one extra local notification tomorrow at 18:00 device
-local time (18:30 when a daily reminder uses the 18:00 hour). Existing reminders
-and donation entry points remain. A server donation announcement is replaced
-by the local appeal in B/C to avoid double asks; other server announcements
-remain visible. A retains the usual server announcement, including any existing
-fundraising announcement. Thus the contrast is the new flow versus usual app,
-not necessarily fundraising versus no fundraising at all.
+Eligibility and token data are operational first-party records. The server never
+receives the app's raw local history in registration; it uses its existing stats.
+FCM payloads contain opaque assignment/campaign IDs, no email or user ID. Account
+deletion cascades to subscribers and assignments. Reporting is aggregate only.
 
-Eligibility requires at least three recorded completions, the first at least
-30 days old, and the latest within 30 days. This is observed practice tenure,
-not a claim about the original install date. No consistency-score threshold;
-save its pre-assignment band for subgroup analysis. Exclude locally known
-donors, existing snoozes and campaign dismissals. Local records cannot identify
-donations made elsewhere or prevent cross-device/reinstall re-enrollment.
+## Delivery guarantees and limits
 
-Record notification availability before assignment in every arm. C schedules
-only with an existing enabled reminder preference and granted OS permission;
-there is no new permission prompt. Keep all assigned installs in intent-to-treat
-results, and also compare the pre-assignment notification-enabled stratum across
-all three arms. Do not drop C non-openers, denied notifications or failed sends.
+Minute cron: enroll <=100 users per run up to the campaign participant cap,
+then attempt <=50 queued B/C sends. This is a rollout over time, not a single
+instant simultaneous blast. The campaign window is at most seven days; a later
+campaign respects a global >=30-day assignment cooldown (including controls).
+UTC campaign windows are configured from the admin's local-time inputs. Within
+that window, new push attempts run only from 09:00 to 21:00 using each device's
+latest synced UTC offset. Quiet recipients remain pending and are filtered before
+the 50-recipient batch limit; they cannot block daytime recipients. Provider TTL
+is capped at the local closing time with a 15-second request margin, and new
+claims stop 16 seconds before closing. Offset changes are rechecked at claim.
+Offsets are snapshots: travel or daylight-saving changes after the latest sync
+can make them stale until the next Home/resume/settings sync. This does not
+randomize time of day or avoid collisions with daily reminders.
 
-Card expires seven days after assignment. Never re-enroll or auto-repeat this
-campaign; monthly versus quarterly cadence is a separate future test. New
-donation, dismissal or disabling reminders cancels the pending extra notification.
-Build with `--dart-define=SUPPORTER_APPEAL_ENABLED=false` to stop new enrollment
-and cards in a subsequent release; OS notifications already scheduled need an
-app launch to cancel. No server-side kill switch is claimed.
+Each outbound call is preceded by an atomic D1 `pending -> sending` claim with
+live campaign, recipient and dismissal checks. Captured token hashes must still
+match. No automatic reclaim/re-send follows an uncertain response or a crash
+after claim: these become `unknown`. Explicit provider errors become `failed`.
+This is at-most-one **attempt**, not exactly-once delivery. FCM acceptance is not
+delivery or an open; the API retains its message ID and sanitized error only.
+Expired pending entries become suppressed. Bad unregistered tokens are cleared
+only if they have not rotated in the meantime. Backlog timing can vary by arm;
+retain assignment/send timestamps in any later analysis.
 
-## Measurement
+Pause stops new claims immediately on the next check. It cannot recall calls
+already in flight or messages already accepted by FCM. Provider TTL is <=1 hour
+and never extends past campaign end. APNs collapse IDs/Android tags reduce
+presentation duplication; they are not a financial-grade idempotency guarantee.
+Opens of previously accepted messages remain recordable during pause/completion
+until their original expiry, even though the campaign card is no longer active.
 
-Campaign: `support_medito_june_copy_v1`; arm key: `supporter_appeal_v1`.
-Random 128-bit `appeal_id` identifies the install assignment, with no personal
-information in the identifier. The one notification uses that ID as its click
-join key. Warm/background and terminated-launch paths use the same validation
-and persist one unique open. Opening a different reminder never creates this
-campaign's click record. The notification opens normal Home, not checkout.
+The app sends analytics-consented unique opens/views; dismissal is an operational
+preference. Generic notification opens carry the same push ID and planned UTC
+time. Offline pending taps retry with the same ID and original app-recorded time.
+The server separately stores receipt time. Only a matched owned assignment can
+be attributed. The source click tags are associations, not causal proof.
 
-Events (existing analytics consent applies):
+## API
 
-- `appeal_assigned`: denominator, including A and people who never tap.
-- `appeal_notification_scheduled`: scheduling acknowledgement, NOT delivery.
-- `appeal_notification_opened`: unique actual tap with its click ID and time.
-- `appeal_announcement_viewed`: first visible paint, not hidden Home build.
-- `appeal_donate_tapped`, `appeal_dismissed`.
-- Existing successful donation events also carry assignment and recent tap tags.
+- Public `GET /supporter-campaigns/status`: `{version:5}`; no credentials.
+- App JWT `POST /supporter-campaigns/sync`: push/supporter/snooze/reminder
+  preferences (`push_allowed` reflects OS permission only) and consistency band; returns active assignment or null.
+- App JWT `POST /supporter-campaigns/events`: owned `assignment_id`, kind
+  `opened`, `viewed`, `dismissed`; duplicate events keep the first timestamp.
+- Dedicated admin `GET/POST /admin/campaigns`; PATCH `/:id` includes the last
+  revision. Editing stale revisions or frozen content is rejected.
+- Admin GET `/:id/preview`: at most 100 eligible rows counted, no enrollment.
+- Admin POST `/:id/validate`: own registered test user ID; FCM `validate_only`,
+  no delivery, no experiment assignment. This does not test actual OS delivery.
 
-Native payments and web fallback carry the arm, assignment ID/time, baseline
-consistency band and notification eligibility. An actual notification tap adds
-`appeal_notification_click_id` and `appeal_notification_tapped_at` for seven
-days; membership in C alone does not claim a tap. Assignment tags persist for
-90 days for retention follow-up. These are associations, not causal credit.
+No send/activate path accepts the app key. `CAMPAIGN_ADMIN_TOKEN` must be >=32
+characters and different from `APP_KEY`. Keep it separate from the donation
+API's mobile bearer token too. Allowed browser origins are the two admin hosts
+and local development. Tokens stay in tab memory and do not enter public JS.
 
-The appeal CTA additionally sends scoped UTMs: source `medito_app`, medium
-`in_app_announcement`, campaign above, content B/C. It never writes over stored
-acquisition UTMs; the CTA payment also preserves their values in separate
-`acquisition_utm_*` metadata. Other payment entry points keep their acquisition UTMs and
-still carry assignment/recent-tap tags. Existing server pricing experiment
-metadata remains separate. No donor contact details are added to campaign URLs.
+## Release order
 
-Use the actual paid Stripe charge/initial invoice as payment truth; a Donate
-tap or abandoned PaymentIntent is not a donation. Compare distinct paid donors
-per all assigned eligible installs within seven days, cash by original currency
-within 28 days, and successful renewals at matched 30/60/90-day maturity. Analyze
-the notification-click-to-paid funnel separately using the shared click ID and
-requiring paid time after tapped time within seven days. Count unique click IDs,
-deduplicate payments/invoices, exclude failed/zero-paid checkouts, and retain
-refunds. Do not treat annual subscription status as a successful annual renewal.
+1. Release the donation API donor feed first, with its additive migration
+   `0001_supporter_donor_feed.sql` and dedicated server-only
+   `SUPPORTER_DONOR_FEED_TOKEN`. Then apply app API migrations
+   `0015_supporter_campaigns.sql` (if absent), `0016_supporter_donor_sync.sql`,
+   `0017_supporter_suppression_events.sql` and `0018_supporter_assignment_totals.sql`.
+   Configure its matching `SUPPORTER_DONOR_FEED_URL`/token. Keep sending OFF
+   while the historical import completes. Follow the backend release guide.
+2. Set secret `CAMPAIGN_ADMIN_TOKEN` and secret `FCM_SERVICE_ACCOUNT` (JSON
+   service-account identity with only the needed Firebase messaging permission
+   in the correct Medito Firebase project). Do not paste either into chat, code
+   or the app. Keep the sender flag false until validation is complete.
+3. Deploy the app API to preview, then production through its existing release
+   process. The website PR can deploy independently; it remains unavailable
+   until this backend exists. Its production/preview hosts select different APIs.
+4. Release the app PR to internal testers. Confirm registration, ownership,
+   permission changes, donor/dismiss suppression, notification warm/cold opens,
+   native monthly/yearly **test-mode** checkout and actual Stripe metadata.
+   The existing in-memory simulator preview does not perform this live test.
+5. Use the admin's validation-only action with the test user's registered ID.
+   Then enable sending and activate a deliberately limited real-device pilot
+   only after its audience/copy/window have been reviewed. No campaign is seeded
+   active by a migration, deployment or admin draft save.
 
-Notification scheduling does not supply a delivery denominator. Permission
-revocations, dismissals and continued app use are useful guardrails; absent
-return events do not prove uninstall. Analytics opt-outs and cross-device
-identity limit completeness. Do not manufacture exposure records for opt-outs.
+FCM messaging permissions/authentication and actual delivery need one real-device
+test before calling the sender production-verified. Local tests substitute the
+OAuth/FCM network and preserve SQL/pause/claim/cap behavior.
 
-### Reminder timing (observational, no sending-time change)
+## App preview and checks
 
-Existing onboarding, Settings and end-screen reminder-selection events already
-record the chosen hour/minute. New daily-series and appeal payloads also carry:
-
-- `notification_instance_id`: unique for each scheduling instance, even when
-  the OS notification ID is reused after a session.
-- `scheduled_at`: UTC epoch seconds; `scheduled_local_hour`,
-  `scheduled_local_minute`, `scheduled_utc_offset_min`, `scheduled_timezone`
-  describe the device clock at that planned instant. The timezone name may be
-  an abbreviation, not an IANA identifier; retain the offset and instant.
-- Appeal scheduling snapshots `reminder_hour`/`reminder_minute` and, where known,
-  `nearest_reminder_gap_min`: signed distance from the appeal to the nearest
-  **pending** daily reminder (-30 means the daily reminder precedes it by 30
-  minutes). Legacy requests without a planned-time payload leave this unknown.
-
-`notification_scheduled` is recorded per successful OS scheduling call, not per
-attempt and not as delivery. Pending tagged requests produce
-`notification_cancelled` after a successful explicit cancellation. Replacements
-get new instance IDs. `notification_opened` carries the same planned snapshot,
-the opened local hour/minute/offset and `seconds_since_scheduled` when valid.
-The unique campaign-open event carries this context too. Analytics consent
-still applies; analytics failure does not fail scheduling/cancellation.
-
-The gap is a snapshot at appeal scheduling: later reminder changes can make it
-stale. Join scheduling/cancellation events by instance ID and event timestamps
-to reconstruct the intended schedule at open time. Do not interpret missing
-cancellation events as proof of delivery: OS removals, app upgrades, permission
-revocation, analytics gaps and old payloads are not fully observable. Deduplicate
-generic opens by instance ID before computing scheduled-to-open rates. These
-are not delivered-to-open rates. Android inexact scheduling can delay delivery,
-so a planned gap is not a measured delivery gap and open-minus-planned time is
-not delivery latency. Timing is not randomized; use correlations to choose a
-later controlled test, not as evidence that a particular time causes donations.
-
-## Verification and launch
-
-### Try the UI in development
-
-Real-backend dev builds use the same eligibility, sticky assignment and expiry
-rules as other builds. A fresh install will not immediately show the appeal;
-the normal full-app mock mode skips automatic appeal enrollment altogether.
-
-For an immediate UI walkthrough, select **Supporter appeal preview · 🍎** in
-VS Code, or run on a simulator:
+Run the isolated UI preview on a simulator with:
 
 ```sh
-flutter run -t lib/main_supporter_appeal_preview.dart --dart-define=MOCK_MODE=true -d <simulator-id>
+flutter run -t lib/main_supporter_appeal_preview.dart --dart-define=MOCK_MODE=true
 ```
 
-The separate entrypoint requires debug + mock mode and never replaces the
-normal app startup. It uses the actual announcement card and donation screen,
-in-memory preferences, a sample B assignment and sample EUR monthly/yearly
-ladders. These sample prices are not a read of the active server experiment.
-Tap Donate now, change frequency/amount, and tap Donate to see a simulated
-checkout acknowledgement. No payment controller, payment API or Stripe sheet
-is invoked. Reset preview restores the card after Dismiss. The notification
-copy is a visual preview only; this entrypoint schedules no notifications and
-does not verify actual push/local delivery, live attribution or server pricing.
-Use a separate simulator so installing the app does not replace an existing
-dev installation or its real local data. Native SDK startup still follows the
-host's iOS configuration; Dart mock mode skips custom analytics. The prepared
-simulator copy additionally disables native automatic analytics via its built
-Info.plist, without changing the app's source configuration.
+It requires a debug build. Sample eligibility, prices and assignment are stored
+in memory, and checkout shows a simulated result without calling a payment
+controller or API. Use it to review announcement dismissal, the immediate
+top-right Close button, monthly/yearly layout and reset behavior. It does not
+exercise push delivery, backend registration or a real Stripe transaction.
 
-### Checks
+Focused Flutter checks cover authenticated preference sync, offline tap retry
+and opt-out, owned assignment attribution, native payment requests and existing
+pricing-test metadata, actual card visibility, dismissal, reminder timing,
+native screen frequency availability, email and amount regressions.
 
-- Flutter eligibility, assignment, expiry, tap deduplication and OS scheduling
-  tests use mocked channels; they send no real notification or charge.
-- Native payment-request tests capture all three donation frequencies.
-- Announcement native-screen tests check the actual monthly/yearly UI dispatch,
-  source-specific localized amounts, unchanged server experiment attribution,
-  campaign metadata, and hiding yearly when the server does not offer it.
-- Timing tests cover unique scheduling IDs, UTC/local offsets, signed pending
-  reminder gaps, missing/legacy payloads and the unchanged appeal schedule.
-- Card widget test checks hidden/visible Home and dismissal.
-- Checkout `node --test test/supporter-appeal-attribution.test.mjs` executes the
-  real inline parser/request builder with fake checkout inputs and no Stripe call.
-- Before production readout, verify a device tap from both terminated and
-  background states, then a **test-mode** donation through native and fallback
-  checkout. Confirm the actual Stripe metadata and analytics records. No real
-  donation, live API write, build upload or deployment was performed here.
+## Companion backend checks
+
+`npm run test:campaigns` (Node 24+): real SQLite SQL/migration with a D1 adapter;
+eligibility, admin isolation, draft gates, atomic caps, stable groups, cooldown,
+ownership, account deletion, current suppression/pause, message envelope and a
+full twice-run sender with fake OAuth/FCM including an ambiguous result.
+
+`node --import tsx test/local-admin-demo.ts`: loopback-only UI fixture on 9989,
+eight synthetic users, temporary in-memory DB, fixed clearly fake token, sender
+disabled. Pair with the website dev server. It is not imported by the Worker.
+
+The campaign admin requires backend status version 5, which uses OS notification
+permission independently of daily reminders, local quiet hours, donor-sync gating
+and participant export. Apply app API migrations 0015–0018 and the donation API
+feed migration before using this release. Deploy the matching website/API before
+testing activation. Refresh an older admin page after deployment.
+
+
+For experiment outcomes, use the protocol-5 **Download analysis (CSV)** export
+and the API's canonical `docs/supporter-campaign-readout.sql`. Aggregate assignment
+and deletion counts survive account erasure without retaining deleted identities.
+The readout requires the full per-person outcome window and a verified daily
+Stripe sync watermark; it flags missing/deleted outcomes and does not assume
+anonymous gifts are equally missing in each arm. GA4 is supporting funnel data,
+not the authoritative assignment or revenue denominator.

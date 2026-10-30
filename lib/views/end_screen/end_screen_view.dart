@@ -2,6 +2,7 @@ import 'package:medito/widgets/adaptive/adaptive_page_body.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:medito/utils/pending_end_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -107,6 +108,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   @override
   void initState() {
     super.initState();
+    PendingEndScreen.endScreenMounted();
     _logScreenView();
     _checkNotificationPermission();
 
@@ -211,6 +213,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
   @override
   void dispose() {
+    PendingEndScreen.endScreenUnmounted();
     _statsAnimationController.dispose();
     _reminderAnimationController.dispose();
     _cardAnimationController.dispose();

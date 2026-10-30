@@ -21,6 +21,54 @@ void main() {
   };
 
   group('PaywallConfigModel', () {
+    test(
+      'campaign offers recurring donations when general pricing offers all frequencies',
+      () {
+        final model = PaywallConfigModel.fromJson(baseJson());
+        expect(
+          model.isFrequencyOffered('oneTime', source: 'announcement'),
+          isFalse,
+        );
+        expect(
+          model.isFrequencyOffered('monthly', source: 'announcement'),
+          isTrue,
+        );
+        expect(
+          model.isFrequencyOffered('yearly', source: 'announcement'),
+          isTrue,
+        );
+        expect(model.isFrequencyOffered('oneTime', source: 'settings'), isTrue);
+        expect(
+          model.isFrequencyOffered('oneTime', source: 'onboarding'),
+          isTrue,
+        );
+      },
+    );
+
+    test('campaign source overrides cannot re-enable one-time donations', () {
+      final json = baseJson()
+        ..['defaults'] = {
+          'config': {
+            'sources': {
+              'announcement': {
+                'oneTime': [500],
+                'monthly': [700],
+                'yearly': [7700],
+              },
+            },
+          },
+        };
+      final model = PaywallConfigModel.fromJson(json);
+      expect(
+        model.isFrequencyOffered('oneTime', source: 'announcement'),
+        isFalse,
+      );
+      expect(
+        model.isFrequencyOffered('monthly', source: 'announcement'),
+        isTrue,
+      );
+    });
+
     test('parses a full response with an experiment', () {
       final json = baseJson()
         ..['experiment'] = {

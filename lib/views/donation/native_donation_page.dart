@@ -13,6 +13,8 @@ import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
 import 'package:medito/models/stripe/paywall_config_model.dart';
+import 'package:medito/models/stripe/payment_error_model.dart';
+import 'package:medito/models/stripe/payment_intent_model.dart';
 import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
@@ -71,6 +73,7 @@ class NativeDonationPage extends ConsumerStatefulWidget {
     required this.source,
     this.campaignMetadata = const {},
     this.showCloseButton = true,
+    this.onNativeUnavailable,
   });
 
   final PaywallConfigModel config;
@@ -80,6 +83,7 @@ class NativeDonationPage extends ConsumerStatefulWidget {
 
   /// Disable when the enclosing screen supplies its own header close button.
   final bool showCloseButton;
+  final VoidCallback? onNativeUnavailable;
 
   @override
   ConsumerState<NativeDonationPage> createState() => _NativeDonationPageState();
@@ -405,9 +409,10 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
         widget.onNext();
       }
 
+      late final PaymentResult result;
       switch (_selectedFrequency) {
         case _Frequency.monthly:
-          await uiController.initiateMonthlySubscription(
+          result = await uiController.initiateMonthlySubscription(
             context: context,
             amount: amount,
             currency: currency,
@@ -422,7 +427,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             onSuccess: onSuccess,
           );
         case _Frequency.yearly:
-          await uiController.initiateYearlySubscription(
+          result = await uiController.initiateYearlySubscription(
             context: context,
             amount: amount,
             currency: currency,
@@ -437,7 +442,7 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             onSuccess: onSuccess,
           );
         case _Frequency.oneTime:
-          await uiController.initiateOneTimePayment(
+          result = await uiController.initiateOneTimePayment(
             context: context,
             amount: amount,
             currency: currency,
@@ -451,6 +456,15 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
             campaignMetadata: widget.campaignMetadata,
             onSuccess: onSuccess,
           );
+      }
+      if (mounted &&
+          result is PaymentFailure &&
+          [
+            PaymentErrorType.paymentMethodNotSupported,
+            PaymentErrorType.applePayNotAvailable,
+            PaymentErrorType.googlePayNotAvailable,
+          ].contains(result.error?.type)) {
+        widget.onNativeUnavailable?.call();
       }
     } finally {
       if (mounted) setState(() => _isProcessingPayment = false);

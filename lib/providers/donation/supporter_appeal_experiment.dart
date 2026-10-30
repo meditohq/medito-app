@@ -5,9 +5,21 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// One assignment and at most one additional notification per install. No
-/// recurring fundraising schedule; the first test separates the card's effect
-/// from the additional reminder's effect. Existing asks remain in all arms.
+class _CampaignAccountWrites {
+  int generation = 0;
+  Future<void> _pending = Future<void>.value();
+
+  Future<T> run<T>(Future<T> Function() operation) {
+    final next = _pending.then((_) => operation());
+    // A failed persistence operation must not block later account cleanup.
+    _pending = next.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+    return next;
+  }
+}
+
+/// Caches authenticated server assignments and keeps campaign attribution
+/// separate from acquisition and pricing experiments. Local enrollment exists
+/// only for the isolated preview and tests; production pushes come from the server.
 class SupporterAppealExperiment {
   SupporterAppealExperiment(this.prefs);
 
@@ -32,9 +44,39 @@ class SupporterAppealExperiment {
   static const scheduledKey = '${name}_scheduled';
   static const shownKey = '${name}_shown';
   static const tapKey = '${name}_notification_tap';
+  static const pendingOpenKey = 'supporter_campaign_pending_open';
+  static final _accountWrites = Expando<_CampaignAccountWrites>();
+
+  static _CampaignAccountWrites _writesFor(SharedPreferences prefs) =>
+      _accountWrites[prefs] ??= _CampaignAccountWrites();
+
+  /// Campaign identity and queued events belong to the signed-in account.
+  static Future<void> clearAccountState(SharedPreferences prefs) {
+    final writes = _writesFor(prefs);
+    // Invalidate responses immediately, even while an earlier preference write
+    // is still awaiting persistence. Clear after that write has finished.
+    writes.generation++;
+    return writes.run(() async {
+      for (final key in [
+        assignmentKey,
+        dismissedKey,
+        scheduledKey,
+        shownKey,
+        tapKey,
+        pendingOpenKey,
+        'supporter_campaign_registered',
+      ]) {
+        await prefs.remove(key);
+      }
+    });
+  }
+
   static const cardWindow = Duration(days: 7);
   static const attributionWindow = Duration(days: 7);
   static const measurementWindow = Duration(days: 90);
+  static final _serverIdPattern = RegExp(
+    r'^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$',
+  );
 
   AppealAssignment? get assignment {
     final raw = prefs.getString(assignmentKey);
@@ -45,7 +87,18 @@ class SupporterAppealExperiment {
       final at = data['at'];
       if (!['A', 'B', 'C'].contains(arm) || at is! int) return null;
       final nonce = data['nonce'];
-      if (nonce is! String || !RegExp(r'^[a-f0-9]{16}$').hasMatch(nonce)) {
+      final serverId = data['server_id'];
+      final isServer = serverId is String;
+      if (isServer &&
+          (!_serverIdPattern.hasMatch(serverId) ||
+              data['user_id'] is! String ||
+              data['user_id'] !=
+                  prefs.getString(SharedPreferenceConstants.userId) ||
+              prefs.getBool(SharedPreferenceConstants.isLoggedIn) == false)) {
+        return null;
+      }
+      if (!isServer &&
+          (nonce is! String || !RegExp(r'^[a-f0-9]{16}$').hasMatch(nonce))) {
         return null;
       }
       return AppealAssignment(
@@ -53,11 +106,77 @@ class SupporterAppealExperiment {
         at: DateTime.fromMillisecondsSinceEpoch(at),
         consistency: data['consistency'] as String,
         notificationsAllowed: data['notifications_allowed'] == true,
-        nonce: nonce,
+        nonce: nonce is String ? nonce : '',
+        serverId: isServer ? serverId : null,
+        campaignId: data['campaign_id'] as String? ?? campaign,
+        announcement: data['announcement'] as String? ?? announcementText,
+        ctaTitle: data['cta_title'] as String? ?? 'Donate now',
+        expiresAt: data['expires_at'] is int
+            ? DateTime.fromMillisecondsSinceEpoch(data['expires_at'] as int)
+            : null,
       );
     } catch (_) {
       return null;
     }
+  }
+
+  /// Accept only the authenticated app backend's assignment. Device preview
+  /// enrollment remains separate; normal builds never randomize locally.
+  Future<bool> applyServerAssignment(
+    Map<String, dynamic> data, {
+    required String userId,
+  }) {
+    final writes = _writesFor(prefs);
+    final generation = writes.generation;
+    bool currentAccount() =>
+        generation == writes.generation &&
+        userId.isNotEmpty &&
+        userId == prefs.getString(SharedPreferenceConstants.userId) &&
+        prefs.getBool(SharedPreferenceConstants.isLoggedIn) != false;
+    return writes.run(() async {
+      // Capture this ID before the request, not when its response arrives.
+      if (!currentAccount()) {
+        return false;
+      }
+      final id = data['id'], arm = data['arm'], at = data['assigned_at'];
+      final end = data['expires_at'], campaignId = data['campaign_id'];
+      if (id is! String ||
+          !_serverIdPattern.hasMatch(id) ||
+          !['A', 'B', 'C'].contains(arm) ||
+          at is! int ||
+          end is! int ||
+          end <= at ||
+          end - at > cardWindow.inMilliseconds ||
+          campaignId is! String ||
+          !RegExp(r'^[a-z0-9][a-z0-9_-]{2,79}$').hasMatch(campaignId) ||
+          data['announcement'] is! String ||
+          data['cta_title'] is! String) {
+        return false;
+      }
+      if (assignment?.id != id) {
+        for (final key in [dismissedKey, shownKey, scheduledKey, tapKey]) {
+          if (!currentAccount()) return false;
+          await prefs.remove(key);
+        }
+      }
+      if (!currentAccount()) return false;
+      await prefs.setString(
+        assignmentKey,
+        jsonEncode({
+          'server_id': id,
+          'user_id': userId,
+          'campaign_id': campaignId,
+          'arm': arm,
+          'at': at,
+          'expires_at': end,
+          'consistency': data['consistency_band'] as String? ?? 'unknown',
+          'notifications_allowed': data['notification_eligible'] == true,
+          'announcement': data['announcement'],
+          'cta_title': data['cta_title'],
+        }),
+      );
+      return currentAccount();
+    });
   }
 
   bool get suppressed =>
@@ -133,12 +252,12 @@ class SupporterAppealExperiment {
         !suppressed &&
         !isSnoozed(now) &&
         !now.isBefore(a.at) &&
-        now.difference(a.at) < cardWindow;
+        now.isBefore(a.expiresAt ?? a.at.add(cardWindow));
   }
 
   String notificationPayload(AppealAssignment a) => jsonEncode({
     'source': name,
-    'campaign_id': campaign,
+    'campaign_id': a.campaignId,
     'variant_id': a.arm,
     'appeal_id': a.id,
   });
@@ -152,13 +271,13 @@ class SupporterAppealExperiment {
     final a = assignment;
     if (!enabled ||
         a == null ||
-        a.arm != 'C' ||
+        (a.isServer ? a.arm == 'A' : a.arm != 'C') ||
         data?['source'] != name ||
-        data?['campaign_id'] != campaign ||
+        data?['campaign_id'] != a.campaignId ||
         data?['variant_id'] != a.arm ||
         data?['appeal_id'] != a.id ||
         now.isBefore(a.at) ||
-        now.difference(a.at) > cardWindow ||
+        !now.isBefore(a.expiresAt ?? a.at.add(cardWindow)) ||
         prefs.containsKey(tapKey)) {
       return null;
     }
@@ -181,6 +300,7 @@ class SupporterAppealExperiment {
       'appeal_assigned_at': '${a.at.millisecondsSinceEpoch ~/ 1000}',
       'appeal_consistency': a.consistency,
       'appeal_notifications_allowed': a.notificationsAllowed ? 'true' : 'false',
+      if (a.isServer) 'appeal_campaign_id': a.campaignId,
     };
     final raw = prefs.getString(tapKey);
     if (raw != null) {
@@ -208,7 +328,7 @@ class SupporterAppealExperiment {
   Map<String, String> ctaMetadata({DateTime? now}) => {
     'utm_source': 'medito_app',
     'utm_medium': 'in_app_announcement',
-    'utm_campaign': campaign,
+    'utm_campaign': assignment?.campaignId ?? campaign,
     'utm_content': assignment?.arm ?? 'unknown',
   };
 
@@ -234,11 +354,22 @@ class AppealAssignment {
     required this.consistency,
     required this.notificationsAllowed,
     required this.nonce,
+    this.serverId,
+    this.campaignId = SupporterAppealExperiment.campaign,
+    this.announcement = SupporterAppealExperiment.announcementText,
+    this.ctaTitle = 'Donate now',
+    this.expiresAt,
   });
   final String arm;
   final DateTime at;
   final String consistency;
   final bool notificationsAllowed;
   final String nonce;
-  String get id => '${SupporterAppealExperiment.name}_$nonce';
+  final String? serverId;
+  final String campaignId;
+  final String announcement;
+  final String ctaTitle;
+  final DateTime? expiresAt;
+  bool get isServer => serverId != null;
+  String get id => serverId ?? '${SupporterAppealExperiment.name}_$nonce';
 }

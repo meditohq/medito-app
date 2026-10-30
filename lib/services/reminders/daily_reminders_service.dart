@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import '../notifications/supporter_campaign_api.dart';
 import '../../providers/donation/supporter_appeal_experiment.dart';
 import '../notifications/local_notifications.dart';
 import '../notifications/notification_timing.dart';
@@ -83,6 +85,7 @@ class DailyRemindersService {
   Future<DateTime> enableAt(TimeOfDay time, {AppLocalizations? l10n}) async {
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
     await _saveTime(time);
+    unawaited(SupporterCampaignApi.updatePreferences(prefs));
 
     final now = DateTime.now();
     final candidate = DateTime(
@@ -107,6 +110,7 @@ class DailyRemindersService {
 
   Future<void> disable() async {
     await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, false);
+    unawaited(SupporterCampaignApi.updatePreferences(prefs));
     await reminders.cancelDailyNotification();
     await reminders.cancelReminderSeries();
     await LocalNotifications.cancelSafely(

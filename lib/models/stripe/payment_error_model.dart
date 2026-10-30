@@ -2,6 +2,7 @@
 // collides with our own in payment_method_model.dart.
 import 'package:flutter_stripe/flutter_stripe.dart' show StripeException;
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/services.dart';
 import 'package:medito/models/stripe/payment_method_model.dart';
 
 part 'payment_error_model.freezed.dart';
@@ -91,6 +92,15 @@ class PaymentErrorHandler {
 
   static PaymentError _classifyStripeError(dynamic error) {
     final errorString = error.toString().toLowerCase();
+    if (error is MissingPluginException ||
+        error is UnsupportedError ||
+        errorString.contains('stripeconfigerror')) {
+      return const PaymentError(
+        type: PaymentErrorType.paymentMethodNotSupported,
+        message: 'Native checkout unavailable',
+        userFriendlyMessage: 'Native checkout is unavailable on this device.',
+      );
+    }
 
     if (errorString.contains('card_declined')) {
       return const PaymentError(

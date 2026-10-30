@@ -25,12 +25,21 @@ class LocalNotifications {
   /// `plugin.getNotificationAppLaunchDetails()` instead.
   static void Function(NotificationResponse response)? tapHandler;
 
-  static Future<void> ensureInitialized() => _initFuture ??= _initialize();
+  static Future<void> ensureInitialized() => _initFuture ??= _initialize()
+      .catchError((Object error, StackTrace stack) {
+        // Share an in-flight attempt, but allow the next caller to retry a
+        // transient platform failure rather than caching it for the session.
+        _initFuture = null;
+        Error.throwWithStackTrace(error, stack);
+      });
 
   /// Cancelling an optional campaign must never turn a successful donation
   /// or a settings change into an error if the OS notification service fails.
   static Future<void> cancelSafely(int id) async {
     try {
+      // Returning users may cancel the prototype before reminders or push have
+      // initialized the shared plugin. Initialization requests no permission.
+      await ensureInitialized();
       String? payload;
       try {
         final pending = await plugin.pendingNotificationRequests();

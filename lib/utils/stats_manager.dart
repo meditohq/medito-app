@@ -245,8 +245,21 @@ class StatsManager {
   /// Reads saved progress without attempting a network sync, even when empty.
   Future<LocalAllStats> readLocalStats() async {
     await initialize();
-    _allStats ??= await _loadLocalAllStats();
-    return _allStats!;
+    final generation = _clearGeneration;
+    final local = _allStats ?? await _loadLocalAllStats();
+    if (generation != _clearGeneration) return LocalAllStats.empty();
+    return local;
+  }
+
+  /// Current local history for first paint. Unlike localAllStats, this never
+  /// starts a network request, even for an empty/new account.
+  Future<LocalAllStats> readLocalSnapshot() async {
+    await initialize();
+    final generation = _clearGeneration;
+    final snapshot = _allStats ?? await _loadLocalAllStats();
+    if (generation != _clearGeneration) return LocalAllStats.empty();
+    final local = calculateStreak(snapshot);
+    return local.copyWith(consistencyScore: calculateConsistencyScore(local));
   }
 
   Future<LocalAllStats> get localAllStats async {

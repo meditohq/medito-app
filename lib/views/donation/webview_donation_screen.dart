@@ -11,6 +11,8 @@ import 'package:medito/constants/http/http_constants.dart';
 import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/stripe/payment_intent_model.dart';
+import 'package:medito/models/stripe/payment_config_model.dart';
+import 'package:medito/models/stripe/payment_error_model.dart';
 import 'package:medito/models/stripe/payment_method_model.dart'
     as payment_models;
 import 'package:medito/providers/donation/end_screen_donation_experiment.dart';
@@ -23,6 +25,9 @@ import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
+import 'package:medito/utils/receipt_email.dart';
+import 'package:medito/providers/donation/donation_snooze_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -36,10 +41,16 @@ class WebViewDonationScreen extends ConsumerStatefulWidget {
     super.key,
     this.source,
     this.campaignMetadata = const {},
+    this.useNativePaymentSheet = true,
+    this.showImmediateCloseButton = false,
   });
 
   final String? source;
   final Map<String, String> campaignMetadata;
+
+  /// Prefer the native sheet when available; false forces browser checkout.
+  final bool useNativePaymentSheet;
+  final bool showImmediateCloseButton;
 
   @override
   ConsumerState<WebViewDonationScreen> createState() =>
@@ -59,6 +70,8 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   bool _hasLoadError = false;
   bool _isProcessingPayment = false;
   bool _didDonate = false;
+  bool _nativeSheetAvailable = false;
+  bool _nativeSheetFailed = false;
   bool _presentedLogged = false;
   bool _dismissLogged = false;
   bool _loadOutcomeLogged = false;
@@ -255,7 +268,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
 
   Future<void> _loadPaywall() async {
     final authRepository = ref.read(authRepositorySyncProvider);
-    final email = authRepository.currentUser?.email;
+    final email =
+        authRepository.currentUser?.email ??
+        ReceiptEmail.read(ref.read(sharedPreferencesProvider));
     final userId = authRepository.currentUser?.id;
     final locale = ref.read(localeProvider)?.languageCode ?? 'en';
 
@@ -277,20 +292,31 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       query.addAll(SupporterAppealExperiment(prefs).acquisitionMetadata());
     }
 
-    try {
-      final config = await ref.read(paymentConfigProvider.future);
-      query['currency'] = config.pricing.currency;
-      query['country'] = config.pricing.country;
-    } catch (e) {
-      AppLogger.w(_logTag, 'Could not load payment config: $e');
+    _nativeSheetAvailable = false;
+    if (widget.useNativePaymentSheet && !_nativeSheetFailed) {
+      try {
+        final config = await ref.read(paymentConfigProvider.future);
+        query['currency'] = config.pricing.currency;
+        query['country'] = config.pricing.country;
+        final methods = await ref.read(availablePaymentMethodsProvider.future);
+        _nativeSheetAvailable = methods.any((method) => method.isAvailable);
+      } catch (e) {
+        AppLogger.w(_logTag, 'Native payment sheet unavailable: $e');
+      }
     }
-
-    try {
-      final methods = await ref.read(availablePaymentMethodsProvider.future);
-      query['isInAppPaymentAvailable'] = methods.isNotEmpty ? 'true' : 'false';
-    } catch (e) {
-      AppLogger.w(_logTag, 'Could not load payment methods: $e');
-      query['isInAppPaymentAvailable'] = 'false';
+    query['isInAppPaymentAvailable'] = _nativeSheetAvailable ? 'true' : 'false';
+    if (!_nativeSheetAvailable) {
+      try {
+        final device = await ref.read(deviceAndAppInfoProvider.future);
+        if (device.currency case final String currency) {
+          query['currency'] = currency;
+        }
+        if (device.country case final String country) {
+          query['country'] = country;
+        }
+      } catch (_) {
+        // The web page resolves its own pricing and payment availability.
+      }
     }
 
     if (kDebugMode) query['debug'] = 'true';
@@ -318,7 +344,9 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     final type = data['type'] as String? ?? '';
     switch (type) {
       case 'paywall_payment_request':
-        _handlePaymentRequest(data);
+        if (_nativeSheetAvailable) _handlePaymentRequest(data);
+      case 'web_payment_succeeded':
+        unawaited(_handleWebPaymentSucceeded(data));
       case 'page_view':
         _handlePageView(data);
       case 'close':
@@ -385,6 +413,38 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
     if (mounted) Navigator.of(context).pop(_didDonate);
   }
 
+  Future<void> _handleWebPaymentSucceeded(Map<String, dynamic> data) async {
+    if (_nativeSheetAvailable || _didDonate || data['status'] != 'succeeded') {
+      return;
+    }
+    final id = data['payment_intent_id'];
+    final frequency = data['frequency'];
+    if (id is! String ||
+        !RegExp(r'^pi_[A-Za-z0-9]+$').hasMatch(id) ||
+        !['one_time', 'monthly', 'yearly'].contains(frequency)) {
+      return;
+    }
+    final current = Uri.tryParse(await _controller.currentUrl() ?? '');
+    final expected = Uri.parse(paywallFormUrl);
+    if (!mounted ||
+        _didDonate ||
+        current == null ||
+        current.scheme != expected.scheme ||
+        current.authority != expected.authority ||
+        !(current.path.replaceFirst(RegExp(r'/$'), '') ==
+                expected.path.replaceFirst(RegExp(r'/$'), '') ||
+            expected.path == '/' &&
+                current.path.replaceFirst(RegExp(r'/$'), '') == '/paywall')) {
+      return;
+    }
+    _didDonate = true;
+    await ref
+        .read(donationSnoozeProvider.notifier)
+        .recordDonationSuccess(
+          frequency == 'one_time' ? 'onetime' : frequency as String,
+        );
+  }
+
   Future<void> _handlePaymentRequest(Map<String, dynamic> data) async {
     if (_isProcessingPayment) {
       AppLogger.d(_logTag, 'payment already in progress, ignoring duplicate');
@@ -431,17 +491,21 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
         ? emailFromPage
         : authRepository.currentUser?.email;
 
-    final paymentConfig = await ref.read(paymentConfigProvider.future);
-    final availableMethods = await ref.read(
-      availablePaymentMethodsProvider.future,
-    );
-
+    late final PaymentConfigModel paymentConfig;
+    late final List<payment_models.PaymentMethod> availableMethods;
+    try {
+      paymentConfig = await ref.read(paymentConfigProvider.future);
+      final methods = await ref.read(availablePaymentMethodsProvider.future);
+      availableMethods = methods.where((method) => method.isAvailable).toList();
+    } catch (e) {
+      // No payment has been attempted yet. Configuration may have expired or
+      // become unavailable since the page's initial capability check.
+      AppLogger.w(_logTag, 'Native payment setup unavailable: $e');
+      _offerBrowserCheckout();
+      return;
+    }
     if (availableMethods.isEmpty) {
-      AppLogger.w(_logTag, 'no native payment methods available');
-      _notifyJsResult(
-        status: 'error',
-        message: 'No payment methods available on this device.',
-      );
+      _offerBrowserCheckout();
       return;
     }
 
@@ -473,7 +537,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
-          onSuccess: () {},
+          showSuccessFeedback: false,
         );
       case 'yearly':
         result = await uiController.initiateYearlySubscription(
@@ -488,7 +552,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
-          onSuccess: () {},
+          showSuccessFeedback: false,
         );
       case 'one_time':
       default:
@@ -504,7 +568,7 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
           campaignMetadata: widget.campaignMetadata,
           variantId: _variantId,
           experimentId: _experimentId,
-          onSuccess: () {},
+          showSuccessFeedback: false,
         );
     }
 
@@ -512,11 +576,27 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
       case PaymentSuccess():
         _didDonate = true;
         _notifyJsResult(status: 'success');
-      case PaymentFailure(:final errorMessage):
-        _notifyJsResult(status: 'error', message: errorMessage);
+      case PaymentFailure(:final errorMessage, :final error):
+        if (mounted &&
+            [
+              PaymentErrorType.paymentMethodNotSupported,
+              PaymentErrorType.applePayNotAvailable,
+              PaymentErrorType.googlePayNotAvailable,
+            ].contains(error?.type)) {
+          _offerBrowserCheckout();
+        } else {
+          _notifyJsResult(status: 'error', message: errorMessage);
+        }
       case PaymentCancelled():
         _notifyJsResult(status: 'cancelled');
     }
+  }
+
+  void _offerBrowserCheckout() {
+    if (!mounted) return;
+    _nativeSheetFailed = true;
+    _nativeSheetAvailable = false;
+    _startLoad();
   }
 
   Widget _buildErrorOverlay() {
@@ -637,12 +717,24 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
                       child: Semantics(
                         container: true,
                         label: _isLoading ? l10n?.loading : null,
-                        child: const _PaywallSkeleton(),
+                        child: TickerMode(
+                          enabled: _isLoading,
+                          child: const _PaywallSkeleton(),
+                        ),
                       ),
                     ),
                   ),
                   if (_hasLoadError) _buildErrorOverlay(),
-                  if (isSmokeTestMode)
+                  if (widget.showImmediateCloseButton)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: CloseButton(
+                        color: const Color(0xFF1A1A17),
+                        onPressed: _closePaywall,
+                      ),
+                    )
+                  else if (isSmokeTestMode)
                     _buildSmokeTestCloseButton()
                   else if (MediaQuery.accessibleNavigationOf(context))
                     _buildAccessibleCloseButton(),

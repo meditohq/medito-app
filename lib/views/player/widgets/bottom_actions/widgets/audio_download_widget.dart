@@ -246,10 +246,11 @@ class AudioDownloadWidget extends ConsumerWidget {
       try {
         await ref
             .read(audioDownloaderProvider.notifier)
-            .deleteTrackAudio(
-              '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}',
+            .removeTrackDownload(
+              fileName:
+                  '${request.trackId}-${request.fileId}${getAudioFileExtension(request.remoteUrl)}',
+              fileId: request.fileId,
             );
-        ref.read(deleteDownloadedTrackByIdProvider(fileId: request.fileId));
       } catch (e) {
         showSnackBar(context, e.toString(), backgroundColor: Colors.red);
       }

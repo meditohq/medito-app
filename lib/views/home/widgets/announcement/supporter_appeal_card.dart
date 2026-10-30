@@ -27,6 +27,7 @@ class SupporterAppealCard extends ConsumerWidget {
         SupporterAppealExperiment.notificationId,
       );
       await SupporterAppealRuntime.log(event, prefs);
+      unawaited(SupporterAppealRuntime.report('dismissed', prefs));
     }
 
     return Column(
@@ -43,15 +44,16 @@ class SupporterAppealCard extends ConsumerWidget {
             unawaited(
               SupporterAppealRuntime.log('appeal_announcement_viewed', prefs),
             );
+            unawaited(SupporterAppealRuntime.report('viewed', prefs));
           },
           child: AnnouncementWidget(
             key: ValueKey(experiment.assignment!.id),
-            announcement: const AnnouncementModel(
-              id: SupporterAppealExperiment.name,
-              text: SupporterAppealExperiment.announcementText,
+            announcement: AnnouncementModel(
+              id: experiment.assignment!.id,
+              text: experiment.assignment!.announcement,
               colorBackground: '#e9d5ff',
               colorText: '#4c1d95',
-              ctaTitle: 'Donate now',
+              ctaTitle: experiment.assignment!.ctaTitle,
               ctaType: 'donation',
               ctaPath: 'https://donate.meditofoundation.org',
             ),

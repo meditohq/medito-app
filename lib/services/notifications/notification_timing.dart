@@ -39,17 +39,20 @@ class NotificationTiming {
       'nearest_reminder_gap_min',
       'reminder_hour',
       'reminder_minute',
+      'reminder_utc_offset_snapshot',
     ])
       if (payload?[key] case final Object value
           when value is String || value is int)
-        key: value,
+        key: key == 'notification_instance_id' || key == 'scheduled_timezone'
+            ? value
+            : (value is String ? int.tryParse(value) ?? value : value),
   };
 
   static Map<String, Object> opened(
     Map<String, dynamic>? payload,
     DateTime now,
   ) {
-    final plannedAt = payload?['scheduled_at'];
+    final plannedAt = int.tryParse('${payload?['scheduled_at']}');
     return {
       ...parameters(payload),
       'opened_local_hour': now.hour,

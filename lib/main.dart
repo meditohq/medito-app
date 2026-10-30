@@ -334,7 +334,7 @@ class _ParentWidgetState extends ConsumerState<ParentWidget>
     return authRepo.when(
       loading: () => const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LaunchSplash(),
+        home: LaunchSplashFrame(child: LaunchSplash()),
       ),
       // Same delegates as the main app, so the message is localized; the raw
       // error stays underneath for support screenshots.

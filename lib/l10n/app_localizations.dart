@@ -5949,6 +5949,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End'**
   String get sessionBellEnd;
+
+  /// Option to download all sessions in a pack
+  ///
+  /// In en, this message translates to:
+  /// **'Download all'**
+  String get downloadAll;
+
+  /// Status text while batch downloading tracks in a pack
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading {completed} of {total}'**
+  String downloadingPack(int completed, int total);
+
+  /// Action to cancel ongoing pack downloads
+  ///
+  /// In en, this message translates to:
+  /// **'Stop downloading'**
+  String get stopDownloading;
+
+  /// Action to remove downloaded files for a pack
+  ///
+  /// In en, this message translates to:
+  /// **'Delete downloads'**
+  String get deletePackDownloads;
+
+  /// Snackbar confirming downloaded files for the pack were removed
+  ///
+  /// In en, this message translates to:
+  /// **'Downloads removed'**
+  String get packDownloadsDeleted;
+
+  /// Status text when all tracks in a pack are downloaded
+  ///
+  /// In en, this message translates to:
+  /// **'All sessions downloaded'**
+  String get allDownloaded;
+
+  /// Accessibility label for the overflow menu button on the pack screen
+  ///
+  /// In en, this message translates to:
+  /// **'More options'**
+  String get overflowMenu;
+
+  /// Action to download tracks in this pack that are not already saved offline
+  ///
+  /// In en, this message translates to:
+  /// **'Download remaining tracks'**
+  String get downloadRemaining;
+
+  /// Offline download status in the pack menu
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {total} tracks downloaded'**
+  String packDownloadedCount(int count, int total);
+
+  /// Label beneath a pack track available offline
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get trackDownloaded;
 }
 
 class _AppLocalizationsDelegate

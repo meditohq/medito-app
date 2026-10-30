@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart' hide AuthTokens;
 import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/auth/auth_tokens.dart';
+import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:medito/models/me/me_model.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/repositories/me/me_repository.dart';
@@ -69,6 +70,7 @@ void main() {
 
     when(() => mockUuid.v4()).thenReturn('test-uuid-value-1234');
     when(() => mockHttpApiService.clearLocalAuth()).thenAnswer((_) async {});
+    when(() => mockPreferences.remove(any())).thenAnswer((_) async => true);
   });
 
   group('AuthRepositoryImpl', () {
@@ -336,6 +338,12 @@ void main() {
       final result = await authRepository.signOut();
 
       expect(result, isTrue);
+      verify(
+        () => mockPreferences.remove(SupporterAppealExperiment.assignmentKey),
+      ).called(1);
+      verify(
+        () => mockPreferences.remove(SupporterAppealExperiment.pendingOpenKey),
+      ).called(1);
       verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
       verify(() => mockSecureStorageService.clearUserEmail()).called(1);
       verify(
@@ -708,6 +716,10 @@ void main() {
 
         // Verify
         verify(() => mockAuthApiService.refreshToken(refreshToken)).called(1);
+        // Same account signs back in: keep its campaign arm for attribution.
+        verifyNever(
+          () => mockPreferences.remove(SupporterAppealExperiment.assignmentKey),
+        );
         verify(() => mockSecureStorageService.clearRefreshToken()).called(1);
         verify(() => mockSecureStorageService.clearUserEmail()).called(1);
         verify(() => mockHttpApiService.clearLocalAuth()).called(1);
@@ -832,6 +844,10 @@ void main() {
       verifyNever(() => mockHttpApiService.setAuthHeader(any()));
       verifyNever(() => mockSecureStorageService.storeUserEmail(any()));
       verify(() => mockHttpApiService.clearLocalAuth()).called(1);
+      // Account deletion: the deleted account's campaign arm goes with it.
+      verify(
+        () => mockPreferences.remove(SupporterAppealExperiment.assignmentKey),
+      ).called(1);
     });
   });
 

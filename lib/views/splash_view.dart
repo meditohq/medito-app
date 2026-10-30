@@ -563,10 +563,8 @@ class SplashViewState extends ConsumerState<SplashView>
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: LaunchSplash.systemUiStyle,
-        child: Scaffold(
-          extendBody: true,
-          backgroundColor: Colors.black,
-          body: AnimatedSwitcher(
+        child: LaunchSplashFrame(
+          child: AnimatedSwitcher(
             duration: MediaQuery.disableAnimationsOf(context)
                 ? Duration.zero
                 : const Duration(milliseconds: 250),

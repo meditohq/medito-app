@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/providers/stripe/payment_ui_controller.dart';
 import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
@@ -10,6 +11,7 @@ import 'package:medito/repositories/auth/auth_repository.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 import 'native_donation_page.dart';
+import 'webview_donation_screen.dart';
 
 /// A separate source fetch: onboarding/end-screen configs can have different
 /// ladders. Keep the server's experiment assignment and localized amounts.
@@ -27,18 +29,59 @@ final supporterPaywallConfigProvider =
       );
     });
 
-/// Native checkout reached deliberately from the announcement, with an
-/// immediate exit. Frequency availability (including yearly) stays server-led.
-class SupporterDonationScreen extends ConsumerWidget {
+/// Resolve everything needed by native checkout before allowing a payment
+/// attempt. A setup/configuration failure must leave a usable web checkout.
+final supporterNativeCheckoutProvider =
+    FutureProvider.autoDispose<PaywallConfigModel?>((ref) async {
+      Future<PaywallConfigModel?> resolve() async {
+        final config = await ref.watch(supporterPaywallConfigProvider.future);
+        if (config.effectiveConfig?['nativePaywall'] == false ||
+            !['monthly', 'yearly'].any(
+              (frequency) =>
+                  config.isFrequencyOffered(frequency, source: 'announcement'),
+            )) {
+          return null;
+        }
+        await ref.watch(paymentConfigProvider.future);
+        final methods = await ref.watch(availablePaymentMethodsProvider.future);
+        return methods.any((method) => method.isAvailable) ? config : null;
+      }
+
+      try {
+        return await resolve();
+      } catch (_) {
+        return null;
+      }
+    });
+
+class SupporterDonationScreen extends ConsumerStatefulWidget {
   const SupporterDonationScreen({super.key, this.campaignMetadata = const {}});
 
   final Map<String, String> campaignMetadata;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final config = ref.watch(supporterPaywallConfigProvider);
+  ConsumerState<SupporterDonationScreen> createState() =>
+      _SupporterDonationScreenState();
+}
+
+class _SupporterDonationScreenState
+    extends ConsumerState<SupporterDonationScreen> {
+  bool _useWeb = false;
+  bool _nativeSheetFailed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final config = ref.watch(supporterNativeCheckoutProvider);
+    if (_useWeb || config.hasError || config.hasValue && config.value == null) {
+      _useWeb = true;
+      return WebViewDonationScreen(
+        source: 'announcement',
+        campaignMetadata: widget.campaignMetadata,
+        useNativePaymentSheet: !_nativeSheetFailed,
+        showImmediateCloseButton: true,
+      );
+    }
     final l10n = AppLocalizations.of(context)!;
-    // The app bar has no title, so name the route for screen readers.
     return Semantics(
       scopesRoute: true,
       namesRoute: true,
@@ -69,49 +112,21 @@ class SupporterDonationScreen extends ConsumerWidget {
             loading: () => Center(
               child: CircularProgressIndicator(semanticsLabel: l10n.loading),
             ),
-            error: (_, _) =>
-                _buildRetry(context, ref, l10n.connectionErrorMessage),
-            data: (value) {
-              if (!['monthly', 'yearly', 'oneTime'].any(
-                (frequency) =>
-                    value.isFrequencyOffered(frequency, source: 'announcement'),
-              )) {
-                return _buildRetry(context, ref, l10n.anErrorOccurred);
-              }
-              return NativeDonationPage(
-                config: value,
-                source: 'announcement',
-                campaignMetadata: campaignMetadata,
-                showCloseButton: false,
-                onNext: () => Navigator.of(context).pop(),
-              );
-            },
+            error: (_, _) => const SizedBox.shrink(),
+            data: (value) => value == null
+                ? const SizedBox.shrink()
+                : NativeDonationPage(
+                    config: value,
+                    source: 'announcement',
+                    campaignMetadata: widget.campaignMetadata,
+                    showCloseButton: false,
+                    onNativeUnavailable: () => setState(() {
+                      _nativeSheetFailed = true;
+                      _useWeb = true;
+                    }),
+                    onNext: () => Navigator.of(context).pop(),
+                  ),
           ),
-        ),
-      ),
-    );
-  }
-
-  /// A bare "Try again" said nothing about what went wrong; the message is
-  /// announced when it replaces the spinner.
-  Widget _buildRetry(BuildContext context, WidgetRef ref, String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Semantics(
-              container: true,
-              liveRegion: true,
-              child: Text(message, textAlign: TextAlign.center),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => ref.invalidate(supporterPaywallConfigProvider),
-              child: Text(AppLocalizations.of(context)!.tryAgain),
-            ),
-          ],
         ),
       ),
     );

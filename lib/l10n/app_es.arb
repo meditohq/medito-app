@@ -1474,5 +1474,15 @@
   "sessionBellEveryMinuteDescription": "Una campana al principio, cada minuto y al final",
   "sessionBellBeginning": "Principio",
   "sessionBellMiddle": "Mitad",
-  "sessionBellEnd": "Final"
+  "sessionBellEnd": "Final",
+  "downloadAll": "Descargar todo",
+  "downloadingPack": "Descargando {completed} de {total}",
+  "stopDownloading": "Detener descarga",
+  "deletePackDownloads": "Eliminar descargas",
+  "packDownloadsDeleted": "Descargas eliminadas",
+  "allDownloaded": "Todas las sesiones descargadas",
+  "overflowMenu": "Más opciones",
+  "downloadRemaining": "Descargar pistas restantes",
+  "packDownloadedCount": "{count} de {total} pistas descargadas",
+  "trackDownloaded": "Descargada"
 }

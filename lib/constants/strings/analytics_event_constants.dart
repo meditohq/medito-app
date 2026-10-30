@@ -933,6 +933,22 @@ class AnalyticsEventConstants {
   /// Parameter: [paramPackId].
   static const String packUnfavourited = 'pack_unfavourited';
 
+  /// User started downloading all sessions in a pack.
+  /// Parameter: [paramPackId].
+  static const String packBatchDownloadStarted = 'pack_batch_download_started';
+
+  /// Batch download of all sessions in a pack completed.
+  /// Parameter: [paramPackId].
+  static const String packBatchDownloadCompleted = 'pack_batch_download_completed';
+
+  /// Batch download of sessions in a pack was cancelled.
+  /// Parameter: [paramPackId].
+  static const String packBatchDownloadCancelled = 'pack_batch_download_cancelled';
+
+  /// User deleted all downloaded sessions of a pack.
+  /// Parameter: [paramPackId].
+  static const String packBatchDownloadsDeleted = 'pack_batch_downloads_deleted';
+
   /// Track id (not the audio file id) on the favourite events.
   static const String paramTrackId = 'track_id';
 

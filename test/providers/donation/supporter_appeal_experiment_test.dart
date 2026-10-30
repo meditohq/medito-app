@@ -1,16 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/models/local_all_stats.dart';
 import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 import 'package:medito/providers/donation/supporter_appeal_provider.dart';
-import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -53,7 +49,9 @@ void main() {
   }
 
   setUp(() async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({
+      SharedPreferenceConstants.userId: 'test-user',
+    });
     prefs = await SharedPreferences.getInstance();
     experiment = SupporterAppealExperiment(prefs);
   });
@@ -251,80 +249,54 @@ void main() {
   );
 
   test(
-    'real scheduling boundary sends one C-only notification with a valid tap payload',
+    'server assignments use persistent IDs, dynamic copy and B/C tap attribution',
     () async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      AndroidFlutterLocalNotificationsPlugin.registerWith();
-      addTearDown(() => debugDefaultTargetPlatformOverride = null);
-      final calls = <MethodCall>[];
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-            const MethodChannel('dexterous.com/flutter/local_notifications'),
-            (call) async {
-              calls.add(call);
-              if (call.method == 'pendingNotificationRequests') {
-                return [
-                  {
-                    'id': 123,
-                    'title': 'Reminder',
-                    'body': 'Practice',
-                    'payload': reminderPayload(
-                      1,
-                      scheduledAt: DateTime(
-                        now.year,
-                        now.month,
-                        now.day + 1,
-                        18,
-                        5,
-                      ),
-                      notificationId: 123,
-                    ),
-                  },
-                ];
-              }
-              return call.method == 'initialize' ? true : null;
-            },
-          );
-      addTearDown(
-        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(
-              const MethodChannel('dexterous.com/flutter/local_notifications'),
-              null,
-            ),
-      );
-      await prefs.setBool(SharedPreferenceConstants.dailyReminderEnabled, true);
-      await prefs.setInt(SharedPreferenceConstants.savedHours, 18);
-      await prefs.setInt(SharedPreferenceConstants.savedMinutes, 5);
-      final a = await enroll('C');
-      await SupporterAppealRuntime.schedule(prefs, a, now);
-      await SupporterAppealRuntime.schedule(prefs, a, now);
-      final scheduled = calls
-          .where((c) => c.method == 'zonedSchedule')
-          .toList();
-      expect(scheduled, hasLength(1));
-      final args = scheduled.single.arguments as Map;
-      expect(args['id'], SupporterAppealExperiment.notificationId);
-      expect(args['title'], SupporterAppealExperiment.notificationTitle);
-      expect(jsonDecode(args['payload'] as String)['appeal_id'], a.id);
-      final payload =
-          jsonDecode(args['payload'] as String) as Map<String, dynamic>;
-      expect(payload['scheduled_local_hour'], 18);
-      expect(payload['scheduled_local_minute'], 30);
-      expect(payload['reminder_hour'], 18);
-      expect(payload['reminder_minute'], 5);
-      expect(payload['nearest_reminder_gap_min'], -25);
-      expect(payload['notification_instance_id'], isA<String>());
+      final data = {
+        'id': '11111111-2222-4333-8444-555555555555',
+        'campaign_id': 'remote-campaign',
+        'arm': 'B',
+        'assigned_at': now.millisecondsSinceEpoch,
+        'expires_at': now.add(const Duration(days: 2)).millisecondsSinceEpoch,
+        'notification_eligible': true,
+        'consistency_band': 'under_25',
+        'announcement': 'Server announcement',
+        'cta_title': 'Support Medito',
+      };
       expect(
-        calls.where((c) => c.method.toLowerCase().contains('permission')),
-        isEmpty,
+        await experiment.applyServerAssignment(data, userId: 'test-user'),
+        isTrue,
       );
-      for (final arm in ['A', 'B']) {
-        await prefs.remove(SupporterAppealExperiment.assignmentKey);
-        await prefs.remove(SupporterAppealExperiment.scheduledKey);
-        final other = await enroll(arm);
-        await SupporterAppealRuntime.schedule(prefs, other, now);
-      }
-      expect(calls.where((c) => c.method == 'zonedSchedule'), hasLength(1));
+      final a = experiment.assignment!;
+      expect(a.isServer, isTrue);
+      expect(a.id, data['id']);
+      expect(a.announcement, 'Server announcement');
+      expect(experiment.showCard(now.add(const Duration(days: 3))), isFalse);
+      expect(experiment.ctaMetadata()['utm_campaign'], 'remote-campaign');
+      expect(
+        experiment.paymentMetadata(now: now)['appeal_campaign_id'],
+        'remote-campaign',
+      );
+      final payload =
+          jsonDecode(experiment.notificationPayload(a)) as Map<String, dynamic>;
+      expect(
+        await experiment.recordNotificationTap(
+          payload,
+          now.add(const Duration(minutes: 1)),
+        ),
+        isNotNull,
+      );
+      await prefs.setBool(SupporterAppealExperiment.dismissedKey, true);
+      await experiment.applyServerAssignment(data, userId: 'test-user');
+      expect(prefs.getBool(SupporterAppealExperiment.dismissedKey), isTrue);
+      expect(prefs.containsKey(SupporterAppealExperiment.tapKey), isTrue);
+      expect(
+        await experiment.applyServerAssignment({
+          ...data,
+          'id': 'bad-id',
+        }, userId: 'test-user'),
+        isFalse,
+      );
+      expect(experiment.assignment!.id, a.id);
     },
   );
 }

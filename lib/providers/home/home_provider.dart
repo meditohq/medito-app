@@ -1,3 +1,9 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medito/constants/http/http_constants.dart';
+import 'package:medito/constants/strings/shared_preference_constants.dart';
+import '../shared_preference/shared_preference_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../constants/types/type_constants.dart';
@@ -18,49 +24,122 @@ const String kSpanishFeaturedPackId = 'amjI3HrH0InbmBiW';
 
 @riverpod
 Future<HomeModel> fetchHome(Ref ref) async {
+  ref.watch(homeCacheScopeProvider);
   final homeRepository = ref.watch(homeRepositoryProvider);
   ref.keepAlive();
 
-  final home = await homeRepository.fetchHome();
-  return _withSpanishFeaturedPack(ref, home);
+  return homeRepository.fetchHome();
 }
 
-/// Prepends [kSpanishFeaturedPackId] to `home.carousel` when the device
-/// prefers Spanish. The card is built from the live pack (title/cover stay
-/// in sync with the CMS); if the fetch fails the network carousel is returned
-/// untouched so a missing pack never breaks the home screen.
-Future<HomeModel> _withSpanishFeaturedPack(Ref ref, HomeModel home) async {
-  final prefersSpanish = ref
-      .read(deviceLocalesProvider)
-      .any((locale) => locale.languageCode.toLowerCase() == 'es');
-  if (!prefersSpanish) return home;
+/// Invalidated when Home mounts, including after an account switch. The cache
+/// envelope also guards account, backend and language on every read/write.
+final homeCacheScopeProvider = Provider<String>(
+  (ref) => jsonEncode([
+    contentBaseUrl,
+    ref.watch(localeProvider)?.languageCode ?? 'en',
+    ref
+        .watch(sharedPreferencesProvider)
+        .getString(SharedPreferenceConstants.userId),
+  ]),
+);
 
-  final alreadyFeatured = home.carousel.any(
-    (item) => item.id == kSpanishFeaturedPackId ||
-        item.path?.split('/').last == kSpanishFeaturedPackId,
-  );
-  if (alreadyFeatured) return home;
+const homeFeedCacheKey = 'home_feed_cache_v1';
+const _cacheLifetime = Duration(days: 7);
 
-  final PackModel pack;
+HomeModel? _cachedHome(Ref ref, String scope) {
   try {
-    pack = await ref
-        .read(packRepositoryProvider)
+    final raw = ref.read(sharedPreferencesProvider).getString(homeFeedCacheKey);
+    if (raw == null) return null;
+    final saved = jsonDecode(raw) as Map<String, dynamic>;
+    final age =
+        DateTime.now().millisecondsSinceEpoch - (saved['saved_at'] as int);
+    if (saved['scope'] != scope ||
+        age < 0 ||
+        age > _cacheLifetime.inMilliseconds) {
+      return null;
+    }
+    return HomeModel.fromJson(saved['home'] as Map<String, dynamic>);
+  } catch (_) {
+    return null; // A corrupt/older cache must never break Home.
+  }
+}
+
+/// Base Home content stays visible during refresh or a network failure. Only
+/// the editorial feed is cached: announcements, assignments and user stats
+/// retain their own validation and persistence paths.
+final homeFeedProvider = Provider<AsyncValue<HomeModel>>((ref) {
+  final scope = ref.watch(homeCacheScopeProvider);
+  final prefs = ref.watch(sharedPreferencesProvider);
+  final network = ref.watch(fetchHomeProvider);
+  final cached = _cachedHome(ref, scope);
+  return network.when(
+    skipLoadingOnRefresh: false,
+    skipLoadingOnReload: false,
+    data: (home) {
+      unawaited(
+        prefs
+            .setString(
+              homeFeedCacheKey,
+              jsonEncode({
+                'scope': scope,
+                'saved_at': DateTime.now().millisecondsSinceEpoch,
+                'home': home.toJson(),
+              }),
+            )
+            .catchError((Object error) => false),
+      );
+      return AsyncData(home);
+    },
+    loading: () => cached == null ? const AsyncLoading() : AsyncData(cached),
+    error: (error, stack) =>
+        cached == null ? AsyncError(error, stack) : AsyncData(cached),
+  );
+});
+
+final spanishFeaturedPackProvider = FutureProvider<PackModel?>((ref) async {
+  try {
+    return await ref
+        .watch(packRepositoryProvider)
         .fetchPacks(kSpanishFeaturedPackId);
   } catch (e) {
     AppLogger.w('Home', 'Spanish featured pack unavailable: $e');
+    return null;
+  }
+});
+
+/// Optional enrichment updates the carousel without delaying the base feed.
+final homeContentProvider = Provider<AsyncValue<HomeModel>>((ref) {
+  final home = ref.watch(homeFeedProvider);
+  final prefersSpanish = ref
+      .watch(deviceLocalesProvider)
+      .any((locale) => locale.languageCode.toLowerCase() == 'es');
+  if (!prefersSpanish || !home.hasValue) return home;
+  final data = home.requireValue;
+  if (data.carousel.any(
+    (item) =>
+        item.id == kSpanishFeaturedPackId ||
+        item.path?.split('/').last == kSpanishFeaturedPackId,
+  )) {
     return home;
   }
-
-  final card = HomeCarouselModel(
-    id: pack.id,
-    title: pack.title,
-    subtitle: pack.subtitle ?? '',
-    coverUrl: pack.coverUrl ?? '',
-    path: pack.path ?? 'packs/${pack.id}',
-    type: TypeConstants.pack,
+  final pack = ref.watch(spanishFeaturedPackProvider).value;
+  if (pack == null) return home;
+  return AsyncData(
+    data.copyWith(
+      carousel: [
+        HomeCarouselModel(
+          id: pack.id,
+          title: pack.title,
+          subtitle: pack.subtitle ?? '',
+          coverUrl: pack.coverUrl ?? '',
+          path: pack.path ?? 'packs/${pack.id}',
+          type: TypeConstants.pack,
+        ),
+        ...data.carousel,
+      ],
+    ),
   );
-  return home.copyWith(carousel: [card, ...home.carousel]);
-}
+});
 
 @riverpod
 Future<void> refreshHomeAPIs(Ref ref) async {
