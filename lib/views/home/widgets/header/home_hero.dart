@@ -17,12 +17,11 @@ const double _kOverscrollBleed = 260.0;
 /// [HomeHero] and the home list, which hands its first section to the hero
 /// whenever there is an image to lay it over.
 final homeHeroCoverProvider = Provider.autoDispose<String?>((ref) {
-  final upNext = ref.watch(upNextProvider);
-  // Resolving the next unfinished pack can temporarily be loading. The
-  // pinned pack is already known: keep its hero instead of collapsing it.
-  final pack =
-      upNext.value?.pack ??
-      ref.watch(packProvider(packId: ref.watch(upNextPackIdProvider))).value;
+  // Artwork depends only on the pinned pack, not session completion or the
+  // next unfinished pack. Those can reload when returning from the player.
+  final pack = ref
+      .watch(packDataProvider(packId: ref.watch(upNextPackIdProvider)))
+      .value;
   final cover = pack?.coverUrl;
   return (cover == null || cover.isEmpty) ? null : cover;
 });
@@ -195,7 +194,12 @@ class _HeroBackdrop extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              NetworkImageWidget(url: coverUrl, shouldCache: true),
+              NetworkImageWidget(
+                url: coverUrl,
+                shouldCache: true,
+                fadeInDuration: Duration.zero,
+                fadeOutDuration: Duration.zero,
+              ),
               // Pixel-anchored to the top of the bleed: dark across the whole
               // bleed and the status-bar/pill area, then faded to nothing.
               Align(

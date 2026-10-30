@@ -10,7 +10,6 @@ import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/icons/medito_icons.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/models/local_all_stats.dart';
-import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/models/timer/timer_session.dart';
 import 'package:medito/providers/notification/reminder_provider.dart';
@@ -20,6 +19,8 @@ import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/services/reminders/daily_reminders_service.dart';
 import 'package:medito/utils/logger.dart';
+import 'package:medito/utils/day_boundary.dart';
+import 'package:medito/widgets/calendar_stamp.dart';
 import 'package:medito/utils/notification_permission_flow.dart';
 import 'package:medito/utils/permission_handler.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -101,12 +102,7 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
   late AnimationController _reminderAnimationController;
   late AnimationController _cardAnimationController;
 
-  late Animation<Offset> _statsSlideAnimation;
   late Animation<double> _statsFadeAnimation;
-  late Animation<Offset> _reminderSlideAnimation;
-  late Animation<double> _reminderFadeAnimation;
-  late Animation<Offset> _cardSlideAnimation;
-  late Animation<double> _cardFadeAnimation;
 
   @override
   void initState() {
@@ -116,56 +112,46 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
 
     _statsAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 420),
     );
-
     _reminderAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 520),
     );
-
     _cardAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 560),
     );
+    _statsFadeAnimation = CurvedAnimation(
+      parent: _statsAnimationController,
+      curve: const Interval(0, 0.65, curve: Curves.easeOut),
+    );
+  }
 
-    _statsSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _statsAnimationController,
-            curve: Curves.easeOutCubic,
+  Widget _buildEntrance(AnimationController controller, Widget child) {
+    return AnimatedBuilder(
+      animation: controller,
+      child: child,
+      builder: (context, child) {
+        final settle = Curves.easeOutCubic.transform(controller.value);
+        final opacity = const Interval(
+          0,
+          0.65,
+          curve: Curves.easeOut,
+        ).transform(controller.value);
+        return Opacity(
+          opacity: opacity,
+          child: Transform.translate(
+            // Pixel distances keep tall cards from sweeping across the page.
+            offset: Offset(0, 18 * (1 - settle)),
+            child: Transform.scale(
+              scale: 0.985 + 0.015 * settle,
+              alignment: Alignment.topCenter,
+              child: child,
+            ),
           ),
         );
-
-    _statsFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _statsAnimationController, curve: Curves.easeOut),
-    );
-
-    _reminderSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _reminderAnimationController,
-            curve: Curves.easeOutCubic,
-          ),
-        );
-
-    _reminderFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _reminderAnimationController,
-        curve: Curves.easeOut,
-      ),
-    );
-
-    _cardSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _cardAnimationController,
-            curve: Curves.easeOutCubic,
-          ),
-        );
-
-    _cardFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _cardAnimationController, curve: Curves.easeOut),
+      },
     );
   }
 
@@ -176,6 +162,11 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     if (!_animationsStarted) {
       _animationsStarted = true;
       _startAnimations();
+    } else if (MediaQuery.disableAnimationsOf(context)) {
+      _statsAnimationController.value = 1;
+      _reminderAnimationController.value = 1;
+      _cardAnimationController.value = 1;
+      _showPriorStats = false;
     }
   }
 
@@ -190,12 +181,12 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
     }
 
     _statsAnimationController.forward();
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 140), () {
       if (mounted) {
         _reminderAnimationController.forward();
       }
     });
-    Future.delayed(const Duration(milliseconds: 400), () {
+    Future.delayed(const Duration(milliseconds: 280), () {
       if (mounted) {
         _cardAnimationController.forward();
       }
@@ -277,38 +268,24 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
                     opacity: _statsFadeAnimation,
                     child: _buildRestoredContext(widget.restoredFrom!),
                   ),
-                SlideTransition(
-                  position: _statsSlideAnimation,
-                  child: FadeTransition(
-                    opacity: _statsFadeAnimation,
-                    child: ref.watch(zenModeProvider)
-                        ? const ZenModeAnimation()
-                        : _buildStatsArea(),
+                _buildEntrance(
+                  _statsAnimationController,
+                  ref.watch(zenModeProvider)
+                      ? const ZenModeAnimation()
+                      : _buildStatsArea(),
+                ),
+                _buildEntrance(
+                  _reminderAnimationController,
+                  // Reminder and account prompts are mutually exclusive.
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AnimatedEndScreenSection(child: _buildReminderPrompt()),
+                      AnimatedEndScreenSection(child: _buildAccountPrompt()),
+                    ],
                   ),
                 ),
-                SlideTransition(
-                  position: _reminderSlideAnimation,
-                  child: FadeTransition(
-                    opacity: _reminderFadeAnimation,
-                    // The reminder and account soft-asks are mutually exclusive
-                    // (see shouldShowAccountPromptProvider), so they share this
-                    // animation slot; only one ever renders.
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AnimatedEndScreenSection(child: _buildReminderPrompt()),
-                        AnimatedEndScreenSection(child: _buildAccountPrompt()),
-                      ],
-                    ),
-                  ),
-                ),
-                SlideTransition(
-                  position: _cardSlideAnimation,
-                  child: FadeTransition(
-                    opacity: _cardFadeAnimation,
-                    child: _buildCard(),
-                  ),
-                ),
+                _buildEntrance(_cardAnimationController, _buildCard()),
                 // _buildFreezeRewardBanner(ref.watch(statsProvider).valueOrNull!),
               ],
             ),
@@ -453,254 +430,215 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
         // The number animates from the prior streak; say the current one
         // straight away rather than the old value for the first 700 ms.
         final spokenStreak = statsAsyncValue.value?.streakCurrent ?? streak;
-        var daysMeditated = _getDaysMeditated(localAllStats.audioCompleted);
-        var lastFiveDays = List.generate(
-          5,
-          (index) => DateTime.now().subtract(Duration(days: index)),
+        final numberStyle = Theme.of(context).textTheme.headlineSmall!.copyWith(
+          fontFamily: googleSans,
+          fontSize: 56,
+          height: 1,
+          fontWeight: FontWeight.w400,
         );
+        // Reserve the larger of the before/after numbers for the entire
+        // transition, including when the outgoing switcher child disappears.
+        final numberSize =
+            [
+              widget.priorStats?.streakCurrent ?? streak,
+              spokenStreak,
+            ].fold<Size>(Size.zero, (size, count) {
+              final painter = TextPainter(
+                text: TextSpan(text: '$count', style: numberStyle),
+                textDirection: Directionality.of(context),
+                textScaler: MediaQuery.textScalerOf(context),
+                locale: Localizations.localeOf(context),
+              )..layout();
+              final measured = painter.size;
+              painter.dispose();
+              return Size(
+                measured.width > size.width ? measured.width : size.width,
+                measured.height > size.height ? measured.height : size.height,
+              );
+            });
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedSwitcher(
-              key: _animatedSwitcherKey,
-              duration: reduceMotion
-                  ? Duration.zero
-                  : const Duration(milliseconds: 500),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(
-                  opacity: animation,
-                  child: ScaleTransition(
-                    scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                      CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOutBack,
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                container: true,
+                excludeSemantics: true,
+                label: l10n.streakDays(spokenStreak),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 12,
+                  runSpacing: 4,
+                  children: [
+                    SizedBox(
+                      width: numberSize.width,
+                      height: numberSize.height,
+                      child: ClipRect(
+                        child: AnimatedSwitcher(
+                          key: _animatedSwitcherKey,
+                          duration: reduceMotion
+                              ? Duration.zero
+                              : const Duration(milliseconds: 550),
+                          reverseDuration: reduceMotion
+                              ? Duration.zero
+                              : const Duration(milliseconds: 350),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) {
+                                final incoming =
+                                    child.key == ValueKey<int>(streak);
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: Offset(0, incoming ? 0.55 : -0.55),
+                                      end: Offset.zero,
+                                    ).animate(animation),
+                                    child: child,
+                                  ),
+                                );
+                              },
+                          // Read with the caption below as one phrase, "5 day streak".
+                          child: ExcludeSemantics(
+                            key: ValueKey<int>(streak),
+                            child: Text(
+                              streak.toString(),
+                              style: numberStyle,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    child: child,
-                  ),
-                );
-              },
-              // Read with the caption below as one phrase, "5 day streak".
-              child: ExcludeSemantics(
-                key: ValueKey<int>(streak),
+                    Text(
+                      l10n.dayStreak,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontFamily: googleSans,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w400,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 300),
+                child: _buildDayLettersAndIcons(localAllStats),
+              ),
+              const SizedBox(height: 20),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 340),
                 child: Text(
-                  streak.toString(),
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  l10n.dailyPracticeMessage,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontFamily: googleSans,
-                    fontSize: 100,
+                    fontSize: 14,
                     fontWeight: FontWeight.w400,
+                    height: 1.45,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
-                  textAlign: TextAlign.left,
                 ),
               ),
-            ),
-            Text(
-              l10n.dayStreak,
-              semanticsLabel: l10n.streakDays(spokenStreak),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontFamily: googleSans,
-                fontSize: 40,
-                fontWeight: FontWeight.w400,
-                height: 1,
-                color: context.brandAccent,
-              ),
-              textAlign: TextAlign.left,
-            ),
-            const SizedBox(height: 24),
-            AnimatedSwitcher(
-              duration: reduceMotion
-                  ? Duration.zero
-                  : const Duration(seconds: 1),
-              child: _buildDayLettersAndIcons(
-                lastFiveDays,
-                daysMeditated,
-                key: ValueKey(daysMeditated.join()),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                AppLocalizations.of(context)!.dailyPracticeMessage,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontFamily: googleSans,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  height: 1.3,
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-          ],
+            ],
+          ),
         );
       },
     );
   }
 
-  List<String> _getDaysMeditated(List<LocalAudioCompleted>? audioCompleted) {
-    return audioCompleted
-            ?.map(
-              (audio) => DateTime.fromMillisecondsSinceEpoch(
-                audio.timestamp,
-              ).toIso8601String().split('T')[0],
-            )
-            .toList() ??
-        [];
-  }
-
-  List<String> _getDaysWithStreakFreeze(LocalAllStats stats) {
-    return stats.freezeUsageDates
-        .map(
-          (timestamp) => DateTime.fromMillisecondsSinceEpoch(
-            timestamp,
-          ).toIso8601String().split('T')[0],
-        )
-        .toList();
-  }
-
-  Widget _buildDayLettersAndIcons(
-    List<DateTime> lastFiveDays,
-    List<String> daysMeditated, {
-    Key? key,
-  }) {
-    lastFiveDays = lastFiveDays.reversed.toList();
-
-    final statsData = _showPriorStats && widget.priorStats != null
-        ? widget.priorStats
-        : ref.watch(statsProvider).value;
-    var daysWithFreeze = statsData != null
-        ? _getDaysWithStreakFreeze(statsData)
-        : <String>[];
-
-    var dayLetters = lastFiveDays.map((day) {
-      switch (day.weekday) {
-        case 1:
-          return AppLocalizations.of(context)!.monday;
-        case 2:
-          return AppLocalizations.of(context)!.tuesday;
-        case 3:
-          return AppLocalizations.of(context)!.wednesday;
-        case 4:
-          return AppLocalizations.of(context)!.thursday;
-        case 5:
-          return AppLocalizations.of(context)!.friday;
-        case 6:
-          return AppLocalizations.of(context)!.saturday;
-        case 7:
-          return AppLocalizations.of(context)!.sunday;
-        default:
-          return '';
-      }
-    }).toList();
+  Widget _buildDayLettersAndIcons(LocalAllStats stats) {
+    final hours =
+        ref
+            .watch(sharedPreferencesProvider)
+            .getInt(SharedPreferenceConstants.dayBoundaryOffsetHours) ??
+        0;
+    final offset = Duration(hours: hours);
+    final today = dayOf(widget.restoredFrom ?? DateTime.now(), offset);
+    final stamps = calendarStampsForSessions(
+      stats.audioCompleted ?? [],
+      offset,
+    );
+    final priorStamps = calendarStampsForSessions(
+      widget.priorStats?.audioCompleted ?? [],
+      offset,
+    );
+    final l10n = AppLocalizations.of(context)!;
+    final labels = [
+      l10n.monday,
+      l10n.tuesday,
+      l10n.wednesday,
+      l10n.thursday,
+      l10n.friday,
+      l10n.saturday,
+      l10n.sunday,
+    ];
 
     return Row(
-      key: key,
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(dayLetters.length, (index) {
-        var day = lastFiveDays[index];
-        var dayString = day.toIso8601String().split('T')[0];
-        var isMeditated = daysMeditated.contains(dayString);
-        var isFreeze = daysWithFreeze.contains(dayString);
-
-        var isConsecutive =
-            (isMeditated || isFreeze) &&
-            (index > 0 &&
-                    (daysMeditated.contains(
-                          lastFiveDays[index - 1].toIso8601String().split(
-                            'T',
-                          )[0],
-                        ) ||
-                        daysWithFreeze.contains(
-                          lastFiveDays[index - 1].toIso8601String().split(
-                            'T',
-                          )[0],
-                        )) ||
-                index < dayLetters.length - 1 &&
-                    (daysMeditated.contains(
-                          lastFiveDays[index + 1].toIso8601String().split(
-                            'T',
-                          )[0],
-                        ) ||
-                        daysWithFreeze.contains(
-                          lastFiveDays[index + 1].toIso8601String().split(
-                            'T',
-                          )[0],
-                        )));
-
-        final l10n = AppLocalizations.of(context)!;
-        // A lone weekday letter and an unlabelled icon told screen readers
-        // nothing; say the day and whether it counted.
-        final daySemantics =
-            '${DateFormat.EEEE(Localizations.localeOf(context).toString()).format(day)}, '
-            '${isFreeze
-                ? l10n.streakFreezeUsed
-                : isMeditated
-                ? l10n.dayMeditated
-                : l10n.dayNotMeditated}';
-
-        return Semantics(
-          label: daySemantics,
-          excludeSemantics: true,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      children: List.generate(5, (index) {
+        final day = DateTime(today.year, today.month, today.day - 4 + index);
+        final type = stamps[day];
+        final isNew =
+            !_showPriorStats &&
+            type != null &&
+            !priorStamps.containsKey(day) &&
+            (widget.priorStats != null || day == today);
+        return Expanded(
+          child: Semantics(
+            label:
+                '${DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toString()).format(day)}, '
+                '${type != null ? l10n.dayMeditated : l10n.dayNotMeditated}',
+            excludeSemantics: true,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  dayLetters[index],
+                  labels[day.weekday - 1],
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontFamily: googleSans,
                     fontSize: 14,
-                    fontWeight: (isMeditated || isFreeze)
+                    fontWeight: type != null
                         ? FontWeight.w600
                         : FontWeight.w500,
-                    height: 1.2,
-                    color: isFreeze
-                        ? ColorConstants.graphite
-                        : isMeditated
-                        ? context.brandAccent
-                        : ColorConstants.moon,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(
+                      alpha: type != null ? 1 : 0.5,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 SizedBox(
-                  width: 36,
-                  height: 36,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isConsecutive
-                                ? Theme.of(context).colorScheme.onSurface
-                                      .withValues(alpha: 0.12)
-                                : Colors.transparent,
-                            width: 2,
+                  height: 44,
+                  child: Center(
+                    child: type == null
+                        ? Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.12),
+                              ),
+                            ),
+                          )
+                        : CalendarStamp(
+                            key: ValueKey(day),
+                            date: day,
+                            type: type,
+                            animateIn: isNew,
+                            revealDelay: widget.priorStats == null
+                                ? const Duration(milliseconds: 700)
+                                : Duration.zero,
                           ),
-                        ),
-                      ),
-                      if (isFreeze)
-                        MeditoIcon(
-                          assetName: MeditoIcons.snow,
-                          size: 32,
-                          color: ColorConstants.graphite,
-                        )
-                      else if (isMeditated)
-                        MeditoIcon(
-                          assetName: MeditoIcons.checkCircleSolid,
-                          size: 32,
-                          color: context.brandAccent,
-                        )
-                      else
-                        _buildCircle(32, ColorConstants.moon),
-                    ],
                   ),
                 ),
               ],
@@ -708,14 +646,6 @@ class _EndScreenViewState extends ConsumerState<EndScreenView>
           ),
         );
       }),
-    );
-  }
-
-  Widget _buildCircle(double size, Color colour) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: colour),
     );
   }
 

@@ -1,0 +1,1442 @@
+{
+  "surface": "report",
+  "title": "Test a premium Medito logo range while protecting the $28 core",
+  "generatedAt": "2026-10-28T12:06:08.462472+00:00",
+  "status": "reviewed",
+  "buildStatus": "creating",
+  "filters": [],
+  "exportPreferences": {
+    "selected": null,
+    "destinations": []
+  },
+  "report": {
+    "asOf": "2026-10-28",
+    "subtitle": "Merchandise decisions from 2026 orders and product sales"
+  },
+  "queries": {
+    "spend_summary": {
+      "rows": [
+        {
+          "orders": 243,
+          "mean_merchandise": 29.99320987654321,
+          "median_merchandise": 28.0,
+          "mean_checkout": 41.78082304526749,
+          "median_checkout": 35.56,
+          "merchandise_total": 7288.35,
+          "checkout_total": 10152.74,
+          "shipping_total": 1770.22,
+          "tax_total": 1022.53,
+          "donation_total": 71.64,
+          "refunded_total": 106.87,
+          "percent_orders_merch_at_least_40": 16.46090534979424,
+          "percent_orders_merch_at_least_60": 4.526748971193416,
+          "percent_orders_merch_at_least_80": 2.05761316872428
+        }
+      ],
+      "source": {
+        "label": "Fourthwall exports, downloaded 28 October 2026",
+        "executedAt": "2026-10-28T12:03:23Z",
+        "filters": [
+          "Jan 1 through Oct 28, 2026 inclusive",
+          "USD",
+          "Non-canceled customer orders; creator/sample order excluded"
+        ],
+        "files": [
+          "Medito-orders_export-2026-10-28_12-03-23.csv"
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Order export",
+            "detail": "Fourthwall Orders > Export orders, downloaded 28 October 2026. Filter type=Order, status!=Canceled, 2026-01-01 <= UTC date < 2026-10-29. Raw contact and address fields excluded from this artifact."
+          }
+        ],
+        "links": [
+          {
+            "label": "Fourthwall orders",
+            "url": "https://admin.fourthwall.com/store/medito-foundation/contributions/orders/"
+          }
+        ],
+        "caveats": [
+          "Canceled orders excluded from spend analysis; type Your order (creator/sample) excluded.",
+          "Order export reports monetary amounts without currency column; USD is the Fourthwall admin display currency for this run."
+        ]
+      }
+    },
+    "spend_distribution": {
+      "rows": [
+        {
+          "band": "Under $20",
+          "orders": 71
+        },
+        {
+          "band": "$20\u2013under $30",
+          "orders": 101
+        },
+        {
+          "band": "$30\u2013under $40",
+          "orders": 31
+        },
+        {
+          "band": "$40\u2013under $60",
+          "orders": 29
+        },
+        {
+          "band": "$60+",
+          "orders": 11
+        }
+      ],
+      "source": {
+        "label": "Fourthwall exports, downloaded 28 October 2026",
+        "executedAt": "2026-10-28T12:03:23Z",
+        "filters": [
+          "Jan 1 through Oct 28, 2026 inclusive",
+          "USD",
+          "Non-canceled customer orders; creator/sample order excluded"
+        ],
+        "files": [
+          "Medito-orders_export-2026-10-28_12-03-23.csv"
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Order export",
+            "detail": "Fourthwall Orders > Export orders, downloaded 28 October 2026. Filter type=Order, status!=Canceled, 2026-01-01 <= UTC date < 2026-10-29. Raw contact and address fields excluded from this artifact."
+          }
+        ],
+        "links": [
+          {
+            "label": "Fourthwall orders",
+            "url": "https://admin.fourthwall.com/store/medito-foundation/contributions/orders/"
+          }
+        ],
+        "caveats": [
+          "Canceled orders excluded from spend analysis; type Your order (creator/sample) excluded.",
+          "Order export reports monetary amounts without currency column; USD is the Fourthwall admin display currency for this run."
+        ]
+      }
+    },
+    "category_results": {
+      "rows": [
+        {
+          "category": "T-shirts",
+          "units": 169.0,
+          "revenue": 4590.0,
+          "profit": 1694.56,
+          "profit_per_unit": 10.03,
+          "margin_pct": 36.92
+        },
+        {
+          "category": "Prints",
+          "units": 71.0,
+          "revenue": 1097.5,
+          "profit": 311.76,
+          "profit_per_unit": 4.39,
+          "margin_pct": 28.41
+        },
+        {
+          "category": "Stickers",
+          "units": 70.0,
+          "revenue": 554.2,
+          "profit": 322.83,
+          "profit_per_unit": 4.61,
+          "margin_pct": 58.25
+        },
+        {
+          "category": "Mugs",
+          "units": 39.0,
+          "revenue": 552.65,
+          "profit": 193.86,
+          "profit_per_unit": 4.97,
+          "margin_pct": 35.08
+        },
+        {
+          "category": "Caps",
+          "units": 8.0,
+          "revenue": 208.0,
+          "profit": 69.15,
+          "profit_per_unit": 8.64,
+          "margin_pct": 33.25
+        },
+        {
+          "category": "Candles",
+          "units": 9.0,
+          "revenue": 207.0,
+          "profit": 79.37,
+          "profit_per_unit": 8.82,
+          "margin_pct": 38.34
+        },
+        {
+          "category": "Blankets",
+          "units": 1.0,
+          "revenue": 69.0,
+          "profit": 18.27,
+          "profit_per_unit": 18.27,
+          "margin_pct": 26.48
+        },
+        {
+          "category": "Gift cards",
+          "units": 1.0,
+          "revenue": 10.0,
+          "profit": 9.02,
+          "profit_per_unit": 9.02,
+          "margin_pct": 90.2
+        }
+      ],
+      "source": {
+        "label": "Fourthwall top products by units sold \u2014 year to date",
+        "executedAt": "2026-10-28T11:56:51Z",
+        "filters": [
+          "Jan 1 through Oct 28, 2026 inclusive",
+          "USD",
+          "Parent product rows only; variants not added twice"
+        ],
+        "files": [
+          "top_products_by_units_sold-2026-10-28_11-56-51.csv"
+        ],
+        "links": [
+          {
+            "label": "Fourthwall product sales",
+            "url": "https://admin.fourthwall.com/store/medito-foundation/analytics/reports/top_products_by_units_sold/"
+          }
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Product export",
+            "detail": "Select Year to date, Apply, Export in Fourthwall top products by units sold. Keep parent rows without the variant separator (space-hyphen-space); preserve duplicated names for archived/current records. Parent totals reconcile to displayed summary: 368 units, $7,288.35 net product sales, $2,698.82 product profit."
+          }
+        ],
+        "caveats": [
+          "Product CSV includes parent and variant rows; parent rows only selected by absence of the export variant separator (space-hyphen-space). Parent rows reconcile to UI summary; archived/current duplicate names kept as separate product rows.",
+          "Observed sales reflect availability and promotion; no product-level exposure or conversion denominators.",
+          "No causal price elasticity or evidence of demand for unsold premium garments.",
+          "Profit fields are provider-reported per-product contribution after payment fees, not business-wide profit after overhead."
+        ]
+      }
+    },
+    "product_results": {
+      "rows": [
+        {
+          "product": "Medito Boat Print",
+          "units_sold": 25.0,
+          "orders": 25.0,
+          "gross_sales": 400.5,
+          "discounts": 0.0,
+          "net_sales": 400.5,
+          "product_cost": 0.0,
+          "costs": 491.92,
+          "costs_product_costs": 263.0,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 123.28,
+          "costs_taxes": 77.62,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 28.02,
+          "profit": 109.48,
+          "gross_margin": 27.34,
+          "net_profit": 109.48,
+          "net_margin": 27.34,
+          "category": "Prints",
+          "profit_per_unit": 4.38,
+          "profit_to_product_revenue_pct": 27.34
+        },
+        {
+          "product": "Cat Reflections T-Shirt",
+          "units_sold": 24.0,
+          "orders": 24.0,
+          "gross_sales": 676.0,
+          "discounts": 0.0,
+          "net_sales": 676.0,
+          "product_cost": 0.0,
+          "costs": 723.36,
+          "costs_product_costs": 422.8,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 125.92,
+          "costs_taxes": 132.2,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 42.44,
+          "profit": 210.76,
+          "gross_margin": 31.18,
+          "net_profit": 210.76,
+          "net_margin": 31.18,
+          "category": "T-shirts",
+          "profit_per_unit": 8.78,
+          "profit_to_product_revenue_pct": 31.18
+        },
+        {
+          "product": "Can't Stop the Waves Kiss Cut Stickers",
+          "units_sold": 21.0,
+          "orders": 20.0,
+          "gross_sales": 170.2,
+          "discounts": 0.0,
+          "net_sales": 170.2,
+          "product_cost": 0.0,
+          "costs": 153.93,
+          "costs_product_costs": 50.29,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 74.83,
+          "costs_taxes": 15.6,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 13.21,
+          "profit": 106.7,
+          "gross_margin": 62.69,
+          "net_profit": 106.7,
+          "net_margin": 62.69,
+          "category": "Stickers",
+          "profit_per_unit": 5.08,
+          "profit_to_product_revenue_pct": 62.69
+        },
+        {
+          "product": "Medito Logo Stickers",
+          "units_sold": 17.0,
+          "orders": 12.0,
+          "gross_sales": 69.6,
+          "discounts": 0.0,
+          "net_sales": 69.6,
+          "product_cost": 0.0,
+          "costs": 73.6,
+          "costs_product_costs": 39.0,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 22.14,
+          "costs_taxes": 7.66,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 4.8,
+          "profit": 25.8,
+          "gross_margin": 37.07,
+          "net_profit": 25.8,
+          "net_margin": 37.07,
+          "category": "Stickers",
+          "profit_per_unit": 1.52,
+          "profit_to_product_revenue_pct": 37.07
+        },
+        {
+          "product": "Medito Course Mug",
+          "units_sold": 16.0,
+          "orders": 15.0,
+          "gross_sales": 215.85,
+          "discounts": 0.0,
+          "net_sales": 215.85,
+          "product_cost": 0.0,
+          "costs": 268.98,
+          "costs_product_costs": 119.05,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 101.63,
+          "costs_taxes": 31.84,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 16.46,
+          "profit": 80.34,
+          "gross_margin": 37.22,
+          "net_profit": 80.34,
+          "net_margin": 37.22,
+          "category": "Mugs",
+          "profit_per_unit": 5.02,
+          "profit_to_product_revenue_pct": 37.22
+        },
+        {
+          "product": "Wildflowers Grow Women's Relaxed-fit T-Shirt",
+          "units_sold": 14.0,
+          "orders": 14.0,
+          "gross_sales": 336.0,
+          "discounts": 0.0,
+          "net_sales": 336.0,
+          "product_cost": 0.0,
+          "costs": 343.16,
+          "costs_product_costs": 191.8,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 82.44,
+          "costs_taxes": 47.57,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 21.35,
+          "profit": 122.85,
+          "gross_margin": 36.56,
+          "net_profit": 122.85,
+          "net_margin": 36.56,
+          "category": "T-shirts",
+          "profit_per_unit": 8.78,
+          "profit_to_product_revenue_pct": 36.56
+        },
+        {
+          "product": "Unplug Front Logo T-Shirt",
+          "units_sold": 14.0,
+          "orders": 14.0,
+          "gross_sales": 396.0,
+          "discounts": 0.0,
+          "net_sales": 396.0,
+          "product_cost": 0.0,
+          "costs": 317.33,
+          "costs_product_costs": 171.86,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 70.67,
+          "costs_taxes": 53.04,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 21.76,
+          "profit": 202.38,
+          "gross_margin": 51.11,
+          "net_profit": 202.38,
+          "net_margin": 51.11,
+          "category": "T-shirts",
+          "profit_per_unit": 14.46,
+          "profit_to_product_revenue_pct": 51.11
+        },
+        {
+          "product": "Gratitude Hands Print",
+          "units_sold": 14.0,
+          "orders": 13.0,
+          "gross_sales": 216.5,
+          "discounts": 0.0,
+          "net_sales": 216.5,
+          "product_cost": 0.0,
+          "costs": 276.03,
+          "costs_product_costs": 139.5,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 71.95,
+          "costs_taxes": 47.46,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 17.12,
+          "profit": 59.88,
+          "gross_margin": 27.66,
+          "net_profit": 59.88,
+          "net_margin": 27.66,
+          "category": "Prints",
+          "profit_per_unit": 4.28,
+          "profit_to_product_revenue_pct": 27.66
+        },
+        {
+          "product": "Sun Print",
+          "units_sold": 12.0,
+          "orders": 12.0,
+          "gross_sales": 173.5,
+          "discounts": 0.0,
+          "net_sales": 173.5,
+          "product_cost": 0.0,
+          "costs": 199.11,
+          "costs_product_costs": 107.5,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 58.28,
+          "costs_taxes": 22.3,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 11.03,
+          "profit": 54.97,
+          "gross_margin": 31.68,
+          "net_profit": 54.97,
+          "net_margin": 31.68,
+          "category": "Prints",
+          "profit_per_unit": 4.58,
+          "profit_to_product_revenue_pct": 31.68
+        },
+        {
+          "product": "Medito Boat T-Shirt",
+          "units_sold": 12.0,
+          "orders": 12.0,
+          "gross_sales": 340.0,
+          "discounts": 0.0,
+          "net_sales": 340.0,
+          "product_cost": 0.0,
+          "costs": 334.76,
+          "costs_product_costs": 213.4,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 60.5,
+          "costs_taxes": 42.04,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 18.82,
+          "profit": 107.78,
+          "gross_margin": 31.7,
+          "net_profit": 107.78,
+          "net_margin": 31.7,
+          "category": "T-shirts",
+          "profit_per_unit": 8.98,
+          "profit_to_product_revenue_pct": 31.7
+        },
+        {
+          "product": "Unplug Sticker Set",
+          "units_sold": 12.0,
+          "orders": 12.0,
+          "gross_sales": 121.6,
+          "discounts": 0.0,
+          "net_sales": 121.6,
+          "product_cost": 0.0,
+          "costs": 93.77,
+          "costs_product_costs": 29.08,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 41.39,
+          "costs_taxes": 14.42,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 8.88,
+          "profit": 83.64,
+          "gross_margin": 68.78,
+          "net_profit": 83.64,
+          "net_margin": 68.78,
+          "category": "Stickers",
+          "profit_per_unit": 6.97,
+          "profit_to_product_revenue_pct": 68.78
+        },
+        {
+          "product": "Surf T-Shirt",
+          "units_sold": 11.0,
+          "orders": 11.0,
+          "gross_sales": 308.0,
+          "discounts": 0.0,
+          "net_sales": 308.0,
+          "product_cost": 0.0,
+          "costs": 305.01,
+          "costs_product_costs": 169.95,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 56.79,
+          "costs_taxes": 59.05,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 19.22,
+          "profit": 118.83,
+          "gross_margin": 38.58,
+          "net_profit": 118.83,
+          "net_margin": 38.58,
+          "category": "T-shirts",
+          "profit_per_unit": 10.8,
+          "profit_to_product_revenue_pct": 38.58
+        },
+        {
+          "product": "Become What You Are Women's Relaxed Fit T-Shirt",
+          "units_sold": 10.0,
+          "orders": 9.0,
+          "gross_sales": 240.0,
+          "discounts": 0.0,
+          "net_sales": 240.0,
+          "product_cost": 0.0,
+          "costs": 210.83,
+          "costs_product_costs": 137.0,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 43.97,
+          "costs_taxes": 17.4,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 12.46,
+          "profit": 90.54,
+          "gross_margin": 37.73,
+          "net_profit": 90.54,
+          "net_margin": 37.73,
+          "category": "T-shirts",
+          "profit_per_unit": 9.05,
+          "profit_to_product_revenue_pct": 37.73
+        },
+        {
+          "product": "What You Think T-Shirt",
+          "units_sold": 10.0,
+          "orders": 10.0,
+          "gross_sales": 280.0,
+          "discounts": 0.0,
+          "net_sales": 280.0,
+          "product_cost": 0.0,
+          "costs": 194.03,
+          "costs_product_costs": 119.9,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 40.65,
+          "costs_taxes": 20.48,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 13.0,
+          "profit": 147.1,
+          "gross_margin": 52.54,
+          "net_profit": 147.1,
+          "net_margin": 52.54,
+          "category": "T-shirts",
+          "profit_per_unit": 14.71,
+          "profit_to_product_revenue_pct": 52.54
+        },
+        {
+          "product": "Learn to Surf Women's Relaxed Fit T-Shirt",
+          "units_sold": 10.0,
+          "orders": 9.0,
+          "gross_sales": 246.0,
+          "discounts": 0.0,
+          "net_sales": 246.0,
+          "product_cost": 0.0,
+          "costs": 235.25,
+          "costs_product_costs": 143.0,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 46.56,
+          "costs_taxes": 31.98,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 13.71,
+          "profit": 89.29,
+          "gross_margin": 36.3,
+          "net_profit": 89.29,
+          "net_margin": 36.3,
+          "category": "T-shirts",
+          "profit_per_unit": 8.93,
+          "profit_to_product_revenue_pct": 36.3
+        },
+        {
+          "product": "Sticker Sheet",
+          "units_sold": 10.0,
+          "orders": 9.0,
+          "gross_sales": 110.0,
+          "discounts": 0.0,
+          "net_sales": 110.0,
+          "product_cost": 0.0,
+          "costs": 109.78,
+          "costs_product_costs": 49.5,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 34.68,
+          "costs_taxes": 17.84,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 7.76,
+          "profit": 52.74,
+          "gross_margin": 47.95,
+          "net_profit": 52.74,
+          "net_margin": 47.95,
+          "category": "Stickers",
+          "profit_per_unit": 5.27,
+          "profit_to_product_revenue_pct": 47.95
+        },
+        {
+          "product": "Cat Mug",
+          "units_sold": 10.0,
+          "orders": 10.0,
+          "gross_sales": 145.85,
+          "discounts": 0.0,
+          "net_sales": 145.85,
+          "product_cost": 0.0,
+          "costs": 197.65,
+          "costs_product_costs": 85.35,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 75.68,
+          "costs_taxes": 24.41,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 12.21,
+          "profit": 48.29,
+          "gross_margin": 33.11,
+          "net_profit": 48.29,
+          "net_margin": 33.11,
+          "category": "Mugs",
+          "profit_per_unit": 4.83,
+          "profit_to_product_revenue_pct": 33.11
+        },
+        {
+          "product": "Sleepy Cat Mug",
+          "units_sold": 9.0,
+          "orders": 8.0,
+          "gross_sales": 135.85,
+          "discounts": 0.0,
+          "net_sales": 135.85,
+          "product_cost": 0.0,
+          "costs": 172.4,
+          "costs_product_costs": 81.4,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 66.59,
+          "costs_taxes": 15.19,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 9.22,
+          "profit": 45.23,
+          "gross_margin": 33.29,
+          "net_profit": 45.23,
+          "net_margin": 33.29,
+          "category": "Mugs",
+          "profit_per_unit": 5.03,
+          "profit_to_product_revenue_pct": 33.29
+        },
+        {
+          "product": "Scenic View Print",
+          "units_sold": 9.0,
+          "orders": 9.0,
+          "gross_sales": 137.0,
+          "discounts": 0.0,
+          "net_sales": 137.0,
+          "product_cost": 0.0,
+          "costs": 161.05,
+          "costs_product_costs": 87.5,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 41.23,
+          "costs_taxes": 23.78,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 8.54,
+          "profit": 40.96,
+          "gross_margin": 29.9,
+          "net_profit": 40.96,
+          "net_margin": 29.9,
+          "category": "Prints",
+          "profit_per_unit": 4.55,
+          "profit_to_product_revenue_pct": 29.9
+        },
+        {
+          "product": "Medito Embroidered Logo Cap",
+          "units_sold": 8.0,
+          "orders": 8.0,
+          "gross_sales": 208.0,
+          "discounts": 0.0,
+          "net_sales": 208.0,
+          "product_cost": 0.0,
+          "costs": 229.87,
+          "costs_product_costs": 125.2,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 49.29,
+          "costs_taxes": 38.27,
+          "costs_custom_duty_cost": 3.46,
+          "costs_payment_processing_fees": 13.65,
+          "profit": 69.15,
+          "gross_margin": 33.25,
+          "net_profit": 69.15,
+          "net_margin": 33.25,
+          "category": "Caps",
+          "profit_per_unit": 8.64,
+          "profit_to_product_revenue_pct": 33.25
+        },
+        {
+          "product": "Embrace T-Shirt",
+          "units_sold": 8.0,
+          "orders": 8.0,
+          "gross_sales": 232.0,
+          "discounts": 0.0,
+          "net_sales": 232.0,
+          "product_cost": 0.0,
+          "costs": 199.72,
+          "costs_product_costs": 131.6,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 39.68,
+          "costs_taxes": 17.7,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 10.74,
+          "profit": 89.66,
+          "gross_margin": 38.65,
+          "net_profit": 89.66,
+          "net_margin": 38.65,
+          "category": "T-shirts",
+          "profit_per_unit": 11.21,
+          "profit_to_product_revenue_pct": 38.65
+        },
+        {
+          "product": "Fly High Kiss Cut Stickers",
+          "units_sold": 8.0,
+          "orders": 7.0,
+          "gross_sales": 64.8,
+          "discounts": 0.0,
+          "net_sales": 64.8,
+          "product_cost": 0.0,
+          "costs": 52.15,
+          "costs_product_costs": 19.12,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 21.14,
+          "costs_taxes": 7.76,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 4.13,
+          "profit": 41.55,
+          "gross_margin": 64.12,
+          "net_profit": 41.55,
+          "net_margin": 64.12,
+          "category": "Stickers",
+          "profit_per_unit": 5.19,
+          "profit_to_product_revenue_pct": 64.12
+        },
+        {
+          "product": "Become What You Are Women's Relaxed Fit T-Shirt",
+          "units_sold": 7.0,
+          "orders": 6.0,
+          "gross_sales": 180.0,
+          "discounts": 0.0,
+          "net_sales": 180.0,
+          "product_cost": 0.0,
+          "costs": 150.67,
+          "costs_product_costs": 107.9,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 15.69,
+          "costs_taxes": 19.05,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 8.03,
+          "profit": 64.07,
+          "gross_margin": 35.59,
+          "net_profit": 64.07,
+          "net_margin": 35.59,
+          "category": "T-shirts",
+          "profit_per_unit": 9.15,
+          "profit_to_product_revenue_pct": 35.59
+        },
+        {
+          "product": "Parachute T-Shirt",
+          "units_sold": 6.0,
+          "orders": 6.0,
+          "gross_sales": 168.0,
+          "discounts": 0.0,
+          "net_sales": 168.0,
+          "product_cost": 0.0,
+          "costs": 151.64,
+          "costs_product_costs": 92.7,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 31.2,
+          "costs_taxes": 18.56,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 9.18,
+          "profit": 66.12,
+          "gross_margin": 39.36,
+          "net_profit": 66.12,
+          "net_margin": 39.36,
+          "category": "T-shirts",
+          "profit_per_unit": 11.02,
+          "profit_to_product_revenue_pct": 39.36
+        },
+        {
+          "product": "Fly T-Shirt (Dark)",
+          "units_sold": 6.0,
+          "orders": 6.0,
+          "gross_sales": 168.0,
+          "discounts": 0.0,
+          "net_sales": 168.0,
+          "product_cost": 0.0,
+          "costs": 148.1,
+          "costs_product_costs": 92.7,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 24.03,
+          "costs_taxes": 21.58,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 9.79,
+          "profit": 65.51,
+          "gross_margin": 38.99,
+          "net_profit": 65.51,
+          "net_margin": 38.99,
+          "category": "T-shirts",
+          "profit_per_unit": 10.92,
+          "profit_to_product_revenue_pct": 38.99
+        },
+        {
+          "product": "Cat Reflection Print",
+          "units_sold": 6.0,
+          "orders": 6.0,
+          "gross_sales": 90.5,
+          "discounts": 0.0,
+          "net_sales": 90.5,
+          "product_cost": 0.0,
+          "costs": 118.83,
+          "costs_product_costs": 57.5,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 38.61,
+          "costs_taxes": 14.93,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 7.79,
+          "profit": 25.21,
+          "gross_margin": 27.86,
+          "net_profit": 25.21,
+          "net_margin": 27.86,
+          "category": "Prints",
+          "profit_per_unit": 4.2,
+          "profit_to_product_revenue_pct": 27.86
+        },
+        {
+          "product": "Cat Face Wax Candle",
+          "units_sold": 5.0,
+          "orders": 4.0,
+          "gross_sales": 115.0,
+          "discounts": 0.0,
+          "net_sales": 115.0,
+          "product_cost": 0.0,
+          "costs": 116.09,
+          "costs_product_costs": 64.75,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 34.96,
+          "costs_taxes": 10.65,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 5.73,
+          "profit": 44.52,
+          "gross_margin": 38.71,
+          "net_profit": 44.52,
+          "net_margin": 38.71,
+          "category": "Candles",
+          "profit_per_unit": 8.9,
+          "profit_to_product_revenue_pct": 38.71
+        },
+        {
+          "product": "Sleepy Cat Print",
+          "units_sold": 5.0,
+          "orders": 5.0,
+          "gross_sales": 79.5,
+          "discounts": 0.0,
+          "net_sales": 79.5,
+          "product_cost": 0.0,
+          "costs": 105.88,
+          "costs_product_costs": 52.0,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 33.44,
+          "costs_taxes": 14.2,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 6.24,
+          "profit": 21.26,
+          "gross_margin": 26.74,
+          "net_profit": 21.26,
+          "net_margin": 26.74,
+          "category": "Prints",
+          "profit_per_unit": 4.25,
+          "profit_to_product_revenue_pct": 26.74
+        },
+        {
+          "product": "Palouse T-Shirt",
+          "units_sold": 5.0,
+          "orders": 5.0,
+          "gross_sales": 140.0,
+          "discounts": 0.0,
+          "net_sales": 140.0,
+          "product_cost": 0.0,
+          "costs": 140.75,
+          "costs_product_costs": 88.5,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 23.1,
+          "costs_taxes": 22.05,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 7.1,
+          "profit": 44.4,
+          "gross_margin": 31.71,
+          "net_profit": 44.4,
+          "net_margin": 31.71,
+          "category": "T-shirts",
+          "profit_per_unit": 8.88,
+          "profit_to_product_revenue_pct": 31.71
+        },
+        {
+          "product": "Unplug Back T-Shirt",
+          "units_sold": 5.0,
+          "orders": 5.0,
+          "gross_sales": 146.0,
+          "discounts": 0.0,
+          "net_sales": 146.0,
+          "product_cost": 0.0,
+          "costs": 115.29,
+          "costs_product_costs": 83.25,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 15.94,
+          "costs_taxes": 9.54,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 6.56,
+          "profit": 56.19,
+          "gross_margin": 38.49,
+          "net_profit": 56.19,
+          "net_margin": 38.49,
+          "category": "T-shirts",
+          "profit_per_unit": 11.24,
+          "profit_to_product_revenue_pct": 38.49
+        },
+        {
+          "product": "Sleepy Cat T-Shirt",
+          "units_sold": 4.0,
+          "orders": 4.0,
+          "gross_sales": 114.0,
+          "discounts": 0.0,
+          "net_sales": 114.0,
+          "product_cost": 0.0,
+          "costs": 116.76,
+          "costs_product_costs": 71.8,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 19.52,
+          "costs_taxes": 18.17,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 7.27,
+          "profit": 34.93,
+          "gross_margin": 30.64,
+          "net_profit": 34.93,
+          "net_margin": 30.64,
+          "category": "T-shirts",
+          "profit_per_unit": 8.73,
+          "profit_to_product_revenue_pct": 30.64
+        },
+        {
+          "product": "Become T-Shirt",
+          "units_sold": 4.0,
+          "orders": 4.0,
+          "gross_sales": 112.0,
+          "discounts": 0.0,
+          "net_sales": 112.0,
+          "product_cost": 0.0,
+          "costs": 100.95,
+          "costs_product_costs": 61.8,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 20.16,
+          "costs_taxes": 12.49,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 6.5,
+          "profit": 43.7,
+          "gross_margin": 39.02,
+          "net_profit": 43.7,
+          "net_margin": 39.02,
+          "category": "T-shirts",
+          "profit_per_unit": 10.93,
+          "profit_to_product_revenue_pct": 39.02
+        },
+        {
+          "product": "Gratitude Mug",
+          "units_sold": 4.0,
+          "orders": 4.0,
+          "gross_sales": 55.1,
+          "discounts": 0.0,
+          "net_sales": 55.1,
+          "product_cost": 0.0,
+          "costs": 67.59,
+          "costs_product_costs": 30.9,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 22.69,
+          "costs_taxes": 9.8,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 4.2,
+          "profit": 20.0,
+          "gross_margin": 36.3,
+          "net_profit": 20.0,
+          "net_margin": 36.3,
+          "category": "Mugs",
+          "profit_per_unit": 5.0,
+          "profit_to_product_revenue_pct": 36.3
+        },
+        {
+          "product": "Scenic View Soy Wax Candle",
+          "units_sold": 4.0,
+          "orders": 4.0,
+          "gross_sales": 92.0,
+          "discounts": 0.0,
+          "net_sales": 92.0,
+          "product_cost": 0.0,
+          "costs": 101.84,
+          "costs_product_costs": 51.8,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 32.5,
+          "costs_taxes": 12.19,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 5.35,
+          "profit": 34.85,
+          "gross_margin": 37.88,
+          "net_profit": 34.85,
+          "net_margin": 37.88,
+          "category": "Candles",
+          "profit_per_unit": 8.71,
+          "profit_to_product_revenue_pct": 37.88
+        },
+        {
+          "product": "Fly T-Shirt (Light)",
+          "units_sold": 4.0,
+          "orders": 4.0,
+          "gross_sales": 112.0,
+          "discounts": 0.0,
+          "net_sales": 112.0,
+          "product_cost": 0.0,
+          "costs": 94.73,
+          "costs_product_costs": 61.8,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 15.77,
+          "costs_taxes": 11.94,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 5.22,
+          "profit": 44.98,
+          "gross_margin": 40.16,
+          "net_profit": 44.98,
+          "net_margin": 40.16,
+          "category": "T-shirts",
+          "profit_per_unit": 11.24,
+          "profit_to_product_revenue_pct": 40.16
+        },
+        {
+          "product": "Peace Comes From Within Women's Relaxed Fit T-Shirt",
+          "units_sold": 4.0,
+          "orders": 4.0,
+          "gross_sales": 100.0,
+          "discounts": 0.0,
+          "net_sales": 100.0,
+          "product_cost": 0.0,
+          "costs": 114.94,
+          "costs_product_costs": 82.6,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 17.25,
+          "costs_taxes": 9.97,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 5.12,
+          "profit": 12.28,
+          "gross_margin": 12.28,
+          "net_profit": 12.28,
+          "net_margin": 12.28,
+          "category": "T-shirts",
+          "profit_per_unit": 3.07,
+          "profit_to_product_revenue_pct": 12.28
+        },
+        {
+          "product": "Gratitude Hands T-Shirt",
+          "units_sold": 3.0,
+          "orders": 3.0,
+          "gross_sales": 84.0,
+          "discounts": 0.0,
+          "net_sales": 84.0,
+          "product_cost": 0.0,
+          "costs": 83.99,
+          "costs_product_costs": 53.1,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 15.91,
+          "costs_taxes": 9.91,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 5.07,
+          "profit": 25.83,
+          "gross_margin": 30.75,
+          "net_profit": 25.83,
+          "net_margin": 30.75,
+          "category": "T-shirts",
+          "profit_per_unit": 8.61,
+          "profit_to_product_revenue_pct": 30.75
+        },
+        {
+          "product": "Daily Sun T-Shirt",
+          "units_sold": 3.0,
+          "orders": 3.0,
+          "gross_sales": 84.0,
+          "discounts": 0.0,
+          "net_sales": 84.0,
+          "product_cost": 0.0,
+          "costs": 80.01,
+          "costs_product_costs": 53.1,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 13.5,
+          "costs_taxes": 8.39,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 5.02,
+          "profit": 25.88,
+          "gross_margin": 30.81,
+          "net_profit": 25.88,
+          "net_margin": 30.81,
+          "category": "T-shirts",
+          "profit_per_unit": 8.63,
+          "profit_to_product_revenue_pct": 30.81
+        },
+        {
+          "product": "What You Think Kiss Cut Sticker Set",
+          "units_sold": 2.0,
+          "orders": 2.0,
+          "gross_sales": 18.0,
+          "discounts": 0.0,
+          "net_sales": 18.0,
+          "product_cost": 0.0,
+          "costs": 10.9,
+          "costs_product_costs": 4.58,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 2.91,
+          "costs_taxes": 2.39,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 1.02,
+          "profit": 12.4,
+          "gross_margin": 68.89,
+          "net_profit": 12.4,
+          "net_margin": 68.89,
+          "category": "Stickers",
+          "profit_per_unit": 6.2,
+          "profit_to_product_revenue_pct": 68.89
+        },
+        {
+          "product": "Peace T-Shirt",
+          "units_sold": 2.0,
+          "orders": 2.0,
+          "gross_sales": 56.0,
+          "discounts": 0.0,
+          "net_sales": 56.0,
+          "product_cost": 0.0,
+          "costs": 49.07,
+          "costs_product_costs": 30.9,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 6.4,
+          "costs_taxes": 9.09,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 2.68,
+          "profit": 22.42,
+          "gross_margin": 40.04,
+          "net_profit": 22.42,
+          "net_margin": 40.04,
+          "category": "T-shirts",
+          "profit_per_unit": 11.21,
+          "profit_to_product_revenue_pct": 40.04
+        },
+        {
+          "product": "What You Think You Become Women's Relaxed Fit T-Shirt",
+          "units_sold": 2.0,
+          "orders": 2.0,
+          "gross_sales": 48.0,
+          "discounts": 0.0,
+          "net_sales": 48.0,
+          "product_cost": 0.0,
+          "costs": 54.52,
+          "costs_product_costs": 39.3,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 5.82,
+          "costs_taxes": 7.08,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 2.32,
+          "profit": 6.38,
+          "gross_margin": 13.29,
+          "net_profit": 6.38,
+          "net_margin": 13.29,
+          "category": "T-shirts",
+          "profit_per_unit": 3.19,
+          "profit_to_product_revenue_pct": 13.29
+        },
+        {
+          "product": "Learn to Surf Text Women's Relaxed Fit T-Shirt",
+          "units_sold": 1.0,
+          "orders": 1.0,
+          "gross_sales": 24.0,
+          "discounts": 0.0,
+          "net_sales": 24.0,
+          "product_cost": 0.0,
+          "costs": 32.46,
+          "costs_product_costs": 19.65,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 5.28,
+          "costs_taxes": 5.86,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 1.67,
+          "profit": 2.68,
+          "gross_margin": 11.17,
+          "net_profit": 2.68,
+          "net_margin": 11.17,
+          "category": "T-shirts",
+          "profit_per_unit": 2.68,
+          "profit_to_product_revenue_pct": 11.17
+        },
+        {
+          "product": "Cosmic Comfort Sherpa Blanket",
+          "units_sold": 1.0,
+          "orders": 1.0,
+          "gross_sales": 69.0,
+          "discounts": 0.0,
+          "net_sales": 69.0,
+          "product_cost": 0.0,
+          "costs": 82.6,
+          "costs_product_costs": 46.5,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 26.25,
+          "costs_taxes": 5.62,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 4.23,
+          "profit": 18.27,
+          "gross_margin": 26.48,
+          "net_profit": 18.27,
+          "net_margin": 26.48,
+          "category": "Blankets",
+          "profit_per_unit": 18.27,
+          "profit_to_product_revenue_pct": 26.48
+        },
+        {
+          "product": "Medito Gift Card",
+          "units_sold": 1.0,
+          "orders": 1.0,
+          "gross_sales": 10.0,
+          "discounts": 0.0,
+          "net_sales": 10.0,
+          "product_cost": 0.0,
+          "costs": 0.98,
+          "costs_product_costs": 0.0,
+          "costs_fulfillment_fees": 0.0,
+          "costs_shipping_costs": 0.0,
+          "costs_taxes": 0.0,
+          "costs_custom_duty_cost": 0.0,
+          "costs_payment_processing_fees": 0.98,
+          "profit": 9.02,
+          "gross_margin": 90.2,
+          "net_profit": 9.02,
+          "net_margin": 90.2,
+          "category": "Gift cards",
+          "profit_per_unit": 9.02,
+          "profit_to_product_revenue_pct": 90.2
+        }
+      ],
+      "source": {
+        "label": "Fourthwall top products by units sold \u2014 year to date",
+        "executedAt": "2026-10-28T11:56:51Z",
+        "filters": [
+          "Jan 1 through Oct 28, 2026 inclusive",
+          "USD",
+          "Parent product rows only; variants not added twice"
+        ],
+        "files": [
+          "top_products_by_units_sold-2026-10-28_11-56-51.csv"
+        ],
+        "links": [
+          {
+            "label": "Fourthwall product sales",
+            "url": "https://admin.fourthwall.com/store/medito-foundation/analytics/reports/top_products_by_units_sold/"
+          }
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Product export",
+            "detail": "Select Year to date, Apply, Export in Fourthwall top products by units sold. Keep parent rows without the variant separator (space-hyphen-space); preserve duplicated names for archived/current records. Parent totals reconcile to displayed summary: 368 units, $7,288.35 net product sales, $2,698.82 product profit."
+          }
+        ],
+        "caveats": [
+          "Product CSV includes parent and variant rows; parent rows only selected by absence of the export variant separator (space-hyphen-space). Parent rows reconcile to UI summary; archived/current duplicate names kept as separate product rows.",
+          "Observed sales reflect availability and promotion; no product-level exposure or conversion denominators.",
+          "No causal price elasticity or evidence of demand for unsold premium garments.",
+          "Profit fields are provider-reported per-product contribution after payment fees, not business-wide profit after overhead."
+        ]
+      }
+    },
+    "geography": {
+      "rows": [
+        {
+          "country": "US",
+          "orders": 116
+        },
+        {
+          "country": "GB",
+          "orders": 28
+        },
+        {
+          "country": "DE",
+          "orders": 21
+        },
+        {
+          "country": "CA",
+          "orders": 12
+        },
+        {
+          "country": "AU",
+          "orders": 10
+        },
+        {
+          "country": "NL",
+          "orders": 9
+        },
+        {
+          "country": "SE",
+          "orders": 6
+        },
+        {
+          "country": "IT",
+          "orders": 5
+        },
+        {
+          "country": "FR",
+          "orders": 5
+        },
+        {
+          "country": "AT",
+          "orders": 3
+        },
+        {
+          "country": "DK",
+          "orders": 3
+        },
+        {
+          "country": "ES",
+          "orders": 3
+        },
+        {
+          "country": "PL",
+          "orders": 3
+        },
+        {
+          "country": "HU",
+          "orders": 2
+        },
+        {
+          "country": "MX",
+          "orders": 2
+        },
+        {
+          "country": "SG",
+          "orders": 2
+        },
+        {
+          "country": "NO",
+          "orders": 2
+        },
+        {
+          "country": "CZ",
+          "orders": 2
+        },
+        {
+          "country": "NZ",
+          "orders": 1
+        },
+        {
+          "country": "BE",
+          "orders": 1
+        },
+        {
+          "country": "Unknown",
+          "orders": 1
+        },
+        {
+          "country": "AE",
+          "orders": 1
+        },
+        {
+          "country": "FI",
+          "orders": 1
+        },
+        {
+          "country": "LT",
+          "orders": 1
+        },
+        {
+          "country": "IE",
+          "orders": 1
+        },
+        {
+          "country": "CH",
+          "orders": 1
+        },
+        {
+          "country": "IL",
+          "orders": 1
+        }
+      ],
+      "source": {
+        "label": "Fourthwall exports, downloaded 28 October 2026",
+        "executedAt": "2026-10-28T12:03:23Z",
+        "filters": [
+          "Jan 1 through Oct 28, 2026 inclusive",
+          "USD",
+          "Non-canceled customer orders; creator/sample order excluded"
+        ],
+        "files": [
+          "Medito-orders_export-2026-10-28_12-03-23.csv"
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Order export",
+            "detail": "Fourthwall Orders > Export orders, downloaded 28 October 2026. Filter type=Order, status!=Canceled, 2026-01-01 <= UTC date < 2026-10-29. Raw contact and address fields excluded from this artifact."
+          }
+        ],
+        "links": [
+          {
+            "label": "Fourthwall orders",
+            "url": "https://admin.fourthwall.com/store/medito-foundation/contributions/orders/"
+          }
+        ],
+        "caveats": [
+          "Canceled orders excluded from spend analysis; type Your order (creator/sample) excluded.",
+          "Order export reports monetary amounts without currency column; USD is the Fourthwall admin display currency for this run."
+        ]
+      }
+    },
+    "pricing_scenario": {
+      "rows": [
+        {
+          "product": "Cat Reflections T-Shirt",
+          "oldPrice": 28,
+          "newPrice": 30,
+          "baseCost": 17.45,
+          "oldSpread": 10.55,
+          "newSpread": 12.55,
+          "unitsRetentionForEqualSpread": 0.8406374501992032,
+          "incrementalSpreadPerSale": 2
+        }
+      ],
+      "source": {
+        "label": "Current Fourthwall Cat Reflections price and displayed spread, inspected by root agent",
+        "filters": [
+          "Current price $28; displayed pre-payment-fee spread $10.55",
+          "Illustrative $30 test; no demand or elasticity forecast"
+        ],
+        "links": [
+          {
+            "label": "Cat Reflections product settings",
+            "url": "https://admin.fourthwall.com/store/medito-foundation/products/all/fb1f21c0-ae14-4cd0-87a6-aff441adb06a/"
+          }
+        ],
+        "evidenceFlow": [
+          {
+            "title": "Current listing",
+            "detail": "Current catalog settings observed: Bella+Canvas Supersoft DTFx tee, price $28, displayed spread $10.55, implied production cost $17.45."
+          },
+          {
+            "title": "Scenario",
+            "detail": "Hold product cost constant: (30 - 17.45) = 12.55 before payment fees. Break-even units retention = 10.55 / 12.55 = 84.1%. This is accounting sensitivity, not predicted conversion."
+          }
+        ],
+        "caveats": [
+          "Payment fees, taxes, refunds, garment size mix and demand can change realized profit."
+        ]
+      }
+    }
+  }
+}

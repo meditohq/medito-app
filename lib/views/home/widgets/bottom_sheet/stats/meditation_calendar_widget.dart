@@ -23,6 +23,7 @@ import 'package:medito/widgets/medito_icon.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'bulk_add_sessions_dialog.dart';
+import 'package:medito/widgets/calendar_stamp.dart';
 import 'manual_session_dialog.dart';
 
 /// Streak-freeze blue for light mode: [ColorConstants.lightBlue] is only
@@ -48,6 +49,9 @@ class _MeditationCalendarWidgetState
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   bool _isAddingSession = false;
+  Set<DateTime>? _knownStampDates;
+  final Set<DateTime> _pendingStampDates = {};
+  Map<DateTime, CalendarStampType> _stamps = {};
 
   // Range selection: long-press one day to anchor, long-press a second day
   // to complete the range. A third long-press resets to a new anchor.
@@ -483,6 +487,15 @@ class _MeditationCalendarWidgetState
 
   @override
   Widget build(BuildContext context) {
+    _stamps = calendarStampsForSessions(
+      widget.stats.audioCompleted ?? [],
+      _dayOffset,
+    );
+    final stampDates = _stamps.keys.toSet();
+    if (_knownStampDates != null) {
+      _pendingStampDates.addAll(stampDates.difference(_knownStampDates!));
+    }
+    _knownStampDates = stampDates;
     final meditationDates = _getMeditationDates(widget.stats);
     final freezeDates = _getFreezeDates(widget.stats);
     final sessions = _getSessionsForDay(_selectedDayForSessions);
@@ -504,11 +517,7 @@ class _MeditationCalendarWidgetState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildCalendarCard(
-          context,
-          meditationDates: meditationDates,
-          freezeDates: freezeDates,
-        ),
+        _buildCalendarCard(context),
         _buildDayDetailsCard(
           context,
           sessions: sessions,
@@ -520,53 +529,49 @@ class _MeditationCalendarWidgetState
     );
   }
 
-  Widget _buildCalendarCard(
-    BuildContext context, {
-    required Set<DateTime> meditationDates,
-    required Set<DateTime> freezeDates,
-  }) {
+  Widget _buildCalendarCard(BuildContext context) {
     return Container(
       decoration: _cardDecoration(context),
-      padding: const EdgeInsets.all(16),
-      child: TableCalendar<dynamic>(
-        // Month title, weekday letters and each day's spoken label.
-        locale: Localizations.localeOf(context).toString(),
-        firstDay: DateTime.utc(2020, 1, 1),
-        lastDay: DateTime.now(),
-        focusedDay: _focusedDay,
-        selectedDayPredicate: (day) {
-          // While a range is active, only range endpoints get selected styling.
-          if (_rangeStart != null) return _isRangeEndpoint(day);
-          return isSameDay(_selectedDay, day);
-        },
-        calendarFormat: CalendarFormat.month,
-        startingDayOfWeek: StartingDayOfWeek.monday,
-        headerStyle: _calendarHeaderStyle(context),
-        calendarStyle: _calendarStyle(context),
-        calendarBuilders: CalendarBuilders(
-          defaultBuilder: (context, date, events) => _buildDefaultDayCell(
-            context,
-            date,
-            meditationDates: meditationDates,
-            freezeDates: freezeDates,
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+      child: Column(
+        children: [
+          TableCalendar<dynamic>(
+            rowHeight: 70 + (MediaQuery.textScalerOf(context).scale(12) - 12),
+            daysOfWeekHeight: 28,
+            // Month title, weekday letters and each day's spoken label.
+            locale: Localizations.localeOf(context).toString(),
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.now(),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) {
+              // While a range is active, only range endpoints get selected styling.
+              if (_rangeStart != null) return _isRangeEndpoint(day);
+              return isSameDay(_selectedDay, day);
+            },
+            calendarFormat: CalendarFormat.month,
+            startingDayOfWeek: StartingDayOfWeek.monday,
+            headerStyle: _calendarHeaderStyle(context),
+            calendarStyle: _calendarStyle(context),
+            calendarBuilders: CalendarBuilders(
+              disabledBuilder: (context, date, _) =>
+                  _buildCalendarDay(context, date, disabled: true),
+              defaultBuilder: (context, date, events) =>
+                  _buildCalendarDay(context, date),
+              todayBuilder: (context, date, events) =>
+                  _buildCalendarDay(context, date),
+              selectedBuilder: (context, date, events) =>
+                  _buildCalendarDay(context, date, selected: true),
+            ),
+            daysOfWeekStyle: _daysOfWeekStyle(context),
+            onDaySelected: _onDaySelected,
+            onDayLongPressed: (day, focusedDay) => _handleLongPress(day),
+            onPageChanged: (focusedDay) {
+              setState(() {
+                _focusedDay = focusedDay;
+              });
+            },
           ),
-          todayBuilder: (context, date, events) => _buildTodayDayCell(
-            context,
-            date,
-            meditationDates: meditationDates,
-            freezeDates: freezeDates,
-          ),
-          selectedBuilder: (context, date, events) =>
-              _buildSelectedDayCell(context, date, freezeDates: freezeDates),
-        ),
-        daysOfWeekStyle: _daysOfWeekStyle(context),
-        onDaySelected: _onDaySelected,
-        onDayLongPressed: (day, focusedDay) => _handleLongPress(day),
-        onPageChanged: (focusedDay) {
-          setState(() {
-            _focusedDay = focusedDay;
-          });
-        },
+        ],
       ),
     );
   }
@@ -632,171 +637,82 @@ class _MeditationCalendarWidgetState
     return DaysOfWeekStyle(weekdayStyle: style, weekendStyle: style);
   }
 
-  Widget? _buildDefaultDayCell(
+  Widget _buildCalendarDay(
     BuildContext context,
     DateTime date, {
-    required Set<DateTime> meditationDates,
-    required Set<DateTime> freezeDates,
+    bool selected = false,
+    bool disabled = false,
   }) {
-    final dayStart = startOfDay(date);
-    final hasMeditation = meditationDates.contains(dayStart);
-    final hasFreeze = freezeDates.contains(dayStart);
+    final theme = Theme.of(context);
+    final type = disabled ? null : _stamps[startOfDay(date)];
+    final today = isSameDay(date, DateTime.now());
     final inRange = _isInRange(date);
-
-    if (inRange && !hasMeditation && !hasFreeze) {
-      return _buildDayCircle(
-        context,
-        date,
-        color: context.brandAccent.withOpacityValue(0.20),
-      );
-    }
-
-    if (hasMeditation) {
-      return _buildDayCircle(
-        context,
-        date,
-        color: _meditatedFill(context),
-        fontWeight: FontWeight.w600,
-      );
-    }
-
-    if (hasFreeze) {
-      return _buildDayCircle(
-        context,
-        date,
-        color: _freezeFill(context),
-        fontWeight: FontWeight.w600,
-        freeze: true,
-      );
-    }
-
-    return null;
-  }
-
-  Widget _buildTodayDayCell(
-    BuildContext context,
-    DateTime date, {
-    required Set<DateTime> meditationDates,
-    required Set<DateTime> freezeDates,
-  }) {
-    final dayStart = startOfDay(date);
-    final hasMeditation = meditationDates.contains(dayStart);
-    final hasFreeze = freezeDates.contains(dayStart);
-    final backgroundColor = hasMeditation
-        ? _meditatedFill(context)
-        : hasFreeze
-        ? _freezeFill(context)
-        : Theme.of(context).colorScheme.surface;
-
-    return _buildDayCircle(
-      context,
-      date,
-      color: backgroundColor,
-      fontWeight: FontWeight.w600,
-      border: Border.all(color: context.brandAccent, width: 2),
-      freeze: !hasMeditation && hasFreeze,
-    );
-  }
-
-  Widget _buildSelectedDayCell(
-    BuildContext context,
-    DateTime date, {
-    required Set<DateTime> freezeDates,
-  }) {
-    final dayStart = startOfDay(date);
-    final isFreeze = freezeDates.contains(dayStart);
-    final fillColor = isFreeze ? _freezeColor(context) : context.brandAccent;
-
-    if (_isRangeEndpoint(date)) {
-      return Container(
-        margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          color: fillColor.withOpacityValue(0.30),
-          shape: BoxShape.circle,
-        ),
-        child: _buildDayCircle(
-          context,
-          date,
-          color: fillColor,
-          margin: const EdgeInsets.all(3),
-          textColor: Theme.of(context).colorScheme.onPrimary,
-          fontWeight: FontWeight.w700,
-          freeze: isFreeze,
-        ),
-      );
-    }
-
-    return _buildDayCircle(
-      context,
-      date,
-      color: fillColor,
-      textColor: Theme.of(context).colorScheme.onPrimary,
-      fontWeight: FontWeight.w700,
-      freeze: isFreeze,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
+      decoration: BoxDecoration(
+        color: selected || inRange
+            ? theme.colorScheme.onSurface.withOpacityValue(
+                selected ? 0.08 : 0.04,
+              )
+            : null,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Column(
+        children: [
+          Container(
+            constraints: const BoxConstraints(minWidth: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                DateFormat.d(
+                  Localizations.localeOf(context).toString(),
+                ).format(date),
+                textAlign: TextAlign.center,
+                style: _dayTextStyle(
+                  context,
+                  color: theme.colorScheme.onSurface.withOpacityValue(
+                    disabled ? 0.3 : 0.85,
+                  ),
+                  fontWeight: selected || today
+                      ? FontWeight.w700
+                      : FontWeight.w400,
+                ).copyWith(fontSize: 12),
+                maxLines: 1,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: type == null
+                  ? const SizedBox.shrink()
+                  : FittedBox(
+                      child: Padding(
+                        padding: const EdgeInsets.all(3),
+                        child: CalendarStamp(
+                          key: ValueKey(startOfDay(date)),
+                          date: date,
+                          type: type,
+                          animateIn: _pendingStampDates.contains(
+                            startOfDay(date),
+                          ),
+                          onRevealComplete: () =>
+                              _pendingStampDates.remove(startOfDay(date)),
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   bool _isDark(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark;
 
-  /// Meditated days: at least 3:1 against the card, so a done day doesn't
-  /// rest on a faint tint, while the digit on top keeps 4.5:1.
-  Color _meditatedFill(BuildContext context) =>
-      context.brandAccent.withOpacityValue(_isDark(context) ? 0.4 : 0.5);
-
   Color _freezeColor(BuildContext context) =>
       _isDark(context) ? ColorConstants.lightBlue : _kFreezeBlueLight;
-
-  /// Same 3:1 / 4.5:1 targets as [_meditatedFill].
-  Color _freezeFill(BuildContext context) =>
-      _freezeColor(context).withOpacityValue(_isDark(context) ? 0.6 : 0.75);
-
-  Widget _buildDayCircle(
-    BuildContext context,
-    DateTime date, {
-    required Color color,
-    EdgeInsets margin = const EdgeInsets.all(4),
-    Color? textColor,
-    FontWeight? fontWeight,
-    BoxBorder? border,
-    bool freeze = false,
-  }) {
-    final digit = Text(
-      '${date.day}',
-      style: _dayTextStyle(context, color: textColor, fontWeight: fontWeight),
-    );
-    return Container(
-      margin: margin,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: border,
-      ),
-      child: freeze
-          // A snowflake under the digit, so a freeze day isn't told apart
-          // from a meditated day by hue alone.
-          ? Stack(
-              fit: StackFit.expand,
-              children: [
-                Center(child: digit),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 3,
-                  child: Center(
-                    child: MeditoIcon(
-                      assetName: MeditoIcons.snow,
-                      size: 8,
-                      color:
-                          textColor ?? Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : Center(child: digit),
-    );
-  }
 
   TextStyle _dayTextStyle(
     BuildContext context, {

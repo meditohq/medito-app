@@ -71,7 +71,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
       appBar: MeditoAppBarSmall(
         hasBackButton: false,
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(52),
+          preferredSize: const Size.fromHeight(64),
           // The page has no visible title: name the route and give screen
           // readers a heading to land on.
           child: Semantics(
@@ -87,9 +87,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
                 builder: (context, _) => Padding(
                   padding: const EdgeInsets.fromLTRB(
                     padding16,
-                    0,
                     padding16,
-                    4,
+                    padding16,
+                    0,
                   ),
                   child: MeditoSegmentedTabs(
                     labels: [
@@ -291,7 +291,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,

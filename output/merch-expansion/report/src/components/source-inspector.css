@@ -1,0 +1,61 @@
+/* Source definitions, provenance, and reviewed SQL shared by apps and inline charts. */
+.source-section { display: grid; gap: var(--space-6); padding: var(--space-6); }
+.source-definition { padding: var(--space-4); border-radius: var(--radius-xl); background: var(--muted); }
+.source-definition h3 { margin: 3px 0 7px; font-size: 16px; }
+.source-definition > p:last-child { margin: 0; color: var(--secondary); font-size: 14px; line-height: 1.55; }
+.source-label, .source-metadata dt { margin: 0; color: var(--secondary); font-size: 14px; line-height: 24px; letter-spacing: 0; text-transform: none; }
+.source-value { margin: 0; overflow-wrap: anywhere; color: var(--secondary); font-size: 12px; }
+.source-metadata { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.source-metadata div { min-width: 0; }
+.source-metadata dd { margin: 8px 0 0; overflow-wrap: anywhere; color: var(--text); font-size: 14px; line-height: 1.6; }
+.source-group { display: grid; gap: 8px; }
+.source-copy { margin: 0; color: var(--secondary); font-size: 14px; line-height: 1.55; }
+.source-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+.source-pill { display: inline-flex; min-width: 0; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; }
+.source-pill[href] { color: var(--text); text-decoration: none; }
+.source-pill[href]:hover { border-color: var(--accent); color: var(--accent); }
+.source-pill span { overflow-wrap: anywhere; }
+.source-definitions { width: 100%; border-collapse: collapse; }
+.source-definitions :is(th, td) { padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--text) 5%, transparent); color: var(--text); font-size: 14px; line-height: 1.6; text-align: left; vertical-align: top; }
+.source-definitions tr:first-child :is(th, td) { border-top: 1px solid color-mix(in srgb, var(--text) 5%, transparent); }
+.source-definitions th { width: 136px; padding-right: 16px; font-weight: 500; }
+.source-definition-formula { display: block; margin-top: 5px; overflow-wrap: anywhere; color: var(--secondary); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.55; }
+.source-definition-variable { margin-top: 2px; font-weight: 400; }
+.source-definition-lineage { display: block; margin-top: 4px; overflow-wrap: anywhere; color: var(--secondary); font-size: 12px; line-height: 1.55; }
+.source-caveats { display: grid; margin: 0; padding: 0; border-top: 1px solid color-mix(in srgb, var(--text) 5%, transparent); list-style: none; }
+.source-caveats li { min-width: 0; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--text) 5%, transparent); color: var(--text); font-size: 14px; line-height: 1.6; }
+.source-list { display: grid; gap: 2px; margin: 0 -8px; }
+.source-row { display: grid; min-width: 0; grid-template-columns: 17px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 9px 8px; border-radius: 8px; color: var(--text); font-size: 14px; line-height: 20px; text-decoration: none; }
+.source-row-icon { align-self: start; margin-top: 2px; color: var(--secondary); }
+.source-row-copy { display: grid; min-width: 0; gap: 1px; }
+.source-row-title { min-width: 0; overflow-wrap: anywhere; white-space: normal; }
+.source-trust, .source-usage-note { overflow-wrap: anywhere; color: var(--secondary); font-family: var(--font-sans, inherit); font-size: 12px; line-height: 20px; white-space: normal; }
+.source-row-external { color: var(--secondary); opacity: 0; transition: opacity 120ms ease; }
+.source-row[href]:is(:hover, :focus-visible) { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.source-row[href]:is(:hover, :focus-visible) .source-row-external { opacity: 1; }
+.source-section .source-evidence { color: var(--text); font-size: 14px; line-height: 1.55; }
+.source-trace { display: grid; gap: 0; margin: 2px 0 0; padding: 0; list-style: none; }
+.source-trace-step { position: relative; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 13px; padding: 0 0 22px; }
+.source-trace-step:not(:last-child)::after { position: absolute; top: 30px; bottom: 3px; left: 14px; width: 1px; background: var(--border); content: ""; }
+.source-trace-marker { display: grid; width: 29px; height: 29px; border: 1px solid var(--border); border-radius: 50%; background: var(--surface); color: var(--secondary); font-size: 12px; place-items: center; }
+.source-trace-copy { min-width: 0; padding-top: 4px; }
+.source-trace-copy > strong { display: block; color: var(--text); font-size: 14px; line-height: 1.45; }
+.source-trace-copy > p { margin: 6px 0 0; color: var(--text); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.source-trace-copy .source-pills { margin-top: 10px; }
+
+.sql-viewer { overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--muted); }
+.sql-toolbar { display: flex; min-height: 46px; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 10px 6px 14px; border-bottom: 1px solid var(--border); }
+.sql-toolbar-actions { display: flex; align-items: center; gap: 2px; }
+.sql-source-links { display: flex; min-width: 0; flex-wrap: wrap; gap: 8px; }
+.sql-source-links a { display: inline-flex; align-items: center; gap: 5px; color: var(--secondary); font-size: 12px; text-decoration: none; }
+.sql-source-links a:hover { color: var(--text); }
+.sql-copy-button { display: inline-flex; min-height: 30px; flex: 0 0 auto; align-items: center; gap: 5px; padding: 5px 8px; border: 0; border-radius: 7px; background: transparent; color: var(--secondary); font-size: 12px; }
+.sql-copy-button:hover { background: var(--interaction-hover); color: var(--text); }
+.sql { min-height: 120px; max-height: calc(100dvh - 250px); margin: 0; overflow: auto; padding: 12px 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; line-height: 1.7; white-space: pre; }
+.sql :is(code, span) { font-family: inherit; }
+.sql-line { display: grid; grid-template-columns: 38px minmax(0, 1fr); padding-right: 14px; }
+.sql-line-number { padding-right: 10px; color: var(--secondary); text-align: right; user-select: none; }
+.sql-line-content { overflow-wrap: anywhere; white-space: pre-wrap; }
+.sql code { display: block; min-width: 0; }
+.sql-keyword { color: var(--accent); }
+.sql-string { color: var(--positive); }

@@ -1,0 +1,74 @@
+[
+  {
+    "name": "cream",
+    "width": 2400,
+    "height": 1220,
+    "dpi": 300,
+    "alpha": true,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "components": 1,
+    "componentAreas": [
+      1479254
+    ],
+    "pathExact": true
+  },
+  {
+    "name": "white",
+    "width": 2400,
+    "height": 1220,
+    "dpi": 300,
+    "alpha": true,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "components": 1,
+    "componentAreas": [
+      1479254
+    ],
+    "pathExact": true
+  },
+  {
+    "name": "charcoal",
+    "width": 2400,
+    "height": 1220,
+    "dpi": 300,
+    "alpha": true,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "components": 1,
+    "componentAreas": [
+      1479254
+    ],
+    "pathExact": true
+  },
+  {
+    "name": "forest",
+    "width": 2400,
+    "height": 1220,
+    "dpi": 300,
+    "alpha": true,
+    "corners": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "components": 1,
+    "componentAreas": [
+      1479254
+    ],
+    "pathExact": true
+  }
+]

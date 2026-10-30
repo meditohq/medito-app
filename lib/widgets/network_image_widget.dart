@@ -10,6 +10,8 @@ class NetworkImageWidget extends StatelessWidget {
   final bool shouldCache;
   final Gradient? gradient;
   final Widget? errorWidget;
+  final Duration fadeInDuration;
+  final Duration fadeOutDuration;
   const NetworkImageWidget({
     super.key,
     required this.url,
@@ -18,6 +20,8 @@ class NetworkImageWidget extends StatelessWidget {
     this.shouldCache = false,
     this.gradient,
     this.errorWidget,
+    this.fadeInDuration = const Duration(milliseconds: 500),
+    this.fadeOutDuration = const Duration(milliseconds: 1000),
   });
 
   static final Map<double, String> _resolutionSuffixes = {
@@ -76,6 +80,8 @@ class NetworkImageWidget extends StatelessWidget {
   Widget _buildCachedImage(String scaledUrl, String originalUrl) {
     return CachedNetworkImage(
       imageUrl: scaledUrl,
+      fadeInDuration: fadeInDuration,
+      fadeOutDuration: fadeOutDuration,
       imageBuilder: (context, imageProvider) => Container(
         decoration: BoxDecoration(
           image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
@@ -88,6 +94,8 @@ class NetworkImageWidget extends StatelessWidget {
         if (url != originalUrl) {
           return CachedNetworkImage(
             imageUrl: originalUrl,
+            fadeInDuration: fadeInDuration,
+            fadeOutDuration: fadeOutDuration,
             imageBuilder: (context, imageProvider) => Container(
               decoration: BoxDecoration(
                 image: DecorationImage(image: imageProvider, fit: BoxFit.cover),

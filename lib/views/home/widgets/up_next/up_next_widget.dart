@@ -167,9 +167,11 @@ class UpNextWidget extends ConsumerWidget {
       },
     );
 
-    final alignment = style == UpNextStyle.hero
-        ? Alignment.bottomCenter
-        : Alignment.topCenter;
+    // Progress can change while Home is covered by the player. Keep the
+    // hero settled on return instead of animating the whole page's height.
+    if (style == UpNextStyle.hero) return child;
+
+    const alignment = Alignment.topCenter;
     return AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOutCubic,

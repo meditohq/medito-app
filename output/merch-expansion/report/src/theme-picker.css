@@ -1,0 +1,167 @@
+/* App-shell UI only. Inline charts use theme tokens, not the theme picker. */
+.theme-drawer {
+  position: sticky;
+  z-index: 20;
+  top: calc(var(--dashboard-topbar-base-height, 52px) + var(--dashboard-tabs-visible-height, 0px));
+  max-height: 0;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid transparent;
+  background: var(--surface);
+  transition:
+    max-height 240ms ease,
+    border-color 160ms ease;
+}
+.theme-drawer.is-open {
+  max-height: 280px;
+  border-bottom-color: var(--border);
+}
+.theme-drawer-content {
+  min-width: 0;
+  padding-block: 15px 4px;
+}
+.theme-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.theme-drawer-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+.theme-drawer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.theme-drawer-close {
+  color: var(--text);
+}
+.theme-appearance-trigger {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--control-radius);
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+}
+.theme-appearance-trigger:hover {
+  background: var(--interaction-hover);
+}
+.theme-appearance-trigger:focus-visible {
+  outline: none;
+  background: var(--interaction-hover);
+}
+.theme-card-list {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  overflow-x: auto;
+  padding: 6px var(--theme-edge-inset) 16px;
+  scroll-padding-inline: var(--theme-edge-inset);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  --theme-edge-inset: max(
+    var(--dashboard-content-gutter),
+    calc((100vw - var(--dashboard-content-max-width)) / 2 + var(--dashboard-content-gutter))
+  );
+}
+.theme-card-list::-webkit-scrollbar {
+  display: none;
+}
+.theme-card {
+  display: grid;
+  width: 200px;
+  min-width: 0;
+  flex: 0 0 200px;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  scroll-snap-align: start;
+  text-align: left;
+}
+.theme-card:hover,
+.theme-card:focus-visible,
+.theme-card.is-active {
+  color: var(--text);
+}
+.theme-preview {
+  display: grid;
+  height: 120px;
+  align-content: space-between;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--preview-text) 11%, var(--preview-background));
+  border-radius: 12px;
+  background: var(--preview-background);
+  color: var(--preview-text);
+  font-family: var(--preview-font);
+}
+.theme-preview :is(span, strong, b, i) {
+  font-family: var(--preview-font);
+}
+.theme-card.is-active .theme-preview {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.theme-preview-type {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.theme-preview-type strong {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+}
+.theme-preview-type > span {
+  overflow: hidden;
+  color: var(--preview-secondary);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.theme-preview-swatches {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.theme-preview-swatches i {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+.theme-preview-geometry {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+.theme-preview-geometry > i {
+  width: 58px;
+  height: 20px;
+  flex: 0 0 auto;
+  border: 1px solid var(--preview-border);
+  border-radius: var(--preview-radius);
+  background: var(--preview-control);
+}
+.theme-card-label {
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 650px) {
+  .theme-card-list {
+    --theme-edge-inset: var(--dashboard-content-mobile-gutter);
+  }
+  .theme-drawer { top: var(--dashboard-topbar-base-height, 50px); z-index: var(--layer-header); }
+  .dashboard-root:has(.theme-drawer.is-open) .filters.filter-bar { position: relative; top: auto; }
+}

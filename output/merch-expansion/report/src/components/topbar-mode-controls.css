@@ -1,0 +1,9 @@
+.dashboard-topbar-copy, .dashboard-topbar-actions, .dashboard-topbar-edit-controls { display: flex; min-width: 0; align-items: center; gap: 10px; }
+.dashboard-topbar-copy { flex: 1 1 auto; }
+.dashboard-topbar-actions, .dashboard-topbar-edit-controls { flex: 0 0 auto; }
+.dashboard-topbar-mode-controls { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; }
+/* Keep the actual action buttons mounted and animate their geometry without per-frame layout. */
+.dashboard-topbar-mode-controls [data-mode-action] { box-sizing: border-box; white-space: nowrap; transform-origin: right center; }
+@media (max-width: 599px) {
+  .dashboard-topbar-mode-controls { grid-area: 2 / 1 / 3 / -1; justify-self: end; }
+}

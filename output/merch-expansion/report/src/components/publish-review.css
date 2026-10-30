@@ -1,0 +1,38 @@
+/* Publication review keeps audience choices and permission facts together. */
+.dialog.publish-review-dialog { display: flex; flex-direction: column; width: min(480px, calc(100vw - 32px)); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); overflow: hidden; border-radius: 24px; }
+.publish-review-dialog .dialog-header { flex: 0 0 auto; padding: 24px 24px 20px; }
+.publish-review-dialog .dialog-header h2 { font-size: 20px; line-height: 28px; }
+.publish-review-dialog .dialog-header .icon-button:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 8%, transparent); }
+.publish-review-dialog .dialog-content { display: flex; flex-direction: column; min-height: 0; padding: 0; }
+.publish-review-body { min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 0 24px 24px; }
+.publish-review-section h3 { margin: 0 0 12px; font: 500 14px/20px var(--font-sans); }
+.publish-review-section p { margin: 0; color: var(--secondary); font: 400 14px/20px var(--font-sans); }
+.publish-review-audience { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.publish-review-option { display: grid; grid-template-columns: 18px minmax(0, 1fr) 16px; align-items: center; gap: 12px; min-height: 68px; padding: 12px; border: 1px solid var(--color-border-light, var(--border)); border-radius: 12px; cursor: pointer; }
+.publish-review-option:has(input:checked) { border-color: var(--text); background: color-mix(in srgb, var(--text) 3%, transparent); }
+.publish-review-option:hover { background: var(--interaction-hover); }
+.publish-review-option:has(input:focus-visible) { outline: 2px solid var(--text); outline-offset: 2px; }
+.publish-review-option > .dashboard-icon, .publish-review-existing > .dashboard-icon { color: var(--secondary); }
+.publish-review-option strong, .publish-review-existing strong { font: 500 14px/20px var(--font-sans); }
+.publish-review-option-detail { display: block; margin-top: 2px; color: var(--secondary); font: 400 12px/18px var(--font-sans); }
+.publish-review-option input { width: 16px; height: 16px; margin: 0; accent-color: var(--text); cursor: pointer; }
+.publish-review-permissions { margin-top: 20px; }
+.publish-review-permissions p { margin: 12px 0 0; color: var(--secondary); font: 400 14px/20px var(--font-sans); }
+.publish-review-facts { display: grid; gap: 8px; margin: 0; padding-left: 18px; color: var(--text); font: 400 14px/20px var(--font-sans); }
+.publish-review-facts li { padding-left: 2px; }
+.publish-review-existing { display: flex; align-items: flex-start; gap: 12px; }
+.publish-review-existing .dashboard-icon { flex-shrink: 0; margin-top: 2px; }
+.publish-review-existing p { margin-top: 4px; }
+.publish-review-footer { display: flex; flex: 0 0 auto; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--color-border-light, var(--border)); }
+.publish-review-footer > .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 36px; min-height: 36px; padding: 0 16px; border: 1px solid var(--border); border-radius: 12px; font: 500 14px/20px var(--font-sans); text-decoration: none; white-space: nowrap; }
+.publish-review-footer > .button.primary { border-color: transparent; }
+.publish-review-footer > .button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.dashboard-publish-confirm > .dashboard-icon { flex: 0 0 auto; }
+.dashboard-publish-button:disabled, .dashboard-publish-confirm:disabled, .dashboard-publish-confirm[aria-disabled="true"] { cursor: not-allowed; opacity: .45; }
+@media (max-width: 480px) {
+  .publish-review-dialog .dialog-header { padding: 20px 20px 16px; }
+  .publish-review-body { padding: 0 20px 20px; }
+  .publish-review-footer { padding: 12px; flex-wrap: wrap; }
+  .publish-review-footer > .button { padding-inline: 12px; }
+  .publish-review-option { gap: 10px; padding: 10px; }
+}

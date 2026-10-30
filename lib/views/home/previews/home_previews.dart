@@ -27,6 +27,7 @@ import 'package:medito/views/shop/previews/shop_previews.dart';
 import 'package:medito/providers/home/up_next_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/views/home/home_view.dart';
+import 'package:medito/views/home/widgets/header/home_hero.dart';
 import 'package:medito/views/home/widgets/shortcuts/shortcuts_items_widget.dart';
 import 'package:medito/views/home/widgets/up_next/up_next_widget.dart';
 import 'package:medito/views/previews/preview_support.dart';
@@ -314,6 +315,9 @@ List<Override> _homeOverrides({
 }) => [
   fetchHomeProvider.overrideWith((ref) async => previewHome),
   upNextProvider.overrideWith((ref) => upNext ?? AsyncData(previewUpNext)),
+  homeHeroCoverProvider.overrideWith(
+    (ref) => (upNext ?? AsyncData(previewUpNext)).value?.pack.coverUrl,
+  ),
   statsProvider.overrideWith(() => _PreviewStatsNotifier(stats)),
   fetchLatestAnnouncementProvider.overrideWith((ref) async => announcement),
   homeShopProductsProvider.overrideWith(

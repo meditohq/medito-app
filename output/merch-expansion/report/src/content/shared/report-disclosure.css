@@ -1,0 +1,20 @@
+.report-evidence-disclosure { margin-top: 16px; }
+.report-evidence-disclosure-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.report-evidence-disclosure-trigger:hover { color: var(--text); }
+.report-evidence-disclosure-trigger:disabled { cursor: default; }
+.report-evidence-disclosure-content:not([hidden]) { margin-top: 16px; }
+@media print {
+  .report-evidence-disclosure-trigger { display: none !important; }
+  .report-evidence-disclosure-content[hidden] { display: block !important; }
+}

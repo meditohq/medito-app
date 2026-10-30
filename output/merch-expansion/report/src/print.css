@@ -1,0 +1,165 @@
+@page {
+  margin: 12mm;
+}
+
+@media print {
+  :root {
+    color-scheme: light dark;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  html,
+  body,
+  #root,
+  .dashboard-root {
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .dashboard-topbar,
+  .theme-drawer,
+  .popover,
+  .dialog-backdrop,
+  .source-sidebar-backdrop,
+  .source-sidebar,
+  .dashboard-toast,
+  .dashboard-ask-panel,
+  .dashboard-ask-selected-region,
+  .dashboard-tooltip,
+  .menu-trigger,
+  .info,
+  .table-toolbar .search-field,
+  .table-row-action,
+  .table-pagination .actions,
+  .receipt-pagination > button,
+  .select-trigger .chevron,
+  .data-segmented-control-button[aria-pressed="false"],
+  .data-slider-input,
+  .data-slider-track,
+  .data-slider-bound,
+  .data-switch-track {
+    display: none !important;
+  }
+
+  /* Keep the page receipt: only the current filtered/sorted page is mounted. */
+  .table-toolbar:not(:has(.table-toolbar-controls)) { display: none !important; }
+  .table-print-search {
+    display: block;
+    margin-block-end: 8px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: var(--secondary);
+  }
+
+  /* Controls also contain column titles, selected values and scenario inputs.
+     Remove their affordances without hiding that information. */
+  .select-trigger,
+  .data-segmented-control,
+  .data-segmented-control-button,
+  .data-switch,
+  .table th button {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    min-height: 0;
+    height: auto;
+    cursor: default;
+  }
+  .select-trigger .filter-label::after { content: ": "; }
+  .data-switch[aria-checked="true"]::after { content: " — On"; }
+  .data-switch[aria-checked="false"]::after { content: " — Off"; }
+  .data-slider-control {
+    display: block;
+    height: auto;
+    min-height: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .data-slider-value { position: static !important; transform: none !important; }
+  .data-slider--range .data-slider-value--lower::after { content: " – "; white-space: pre; }
+  .table-wrap { mask-image: none !important; -webkit-mask-image: none !important; }
+  .table td, .table th { white-space: normal; overflow-wrap: break-word; }
+
+  /* Scale the existing viewBox before ResizeObserver handles the paper width.
+     Recharts' immediate inner div otherwise has zero width and height. */
+  .recharts-responsive-container > div { width: 100% !important; height: 100% !important; }
+  .recharts-wrapper { max-width: 100% !important; }
+  .recharts-wrapper > .recharts-surface { width: 100% !important; height: 100% !important; }
+
+  main.page,
+  main.report-page {
+    width: auto;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  main.page.has-source-sidebar {
+    margin-inline-end: 0;
+  }
+
+  .filters.filter-bar,
+  .filters.filter-bar[data-stuck] {
+    position: static;
+    margin-inline: 0;
+    padding-inline: 0;
+    border-color: transparent;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .data-section-header { break-inside: avoid-page; }
+  .chart-funnel { break-inside: avoid-page; }
+  .chart-funnel-scroll { overflow: visible; }
+  .chart-funnel-canvas { min-width: 0; }
+  .chart-funnel-stage-name { padding-inline: 6px; font-size: 12px; }
+  .chart-funnel-stage-value { padding-inline: 6px; font-size: 20px; line-height: 28px; }
+  .chart-funnel-stage-share { padding-inline: 2px; }
+  .chart-funnel-stage-share > span { padding-inline: 4px; }
+  .chart-funnel-stage:focus-visible { outline: none; }
+  .chart-funnel-tooltip { display: none; }
+  :is(.data-section-filters, .component-section-filters) .clear-filters { display: none; }
+  /* Print can change dimensions before ResizeObserver runs. Keep a native
+     surface rather than printing a stale, screen-sized SVG background. */
+  .smooth-card-surface { display: none !important; }
+  .dashboard-component:has(> .smooth-card-surface[data-ready]) {
+    background: var(--card-surface, var(--background)) !important;
+    border-color: var(--card-surface-border, var(--border)) !important;
+  }
+
+  .dashboard-component,
+  .metric-item,
+  .chart-layout,
+  .report-summary,
+  .report-recommendations,
+  .report-facts,
+  table,
+  tr,
+  svg,
+  img {
+    break-inside: avoid-page;
+  }
+
+  .table-wrap,
+  .table-scroll,
+  .chart-layout,
+  .recharts-responsive-container {
+    max-width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+}

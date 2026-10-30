@@ -1,0 +1,70 @@
+/* Chart export uses shared controls and keeps the live chart visible while encoding. */
+.dialog.chart-export-dialog { --control-radius: var(--radius-xl); top: 0; left: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none; display: flex; flex-direction: column; overflow: hidden; border: 0; border-radius: 0; background: var(--background); box-shadow: none; transform: none; }
+.chart-export-dialog .dialog-header:focus { outline: none; }
+.chart-export-dialog > .dialog-header, .chart-export-footer { flex-shrink: 0; }
+.chart-export-dialog > .dialog-header { min-height: 52px; padding: 0 var(--data-app-dashboard-gutter); border-bottom: var(--hairline, 1px) solid var(--color-border-light, var(--border)); }
+.chart-export-dialog .dialog-content { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding: 0; overflow: hidden; }
+.chart-export-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 320px); min-height: 0; overflow: hidden; flex: 1 1 auto; }
+.chart-export-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 0 0 20px; }
+.chart-export-stage { min-width: 0; display: flex; align-items: safe center; justify-content: safe center; padding: 28px; min-height: 0; flex: 1 1 auto; overflow: auto; background: var(--background); }
+.chart-export-preset-description { margin: 0; font-size: 12px; line-height: 18px; color: var(--secondary); text-align: center; }
+.chart-export-preview-frame { position: relative; flex-shrink: 0; }
+.chart-export-preview { position: absolute; inset: 0 auto auto 0; box-sizing: content-box; transform-origin: top left; border: 1px solid var(--color-border-light, var(--border)); border-radius: var(--radius-3xl); }
+.chart-export-preview-clip { width: 100%; height: 100%; border-radius: inherit; overflow: hidden; }
+.chart-export-preview-clip[data-transparent="true"] { background-color: var(--surface); background-image: conic-gradient(color-mix(in srgb, var(--text) 8%, transparent) 25%, transparent 0 50%, color-mix(in srgb, var(--text) 8%, transparent) 0 75%, transparent 0); background-size: 16px 16px; }
+.chart-export-artwork[data-transparent="true"] { background: transparent; }
+.chart-export-artwork { position: relative; display: flex; flex-direction: column; box-sizing: border-box; padding: 20px; gap: 12px; border: 0; border-radius: 0; background: var(--surface); color: var(--text); font-family: var(--font-sans); overflow: hidden; pointer-events: none; }
+.chart-export-heading { flex-shrink: 0; }
+.chart-export-heading h2 { margin: 0; font: 500 16px/24px var(--font-sans); color: var(--text); }
+.chart-export-heading p { margin: 0; font: 400 14px/20px var(--font-sans); color: var(--secondary); }
+.chart-export-heading h2 + p { margin-top: 4px; }
+.chart-export-provenance p { margin: 0; }
+.chart-export-provenance p + p { margin-top: 2px; }
+.chart-export-provenance { margin: 0; flex-shrink: 0; font: 400 12px/18px var(--font-sans); color: var(--secondary); overflow-wrap: anywhere; }
+.chart-export-plot { flex: 1 1 auto; min-height: 100px; }
+.chart-export-plot > .chart-layout { height: auto; }
+.chart-export-plot .chart-frame { flex: none; }
+.chart-export-plot .chart-layout--legend-right { display: flex; flex-direction: column; }
+.chart-export-plot .chart-legend { max-height: none; overflow: visible; mask-image: none; }
+.chart-export-plot .chart-legend li[data-collapsed] { visibility: visible; }
+.chart-export-plot .chart-legend-toggle { display: none; }
+.chart-export-resize { position: absolute; right: -12px; bottom: -12px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: var(--radius-md); background: transparent; color: var(--border-strong); cursor: nwse-resize; touch-action: none; }
+.chart-export-resize::after { content: ""; position: absolute; left: -3px; top: -3px; width: 24px; height: 24px; box-sizing: border-box; border: 2px solid currentColor; border-radius: var(--radius-full); clip-path: inset(50% 0 0 50%); pointer-events: none; }
+.chart-export-resize:hover { color: var(--secondary); }
+.chart-export-resize:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chart-export-size-controls { display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 14px; padding: 20px 20px 0; }
+.chart-export-presets { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
+.chart-export-presets button { min-height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius-xl); background: transparent; color: var(--secondary); font-size: 14px; }
+.chart-export-presets button:hover, .chart-export-presets button[data-active] { background: var(--interaction-hover); color: var(--text); }
+.chart-export-custom-size { display: flex; align-items: center; gap: 8px; }
+.chart-export-controls.explorer-controls { max-height: none; overflow: auto; border-top: 0; border-left: var(--hairline, 1px) solid var(--color-border-light, var(--border)); }
+.chart-export-controls .explorer-section { display: flex; flex-direction: column; align-items: stretch; }
+.chart-export-controls .explorer-section + .explorer-section { margin-inline: 0; padding-inline: 0; border: 0; }
+.chart-export-dimensions { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--secondary); }
+.chart-export-dimensions label { display: flex; align-items: center; gap: 4px; min-width: 0; padding: 0 6px 0 8px; border: 1px solid var(--border); border-radius: var(--radius-xl); }
+.chart-export-dimensions input { width: 48px; min-width: 0; height: 30px; border: 0; padding: 0; color: var(--text); background: transparent; font: inherit; font-variant-numeric: tabular-nums; appearance: textfield; }
+.chart-export-dimensions input::-webkit-inner-spin-button, .chart-export-dimensions input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.chart-export-dimensions label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chart-export-dimensions input:focus { outline: none; }
+.chart-export-footer { display: flex; gap: 8px; align-items: center; justify-content: flex-end; padding: 16px 20px; border-top: 1px solid var(--border); }
+.chart-export-status { margin: 0 auto 0 0; font-size: 12px; line-height: 18px; color: var(--secondary); }
+@media (max-width: 800px) {
+  .chart-export-layout { display: flex; flex-direction: column; overflow: auto; }
+  .chart-export-main { flex: 0 0 auto; }
+  .chart-export-stage { min-height: 280px; height: 55dvh; flex: none; }
+  .chart-export-controls.explorer-controls { overflow: visible; border-left: 0; border-top: var(--hairline, 1px) solid var(--color-border-light, var(--border)); }
+  .chart-export-footer { flex-wrap: wrap; }
+  .chart-export-status { flex-basis: 100%; }
+}
+@media (max-width: 650px) {
+  .chart-editor-dialog.chart-export-dialog > .dialog-header { min-height: 50px; padding: 0 var(--data-app-dashboard-mobile-gutter); }
+  .chart-export-stage { padding-inline: var(--data-app-dashboard-mobile-gutter); }
+  .chart-export-size-controls { padding: 16px var(--data-app-dashboard-mobile-gutter) 0; gap: 10px; }
+  .chart-export-presets { width: 100%; flex-wrap: nowrap; justify-content: space-between; gap: 4px; overflow-x: auto; }
+  .chart-export-presets button { padding-inline: 4px; white-space: nowrap; }
+  .chart-export-resize { width: 44px; height: 44px; }
+  .chart-export-resize::after { left: 7px; top: 7px; }
+  .chart-export-footer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px var(--data-app-dashboard-mobile-gutter) calc(12px + env(safe-area-inset-bottom)); }
+  .chart-export-footer > :is(button, a) { display: grid; place-items: center; box-sizing: border-box; min-width: 0; min-height: 44px; width: 100%; padding-inline: 4px; font-size: 14px; white-space: nowrap; }
+  .chart-export-footer .chart-export-status { grid-column: 1 / -1; }
+}

@@ -1,0 +1,30 @@
+.report-task-link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  max-width: 100%;
+  margin-block-start: 12px;
+  color: var(--accent);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.report-task-link > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.report-task-link > .dashboard-icon { flex-shrink: 0; }
+.report-task-link:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.report-task-link:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 2px; }
+
+/* Align the task with the text of a single Markdown bullet, not its marker.
+   Unbulleted recommendations keep their normal left edge. */
+.rich-narrative:has(> .rich-narrative-content > :is(ul, ol):only-child) + .report-task-link {
+  margin-inline-start: 24px;
+  max-width: calc(100% - 24px);
+}
+
+.report-recommendations { display: grid; gap: 24px; min-width: 0; }
+.report-recommendations > * { min-width: 0; }
+
+@media print { .report-task-link { display: none; } }

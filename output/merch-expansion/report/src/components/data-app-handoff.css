@@ -1,0 +1,16 @@
+.dialog-backdrop.data-app-handoff-backdrop { z-index: calc(var(--layer-tooltip-portal, 1100) + 1); }
+.dialog.data-app-handoff-dialog { z-index: calc(var(--layer-tooltip-portal, 1100) + 2); width: min(440px, calc(100vw - 32px)); max-width: calc(100vw - 32px); }
+.data-app-handoff-dialog .dialog-content { display: grid; gap: var(--space-4); }
+.data-app-handoff-question { margin: 0; color: var(--secondary); font: 400 var(--text-sm-size)/var(--text-sm-line) var(--font-sans); }
+.data-app-handoff-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.data-app-handoff-dialog .button { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 var(--space-4); color: var(--text); font: 500 var(--text-sm-size)/var(--text-sm-line) var(--font-sans); text-decoration: none; white-space: nowrap; }
+.data-app-handoff-dialog .button:focus-visible, .data-app-handoff-remember input:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.data-app-handoff-footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.data-app-handoff-footer > .button { margin-left: auto; }
+.data-app-handoff-remember { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 36px; color: var(--text); font: 400 var(--text-sm-size)/var(--text-sm-line) var(--font-sans); cursor: pointer; }
+.data-app-handoff-remember input { flex: 0 0 16px; width: 16px; height: 16px; margin: 0; accent-color: var(--text); cursor: pointer; }
+@media (max-width: 480px) {
+  .data-app-handoff-dialog .dialog-header { padding-inline: var(--space-5); }
+  .data-app-handoff-dialog .dialog-content { padding-inline: var(--space-5); padding-bottom: var(--space-5); }
+}
+@media (max-width: 360px) { .data-app-handoff-choices { grid-template-columns: minmax(0, 1fr); } }

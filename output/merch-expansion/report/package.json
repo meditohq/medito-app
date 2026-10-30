@@ -1,0 +1,35 @@
+{
+  "name": "data-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "prebuild": "node scripts/verify-protected-runtime.mjs",
+    "build": "node scripts/verify-protected-runtime.mjs && vite build",
+    "test": "node --test tests/*.test.mjs",
+    "verify:runtime": "node scripts/verify-protected-runtime.mjs",
+    "integrity:authorize": "node scripts/authorize-protected-change.mjs",
+    "integrity:update": "node scripts/verify-protected-runtime.mjs --update --maintainer"
+  },
+  "dependencies": {
+    "@lexical/history": "^0.44.0",
+    "@lexical/link": "^0.44.0",
+    "@lexical/list": "^0.44.0",
+    "@lexical/markdown": "^0.44.0",
+    "@lexical/react": "^0.44.0",
+    "@lexical/rich-text": "^0.44.0",
+    "@radix-ui/react-dialog": "^1.1.18",
+    "@radix-ui/react-dropdown-menu": "^2.1.19",
+    "figma-squircle": "1.1.0",
+    "html-to-image": "1.11.13",
+    "lexical": "^0.44.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "vite": "^8.0.8",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}

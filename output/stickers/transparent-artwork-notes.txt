@@ -1,0 +1,11 @@
+Final chosen assets: take-a-breath-transparent.png and quiet-landscape-transparent.png.
+Mode: built-in image_gen edits of the original concepts. Canva background-removal attempt was not used in Fourthwall.
+Verified: both 1254 x 1254 RGBA PNGs, alpha range 0-255, all four corner pixels fully transparent.
+The solid pale-blue silhouette is part of the printed design; its exterior is transparent. No rectangular white background.
+Fourthwall: Kiss Cut Stickers, 3 by 3 inches only, $5.29 suggested selling price, saved as hidden. A Little Kindness excluded at user's request.
+
+Final prompt for Take a Breath:
+Create final transparent-background sticker artwork from this design. Keep the exact colored landscape, all typography 'take a breath' and 'medito', and composition. Put a continuous PALE SKY BLUE (#D4EDF7) filled silhouette behind the entire design, connecting lettering and illustration into one compact shaped sticker. Replace every existing white internal area with pale sky blue. Use a smooth DARK TEAL thin 3px outer contour around this one solid connected shape. Absolutely NO white border, NO white background, NO white paper. Outside that dark teal outer contour is completely transparent alpha, with 5 percent transparent padding. All outer contour edges must be smooth and clean, no flecks. No shadows. Preserve original colors within landscape. Flat illustrated sticker, not physical mockup.
+
+Final prompt for Quiet Landscape:
+Create final transparent-background sticker artwork from this exact design. Preserve exact medito lettering, the arch, river, hills, colors and illustration textures. Put one continuous PALE SKY BLUE (#D4EDF7) filled silhouette behind all the artwork, joining all leaves and the arch and word into ONE compact sticker. Replace white internal background gaps with pale sky blue. Use a smooth DARK TEAL thin 3px outer contour around this single connected shape. Absolutely NO white border, NO white background, NO white paper. Outside that dark teal outer contour is completely transparent alpha, with 5 percent transparent padding all sides. The outer edges must be smooth and clean, no distressed edges, no flecks or stray pixels. No shadows. Preserve original colors within landscape. Flat illustration, not physical mockup.
