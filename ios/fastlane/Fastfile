@@ -204,6 +204,12 @@ platform :ios do
 
 end
 
+# App Store Connect now reports appVersionState; appStoreState is deprecated
+# and can be absent even while the version is an editable draft.
+def draft_version_state(version)
+  version.app_version_state || version.app_store_state
+end
+
 # Deliver uploads a draft's binary and metadata without selecting its build.
 # Finish the draft explicitly, without creating a review submission.
 def attach_draft_build(app_version, build_number)
@@ -222,12 +228,14 @@ def attach_draft_build(app_version, build_number)
 
   filter = { versionString: app_version, platform: "IOS" }
   version = app.get_app_store_versions(filter: filter).first
-  unless version && version.app_store_state == "PREPARE_FOR_SUBMISSION"
-    UI.user_error!("Version #{app_version} is not an editable draft")
+  state = version && draft_version_state(version)
+  UI.message("App Store version #{app_version}: #{state || 'not found'}")
+  unless state == "PREPARE_FOR_SUBMISSION"
+    UI.user_error!("Version #{app_version} is not an editable draft (#{state || 'not found'})")
   end
   version.select_build(build_id: build.id)
   saved = app.get_app_store_versions(filter: filter).first
-  unless saved&.build&.id == build.id && saved.app_store_state == "PREPARE_FOR_SUBMISSION"
+  unless saved&.build&.id == build.id && draft_version_state(saved) == "PREPARE_FOR_SUBMISSION"
     UI.user_error!("Could not verify draft #{app_version} with build #{build_number}")
   end
   UI.success("Verified draft #{app_version} (#{build_number}): PREPARE_FOR_SUBMISSION, build attached")
