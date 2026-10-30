@@ -1,6 +1,15 @@
 Unreleased
 -
 
+2610.30.0
+- Download a whole course from its pack page
+- Adjust timer bells before starting your session
+- Better screen reader support and layouts for large text
+- A refreshed meditation calendar and smoother end-of-session animations
+- Faster Home loading, with saved progress available offline
+- More reliable notifications, downloads and donation checkout
+- Find the app rating link in Settings
+
 2610.17.1
 - Choose beginning, middle and end bells independently with simple checkboxes
 - A clearer sound picker with consistent headings and aligned controls
