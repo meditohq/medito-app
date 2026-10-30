@@ -213,6 +213,9 @@ end
 # Deliver uploads a draft's binary and metadata without selecting its build.
 # Finish the draft explicitly, without creating a review submission.
 def attach_draft_build(app_version, build_number)
+  # An editable version can retain the preceding binary's rejection state.
+  # Selecting a replacement build must not send it back into review.
+  editable_states = %w[PREPARE_FOR_SUBMISSION DEVELOPER_REJECTED REJECTED METADATA_REJECTED INVALID_BINARY]
   app = Spaceship::ConnectAPI::App.find(ENV.fetch("DEVELOPER_APP_IDENTIFIER"))
   UI.user_error!("App not found on App Store Connect") unless app
   build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
@@ -230,15 +233,15 @@ def attach_draft_build(app_version, build_number)
   version = app.get_app_store_versions(filter: filter).first
   state = version && draft_version_state(version)
   UI.message("App Store version #{app_version}: #{state || 'not found'}")
-  unless state == "PREPARE_FOR_SUBMISSION"
+  unless editable_states.include?(state)
     UI.user_error!("Version #{app_version} is not an editable draft (#{state || 'not found'})")
   end
   version.select_build(build_id: build.id)
   saved = app.get_app_store_versions(filter: filter).first
-  unless saved&.build&.id == build.id && draft_version_state(saved) == "PREPARE_FOR_SUBMISSION"
+  unless saved&.build&.id == build.id && editable_states.include?(draft_version_state(saved))
     UI.user_error!("Could not verify draft #{app_version} with build #{build_number}")
   end
-  UI.success("Verified draft #{app_version} (#{build_number}): PREPARE_FOR_SUBMISSION, build attached")
+  UI.success("Verified editable version #{app_version} (#{build_number}): #{draft_version_state(saved)}, build attached, not submitted for review")
 end
 
 # Builds and code-signs the .ipa with `flutter build ios --no-codesign` +
