@@ -7,6 +7,7 @@ import 'package:medito/models/local_audio_completed.dart';
 import 'package:medito/providers/day_boundary_offset_provider.dart';
 import 'package:medito/widgets/calendar_stamp.dart';
 import 'package:medito/views/home/widgets/bottom_sheet/stats/meditation_calendar_widget.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class _DayOffset extends DayBoundaryOffsetNotifier {
   @override
@@ -14,6 +15,67 @@ class _DayOffset extends DayBoundaryOffsetNotifier {
 }
 
 void main() {
+  testWidgets('calendar allows page scrolling and horizontal month swipes', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [dayBoundaryOffsetProvider.overrideWith(_DayOffset.new)],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: SingleChildScrollView(
+              controller: controller,
+              child: Column(
+                children: [
+                  MeditationCalendarWidget(stats: LocalAllStats.empty()),
+                  const SizedBox(height: 600),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final calendar = find.byType(TableCalendar<dynamic>);
+    final initialMonth = tester
+        .widget<TableCalendar<dynamic>>(calendar)
+        .focusedDay;
+    final dragStart = tester.getTopLeft(calendar) + const Offset(180, 200);
+
+    await tester.dragFrom(dragStart, const Offset(0, -150));
+    await tester.pumpAndSettle();
+    expect(controller.offset, greaterThan(0));
+    expect(
+      tester.widget<TableCalendar<dynamic>>(calendar).calendarFormat,
+      CalendarFormat.month,
+    );
+
+    controller.jumpTo(0);
+    await tester.pumpAndSettle();
+    await tester.dragFrom(
+      tester.getTopLeft(calendar) + const Offset(40, 200),
+      const Offset(300, 0),
+    );
+    await tester.pumpAndSettle();
+    final previousMonth = DateTime(initialMonth.year, initialMonth.month - 1);
+    final focusedDay = tester
+        .widget<TableCalendar<dynamic>>(calendar)
+        .focusedDay;
+    expect(focusedDay.year, previousMonth.year);
+    expect(focusedDay.month, previousMonth.month);
+    expect(controller.offset, 0);
+    expect(tester.takeException(), isNull);
+  });
+
   test('impressions are stable for a date regardless of time or timezone', () {
     final first = CalendarStampImpression(DateTime(2026, 10, 12));
     final rebuilt = CalendarStampImpression(DateTime.utc(2026, 10, 12, 23));

@@ -549,6 +549,8 @@ class _MeditationCalendarWidgetState
               return isSameDay(_selectedDay, day);
             },
             calendarFormat: CalendarFormat.month,
+            // Let vertical drags scroll the history page around the calendar.
+            availableGestures: AvailableGestures.horizontalSwipe,
             startingDayOfWeek: StartingDayOfWeek.monday,
             headerStyle: _calendarHeaderStyle(context),
             calendarStyle: _calendarStyle(context),
