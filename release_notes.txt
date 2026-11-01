@@ -1,6 +1,9 @@
 Unreleased
 -
 
+2611.1.0
+- Bug fixes
+
 2610.30.0
 - Download a whole course from its pack page
 - Adjust timer bells before starting your session
