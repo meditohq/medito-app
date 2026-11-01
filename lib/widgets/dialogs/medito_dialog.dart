@@ -148,13 +148,10 @@ class MeditoDialogBody extends StatelessWidget {
   final String? text;
   final InlineSpan? textSpan;
 
-  const MeditoDialogBody(String text, {super.key})
-    : text = text,
-      textSpan = null;
+  const MeditoDialogBody(String this.text, {super.key}) : textSpan = null;
 
-  const MeditoDialogBody.rich(InlineSpan textSpan, {super.key})
-    : text = null,
-      textSpan = textSpan;
+  const MeditoDialogBody.rich(InlineSpan this.textSpan, {super.key})
+    : text = null;
 
   @override
   Widget build(BuildContext context) {
