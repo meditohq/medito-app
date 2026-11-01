@@ -153,6 +153,37 @@ void main() {
     web = FakeCheckoutWebViewPlatform();
     WebViewPlatform.instance = web;
   });
+
+  // Regression (2610.30.0): Android reports accessibleNavigation whenever any
+  // service reads the accessibility tree, which drew an immediate X on the
+  // onboarding paywall for ordinary users. The page's own X must stay the
+  // only visible close; screen readers still get a semantics-only Close.
+  testWidgets(
+    'webview paywall draws no app close button even with accessibleNavigation',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(accessibleNavigation: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+
+      await pump(
+        tester,
+        value: config(),
+        payments: _CapturePaymentUI(),
+        webSource: 'onboarding',
+      );
+
+      expect(find.byIcon(Icons.close), findsNothing);
+      expect(find.byType(IconButton), findsNothing);
+      expect(find.byType(CloseButton), findsNothing);
+      expect(find.bySemanticsLabel('Close'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox());
+      semantics.dispose();
+    },
+  );
   test(
     'fetches announcement config with the same identity and currency',
     () async {

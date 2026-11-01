@@ -736,8 +736,8 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
                     )
                   else if (isSmokeTestMode)
                     _buildSmokeTestCloseButton()
-                  else if (MediaQuery.accessibleNavigationOf(context))
-                    _buildAccessibleCloseButton(),
+                  else
+                    _buildScreenReaderCloseAction(),
                   // Close affordance lives in the webpage itself (delayed
                   // fade-in so users don't dismiss before they've read the
                   // page). The JS bridge posts a `close` message which
@@ -752,17 +752,26 @@ class _WebViewDonationScreenState extends ConsumerState<WebViewDonationScreen> {
   }
 
   /// Screen readers only: the page's own close fades in after a delay inside
-  /// the web content, which is hard to find by touch or swipe. Top-left so it
-  /// never covers that X; sighted users (the experiment) see no change.
-  Widget _buildAccessibleCloseButton() {
+  /// the web content, which is hard to find by touch or swipe, so expose a
+  /// Close action in the semantics tree.
+  ///
+  /// It draws nothing and isn't hit-testable, so sighted users only ever see
+  /// the page's delayed X and taps fall through to the page. Deliberately NOT
+  /// gated on `MediaQuery.accessibleNavigationOf`: on Android the engine sets
+  /// that flag as soon as any service queries the accessibility tree
+  /// (autofill, password managers, keyboards, on-device assistants), which
+  /// put a visible X on the paywall immediately for ordinary users.
+  Widget _buildScreenReaderCloseAction() {
     final close = AppLocalizations.of(context)?.close ?? 'Close';
     return Positioned(
       top: 4,
       left: 4,
-      child: IconButton(
-        onPressed: _closePaywall,
-        tooltip: close,
-        icon: const Icon(Icons.close, color: Color(0xFF1A1A17)),
+      child: Semantics(
+        container: true,
+        button: true,
+        label: close,
+        onTap: _closePaywall,
+        child: const SizedBox(width: 48, height: 48),
       ),
     );
   }
