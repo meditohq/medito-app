@@ -2660,5 +2660,10 @@
   "packDownloadedCount": "{count} of {total} tracks downloaded",
   "@packDownloadedCount": {"description": "Offline download status in the pack menu", "placeholders": {"count": {"type": "int"}, "total": {"type": "int"}}},
   "trackDownloaded": "Downloaded",
-  "@trackDownloaded": {"description": "Label beneath a pack track available offline"}
+  "@trackDownloaded": {"description": "Label beneath a pack track available offline"},
+  "sessionOptions": "Session options",
+  "openSession": "Open session",
+  "editSessionDateTime": "Edit date & time",
+  "editSessionExplanation": "Correct when this session took place. Your listening time stays the same.",
+  "editSessionError": "Could not update this session. Please try again."
 }

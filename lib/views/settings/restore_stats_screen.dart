@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
+import 'package:medito/widgets/dialogs/dialogs.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/services/stats_backup_service.dart';
 import 'package:medito/views/home/widgets/header/home_header_widget.dart';
@@ -219,17 +220,17 @@ class _BackupRow extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.restoreStatsConfirmTitle),
-        content: Text(l10n.restoreStatsConfirmBody),
+      builder: (ctx) => MeditoDialog(
+        title: l10n.restoreStatsConfirmTitle,
+        content: MeditoDialogBody(l10n.restoreStatsConfirmBody),
         actions: [
-          TextButton(
+          MeditoDialogSecondaryButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.cancel),
+            label: l10n.cancel,
           ),
-          TextButton(
+          MeditoDialogPrimaryButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.restore),
+            label: l10n.restore,
           ),
         ],
       ),

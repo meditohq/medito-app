@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:medito/constants/constants.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/utils/email_typo.dart';
-import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/dialogs/dialogs.dart';
 
 const emailTypoHintKey = Key('email_typo_hint');
@@ -128,16 +127,11 @@ class EmailTypoConfirmation {
     if (suggestion == null || typed == _kept) return true;
 
     final l10n = AppLocalizations.of(context)!;
-    final bodyStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-      fontFamily: googleSans,
-      height: 1.5,
-      color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.75),
-    );
     final choice = await showDialog<bool>(
       context: context,
       builder: (context) => MeditoDialog(
         title: l10n.emailTypoDialogTitle,
-        content: Text.rich(
+        content: MeditoDialogBody.rich(
           TextSpan(
             children: [
               TextSpan(text: '${l10n.emailTypoDialogTyped(typed)}\n'),
@@ -145,7 +139,6 @@ class EmailTypoConfirmation {
             ],
           ),
           key: emailTypoDialogKey,
-          style: bodyStyle,
         ),
         actions: [
           MeditoDialogSecondaryButton(

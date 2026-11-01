@@ -45,12 +45,7 @@ class ReportDialogWidget extends ConsumerWidget {
             children: [
               MeditoDialogBody(l10n.reportTrackDescription(request.title)),
               const SizedBox(height: 16),
-              Text(
-                l10n.reportDialogQuestion,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacityValue(0.8),
-                ),
-              ),
+              MeditoDialogBody(l10n.reportDialogQuestion),
               // Announced as a link, with a 44px tall tap target (the text
               // alone was ~20px); the min height absorbs the old 12px gap.
               Semantics(

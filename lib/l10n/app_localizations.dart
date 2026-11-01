@@ -6009,6 +6009,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Downloaded'**
   String get trackDownloaded;
+
+  /// No description provided for @sessionOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Session options'**
+  String get sessionOptions;
+
+  /// No description provided for @openSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Open session'**
+  String get openSession;
+
+  /// No description provided for @editSessionDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit date & time'**
+  String get editSessionDateTime;
+
+  /// No description provided for @editSessionExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct when this session took place. Your listening time stays the same.'**
+  String get editSessionExplanation;
+
+  /// No description provided for @editSessionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update this session. Please try again.'**
+  String get editSessionError;
 }
 
 class _AppLocalizationsDelegate

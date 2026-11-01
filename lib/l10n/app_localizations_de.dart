@@ -3448,4 +3448,21 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trackDownloaded => 'Heruntergeladen';
+
+  @override
+  String get sessionOptions => 'Sitzungsoptionen';
+
+  @override
+  String get openSession => 'Sitzung öffnen';
+
+  @override
+  String get editSessionDateTime => 'Datum & Uhrzeit bearbeiten';
+
+  @override
+  String get editSessionExplanation =>
+      'Korrigiere, wann diese Sitzung stattgefunden hat. Deine Hörzeit bleibt unverändert.';
+
+  @override
+  String get editSessionError =>
+      'Diese Sitzung konnte nicht aktualisiert werden. Bitte versuche es erneut.';
 }

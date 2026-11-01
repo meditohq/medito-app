@@ -3389,4 +3389,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trackDownloaded => 'Downloaded';
+
+  @override
+  String get sessionOptions => 'Session options';
+
+  @override
+  String get openSession => 'Open session';
+
+  @override
+  String get editSessionDateTime => 'Edit date & time';
+
+  @override
+  String get editSessionExplanation =>
+      'Correct when this session took place. Your listening time stays the same.';
+
+  @override
+  String get editSessionError =>
+      'Could not update this session. Please try again.';
 }

@@ -25,6 +25,8 @@ import 'package:table_calendar/table_calendar.dart';
 import 'bulk_add_sessions_dialog.dart';
 import 'package:medito/widgets/calendar_stamp.dart';
 import 'manual_session_dialog.dart';
+import 'edit_session_dialog.dart';
+import 'session_actions_sheet.dart';
 
 /// Streak-freeze blue for light mode: [ColorConstants.lightBlue] is only
 /// ~2.3:1 on the light card. This one is ~4.9:1 as text.
@@ -44,7 +46,7 @@ class _MeditationCalendarWidgetState
     extends ConsumerState<MeditationCalendarWidget>
     with SingleTickerProviderStateMixin {
   late DateTime _focusedDay;
-  late DateTime _selectedDay;
+  DateTime? _selectedDay;
   late DateTime _selectedDayForSessions;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -239,6 +241,43 @@ class _MeditationCalendarWidgetState
       await ref.read(statsProvider.notifier).refreshFromLocal();
     } else {
       messenger.showSnackBar(SnackBar(content: Text(errorMessage)));
+    }
+  }
+
+  Future<void> _editSession(LocalAudioCompleted session) async {
+    final picked = await showDialog<DateTime>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => EditSessionDialog(
+        initialDate: DateTime.fromMillisecondsSinceEpoch(session.timestamp),
+      ),
+    );
+    if (picked == null ||
+        !mounted ||
+        picked.millisecondsSinceEpoch == session.timestamp) {
+      return;
+    }
+    setState(() => _isAddingSession = true);
+    final success = await editSessionDateTime(
+      session: session,
+      dateTime: picked,
+    );
+    if (!mounted) return;
+    if (success) await ref.read(statsProvider.notifier).refreshFromLocal();
+    if (!mounted) return;
+    setState(() {
+      _isAddingSession = false;
+      if (success) {
+        final day = dayOf(picked, _dayOffset);
+        _selectedDay = day;
+        _selectedDayForSessions = day;
+        _focusedDay = day;
+      }
+    });
+    if (!success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.editSessionError)),
+      );
     }
   }
 
@@ -536,18 +575,14 @@ class _MeditationCalendarWidgetState
       child: Column(
         children: [
           TableCalendar<dynamic>(
-            rowHeight: 70 + (MediaQuery.textScalerOf(context).scale(12) - 12),
+            rowHeight: 78 + (MediaQuery.textScalerOf(context).scale(12) - 12),
             daysOfWeekHeight: 28,
             // Month title, weekday letters and each day's spoken label.
             locale: Localizations.localeOf(context).toString(),
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.now(),
             focusedDay: _focusedDay,
-            selectedDayPredicate: (day) {
-              // While a range is active, only range endpoints get selected styling.
-              if (_rangeStart != null) return _isRangeEndpoint(day);
-              return isSameDay(_selectedDay, day);
-            },
+            selectedDayPredicate: _isSelectedDay,
             calendarFormat: CalendarFormat.month,
             // Let vertical drags scroll the history page around the calendar.
             availableGestures: AvailableGestures.horizontalSwipe,
@@ -555,6 +590,13 @@ class _MeditationCalendarWidgetState
             headerStyle: _calendarHeaderStyle(context),
             calendarStyle: _calendarStyle(context),
             calendarBuilders: CalendarBuilders(
+              // CellContent excludes its children's semantics. A sibling marker
+              // merges selection into the existing date label and tap action.
+              markerBuilder: (context, day, _) => Semantics(
+                selected: _isSelectedDay(day),
+                button: true,
+                child: const SizedBox.expand(),
+              ),
               disabledBuilder: (context, date, _) =>
                   _buildCalendarDay(context, date, disabled: true),
               defaultBuilder: (context, date, events) =>
@@ -639,6 +681,10 @@ class _MeditationCalendarWidgetState
     return DaysOfWeekStyle(weekdayStyle: style, weekendStyle: style);
   }
 
+  bool _isSelectedDay(DateTime day) => _rangeStart != null
+      ? _isRangeEndpoint(day)
+      : isSameDay(_selectedDay, day);
+
   Widget _buildCalendarDay(
     BuildContext context,
     DateTime date, {
@@ -649,63 +695,92 @@ class _MeditationCalendarWidgetState
     final type = disabled ? null : _stamps[startOfDay(date)];
     final today = isSameDay(date, DateTime.now());
     final inRange = _isInRange(date);
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 1, vertical: 2),
-      decoration: BoxDecoration(
-        color: selected || inRange
-            ? theme.colorScheme.onSurface.withOpacityValue(
-                selected ? 0.08 : 0.04,
-              )
-            : null,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        children: [
-          Container(
-            constraints: const BoxConstraints(minWidth: 24),
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                DateFormat.d(
-                  Localizations.localeOf(context).toString(),
-                ).format(date),
-                textAlign: TextAlign.center,
-                style: _dayTextStyle(
-                  context,
-                  color: theme.colorScheme.onSurface.withOpacityValue(
-                    disabled ? 0.3 : 0.85,
-                  ),
-                  fontWeight: selected || today
-                      ? FontWeight.w700
-                      : FontWeight.w400,
-                ).copyWith(fontSize: 12),
-                maxLines: 1,
+    final hasSelection =
+        _rangeStart != null ||
+        (_selectedDay != null &&
+            _selectedDay!.year == _focusedDay.year &&
+            _selectedDay!.month == _focusedDay.month);
+    final duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
+    return AnimatedScale(
+      key: ValueKey('calendar-day-${startOfDay(date).toIso8601String()}'),
+      scale: selected ? 1.08 : 1,
+      duration: duration,
+      curve: Curves.easeOutCubic,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+        decoration: BoxDecoration(
+          color: inRange
+              ? theme.colorScheme.onSurface.withOpacityValue(0.04)
+              : null,
+          border: Border.all(
+            color: selected
+                ? theme.colorScheme.onSurface.withOpacityValue(0.85)
+                : Colors.transparent,
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Container(
+              constraints: const BoxConstraints(minWidth: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  DateFormat.d(
+                    Localizations.localeOf(context).toString(),
+                  ).format(date),
+                  textAlign: TextAlign.center,
+                  style: _dayTextStyle(
+                    context,
+                    color: theme.colorScheme.onSurface.withOpacityValue(
+                      disabled ? 0.3 : 0.85,
+                    ),
+                    fontWeight: selected || today
+                        ? FontWeight.w700
+                        : FontWeight.w400,
+                  ).copyWith(fontSize: 12),
+                  maxLines: 1,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Center(
-              child: type == null
-                  ? const SizedBox.shrink()
-                  : FittedBox(
-                      child: Padding(
-                        padding: const EdgeInsets.all(3),
-                        child: CalendarStamp(
-                          key: ValueKey(startOfDay(date)),
-                          date: date,
-                          type: type,
-                          animateIn: _pendingStampDates.contains(
-                            startOfDay(date),
+            Expanded(
+              child: AnimatedOpacity(
+                key: ValueKey(
+                  'calendar-stamp-opacity-${startOfDay(date).toIso8601String()}',
+                ),
+                opacity: hasSelection && !selected && !inRange && !disabled
+                    ? 0.65
+                    : 1,
+                duration: duration,
+                curve: Curves.easeOutCubic,
+                child: Center(
+                  child: type == null
+                      ? const SizedBox.shrink()
+                      : FittedBox(
+                          child: Padding(
+                            padding: const EdgeInsets.all(3),
+                            child: CalendarStamp(
+                              key: ValueKey(startOfDay(date)),
+                              date: date,
+                              type: type,
+                              animateIn: _pendingStampDates.contains(
+                                startOfDay(date),
+                              ),
+                              onRevealComplete: () =>
+                                  _pendingStampDates.remove(startOfDay(date)),
+                            ),
                           ),
-                          onRevealComplete: () =>
-                              _pendingStampDates.remove(startOfDay(date)),
                         ),
-                      ),
-                    ),
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -736,7 +811,7 @@ class _MeditationCalendarWidgetState
       _clearRange();
     }
     setState(() {
-      _selectedDay = selectedDay;
+      _selectedDay = isSameDay(_selectedDay, selectedDay) ? null : selectedDay;
       _focusedDay = focusedDay;
     });
     _toggleDaySessions(selectedDay);
@@ -759,8 +834,10 @@ class _MeditationCalendarWidgetState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailsTitle(context, rangeDays),
-            const SizedBox(height: 8),
+            if (_hasCompleteRange) ...[
+              _buildRangeTitle(context, rangeDays),
+              const SizedBox(height: 8),
+            ],
             _buildDetailsSubtitle(context, sessions),
             const SizedBox(height: 16),
             _buildSessionList(context, sessions),
@@ -778,14 +855,11 @@ class _MeditationCalendarWidgetState
     );
   }
 
-  Widget _buildDetailsTitle(BuildContext context, List<DateTime> rangeDays) {
-    final locale = Localizations.localeOf(context).toString();
+  Widget _buildRangeTitle(BuildContext context, List<DateTime> rangeDays) {
     return Semantics(
       header: true,
       child: Text(
-        _hasCompleteRange
-            ? AppLocalizations.of(context)!.daysSelected(rangeDays.length)
-            : DateFormat.yMMMMEEEEd(locale).format(_selectedDayForSessions),
+        AppLocalizations.of(context)!.daysSelected(rangeDays.length),
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
           fontFamily: googleSans,
           fontWeight: FontWeight.w600,
@@ -873,6 +947,7 @@ class _MeditationCalendarWidgetState
             key: ValueKey(session.id + session.timestamp.toString()),
             session: session,
             onLongPress: () => _confirmDeleteSession(session),
+            onEdit: () => _editSession(session),
           ),
         );
       }).toList(),
@@ -1014,11 +1089,13 @@ class _MeditationCalendarWidgetState
 class _SessionItemWidget extends ConsumerWidget {
   final LocalAudioCompleted session;
   final VoidCallback? onLongPress;
+  final VoidCallback? onEdit;
 
   const _SessionItemWidget({
     super.key,
     required this.session,
     this.onLongPress,
+    this.onEdit,
   });
 
   @override
@@ -1123,14 +1200,14 @@ class _SessionItemWidget extends ConsumerWidget {
                     ),
                   ),
           ),
-          if (!isManual)
-            Icon(
-              Icons.chevron_right_rounded,
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withOpacityValue(0.6),
-              size: 20,
-            ),
+          Icon(
+            Icons.more_horiz,
+            semanticLabel: AppLocalizations.of(context)!.sessionOptions,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withOpacityValue(0.6),
+            size: 20,
+          ),
         ],
       ),
     );
@@ -1148,21 +1225,33 @@ class _SessionItemWidget extends ConsumerWidget {
             child: row,
           );
 
-    if (isManual) {
-      return withDeleteAction(
-        InkWell(
-          onLongPress: onLongPress,
-          borderRadius: BorderRadius.circular(8),
-          child: content,
-        ),
-      );
-    }
-
     return withDeleteAction(
       Semantics(
         button: true,
         child: InkWell(
-          onTap: () {
+          onTap: () async {
+            final l10n = AppLocalizations.of(context)!;
+            final title = isManual
+                ? getManualSessionTitle(session.id, l10n)
+                : isTimer
+                ? l10n.timerHistoryTitle(formatTimerLength(timerLength, l10n))
+                : trackAsync?.value?.title ?? l10n.historySessionFallback;
+            final action = await showSessionActionsSheet(
+              context,
+              title: title,
+              date: date,
+              canOpen: !isManual,
+            );
+            if (!context.mounted) return;
+            if (action == SessionAction.delete) {
+              onLongPress?.call();
+              return;
+            }
+            if (action == SessionAction.edit) {
+              onEdit?.call();
+              return;
+            }
+            if (action != SessionAction.open) return;
             Navigator.push(
               context,
               MaterialPageRoute(

@@ -1878,5 +1878,10 @@
   "overflowMenu": "Weitere Optionen",
   "downloadRemaining": "Verbleibende Titel herunterladen",
   "packDownloadedCount": "{count} von {total} Titeln heruntergeladen",
-  "trackDownloaded": "Heruntergeladen"
+  "trackDownloaded": "Heruntergeladen",
+  "sessionOptions": "Sitzungsoptionen",
+  "openSession": "Sitzung öffnen",
+  "editSessionDateTime": "Datum & Uhrzeit bearbeiten",
+  "editSessionExplanation": "Korrigiere, wann diese Sitzung stattgefunden hat. Deine Hörzeit bleibt unverändert.",
+  "editSessionError": "Diese Sitzung konnte nicht aktualisiert werden. Bitte versuche es erneut."
 }

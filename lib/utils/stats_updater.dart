@@ -429,6 +429,38 @@ String _getManualSessionId(DateTime dateTime) {
   }
 }
 
+/// Corrects a history entry while preserving listening totals.
+Future<bool> editSessionDateTime({
+  required LocalAudioCompleted session,
+  required DateTime dateTime,
+  StatsManager? statsManager,
+}) async {
+  if (dateTime.isAfter(DateTime.now()) || isFreezeSession(session)) {
+    return false;
+  }
+  try {
+    statsManager ??= StatsManager();
+    final updated = session.copyWith(
+      timestamp: dateTime.millisecondsSinceEpoch,
+      id: isManualSession(session) ? _getManualSessionId(dateTime) : session.id,
+    );
+    final success = await statsManager.replaceAudioCompleted(
+      original: session,
+      replacement: updated,
+    );
+    if (!success) return false;
+    await _refreshStatsAndUpNext();
+    await _rescheduleReminders(
+      endMs: DateTime.now().millisecondsSinceEpoch,
+      durationMs: 0,
+    );
+    return true;
+  } catch (e) {
+    AppLogger.e('STATS', 'Failed to edit session', e);
+    return false;
+  }
+}
+
 /// Removes a previously recorded session from stats.
 ///
 /// Matches on id + timestamp so that duplicate ids on different days are

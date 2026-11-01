@@ -53,14 +53,7 @@ class _DayBoundaryOffsetDialogState extends State<DayBoundaryOffsetDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              l10n.dayStartsDialogBody,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontFamily: googleSans,
-                height: 1.5,
-                color: onSurface.withOpacityValue(0.75),
-              ),
-            ),
+            MeditoDialogBody(l10n.dayStartsDialogBody),
             const SizedBox(height: 16),
             for (final hours in _options)
               _OffsetOptionTile(

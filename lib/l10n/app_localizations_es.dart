@@ -3444,4 +3444,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get trackDownloaded => 'Descargada';
+
+  @override
+  String get sessionOptions => 'Opciones de la sesión';
+
+  @override
+  String get openSession => 'Abrir sesión';
+
+  @override
+  String get editSessionDateTime => 'Editar fecha y hora';
+
+  @override
+  String get editSessionExplanation =>
+      'Corrige cuándo tuvo lugar esta sesión. Tu tiempo de escucha no cambiará.';
+
+  @override
+  String get editSessionError =>
+      'No se pudo actualizar esta sesión. Inténtalo de nuevo.';
 }

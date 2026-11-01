@@ -708,6 +708,36 @@ class StatsManager {
     });
   }
 
+  /// Corrects one history entry without changing listening totals or counts.
+  Future<bool> replaceAudioCompleted({
+    required LocalAudioCompleted original,
+    required LocalAudioCompleted replacement,
+  }) async {
+    if (replacement.timestamp > _getCurrentDate().millisecondsSinceEpoch) {
+      throw ArgumentError('A session cannot be moved into the future');
+    }
+    if (!_isInitialized) await initialize();
+    await _ensureStatsLoaded();
+    if (_allStats == null) return false;
+    final sessions = [...?_allStats!.audioCompleted];
+    final index = sessions.indexWhere(
+      (entry) =>
+          entry.id == original.id && entry.timestamp == original.timestamp,
+    );
+    if (index < 0) return false;
+    if (sessions.asMap().entries.any(
+      (entry) =>
+          entry.key != index &&
+          entry.value.id == replacement.id &&
+          entry.value.timestamp == replacement.timestamp,
+    )) {
+      throw StateError('A matching session already exists');
+    }
+    sessions[index] = replacement;
+    await restoreFromBackup(_allStats!.copyWith(audioCompleted: sessions));
+    return true;
+  }
+
   Future<void> removeAudioCompleted(LocalAudioCompleted session) async {
     if (!_isInitialized) {
       await initialize();

@@ -8,8 +8,8 @@ import 'package:medito/utils/utils.dart';
 /// 16px rounded corners, 24px padding, capped at 400px wide.
 ///
 /// Use [title] / [content] / [actions] for the common AlertDialog-like layout,
-/// or pass [child] for a fully custom body. A custom [child] is wrapped in a
-/// scroll view, so it must not contain vertically flexed widgets (Expanded/
+/// or pass [child] for a fully custom body. All contents are wrapped in a
+/// scroll view, so they must not contain vertically flexed widgets (Expanded/
 /// Flexible in a Column) and scrolls instead of overflowing when the keyboard
 /// shrinks the available height — overflowing buttons paint outside the
 /// dialog's bounds where taps land on the dismiss barrier.
@@ -49,9 +49,7 @@ class MeditoDialog extends StatelessWidget {
           maxHeight: maxHeight ?? double.infinity,
         ),
         padding: padding,
-        child: child != null
-            ? SingleChildScrollView(child: child)
-            : _buildStructured(context),
+        child: SingleChildScrollView(child: child ?? _buildStructured(context)),
       ),
     );
     // Like AlertDialog: a route scope, named by MeditoDialogTitle, so screen
@@ -72,10 +70,7 @@ class MeditoDialog extends StatelessWidget {
           MeditoDialogTitle(title!),
           const SizedBox(height: 12),
         ],
-        if (content != null) ...[
-          Flexible(child: content!),
-          const SizedBox(height: 24),
-        ],
+        if (content != null) ...[content!, const SizedBox(height: 24)],
         if (actions != null && actions!.isNotEmpty)
           _MeditoDialogActions(actions: actions!),
       ],
@@ -138,7 +133,9 @@ class MeditoDialogTitle extends StatelessWidget {
         text,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
           fontFamily: googleSans,
-          fontWeight: FontWeight.w600,
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          height: 1.2,
           color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
@@ -148,19 +145,27 @@ class MeditoDialogTitle extends StatelessWidget {
 
 /// Standard dialog body text.
 class MeditoDialogBody extends StatelessWidget {
-  final String text;
+  final String? text;
+  final InlineSpan? textSpan;
 
-  const MeditoDialogBody(this.text, {super.key});
+  const MeditoDialogBody(String text, {super.key})
+    : text = text,
+      textSpan = null;
+
+  const MeditoDialogBody.rich(InlineSpan textSpan, {super.key})
+    : text = null,
+      textSpan = textSpan;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-        fontFamily: googleSans,
-        height: 1.5,
-        color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.75),
-      ),
+    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      fontFamily: googleSans,
+      fontSize: 14,
+      height: 1.5,
+      color: Theme.of(context).colorScheme.onSurface.withOpacityValue(0.75),
     );
+    return textSpan == null
+        ? Text(text!, style: style)
+        : Text.rich(textSpan!, style: style);
   }
 }

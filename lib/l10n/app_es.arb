@@ -1484,5 +1484,10 @@
   "overflowMenu": "Más opciones",
   "downloadRemaining": "Descargar pistas restantes",
   "packDownloadedCount": "{count} de {total} pistas descargadas",
-  "trackDownloaded": "Descargada"
+  "trackDownloaded": "Descargada",
+  "sessionOptions": "Opciones de la sesión",
+  "openSession": "Abrir sesión",
+  "editSessionDateTime": "Editar fecha y hora",
+  "editSessionExplanation": "Corrige cuándo tuvo lugar esta sesión. Tu tiempo de escucha no cambiará.",
+  "editSessionError": "No se pudo actualizar esta sesión. Inténtalo de nuevo."
 }
