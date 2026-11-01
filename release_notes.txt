@@ -1,6 +1,9 @@
 Unreleased
 -
 
+2611.1.1
+- Fixed scrolling when dragging inside the meditation history calendar
+
 2611.1.0
 - Bug fixes
 
