@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:medito/constants/strings/shared_preference_constants.dart';
@@ -16,11 +14,12 @@ import 'package:medito/constants/strings/shared_preference_constants.dart';
 /// which demands a correctly formatted typed time before it will accept
 /// anything.
 ///
-/// Control keeps `input` so the arm is directly comparable with the
-/// pre-experiment data. Assignment is sticky per install (persisted) and
-/// isolated here so the source can later be swapped for a server-controlled
-/// flag without touching the screen or analytics call sites. Variant share
-/// is 50/50.
+/// CONCLUDED 2026-11-04: dial won (GA, 15 Sep – 2 Nov, ~29k per arm): 36.9%
+/// of picker openers backed out vs 41.4% on input, with onboarding completion
+/// and reminder-setting unchanged. Every install now gets [variantDial],
+/// including ones previously stored as input. Exposure events keep their
+/// `variant_id` tag, so when comparing arms only use installs exposed before
+/// this release.
 class OnboardingPickerModeExperiment {
   OnboardingPickerModeExperiment._();
 
@@ -32,20 +31,18 @@ class OnboardingPickerModeExperiment {
   /// Clock dial, the Material default.
   static const String variantDial = 'dial';
 
-  /// Returns the sticky variant for this install, assigning (50/50) and
-  /// persisting it on first call.
+  /// Returns the variant for this install. Since the rollout this is always
+  /// [variantDial]; it is persisted so the stored value matches what shipped.
   static String resolveVariant(SharedPreferences prefs) {
-    final existing = prefs.getString(
-      SharedPreferenceConstants.onboardingReminderPickerModeVariant,
-    );
-    if (existing == variantInput || existing == variantDial) {
-      return existing!;
+    if (prefs.getString(
+          SharedPreferenceConstants.onboardingReminderPickerModeVariant,
+        ) !=
+        variantDial) {
+      prefs.setString(
+        SharedPreferenceConstants.onboardingReminderPickerModeVariant,
+        variantDial,
+      );
     }
-    final assigned = Random().nextBool() ? variantDial : variantInput;
-    prefs.setString(
-      SharedPreferenceConstants.onboardingReminderPickerModeVariant,
-      assigned,
-    );
-    return assigned;
+    return variantDial;
   }
 }

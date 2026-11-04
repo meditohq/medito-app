@@ -331,9 +331,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       ),
     );
 
-    // A/B: `input` is the mode that has always shipped and half of the people
-    // who opened it backed out; `dial` is the Material default and needs no
-    // typing. See OnboardingPickerModeExperiment.
+    // Dial won the picker-mode A/B (fewer back-outs than typed input). See
+    // OnboardingPickerModeExperiment.
     final picked = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 7, minute: 0),
