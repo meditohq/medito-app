@@ -8,16 +8,16 @@ fields below to tell which meditation was completed.
 | Field | Value |
 |---|---|
 | `startTime` / `endTime` | Start and end of the session (UTC offset). |
-| `title` | Track name, e.g. `Body Scan`. `Medito` when the name isn't known (timer sessions, or sessions completed before this was added). |
+| `title` | Track name, e.g. `Body Scan`. Timer sessions use the timer's localized name (e.g. `Timer`, `Stopwatch`). `Medito` when the name isn't known (e.g. sessions completed before this was added). |
 | `notes` | Semicolon-separated `key=value` ids, e.g. `trackId=abc123;fileId=def456`. Keys with no value are left out, and `notes` is null when there are none. |
-| `metadata.clientRecordId` | `medito-<endEpochMs>`. Re-syncing the same session updates this record instead of adding a duplicate. |
+| `metadata.clientRecordId` | `medito-<endEpochMs>`. Re-syncing the same session never creates a duplicate record. |
 
 ## Ids in `notes`
 
-- `trackId`: the Medito track (meditation). Timer sessions use a synthetic id `timer-<seconds>`.
+- `trackId`: the Medito track (meditation).
 - `fileId`: the specific recording of that track (tracks can have several, e.g. different lengths or guides).
 
-Both are stable ids from the Medito content API, so they're safe to store. Parse `notes` by splitting
+For tracks, both are stable ids from the Medito content API, so they're safe to store. Timer sessions have no content ids and use synthetic ones instead: `trackId=timer-<seconds>` and `fileId=timer-<mode>-<ms>` (e.g. `timer-countdown-600000`, `timer-stopwatch-0`). Parse `notes` by splitting
 on `;` and then on the first `=`, and ignore keys you don't recognise: more keys may be added later.
 
 This format is informational and may change between app versions; there is no backwards-compatibility
