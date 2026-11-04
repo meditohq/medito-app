@@ -7,6 +7,10 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
+// Optional string field; null when absent (older stored data) or JSON null.
+private fun JSONObject.optStringOrNull(key: String): String? =
+    if (has(key) && !isNull(key)) getString(key) else null
+
 object SharedPreferencesManager {
     private const val PREFS_NAME = "MeditoAudioPrefs"
     private const val KEY_LAST_COMPLETED_TRACK = "lastCompletedTrack"
@@ -21,6 +25,7 @@ object SharedPreferencesManager {
                 put("fileId", completionData.fileId)
                 put("guideId", completionData.guideId)
                 put("timestamp", completionData.timestamp)
+                put("title", completionData.title)
             }
 
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -47,7 +52,8 @@ object SharedPreferencesManager {
                         duration = json.getLong("duration"),
                         fileId = json.getString("fileId"),
                         guideId = json.optString("guideId", "None"),
-                        timestamp = json.getLong("timestamp")
+                        timestamp = json.getLong("timestamp"),
+                        title = json.optStringOrNull("title")
                     )
                 } else {
                     Log.w(TAG, "Missing required fields in stored completion data")
@@ -79,6 +85,7 @@ object SharedPreferencesManager {
             put("fileId", completionData.fileId)
             put("guideId", completionData.guideId)
             put("timestamp", completionData.timestamp)
+            put("title", completionData.title)
         })
         writePendingRepeats(context, pending)
     }
@@ -94,7 +101,8 @@ object SharedPreferencesManager {
                     duration = json.getLong("duration"),
                     fileId = json.getString("fileId"),
                     guideId = json.optString("guideId", "None"),
-                    timestamp = json.getLong("timestamp")
+                    timestamp = json.getLong("timestamp"),
+                    title = json.optStringOrNull("title")
                 )
             } catch (e: JSONException) {
                 Log.e(TAG, "Error parsing pending repeat: ${e.message}")

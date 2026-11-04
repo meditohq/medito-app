@@ -61,7 +61,13 @@ abstract class MeditoHealthConnectManager {
   bool requestMindfulnessPermissions();
 
   @async
-  bool writeMindfulnessSession(int startEpochMs, int endEpochMs);
+  bool writeMindfulnessSession(
+    int startEpochMs,
+    int endEpochMs,
+    String? title,
+    String? notes,
+    String? clientRecordId,
+  );
 
   void openHealthConnectInstall();
 }
@@ -167,6 +173,7 @@ class CompletionData {
   String? guideId;
   int timestamp;
   String? userToken;
+  String? title;
 
   CompletionData({
     required this.trackId,
@@ -175,6 +182,7 @@ class CompletionData {
     required this.guideId,
     required this.timestamp,
     required this.userToken,
+    this.title,
   });
 }
 

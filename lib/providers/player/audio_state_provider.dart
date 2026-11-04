@@ -58,6 +58,7 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
         TypeConstants.fileIdKey: completionData.fileId,
         TypeConstants.guideIdKey: completionData.guideId,
         TypeConstants.timestampIdKey: completionData.timestamp,
+        TypeConstants.titleKey: completionData.title,
       });
 
       return true;
@@ -75,6 +76,7 @@ class AudioStateProvider implements MeditoAudioServiceCallbackApi {
       TypeConstants.fileIdKey: completionData.fileId,
       TypeConstants.guideIdKey: completionData.guideId,
       TypeConstants.timestampIdKey: completionData.timestamp,
+      TypeConstants.titleKey: completionData.title,
     });
   }
 }
