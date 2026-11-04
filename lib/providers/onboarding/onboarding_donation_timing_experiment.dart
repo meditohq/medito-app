@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum OnboardingStep {
@@ -12,6 +10,13 @@ enum OnboardingStep {
 }
 
 /// Independent of the server's pricing experiment and the experienced-user test.
+///
+/// CONCLUDED 2026-11-04: the early ask ([variantControl]) won (21 Sep – 2 Nov,
+/// ~25k per arm): asking last cost 25% of donors (1.08% vs 1.43%) and ~12% of
+/// cash, for a day-0 activation bump that was gone by days 1-7. Every
+/// onboarding now uses the early ask. Installs already stored as
+/// [variantLast] keep that value so their later gifts stay attributed to the
+/// arm they were randomised into; new installs are stored as [variantControl].
 class OnboardingDonationTimingExperiment {
   OnboardingDonationTimingExperiment._();
 
@@ -27,12 +32,14 @@ class OnboardingDonationTimingExperiment {
   static const variantControl = 'A';
   static const variantLast = 'B';
 
+  /// The flow to show. Since the rollout this is always [variantControl];
+  /// a missing or invalid stored value is set to it, a stored [variantLast]
+  /// is left alone for payment attribution.
   static String resolveVariant(SharedPreferences prefs) {
-    final existing = assignedVariant(prefs);
-    if (existing != null) return existing;
-    final variant = Random().nextBool() ? variantControl : variantLast;
-    prefs.setString(preferenceKey, variant);
-    return variant;
+    if (assignedVariant(prefs) == null) {
+      prefs.setString(preferenceKey, variantControl);
+    }
+    return variantControl;
   }
 
   static String? assignedVariant(SharedPreferences prefs) {

@@ -7,13 +7,23 @@ typedef Exp = OnboardingDonationTimingExperiment;
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  test('assignment survives a fresh preferences instance', () async {
+  test('new installs get and store the early ask', () async {
     final prefs = await SharedPreferences.getInstance();
-    final variant = Exp.resolveVariant(prefs);
-    expect(variant, anyOf('A', 'B'));
+    expect(Exp.resolveVariant(prefs), 'A');
     await prefs.reload();
-    expect(Exp.resolveVariant(await SharedPreferences.getInstance()), variant);
+    expect(Exp.assignedVariant(await SharedPreferences.getInstance()), 'A');
   });
+
+  test(
+    'stored late-ask installs see the early ask but keep their tag',
+    () async {
+      SharedPreferences.setMockInitialValues({Exp.preferenceKey: 'B'});
+      final prefs = await SharedPreferences.getInstance();
+      expect(Exp.resolveVariant(prefs), 'A');
+      expect(Exp.assignedVariant(prefs), 'B');
+      expect(Exp.paymentMetadata(prefs), {Exp.paymentMetadataKey: 'B'});
+    },
+  );
 
   test('payment attribution never enrolls existing users', () async {
     final prefs = await SharedPreferences.getInstance();
@@ -31,14 +41,14 @@ void main() {
     };
     expect(metadata['experiment_variant'], 'A');
     expect(metadata[Exp.paymentMetadataKey], 'B');
-    expect(Exp.resolveVariant(prefs), 'B');
   });
 
   test('invalid saved assignment is repaired', () async {
     SharedPreferences.setMockInitialValues({Exp.preferenceKey: 'invalid'});
     final prefs = await SharedPreferences.getInstance();
     expect(Exp.assignedVariant(prefs), isNull);
-    expect(Exp.resolveVariant(prefs), anyOf('A', 'B'));
+    expect(Exp.resolveVariant(prefs), 'A');
+    expect(Exp.assignedVariant(prefs), 'A');
   });
 
   for (final battery in [false, true]) {

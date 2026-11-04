@@ -721,8 +721,9 @@ void main() {
           await tester.pump(const Duration(milliseconds: 250));
           await tester.pump();
           await tester.pump(const Duration(seconds: 1));
+          // Concluded: a stored late-ask (B) install still gets the A flow.
           final steps = OnboardingDonationTimingExperiment.steps(
-            variant: variant,
+            variant: OnboardingDonationTimingExperiment.variantControl,
             showBattery: false,
             showTracking: true,
           );
