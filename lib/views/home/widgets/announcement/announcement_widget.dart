@@ -155,10 +155,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
               ),
               child: Column(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [_iconBadge(context), width16, _text(context)],
-                  ),
+                  _text(context),
                   height16,
                   _actionBtn(context),
                 ],
@@ -166,25 +163,6 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  /// Leading badge that marks the card as an announcement.
-  Widget _iconBadge(BuildContext context) {
-    final onSurface = Theme.of(context).colorScheme.onSurface;
-    return Container(
-      width: 36,
-      height: 36,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: onSurface.withValues(alpha: 0.08),
-      ),
-      child: Icon(
-        Icons.campaign_rounded,
-        size: 20,
-        color: onSurface.withValues(alpha: 0.85),
       ),
     );
   }
@@ -222,24 +200,22 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
     );
   }
 
-  Flexible _text(BuildContext context) {
+  Widget _text(BuildContext context) {
     var markDownTheme = Theme.of(context).textTheme.bodyMedium?.copyWith(
       color: Theme.of(context).colorScheme.onSurface,
     );
 
-    return Flexible(
-      child: MarkdownWidget(
-        body: widget.announcement.text ?? '',
-        // Not selectable: TalkBack exposed the selectable text as a
-        // long-clickable read-only field instead of plain text.
-        selectable: false,
-        textAlign: WrapAlignment.start,
-        a: markDownTheme?.copyWith(
-          decoration: TextDecoration.underline,
-          fontWeight: FontWeight.w700,
-        ),
-        p: markDownTheme?.copyWith(fontWeight: FontWeight.w500),
+    return MarkdownWidget(
+      body: widget.announcement.text ?? '',
+      // Not selectable: TalkBack exposed the selectable text as a
+      // long-clickable read-only field instead of plain text.
+      selectable: false,
+      textAlign: WrapAlignment.start,
+      a: markDownTheme?.copyWith(
+        decoration: TextDecoration.underline,
+        fontWeight: FontWeight.w700,
       ),
+      p: markDownTheme?.copyWith(fontWeight: FontWeight.w500),
     );
   }
 

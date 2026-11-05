@@ -143,7 +143,6 @@ class _BottomNavigationBarViewState
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-    final keyboardOpen = keyboardInset > 0;
     final width = MediaQuery.sizeOf(context).width;
     final wide = width >= 700;
     final items = [
@@ -170,29 +169,15 @@ class _BottomNavigationBarViewState
           _onDestinationSelected(_homeIndex);
         },
         child: Scaffold(
-          // The nav bar is lifted to sit just above the keyboard (via the
-          // bottom-inset padding below) rather than hiding behind it, so a tap
-          // aimed at the Search tab hits the icon instead of the keyboard's
-          // spacebar. resizeToAvoidBottomInset stays false so the Scaffold
-          // doesn't also inset the body — padding the bar already reserves the
-          // keyboard's height, shrinking the body to sit above it.
+          // The nav bar stays at the bottom and is covered by the keyboard
+          // when it opens, rather than being lifted to sit on top of it.
           resizeToAvoidBottomInset: false,
           bottomNavigationBar: wide
               ? null
-              : Padding(
-                  padding: EdgeInsets.only(bottom: keyboardInset),
-                  // While the keyboard is open the bar sits directly on top of it, so
-                  // drop the bar's bottom safe-area (home-indicator) inset — otherwise
-                  // it leaves a gap between the tabs and the keyboard.
-                  child: MediaQuery.removePadding(
-                    context: context,
-                    removeBottom: keyboardOpen,
-                    child: MeditoNavBar(
-                      selectedIndex: _currentPageIndex,
-                      onSelected: _onDestinationSelected,
-                      items: items,
-                    ),
-                  ),
+              : MeditoNavBar(
+                  selectedIndex: _currentPageIndex,
+                  onSelected: _onDestinationSelected,
+                  items: items,
                 ),
           body: Padding(
             padding: EdgeInsets.only(bottom: wide ? keyboardInset : 0),

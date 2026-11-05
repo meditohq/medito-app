@@ -399,7 +399,7 @@ class _UpNextCompletedState extends ConsumerState<_UpNextCompleted> {
             child: Text(
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
-                fontSize: isHero ? 28 : 22,
+                fontSize: isHero ? 24 : 22,
                 fontWeight: FontWeight.w700,
                 height: 1.2,
                 color: onSurface,
@@ -695,54 +695,62 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          eyebrow.toUpperCase(),
+                                  // On the hero, drop the eyebrow in the
+                                  // Continue case: the pack cover already
+                                  // carries the "where you are" cue, and the
+                                  // "CONTINUE · <pack>" line was noise over
+                                  // the artwork. Keep it when we need to say
+                                  // START HERE, and keep it in card style.
+                                  if (!isHero ||
+                                      widget.data.completedCount == 0)
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            eyebrow.toUpperCase(),
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  letterSpacing: 1.2,
+                                                  color: palette.muted,
+                                                ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '·',
                                           style: theme.textTheme.bodySmall
                                               ?.copyWith(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
-                                                letterSpacing: 1.2,
                                                 color: palette.muted,
                                               ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '·',
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: palette.muted,
-                                            ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
-                                          widget.data.pack.title,
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                                letterSpacing: 1.2,
-                                                color: palette.muted,
-                                              ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            widget.data.pack.title,
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  letterSpacing: 1.2,
+                                                  color: palette.muted,
+                                                ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
+                                      ],
+                                    ),
                                   Text(
                                     nextSession.title,
                                     style: theme.textTheme.headlineSmall
                                         ?.copyWith(
-                                          fontSize: isHero ? 28 : 22,
+                                          fontSize: isHero ? 24 : 22,
                                           fontWeight: FontWeight.w700,
                                           height: 1.2,
                                           color: palette.foreground,
@@ -752,7 +760,9 @@ class _UpNextContentState extends ConsumerState<_UpNextContent>
                                     trackId: nextSession.id,
                                     palette: palette,
                                   ),
-                                  if (widget.data.totalCount > 0) ...[
+                                  // Progress bar stays off the hero — the
+                                  // image is doing the work.
+                                  if (!isHero && widget.data.totalCount > 0) ...[
                                     const SizedBox(height: 10),
                                     _ProgressRow(
                                       completed: widget.data.completedCount,

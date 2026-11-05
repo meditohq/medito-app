@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +6,6 @@ import 'package:medito/models/stripe/paywall_config_model.dart';
 import 'package:medito/providers/device_and_app_info/device_and_app_info_provider.dart';
 import 'package:medito/providers/stripe/payment_service_provider.dart';
 import 'package:medito/repositories/auth/auth_repository.dart';
-import 'package:medito/services/analytics/firebase_analytics_service.dart';
 
 import 'native_donation_page.dart';
 import 'webview_donation_screen.dart';
@@ -88,25 +85,9 @@ class _SupporterDonationScreenState
       explicitChildNodes: true,
       label: l10n.donateTitle,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          actions: [
-            CloseButton(
-              onPressed: () {
-                unawaited(
-                  FirebaseAnalyticsService().logEvent(
-                    name: 'donation_close_tapped',
-                    parameters: {
-                      'method': 'close',
-                      'paywall_source': 'announcement',
-                    },
-                  ),
-                );
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
+        // No AppBar: the native page owns its own close button (top-left).
+        // Keeping an app-bar region on top of the scrolling body read as two
+        // stacked surfaces, with a faint scrim where they met.
         body: SafeArea(
           child: config.when(
             loading: () => Center(
@@ -119,7 +100,6 @@ class _SupporterDonationScreenState
                     config: value,
                     source: 'announcement',
                     campaignMetadata: widget.campaignMetadata,
-                    showCloseButton: false,
                     onNativeUnavailable: () => setState(() {
                       _nativeSheetFailed = true;
                       _useWeb = true;

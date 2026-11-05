@@ -99,13 +99,6 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   bool _didDonate = false;
   bool _dismissLogged = false;
   bool _donateTapLogged = false;
-  // Escape hatch mirrors the webview arm exactly: an X in the top-right
-  // corner that fades in ~5s after the page loads. No skip button — keeping
-  // the exit affordance identical means the experiment measures the page,
-  // not the escape hatch.
-  static const _closeDelay = Duration(seconds: 5);
-  bool _showClose = false;
-  Timer? _closeTimer;
   String? _capturedUserId;
 
   // Anonymous donors have no account email, so without asking here the Stripe
@@ -188,12 +181,6 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               : _Frequency.monthly);
     _selectedAmount = _suggestedAmountFor(_selectedFrequency);
 
-    if (widget.showCloseButton) {
-      _closeTimer = Timer(_closeDelay, () {
-        if (mounted) setState(() => _showClose = true);
-      });
-    }
-
     _logPageShown();
   }
 
@@ -201,7 +188,6 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
   void dispose() {
     _emailController.dispose();
     _customAmountController.dispose();
-    _closeTimer?.cancel();
     // Parent pager may advance past this tab without an explicit skip tap.
     if (!_didDonate) _logPaywallDismissedNoPayment();
     super.dispose();
@@ -540,30 +526,18 @@ class _NativeDonationPageState extends ConsumerState<NativeDonationPage> {
               );
             },
           ),
-          // Delayed close affordance — same position and ~5s fade-in as the
-          // X on the webview paywall. Only inserted once active so its
-          // semantics don't exist while it can't be tapped (keeps UI tests
-          // honest too).
-          if (widget.showCloseButton && _showClose)
+          if (widget.showCloseButton)
             Positioned(
               top: 4,
-              right: 4,
-              child: TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: 1),
-                duration: MediaQuery.disableAnimationsOf(context)
-                    ? Duration.zero
-                    : const Duration(milliseconds: 400),
-                builder: (context, opacity, child) =>
-                    Opacity(opacity: opacity, child: child),
-                child: IconButton(
-                  onPressed: () => _handleSkip('close'),
-                  icon: Icon(
-                    Icons.close,
-                    size: 22,
-                    color: onSurface.withValues(alpha: 0.6),
-                  ),
-                  tooltip: AppLocalizations.of(context)!.skipForNow,
+              left: 4,
+              child: IconButton(
+                onPressed: () => _handleSkip('close'),
+                icon: Icon(
+                  Icons.close,
+                  size: 22,
+                  color: onSurface.withValues(alpha: 0.6),
                 ),
+                tooltip: AppLocalizations.of(context)!.skipForNow,
               ),
             ),
         ],
