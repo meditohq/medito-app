@@ -185,34 +185,45 @@ class _TimerViewState extends ConsumerState<TimerView> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                  // Horizontal padding is applied per child so the preset
+                  // chips can scroll edge-to-edge.
+                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       if (coverUrl != null) ...[
-                        AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: HomeGradientBorder(
-                            backgroundColor: Theme.of(context).cardColor,
-                            borderRadius: 20,
-                            borderWidth: 0.5,
-                            child: NetworkImageWidget(
-                              url: coverUrl,
-                              shouldCache: true,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: HomeGradientBorder(
+                              backgroundColor: Theme.of(context).cardColor,
+                              borderRadius: 20,
+                              borderWidth: 0.5,
+                              child: NetworkImageWidget(
+                                url: coverUrl,
+                                shouldCache: true,
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
                       ],
-                      MeditoSegmentedTabs(
-                        labels: [l10n.timerTitle, l10n.timerModeStopwatch],
-                        selectedIndex: settings.mode.index,
-                        onChanged: (index) {
-                          unawaited(HapticFeedback.selectionClick());
-                          ref
-                              .read(timerSettingsProvider.notifier)
-                              .setMode(TimerMode.values[index]);
-                        },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: MeditoSegmentedTabs(
+                          labels: [
+                            l10n.timerTitle,
+                            l10n.timerModeStopwatch,
+                          ],
+                          selectedIndex: settings.mode.index,
+                          onChanged: (index) {
+                            unawaited(HapticFeedback.selectionClick());
+                            ref
+                                .read(timerSettingsProvider.notifier)
+                                .setMode(TimerMode.values[index]);
+                          },
+                        ),
                       ),
                       const SizedBox(height: 16),
                       AnimatedSize(
@@ -222,7 +233,12 @@ class _TimerViewState extends ConsumerState<TimerView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            if (isStopwatch) const _StopwatchInfo(),
+                            if (isStopwatch)
+                              const Padding(
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 20),
+                                child: _StopwatchInfo(),
+                              ),
                             // Kept mounted while hidden so switching back
                             // keeps the wheels' position.
                             Visibility(
@@ -231,17 +247,24 @@ class _TimerViewState extends ConsumerState<TimerView> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  TimerDurationWheels(
-                                    key: _wheels,
-                                    minutes: settings.minutes,
-                                    // Only user drags report here; a
-                                    // preset's spin is suppressed.
-                                    onChanged: (minutes) {
-                                      _lengthSource = 'wheel';
-                                      ref
-                                          .read(timerSettingsProvider.notifier)
-                                          .setMinutes(minutes);
-                                    },
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                    ),
+                                    child: TimerDurationWheels(
+                                      key: _wheels,
+                                      minutes: settings.minutes,
+                                      // Only user drags report here; a
+                                      // preset's spin is suppressed.
+                                      onChanged: (minutes) {
+                                        _lengthSource = 'wheel';
+                                        ref
+                                            .read(
+                                              timerSettingsProvider.notifier,
+                                            )
+                                            .setMinutes(minutes);
+                                      },
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   _PresetChips(
@@ -255,7 +278,10 @@ class _TimerViewState extends ConsumerState<TimerView> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      const TimerBellsTile(),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: TimerBellsTile(),
+                      ),
                     ],
                   ),
                 ),
@@ -341,22 +367,32 @@ class _PresetChips extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final scaledDiameter = MediaQuery.textScalerOf(context).scale(_diameter);
     final diameter = scaledDiameter < _diameter ? _diameter : scaledDiameter;
-    return Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      spacing: 12,
-      runSpacing: 12,
-      children: [
-        for (final minutes in kTimerPresetMinutes)
-          _PresetChip(
-            diameter: diameter,
-            minutes: minutes,
-            selected: minutes == selectedMinutes,
-            label: l10n.min,
-            semanticLabel: l10n.timerPresetSemantics(minutes),
-            onTap: () => onSelected(minutes),
-            theme: theme,
-          ),
-      ],
+    // Scrolls edge-to-edge: the parent column removes its horizontal padding
+    // around this row so the first and last chips sit under the normal 20pt
+    // gutter and extra chips can slide past the edge instead of being
+    // clipped at the padding boundary.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          for (var i = 0; i < kTimerPresetMinutes.length; i++) ...[
+            if (i > 0) const SizedBox(width: 12),
+            _PresetChip(
+              diameter: diameter,
+              minutes: kTimerPresetMinutes[i],
+              selected: kTimerPresetMinutes[i] == selectedMinutes,
+              label: l10n.min,
+              semanticLabel: l10n.timerPresetSemantics(
+                kTimerPresetMinutes[i],
+              ),
+              onTap: () => onSelected(kTimerPresetMinutes[i]),
+              theme: theme,
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
