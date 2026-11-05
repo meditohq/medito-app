@@ -18,6 +18,7 @@ import 'package:medito/utils/logger.dart';
 import 'package:medito/l10n/app_localizations.dart';
 
 import '../../constants/strings/analytics_event_constants.dart';
+import '../../utils/launch_source_tracker.dart';
 import '../../models/notification/notification_payload_model.dart';
 import '../analytics/firebase_analytics_service.dart';
 import 'local_notifications.dart';
@@ -239,6 +240,11 @@ class FirebaseMessagingHandler {
         sourceOverride ??
         (data?['source'] as String?) ??
         (data == null ? 'unknown' : AnalyticsEventConstants.sourcePush);
+    if (source == AnalyticsEventConstants.sourceLocalReminder) {
+      LaunchSourceTracker.instance.markLocalReminder();
+    } else if (source != 'unknown') {
+      LaunchSourceTracker.instance.markPush();
+    }
     final day = data?[AnalyticsEventConstants.paramNotificationDay];
 
     await FirebaseAnalyticsService().logEvent(

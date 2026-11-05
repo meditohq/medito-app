@@ -1,9 +1,14 @@
 import 'package:medito/constants/constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/models/home/announcement/announcement_model.dart';
+import 'package:medito/providers/donation/announcement_donation_experiment.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
+import 'package:medito/views/donation/supporter_donation_screen.dart';
 import 'package:medito/views/home/home_styles.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
+import 'package:medito/utils/launch_source_tracker.dart';
 import 'package:medito/utils/utils.dart';
 import 'package:medito/widgets/widgets.dart';
 import 'dart:ui';
@@ -27,6 +32,11 @@ class AnnouncementWidget extends ConsumerStatefulWidget {
   ConsumerState<AnnouncementWidget> createState() => _AnnouncementWidgetState();
 }
 
+/// Announcement ids already logged this app lifetime. Prevents a scroll /
+/// rebuild / hot reload from inflating impressions; a cold restart or a
+/// background→foreground round-trip legitimately gets a new impression.
+final Set<String> _loggedImpressions = <String>{};
+
 class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
@@ -36,6 +46,7 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
   @override
   void initState() {
     super.initState();
+    _logImpression();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -63,9 +74,54 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
   }
 
   void _handleDismiss() {
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.announcementDismissed,
+      parameters: _baseParams(),
+    );
     _animationController.reverse().then((_) {
       widget.onPressedDismiss?.call();
     });
+  }
+
+  bool _isDonationCta() {
+    final type = widget.announcement.ctaType;
+    final path = widget.announcement.ctaPath;
+    return type == 'donation' ||
+        (type == TypeConstants.route && path == RouteConstants.donation);
+  }
+
+  Map<String, Object> _baseParams() {
+    final params = <String, Object>{
+      AnalyticsEventConstants.paramAnnouncementId: widget.announcement.id ?? '',
+      AnalyticsEventConstants.paramAnnouncementCtaType:
+          widget.announcement.ctaType ?? 'none',
+      AnalyticsEventConstants.paramLaunchSource:
+          LaunchSourceTracker.instance.current,
+    };
+    // Only tag the arm on donation surfaces, and only read it — assignment
+    // happens at CTA tap so users who never see a donation card aren't
+    // pulled into the experiment.
+    if (_isDonationCta()) {
+      final arm = AnnouncementDonationExperiment.peek(
+        ref.read(sharedPreferencesProvider),
+      );
+      if (arm != null) {
+        params[AnalyticsEventConstants.paramExperimentName] =
+            AnnouncementDonationExperiment.experimentName;
+        params[AnalyticsEventConstants.paramVariantId] = arm;
+      }
+    }
+    return params;
+  }
+
+  void _logImpression() {
+    final id = widget.announcement.id;
+    if (id == null || id.isEmpty) return;
+    if (!_loggedImpressions.add(id)) return;
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.announcementImpression,
+      parameters: _baseParams(),
+    );
   }
 
   @override
@@ -190,9 +246,36 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
   void _handleCtaTitlePress(BuildContext context) async {
     var path = widget.announcement.ctaPath;
     var type = widget.announcement.ctaType;
-    var isDonation =
-        type == 'donation' ||
-        (type == TypeConstants.route && path == RouteConstants.donation);
+    final isDonation = _isDonationCta();
+
+    // Assign the donation-CTA arm NOW (first tap, persisted) so the tap
+    // event, the Stripe metadata, and the navigation decision all agree.
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (isDonation) {
+      AnnouncementDonationExperiment.resolveVariant(prefs);
+    }
+
+    FirebaseAnalyticsService().logEvent(
+      name: AnalyticsEventConstants.announcementCtaTapped,
+      parameters: _baseParams(),
+    );
+
+    if (isDonation) {
+      final arm = AnnouncementDonationExperiment.peek(prefs);
+      if (arm == AnnouncementDonationExperiment.variantNative) {
+        await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => SupporterDonationScreen(
+              campaignMetadata: AnnouncementDonationExperiment.paymentMetadata(
+                prefs,
+              ),
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
     await handleNavigation(
       type,
       [path.toString().getIdFromPath(), path],
@@ -201,6 +284,9 @@ class _AnnouncementWidgetState extends ConsumerState<AnnouncementWidget>
       sourceRouteName: isDonation
           ? FirebaseAnalyticsService.paywallSourceAnnouncement
           : null,
+      donationCampaignMetadata: isDonation
+          ? AnnouncementDonationExperiment.paymentMetadata(prefs)
+          : const {},
     );
   }
 }

@@ -133,6 +133,12 @@ class SharedPreferenceConstants {
   static const String onboardingExperiencedMeditationVariant =
       'onboarding_experienced_meditation_variant';
 
+  // Home-announcement donation CTA A/B test (webview donate page vs native
+  // fullscreen donate page) — sticky per-install variant, applies to every
+  // announcement whose CTA is a donation.
+  static const String announcementDonationVariant =
+      'announcement_donation_variant';
+
   // Last selected main tab (home=0, explore=1)
   static const String lastMainTabIndex = 'last_main_tab_index';
 

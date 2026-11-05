@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../constants/strings/analytics_event_constants.dart';
 import '../services/analytics/firebase_analytics_service.dart';
+import 'launch_source_tracker.dart';
 import 'logger.dart';
 import 'network_type.dart';
 
@@ -30,7 +31,10 @@ class AppOpenTracker {
   DateTime? _backgroundedAt;
 
   /// Called once from app init.
-  Future<void> onColdStart() => _log('cold');
+  Future<void> onColdStart() {
+    LaunchSourceTracker.instance.markCold();
+    return _log('cold');
+  }
 
   /// Called on every lifecycle pause. Only the first one since the last
   /// resume counts, so the away time isn't reset by inactive → paused.
@@ -44,6 +48,7 @@ class AppOpenTracker {
     final since = _backgroundedAt;
     _backgroundedAt = null;
     if (since == null || now().difference(since) < _minBackground) return;
+    LaunchSourceTracker.instance.markResume();
     await _log('resume');
   }
 

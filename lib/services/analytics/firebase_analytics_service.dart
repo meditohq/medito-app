@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:medito/providers/donation/announcement_donation_experiment.dart';
 import 'package:medito/providers/donation/supporter_appeal_experiment.dart';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -464,8 +465,10 @@ class FirebaseAnalyticsService {
         await _analytics.logEvent(
           name: name,
           parameters: {
-            if (isDonation)
+            if (isDonation) ...{
               ...SupporterAppealExperiment(prefs).paymentMetadata(),
+              ...AnnouncementDonationExperiment.paymentMetadata(prefs),
+            },
             ...?parameters,
           },
         );

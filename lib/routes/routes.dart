@@ -44,6 +44,9 @@ Future<void> handleNavigation(
   String? sourceRouteName,
   // Where a Timer opened from, for timer_opened; deeplink when unset.
   String? timerSource,
+  // Arbitrary key/values stamped into Stripe metadata on donation flows,
+  // for experiment/campaign attribution. Non-donation routes ignore it.
+  Map<String, String> donationCampaignMetadata = const {},
 }) async {
   ids.removeWhere((element) => element == null);
 
@@ -84,7 +87,12 @@ Future<void> handleNavigation(
   } else if (type.contains('settings')) {
     await _pushRoute(SettingsScreen(), ref);
   } else if (_isDonationRoute(type, ids)) {
-    await handleDonationNavigation(context, ref, sourceRouteName);
+    await handleDonationNavigation(
+      context,
+      ref,
+      sourceRouteName,
+      campaignMetadata: donationCampaignMetadata,
+    );
   } else if (type == TypeConstants.email) {
     await _handleEmailNavigation(ids, ref);
   } else if (type == TypeConstants.flow && ids.contains('downloads')) {
@@ -208,6 +216,7 @@ Future<bool?> handleDonationNavigation(
   WidgetRef? ref,
   String? sourceRouteName, {
   NavigatorState? navigator,
+  Map<String, String> campaignMetadata = const {},
 }) async {
   if (ref == null) {
     AppLogger.w('ROUTES', 'Cannot open donation screen: ref is null');
@@ -239,7 +248,10 @@ Future<bool?> handleDonationNavigation(
 
   return await nav.push<bool>(
     MaterialPageRoute(
-      builder: (context) => WebViewDonationScreen(source: sourceRouteName),
+      builder: (context) => WebViewDonationScreen(
+        source: sourceRouteName,
+        campaignMetadata: campaignMetadata,
+      ),
     ),
   );
 }

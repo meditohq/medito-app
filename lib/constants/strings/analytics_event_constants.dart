@@ -326,6 +326,32 @@ class AnalyticsEventConstants {
   /// Paywall source identifier for announcement
   static const String paywallSourceAnnouncement = 'announcement';
 
+  /// Fired once per session the first time a server-driven home announcement
+  /// renders, so we can count impressions per announcement and segment by
+  /// [paramLaunchSource] (did they see it after a deep link, a push, a daily
+  /// reminder, a cold start, or a resume).
+  static const String announcementImpression = 'announcement_impression';
+
+  /// Fired when the user taps Dismiss on a home announcement.
+  static const String announcementDismissed = 'announcement_dismissed';
+
+  /// Fired when the user taps the CTA on a home announcement. The paywall
+  /// source for donation CTAs is already [paywallSourceAnnouncement]; this
+  /// event covers non-donation CTAs too and carries [paramLaunchSource].
+  static const String announcementCtaTapped = 'announcement_cta_tapped';
+
+  /// The server's announcement id (admin-dashboard record).
+  static const String paramAnnouncementId = 'announcement_id';
+
+  /// The announcement's CTA type as sent by the server (e.g. 'donation',
+  /// 'route', 'url'). 'none' when there is no CTA.
+  static const String paramAnnouncementCtaType = 'announcement_cta_type';
+
+  /// The reason the app most recently foregrounded or routed before this
+  /// event: cold | resume | deep_link | push | smart_reminder. Written by
+  /// [LaunchSourceTracker]. "Latest wins" within a session.
+  static const String paramLaunchSource = 'launch_source';
+
   // Analytics parameter names
   /// Parameter name for donation/payment amount
   static const String paramAmount = 'amount';
