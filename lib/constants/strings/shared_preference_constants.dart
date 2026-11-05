@@ -188,6 +188,8 @@ class SharedPreferenceConstants {
   static const String sessionBellPattern = 'session_bell_pattern';
   static const String timerSessionBellPattern = 'timer_session_bell_pattern';
   static const String timerSessionBellsEnabled = 'timer_session_bells_enabled';
+  static const String timerSessionBellIntervalSeconds =
+      'timer_session_bell_interval_seconds';
   // Cover URL of the timer track, last fetched; shown behind the Timer
   // screen (offline from the image disk cache).
   static const String timerCoverUrl = 'timer_cover_url';

@@ -2,13 +2,21 @@ import '../../models/background_sounds/session_bell_pattern.dart';
 
 /// One-shot cues follow media time, never wall-clock time. Seeking past a cue
 /// consumes it; seeking to the beginning starts a fresh session.
+///
+/// [intervalSeconds] optionally rings every N seconds on top of the pattern —
+/// the first tick is at N seconds in, the beginning cue covers position 0.
 class SessionBellSchedule {
-  SessionBellSchedule({this.pattern = SessionBellPattern.beginningMiddleEnd});
+  SessionBellSchedule({
+    this.pattern = SessionBellPattern.beginningMiddleEnd,
+    this.intervalSeconds = 0,
+  });
 
   SessionBellPattern pattern;
+  int intervalSeconds;
   bool _started = false;
   bool _middle = false;
   bool _end = false;
+  int _intervalTicksFired = 0;
 
   // The asset lasts six seconds, including its silent tail. Convert that
   // wall-clock duration to media time so faster playback still leaves room.
@@ -22,6 +30,7 @@ class SessionBellSchedule {
     _started = false;
     _middle = false;
     _end = false;
+    _intervalTicksFired = 0;
   }
 
   void seek(Duration position, Duration duration, {double speed = 1}) {
@@ -32,6 +41,9 @@ class SessionBellSchedule {
       _middle = duration > Duration.zero && position >= duration ~/ 2;
       _end =
           duration > Duration.zero && position >= _endPosition(duration, speed);
+      if (intervalSeconds > 0) {
+        _intervalTicksFired = position.inSeconds ~/ intervalSeconds;
+      }
     }
   }
 
@@ -41,6 +53,9 @@ class SessionBellSchedule {
       _started = true;
       _middle = position >= duration ~/ 2;
       _end = position >= _endPosition(duration, speed);
+      if (intervalSeconds > 0) {
+        _intervalTicksFired = position.inSeconds ~/ intervalSeconds;
+      }
       return pattern.hasBeginning && position < const Duration(seconds: 2);
     }
     if (!_end && position >= _endPosition(duration, speed)) {
@@ -56,6 +71,14 @@ class SessionBellSchedule {
         position < duration) {
       _middle = true;
       return true;
+    }
+    if (intervalSeconds > 0) {
+      final ticks = position.inSeconds ~/ intervalSeconds;
+      // Skip tick 0 — the beginning cue covers it.
+      if (ticks > _intervalTicksFired && ticks > 0) {
+        _intervalTicksFired = ticks;
+        return true;
+      }
     }
     return false;
   }

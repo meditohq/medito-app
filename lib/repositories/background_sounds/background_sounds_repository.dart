@@ -43,6 +43,12 @@ abstract class BackgroundSoundsRepository {
     bool forTimer = false,
   });
 
+  /// Seconds between interval bells on top of the pattern cues, or 0 for off.
+  /// Only used by the timer; tracks have no interval setting.
+  int getTimerBellIntervalSeconds();
+
+  void saveTimerBellIntervalSeconds(int seconds);
+
   void removeSelectedBgSound();
 
   void handleOnChangeVolume(double vol);
@@ -273,6 +279,25 @@ class BackgroundSoundsRepositoryImpl extends BackgroundSoundsRepository {
                 ? SharedPreferenceConstants.timerSessionBellPattern
                 : SharedPreferenceConstants.sessionBellPattern,
             pattern.name,
+          ),
+    );
+  }
+
+  @override
+  int getTimerBellIntervalSeconds() =>
+      ref
+          .read(sharedPreferencesProvider)
+          .getInt(SharedPreferenceConstants.timerSessionBellIntervalSeconds) ??
+      0;
+
+  @override
+  void saveTimerBellIntervalSeconds(int seconds) {
+    unawaited(
+      ref
+          .read(sharedPreferencesProvider)
+          .setInt(
+            SharedPreferenceConstants.timerSessionBellIntervalSeconds,
+            seconds,
           ),
     );
   }

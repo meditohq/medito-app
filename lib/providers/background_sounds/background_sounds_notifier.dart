@@ -136,6 +136,10 @@ class BackgroundSoundsState {
   final bool bellsEnabled;
   final SessionBellPattern bellPattern;
 
+  /// Seconds between interval bells on top of [bellPattern]'s cues, or 0 for
+  /// off. Timer-only; tracks never set this.
+  final int bellIntervalSeconds;
+
   const BackgroundSoundsState({
     this.volume = 50,
     this.selectedBgSound,
@@ -143,6 +147,7 @@ class BackgroundSoundsState {
     this.failedBgSound,
     this.bellsEnabled = false,
     this.bellPattern = SessionBellPattern.beginningMiddleEnd,
+    this.bellIntervalSeconds = 0,
   });
 
   /// Whether anything plays over the session (lights the player's sound
@@ -158,6 +163,7 @@ class BackgroundSoundsState {
   BackgroundSoundsState copyWith({
     bool? bellsEnabled,
     SessionBellPattern? bellPattern,
+    int? bellIntervalSeconds,
     double? volume,
     Object? selectedBgSound = _sentinel,
     Object? downloadingBgSound = _sentinel,
@@ -166,6 +172,7 @@ class BackgroundSoundsState {
     return BackgroundSoundsState(
       bellsEnabled: bellsEnabled ?? this.bellsEnabled,
       bellPattern: bellPattern ?? this.bellPattern,
+      bellIntervalSeconds: bellIntervalSeconds ?? this.bellIntervalSeconds,
       volume: volume ?? this.volume,
       selectedBgSound: selectedBgSound == _sentinel
           ? this.selectedBgSound
@@ -331,15 +338,16 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
   Future<void> prepareSessionBells({required bool forTimer}) async {
     _timerScope = forTimer;
     final repo = ref.read(backgroundSoundsRepositoryProvider);
-    final pattern = forTimer
-        ? ref.read(timerBellSettingsProvider)
-        : repo.getSessionBellPattern();
+    final timerSettings = forTimer ? ref.read(timerBellSettingsProvider) : null;
+    final pattern = timerSettings?.pattern ?? repo.getSessionBellPattern();
+    final intervalSeconds = timerSettings?.intervalSeconds ?? 0;
+    final hasAnyBell =
+        pattern != SessionBellPattern.none || intervalSeconds > 0;
     state = state.copyWith(
       volume: repo.getBgSoundVolume() ?? 50,
-      bellsEnabled: forTimer
-          ? pattern != SessionBellPattern.none
-          : repo.getSessionBellsEnabled(),
+      bellsEnabled: forTimer ? hasAnyBell : repo.getSessionBellsEnabled(),
       bellPattern: pattern,
+      bellIntervalSeconds: intervalSeconds,
     );
     // Android starts with a native volume of zero. Previously this was only
     // restored when an ambient sound played, so bells alone stayed silent.
@@ -349,15 +357,27 @@ class BackgroundSoundsNotifier extends Notifier<BackgroundSoundsState> {
     await _applySessionBells(state.bellsEnabled, preview: false);
   }
 
+  /// Encodes [pattern] and an optional interval into the single string the
+  /// platform bell schedules understand. The bare pattern name stays the same
+  /// for compatibility; an interval is appended as `"+<seconds>"`.
+  String _encodePattern(SessionBellPattern pattern, int intervalSeconds) =>
+      intervalSeconds > 0
+          ? '${pattern.name}+$intervalSeconds'
+          : pattern.name;
+
   Future<void> _applySessionBells(bool enabled, {required bool preview}) async {
     try {
       final volume = scaledVolume(state.volume);
       if (Platform.isAndroid) {
-        await _api.setSessionBells(enabled, state.bellPattern.name);
+        await _api.setSessionBells(
+          enabled,
+          _encodePattern(state.bellPattern, state.bellIntervalSeconds),
+        );
       } else if (enabled) {
         await iosAudioHandler.sessionBells.enable(
           volume,
           pattern: state.bellPattern,
+          intervalSeconds: state.bellIntervalSeconds,
         );
       } else {
         await iosAudioHandler.sessionBells.disable();

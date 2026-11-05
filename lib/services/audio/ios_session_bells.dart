@@ -40,12 +40,17 @@ class IosSessionBells {
   Future<void> enable(
     double volume, {
     SessionBellPattern pattern = SessionBellPattern.beginningMiddleEnd,
+    int intervalSeconds = 0,
   }) async {
-    if (_enabled && _ready && _schedule.pattern == pattern) {
+    if (_enabled &&
+        _ready &&
+        _schedule.pattern == pattern &&
+        _schedule.intervalSeconds == intervalSeconds) {
       await _bell.setVolume(volume);
       return;
     }
     _schedule.pattern = pattern;
+    _schedule.intervalSeconds = intervalSeconds;
     final generation = ++_generation;
     _enabled = true;
     _ready = false;

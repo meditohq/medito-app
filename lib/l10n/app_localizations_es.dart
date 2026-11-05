@@ -3412,6 +3412,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sessionBellEnd => 'Final';
 
   @override
+  String get sessionBellEveryXMinutes => 'Cada pocos minutos';
+
+  @override
+  String get sessionBellIntervalOff => 'Desactivado';
+
+  @override
+  String sessionBellIntervalMinutes(int minutes) {
+    return 'Cada $minutes min';
+  }
+
+  @override
   String get downloadAll => 'Descargar todo';
 
   @override

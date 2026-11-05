@@ -5950,6 +5950,24 @@ abstract class AppLocalizations {
   /// **'End'**
   String get sessionBellEnd;
 
+  /// Section header above the interval-bell chips in the Timer bells sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Every few minutes'**
+  String get sessionBellEveryXMinutes;
+
+  /// Chip in the interval-bell row that disables recurring bells
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get sessionBellIntervalOff;
+
+  /// Interval-bell chip label, e.g. 'Every 5 min'
+  ///
+  /// In en, this message translates to:
+  /// **'Every {minutes} min'**
+  String sessionBellIntervalMinutes(int minutes);
+
   /// Option to download all sessions in a pack
   ///
   /// In en, this message translates to:

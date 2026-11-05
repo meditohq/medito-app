@@ -2619,6 +2619,23 @@
   "sessionBellBeginning": "Beginning",
   "sessionBellMiddle": "Middle",
   "sessionBellEnd": "End",
+  "sessionBellEveryXMinutes": "Every few minutes",
+  "@sessionBellEveryXMinutes": {
+    "description": "Section header above the interval-bell chips in the Timer bells sheet"
+  },
+  "sessionBellIntervalOff": "Off",
+  "@sessionBellIntervalOff": {
+    "description": "Chip in the interval-bell row that disables recurring bells"
+  },
+  "sessionBellIntervalMinutes": "Every {minutes} min",
+  "@sessionBellIntervalMinutes": {
+    "description": "Interval-bell chip label, e.g. 'Every 5 min'",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "downloadAll": "Download all",
   "@downloadAll": {
     "description": "Option to download all sessions in a pack"

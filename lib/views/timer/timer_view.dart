@@ -278,9 +278,9 @@ class _TimerViewState extends ConsumerState<TimerView> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: TimerBellsTile(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: TimerBellsTile(isStopwatch: isStopwatch),
                       ),
                     ],
                   ),

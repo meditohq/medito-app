@@ -3416,6 +3416,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sessionBellEnd => 'Ende';
 
   @override
+  String get sessionBellEveryXMinutes => 'Alle paar Minuten';
+
+  @override
+  String get sessionBellIntervalOff => 'Aus';
+
+  @override
+  String sessionBellIntervalMinutes(int minutes) {
+    return 'Alle $minutes Min.';
+  }
+
+  @override
   String get downloadAll => 'Alle herunterladen';
 
   @override
