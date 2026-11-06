@@ -405,7 +405,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> {
         TypeConstants.fileIdKey: request.fileId,
         TypeConstants.guideIdKey: '',
         TypeConstants.timestampIdKey: DateTime.now().millisecondsSinceEpoch,
-        // Same title a natively finished countdown reports (e.g. "Timer").
+        // Use the same title that a natively finished countdown reports (e.g. "Timer").
         TypeConstants.titleKey: request.title,
       }),
     );
