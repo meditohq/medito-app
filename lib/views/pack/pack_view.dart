@@ -71,7 +71,7 @@ class _PackViewState extends ConsumerState<PackView>
       if (!mounted) return;
       ref
           .read(locallyCompletedPacksProvider.notifier)
-          .setComplete(widget.id, complete);
+          .setComplete(pack, complete);
     });
   }
 
