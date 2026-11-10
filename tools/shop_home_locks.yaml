@@ -1,0 +1,15 @@
+# Editorial overrides for the weekly app-home order refresh.
+# Both lists are product slugs (the handle in the Fourthwall admin URL).
+#
+# - always_include: these slugs are always kept in the app-home collection,
+#   even when their data would otherwise put them out of the top N.
+# - never_include: these slugs will never be added by the refresh job (the
+#   admin can still add them by hand, but they will be dropped on the next run).
+
+always_include: []
+# Example:
+# - sun-print
+
+never_include: []
+# Example:
+# - medito-gift-card

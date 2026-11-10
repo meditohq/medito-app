@@ -1,0 +1,54 @@
+name: refresh-shop-home-order
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'  # Mon 07:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Print the proposed order without calling Fourthwall'
+        type: boolean
+        default: false
+
+concurrency:
+  group: refresh-shop-home-order
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install google-cloud-bigquery requests pyyaml
+
+      - name: Refresh app-home order
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.BQ_READONLY_SA }}
+          FW_USER: ${{ secrets.FOURTHWALL_API_USER }}
+          FW_PASS: ${{ secrets.FOURTHWALL_API_PASS }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_SHOP_WEBHOOK }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: python tools/refresh_shop_home_order.py
+
+      - name: Commit changelog
+        if: ${{ !inputs.dry_run }}
+        run: |
+          if [ -n "$(git status --porcelain docs/shop_home_order_log.md)" ]; then
+            git config user.name  'medito-bot'
+            git config user.email 'bot@meditofoundation.org'
+            git add docs/shop_home_order_log.md
+            git commit -m "chore(shop): refresh app-home order"
+            git push
+          else
+            echo "No changelog change to commit."
+          fi
