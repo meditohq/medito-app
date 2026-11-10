@@ -7,6 +7,7 @@ import 'package:medito/exceptions/app_error.dart';
 import 'package:medito/models/models.dart';
 import 'package:medito/providers/favorites/favorites_provider.dart';
 import 'package:medito/providers/providers.dart';
+import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/routes/routes.dart';
 import 'package:medito/services/analytics/firebase_analytics_service.dart';
 import 'package:medito/views/pack/widgets/pack_item_widget.dart';
@@ -52,6 +53,26 @@ class _PackViewState extends ConsumerState<PackView>
     super.initState();
     _scrollController.addListener(_scrollListener);
     _logScreenView();
+    ref.listenManual(
+      packProvider(packId: widget.id),
+      (_, next) => _recordCompletion(next.value),
+      fireImmediately: true,
+    );
+  }
+
+  // Deferred: providers can't be modified while the widget tree is building.
+  // The setter is idempotent, so repeated updates never loop.
+  void _recordCompletion(PackModel? pack) {
+    // Before stats load every item reads as incomplete, which would wipe a
+    // correctly recorded pack.
+    if (pack == null || !ref.read(statsProvider).hasValue) return;
+    final complete = isPackFullyComplete(pack);
+    Future.microtask(() {
+      if (!mounted) return;
+      ref
+          .read(locallyCompletedPacksProvider.notifier)
+          .setComplete(widget.id, complete);
+    });
   }
 
   Future<void> _logScreenView() async {

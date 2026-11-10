@@ -6,7 +6,9 @@ import 'package:medito/models/models.dart';
 import 'package:medito/providers/pack/pack_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/pack/packs_repository.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/services/network/http_api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _Stats extends StatsNotifier {
   _Stats(this.checked);
@@ -50,9 +52,18 @@ class _FakeRepo implements PackRepositoryImpl {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-ProviderContainer _container(_FakeRepo repo, List<String> checked) {
+Future<ProviderContainer> _container(
+  _FakeRepo repo,
+  List<String> checked, {
+  SharedPreferences? prefs,
+}) async {
+  if (prefs == null) {
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
+  }
   final container = ProviderContainer(
     overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
       packRepositoryProvider.overrideWithValue(repo),
       statsProvider.overrideWith(() => _Stats(checked)),
     ],
@@ -60,6 +71,14 @@ ProviderContainer _container(_FakeRepo repo, List<String> checked) {
   addTearDown(container.dispose);
   return container;
 }
+
+PackItemsModel _item(String type, String id, {bool? done}) => PackItemsModel(
+  type: type,
+  id: id,
+  title: id,
+  path: '/$id',
+  isCompleted: done,
+);
 
 Future<Set<String>> _completed(ProviderContainer container) async {
   container.listen(completedPackIdsProvider, (_, _) {});
@@ -71,7 +90,7 @@ Future<Set<String>> _completed(ProviderContainer container) async {
 void main() {
   group('completedPackIdsProvider', () {
     test('ticks a pack only when all its tracks are checked', () async {
-      final container = _container(
+      final container = await _container(
         _FakeRepo(
           packTracks: {
             'sleep': ['a', 'b'],
@@ -85,7 +104,7 @@ void main() {
     });
 
     test('a shared track counts towards every pack that has it', () async {
-      final container = _container(
+      final container = await _container(
         _FakeRepo(
           packTracks: {
             'sleep': ['shared'],
@@ -99,7 +118,7 @@ void main() {
     });
 
     test('never ticks a pack with no tracks', () async {
-      final container = _container(
+      final container = await _container(
         _FakeRepo(packTracks: {'empty': []}),
         ['a'],
       );
@@ -108,7 +127,7 @@ void main() {
     });
 
     test('shows no ticks when the endpoint fails', () async {
-      final container = _container(
+      final container = await _container(
         _FakeRepo(error: Exception('offline')),
         ['a'],
       );
@@ -118,7 +137,7 @@ void main() {
   });
 
   test('packProvider marks completed sub-pack rows', () async {
-    final container = _container(
+    final container = await _container(
       _FakeRepo(
         packTracks: {
           'done': ['a'],
@@ -157,6 +176,153 @@ void main() {
 
     final items = container.read(packProvider(packId: 'parent')).value!.items;
     expect(items.map((i) => i.isCompleted), [true, false, true]);
+  });
+
+  group('isPackFullyComplete', () {
+    PackModel pack(List<PackItemsModel> items) =>
+        PackModel(id: 'p', title: 'P', items: items);
+
+    test('true when all tracks and sub-packs are completed', () {
+      expect(
+        isPackFullyComplete(
+          pack([
+            _item(TypeConstants.track, 't', done: true),
+            _item(TypeConstants.pack, 's', done: true),
+          ]),
+        ),
+        isTrue,
+      );
+    });
+
+    test('false when one item is not completed', () {
+      expect(
+        isPackFullyComplete(
+          pack([
+            _item(TypeConstants.track, 't', done: true),
+            _item(TypeConstants.track, 'u', done: false),
+          ]),
+        ),
+        isFalse,
+      );
+    });
+
+    test('false for an empty pack', () {
+      expect(isPackFullyComplete(pack([])), isFalse);
+    });
+
+    test('ignores link items', () {
+      expect(
+        isPackFullyComplete(
+          pack([
+            _item(TypeConstants.track, 't', done: true),
+            _item(TypeConstants.link, 'l'),
+          ]),
+        ),
+        isTrue,
+      );
+    });
+  });
+
+  group('locallyCompletedPacksProvider', () {
+    test('setComplete adds, removes and persists', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final container = await _container(_FakeRepo(), [], prefs: prefs);
+      final notifier = container.read(locallyCompletedPacksProvider.notifier);
+
+      notifier.setComplete('p1', true);
+      expect(container.read(locallyCompletedPacksProvider), {'p1'});
+      expect(prefs.getStringList('locally_completed_pack_ids'), ['p1']);
+
+      notifier.setComplete('p1', false);
+      expect(container.read(locallyCompletedPacksProvider), isEmpty);
+      expect(prefs.getStringList('locally_completed_pack_ids'), isEmpty);
+    });
+
+    test('setComplete is a no-op when unchanged', () async {
+      final container = await _container(_FakeRepo(), []);
+      var calls = 0;
+      container.listen(locallyCompletedPacksProvider, (_, _) => calls++);
+      final notifier = container.read(locallyCompletedPacksProvider.notifier);
+
+      notifier.setComplete('p1', false);
+      expect(calls, 0);
+      notifier.setComplete('p1', true);
+      notifier.setComplete('p1', true);
+      expect(calls, 1);
+    });
+
+    test('survives a new container on the same preferences', () async {
+      SharedPreferences.setMockInitialValues({
+        'locally_completed_pack_ids': ['p1'],
+      });
+      final prefs = await SharedPreferences.getInstance();
+      final container = await _container(_FakeRepo(), [], prefs: prefs);
+
+      expect(container.read(locallyCompletedPacksProvider), {'p1'});
+    });
+  });
+
+  group('local completion in completedPackIdsProvider', () {
+    test('ticks a locally recorded pack when the endpoint fails', () async {
+      final container = await _container(
+        _FakeRepo(error: Exception('offline')),
+        [],
+      );
+      container
+          .read(locallyCompletedPacksProvider.notifier)
+          .setComplete('p1', true);
+
+      expect(await _completed(container), {'p1'});
+    });
+
+    test('recording then un-recording removes the tick', () async {
+      final container = await _container(_FakeRepo(), []);
+      final notifier = container.read(locallyCompletedPacksProvider.notifier);
+
+      notifier.setComplete('p1', true);
+      expect(await _completed(container), {'p1'});
+      notifier.setComplete('p1', false);
+      expect(container.read(completedPackIdsProvider), isEmpty);
+    });
+
+    test('unions server-derived and local ids', () async {
+      final container = await _container(
+        _FakeRepo(
+          packTracks: {
+            'a': ['t'],
+          },
+        ),
+        ['t'],
+      );
+      container
+          .read(locallyCompletedPacksProvider.notifier)
+          .setComplete('b', true);
+
+      expect(await _completed(container), {'a', 'b'});
+    });
+
+    test('packProvider ticks a sub-pack recorded locally', () async {
+      final container = await _container(
+        _FakeRepo(
+          pack: PackModel(
+            id: 'parent',
+            title: 'Parent',
+            items: [_item(TypeConstants.pack, 'child')],
+          ),
+        ),
+        [],
+      );
+      container
+          .read(locallyCompletedPacksProvider.notifier)
+          .setComplete('child', true);
+      container.listen(packProvider(packId: 'parent'), (_, _) {});
+      await container.read(packDataProvider(packId: 'parent').future);
+      await _completed(container);
+
+      final items = container.read(packProvider(packId: 'parent')).value!.items;
+      expect(items.map((i) => i.isCompleted), [true]);
+    });
   });
 
   test('fetchPackTrackIds parses the packTracks map', () async {

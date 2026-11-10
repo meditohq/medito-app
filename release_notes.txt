@@ -1,5 +1,5 @@
 Unreleased
--
+- Finished courses now show a tick in the course list
 
 2611.1.2
 - Clearer calendar selection with improved accessibility

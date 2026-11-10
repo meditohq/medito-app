@@ -193,4 +193,7 @@ class SharedPreferenceConstants {
   // Cover URL of the timer track, last fetched; shown behind the Timer
   // screen (offline from the image disk cache).
   static const String timerCoverUrl = 'timer_cover_url';
+  // Ids of packs the user has seen fully complete, so the pack row tick
+  // doesn't depend on the server's /packs/tracks data.
+  static const String locallyCompletedPackIds = 'locally_completed_pack_ids';
 }

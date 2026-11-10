@@ -1,5 +1,6 @@
 import 'package:medito/constants/constants.dart';
 import 'package:medito/models/models.dart';
+import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 import 'package:medito/providers/stats_provider.dart';
 import 'package:medito/repositories/repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -25,16 +26,58 @@ Future<Map<String, List<String>>> packTrackIds(Ref ref) async {
   }
 }
 
-/// Ids of packs whose tracks are all completed. Completion is per track, so a
-/// track shared by several packs counts towards each of them.
+/// Packs the user has seen fully complete on their own device. Backs up
+/// [completedPackIds] when the server's track lists are missing or don't match
+/// what the pack screen shows.
+@Riverpod(keepAlive: true)
+class LocallyCompletedPacks extends _$LocallyCompletedPacks {
+  @override
+  Set<String> build() {
+    return ref
+            .read(sharedPreferencesProvider)
+            .getStringList(SharedPreferenceConstants.locallyCompletedPackIds)
+            ?.toSet() ??
+        <String>{};
+  }
+
+  /// No-op when the value is unchanged, so listeners that call this on every
+  /// pack update can't cause a rebuild loop.
+  void setComplete(String packId, bool complete) {
+    if (state.contains(packId) == complete) return;
+    final next = {...state};
+    complete ? next.add(packId) : next.remove(packId);
+    state = next;
+    ref
+        .read(sharedPreferencesProvider)
+        .setStringList(
+          SharedPreferenceConstants.locallyCompletedPackIds,
+          next.toList(),
+        );
+  }
+}
+
+/// True when [pack] has at least one track or sub-pack and all of them are
+/// completed. Other item types (links, etc.) are ignored.
+bool isPackFullyComplete(PackModel pack) {
+  final counted = pack.items.where(
+    (i) => i.type == TypeConstants.track || i.type == TypeConstants.pack,
+  );
+  return counted.isNotEmpty && counted.every((i) => i.isCompleted == true);
+}
+
+/// Ids of packs whose tracks are all completed, plus packs recorded complete
+/// locally. Completion is per track, so a track shared by several packs
+/// counts towards each of them.
 @Riverpod(keepAlive: true)
 Set<String> completedPackIds(Ref ref) {
+  final local = ref.watch(locallyCompletedPacksProvider);
   final packTracks = ref.watch(packTrackIdsProvider).value ?? const {};
   final checked = ref.watch(statsProvider).value?.tracksChecked;
-  if (packTracks.isEmpty || checked == null || checked.isEmpty) return const {};
+  if (packTracks.isEmpty || checked == null || checked.isEmpty) return local;
 
   final completed = checked.toSet();
   return {
+    ...local,
     for (final entry in packTracks.entries)
       if (entry.value.isNotEmpty && entry.value.every(completed.contains))
         entry.key,
