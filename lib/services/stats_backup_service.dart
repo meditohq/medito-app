@@ -300,4 +300,15 @@ class StatsBackupService {
   }
 
   String _getBackupKey(int index) => '$_backupKeyPrefix$index';
+
+  /// Synchronously counts how many of the ring's backup slots are populated.
+  /// Used by the debug screen to flag "the restore list is empty / full"
+  /// without decoding every snapshot.
+  int countBackupSlots() {
+    var count = 0;
+    for (var i = 0; i < _maxBackups; i++) {
+      if (_prefs.getString(_getBackupKey(i)) != null) count++;
+    }
+    return count;
+  }
 }

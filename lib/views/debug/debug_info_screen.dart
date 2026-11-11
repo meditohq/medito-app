@@ -1,5 +1,4 @@
 // ignore_for_file: prefer_initializing_formals
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +16,7 @@ import 'package:medito/views/onboarding/onboarding_pager_screen.dart';
 import 'package:medito/widgets/snackbar_widget.dart';
 import 'package:medito/utils/logger.dart';
 import 'package:medito/services/history/app_history_service.dart';
+import 'package:medito/services/stats_backup_service.dart';
 import 'package:medito/providers/shared_preference/shared_preference_provider.dart';
 
 class _ReminderWithDate {
@@ -102,20 +102,13 @@ class DebugInfoScreen extends ConsumerWidget {
         );
   }
 
-  String _buildStatsBase64(WidgetRef ref) {
-    final stats = ref.read(statsProvider).asData?.value;
-    if (stats == null) return '';
-    final bytes = utf8.encode(jsonEncode(stats.toJson()));
-    return base64Encode(bytes);
-  }
-
   Widget _buildInfoView(
     BuildContext context,
     WidgetRef ref,
     String infoString,
   ) {
     final fullInfo = infoString;
-    final statsBase64 = _buildStatsBase64(ref);
+    final localStatsSummary = _formatLocalStatsSummary(ref);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -126,22 +119,20 @@ class DebugInfoScreen extends ConsumerWidget {
             fullInfo,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          if (statsBase64.isNotEmpty) ...[
+          if (localStatsSummary.isNotEmpty) ...[
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 8),
             Text(
-              'Stats (base64)',
+              'Local Stats',
               style: Theme.of(
                 context,
               ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             SelectableText(
-              statsBase64,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
+              localStatsSummary,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
           const SizedBox(height: 24),
@@ -151,9 +142,6 @@ class DebugInfoScreen extends ConsumerWidget {
             context,
             title: 'Installed Versions',
             body: _formatVersionHistory(ref),
-            base64: AppHistoryService.getVersionHistoryBase64(
-              ref.read(sharedPreferencesProvider),
-            ),
             emptyText: 'No versions recorded yet',
           ),
           const SizedBox(height: 24),
@@ -163,9 +151,6 @@ class DebugInfoScreen extends ConsumerWidget {
             context,
             title: 'Sign-In History',
             body: _formatSignInHistory(ref),
-            base64: AppHistoryService.getSignInHistoryBase64(
-              ref.read(sharedPreferencesProvider),
-            ),
             emptyText: 'No sign-ins recorded yet',
           ),
           if (kDebugMode) ...[
@@ -445,7 +430,6 @@ class DebugInfoScreen extends ConsumerWidget {
     BuildContext context, {
     required String title,
     required String body,
-    required String base64,
     required String emptyText,
   }) {
     return Column(
@@ -462,17 +446,44 @@ class DebugInfoScreen extends ConsumerWidget {
           body.isEmpty ? emptyText : body,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
-        if (base64.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          SelectableText(
-            base64,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(fontFamily: 'monospace'),
-          ),
-        ],
       ],
     );
+  }
+
+  // Compact plaintext snapshot of the device's own stats. Lets support spot
+  // divergence from the server row (counters, streak, last successful sync)
+  // without the 60KB+ base64 blob that used to live here.
+  String _formatLocalStatsSummary(WidgetRef ref) {
+    final stats = ref.read(statsProvider).asData?.value;
+    if (stats == null) return '';
+
+    final prefs = ref.read(sharedPreferencesProvider);
+    final lastSyncedMs = prefs.getInt(
+      SharedPreferenceConstants.statsLastSyncedAt,
+    );
+    final df = DateFormat('yyyy-MM-dd HH:mm:ss');
+    String fmtMs(int? ms) {
+      if (ms == null || ms <= 0) return '—';
+      return df.format(DateTime.fromMillisecondsSinceEpoch(ms).toLocal());
+    }
+
+    final backupService = StatsBackupService(prefs: prefs);
+    final backupCount = backupService.countBackupSlots();
+
+    final totalMinutes = (stats.totalTimeListened / 60000).round();
+    final acCount = stats.audioCompleted?.length ?? 0;
+
+    return [
+      'streakCurrent: ${stats.streakCurrent}',
+      'streakLongest: ${stats.streakLongest}',
+      'totalTracksCompleted: ${stats.totalTracksCompleted}',
+      'totalTimeListened: ${stats.totalTimeListened} ms ($totalMinutes min)',
+      'audioCompletedCount: $acCount',
+      'tracksCheckedCount: ${stats.tracksChecked?.length ?? 0}',
+      'statsUpdated: ${fmtMs(stats.updated)}',
+      'statsLastSyncedAt: ${fmtMs(lastSyncedMs)}',
+      'backupSlotsUsed: $backupCount',
+    ].join('\n');
   }
 
   String _formatVersionHistory(WidgetRef ref) {
@@ -563,26 +574,24 @@ class DebugInfoScreen extends ConsumerWidget {
     }
 
     final prefs = ref.read(sharedPreferencesProvider);
-    final versionHistoryB64 = AppHistoryService.getVersionHistoryBase64(prefs);
-    if (versionHistoryB64.isNotEmpty) {
-      fullInfo = '$fullInfo\n\nversion_history_b64: $versionHistoryB64';
-    }
 
-    final signInHistoryB64 = AppHistoryService.getSignInHistoryBase64(prefs);
-    if (signInHistoryB64.isNotEmpty) {
-      fullInfo = '$fullInfo\n\nsignin_history_b64: $signInHistoryB64';
-    }
-
-    // Surfaced in plaintext (not just inside stats_b64) so support can see the
-    // user's day-boundary offset without decoding — it drives how the streak
-    // buckets sessions into days.
     final dayBoundaryOffsetHours =
         prefs.getInt(SharedPreferenceConstants.dayBoundaryOffsetHours) ?? 0;
     fullInfo = '$fullInfo\n\ndayBoundaryOffsetHours: $dayBoundaryOffsetHours';
 
-    final statsBase64 = _buildStatsBase64(ref);
-    if (statsBase64.isNotEmpty) {
-      fullInfo = '$fullInfo\n\nstats_b64: $statsBase64';
+    final localStatsSummary = _formatLocalStatsSummary(ref);
+    if (localStatsSummary.isNotEmpty) {
+      fullInfo = '$fullInfo\n\nLocal Stats:\n$localStatsSummary';
+    }
+
+    final versionHistory = _formatVersionHistory(ref);
+    if (versionHistory.isNotEmpty) {
+      fullInfo = '$fullInfo\n\nInstalled Versions:\n$versionHistory';
+    }
+
+    final signInHistory = _formatSignInHistory(ref);
+    if (signInHistory.isNotEmpty) {
+      fullInfo = '$fullInfo\n\nSign-In History:\n$signInHistory';
     }
 
     await Clipboard.setData(ClipboardData(text: fullInfo));

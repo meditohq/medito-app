@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medito/constants/strings/shared_preference_constants.dart';
 import 'package:medito/services/history/app_history_service.dart';
@@ -160,38 +158,4 @@ void main() {
     });
   });
 
-  group('AppHistoryService base64 helpers', () {
-    test('empty history returns empty string (not base64 of [])', () async {
-      final prefs = await SharedPreferences.getInstance();
-      expect(AppHistoryService.getVersionHistoryBase64(prefs), '');
-      expect(AppHistoryService.getSignInHistoryBase64(prefs), '');
-    });
-
-    test('base64 decodes to the same JSON list', () async {
-      final prefs = await SharedPreferences.getInstance();
-      await AppHistoryService.recordCurrentVersion(
-        prefs,
-        version: '3.6.17',
-        buildNumber: '100',
-      );
-      await AppHistoryService.recordSignIn(
-        prefs,
-        userId: 'client-1',
-        email: 'a@example.com',
-      );
-
-      final versionB64 = AppHistoryService.getVersionHistoryBase64(prefs);
-      final signInB64 = AppHistoryService.getSignInHistoryBase64(prefs);
-
-      final decodedVersions =
-          jsonDecode(utf8.decode(base64Decode(versionB64))) as List;
-      final decodedSignIns =
-          jsonDecode(utf8.decode(base64Decode(signInB64))) as List;
-
-      expect(decodedVersions, hasLength(1));
-      expect((decodedVersions.first as Map)['version'], '3.6.17');
-      expect(decodedSignIns, hasLength(1));
-      expect((decodedSignIns.first as Map)['userId'], 'client-1');
-    });
-  });
 }

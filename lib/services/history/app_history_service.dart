@@ -61,17 +61,6 @@ class AppHistoryService {
     return _decodeList(raw);
   }
 
-  static String getVersionHistoryBase64(SharedPreferences prefs) =>
-      _encodeBase64(getVersionHistory(prefs));
-
-  static String getSignInHistoryBase64(SharedPreferences prefs) =>
-      _encodeBase64(getSignInHistory(prefs));
-
-  static String _encodeBase64(List<Map<String, dynamic>> list) {
-    if (list.isEmpty) return '';
-    return base64Encode(utf8.encode(jsonEncode(list)));
-  }
-
   static List<Map<String, dynamic>> _decodeList(String? raw) {
     if (raw == null || raw.isEmpty) return [];
     try {
