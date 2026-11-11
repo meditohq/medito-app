@@ -1,6 +1,12 @@
 Unreleased
 -
 
+2611.11.0
+- A refreshed donation page
+- New interval chimes for Timer and Stopwatch (every 1, 2, 5, 10 or 15 min)
+- Refreshed shop ordering on Home
+- Fixed timer length presets wrapping onto a second line on narrower screens
+
 2611.1.2
 - Clearer calendar selection with improved accessibility
 - Edit the date and time of sessions from your meditation history
