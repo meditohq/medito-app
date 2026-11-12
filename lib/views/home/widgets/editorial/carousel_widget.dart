@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medito/constants/colors/color_constants.dart';
+import 'package:medito/constants/strings/analytics_event_constants.dart';
 import 'package:medito/constants/styles/widget_styles.dart';
 import 'package:medito/models/home/home_model.dart';
 import 'package:medito/providers/providers.dart';
@@ -13,8 +14,10 @@ import 'package:medito/utils/utils.dart';
 
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/widgets/network_image_widget.dart';
+
 import '../../home_styles.dart';
 import '../home_gradient_border.dart';
+
 import 'package:medito/constants/theme/medito_text.dart';
 
 const _kCardBorderRadius = kHomeCardRadius;
@@ -152,9 +155,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                         end: Alignment.centerRight,
                         colors: [
                           Theme.of(context).scaffoldBackgroundColor,
-                          Theme.of(
-                            context,
-                          ).scaffoldBackgroundColor.withValues(alpha: 0),
+                          Theme.of(context).scaffoldBackgroundColor
+                              .withValues(alpha: 0),
                         ],
                       ),
                     ),
@@ -179,9 +181,8 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
                         end: Alignment.centerLeft,
                         colors: [
                           Theme.of(context).scaffoldBackgroundColor,
-                          Theme.of(
-                            context,
-                          ).scaffoldBackgroundColor.withValues(alpha: 0),
+                          Theme.of(context).scaffoldBackgroundColor
+                              .withValues(alpha: 0),
                         ],
                       ),
                     ),
@@ -198,11 +199,19 @@ class _CarouselWidgetState extends ConsumerState<CarouselWidget> {
   void _onItemTap(int index) {
     if (index >= widget.carouselItems.length) return;
     final item = widget.carouselItems[index];
+    final analytics = ref.read(analyticsServiceProvider);
     unawaited(
-      ref
-          .read(analyticsServiceProvider)
-          .logFirstActionAfterOnboardingIfNeeded('carousel'),
+      analytics.logEvent(
+        name: AnalyticsEventConstants.carouselItemTapped,
+        parameters: {
+          AnalyticsEventConstants.paramCarouselItemId: item.id,
+          AnalyticsEventConstants.paramCarouselItemTitle: item.title,
+          AnalyticsEventConstants.paramCarouselItemType: ?item.type,
+          AnalyticsEventConstants.paramCarouselPosition: index + 1,
+        },
+      ),
     );
+    unawaited(analytics.logFirstActionAfterOnboardingIfNeeded('carousel'));
     handleNavigation(
       item.type,
       [item.path.toString().getIdFromPath(), item.path],

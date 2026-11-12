@@ -876,6 +876,33 @@ class AnalyticsEventConstants {
   /// Parameter name for the shortcut destination type (e.g. pack, track, link)
   static const String paramShortcutType = 'shortcut_type';
 
+  /// The user tapped a card in the home Featured row. Until this existed the
+  /// row's only signal was first_action_after_onboarding (target 'carousel'),
+  /// so its ongoing use could not be compared with the shortcuts'.
+  /// Parameters: paramCarouselItemId, paramCarouselItemTitle,
+  /// paramCarouselItemType, paramCarouselPosition.
+  static const String carouselItemTapped = 'carousel_item_tapped';
+
+  static const String paramCarouselItemId = 'carousel_item_id';
+  static const String paramCarouselItemTitle = 'carousel_item_title';
+
+  /// Destination type of the card (e.g. pack, track, link).
+  static const String paramCarouselItemType = 'carousel_item_type';
+
+  /// 1-based position of the card in the row.
+  static const String paramCarouselPosition = 'carousel_position';
+
+  /// The user moved to a different main tab. screen_view cannot answer "who
+  /// opens Explore": every tab is built at launch, so Home, Explore and
+  /// Settings all log a screen_view for nearly every user. Also fires when
+  /// the back button returns to Home from another tab.
+  /// Parameters: paramTab, paramFromTab ('home', 'explore', 'search',
+  /// 'settings').
+  static const String tabSelected = 'tab_selected';
+
+  static const String paramTab = 'tab';
+  static const String paramFromTab = 'from_tab';
+
   /// The user started a session from the home Timer screen. The session
   /// itself then logs audio_session_started/completed/abandoned with an
   /// audioFileId of `timer-<mode>-<ms>`. Parameters: timer_mode
@@ -965,15 +992,18 @@ class AnalyticsEventConstants {
 
   /// Batch download of all sessions in a pack completed.
   /// Parameter: [paramPackId].
-  static const String packBatchDownloadCompleted = 'pack_batch_download_completed';
+  static const String packBatchDownloadCompleted =
+      'pack_batch_download_completed';
 
   /// Batch download of sessions in a pack was cancelled.
   /// Parameter: [paramPackId].
-  static const String packBatchDownloadCancelled = 'pack_batch_download_cancelled';
+  static const String packBatchDownloadCancelled =
+      'pack_batch_download_cancelled';
 
   /// User deleted all downloaded sessions of a pack.
   /// Parameter: [paramPackId].
-  static const String packBatchDownloadsDeleted = 'pack_batch_downloads_deleted';
+  static const String packBatchDownloadsDeleted =
+      'pack_batch_downloads_deleted';
 
   /// Track id (not the audio file id) on the favourite events.
   static const String paramTrackId = 'track_id';

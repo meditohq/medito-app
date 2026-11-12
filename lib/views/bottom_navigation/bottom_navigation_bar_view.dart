@@ -1,6 +1,8 @@
 import 'package:medito/widgets/adaptive/adaptive_content.dart';
 import 'package:medito/views/bottom_navigation/widgets/medito_sidebar.dart';
+
 import 'dart:async';
+
 import 'package:medito/services/notifications/supporter_campaign_navigation.dart';
 import 'package:medito/providers/donation/supporter_appeal_provider.dart';
 
@@ -217,6 +219,28 @@ class _BottomNavigationBarViewState
     }
 
     if (entering) {
+      const tabNames = {
+        _homeIndex: 'home',
+        _exploreIndex: 'explore',
+        _searchIndex: 'search',
+        3: 'settings',
+      };
+      final tab = tabNames[index];
+      if (tab != null) {
+        unawaited(
+          ref
+              .read(analyticsServiceProvider)
+              .logEvent(
+                name: AnalyticsEventConstants.tabSelected,
+                parameters: {
+                  AnalyticsEventConstants.paramTab: tab,
+                  AnalyticsEventConstants.paramFromTab:
+                      tabNames[_currentPageIndex] ?? 'unknown',
+                },
+              ),
+        );
+      }
+
       const tabTargets = {
         _homeIndex: 'tab_home',
         _exploreIndex: 'tab_explore',
