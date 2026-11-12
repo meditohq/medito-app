@@ -39,7 +39,7 @@ jobs:
     environment: prod
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           # Release notes come from the tagged release, not from whatever the
@@ -47,7 +47,7 @@ jobs:
           ref: ${{ inputs.app_version }}
           path: tagged
 
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           path: current

@@ -32,7 +32,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - run: gh extension install github/gh-actions-lock --pin v0.4.1
@@ -45,23 +45,23 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4.4.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
       - name: Java version
-        uses: actions/setup-java@v4.9.1
+        uses: actions/setup-java@v6.2.0
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Flutter version
-        uses: subosito/flutter-action@v2.12.0
+        uses: subosito/flutter-action@v2.23.0
         with:
           flutter-version: '3.47.2'
 
       - name: Flutter Pub Get
-        uses: nick-fields/retry@v2.9.0
+        uses: nick-fields/retry@v4.0.0
         with:
           timeout_minutes: 5
           max_attempts: 2
@@ -111,7 +111,7 @@ jobs:
 
       - name: Cache build_runner outputs
         id: cache-buildrunner
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             lib/**/*.g.dart
@@ -125,7 +125,7 @@ jobs:
 
       - name: Cache pigeon outputs
         id: cache-pigeon
-        uses: actions/cache@v4.3.0
+        uses: actions/cache@v6.1.0
         with:
           path: |
             lib/src/audio_pigeon.g.dart
@@ -145,7 +145,7 @@ jobs:
         run: flutter test --dart-define-from-file=.prod.json
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: flutter-artifacts
           path: build/
