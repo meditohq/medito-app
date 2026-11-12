@@ -28,6 +28,44 @@ def set_environment_values(url, init_token, sentry_dsn)
   end
 end
 
+# Read the +NNNNNN build-number suffix from pubspec.yaml.
+def pubspec_version_code
+  pubspec_path = File.expand_path('../pubspec.yaml', __dir__)
+  content = File.read(pubspec_path)
+  match = content.match(/^version:\s*\S+\+(\d+)/)
+  UI.user_error!("Could not parse version code from #{pubspec_path}") unless match
+  Integer(match[1])
+end
+
+# Query the production track via the Play Developer API and return every
+# versionCode currently included in its releases. Used to verify a promote
+# that Play's API rejected with a rollout-coverage error but may have
+# committed anyway.
+def production_track_version_codes(json_key_data, package_name)
+  require 'google/apis/androidpublisher_v3'
+  require 'googleauth'
+  require 'stringio'
+
+  creds = Google::Auth::ServiceAccountCredentials.make_creds(
+    json_key_io: StringIO.new(json_key_data),
+    scope: 'https://www.googleapis.com/auth/androidpublisher',
+  )
+  service = Google::Apis::AndroidpublisherV3::AndroidPublisherService.new
+  service.authorization = creds
+
+  edit = service.insert_edit(package_name)
+  begin
+    track = service.get_edit_track(package_name, edit.id, 'production')
+    (track.releases || []).flat_map { |r| r.version_codes || [] }.map(&:to_i).uniq
+  ensure
+    begin
+      service.delete_edit(package_name, edit.id)
+    rescue StandardError
+      # best effort — the edit will auto-expire
+    end
+  end
+end
+
 platform :android do
   desc "Runs all the tests"
   lane :test do
@@ -85,23 +123,52 @@ platform :android do
       UI.user_error!("No Google Play JSON key provided. Set PLAY_STORE_CONFIG_JSON env var.")
     end
 
+    package_name = 'meditofoundation.medito'
+    expected_version_code = pubspec_version_code
+
     # No APK upload — the release being promoted already went through the
     # build + smoke gates when it landed on internal. 'completed' sends the
     # production release to Play review and publishes on approval (a draft
     # promote would just recreate the can't-act-on-mobile problem this lane
     # exists to solve).
-    upload_to_play_store(
-      track: 'internal',
-      track_promote_to: 'production',
-      track_promote_release_status: 'completed',
-      skip_upload_apk: true,
-      skip_upload_aab: true,
-      skip_upload_metadata: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true,
-      skip_upload_changelogs: true,
-      json_key_data: json_key_data,
-    )
+    begin
+      upload_to_play_store(
+        track: 'internal',
+        track_promote_to: 'production',
+        track_promote_release_status: 'completed',
+        skip_upload_apk: true,
+        skip_upload_aab: true,
+        skip_upload_metadata: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: true,
+        skip_upload_changelogs: true,
+        json_key_data: json_key_data,
+      )
+    rescue StandardError => e
+      # Play's rollout-coverage check sometimes fires at commit time even
+      # after the production track update has persisted. We saw this on
+      # 2611.11.0 (run 43059321310) — fastlane errored, but Play Console
+      # showed the release rolling out. Rescue only that specific error
+      # and verify the production track holds the expected versionCode
+      # before treating the promote as successful.
+      raise unless e.message.to_s.include?('You cannot rollout this release')
+
+      UI.important("Play returned a rollout-coverage error on the promote.")
+      UI.important("Verifying production track holds versionCode #{expected_version_code}...")
+
+      sleep 30 # let Play's edit propagation settle
+
+      prod_codes = production_track_version_codes(json_key_data, package_name)
+
+      if prod_codes.include?(expected_version_code)
+        UI.success("Production track includes #{expected_version_code} (current: #{prod_codes.inspect}) — promote landed despite the API error.")
+      else
+        UI.user_error!(
+          "Production track codes #{prod_codes.inspect} do NOT include " \
+          "#{expected_version_code}. Promote did not land. Original error: #{e.message}"
+        )
+      end
+    end
   end
 
   desc "Upload APK to Play Store with custom path and track"
