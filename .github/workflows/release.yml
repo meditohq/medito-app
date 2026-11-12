@@ -41,6 +41,10 @@ on:
         type: boolean
         default: false
 
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  contents: read
+
 jobs:
   # Standalone promote path: ships the release already sitting on the internal
   # track to production without rebuilding — that binary passed the build and
@@ -55,6 +59,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - uses: ruby/setup-ruby@v1.338.0
         with:
@@ -76,6 +82,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-java@v4.9.1
         with:
@@ -218,6 +226,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Download APK
         uses: actions/download-artifact@v4.3.0
@@ -367,6 +377,10 @@ jobs:
     name: Android – Upgrade Test
     needs: [android-smoke-test]
     runs-on: ubuntu-latest
+    # action-download-artifact reads a previous run's artifact.
+    permissions:
+      contents: read
+      actions: read
     # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
     # there's no baseline yet, or to avoid blocking ship on a flaky test.
     continue-on-error: true
@@ -376,6 +390,7 @@ jobs:
       # smoke.yaml that matches the previously-shipped binary.
       - uses: actions/checkout@v4.4.0
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       # NEW APK (this release) — already built and uploaded upstream.
@@ -541,6 +556,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Download APK
         uses: actions/download-artifact@v4.3.0
@@ -612,6 +629,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Select Xcode (Icon Composer requires 26+)
         uses: maxim-lobanov/setup-xcode@v1.7.0
@@ -873,6 +892,10 @@ jobs:
     # The XCTest driver Maestro installs can take well over its default
     # startup timeout on a cold CI simulator ("iOS driver not ready in time",
     # run 36309254158), failing the job before any flow runs.
+    # action-download-artifact reads a previous run's artifact.
+    permissions:
+      contents: read
+      actions: read
     env:
       MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
     # Non-blocking: a failed upgrade test won't gate the deploy. Useful when
@@ -882,6 +905,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.4.0
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       # NEW .app (this release) — uploaded by ios-smoke-test.
@@ -1024,6 +1048,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Select Xcode (Icon Composer requires 26+)
         uses: maxim-lobanov/setup-xcode@v1.7.0

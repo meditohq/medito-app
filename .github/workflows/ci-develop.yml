@@ -15,6 +15,10 @@ on:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  contents: read
+
 jobs:
   # Fails when actions.lock is out of sync with the workflows, or when a locked
   # pin no longer matches upstream (a moved/hijacked tag). After changing any
@@ -42,6 +46,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Java version
         uses: actions/setup-java@v4.9.1

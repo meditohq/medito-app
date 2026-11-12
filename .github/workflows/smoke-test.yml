@@ -13,6 +13,10 @@ on:
           - android
           - ios
 
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  contents: read
+
 jobs:
   android-smoke-test:
     name: Android Smoke Test
@@ -22,6 +26,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-java@v4.9.1
         with:
@@ -311,6 +317,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
       # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the

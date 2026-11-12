@@ -1,0 +1,18 @@
+# Version updates for GitHub Actions only. Dependabot bumps the `uses:` tag
+# and regenerates the matching entry in .github/workflows/actions.lock in the
+# same PR, so the workflows and the lockfile cannot drift apart.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Wait a week after a release before adopting it, so a compromised
+    # release has time to be noticed and pulled.
+    cooldown:
+      default-days: 7
+    # One PR for all action bumps instead of one per action.
+    groups:
+      actions:
+        patterns:
+          - "*"

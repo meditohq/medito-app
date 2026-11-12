@@ -28,6 +28,10 @@ on:
         type: boolean
         default: false
 
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  contents: read
+
 jobs:
   submit:
     name: Attach build and submit
@@ -37,6 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.4.0
         with:
+          persist-credentials: false
           # Release notes come from the tagged release, not from whatever the
           # dispatch ref has in Unreleased.
           ref: ${{ inputs.app_version }}
@@ -44,6 +49,7 @@ jobs:
 
       - uses: actions/checkout@v4.4.0
         with:
+          persist-credentials: false
           path: current
 
       - uses: ruby/setup-ruby@v1.338.0
@@ -54,15 +60,17 @@ jobs:
 
       - name: Set release notes
         working-directory: tagged
+        env:
+          APP_VERSION: ${{ inputs.app_version }}
         run: |
-          notes=$(awk -v v="${{ inputs.app_version }}" '
+          notes=$(awk -v v="$APP_VERSION" '
             $0 == v { in_v = 1; next }
             in_v && /^[0-9]/ { exit }
             in_v && /^-/ { print; next }
             in_v && NF && !/^- / { exit }
           ' release_notes.txt)
           if [ -z "$notes" ]; then
-            echo "::error::No release notes for ${{ inputs.app_version }} in release_notes.txt"
+            echo "::error::No release notes for $APP_VERSION in release_notes.txt"
             exit 1
           fi
           # Same per-platform filter as release.yml.
@@ -80,9 +88,11 @@ jobs:
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
           APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
           DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
+          APP_VERSION: ${{ inputs.app_version }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
         run: |
           bundle exec fastlane ios release \
             submit_for_review:"${{ inputs.submit_for_review }}" \
-            app_version:"${{ inputs.app_version }}" \
-            build_number:"${{ inputs.build_number }}" \
+            app_version:"$APP_VERSION" \
+            build_number:"$BUILD_NUMBER" \
             reject_if_possible:"${{ inputs.reject_if_possible }}"

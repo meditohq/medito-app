@@ -4,6 +4,10 @@ on:
   issues:
     types: [closed]
 
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  issues: write
+
 jobs:
   remind:
     if: contains(github.event.issue.labels.*.name, 'firebase-alert')

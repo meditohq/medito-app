@@ -27,6 +27,10 @@ on:
         default: '12.14.0'
         type: string
 
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  contents: read
+
 jobs:
   upload-symbols:
     name: Download dSYMs from ASC and upload to Crashlytics
@@ -35,6 +39,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
 
       - uses: ruby/setup-ruby@v1.338.0
         with:
@@ -46,12 +52,14 @@ jobs:
       # upload-symbols from. Fetch just that tool at the version the app
       # resolves (see Firebase in the SPM checkout of a real build).
       - name: Fetch upload-symbols
+        env:
+          FIREBASE_VERSION: ${{ inputs.firebase_version }}
         run: |
-          git clone --depth 1 --branch "${{ inputs.firebase_version }}" \
+          git clone --depth 1 --branch "$FIREBASE_VERSION" \
             https://github.com/firebase/firebase-ios-sdk.git /tmp/firebase-ios-sdk
           BIN=/tmp/firebase-ios-sdk/Crashlytics/upload-symbols
           if [ ! -f "$BIN" ]; then
-            echo "::error::upload-symbols not found at $BIN for tag ${{ inputs.firebase_version }}"
+            echo "::error::upload-symbols not found at $BIN for tag $FIREBASE_VERSION"
             exit 1
           fi
           chmod +x "$BIN"
@@ -72,7 +80,9 @@ jobs:
           DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
           APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
           DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
+          APP_VERSION: ${{ inputs.app_version }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
         run: |
           bundle exec fastlane ios symbols \
-            app_version:"${{ inputs.app_version }}" \
-            build_number:"${{ inputs.build_number }}"
+            app_version:"$APP_VERSION" \
+            build_number:"$BUILD_NUMBER"
