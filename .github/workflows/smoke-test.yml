@@ -21,9 +21,9 @@ jobs:
     environment: prod
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.4.0
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4.9.1
         with:
           distribution: temurin
           java-version: '17'
@@ -33,7 +33,7 @@ jobs:
       # build and timed out over the iOS build tree, failing a job whose tests
       # had passed (run 37440292038 attempt 2).
       - name: Cache Flutter SDK
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: ${{ runner.tool_cache }}/flutter
           key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
@@ -44,14 +44,14 @@ jobs:
           cache: false
 
       - name: Cache pub packages
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache Gradle
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: |
             ~/.gradle/caches
@@ -66,7 +66,7 @@ jobs:
       - name: Cache build_runner outputs
         if: steps.cache-apk.outputs.cache-hit != 'true'
         id: cache-buildrunner
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: |
             lib/**/*.g.dart
@@ -81,7 +81,7 @@ jobs:
       - name: Cache pigeon outputs
         if: steps.cache-apk.outputs.cache-hit != 'true'
         id: cache-pigeon
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: |
             lib/src/audio_pigeon.g.dart
@@ -96,7 +96,7 @@ jobs:
 
       - name: Cache APK
         id: cache-apk
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: build/app/outputs/apk/prod/release/app-prod-release.apk
           key: ${{ runner.os }}-apk-prod-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'android/**/*.gradle*', 'android/app/src/**') }}
@@ -168,7 +168,7 @@ jobs:
 
       - name: Smoke test on emulator
         timeout-minutes: 25
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
           api-level: 34
           arch: x86_64
@@ -201,7 +201,7 @@ jobs:
         id: signed_in
         continue-on-error: true
         timeout-minutes: 25
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.38.0
         env:
           TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
           TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
@@ -230,7 +230,7 @@ jobs:
       - name: Signed-in stats test on emulator (retry on a fresh boot)
         if: steps.signed_in.outcome == 'failure'
         timeout-minutes: 25
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.38.0
         env:
           TEST_ACCOUNT_EMAIL: ${{ secrets.TEST_ACCOUNT_EMAIL }}
           TEST_ACCOUNT_OTP: ${{ secrets.TEST_ACCOUNT_OTP }}
@@ -279,7 +279,7 @@ jobs:
 
       - name: Upload Maestro debug output
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: maestro-debug-android
           path: /tmp/maestro-debug/
@@ -310,14 +310,14 @@ jobs:
       MAESTRO_DRIVER_STARTUP_TIMEOUT: 180000
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.4.0
 
       # Cache the Flutter SDK ourselves: flutter-action v2.12.0's built-in cache
       # keys on hashFiles('**/pubspec.lock'), which is re-evaluated after the
       # build and timed out over the iOS build tree, failing a job whose tests
       # had passed (run 37440292038 attempt 2).
       - name: Cache Flutter SDK
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: ${{ runner.tool_cache }}/flutter
           key: flutter-sdk-${{ runner.os }}-${{ runner.arch }}-3.47.2
@@ -328,14 +328,14 @@ jobs:
           cache: false
 
       - name: Cache pub packages
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
       - name: Cache CocoaPods
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: ios/Pods
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
@@ -343,7 +343,7 @@ jobs:
 
       - name: Cache iOS app
         id: cache-ios-app
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: build/ios/iphonesimulator/Medito Dev.app
           key: ${{ runner.os }}-ios-app-${{ hashFiles('lib/**/*.dart', 'pubspec.lock', 'ios/Podfile.lock', 'ios/Runner.xcodeproj/project.pbxproj', 'ios/Runner/**', 'ios/MeditoWidget/**', 'ios/*.entitlements', 'ios/*.plist') }}
@@ -355,7 +355,7 @@ jobs:
       - name: Cache build_runner outputs
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
         id: cache-buildrunner
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: |
             lib/**/*.g.dart
@@ -370,7 +370,7 @@ jobs:
       - name: Cache pigeon outputs
         if: steps.cache-ios-app.outputs.cache-hit != 'true'
         id: cache-pigeon
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
         with:
           path: |
             lib/src/audio_pigeon.g.dart
@@ -518,7 +518,7 @@ jobs:
 
       - name: Upload Maestro debug output
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: maestro-debug-ios
           path: /tmp/maestro-debug/
