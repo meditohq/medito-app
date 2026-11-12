@@ -211,7 +211,12 @@ void main() {
             expect(bubble.top, greaterThanOrEqualTo(0));
             expect(bubble.bottom, lessThanOrEqualTo(button.top));
             expect(bubble.contains(closeRect.center), isTrue);
-            expect(closeRect.shortestSide, greaterThanOrEqualTo(44));
+            // The button is a tight 44x44; its global rect picks up
+            // floating-point error from fractional ancestor offsets.
+            expect(
+              closeRect.shortestSide,
+              greaterThanOrEqualTo(44 - 1e-9),
+            );
             expect(close.hitTestable(), findsOneWidget);
             expect(tester.takeException(), isNull);
 
