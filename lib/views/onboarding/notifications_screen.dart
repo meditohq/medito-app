@@ -377,6 +377,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final reminderTime = ref.watch(reminderTimeProvider);
 
     return Scaffold(
@@ -385,8 +386,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         top: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Smaller hero than the default onboarding pages so the preview +
-            // time chips have room to sit higher on the screen.
+            // Smaller hero than the default onboarding pages so the preview and
+            // the time options fit without scrolling on most phones.
             const headerFraction = 0.2;
             final headerHeight = widget.headerImage != null
                 ? OnboardingHeaderImage.heightFor(
@@ -407,78 +408,81 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                     ),
                   OnboardingContent(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(32, 24, 32, 32),
+                      padding: const EdgeInsets.fromLTRB(
+                        padding24,
+                        padding24,
+                        padding24,
+                        padding16,
+                      ),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          minHeight: (constraints.maxHeight - 72 - headerHeight)
+                          minHeight: (constraints.maxHeight - 40 - headerHeight)
                               .clamp(0.0, double.infinity),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Top group: title, notification preview and the time
-                            // chips stack together near the top so the choice sits
-                            // right under the preview rather than being pushed to
-                            // the bottom of the screen.
+                            // Laid out like the onboarding question pages: a
+                            // left-aligned title, then a list of answers. The
+                            // notification preview sits between the two as
+                            // the thing the answer will schedule.
                             Column(
                               mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 OnboardingStepTitle(
-                                  _notificationsTitle(
-                                    AppLocalizations.of(context)!,
-                                  ),
+                                  _notificationsTitle(l10n),
                                   style: context.text.headline,
-                                  textAlign: TextAlign.center,
                                 ),
-                                // When a reminder already exists (e.g. re-entering
-                                // onboarding) surface the time it's set for; the
-                                // chips below let the user change it.
-                                if (reminderTime != null) ...[
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!.onboardingReminderCurrentlySet(
-                                      reminderTime.format(context),
-                                    ),
-                                    style: context.text.muted.body,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                                const SizedBox(height: 24),
+                                const SizedBox(height: 20),
                                 // Decorative illustration: without the
                                 // exclusion, screen readers read the mock
                                 // card ("MEDITO", time, title, body) as if a
                                 // real notification had arrived mid-screen.
                                 ExcludeSemantics(
-                                  child: _buildNotificationPreview(context),
+                                  child: _buildNotificationPreview(),
                                 ),
-                                const SizedBox(height: 24),
-                                // Always the chips: first-timers pick a time
-                                // (which sets it and auto-advances), and returning
-                                // users change the already-set time with the same
-                                // control.
-                                _buildTimeChips(AppLocalizations.of(context)!),
+                                const SizedBox(height: 28),
+                                Text(
+                                  l10n.reminderChipsQuestion,
+                                  style: context.text.subtitle,
+                                ),
+                                // When a reminder already exists (e.g.
+                                // re-entering onboarding) surface the time it's
+                                // set for; the options below change it.
+                                if (reminderTime != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    l10n.onboardingReminderCurrentlySet(
+                                      reminderTime.format(context),
+                                    ),
+                                    style: context.text.muted.bodySmall,
+                                  ),
+                                ],
+                                const SizedBox(height: 12),
+                                _buildTimeOptions(l10n),
                               ],
                             ),
                             // Skip stays pinned toward the bottom.
                             Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: TextButton(
-                                  onPressed: () async {
-                                    await FirebaseAnalyticsService().logEvent(
-                                      name: FirebaseAnalyticsService
-                                          .eventOnboardingReminderSkipTap,
-                                      parameters: _eventParams,
-                                    );
-                                    _navigateNext();
-                                  },
-                                  child: Text(
-                                    AppLocalizations.of(context)!.skipForNow,
-                                  ),
+                              padding: const EdgeInsets.only(top: 8),
+                              child: TextButton(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
                                 ),
+                                onPressed: () async {
+                                  await FirebaseAnalyticsService().logEvent(
+                                    name: FirebaseAnalyticsService
+                                        .eventOnboardingReminderSkipTap,
+                                    parameters: _eventParams,
+                                  );
+                                  _navigateNext();
+                                },
+                                child: Text(l10n.skipForNow),
                               ),
                             ),
                           ],
@@ -495,69 +499,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     );
   }
 
-  Widget _buildNotificationPreview(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final phoneBorder = isDark
-        ? Colors.white.withValues(alpha: 0.18)
-        : Colors.black87;
-    const phoneWidth = 280.0;
-    const cardOverhang = 36.0;
-
-    return SizedBox(
-      height: 170,
-      child: ClipRect(
-        clipper: _BottomOnlyClipper(),
-        child: OverflowBox(
-          maxHeight: 600,
-          maxWidth: double.infinity,
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-            width: phoneWidth,
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topCenter,
-              children: [
-                Container(
-                  width: phoneWidth,
-                  height: 560,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(44),
-                    ),
-                    border: Border.all(color: phoneBorder, width: 3),
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.02)
-                        : Colors.white,
-                  ),
-                ),
-                Positioned(
-                  top: 56,
-                  left: -cardOverhang,
-                  right: -cardOverhang,
-                  child: FadeTransition(
-                    opacity: CurvedAnimation(
-                      parent: _previewAnimation,
-                      curve: Curves.easeOutCubic,
-                    ),
-                    child: SlideTransition(
-                      position:
-                          Tween<Offset>(
-                            begin: const Offset(0, -0.04),
-                            end: Offset.zero,
-                          ).animate(
-                            CurvedAnimation(
-                              parent: _previewAnimation,
-                              curve: Curves.easeOutCubic,
-                            ),
-                          ),
-                      child: _buildNotificationCard(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+  /// The mock notification, sliding in shortly after the page appears.
+  Widget _buildNotificationPreview() {
+    final curve = CurvedAnimation(
+      parent: _previewAnimation,
+      curve: Curves.easeOutCubic,
+    );
+    return FadeTransition(
+      opacity: curve,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, -0.15),
+          end: Offset.zero,
+        ).animate(curve),
+        child: _buildNotificationCard(),
       ),
     );
   }
@@ -567,36 +522,38 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     final title = l10n.notificationPreviewTitleB;
     final body = l10n.notificationPreviewBodyB;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+        // The card is white in both themes; the hairline keeps its edge on
+        // the light theme's white page.
+        border: Border.all(color: Colors.black.withValues(alpha: 0.08)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.28),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: ColorConstants.accentDark,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
             ),
             alignment: Alignment.center,
             child: SvgPicture.asset(
               'assets/images/ic_logo.svg',
-              width: 22,
-              height: 22,
+              width: 26,
+              height: 26,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -605,10 +562,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                   children: [
                     Expanded(
                       child: Text(
-                        'MEDITO',
-                        style: context.text.on(Colors.black54).caption,
+                        title,
+                        style: context.text.on(Colors.black).label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       l10n.notificationPreviewTimestamp,
                       style: context.text.on(Colors.black45).caption,
@@ -617,15 +577,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  title,
-                  style: context.text.on(Colors.black).label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 1),
-                Text(
                   body,
-                  style: context.text.on(Colors.black87).caption,
+                  style: context.text.on(Colors.black87).bodySmall,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -637,135 +590,111 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     );
   }
 
-  /// Chips arm: "When will you meditate?" + three time-of-day chips and a
-  /// custom-time option. Picking one is an implementation intention — it
-  /// anchors the reminder series to the chosen slot instead of the silent
-  /// "same time tomorrow" default, and only then triggers the OS permission
+  /// The three time-of-day presets and a custom-time option, as a list of
+  /// full-width rows like the answers on the onboarding question pages.
+  /// Picking one is an implementation intention: it anchors the reminder
+  /// series to the chosen slot, and only then triggers the OS permission
   /// prompt.
-  /// Three time presets on ONE row, plus a full-width "pick my own time"
-  /// button underneath.
   ///
-  /// This was four ActionChips in a Wrap. Chips inherit `labelLarge`, which
-  /// this app's text theme overrides to 20sp with 0.8 letter-spacing (it is
-  /// meant for shortcut titles), so a single chip came out ~270pt wide and the
-  /// Wrap put every one on its own line — four stacked rows, in every locale
-  /// and at every text scale, which is what pushed the screen into scrolling.
-  /// Equal-width cards with the label above the time are immune to that: the
-  /// layout is the same three columns whether the time reads "7:00 AM" or
-  /// "07:00", and a long label (es: "Antes de dormir") wraps inside its own
-  /// card instead of reflowing the row.
-  ///
-  /// Custom is deliberately NOT a fourth card. It opens a different kind of
-  /// interaction, and giving it the full width both reflects that and keeps
-  /// the presets visually a set of three. Icons match the Settings reminder
-  /// sheet so the two surfaces read as the same control.
-  Widget _buildTimeChips(AppLocalizations l10n) {
+  /// Rows rather than chips or side-by-side cards: the label and the time each
+  /// get a full line's width, so nothing wraps or reflows whether the time
+  /// reads "7:00 AM" or "07:00", in any locale and at any text scale. Custom
+  /// is the last row with an arrow instead of a time, since it opens a picker
+  /// rather than setting a reminder outright. Icons match the Settings
+  /// reminder sheet so the two surfaces read as the same control.
+  Widget _buildTimeOptions(AppLocalizations l10n) {
+    final selected = ReminderSlot.forTime(ref.watch(reminderTimeProvider));
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Column(
       children: [
-        Text(
-          l10n.reminderChipsQuestion,
-          style: context.text.muted.body,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final slot in ReminderSlot.values) ...[
-                if (slot != ReminderSlot.values.first) const SizedBox(width: 8),
-                Expanded(child: _buildSlotCard(l10n, slot)),
-              ],
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.onSurface,
-              side: BorderSide(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.24),
-              ),
+        for (final slot in ReminderSlot.values) ...[
+          _buildOptionRow(
+            icon: MeditoIcon(
+              assetName: switch (slot) {
+                ReminderSlot.morning => MeditoIcons.sun,
+                ReminderSlot.evening => MeditoIcons.bell,
+                ReminderSlot.night => MeditoIcons.moon,
+              },
+              color: onSurface,
+              size: 20,
             ),
-            onPressed: _isProcessing ? null : _onCustomTimeTap,
-            icon: const Icon(Icons.schedule_rounded, size: 20),
-            label: Text(
-              l10n.reminderSlotCustom,
-              style: context.text.muted.subtitle,
+            label: slot.label(l10n),
+            trailing: Text(
+              slot.time.format(context),
+              style: context.text.muted.body,
             ),
+            selected: selected == slot,
+            onTap: () => _onSlotSelected(slot.analyticsId, slot.time),
           ),
+          const SizedBox(height: 8),
+        ],
+        _buildOptionRow(
+          icon: Icon(Icons.schedule_rounded, size: 20, color: onSurface),
+          label: l10n.reminderSlotCustom,
+          trailing: MeditoIcon(
+            assetName: MeditoIcons.arrowRight,
+            color: onSurface.withValues(alpha: 0.6),
+            size: 18,
+          ),
+          selected: false,
+          onTap: _onCustomTimeTap,
         ),
       ],
     );
   }
 
-  Widget _buildSlotCard(AppLocalizations l10n, ReminderSlot slot) {
+  Widget _buildOptionRow({
+    required Widget icon,
+    required String label,
+    required Widget trailing,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
     final theme = Theme.of(context);
-    final onSurface = theme.colorScheme.onSurface;
+    final colorScheme = theme.colorScheme;
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+      side: BorderSide(
+        color: selected
+            ? colorScheme.primary
+            : colorScheme.outline.withAlpha(80),
+        width: selected ? 1.5 : 1,
+      ),
+    );
 
-    // Custom card: without the button role it's announced as plain text.
-    // Disabled and selected mirror the chip's state for screen readers.
+    // Without the button role the row is announced as plain text. Disabled
+    // and selected mirror its state for screen readers.
     return Semantics(
       button: true,
       enabled: !_isProcessing,
-      selected: ReminderSlot.forTime(ref.watch(reminderTimeProvider)) == slot,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: _isProcessing
-            ? null
-            : () => _onSlotSelected(slot.analyticsId, slot.time),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: onSurface.withValues(alpha: 0.24)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              MeditoIcon(
-                assetName: switch (slot) {
-                  ReminderSlot.morning => MeditoIcons.sun,
-                  ReminderSlot.evening => MeditoIcons.bell,
-                  ReminderSlot.night => MeditoIcons.moon,
-                },
-                color: onSurface,
-                size: 20,
+      selected: selected,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 150),
+        opacity: _isProcessing ? 0.5 : 1,
+        child: Material(
+          color: selected ? colorScheme.primary.withAlpha(25) : theme.cardColor,
+          shape: shape,
+          child: InkWell(
+            customBorder: shape,
+            onTap: _isProcessing ? null : onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: padding16,
+                vertical: 14,
               ),
-              const SizedBox(height: 8),
-              Text(
-                slot.label(l10n),
-                textAlign: TextAlign.center,
-                style: context.text.muted.bodySmall,
+              child: Row(
+                children: [
+                  icon,
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(label, style: context.text.subtitle)),
+                  const SizedBox(width: 12),
+                  trailing,
+                ],
               ),
-              const SizedBox(height: 2),
-              Text(
-                slot.time.format(context),
-                textAlign: TextAlign.center,
-                style: context.text.bodySmall.copyWith(
-                  color: onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
-}
-
-/// Clips only the bottom of a widget, leaving horizontal overflow intact so
-/// the notification card can overhang the phone frame without being clipped.
-class _BottomOnlyClipper extends CustomClipper<Rect> {
-  @override
-  Rect getClip(Size size) =>
-      Rect.fromLTRB(-10000, 0, size.width + 10000, size.height);
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) => false;
 }
