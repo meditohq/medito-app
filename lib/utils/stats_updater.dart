@@ -384,7 +384,13 @@ Future<bool> _updateHealthKit(Map<String, dynamic> payload) async {
     Duration(milliseconds: payload[TypeConstants.durationIdKey]),
   );
 
-  return await HealthKitManager().writeMindfulnessData(start, end);
+  return await HealthKitManager().writeMindfulnessData(
+    start,
+    end,
+    title: payload[TypeConstants.titleKey] as String?,
+    trackId: payload[TypeConstants.trackIdKey] as String?,
+    fileId: payload[TypeConstants.fileIdKey] as String?,
+  );
 }
 
 /// Checks if a session was manually added (not from a track)

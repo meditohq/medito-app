@@ -100,11 +100,16 @@ class HealthConnectBridge(
     override fun writeMindfulnessSession(
         startEpochMs: Long,
         endEpochMs: Long,
+        title: String?,
+        notes: String?,
+        clientRecordId: String?,
         callback: (Result<Boolean>) -> Unit,
     ) {
         val client = clientOrNull() ?: return callback(Result.success(false))
         scope.launch(Dispatchers.IO) {
             try {
+                val device = androidx.health.connect.client.records.metadata
+                    .Device(type = androidx.health.connect.client.records.metadata.Device.TYPE_PHONE)
                 val record = MindfulnessSessionRecord(
                     startTime = Instant.ofEpochMilli(startEpochMs),
                     startZoneOffset = ZoneOffset.UTC,
@@ -112,12 +117,15 @@ class HealthConnectBridge(
                     endZoneOffset = ZoneOffset.UTC,
                     mindfulnessSessionType = MindfulnessSessionRecord
                         .MINDFULNESS_SESSION_TYPE_MEDITATION,
-                    title = "Medito",
-                    notes = null,
-                    metadata = Metadata.autoRecorded(
-                        device = androidx.health.connect.client.records.metadata
-                            .Device(type = androidx.health.connect.client.records.metadata.Device.TYPE_PHONE),
-                    ),
+                    title = title?.takeIf { it.isNotBlank() } ?: "Medito",
+                    notes = notes?.takeIf { it.isNotBlank() },
+                    // A clientRecordId makes re-syncing the same session
+                    // update the existing record instead of duplicating it.
+                    metadata = if (clientRecordId.isNullOrBlank()) {
+                        Metadata.autoRecorded(device = device)
+                    } else {
+                        Metadata.autoRecorded(device = device, clientRecordId = clientRecordId)
+                    },
                 )
                 client.insertRecords(listOf(record))
                 callback(Result.success(true))
