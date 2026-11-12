@@ -8,9 +8,11 @@ import 'package:medito/providers/settings/settings_providers.dart';
 import 'package:medito/l10n/app_localizations.dart';
 import 'package:medito/views/home/widgets/stats/streak_circle_controller.dart';
 import 'package:medito/widgets/medito_icon.dart';
+
 import '../../../../constants/colors/color_constants.dart';
 import 'streak_circle_constants.dart';
 import 'streak_ring.dart';
+
 import 'package:medito/utils/utils.dart';
 
 class StreakCircle extends ConsumerStatefulWidget {
@@ -169,6 +171,24 @@ class StreakCircleState extends ConsumerState<StreakCircle>
     double progressValue,
     bool showConsistencyScore,
   ) {
+    Widget pill(BuildContext context) => _buildPill(
+      context,
+      isStreakDoneToday,
+      displayValue,
+      progressValue,
+      showConsistencyScore,
+    );
+
+    return pill(context);
+  }
+
+  Widget _buildPill(
+    BuildContext context,
+    bool isStreakDoneToday,
+    String displayValue,
+    double progressValue,
+    bool showConsistencyScore,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     // Says whether today is done, which sighted users see from the lit ring
     // and flame.
@@ -177,6 +197,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
         '${isStreakDoneToday ? ', ${l10n.meditatedToday}' : ''}';
 
     return _ring(
+      context,
       active: isStreakDoneToday,
       child: Material(
         color: Colors.transparent,
@@ -219,9 +240,10 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                               height: StreakCircleConstants.iconSize,
                               child: CircularProgressIndicator(
                                 value: progressValue,
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withOpacityValue(0.2),
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withOpacityValue(0.2),
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   isStreakDoneToday
                                       ? context.brandAccent
@@ -239,9 +261,9 @@ class StreakCircleState extends ConsumerState<StreakCircle>
                                   MeditoIcon(
                                     assetName: MeditoIcons.fire,
                                     size: StreakCircleConstants.iconSize,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
                                   ),
                                 MeditoIcon(
                                   assetName: MeditoIcons.fire,
@@ -277,7 +299,11 @@ class StreakCircleState extends ConsumerState<StreakCircle>
   }
 
   /// Wraps [child] in the travelling-glow ring when the streak is done today.
-  Widget _ring({required bool active, required Widget child}) {
+  Widget _ring(
+    BuildContext context, {
+    required bool active,
+    required Widget child,
+  }) {
     if (!active) return child;
     return StreakRing(
       animation: _controller.animationController,
@@ -319,6 +345,7 @@ class StreakCircleState extends ConsumerState<StreakCircle>
 
   Widget _buildZenModeCircle(bool isStreakDoneToday) {
     return _ring(
+      context,
       active: isStreakDoneToday,
       child: Material(
         color: Colors.transparent,
