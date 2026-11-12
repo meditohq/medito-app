@@ -40,15 +40,10 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.pump(const Duration(seconds: 6));
       await tester.pumpAndSettle();
+      // The native page owns its close button; the screen has no AppBar.
+      expect(find.byType(AppBar), findsNothing);
       expect(find.byIcon(Icons.close), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byType(AppBar),
-          matching: find.byType(CloseButton),
-        ),
-        findsOneWidget,
-      );
-      await tester.tap(find.byType(CloseButton));
+      await tester.tap(find.byIcon(Icons.close));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Dismiss'));
       await tester.pumpAndSettle();

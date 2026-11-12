@@ -186,7 +186,10 @@ void main() {
       container.listen(timerBellSettingsProvider, (_, _) {});
       final settings = container.read(timerBellSettingsProvider.notifier);
       settings.setCue(SessionBellCue.beginning, false);
-      expect(container.read(timerBellSettingsProvider), SessionBellPattern.end);
+      expect(
+        container.read(timerBellSettingsProvider).pattern,
+        SessionBellPattern.end,
+      );
       // Editing setup must not touch the active audio engine.
       verifyNever(() => bells.enable(any(), pattern: any(named: 'pattern')));
       verifyNever(() => bells.disable());
@@ -202,7 +205,7 @@ void main() {
       sounds.setSessionBellCue(SessionBellCue.middle, true);
       await Future<void>.delayed(Duration.zero);
       expect(
-        container.read(timerBellSettingsProvider),
+        container.read(timerBellSettingsProvider).pattern,
         SessionBellPattern.middleEnd,
       );
       expect(
@@ -218,7 +221,7 @@ void main() {
         SessionBellPattern.beginning,
       );
       expect(
-        container.read(timerBellSettingsProvider),
+        container.read(timerBellSettingsProvider).pattern,
         SessionBellPattern.middleEnd,
       );
     },

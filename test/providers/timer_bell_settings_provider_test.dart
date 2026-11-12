@@ -21,7 +21,7 @@ void main() {
   test('timer setup defaults to beginning and end', () async {
     final container = await containerWith({});
     expect(
-      container.read(timerBellSettingsProvider),
+      container.read(timerBellSettingsProvider).pattern,
       SessionBellPattern.beginningEnd,
     );
   });
@@ -38,7 +38,7 @@ void main() {
       notifier.setCue(SessionBellCue.middle, true);
       final prefs = container.read(sharedPreferencesProvider);
       expect(
-        container.read(timerBellSettingsProvider),
+        container.read(timerBellSettingsProvider).pattern,
         SessionBellPattern.middleEnd,
       );
       expect(
@@ -59,7 +59,7 @@ void main() {
       );
       container.invalidate(timerBellSettingsProvider);
       expect(
-        container.read(timerBellSettingsProvider),
+        container.read(timerBellSettingsProvider).pattern,
         SessionBellPattern.middleEnd,
       );
     },
@@ -71,7 +71,10 @@ void main() {
       ..setCue(SessionBellCue.beginning, false)
       ..setCue(SessionBellCue.end, false);
     container.invalidate(timerBellSettingsProvider);
-    expect(container.read(timerBellSettingsProvider), SessionBellPattern.none);
+    expect(
+      container.read(timerBellSettingsProvider).pattern,
+      SessionBellPattern.none,
+    );
   });
 
   test('an existing timer opt-out is shown as all three unchecked', () async {
@@ -79,12 +82,15 @@ void main() {
       SharedPreferenceConstants.timerSessionBellsEnabled: false,
       SharedPreferenceConstants.timerSessionBellPattern: 'beginningEnd',
     });
-    expect(container.read(timerBellSettingsProvider), SessionBellPattern.none);
+    expect(
+      container.read(timerBellSettingsProvider).pattern,
+      SessionBellPattern.none,
+    );
     container
         .read(timerBellSettingsProvider.notifier)
         .setCue(SessionBellCue.middle, true);
     expect(
-      container.read(timerBellSettingsProvider),
+      container.read(timerBellSettingsProvider).pattern,
       SessionBellPattern.middle,
     );
   });

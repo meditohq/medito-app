@@ -103,7 +103,7 @@ void main() {
       await tester.pumpWidget(screen(prefs));
       await tester.pumpAndSettle();
       expect(find.byType(Checkbox), findsNothing);
-      expect(find.text('Beginning and end'), findsOneWidget);
+      expect(find.text('Beginning · End'), findsOneWidget);
       await openBells(tester);
       List<bool?> selections() => tester
           .widgetList<Checkbox>(find.byType(Checkbox))
@@ -114,16 +114,19 @@ void main() {
       await tester.pumpAndSettle();
       expect(selections(), [true, true, true]);
       await closeBells(tester);
-      expect(find.text('Beginning, middle and end'), findsOneWidget);
+      expect(find.text('Beginning · Middle · End'), findsOneWidget);
       await tester.tap(find.text('Stopwatch'));
       await tester.pumpAndSettle();
+      // A stopwatch has no length, so only the Beginning cue is offered and
+      // the summary leaves out the saved Middle and End cues.
+      expect(find.text('Beginning'), findsOneWidget);
       await openBells(tester);
-      expect(selections(), [true, true, true]);
+      expect(selections(), [true]);
       await tester.tap(find.widgetWithText(CheckboxListTile, 'Beginning'));
       await tester.pumpAndSettle();
-      expect(selections(), [false, true, true]);
+      expect(selections(), [false]);
       await closeBells(tester);
-      expect(find.text('Middle · End'), findsOneWidget);
+      expect(find.text('None'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
       await tester.pumpWidget(screen(prefs));
